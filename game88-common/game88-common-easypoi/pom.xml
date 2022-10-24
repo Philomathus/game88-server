@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>game88-common</artifactId>
+        <groupId>tv.game88.common</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>game88-common-easypoi</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Game88 Server Common EasyPoi</name>
+    <description>融合服务公共库 - 导出Excel工具封装</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- excel工具 -->
+        <dependency>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-web</artifactId>
+        </dependency>
+    </dependencies>
+</project>

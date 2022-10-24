@@ -1,0 +1,21 @@
+package ${packageName}.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import ${packageName}.entity.${ClassName};
+
+import java.util.List;
+
+/**
+ * ${functionName}Service接口
+ *
+ * @author ${author}
+ */
+public interface I${ClassName}Service extends IService<${ClassName}> {
+	/**
+	 * 查询${functionName}列表
+	 *
+	 * @param ${className} ${functionName}
+	 * @return ${functionName}集合
+	 */
+	public List<${ClassName}> select${ClassName}List(${ClassName} ${className});
+}

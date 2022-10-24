@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>tv.game88</groupId>
+        <artifactId>game88-server</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <groupId>tv.game88.common</groupId>
+    <artifactId>game88-common</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Game88 Server Common Parent</name>
+    <description>融合服务公共库</description>
+
+    <modules>
+        <module>game88-common-easypoi</module>
+        <module>game88-common-googleAuth</module>
+        <module>game88-common-http</module>
+        <module>game88-common-orm</module>
+        <module>game88-common-redis</module>
+        <module>game88-common-swagger</module>
+        <module>game88-common-utils</module>
+    </modules>
+</project>

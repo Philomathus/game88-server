@@ -1,0 +1,25 @@
+package ${packageName}.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import ${packageName}.entity.${ClassName};
+#if($table.sub)
+import ${packageName}.entity.${subClassName};
+#end
+
+import java.util.List;
+
+/**
+ * ${functionName}Mapper接口
+ *
+ * @author ${author}
+ */
+public interface ${ClassName}Mapper extends BaseMapper<${ClassName}> {
+
+	/**
+	 * 查询${functionName}列表
+	 *
+	 * @param ${className} ${functionName}
+	 * @return ${functionName}集合
+	 */
+	public List<${ClassName}> select${ClassName}List(${ClassName} ${className});
+}

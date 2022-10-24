@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.config.mapper.ConfigEnvironmentMapper">
+
+    <resultMap type="tv.game88.core.config.entity.ConfigEnvironment" id="ConfigEnvironmentResult">
+        <result property="envTitle" column="env_title"/>
+        <result property="envCode" column="env_code"/>
+        <result property="envValue" column="env_value"/>
+        <result property="envDes" column="env_des"/>
+        <result property="envGroup" column="env_group"/>
+        <result property="envSort" column="env_sort"/>
+        <result property="envStatus" column="env_status"/>
+    </resultMap>
+
+    <sql id="selectConfigEnvironmentVo">
+        select env_title, env_code, env_value, env_des, env_group, env_sort, env_status from config_environment
+    </sql>
+
+    <select id="selectConfigEnvironmentList" parameterType="tv.game88.core.config.entity.ConfigEnvironment" resultMap="ConfigEnvironmentResult">
+        <include refid="selectConfigEnvironmentVo"/>
+        <where>
+            <if test="envTitle != null  and envTitle != ''">and env_title = #{envTitle}</if>
+            <if test="envCode != null and envCode != ''">and env_code = #{envCode}</if>
+            <if test="envValue != null  and envValue != ''">and env_value = #{envValue}</if>
+            <if test="envDes != null  and envDes != ''">and env_des = #{envDes}</if>
+            <if test="envGroup != null ">and env_group = #{envGroup}</if>
+            <if test="envSort != null ">and env_sort = #{envSort}</if>
+            <if test="envStatus != null ">and env_status = #{envStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectConfigEnvironmentTwo" parameterType="tv.game88.core.config.entity.ConfigEnvironment" resultMap="ConfigEnvironmentResult">
+        <include refid="selectConfigEnvironmentVo"/>
+        where env_code in ("share_background", "share_strategy", "star_pic")
+    </select>
+
+    <select id="getTitleIndex" resultType="java.lang.Integer">
+        SELECT env_group FROM `config_environment`
+        <where>
+            <if test="title != null and title != ''">And env_title = #{title}</if>
+            <if test="code != null and code != ''">And env_code = #{code}</if>
+        </where>
+    </select>
+    <select id="checkType" resultType="int">
+        SELECT COUNT(*) FROM sys_dict_data where dict_type= 'config_environment_group' and dict_label=#{envTitle}
+    </select>
+    <select id="checkCode" resultType="int">
+        SELECT COUNT(*) FROM sys_dict_data where dict_type= 'config_environment_group' and dict_value=#{envValue}
+    </select>
+    <select id="checkType2" resultType="int">
+        SELECT COUNT(*) FROM `config_environment` where env_title=#{envTitle}
+    </select>
+    <select id="checkCode2" resultType="int">
+        SELECT COUNT(*) FROM `config_environment` where env_code=#{envValue}
+    </select>
+    <select id="getValue" resultType="java.lang.String">
+        select dict_value from sys_dict_data where dict_type= 'config_environment_group' ORDER BY dict_value desc LIMIT 1
+    </select>
+
+</mapper>

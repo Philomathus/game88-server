@@ -1,0 +1,14 @@
+.idea/
+logs/
+*/target/
+*/*.iml
+out/
+*.iml
+target/
+.factorypath
+.classpath
+.project
+.settings/
+.vscode/
+.DS_Store
+.logback-spring.xml
