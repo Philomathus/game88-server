@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>Game88 Server Common Parent</name>
-    <description>融合服务公共库</description>
+    <description>88棋牌服务公共库</description>
 
     <modules>
         <module>game88-common-easypoi</module>
@@ -23,5 +23,6 @@
         <module>game88-common-redis</module>
         <module>game88-common-swagger</module>
         <module>game88-common-utils</module>
+        <module>game88-common-rateLimiter</module>
     </modules>
 </project>

@@ -1,6 +1,5 @@
 package tv.game88.admin.system.service.impl;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,7 +21,6 @@ import tv.game88.core.admin.vo.LoginUser;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * 登录校验方法
@@ -48,23 +46,22 @@ public class SysLoginService {
      *
      * @return 结果
      */
-    public Map<String, Object> login( LoginBody loginBody ) throws Exception {
+    public RspBase<String> login( LoginBody loginBody ) throws Exception {
         if ( !redisUtil.lock( "systemLogin:" + loginBody.getUsername(), 5 ) ) {
-            return ImmutableMap.of( "msg", "正在登录中，请勿重复点击登录", "code", 500 );
+            return RspBase.businessError( "正在登录中，请勿重复点击登录" );
         }
         SysUser user = userService.selectOtpSecretByUserName( loginBody.getUsername() );
         if ( user == null ) {
-            return ImmutableMap.of( "msg", "获取用户账户异常", "code", 500 );
+            return RspBase.businessError( "获取用户账户异常" );
         }
         if ( StringUtils.isBlank( user.getOtpSecret() ) ) {
-            return ImmutableMap.of( "msg", "请联系管理员绑定MFA验证秘钥", "code", 500 );
+            return RspBase.businessError( "请联系管理员绑定MFA验证秘钥" );
         }
         String otpSecretKey = RSACoder.decryptByPrivateKey( user.getOtpSecret(), KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
         if ( !GoogleAuthUtil.verifyCode( otpSecretKey, loginBody.getCode() ) ) {
-            AsyncManager.me()
-                        .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
+            AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                 "MFA验证码错误" ) );
-            return ImmutableMap.of( "msg", "MFA验证码不正确，请检查", "code", 500 );
+            return RspBase.businessError( "MFA验证码不正确，请检查" );
         }
 
         // 用户验证
@@ -78,15 +75,14 @@ public class SysLoginService {
         } catch ( Exception e ) {
             if ( e instanceof BadCredentialsException ) {
                 String message = "用户不存在/密码错误";
-                AsyncManager.me()
-                            .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
+                AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                     message ) );
-                return ImmutableMap.of( "msg", message, "code", 500 );
+                return RspBase.businessError( message );
             } else {
                 AsyncManager.me()
                             .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                     e.getMessage() ) );
-                return ImmutableMap.of( "msg", e.getMessage(), "code", 500 );
+                return RspBase.businessError( e.getMessage() );
             }
         } finally {
             AuthenticationContextHolder.clearContext();
@@ -95,8 +91,7 @@ public class SysLoginService {
         String ip = ServletUtil.getIp();
         log.info( "管理员{}登录IP:{}", loginBody.getUsername(), ip );
 
-        AsyncManager.me()
-                    .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_SUCCESS, "登录成功" ) );
+        AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_SUCCESS, "登录成功" ) );
         LoginUser loginUser = ( LoginUser ) authentication.getPrincipal();
 
         SysUser sysUser = new SysUser();
@@ -109,10 +104,8 @@ public class SysLoginService {
         loginUser.setIpaddr( sysUser.getLoginIp() );
 
         // 生成token
-        String              token     = tokenService.createToken( loginUser );
-        Map<String, Object> resultMap = JsonUtil.object2Map( RspBase.ok() );
-        resultMap.put( AdminConstants.TOKEN, token );
+        String token = tokenService.createToken( loginUser );
         redisUtil.unLock( "systemLogin:" + loginBody.getUsername() );
-        return resultMap;
+        return RspBase.ok( "登录成功", token );
     }
 }

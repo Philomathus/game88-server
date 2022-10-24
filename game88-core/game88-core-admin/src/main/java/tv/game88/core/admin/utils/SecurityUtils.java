@@ -10,7 +10,6 @@ import tv.game88.common.utils.GoogleAuthUtil;
 import tv.game88.common.utils.RSACoder;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.KeyConstants;
-import tv.game88.core.admin.exception.CustomException;
 import tv.game88.core.admin.vo.LoginUser;
 
 /**
@@ -27,7 +26,7 @@ public class SecurityUtils {
         try {
             return getLoginUser().getUsername();
         } catch ( Exception e ) {
-            throw new CustomException( "获取用户账户异常", HttpStatus.UNAUTHORIZED );
+            throw new BusinessException( "获取用户账户异常", HttpStatus.UNAUTHORIZED );
         }
     }
 
@@ -38,7 +37,7 @@ public class SecurityUtils {
         try {
             return ( LoginUser ) getAuthentication().getPrincipal();
         } catch ( Exception e ) {
-            throw new CustomException( "获取用户信息异常", HttpStatus.UNAUTHORIZED );
+            throw new BusinessException( "获取用户信息异常", HttpStatus.UNAUTHORIZED );
         }
     }
 

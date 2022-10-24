@@ -1,29 +1,39 @@
 package tv.game88.common.exception;
 
+import java.io.Serial;
+
 /**
  * 业务异常
  */
 public class BusinessException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    public BusinessException(String errCode) {
-        super(errCode);
+    private Integer code;
+
+    private final String message;
+
+    public BusinessException( String message ) {
+        this.message = message;
     }
 
-    public BusinessException(String errCode, Throwable cause) {
-        super(errCode, cause);
+    public BusinessException( String message, Integer code ) {
+        this.message = message;
+        this.code    = code;
     }
 
-    public BusinessException(Throwable cause) {
-        super(cause);
+    public BusinessException( String message, Throwable e ) {
+        super( message, e );
+        this.message = message;
     }
-
-//    @Override
-//    public StackTraceElement[] getStackTrace() {
-//        return new StackTraceElement[]{};
-//    }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
-        return null;
+    public String getMessage() {
+        return message;
     }
+
+    public Integer getCode() {
+        return code;
+    }
+
 }

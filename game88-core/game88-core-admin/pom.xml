@@ -10,7 +10,7 @@
     <artifactId>game88-core-admin</artifactId>
 
     <name>Game88 Server Core Admin</name>
-    <description>融合服务业务核心库 - 管理后台基础服务</description>
+    <description>88棋牌服务业务核心库 - 管理后台基础服务</description>
 
     <dependencies>
         <dependency>

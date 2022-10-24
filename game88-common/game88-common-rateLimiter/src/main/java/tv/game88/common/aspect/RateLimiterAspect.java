@@ -1,20 +1,19 @@
-package tv.game88.core.admin.aspect;
+package tv.game88.common.aspect;
 
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-import tv.game88.common.utils.ServletUtil;
-import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.annotation.RateLimiter;
-import tv.game88.core.admin.enums.LimitType;
-import tv.game88.core.admin.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
+import tv.game88.common.annotation.RateLimiter;
+import tv.game88.common.enums.LimitType;
+import tv.game88.common.utils.ServletUtil;
+import tv.game88.common.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -23,7 +22,7 @@ import java.util.List;
 /**
  * 限流处理
  *
- * @author ruoyi
+ * @author mengJun
  */
 @Log4j2
 @Aspect
@@ -44,22 +43,17 @@ public class RateLimiterAspect {
 
         String       combineKey = getCombineKey( rateLimiter, point );
         List<Object> keys       = Collections.singletonList( combineKey );
-        try {
-            Long number = redisTemplate.execute( limitScript(), keys, count, time );
-            if (StringUtils.isNull( number ) || number.intValue() > count) {
-                throw new ServiceException( "访问过于频繁，请稍候再试" );
-            }
-            log.info( "限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), key );
-        } catch ( ServiceException e ) {
-            throw e;
-        } catch ( Exception e ) {
-            throw new RuntimeException( "服务器限流异常，请稍候再试" );
+        Long         number     = redisTemplate.execute( limitScript(), keys, count, time );
+        if ( StringUtils.isNull( number ) || number.intValue() > count ) {
+            throw new RuntimeException( "访问过于频繁，请稍候再试" );
         }
+        log.info( "限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), key );
+
     }
 
     public String getCombineKey( RateLimiter rateLimiter, JoinPoint point ) {
         StringBuilder stringBuilder = new StringBuilder( rateLimiter.key() );
-        if (rateLimiter.limitType() == LimitType.IP) {
+        if ( rateLimiter.limitType() == LimitType.IP ) {
             stringBuilder.append( ServletUtil.getIp() ).append( "-" );
         }
         MethodSignature signature   = ( MethodSignature ) point.getSignature();

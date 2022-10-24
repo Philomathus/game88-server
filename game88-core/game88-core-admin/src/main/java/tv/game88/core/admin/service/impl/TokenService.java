@@ -7,15 +7,15 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.vo.LoginUser;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -37,8 +37,8 @@ public class TokenService {
     // 令牌自定义标识
     @Value( "${token.header}" )
     private String header;
-    // 令牌有效期（默认30分钟）
-    @Value( "${token.expireTime}" )
+    // 令牌有效期（默认1小时）
+    @Value( "${token.expireTime:1}" )
     private int    expireTime;
 
     @Resource
@@ -49,6 +49,15 @@ public class TokenService {
     @Value( "${token.secret}" )
     private void setKeySecret( String secret ) {
         TokenService.KEY_SECRET = Keys.hmacShaKeyFor( secret.getBytes( StandardCharsets.UTF_8 ) );
+    }
+
+    public static void main( String[] args ) throws Exception {
+        //SecretKey secretKey = Keys.secretKeyFor( SignatureAlgorithm.HS512);
+        //System.out.println(Base64Utils.encodeToString( secretKey.getEncoded() ));
+
+        //KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS512);
+        //System.out.println("公钥:" + Base64Utils.encodeToString( keyPair.getPublic().getEncoded() ));
+        //System.out.println("私钥:" + Base64Utils.encodeToString( keyPair.getPrivate().getEncoded() ));
     }
 
     /**
@@ -82,7 +91,7 @@ public class TokenService {
      */
     public void setLoginUser( LoginUser loginUser ) {
         if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNotBlank( loginUser.getToken() ) ) {
-            Duration duration = Duration.ofMinutes( expireTime );
+            Duration duration = Duration.ofHours( expireTime );
             redisUtil.strSet( AdminConstants.SYS_LOGIN_USER + loginUser.getUser().getUserId(), loginUser.getToken(), duration );
             redisUtil.hMSet( AdminConstants.SYS_LOGIN_TOKEN + loginUser.getToken(), JsonUtil.object2Map( loginUser ) );
             redisUtil.expire( AdminConstants.SYS_LOGIN_TOKEN + loginUser.getToken(), duration );

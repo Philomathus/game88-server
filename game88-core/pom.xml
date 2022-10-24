@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>Game88 Server Core Parent</name>
-    <description>融合服务业务核心库</description>
+    <description>88棋牌服务业务核心库</description>
 
     <modules>
         <module>game88-core-admin</module>

@@ -4,7 +4,7 @@ import tv.game88.admin.system.config.GenConfig;
 import tv.game88.admin.system.entity.GenTable;
 import tv.game88.admin.system.entity.GenTableColumn;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.constant.GenConstants;
+import tv.game88.admin.system.constants.GenConstants;
 import org.apache.commons.lang3.RegExUtils;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * 代码生成器 工具类
  *
- * @author ruoyi
+ * @author mengJun
  */
 public class GenUtils {
 	/**

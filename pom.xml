@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <name>Game88 Server Project</name>
-    <description>融合服务项目</description>
+    <description>88棋牌服务项目</description>
 
     <modules>
         <module>game88-common</module>

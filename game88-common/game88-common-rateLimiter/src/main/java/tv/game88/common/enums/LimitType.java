@@ -1,9 +1,9 @@
-package tv.game88.core.admin.enums;
+package tv.game88.common.enums;
 
 /**
  * 限流类型
  *
- * @author ruoyi
+ * @author mengJun
  */
 
 public enum LimitType {

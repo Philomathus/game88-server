@@ -9,8 +9,8 @@ import tv.game88.admin.system.entity.SysDictType;
 import tv.game88.admin.system.mapper.SysDictDataMapper;
 import tv.game88.admin.system.mapper.SysDictTypeMapper;
 import tv.game88.admin.system.service.ISysDictTypeService;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.exception.CustomException;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -104,7 +104,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
         for ( Long dictId : dictIds ) {
             SysDictType dictType = selectDictTypeById( dictId );
             if ( dictDataMapper.countDictDataByType( dictType.getDictType() ) > 0 ) {
-                throw new CustomException( String.format( "%1$s已分配,不能删除", dictType.getDictName() ) );
+                throw new BusinessException( String.format( "%1$s已分配,不能删除", dictType.getDictName() ) );
             }
         }
         int count = dictTypeMapper.deleteDictTypeByIds( dictIds );

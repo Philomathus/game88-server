@@ -10,7 +10,7 @@
     <artifactId>game88-core-config</artifactId>
 
     <name>Game88 Server Core Config</name>
-    <description>融合服务业务核心库 - 环境参数服务</description>
+    <description>88棋牌服务业务核心库 - 环境参数服务</description>
 
     <dependencies>
         <dependency>

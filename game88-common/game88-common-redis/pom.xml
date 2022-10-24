@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <name>Game88 Server Common Redis</name>
-    <description>融合服务公共库 - Redis工具封装</description>
+    <description>88棋牌服务公共库 - Redis工具封装</description>
 
     <dependencies>
         <dependency>

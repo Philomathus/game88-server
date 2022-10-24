@@ -1,14 +1,13 @@
-package tv.game88.core.admin.annotation;
+package tv.game88.common.annotation;
 
-import tv.game88.core.admin.constant.AdminConstants;
-import tv.game88.core.admin.enums.LimitType;
+import tv.game88.common.enums.LimitType;
 
 import java.lang.annotation.*;
 
 /**
  * 限流注解
  *
- * @author ruoyi
+ * @author mengJun
  */
 @Target( ElementType.METHOD )
 @Retention( RetentionPolicy.RUNTIME )
@@ -17,7 +16,7 @@ public @interface RateLimiter {
     /**
      * 限流key
      */
-    public String key() default AdminConstants.RATE_LIMIT_KEY;
+    public String key() default "rateLimit:";
 
     /**
      * 限流时间,单位秒

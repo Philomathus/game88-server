@@ -13,7 +13,7 @@
     <artifactId>game88-admin</artifactId>
 
     <name>Game88 Server Admin</name>
-    <description>融合服务管理后台系统服务</description>
+    <description>88棋牌服务管理后台系统服务</description>
 
     <dependencies>
         <dependency>

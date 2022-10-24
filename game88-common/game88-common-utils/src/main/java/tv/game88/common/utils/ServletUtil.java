@@ -118,18 +118,27 @@ public class ServletUtil {
      * @return String 客户端请求ip
      */
     public static String getIp( HttpServletRequest request ) {
-        String ip = request.getHeader( "x-forwarded-for" );
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip )) {
-            ip = request.getHeader( "Proxy-Client-IP" );
+        String             ip      = request.getHeader( "cf-pseudo-ipv4" );
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "client-ip" );
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip )) {
-            ip = request.getHeader( "X-Forwarded-For" );
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "cf-connecting-ip" );
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip )) {
-            ip = request.getHeader( "WL-Proxy-Client-IP" );
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "ali-cdn-real-ip" );
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip )) {
-            ip = request.getHeader( "X-Real-IP" );
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "x-real-ip" );
+        }
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "x-forwarded-for" );
+        }
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "HTTP_CLIENT_IP" );
+        }
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "wl-proxy-client-ip" );
         }
         if (ip != null && ip.contains( "," )) {
             ip = ip.split( "," )[0];

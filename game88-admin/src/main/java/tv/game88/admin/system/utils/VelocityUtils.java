@@ -5,7 +5,7 @@ import tv.game88.admin.system.entity.GenTableColumn;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.constant.GenConstants;
+import tv.game88.admin.system.constants.GenConstants;
 import org.apache.velocity.VelocityContext;
 import org.springframework.util.CollectionUtils;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * 模板处理工具类
  *
- * @author ruoyi
+ * @author mengJun
  */
 public class VelocityUtils {
     /**

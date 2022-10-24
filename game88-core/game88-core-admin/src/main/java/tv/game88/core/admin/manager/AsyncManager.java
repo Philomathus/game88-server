@@ -1,8 +1,8 @@
 package tv.game88.core.admin.manager;
 
-import tv.game88.common.utils.SpringUtils;
-import tv.game88.core.admin.utils.Threads;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import tv.game88.common.utils.SpringUtils;
 
 import javax.annotation.PreDestroy;
 import java.util.TimerTask;
@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author MengJun
  */
+@Log4j2
 @Component
 public class AsyncManager {
 	private static final AsyncManager ME = new AsyncManager();
@@ -50,6 +51,19 @@ public class AsyncManager {
 	 */
 	@PreDestroy
 	public void shutdown() {
-		Threads.shutdownAndAwaitTermination( executor );
+		if ( !executor.isShutdown() ) {
+			executor.shutdown();
+			try {
+				if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+					executor.shutdownNow();
+					if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+						log.warn( "Pool did not terminate" );
+					}
+				}
+			} catch ( InterruptedException ie ) {
+				executor.shutdownNow();
+				Thread.currentThread().interrupt();
+			}
+		}
 	}
 }

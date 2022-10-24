@@ -1,9 +1,9 @@
-package tv.game88.core.admin.constant;
+package tv.game88.admin.system.constants;
 
 /**
  * 代码生成通用常量
  *
- * @author ruoyi
+ * @author mengJun
  */
 public class GenConstants {
 	/**

@@ -6,6 +6,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import tv.game88.admin.system.constants.GenConstants;
 import tv.game88.admin.system.entity.GenTable;
 import tv.game88.admin.system.entity.GenTableColumn;
 import tv.game88.admin.system.mapper.GenTableColumnMapper;
@@ -14,15 +18,11 @@ import tv.game88.admin.system.service.IGenTableService;
 import tv.game88.admin.system.utils.GenUtils;
 import tv.game88.admin.system.utils.VelocityInitializer;
 import tv.game88.admin.system.utils.VelocityUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.AdminConstants;
-import tv.game88.core.admin.constant.GenConstants;
-import tv.game88.core.admin.exception.CustomException;
 import tv.game88.core.admin.utils.SecurityUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
@@ -41,7 +41,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * 业务 服务层实现
  *
- * @author ruoyi
+ * @author mengJun
  */
 @Log4j2
 @Service
@@ -186,7 +186,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 }
             }
         } catch ( Exception e ) {
-            throw new CustomException( "导入失败：" + e.getMessage() );
+            throw new BusinessException( "导入失败：" + e.getMessage() );
         }
     }
 
@@ -268,7 +268,7 @@ public class GenTableServiceImpl implements IGenTableService {
                     String path = getGenPath( table, template );
                     FileUtils.writeStringToFile( new File( path ), sw.toString(), StandardCharsets.UTF_8 );
                 } catch ( IOException e ) {
-                    throw new CustomException( "渲染模板失败，表名：" + table.getTableName() );
+                    throw new BusinessException( "渲染模板失败，表名：" + table.getTableName() );
                 }
             }
         }
@@ -288,7 +288,7 @@ public class GenTableServiceImpl implements IGenTableService {
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName( tableName );
         if ( CollectionUtils.isEmpty( dbTableColumns ) ) {
-            throw new CustomException( "同步数据失败，原表结构不存在" );
+            throw new BusinessException( "同步数据失败，原表结构不存在" );
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map( GenTableColumn::getColumnName )
                                                         .collect( Collectors.toList() );
@@ -370,16 +370,16 @@ public class GenTableServiceImpl implements IGenTableService {
     public void validateEdit( GenTable genTable ) {
         if ( GenConstants.TPL_TREE.equals( genTable.getTplCategory() ) ) {
             if ( Objects.isNull( genTable.getParams().get( GenConstants.TREE_CODE ) ) ) {
-                throw new CustomException( "树编码字段不能为空" );
+                throw new BusinessException( "树编码字段不能为空" );
             } else if ( Objects.isNull( genTable.getParams().get( GenConstants.TREE_PARENT_CODE ) ) ) {
-                throw new CustomException( "树父编码字段不能为空" );
+                throw new BusinessException( "树父编码字段不能为空" );
             } else if ( Objects.isNull( genTable.getParams().get( GenConstants.TREE_NAME ) ) ) {
-                throw new CustomException( "树名称字段不能为空" );
+                throw new BusinessException( "树名称字段不能为空" );
             } else if ( GenConstants.TPL_SUB.equals( genTable.getTplCategory() ) ) {
                 if ( StringUtils.isBlank( genTable.getSubTableName() ) ) {
-                    throw new CustomException( "关联子表的表名不能为空" );
+                    throw new BusinessException( "关联子表的表名不能为空" );
                 } else if ( StringUtils.isBlank( genTable.getSubTableFkName() ) ) {
-                    throw new CustomException( "子表关联的外键名不能为空" );
+                    throw new BusinessException( "子表关联的外键名不能为空" );
                 }
             }
         }

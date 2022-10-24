@@ -3,7 +3,7 @@ package tv.game88.admin.system.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import tv.game88.core.admin.constant.GenConstants;
+import tv.game88.admin.system.constants.GenConstants;
 import tv.game88.common.vo.BaseEntity;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 业务表 gen_table
  *
- * @author ruoyi
+ * @author mengJun
  */
 @TableName( "sys_gen_table" )
 public class GenTable extends BaseEntity {

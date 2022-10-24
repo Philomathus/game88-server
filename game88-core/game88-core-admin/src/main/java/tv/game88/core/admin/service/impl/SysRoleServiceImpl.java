@@ -2,6 +2,7 @@ package tv.game88.core.admin.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.annotation.DataScope;
@@ -9,7 +10,6 @@ import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.entity.SysRoleMenu;
 import tv.game88.core.admin.entity.SysUserRole;
-import tv.game88.core.admin.exception.CustomException;
 import tv.game88.core.admin.mapper.SysRoleMapper;
 import tv.game88.core.admin.mapper.SysRoleMenuMapper;
 import tv.game88.core.admin.mapper.SysUserRoleMapper;
@@ -136,7 +136,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public void checkRoleAllowed( SysRole role ) {
         if ( StringUtils.isNotNull( role.getRoleId() ) && role.isAdmin() ) {
-            throw new CustomException( "不允许操作超级管理员角色" );
+            throw new BusinessException( "不允许操作超级管理员角色" );
         }
     }
 
@@ -240,7 +240,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
             checkRoleAllowed( new SysRole( roleId ) );
             SysRole role = selectRoleById( roleId );
             if ( countUserRoleByRoleId( roleId ) > 0 ) {
-                throw new CustomException( String.format( "%1$s已分配,不能删除", role.getRoleName() ) );
+                throw new BusinessException( String.format( "%1$s已分配,不能删除", role.getRoleName() ) );
             }
         }
         // 删除角色与菜单关联

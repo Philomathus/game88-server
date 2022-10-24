@@ -74,10 +74,10 @@ pagehelper:
 token:
   # 令牌自定义标识
   header: Authorization
-  # 令牌密钥
-  secret: Qr5mpWbe/p4MCJ2ieL+Nx2g+oCEktE00O9GkeyTGmwdQt5DtJ4Vpv9HI6TfKmv72LkTZFBWsbwOSqiki2g9ffA==
-  # 令牌有效期（默认30分钟）
-  expireTime: 60
+  # 令牌密钥 HS512算法
+  secret: F3bjHBhEm41jDTj2RFwM/Diofky+sW1gmNquvwnz3p0UZh6Yq6xxiPO4hTCbpYFVqjpxWDjEtclvXtkLo/zdtw==
+  # 令牌有效期（默认1小时）
+  expireTime: 6
 
 management:
   endpoint:
