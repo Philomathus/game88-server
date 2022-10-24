@@ -159,7 +159,7 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 获取OTP验证码二维码
+     * 获取MFA验证码二维码
      */
     @GetMapping( "getOtpSecretQrcode" )
     public RspBase<?> getOtpSecretQrcode( String name ) {
@@ -172,11 +172,11 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 重置用户OTP秘钥
+     * 重置用户MFA秘钥
      */
     @PreAuthorize( "@ss.hasPermi('system:user:resetOtp')" )
     @DeleteMapping( "resetUserOtpSecret" )
-    @Log( title = "重置用户OTP秘钥", businessType = BusinessType.DELETE )
+    @Log( title = "重置用户MFA秘钥", businessType = BusinessType.DELETE )
     public RspBase<?> resetUserOtpSecret( Long userId, int otpAuthCode ) throws Exception {
         SecurityUtils.verifyOTPCode( otpAuthCode );
         SysUser sysUser = new SysUser( userId );
@@ -187,7 +187,7 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 绑定OTP密钥
+     * 绑定MFA密钥
      */
     @PostMapping( "boundOtpSecret" )
     public RspBase<?> boundOtpSecret( @RequestBody Map<String, Object> requestMap ) throws Exception {
@@ -201,12 +201,12 @@ public class SysUserController extends BaseController {
             }
             //当用户是重置OTP密钥
             if ( StringUtils.isNotBlank( sysUser.getOtpSecret() ) ) {
-                return RspBase.businessError( "该账户已绑定谷歌验证码，请勿重复绑定" );
+                return RspBase.businessError( "该账户已绑定谷MFA验证器，请勿重复绑定" );
             }
             sysUser.setOtpSecret( RSACoder.encryptByPublicKey( otpAuthKey, KeyConstants.GOOGLE_AUTH_PUBLIC_KEY ) );
             sysUserMapper.updateOtpSecret( sysUser );
             return RspBase.ok();
         }
-        return RspBase.businessError( "OTP验证码不正确，请检查" );
+        return RspBase.businessError( "MFA验证码不正确，请检查" );
     }
 }

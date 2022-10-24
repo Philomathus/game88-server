@@ -107,7 +107,6 @@ public class SecurityConfig implements WebSecurityCustomizer {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers( "/profile/**" ).anonymous()
                 .antMatchers( "/doc.html" ).anonymous()
                 .antMatchers( "/swagger-resources/**" ).anonymous()
                 .antMatchers( "/webjars/**" ).anonymous()

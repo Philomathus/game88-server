@@ -79,8 +79,7 @@ public class SysLoginService {
                                     message ) );
                 return RspBase.businessError( message );
             } else {
-                AsyncManager.me()
-                            .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
+                AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                     e.getMessage() ) );
                 return RspBase.businessError( e.getMessage() );
             }
