@@ -1,4 +1,4 @@
-package tv.game88.core.admin.context;
+package tv.game88.common.security.context;
 
 import org.springframework.security.core.Authentication;
 

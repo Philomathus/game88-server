@@ -1,0 +1,83 @@
+package tv.game88.core.member.entity;
+
+import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * 资金日志对象 log_money
+ *
+ * @author mengJun
+ */
+@Data
+public class LogMoney {
+    @TableId( value = "id", type = IdType.INPUT )
+    private String     id;
+    @Excel( name = "会员编号" )
+    private String     userId;
+    @Excel( name = "会员账号" )
+    private String     userName;
+    @Excel( name = "变化类型" )
+    private Long       type;
+    @Excel( name = "描述" )
+    private String     des;
+    @Excel( name = "收入" )
+    private BigDecimal income;
+    @Excel( name = "支出" )
+    private BigDecimal pay;
+    @Excel( name = "变化前余额" )
+    private BigDecimal totalBefore;
+    @Excel( name = "变化后余额" )
+    private BigDecimal total;
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "创建时间", width = 30, databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    private Date       createTime;
+    @Excel( name = "备注信息" )
+    private String     mark;
+    @Excel( name = "备注订单号" )
+    private String     markorder;
+
+    @JsonIgnore
+    @TableField( exist = false )
+    private String[] types;
+    @JsonIgnore
+    @TableField( exist = false )
+    private String[] selectDate;
+    @JsonIgnore
+    @TableField( exist = false )
+    private String   startTime;
+    @JsonIgnore
+    @TableField( exist = false )
+    private String   endTime;
+    @JsonIgnore
+    @TableField( exist = false )
+    private String   tableLast;
+    @JsonIgnore
+    @TableField( exist = false )
+    private String   searchValue;
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE )
+                .append( "id", getId() )
+                .append( "userId", getUserId() )
+                .append( "type", getType() )
+                .append( "des", getDes() )
+                .append( "income", getIncome() )
+                .append( "pay", getPay() )
+                .append( "total", getTotal() )
+                .append( "createTime", getCreateTime() )
+                .append( "mark", getMark() )
+                .append( "markorder", getMarkorder() )
+                .toString();
+    }
+}

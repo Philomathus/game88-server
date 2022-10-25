@@ -12,12 +12,12 @@
     <packaging>jar</packaging>
 
     <name>Game88 Server Common Swagger</name>
-    <description>88棋牌服务公共库 - Swagger插件封装</description>
+    <description>88棋牌服务公共库 - SpringDoc插件封装</description>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
         </dependency>
 
         <dependency>

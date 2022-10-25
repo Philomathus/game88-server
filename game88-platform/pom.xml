@@ -1,10 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <modules>
-        <module>game88-platform-api</module>
-    </modules>
-
     <parent>
         <groupId>tv.game88</groupId>
         <artifactId>game88-server</artifactId>
@@ -17,4 +13,10 @@
 
     <name>Game88 Server Platform Parent</name>
     <description>88棋牌服务-平台和会员服务</description>
+
+    <modules>
+        <module>game88-platform-api</module>
+        <module>game88-platform-app</module>
+        <module>game88-platform-admin</module>
+    </modules>
 </project>

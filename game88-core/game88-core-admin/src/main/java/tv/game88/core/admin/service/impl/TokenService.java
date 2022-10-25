@@ -122,7 +122,7 @@ public class TokenService {
     public void refreshToken( LoginUser loginUser ) {
         String userKey = redisUtil.strGet( AdminConstants.SYS_LOGIN_USER + loginUser.getUser().getUserId() );
         if ( StringUtils.isNotBlank( userKey ) ) {
-            Duration duration = Duration.ofMinutes( expireTime );
+            Duration duration = Duration.ofHours( expireTime );
             redisUtil.expire( AdminConstants.SYS_LOGIN_USER + loginUser.getUser().getUserId(), duration );
             redisUtil.expire( AdminConstants.SYS_LOGIN_TOKEN + userKey, duration );
         }

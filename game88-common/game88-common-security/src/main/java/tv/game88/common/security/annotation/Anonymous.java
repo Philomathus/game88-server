@@ -1,4 +1,4 @@
-package tv.game88.core.admin.annotation;
+package tv.game88.common.security.annotation;
 
 import java.lang.annotation.*;
 

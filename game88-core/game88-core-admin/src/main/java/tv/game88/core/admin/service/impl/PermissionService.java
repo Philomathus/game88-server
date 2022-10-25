@@ -1,12 +1,12 @@
 package tv.game88.core.admin.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import tv.game88.common.security.context.PermissionContextHolder;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.context.PermissionContextHolder;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
 

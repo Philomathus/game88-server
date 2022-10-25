@@ -13,6 +13,10 @@
     <description>88棋牌服务-平台和会员API服务</description>
 
     <dependencies>
-
+        <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-member</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 </project>

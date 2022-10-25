@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.member.mapper.MemberBcodeMapper">
+
+	<resultMap type="tv.game88.core.member.entity.MemberBcode" id="MemberBcodeResult">
+		<result property="id"	column="id"	/>
+		<result property="userId"	column="user_id"	/>
+		<result property="des"	column="des"	/>
+		<result property="charge"	column="charge"	/>
+		<result property="income"	column="income"	/>
+		<result property="createTime"	column="create_time"	/>
+		<result property="status"	column="status"	/>
+		<result property="cur"	column="cur"	/>
+	</resultMap>
+
+	<sql id="selectMemberBcodeVo">
+		select id, user_id, des, charge, income, create_time, status, cur	from member_bcode
+	</sql>
+
+	<insert id="insertMemberBcode" parameterType="tv.game88.core.member.entity.MemberBcode">
+		insert into member_bcode
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="des != null">
+				des,
+			</if>
+			<if test="income != null">
+				income,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="cur != null">
+				cur,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="userId != null">
+				#{userId},
+			</if>
+			<if test="des != null">
+				#{des},
+			</if>
+			<if test="income != null">
+				#{income},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="status != null">
+				#{status},
+			</if>
+			<if test="cur != null">
+				#{cur},
+			</if>
+		</trim>
+	</insert>
+
+	<select id="selectWillBcodeList" parameterType="tv.game88.core.member.entity.MemberBcode" resultMap="MemberBcodeResult">
+		select id, user_id, des, charge, income, create_time, status, cur from member_bcode
+		<where>
+			<if test="userId != null">
+				and user_id = #{userId}
+			</if>
+
+			<if test="status != null">
+				and status = #{status}
+			</if>
+		</where>
+		order by create_time asc
+	</select>
+
+
+	<select id="selectMemberBcodeList" parameterType="tv.game88.core.member.entity.MemberBcode" resultMap="MemberBcodeResult">
+		<include refid="selectMemberBcodeVo"/>
+		<where>
+			<if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+			<if test="des != null  and des != ''"> and des = #{des}</if>
+			<if test="charge != null "> and charge = #{charge}</if>
+			<if test="income != null "> and income = #{income}</if>
+			<if test="createTime != null "> and create_time = #{createTime}</if>
+			<if test="status != null "> and status = #{status}</if>
+			<if test="cur != null "> and cur = #{cur}</if>
+		</where>
+	</select>
+	<select id="findByMemberId" resultType="tv.game88.core.member.dto.RspCodeFlow">
+		<include refid="selectMemberBcodeVo"/>
+		where user_id = #{userId}
+		order by create_time desc
+	</select>
+
+	<update id="updateMemberBcode" parameterType="tv.game88.core.member.entity.MemberBcode">
+		update member_bcode
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userId != null">
+				user_id = #{userId},
+			</if>
+			<if test="des != null">
+				des = #{des},
+			</if>
+			<if test="income != null">
+				income = #{income},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="cur != null">
+				cur = #{cur},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<update id="updateMemberBcodeStatus">
+		update member_bcode set status = 1,cur = income where user_id = #{memberId};
+	</update>
+
+	<update id="repairMemberInfo">
+		update member_info set code_now = code_will where id = #{memberId};
+	</update>
+
+	<select id="selectMemberBcodeById" parameterType="String" resultMap="MemberBcodeResult">
+		<include refid="selectMemberBcodeVo"/>
+		where id = #{id}
+	</select>
+
+	<select id="getTotalData" resultType="tv.game88.core.member.entity.MemberBcode">
+		SELECT cast(SUM(income) AS decimal(10,2)) total,
+		cast(SUM(cur) AS decimal(10,2)) countCur
+		from member_bcode
+		<where>
+			<if test="userId != null  and userId != ''">
+				and user_id = #{userId}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				and create_time <![CDATA[ >= ]]> #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and create_time <![CDATA[ <= ]]> #{endTime}
+			</if>
+		</where>
+	</select>
+</mapper>

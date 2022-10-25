@@ -1,7 +1,6 @@
-package tv.game88.core.admin.config;
+package tv.game88.common.security.config;
 
 import org.apache.commons.lang3.RegExUtils;
-import tv.game88.core.admin.annotation.Anonymous;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +10,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import tv.game88.common.security.annotation.Anonymous;
 
 import java.util.ArrayList;
 import java.util.List;

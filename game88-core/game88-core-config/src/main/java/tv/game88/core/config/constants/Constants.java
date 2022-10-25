@@ -7,8 +7,23 @@ package tv.game88.core.config.constants;
  * @author admin
  */
 public class Constants {
-    public static final String LIVE_PREX   = "live:";
+    /**
+     * 令牌前缀
+     */
+    public static final String USER_KEY    = "userKey";
     public static final String CONFIG_PREX = "config:";
     public static final String MEMBER_PREX = "member:";
+
+    public static final String MEMBER_CODE      = MEMBER_PREX + "member-code";
+    public static final Long   MEMBER_CODE_INIT = 10000L;
+
+    /**
+     * 登录会员 redis token key
+     */
+    public static final String MEMBER_LOGIN_TOKEN = MEMBER_PREX + "login:token:";
+    /**
+     * 登录会员 redis user key
+     */
+    public static final String MEMBER_LOGIN_USER  = MEMBER_PREX + "login:user:";
 
 }

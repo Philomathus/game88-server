@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>tv.game88.core</groupId>
+        <artifactId>game88-core</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>game88-core-session</artifactId>
+
+    <name>Game88 Server Core Session</name>
+    <description>88棋牌服务业务核心库 - App请求校验服务</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-member</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-security</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-orm</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-redis</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!--Token生成与解析-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- 验证 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+</project>

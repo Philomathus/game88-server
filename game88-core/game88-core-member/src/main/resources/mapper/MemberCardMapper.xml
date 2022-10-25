@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.member.mapper.MemberCardMapper">
+
+	<resultMap type="tv.game88.core.member.entity.MemberCard" id="MemberCardResult">
+		<result property="id"	column="id"	/>
+		<result property="realName"	column="real_name"	/>
+		<result property="bankName"	column="bank_name"	/>
+		<result property="bankAccount"	column="bank_account"	/>
+		<result property="bankAddress"	column="bank_address"	/>
+		<result property="memberId"	column="member_id"	/>
+		<result property="createTime"	column="create_time"	/>
+		<result property="dv"	column="dv"	/>
+		<result property="bankId"	column="bank_id"	/>
+		<result property="realBankAddress"	column="real_bank_address"	/>
+	</resultMap>
+
+	<sql id="selectMemberCardVo">
+		select id, real_name, bank_name, bank_account, bank_address, member_id, create_time, dv, bank_id, real_bank_address
+		from member_card
+	</sql>
+
+	<select id="selectMemberCardList" parameterType="tv.game88.core.member.entity.MemberCard" resultMap="MemberCardResult">
+		<include refid="selectMemberCardVo"/>
+		<where>
+			<if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+			<if test="bankName != null  and bankName != ''"> and bank_name like concat('%', #{bankName}, '%')</if>
+			<if test="bankAccount != null  and bankAccount != ''"> and bank_account = #{bankAccount}</if>
+			<if test="bankAddress != null  and bankAddress != ''"> and bank_address = #{bankAddress}</if>
+			<if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+			<if test="createTime != null "> and create_time = #{createTime}</if>
+			<if test="dv != null "> and dv = #{dv}</if>
+			<if test="bankId != null "> and bank_id = #{bankId}</if>
+			<if test="realBankAddress != null  and realBankAddress != ''"> and real_bank_address = #{realBankAddress}</if>
+		</where>
+	</select>
+	<select id="findByAccount" resultType="java.lang.Integer">
+		select COUNT(*)   AS   total
+		from member_card
+		where bank_account =  #{bankAccount}
+	</select>
+
+	<select id="findByMemberId" resultType="tv.game88.core.member.dto.RspMemberCard">
+		SELECT m.*,b.bank_icon ,b.color_start,b.bank_code as bankCode,b.currency_code currencyCode,b.color_end FROM member_card m
+		LEFT JOIN bank_list b on m.bank_id = b.id
+		where m.member_id = #{userId} order by m.create_time desc
+	</select>
+
+	<select id="selectMemberCard" resultType="tv.game88.core.member.entity.MemberCard">
+		select *
+		from member_card
+		where member_id=#{userId}
+	</select>
+
+	<select id="findList" resultMap="MemberCardResult">
+		select *
+		from member_card
+		where member_id = #{memberId}
+		order by create_time desc
+	</select>
+
+	<select id="memberCardList" parameterType="tv.game88.core.member.entity.MemberCard" resultMap="MemberCardResult">
+		<include refid="selectMemberCardVo"/>
+		<where>
+			<if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+		</where>
+	</select>
+
+</mapper>

@@ -24,5 +24,6 @@
         <module>game88-common-swagger</module>
         <module>game88-common-utils</module>
         <module>game88-common-rateLimiter</module>
+        <module>game88-common-security</module>
     </modules>
 </project>

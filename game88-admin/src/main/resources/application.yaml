@@ -52,7 +52,7 @@ spring:
         min-idle: 5
         time-between-eviction-runs: 30s
     ## 连接超时时间（毫秒）
-    timeout: 100000
+    timeout: 5000
   #配置时间返回格式
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

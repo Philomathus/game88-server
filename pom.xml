@@ -38,7 +38,7 @@
         <pagehelper.starter.version>1.4.5</pagehelper.starter.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
 
-        <knife4j.version>3.0.3</knife4j.version>
+        <springdoc.version>1.6.12</springdoc.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.11.0</commons-io.version>
         <commons-compress.version>1.21</commons-compress.version>
@@ -87,11 +87,9 @@
 
             <!-- swagger -->
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-dependencies</artifactId>
-                <version>${knife4j.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <!-- apache commons工具 -->
@@ -150,7 +148,7 @@
                 <version>${easypoi.version}</version>
             </dependency>
 
-            <!-- otp验证码工具 -->
+            <!-- MFA验证码工具 -->
             <dependency>
                 <groupId>com.warrenstrange</groupId>
                 <artifactId>googleauth</artifactId>

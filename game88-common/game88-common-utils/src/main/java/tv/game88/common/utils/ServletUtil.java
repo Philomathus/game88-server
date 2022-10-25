@@ -71,10 +71,8 @@ public class ServletUtil {
      *
      * @param response 渲染对象
      * @param string   待渲染的字符串
-     *
-     * @return null
      */
-    public static String renderString( HttpServletResponse response, String string ) {
+    public static void renderString( HttpServletResponse response, String string ) {
         try {
             response.setStatus( 200 );
             response.setContentType( "application/json" );
@@ -83,7 +81,6 @@ public class ServletUtil {
         } catch ( IOException e ) {
             e.printStackTrace();
         }
-        return null;
     }
 
     /**
@@ -91,11 +88,11 @@ public class ServletUtil {
      */
     public static boolean isAjaxRequest( HttpServletRequest request ) {
         String accept = request.getHeader( "accept" );
-        if (accept != null && accept.indexOf( "application/json" ) != -1) {
+        if (accept != null && accept.contains( "application/json" ) ) {
             return true;
         }
         String xRequestedWith = request.getHeader( "X-Requested-With" );
-        if (xRequestedWith != null && xRequestedWith.indexOf( "XMLHttpRequest" ) != -1) {
+        if (xRequestedWith != null && xRequestedWith.contains( "XMLHttpRequest" ) ) {
             return true;
         }
         String uri = request.getRequestURI();
@@ -286,7 +283,7 @@ public class ServletUtil {
         if (ip != null && ip.indexOf( "," ) > 0) {
             final String[] ips = ip.trim().split( "," );
             for ( String subIp : ips ) {
-                if (false == isUnknown( subIp )) {
+                if ( !isUnknown( subIp ) ) {
                     ip = subIp;
                     break;
                 }
@@ -303,7 +300,7 @@ public class ServletUtil {
     public static String getHostIp() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
-        } catch ( UnknownHostException e ) {
+        } catch ( UnknownHostException ignored ) {
         }
         return "127.0.0.1";
     }
@@ -316,7 +313,7 @@ public class ServletUtil {
     public static String getHostName() {
         try {
             return InetAddress.getLocalHost().getHostName();
-        } catch ( UnknownHostException e ) {
+        } catch ( UnknownHostException ignored ) {
         }
         return "未知";
     }

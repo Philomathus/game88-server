@@ -14,10 +14,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <scope>provided</scope>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-security</artifactId>
+            <version>1.0</version>
         </dependency>
+
         <dependency>
             <groupId>tv.game88.common</groupId>
             <artifactId>game88-common-orm</artifactId>

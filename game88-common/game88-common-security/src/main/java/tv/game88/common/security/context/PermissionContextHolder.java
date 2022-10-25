@@ -1,8 +1,8 @@
-package tv.game88.core.admin.context;
+package tv.game88.common.security.context;
 
-import tv.game88.common.utils.Convert;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import tv.game88.common.utils.Convert;
 
 /**
  * 权限信息
