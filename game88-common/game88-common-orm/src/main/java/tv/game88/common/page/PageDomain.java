@@ -1,6 +1,6 @@
 package tv.game88.common.page;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import tv.game88.common.utils.StringUtils;
 
 /**
@@ -12,25 +12,25 @@ public class PageDomain {
     /**
      * 当前记录起始索引
      */
-    @ApiModelProperty( value = "当前页", example = "1" )
+    @Schema( name = "当前页", example = "1" )
     private Integer pageNum = 1;
 
     /**
      * 每页显示记录数
      */
-    @ApiModelProperty( value = "每页条数", example = "10" )
+    @Schema( name = "每页条数", example = "10" )
     private Integer pageSize = 10;
 
     /**
      * 排序列
      */
-    @ApiModelProperty( hidden = true )
+    @Schema( hidden = true )
     private String orderByColumn;
 
     /**
      * 排序的方向desc或者asc
      */
-    @ApiModelProperty( hidden = true )
+    @Schema( hidden = true )
     private String isAsc = StringUtils.EMPTY;
 
     public String getOrderBy() {

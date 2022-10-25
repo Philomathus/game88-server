@@ -1,6 +1,6 @@
 package tv.game88.core.member.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -8,27 +8,27 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 @Data
 public class RspMemberCard {
 
-    @ApiModelProperty( value = "编号" )
+    @Schema( name = "编号" )
     private Long    id;
-    @ApiModelProperty( value = "银行账号" )
+    @Schema( name = "银行账号" )
     private String  bankAccount;
-    @ApiModelProperty( value = "开户地址" )
+    @Schema( name = "开户地址" )
     private String  bankAddress;
-    @ApiModelProperty( value = "银行编码" )
+    @Schema( name = "银行编码" )
     private String  bankCode;
-    @ApiModelProperty( value = "银行名称" )
+    @Schema( name = "银行名称" )
     private String  bankName;
-    @ApiModelProperty( value = "开户用户" )
+    @Schema( name = "开户用户" )
     private String  realName;
-    @ApiModelProperty( value = "是否默认" )
+    @Schema( name = "是否默认" )
     private boolean dv;
-    @ApiModelProperty( value = "银行图标地址" )
+    @Schema( name = "银行图标地址" )
     private String  bankIcon;
-    @ApiModelProperty( value = "银行真实地址" )
+    @Schema( name = "银行真实地址" )
     private String  realBankAddress;
-    @ApiModelProperty( value = "结束颜色" )
+    @Schema( name = "结束颜色" )
     private String  colorEnd   = "#ffffff";
-    @ApiModelProperty( value = "开始颜色" )
+    @Schema( name = "开始颜色" )
     private String  colorStart = "#ffffff";
 
     public String getBankIcon() {

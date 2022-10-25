@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.platform.api.dto.RspInit;
 import tv.game88.platform.api.dto.RspManUpdateVersion;
@@ -22,6 +23,7 @@ public class LoginController {
 
     @Operation( summary = "初始化接口", description = "初始化接口" )
     @PostMapping( "/init" )
+    @Anonymous
     public RspBase<RspInit> loginInit( @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version ) {
         if ( dev == null || version == null ) {
             return RspBase.businessError( "客户端版本较低" );

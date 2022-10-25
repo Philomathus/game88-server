@@ -1,26 +1,25 @@
 package tv.game88.core.member.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-@ApiModel( "账户明细" )
+@Schema( name = "账户明细" )
 public class RspLogMoney {
 
-    @ApiModelProperty( value = "时间" )
+    @Schema( name = "时间" )
     private String     createTime;
-    @ApiModelProperty( value = "状态" )
+    @Schema( name = "状态" )
     private String     des;
-    @ApiModelProperty( value = "支出" )
+    @Schema( name = "支出" )
     private BigDecimal pay;
-    @ApiModelProperty( value = "收入" )
+    @Schema( name = "收入" )
     private BigDecimal income;
-    @ApiModelProperty( value = "余额" )
+    @Schema( name = "余额" )
     private BigDecimal total;
-    @ApiModelProperty( value = "余额" )
+    @Schema( name = "余额" )
     private BigDecimal totalBefore;
 
 }

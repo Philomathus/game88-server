@@ -1,31 +1,31 @@
 package tv.game88.platform.api.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class RspInit {
-    @ApiModelProperty( value = "最新版本号" )
+    @Schema( name = "最新版本号" )
     private String  latestVersion = "";
-    @ApiModelProperty( value = "1=强更0=不强更" )
+    @Schema( name = "1=强更0=不强更" )
     private String  latestFore    = "";
-    @ApiModelProperty( value = "下载地址" )
+    @Schema( name = "下载地址" )
     private String  downUrl       = "";
-    @ApiModelProperty( value = "是否有新版本" )
+    @Schema( name = "是否有新版本" )
     private boolean hasNew        = false;
-    @ApiModelProperty( value = "更新内容" )
+    @Schema( name = "更新内容" )
     private String  updateText;
-    @ApiModelProperty( value = "客服地址" )
+    @Schema( name = "客服地址" )
     private String  customerUrl;
-    @ApiModelProperty( value = "客服地址2" )
+    @Schema( name = "客服地址2" )
     private String  customerUrl2;
-    @ApiModelProperty( value = "官方网址" )
+    @Schema( name = "官方网址" )
     private String  webUrl;
-    @ApiModelProperty( value = "验证码id" )
+    @Schema( name = "验证码id" )
     private String  captchaId;
-    @ApiModelProperty( value = "产品编号" )
+    @Schema( name = "产品编号" )
     private String  productId;
-    @ApiModelProperty( value = "启动图地址(为空则不显示启动图)" )
+    @Schema( name = "启动图地址(为空则不显示启动图)" )
     private String  starPic;
 
 }

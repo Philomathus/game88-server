@@ -1,7 +1,6 @@
 package tv.game88.common.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tv.game88.common.constant.HttpStatus;
@@ -15,25 +14,25 @@ import tv.game88.common.utils.StringUtils;
  */
 @Data
 @NoArgsConstructor
-@ApiModel( "返回实体对象" )
+@Schema( name = "返回实体对象" )
 public class RspBase<T> {
-    @ApiModelProperty( value = "业务状态码 200=成功,401=登录异常,其他=业务异常" )
+    @Schema( name = "业务状态码", description = "200=成功,401=登录异常,其他=业务异常")
     private int    code;
-    @ApiModelProperty( value = "提示信息" )
+    @Schema( name = "提示信息" )
     private String msg;
-    @ApiModelProperty( value = "业务数据" )
+    @Schema( name = "业务数据" )
     private T      data;
 
-    @ApiModelProperty( value = "总条数" )
+    @Schema( name = "总条数" )
     private Long total;
 
     /**
      * 是否有下一页
      */
-    @ApiModelProperty( value = "是否有下一页" )
+    @Schema( name = "是否有下一页" )
     private Boolean hasNext = false;
 
-    @ApiModelProperty( "其它数据" )
+    @Schema( name = "其它数据" )
     private String otherData;
 
     /**
