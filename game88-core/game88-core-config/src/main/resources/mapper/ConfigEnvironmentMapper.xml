@@ -29,6 +29,7 @@
             <if test="envSort != null ">and env_sort = #{envSort}</if>
             <if test="envStatus != null ">and env_status = #{envStatus}</if>
         </where>
+        order by env_sort asc
     </select>
 
     <select id="selectConfigEnvironmentTwo" parameterType="tv.game88.core.config.entity.ConfigEnvironment" resultMap="ConfigEnvironmentResult">

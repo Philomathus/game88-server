@@ -35,10 +35,8 @@ public class ConfigEnvironmentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ConfigEnvironment>> list( ConfigEnvironment configEnvironment ) {
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        startPage( pageDomain );
         List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentList( configEnvironment );
-        return getRspBasePage( list, pageDomain );
+        return RspBase.ok( list );
     }
 
     /**
