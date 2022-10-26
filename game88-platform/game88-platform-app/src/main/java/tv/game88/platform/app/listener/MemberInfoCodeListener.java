@@ -2,9 +2,9 @@ package tv.game88.platform.app.listener;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 
@@ -14,9 +14,9 @@ import java.util.Objects;
 @Component
 public class MemberInfoCodeListener implements ApplicationListener<ContextRefreshedEvent> {
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisUtils       redisUtils;
     @Resource
-    private MemberInfoMapper    memberInfoMapper;
+    private MemberInfoMapper memberInfoMapper;
 
     @Override
     public void onApplicationEvent( ContextRefreshedEvent event ) {
@@ -28,7 +28,7 @@ public class MemberInfoCodeListener implements ApplicationListener<ContextRefres
         int    mysqlMaxCode = Integer.parseInt( maxCode );
 
         RedisAtomicLong entityIdCounter = new RedisAtomicLong( Constants.MEMBER_CODE,
-                Objects.requireNonNull( stringRedisTemplate.getConnectionFactory() ) );
+                Objects.requireNonNull( redisUtils.getConnectionFactory() ) );
         long redisMaxCode = Constants.MEMBER_CODE_INIT + entityIdCounter.get();
         if ( redisMaxCode < mysqlMaxCode ) {
             entityIdCounter.set( mysqlMaxCode + 10 );

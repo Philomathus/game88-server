@@ -139,7 +139,7 @@ public class SysUserController extends BaseController {
         if ( 1L == userResetPwdReq.getUserId() ) {
             throw new BusinessException( "不允许操作超级管理员角色" );
         }
-        SecurityUtils.verifyOTPCode( userResetPwdReq.getOtpCode() );
+        SecurityUtils.verifyMFACode( userResetPwdReq.getOtpCode() );
         SysUser user = new SysUser( userResetPwdReq.getUserId() );
         user.setPassword( SecurityUtils.encryptPassword( userResetPwdReq.getPassword() ) );
         user.setUpdateBy( SecurityUtils.getUsername() );
@@ -162,7 +162,7 @@ public class SysUserController extends BaseController {
      * 获取MFA验证码二维码
      */
     @GetMapping( "getOtpSecretQrcode" )
-    public RspBase<?> getOtpSecretQrcode( String name ) {
+    public RspBase<Map<String, String>> getOtpSecretQrcode( String name ) {
         String              secretKey    = GoogleAuthUtil.createSecretKey();
         String              qrBarcodeUrl = GoogleAuthUtil.getQRBarcodeURL( name, this.profile + "管理后台", secretKey );
         Map<String, String> resultMap    = new HashMap<>();
@@ -178,7 +178,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping( "resetUserOtpSecret" )
     @Log( title = "重置用户MFA秘钥", businessType = BusinessType.DELETE )
     public RspBase<?> resetUserOtpSecret( Long userId, int otpAuthCode ) throws Exception {
-        SecurityUtils.verifyOTPCode( otpAuthCode );
+        SecurityUtils.verifyMFACode( otpAuthCode );
         SysUser sysUser = new SysUser( userId );
         sysUser.setOtpSecret( null );
         sysUserMapper.updateOtpSecret( sysUser );
@@ -189,6 +189,7 @@ public class SysUserController extends BaseController {
     /**
      * 绑定MFA密钥
      */
+    @PreAuthorize( "@ss.hasPermi('system:user:resetOtp')" )
     @PostMapping( "boundOtpSecret" )
     public RspBase<?> boundOtpSecret( @RequestBody Map<String, Object> requestMap ) throws Exception {
         int    otpAuthCode = Integer.parseInt( requestMap.getOrDefault( "otpAuthCode", 0 ).toString() );

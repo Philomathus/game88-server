@@ -5,21 +5,18 @@ import lombok.Data;
 
 @Data
 public class PlatformUser {
-    @Schema( name = "会员ID" )
+    @Schema( title = "会员ID" )
     private String  id;
-    @Schema( name = "会员账号" )
-    private String  userName;
-    @Schema( name = "会员昵称" )
+    @Schema( title = "会员昵称" )
     private String  nickName;
-    @Schema( name = "登录密码" )
+    @Schema( title = "登录密码" )
     private String  password;
-    @Schema( name = "会员头像" )
-    private String  headImage;
-    @Schema( name = "会员vip" )
+    @Schema( title = "会员头像" )
+    private String  headImg;
+    @Schema( title = "会员vip" )
     private Integer vip;
-    @Schema( name = "会员状态" )
+    @Schema( title = "会员状态" )
     private Integer status;
-    @Schema( name = "邀请码" )
-    private String  inviterCode;
-
+    @Schema( title = "注册类型", description = "0游客 1会员" )
+    private Integer registerType;
 }

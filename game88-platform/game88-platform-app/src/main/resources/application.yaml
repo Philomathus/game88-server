@@ -80,8 +80,9 @@ swagger:
   description: Game88 Platform App Spring Boot Plugin Swagger 3 Web Api Documentation
   version: 1.0.0
   terms-of-service-url:
-  base-scan-package: tv.game88.platform.app
 springdoc:
+  api-docs:
+    enabled: false
   packages-to-scan: tv.game88.platform.app.controller
 
 management:

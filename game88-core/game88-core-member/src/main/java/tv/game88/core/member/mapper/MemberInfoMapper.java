@@ -27,6 +27,8 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     MemberInfo findMemberHistoryByDeviceId( @Param( "deviceId" ) String deviceId );
 
+    MemberInfo findMemberByMobile( String mobile );
+
     RspMember findMemberDetail( @Param( "userId" ) String userId );
 
     int reduceMoney( @Param( "userId" ) String pUserId, @Param( "money" ) BigDecimal money );
@@ -48,9 +50,9 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
      */
     int addMoneySelect( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money, @Param( "charge" ) BigDecimal charge, @Param( "code_mult" ) BigDecimal codeMult );
 
-    int updateMemberInfoById( MemberInfo memberInfo );
+    int updateVipById( MemberInfo memberInfo );
 
-    int updateMoneySelect( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money, @Param( "invite_money" ) BigDecimal invite_money, @Param( "level_integral" ) BigDecimal level_integral, @Param( "code_account" ) BigDecimal code_account, @Param( "code_total" ) BigDecimal code_total );
+    int updateMoneySelect( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money, @Param( "level_integral" ) BigDecimal level_integral, @Param( "code_account" ) BigDecimal code_account, @Param( "code_total" ) BigDecimal code_total );
 
     int updateMemberInfoVip( @Param( "id" ) String id, @Param( "vip" ) Integer vip, @Param( "nickName" ) String nickName );
 
@@ -66,6 +68,7 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     MemberInfo findRecommendByInviterCode( String inviterCode );
 
-    PlatformUser selectPlatformUserByUserName( @Param( "userName" ) String userName );
+    PlatformUser selectPlatformUserByUserId( @Param( "userId" ) String userId );
 
+    String funGetaddressProvinces( String ip );
 }

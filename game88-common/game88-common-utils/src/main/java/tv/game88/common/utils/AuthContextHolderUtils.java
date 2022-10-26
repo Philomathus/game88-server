@@ -1,13 +1,8 @@
-package tv.game88.common.security.context;
+package tv.game88.common.utils;
 
 import org.springframework.security.core.Authentication;
 
-/**
- * 身份验证信息
- *
- * @author mengJun
- */
-public class AuthenticationContextHolder {
+public class AuthContextHolderUtils {
     private static final ThreadLocal<Authentication> contextHolder = new ThreadLocal<>();
 
     public static Authentication getContext() {

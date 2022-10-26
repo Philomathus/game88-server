@@ -61,21 +61,21 @@ public class SecurityUtils {
     }
 
     /**
-     * 校验otp密钥
+     * 校验MFA密钥
      *
-     * @param otpCode otp密钥
+     * @param MFACode MFA密钥
      *
      * @return 是否校验成功
      */
-    public static void verifyOTPCode( int otpCode ) throws Exception {
+    public static void verifyMFACode( int MFACode ) throws Exception {
         String otpSecret = getLoginUser().getUser().getOtpSecret();
         if (StringUtils.isBlank( otpSecret )) {
             throw new BusinessException( "请联系管理员绑定MFA验证秘钥" );
         }
         try {
             String otpSecretKey = RSACoder.decryptByPrivateKey( otpSecret, KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
-            if (!GoogleAuthUtil.verifyCode( otpSecretKey, otpCode )) {
-                throw new BusinessException( "OTP验证码不正确，请检查" );
+            if (!GoogleAuthUtil.verifyCode( otpSecretKey, MFACode )) {
+                throw new BusinessException( "MFA验证码不正确，请检查" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );

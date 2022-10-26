@@ -14,25 +14,25 @@ import tv.game88.common.utils.StringUtils;
  */
 @Data
 @NoArgsConstructor
-@Schema( name = "返回实体对象" )
+@Schema( title = "返回实体对象" )
 public class RspBase<T> {
-    @Schema( name = "业务状态码", description = "200=成功,401=登录异常,其他=业务异常")
+    @Schema( title = "业务状态码", description = "200=成功,401=登录异常,其他=业务异常")
     private int    code;
-    @Schema( name = "提示信息" )
+    @Schema( title = "提示信息" )
     private String msg;
-    @Schema( name = "业务数据" )
+    @Schema( title = "业务数据" )
     private T      data;
 
-    @Schema( name = "总条数" )
+    @Schema( title = "总条数" )
     private Long total;
 
     /**
      * 是否有下一页
      */
-    @Schema( name = "是否有下一页" )
+    @Schema( title = "是否有下一页" )
     private Boolean hasNext = false;
 
-    @Schema( name = "其它数据" )
+    @Schema( title = "其它数据" )
     private String otherData;
 
     /**

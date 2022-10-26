@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 public class RspManUpdateVersion {
-    @Schema( name = "下载地址" )
+    @Schema( title = "下载地址" )
     private String downUrl       = "";
-    @Schema( name = "人工更新版本" )
+    @Schema( title = "人工更新版本" )
     private String manVersion    = "";
-    @Schema( name = "更新内容" )
+    @Schema( title = "更新内容" )
     private String updateContent = "";
 }

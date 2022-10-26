@@ -19,7 +19,7 @@ import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.filter.CorsFilter;
 import tv.game88.common.security.config.PermitAllUrlProperties;
-import tv.game88.core.session.security.filter.MemberJwtAuthenticationTokenFilter;
+import tv.game88.core.session.security.filter.MemberAuthenticationTokenFilter;
 import tv.game88.core.session.security.handle.MemberAuthenticationEntryPointHandle;
 import tv.game88.core.session.security.handle.MemberLogoutSuccessHandle;
 
@@ -51,7 +51,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
      * token认证过滤器
      */
     @Resource
-    private MemberJwtAuthenticationTokenFilter   authenticationTokenFilter;
+    private MemberAuthenticationTokenFilter      authenticationTokenFilter;
     /**
      * 跨域过滤器
      */
@@ -61,7 +61,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
      * 允许匿名访问的地址
      */
     @Resource
-    private PermitAllUrlProperties permitAllUrl;
+    private PermitAllUrlProperties               permitAllUrl;
 
     @Override
     public void customize( WebSecurity webSecurity ) {
@@ -101,23 +101,17 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 // 过滤请求
                 .authorizeRequests()
                 .antMatchers( HttpMethod.GET, // Swagger的资源路径需要允许访问
-                        "/swagger-ui.html",
-                        "/swagger-ui/",
-                        "/*.html",
-                        "/favicon.ico",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/swagger-resources/**",
+                        "/swagger-ui/**",
                         "/v3/api-docs/**"
                 )
                 .permitAll()
-                // 对于登录login 允许匿名访问
-                .antMatchers( "/login" ).anonymous()
-                .antMatchers( "/doc.html" ).anonymous()
-                .antMatchers( "/swagger-resources/**" ).anonymous()
-                .antMatchers( "/webjars/**" ).anonymous()
-                .antMatchers( "/*/api-docs" ).anonymous()
+                // 对于登录初始化相关 允许匿名访问
+                //.mvcMatchers( HttpMethod.POST,"/init" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/check-update" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/login" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/login-device" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/register" ).anonymous()
+                // actuator 健康检查
                 .antMatchers( "/actuator/**" ).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
@@ -127,7 +121,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
         // 添加JWT filter
         httpSecurity.addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class );
         // 添加CORS filter
-        httpSecurity.addFilterBefore( corsFilter, MemberJwtAuthenticationTokenFilter.class );
+        httpSecurity.addFilterBefore( corsFilter, MemberAuthenticationTokenFilter.class );
         httpSecurity.addFilterBefore( corsFilter, LogoutFilter.class );
         return httpSecurity.build();
     }

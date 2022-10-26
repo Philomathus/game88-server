@@ -3,7 +3,6 @@
 <mapper namespace="tv.game88.core.member.mapper.MemberInfoMapper">
 	<resultMap type="tv.game88.core.member.entity.MemberInfo" id="MemberInfoResult">
 		<result property="id" column="id"/>
-		<result property="userName" column="user_name"/>
 		<result property="password" column="password"/>
 		<result property="nickName" column="nick_name"/>
 		<result property="status" column="status"/>
@@ -16,14 +15,13 @@
 		<result property="codeWill" column="code_will"/>
 		<result property="phone" column="phone"/>
 		<result property="inviterCode" column="inviter_code"/>
-		<result property="inviteMoney" column="invite_money"/>
+		<result property="channelCode" column="channel_code"/>
 		<result property="registerTime" column="register_time"/>
 		<result property="registerIp" column="register_ip"/>
 		<result property="loginIp" column="login_ip"/>
 		<result property="loginDev" column="login_dev"/>
 		<result property="loginProvince" column="login_province"/>
 		<result property="headImg" column="head_img"/>
-		<result property="onlineTime" column="online_time"/>
 		<result property="linkUrl" column="link_url"/>
 		<result property="loginTime" column="login_time"/>
 		<result property="boxAccount" column="box_account"/>
@@ -39,7 +37,6 @@
 
 	<sql id="selectMemberInfoVo">
 		select id,
-			   user_name,
 			   password,
 			   nick_name,
 			   status,
@@ -52,14 +49,13 @@
 			   code_will,
 			   phone,
 			   inviter_code,
-			   invite_money,
+			   channel_code,
 			   register_time,
 			   register_ip,
 			   login_ip,
 			   login_dev,
 			   login_province,
 			   head_img,
-			   online_time,
 			   link_url,
 			   login_time,
 			   box_account,
@@ -77,9 +73,6 @@
 	<select id="selectMemberInfoList" parameterType="tv.game88.core.member.entity.MemberInfo" resultMap="MemberInfoResult">
 		<include refid="selectMemberInfoVo"/>
 		<where>
-			<if test="userName != null  and userName != ''">
-				and user_name like concat(#{userName}, '%')
-			</if>
 			<if test="nickName != null  and nickName != ''">
 				and nick_name like concat('%', #{nickName}, '%')
 			</if>
@@ -107,8 +100,8 @@
 			<if test="inviterCode != null  and inviterCode != ''">
 				and inviter_code = #{inviterCode}
 			</if>
-			<if test="inviteMoney != null">
-				and invite_money = #{inviteMoney}
+			<if test="channelCode != null">
+				and channel_code = #{channelCode}
 			</if>
 			<if test="registerIp != null  and registerIp != ''">
 				and register_ip = #{registerIp}
@@ -121,9 +114,6 @@
 			</if>
 			<if test="headImg != null  and headImg != ''">
 				and head_img = #{headImg}
-			</if>
-			<if test="onlineTime != null">
-				and online_time = #{onlineTime}
 			</if>
 			<if test="linkUrl != null  and linkUrl != ''">
 				and link_url = #{linkUrl}
@@ -187,6 +177,10 @@
 		select * from member_info_history where device_id = #{deviceId} limit 1
 	</select>
 
+	<select id="findMemberByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
+		select * from member_info where phone = #{phone}
+	</select>
+
 	<select id="findMemberDetail" resultType="tv.game88.core.member.dto.RspMember">
 		select * from member_info where id = #{userId}
 	</select>
@@ -242,7 +236,7 @@
 		set nick_name=#{nickName},vip=#{vip}
 		where id = #{id}
 	</update>
-	<update id="updateMemberInfoVip">
+	<update id="updateVipById">
 		update member_info
 		set nick_name=#{nickName},vip=#{vip}
 		where id = #{id}
@@ -253,9 +247,6 @@
 		<set>
 			<if test="money != null">
 				account_now = account_now + #{money},
-			</if>
-			<if test="invite_money != null">
-				invite_money = invite_money + #{invite_money},
 			</if>
 			<if test="level_integral != null">
 				level_integral = level_integral + #{level_integral},
@@ -278,9 +269,6 @@
 		SUM(box_account) safeBalanceTotalMoney
 		from member_info
 		<where>
-			<if test="userName != null  and userName != ''">
-				and user_name like concat(#{userName}, '%')
-			</if>
 			<if test="nickName != null  and nickName != ''">
 				and nick_name like concat('%', #{nickName}, '%')
 			</if>
@@ -305,6 +293,9 @@
 			<if test="inviterCode != null  and inviterCode != ''">
 				and inviter_code = #{inviterCode}
 			</if>
+			<if test="channelCode != null  and channelCode != ''">
+				and channel_code = #{channelCode}
+			</if>
 			<if test="registerIp != null  and registerIp != ''">
 				and register_ip = #{registerIp}
 			</if>
@@ -316,9 +307,6 @@
 			</if>
 			<if test="headImg != null  and headImg != ''">
 				and head_img = #{headImg}
-			</if>
-			<if test="onlineTime != null">
-				and online_time = #{onlineTime}
 			</if>
 			<if test="linkUrl != null  and linkUrl != ''">
 				and link_url = #{linkUrl}
@@ -365,15 +353,17 @@
 		from member_info
 		where id REGEXP concat('_', #{inviterCode}, '$')
 	</select>
-	<select id="selectPlatformUserByUserName" resultType="tv.game88.core.member.vo.PlatformUser">
+	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
 		select id,
-		       user_name userName,
 			   password,
 			   nick_name nickName,
 			   status,
 			   vip,
 			   inviter_code inviterCode,
 			   head_img headImg
-		where user_name = #{userName}
+		where id = #{userId}
+	</select>
+	<select id="funGetaddressProvinces" resultType="java.lang.String">
+		select fun_getaddress_provinces(#{ip})
 	</select>
 </mapper>
