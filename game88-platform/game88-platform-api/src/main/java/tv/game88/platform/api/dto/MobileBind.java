@@ -11,7 +11,4 @@ public class MobileBind {
     private String code;
     @Schema( title = "登录密码" )
     private String passwd;
-
-    @Schema( title = "加密登录密码", hidden = true )
-    private String passwdEncoder;
 }

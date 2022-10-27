@@ -15,9 +15,11 @@
 		<result property="smsSdkAppid" column="sms_sdk_appid"/>
 		<result property="identify" column="identify"/>
 		<result property="isEffect" column="is_effect"/>
-		<result property="updateTime" column="update_time"/>
-		<result property="updateTime" column="update_time"/>
 		<result property="endpoint" column="endpoint"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updator" column="updator"/>
+		<result property="creator" column="creator"/>
 	</resultMap>
 
 	<sql id="selectConfigSmsVo">
@@ -33,7 +35,10 @@
 			   identify,
 			   is_effect,
 			   endpoint,
-		       update_time
+		       update_time,
+			   create_time,
+			   updator,
+			   creator
 		from config_sms
 	</sql>
 

@@ -4,62 +4,74 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class ConfigSms {
     /**
      * 主键
      */
-    private Long    id;
+    private Long          id;
     /**
      * SMS名称
      */
-    private String  name;
+    private String        name;
     /**
      * 服务商
      */
-    private Integer provider;
+    private Integer       provider;
     /**
      * appKey
      */
-    private String  appKey;
+    private String        appKey;
     /**
      * appAccess
      */
-    private String  appAccess;
+    private String        appAccess;
     /**
      * 地区
      */
-    private String  region;
+    private String        region;
     /**
      * 签名
      */
-    private String  signature;
+    private String        signature;
     /**
      * 模板
      */
-    private String  template;
+    private String        template;
     /**
      * smsSdkAppid
      */
-    private String  smsSdkAppid;
+    private String        smsSdkAppid;
     /**
      * 管理员账号
      */
-    private String  identify;
+    private String        identify;
     /**
      * 状态
      */
-    private Integer isEffect;
-    /**
-     * 更新时间
-     */
-    private Date    updateTime;
+    private Integer       isEffect;
     /**
      * 节点
      */
-    private String  endpoint;
+    private String        endpoint;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 更新者
+     */
+    private String        updator;
+    /**
+     * 创建者
+     */
+    private String        creator;
 
     @Override
     public String toString() {
@@ -76,6 +88,10 @@ public class ConfigSms {
                 .append( "identify", getIdentify() )
                 .append( "isEffect", getIsEffect() )
                 .append( "endpoint", getEndpoint() )
+                .append( "updateTime", getUpdateTime() )
+                .append( "createTime", getCreateTime() )
+                .append( "updator", getUpdator() )
+                .append( "creator", getCreator() )
                 .toString();
     }
 }

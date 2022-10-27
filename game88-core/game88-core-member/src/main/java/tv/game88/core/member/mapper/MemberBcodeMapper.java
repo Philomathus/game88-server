@@ -15,49 +15,29 @@ import java.util.List;
  */
 public interface MemberBcodeMapper extends BaseMapper<MemberBcode> {
 
-	/**
-	 * 查询打码列表
-	 *
-	 * @param memberBcode 打码
-	 * @return 打码集合
-	 */
-	public List<MemberBcode> selectMemberBcodeList(MemberBcode memberBcode);
+    /**
+     * 查询打码列表
+     *
+     * @param memberBcode 打码
+     *
+     * @return 打码集合
+     */
+    public List<MemberBcode> selectMemberBcodeList( MemberBcode memberBcode );
 
-	List<RspCodeFlow> findByMemberId( @Param( "userId" ) String userId );
+    List<RspCodeFlow> findByMemberId( @Param( "userId" ) String userId );
 
-	/**
-	 * 查询MemberBcode列表
-	 *
-	 * @param memberBcode MemberBcode
-	 * @return MemberBcode集合
-	 */
-	public List<MemberBcode> selectWillBcodeList(MemberBcode memberBcode);
+    /**
+     * 查询MemberBcode列表
+     *
+     * @param memberBcode MemberBcode
+     *
+     * @return MemberBcode集合
+     */
+    public List<MemberBcode> selectWillBcodeList( MemberBcode memberBcode );
 
-	/**
-	 * 修改MemberBcode
-	 *
-	 * @param memberBcode MemberBcode
-	 * @return 结果
-	 */
-	public int updateMemberBcode(MemberBcode memberBcode);
+    int updateMemberBcodeStatus( @Param( "memberId" ) String memberId );
 
-	void updateMemberBcodeStatus(@Param("memberId") String memberId);
-	int repairMemberInfo(@Param("memberId") String memberId);
+    int repairMemberInfo( @Param( "memberId" ) String memberId );
 
-	/**
-	 * 保存
-	 * @param memberBcode
-	 * @return
-	 */
-	public int insertMemberBcode(MemberBcode memberBcode);
-
-	/**
-	 * 查询MemberBcode
-	 *
-	 * @param id MemberBcodeID
-	 * @return MemberBcode
-	 */
-	MemberBcode selectMemberBcodeById(String id);
-
-	MemberBcode getTotalData(MemberBcode memberBcode);
+    MemberBcode getTotalData( MemberBcode memberBcode );
 }

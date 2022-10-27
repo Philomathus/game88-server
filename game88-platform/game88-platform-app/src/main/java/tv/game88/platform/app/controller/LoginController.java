@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.session.service.MemberTokenService;
+import tv.game88.core.member.service.MemberTokenService;
 import tv.game88.platform.api.dto.MobileLogin;
+import tv.game88.platform.api.dto.Phone;
 import tv.game88.platform.api.dto.RspInit;
 import tv.game88.platform.api.dto.RspManUpdateVersion;
 import tv.game88.platform.api.service.MemberInfoService;
@@ -71,5 +72,11 @@ public class LoginController {
         RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin, dev, version, loginUrl );
         memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
+    }
+
+    @Operation( summary = "发送短信验证码" )
+    @PostMapping( "/sendSmsVerifyCode" )
+    public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
+        return memberInfoService.sendSmsVerifyCode(phone);
     }
 }

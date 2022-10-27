@@ -1,0 +1,303 @@
+package tv.game88.platform.api.sms;
+
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
+import com.baidubce.auth.DefaultBceCredentials;
+import com.baidubce.services.sms.SmsClient;
+import com.baidubce.services.sms.SmsClientConfiguration;
+import com.baidubce.services.sms.model.SendMessageV3Request;
+import com.baidubce.services.sms.model.SendMessageV3Response;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.common.profile.HttpProfile;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
+import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.RandomUtils;
+import tv.game88.core.config.cache.ConfigSmsCacheUtil;
+import tv.game88.core.config.entity.ConfigSms;
+import tv.game88.platform.api.entity.ConfigSmsFaillog;
+import tv.game88.platform.api.mapper.ConfigSmsFaillogMapper;
+
+import javax.annotation.Resource;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@Log4j2
+@Component
+public class SmsApi {
+    @Resource
+    private ConfigSmsCacheUtil     configSmsCacheUtil;
+    @Resource
+    private ConfigSmsFaillogMapper configSmsFaillogMapper;
+    @Resource
+    private RestTemplate           restTemplate;
+
+    //无需修改,用于格式化鉴权头域,给"X-WSSE"参数赋值
+    private static final String WSSE_HEADER_FORMAT =
+            "UsernameToken Username=\"%s\",PasswordDigest=\"%s\",Nonce=\"%s\"," + "Created=\"%s\"";
+    //无需修改,用于格式化鉴权头域,给"Authorization"参数赋值
+    private static final String AUTH_HEADER_VALUE  = "WSSE realm=\"SDP\",profile=\"UsernameToken\",type=\"Appkey\"";
+
+    private static String createPhoneCode() {
+        StringBuilder code = new StringBuilder();
+        for ( int i = 1; i <= 6; i++ ) {
+            code.append( RandomUtils.randomIntWithMax( 1, 9 ) );
+        }
+        return code.toString();
+    }
+
+    public String sendSms( String phone, int index, String code ) {
+        long countCache = configSmsCacheUtil.countCache();
+        if ( index > ( countCache - 1 ) ) {
+            index = 0;
+        }
+        ConfigSms serverSms = configSmsCacheUtil.getConfigSmsCache( index );
+        if ( StringUtils.isBlank( code ) ) {
+            code = createPhoneCode();
+        }
+        switch ( serverSms.getProvider() ) {
+        case 0:
+            this.sendSmsTencent( serverSms, phone, code );
+            break;
+        case 1:
+            this.sendSmsAliyun( serverSms, phone, code );
+            break;
+        case 2:
+            this.sendSmsBaidu( serverSms, phone, code );
+            break;
+        case 3:
+            this.sendSmsHuawei( serverSms, phone, code );
+            break;
+        default:
+        }
+        return code;
+    }
+
+    private String sendSmsHuawei( ConfigSms serverSms, String phone, String code ) {
+        String receiver      = "+86" + phone;
+        String templateParas = "[\"" + code + "\"]";
+
+        Map<String, String> params = new HashMap<>();
+        params.put( "from", serverSms.getSignature() );
+        params.put( "to", receiver );
+        params.put( "templateId", serverSms.getTemplate() );
+        params.put( "templateParas", templateParas );
+        params.put( "signature", serverSms.getName() );
+
+        StringBuilder sb = new StringBuilder();
+        params.forEach( ( k, v ) -> {
+            sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) ).append( "&" );
+        } );
+        String body = sb.substring( 0, sb.length() - 1 );
+
+        //请求Headers中的X-WSSE参数值
+        String wsseHeader = buildWsseHeader( serverSms.getAppKey(), serverSms.getAppAccess() );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        httpHeaders.add( "Authorization", AUTH_HEADER_VALUE );
+        httpHeaders.add( "X-WSSE", wsseHeader );
+        HttpEntity<String> httpEntity = new HttpEntity<>( body, httpHeaders );
+
+        try {
+            ResponseEntity<Map> responseEntity = restTemplate.postForEntity(
+                    serverSms.getEndpoint() + "/sms/batchSendSms/v1", httpEntity, Map.class );
+            Map<String, Object> entityBody = responseEntity.getBody();
+            if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
+                if ( !CollectionUtils.isEmpty( entityBody ) ) {
+                    String rspCode = entityBody.getOrDefault( "code", "" ).toString();
+                    if ( "000000".equals( rspCode ) ) {
+                        return code;
+                    }
+                }
+            }
+            log.error( JsonUtil.object2Json( entityBody ) );
+        } catch ( Exception e ) {
+            log.error( "短信发送失败" + e.getMessage(), e );
+
+        }
+        throw new BusinessException( "短信发送失败,请联系客服" );
+    }
+
+    /**
+     * 构造X-WSSE参数值 Construct X-WSSE parameter value
+     *
+     * @param appKey
+     * @param appSecret
+     */
+    private static String buildWsseHeader( String appKey, String appSecret ) {
+        try {
+            SimpleDateFormat sdf   = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
+            String           time  = sdf.format( new Date() );
+            String           nonce = IdWorker.get32UUID();
+            MessageDigest    md    = MessageDigest.getInstance( "SHA-256" );
+            md.update( ( nonce + time + appSecret ).getBytes() );
+            String passwordDigestBase64Str = Base64Utils.encodeToString( md.digest() );
+            return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
+        } catch ( NoSuchAlgorithmException e ) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String sendSmsTencent( ConfigSms serverSms, String phone, String msg ) {
+
+        Credential  cred        = new Credential( serverSms.getAppKey(), serverSms.getAppAccess() );
+        HttpProfile httpProfile = new HttpProfile();
+        httpProfile.setReqMethod( "POST" );
+        httpProfile.setEndpoint( "sms.tencentcloudapi.com" );
+        ClientProfile clientProfile = new ClientProfile();
+        clientProfile.setHttpProfile( httpProfile );
+        com.tencentcloudapi.sms.v20190711.SmsClient client = new com.tencentcloudapi.sms.v20190711.SmsClient( cred,
+                serverSms.getRegion(), clientProfile );
+        com.tencentcloudapi.sms.v20190711.models.SendSmsRequest req =
+                new com.tencentcloudapi.sms.v20190711.models.SendSmsRequest();
+        req.setSmsSdkAppid( serverSms.getSmsSdkAppid() );
+        req.setSign( serverSms.getSignature() );
+        req.setTemplateID( serverSms.getTemplate() );
+        /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]
+         * 例如+8613711112222， 其中前面有一个+号 ，86为国家码，13711112222为手机号，最多不要超过200个手机号*/
+        String[] phoneNumbers = { "+86" + phone };
+        req.setPhoneNumberSet( phoneNumbers );
+        String[] templateParams = { msg };
+        req.setTemplateParamSet( templateParams );
+        com.tencentcloudapi.sms.v20190711.models.SendSmsResponse res = null;
+        try {
+            res = client.SendSms( req );
+        } catch ( TencentCloudSDKException e ) {
+            throw new RuntimeException( e.getMessage() );
+        }
+        if ( res.getSendStatusSet() != null && "Ok".equalsIgnoreCase( res.getSendStatusSet()[ 0 ].getCode() ) ) {
+            return msg;
+        } else {
+            String rspCode    = res.getSendStatusSet()[ 0 ].getCode();
+            String rspMessage = res.getSendStatusSet()[ 0 ].getMessage();
+            String smsName    = "腾讯云";
+            String subname    = serverSms.getName();
+            errorLog( rspCode, rspMessage, phone, smsName, subname );
+            log.warn( "短信发送失败:{}", JsonUtil.object2Json( res ) );
+
+            if ( "LimitExceeded.PhoneNumberDailyLimit".equals( rspCode ) ) {
+                throw new BusinessException( "今日发送短信过多，请明日重试" );
+            } else if ( "FailedOperation.PhoneNumberOnBlacklist".equals( rspCode )
+                    || "FailedOperation.PhoneNumberInBlacklist".equals( rspCode ) ) {
+                throw new BusinessException( "您的号码在黑名单库中，请联系客服" );
+            } else {
+                throw new BusinessException( "发送短信失败，请联系客服" );
+            }
+        }
+
+    }
+
+    private String sendSmsAliyun( ConfigSms serverSms, String phone, String msg ) {
+        System.setProperty( "sun.net.client.defaultConnectTimeout", "10000" );
+        System.setProperty( "sun.net.client.defaultReadTimeout", "10000" );
+        final String   regionId = serverSms.getRegion();
+        IClientProfile profile  = DefaultProfile.getProfile( regionId, serverSms.getAppKey(), serverSms.getAppAccess() );
+        DefaultProfile.addEndpoint( regionId, "Dysmsapi", "dysmsapi.aliyuncs.com" );
+        IAcsClient acsClient = new DefaultAcsClient( profile );
+
+        //组装请求对象
+        SendSmsRequest smsRequest = new SendSmsRequest();
+        smsRequest.setSysMethod( MethodType.POST );
+        smsRequest.setPhoneNumbers( phone );
+        smsRequest.setSignName( serverSms.getSignature() );
+        smsRequest.setTemplateCode( serverSms.getTemplate() );
+        smsRequest.setTemplateParam( "{\"code\":" + msg + "}" );
+
+        SendSmsResponse sendSmsResponse = null;
+        try {
+            sendSmsResponse = acsClient.getAcsResponse( smsRequest );
+        } catch ( ClientException e ) {
+            throw new RuntimeException( e.getErrMsg() );
+        }
+        if ( sendSmsResponse.getCode() != null && "OK".equals( sendSmsResponse.getCode() ) ) {
+            return msg;
+        } else {
+            String rspCode    = sendSmsResponse.getCode();
+            String rspMessage = sendSmsResponse.getMessage();
+            String smsName    = "阿里云";
+            String subname    = serverSms.getName();
+            errorLog( rspCode, rspMessage, phone, smsName, subname );
+
+            log.warn( "阿里云短信发送失败:{}", JsonUtil.object2Json( sendSmsResponse ) );
+
+            if ( "isv.BUSINESS_LIMIT_CONTROL".equals( rspCode ) ) {
+                throw new BusinessException( "今日发送短信过多，请明日重试" );
+            } else {
+                throw new BusinessException( "发送短信失败，请联系客服" );
+            }
+        }
+
+    }
+
+    private String sendSmsBaidu( ConfigSms serverSms, String phone, String msg ) {
+        SmsClientConfiguration config = new SmsClientConfiguration();
+        config.setCredentials( new DefaultBceCredentials( serverSms.getAppKey(), serverSms.getAppAccess() ) );
+        config.setEndpoint( serverSms.getRegion() );
+        SmsClient client = new SmsClient( config );
+
+        SendMessageV3Request request = new SendMessageV3Request();
+        request.setMobile( phone );
+        request.setSignatureId( serverSms.getSignature() );
+        request.setTemplate( serverSms.getTemplate() );
+        Map<String, String> contentVar = new HashMap<>();
+        contentVar.put( "code", msg );
+        contentVar.put( "minute", "1" );
+        request.setContentVar( contentVar );
+        try {
+            SendMessageV3Response sendSmsResponse = client.sendMessage( request );
+            // 解析请求响应 response.isSuccess()为true 表示成功
+            if ( sendSmsResponse != null && sendSmsResponse.isSuccess() ) {
+                return msg;
+            } else {
+                String rspCode    = sendSmsResponse.getCode();
+                String rspMessage = sendSmsResponse.getMessage();
+                String smsName    = "百度云";
+                String subname    = serverSms.getName();
+                errorLog( rspCode, rspMessage, phone, smsName, subname );
+                log.warn( "百度云短信发送失败:{}", JsonUtil.object2Json( sendSmsResponse ) );
+                throw new BusinessException( JsonUtil.object2Json( sendSmsResponse ) );
+            }
+        } catch ( BusinessException e ) {
+            throw new BusinessException( e.getMessage() );
+        }
+    }
+
+    //记录短信登录异常日志
+    private void errorLog( String rspCode, String rspMessage, String phone, String smsName, String subname ) {
+        ConfigSmsFaillog smsFainLog = new ConfigSmsFaillog();
+        smsFainLog.setErrorCode( rspCode );
+        smsFainLog.setErrorMessage( rspMessage );
+        smsFainLog.setPhone( phone );
+        smsFainLog.setSmsName( smsName );
+        smsFainLog.setSmsSubname( subname );
+        Date date = new Date();
+        smsFainLog.setCreateTime( date );
+        configSmsFaillogMapper.insert( smsFainLog );
+    }
+}

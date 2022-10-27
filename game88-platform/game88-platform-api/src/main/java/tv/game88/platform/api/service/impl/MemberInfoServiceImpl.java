@@ -2,6 +2,7 @@ package tv.game88.platform.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
@@ -11,24 +12,36 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumDev;
+import tv.game88.core.member.manager.MemberMoneyManager;
+import tv.game88.core.member.mapper.MemberBcodeMapper;
+import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.platform.api.dto.MobileLogin;
-import tv.game88.platform.api.dto.RspInit;
-import tv.game88.platform.api.dto.RspManUpdateVersion;
+import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
+import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service( "memberInfoService" )
@@ -41,7 +54,18 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private RestTemplate          restTemplate;
     @Resource
     private AuthenticationManager authenticationManager;
-
+    @Resource
+    private SmsPhoneCacheUtil     smsPhoneCacheUtil;
+    @Resource
+    private SmsApi                smsApi;
+    @Resource
+    private ForkJoinPool          forkJoinPool;
+    @Resource
+    private MemberCardMapper      memberCardMapper;
+    @Resource
+    private MemberBcodeMapper     memberBcodeMapper;
+    @Resource
+    private MemberMoneyManager    memberMoneyManager;
 
     @Override
     public RspInit getLoginInit( Integer dev, String version ) {
@@ -229,7 +253,55 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( mobileLogin.getCode() ) ) {
             return RspBase.businessError( "请输入短信验证码" );
         }
-        return null;
+        String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
+        if ( StringUtils.isBlank( fcode ) ) {
+            return RspBase.businessError( "验证码过期" );
+        }
+        if ( smsPhoneCacheUtil.setSmsNumber( mobileLogin.getMobile() ) >= 5 ) {
+            smsPhoneCacheUtil.unLink( mobileLogin.getMobile() );
+            return RspBase.businessError( "短信验证错误不能超过五次" );
+        }
+        if ( !mobileLogin.getCode().equals( fcode ) ) {
+            return RspBase.businessError( "验证码错误" );
+        }
+        MemberInfo memberInfo = this.baseMapper.findMemberByMobile( mobileLogin.getMobile() );
+        MemberInfo oldm       = null;
+        if ( memberInfo == null ) {
+            //检查是不是归档会员回归
+            oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
+            if ( oldm != null ) {
+                memberInfo = oldm;
+                if ( memberInfo.getStatus() == 0 ) {
+                    return RspBase.businessError( "您被限制登录,请联系客服" );
+                }
+            } else {
+                memberInfo = this.newMemberInfoReg( mobileLogin );
+                memberInfo.setRegisterType( 1 );
+            }
+            this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), memberInfo );
+
+            if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
+                return RspBase.businessError( "请勿重复注册" );
+            }
+
+            this.baseMapper.insert( memberInfo );
+            if ( oldm != null ) {
+                this.baseMapper.deleteByHistoryKey( oldm.getId() );
+            }
+        } else {
+            if ( memberInfo.getStatus() == 0 ) {
+                return RspBase.businessError( "您被限制登录,请联系客服" );
+            }
+
+            MemberInfo update = new MemberInfo();
+            update.setId( memberInfo.getId() );
+
+            this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
+            this.baseMapper.updateById( update );
+        }
+        RspMember rspMember = new RspMember();
+        BeanUtils.copyProperties( memberInfo, rspMember );
+        return RspBase.ok( rspMember );
     }
 
     private void setMemberLoginParam( MobileLogin mobileLogin, Integer dev, String version, String loginUrl,
@@ -240,11 +312,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         memberInfo.setVersion( version );
         //手机型号
         if ( StringUtils.isNotBlank( mobileLogin.getPhoneModel() ) ) {
-            if ( mobileLogin.getPhoneModel().length() >= 255 ) {
-                memberInfo.setPhoneModel( mobileLogin.getPhoneModel().substring( 0, 254 ) );
-            } else {
-                memberInfo.setPhoneModel( mobileLogin.getPhoneModel() );
-            }
+            memberInfo.setPhoneModel( mobileLogin.getPhoneModel() );
         }
         if ( StringUtils.isBlank( loginProvince ) ) {
             try {
@@ -256,11 +324,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isNotBlank( loginUrl ) ) {
             memberInfo.setLinkUrl( loginUrl );
         }
+        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
+            memberInfo.setPassword( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+        }
     }
 
     private MemberInfo newMemberInfoReg( MobileLogin mobileLogin ) {
         MemberInfo m = new MemberInfo();
-        m.setHeadImg( String.valueOf( MathUtils.randomIntWithMax( 1, 14 ) ) );
+        m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
         m.setId( makeMemberCode() );
         if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) ) {
             try {
@@ -286,9 +357,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         if ( StringUtils.isNotBlank( mobileLogin.getMobile() ) ) {
             m.setPhone( mobileLogin.getMobile() );
-        }
-        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            m.setPassword( mobileLogin.getPasswdEncoder() );
         }
         m.setNickName( m.getId() );
         m.setLoginNum( 0 );
@@ -329,5 +397,163 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private String makeMemberCode() {
         RedisAtomicLong entityIdCounter = new RedisAtomicLong( Constants.MEMBER_CODE, redisUtils.getConnectionFactory() );
         return String.valueOf( Constants.MEMBER_CODE_INIT + entityIdCounter.getAndIncrement() );
+    }
+
+    @Override
+    public RspBase<?> sendSmsVerifyCode( Phone phone ) {
+        if ( StringUtils.isBlank( phone.getPhone() ) ) {
+            return RspBase.businessError( "请输入你的手机号" );
+        }
+        if ( ValidatorUtil.isMobile( phone.getPhone() ) ) {
+            return RspBase.businessError( "手机号码不正确" );
+        }
+        if ( Objects.nonNull( smsPhoneCacheUtil.getSmsPhoneExpire( phone.getPhone() ) ) ) {
+            return RspBase.businessError( "发送验证码频繁,请稍后发送" );
+        }
+        try {
+            String code     = smsPhoneCacheUtil.getPhoneCode( phone.getPhone() );
+            String indexStr = smsPhoneCacheUtil.getPhoneIndex( phone.getPhone() );
+            int    index    = Integer.parseInt( indexStr == null ? "-1" : indexStr ) + 1;
+            code = smsApi.sendSms( phone.getPhone(), index, code );
+            smsPhoneCacheUtil.setSmsPhoneCache( phone.getPhone(), code, String.valueOf( index ) );
+            return RspBase.ok();
+        } catch ( Exception e ) {
+            log.error( "发送短信失败phone:{}", phone.getPhone(), e );
+            return RspBase.businessError( e.getMessage() );
+        }
+    }
+
+    @Override
+    public RspBase<?> addMemberMoneyOnly( String ip, String userName, ReqAddScore req ) {
+        return null;
+    }
+
+    @Override
+    public List<MemberInfo> selectMemberInfoList( MemberInfo memberInfo ) {
+        return this.baseMapper.selectMemberInfoList( memberInfo );
+    }
+
+    @Override
+    public Map listCount( MemberInfo memberInfo ) {
+        return this.baseMapper.listCount( memberInfo );
+    }
+
+    @Override
+    public RspBase<?> updateMobile( String newMobile, String oldMobile, String memberId ) {
+        return null;
+    }
+
+    @Override
+    public List<MemberCard> selectMemberCardList( String memberId ) {
+        return memberCardMapper.selectMemberCard( memberId );
+    }
+
+    @Override
+    public BigDecimal getHistoryRecharge( String memberId ) {
+        return this.baseMapper.selectMemberInfoHistoryRechargeById( memberId );
+    }
+
+    @Override
+    public boolean repairMemberBcode( String memberId ) {
+        return memberBcodeMapper.updateMemberBcodeStatus( memberId ) > 0 && memberBcodeMapper.repairMemberInfo( memberId ) > 0;
+    }
+
+    @Override
+    public RspBase<?> unbindCard( MemberCard member ) {
+        Long             id             = member.getId();
+        String           memberId       = member.getMemberId();
+        List<MemberCard> memberCardList = memberCardMapper.memberCardList( memberId );
+        MemberCard       memberCard     = memberCardMapper.selectById( id );
+        if ( Objects.isNull( memberCard ) ) {
+            return RspBase.businessError( "卡号不存在" );
+        }
+        if ( memberCardList.size() > 1 && memberCard.getDv() == 1 ) {
+            return RspBase.businessError( "请先解绑副卡" );
+        }
+        memberCardMapper.deleteById( id );
+        return RspBase.ok( "解绑成功" );
+    }
+
+    @Override
+    public RspBase<?> changeBank( MemberCard member ) {
+        Long id = member.getId();
+        //判断用户是否已经绑定该银行卡
+        MemberCard memberCard1 = new MemberCard();
+        memberCard1.setBankAccount( member.getBankAccount() );
+        memberCard1.setMemberId( member.getMemberId() );
+        List<MemberCard> memberCards = memberCardMapper.selectMemberCardList( memberCard1 );
+        if ( !memberCards.isEmpty() ) {
+            MemberCard memberCard2 = memberCards.get( 0 );
+            //判断绑定的与修改成的是不是同一个,如果不是就不能修改
+            if ( !memberCard2.getId().equals( member.getId() ) ) {
+                log.error( "修改的id: {},上传的id: {}", memberCard2.getId(), member.getId() );
+                return RspBase.businessError( "用户已绑定该银行卡" );
+            }
+        }
+        MemberCard memberCard = memberCardMapper.selectById( id );
+        memberCard.setRealName( member.getRealName() );
+        memberCard.setBankName( member.getBankName() );
+        memberCard.setBankAddress( member.getBankAddress() );
+        memberCard.setBankAccount( member.getBankAccount() );
+        memberCardMapper.updateById( memberCard );
+        return RspBase.ok( "修改银行卡信息成功" );
+    }
+
+    @Override
+    public RspBase<?> personalReport( String startTime, String endTime, String memberId ) {
+        List<Callable<Map<String, Object>>> forkJoinTasks = new ArrayList<>();
+
+        // 线下充值 Offline recharge
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalRecharge", this.baseMapper.personalRecharge( startTime, endTime, memberId ) ) );
+        // 线上充值 online recharge
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalOnlineRecharge", this.baseMapper.personalOnlineRecharge( startTime, endTime, memberId ) ) );
+        // 线上充值2 online recharge 2
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime, endTime, memberId ) ) );
+        // 线上充值3 online recharge 3
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime, endTime, memberId ) ) );
+        // 提款 withdrawal
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge", this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount", this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
+
+        List<Future<Map<String, Object>>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
+        Set<Map<String, Object>> resultSet = futureList.stream().map( t -> {
+            try {
+                return t.get();
+            } catch ( InterruptedException | ExecutionException e ) {
+                throw new IllegalStateException( e );
+            }
+        } ).filter( Objects::nonNull ).collect( Collectors.toSet() );
+        resultSet.add( ImmutableMap.of( "memberId", memberId ) );
+
+        Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
+                                                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
+
+        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring( memberId.length() - 1 ) );
+
+        resultMap.put( "bCodeList", mapList );
+
+        return RspBase.ok( resultMap );
+    }
+
+    @Override
+    @Transactional( rollbackFor = Exception.class )
+    public RspBase<?> boxDish( String memberId ) {
+        MemberInfo memberInfo   = this.baseMapper.selectById( memberId );
+        BigDecimal totalAccount = memberInfo.getAccountNow();
+        BigDecimal boxAccount   = memberInfo.getBoxAccount();
+        if ( boxAccount.compareTo( BigDecimal.ZERO ) == 0 ) {
+            return RspBase.businessError( "保险箱余额为0,无需转出" );
+        }
+
+        BigDecimal totalNow = totalAccount.add( boxAccount );
+        String     name     = "保险箱存入:" + boxAccount.negate() + "现保险箱余额:0";
+
+        memberMoneyManager.logSafebox( memberId, boxAccount.negate(), name, totalAccount, totalNow );
+
+        int i = this.baseMapper.boxDish( memberId );
+        if ( i <= 0 ) {
+            throw new BusinessException( "保险箱余额提出失败" );
+        }
+        return RspBase.ok();
     }
 }

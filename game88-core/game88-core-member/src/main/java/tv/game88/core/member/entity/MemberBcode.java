@@ -2,8 +2,10 @@ package tv.game88.core.member.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -37,11 +39,23 @@ public class MemberBcode {
     @Excel( name = "当前打码量" )
     private BigDecimal cur;
 
+    @TableField(exist = false)
+    @JsonIgnore
     private String[]   selectDate;
+    @TableField(exist = false)
+    @JsonIgnore
     private String     startTime;
+    @TableField(exist = false)
+    @JsonIgnore
     private String     endTime;
+    @TableField(exist = false)
     private BigDecimal total;
+    @TableField(exist = false)
     private BigDecimal countCur;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    private Integer googleAuthCode;
 
     @Override
     public String toString() {
