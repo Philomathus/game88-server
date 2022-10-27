@@ -21,4 +21,9 @@ public interface ConfigOssMapper extends BaseMapper<ConfigOss> {
 	public List<ConfigOss> selectConfigOssList(ConfigOss configOss);
 
 	ConfigOss selectConfigOssByEffect();
+
+	int deleteConfigOssDataByIds(Long[] ids);
+
+	int updateConfigOss(ConfigOss configOss);
+
 }
