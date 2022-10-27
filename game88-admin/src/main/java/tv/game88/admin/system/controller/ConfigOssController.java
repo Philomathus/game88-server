@@ -68,13 +68,6 @@ public class ConfigOssController extends BaseController {
         return toResult( configOssService.deleteConfigOssByIds( ids ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('config:oss:deleteOne')" )
-    @Log( title = "oss配置", businessType = BusinessType.DELETE )
-    @DeleteMapping( "/{id}" )
-    public RspBase<?> delete(@PathVariable Long id){
-        return toResult(configOssService.deleteConfigOssById(id));
-    }
-
     @PreAuthorize( "@ss.hasPermi('config:oss:effect')" )
     @PatchMapping( "/effect/{id}" )
     @Log( title = "oss文件存储服务配置", businessType = BusinessType.EFFECT )
