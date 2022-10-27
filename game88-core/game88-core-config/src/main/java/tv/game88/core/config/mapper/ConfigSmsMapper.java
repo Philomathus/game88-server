@@ -22,4 +22,5 @@ public interface ConfigSmsMapper extends BaseMapper<ConfigSms> {
     public List<ConfigSms> selectConfigSmsList( ConfigSms configSms );
 
     List<ConfigSms> selectConfigSmsByEffect();
+
 }

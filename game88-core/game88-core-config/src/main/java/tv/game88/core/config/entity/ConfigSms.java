@@ -3,11 +3,12 @@ package tv.game88.core.config.entity;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import tv.game88.common.vo.BaseEntity;
 
 import java.util.Date;
 
 @Data
-public class ConfigSms {
+public class ConfigSms extends BaseEntity {
     /**
      * 主键
      */
@@ -52,10 +53,10 @@ public class ConfigSms {
      * 状态
      */
     private Integer isEffect;
-    /**
-     * 更新时间
-     */
-    private Date    updateTime;
+//    /**
+//     * 更新时间
+//     */
+//    private Date    updateTime;
     /**
      * 节点
      */

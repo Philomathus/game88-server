@@ -36,8 +36,7 @@
 		       update_time
 		from config_sms
 	</sql>
-
-	<select id="selectConfigSmsList" parameterType="tv.game88.core.config.entity.ConfigSms" resultMap="ConfigSmsResult">
+    <select id="selectConfigSmsList" parameterType="tv.game88.core.config.entity.ConfigSms" resultMap="ConfigSmsResult">
 		<include refid="selectConfigSmsVo"/>
 		<where>
 			<if test="name != null  and name != ''">
@@ -53,8 +52,9 @@
 		order by is_effect desc, update_time asc
 	</select>
 
-	<select id="selectConfigOssByEffect" resultMap="ConfigSmsResult">
+	<select id="selectConfigSmsByEffect" resultMap="ConfigSmsResult">
 		<include refid="selectConfigSmsVo"/>
 		where is_effect = 1 order by RAND()
 	</select>
+
 </mapper>
