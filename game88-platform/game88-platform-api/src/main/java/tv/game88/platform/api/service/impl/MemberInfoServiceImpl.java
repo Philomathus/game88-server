@@ -101,6 +101,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( mobileLogin.getMobile().length() != 11 ) {
             return RspBase.businessError( "请输入正确的手机号" );
         }
+        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
+            return RspBase.businessError( "请输入登陆密码" );
+        }
 
         MemberInfo memberInfo = this.baseMapper.findMemberByMobile( mobileLogin.getMobile() );
         MemberInfo oldm       = null;
