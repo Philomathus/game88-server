@@ -80,9 +80,4 @@ public enum BusinessType {
 	 * 关闭
 	 */
 	CLOSE,
-
-	/**
-	 * 开启收费
-	 */
-	LIVE_PAY
 }

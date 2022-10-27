@@ -1,4 +1,4 @@
-package tv.game88.core.session.service;
+package tv.game88.core.member.service;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;

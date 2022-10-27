@@ -7,7 +7,7 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.session.service.MemberTokenService;
+import tv.game88.core.member.service.MemberTokenService;
 import tv.game88.core.member.vo.MemberLoginUser;
 
 import javax.annotation.Resource;

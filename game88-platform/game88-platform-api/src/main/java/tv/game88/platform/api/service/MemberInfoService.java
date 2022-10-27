@@ -3,10 +3,13 @@ package tv.game88.platform.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.platform.api.dto.MobileLogin;
-import tv.game88.platform.api.dto.RspInit;
-import tv.game88.platform.api.dto.RspManUpdateVersion;
+import tv.game88.platform.api.dto.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 public interface MemberInfoService extends IService<MemberInfo> {
     RspInit getLoginInit( Integer dev, String version );
@@ -18,4 +21,28 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<RspMember> loginDevice( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
 
     RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
+
+    RspBase<?> sendSmsVerifyCode( Phone phone );
+
+    RspBase<?> addMemberMoneyOnly( String ip, String userName, ReqAddScore req );
+
+    List<MemberInfo> selectMemberInfoList( MemberInfo memberInfo );
+
+    Map listCount( MemberInfo memberInfo );
+
+    RspBase<?> updateMobile( String newMobile, String oldMobile, String memberId );
+
+    List<MemberCard> selectMemberCardList( String memberId );
+
+    BigDecimal getHistoryRecharge( String memberId );
+
+    boolean repairMemberBcode( String memberId );
+
+    RspBase<?> unbindCard( MemberCard memberCard );
+
+    RspBase<?> changeBank( MemberCard memberCard );
+
+    RspBase<?> personalReport( String startTime, String endTime, String memberId );
+
+    RspBase<?> boxDish( String memberId );
 }
