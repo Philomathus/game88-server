@@ -1,15 +1,15 @@
-package tv.game88.admin.system.controller;
+package tv.game88.platform.admin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import tv.game88.admin.system.service.ConfigOssService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.config.entity.ConfigOss;
+import tv.game88.platform.api.service.ConfigOssService;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping( "/admin/configOss" )
+@RequestMapping( "/config/oss" )
 public class ConfigOssController extends BaseController {
 
     @Autowired

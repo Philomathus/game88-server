@@ -1,4 +1,4 @@
-package tv.game88.admin.system.service;
+package tv.game88.platform.api.service;
 
 import tv.game88.core.config.entity.ConfigSms;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @date 2022-10-27
  */
 
-public interface IConfigSmsService {
+public interface ConfigSmsService {
 
     /**
      * 查询SMS短信服务配置列表

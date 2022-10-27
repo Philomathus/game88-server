@@ -1,4 +1,4 @@
-package tv.game88.admin.system.service;
+package tv.game88.platform.api.service;
 
 import tv.game88.core.config.entity.ConfigOss;
 

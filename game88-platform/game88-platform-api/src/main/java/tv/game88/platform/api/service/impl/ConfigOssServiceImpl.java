@@ -1,11 +1,11 @@
-package tv.game88.admin.system.service.impl;
+package tv.game88.platform.api.service.impl;
 
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tv.game88.admin.system.service.ConfigOssService;
 import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
+import tv.game88.platform.api.service.ConfigOssService;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;

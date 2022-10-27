@@ -1,17 +1,14 @@
 package tv.game88.admin.system.controller;
 
-import tv.game88.admin.system.service.IConfigEnvironmentService;
-import tv.game88.common.page.PageDomain;
-import tv.game88.common.page.TableSupport;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import tv.game88.admin.system.service.ConfigEnvironmentService;
+import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.common.base.BaseController;
 import tv.game88.core.config.entity.ConfigEnvironment;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -24,15 +21,15 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/admin/configEnvironment" )
+@RequestMapping( "/config/env" )
 public class ConfigEnvironmentController extends BaseController {
     @Resource
-    private IConfigEnvironmentService configEnvironmentService;
+    private ConfigEnvironmentService configEnvironmentService;
 
     /**
      * 查询环境参数配置列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:list')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ConfigEnvironment>> list( ConfigEnvironment configEnvironment ) {
         List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentList( configEnvironment );
@@ -40,42 +37,9 @@ public class ConfigEnvironmentController extends BaseController {
     }
 
     /**
-     * 查询环境参数配置列表
-     */
-    @PreAuthorize( "@ss.hasPermi('admin:recommonPic:list')" )
-    @GetMapping( "/listRecommonPic" )
-    public RspBase<List<ConfigEnvironment>> listRecommonPic( ConfigEnvironment configEnvironment ) {
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        startPage( pageDomain );
-        List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentTwo( configEnvironment );
-        return getRspBasePage( list, pageDomain );
-    }
-
-    /**
-     * 获取推广图详细信息
-     */
-    @PreAuthorize( "@ss.hasPermi('admin:recommonPic:edit')" )
-    @GetMapping( value = "/getRecommonPic/{envCode}" )
-    public RspBase<?> getInfoRecommonPic( @PathVariable( "envCode" ) String envCode ) {
-        return RspBase.ok( configEnvironmentService.selectConfigEnvironmentByIdTwo( envCode ) );
-    }
-
-    /**
-     * 修改推广图
-     */
-    @PreAuthorize( "@ss.hasPermi('admin:recommonPic:edit')" )
-    @PutMapping( value = "/updateRecommonPic" )
-    public RspBase<?> updateRecommonPic( @RequestBody ConfigEnvironment configEnvironment ) {
-        if ( StringUtils.isNotBlank( configEnvironment.getEnvValue() ) ) {
-            configEnvironment.setEnvValue( "${domain.oss}" + configEnvironment.getEnvValue() );
-        }
-        return toResult( configEnvironmentService.updateConfigEnvironment( configEnvironment ) );
-    }
-
-    /**
      * 导出环境参数配置列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:export')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:export')" )
     @Log( title = "导出环境参数配置列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ConfigEnvironment configEnvironment, HttpServletResponse response ) {
@@ -86,7 +50,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 获取环境参数配置详细信息
      */
-    //@PreAuthorize( "@ss.hasPermi('admin:configEnvironment:query')" )
+    //@PreAuthorize( "@ss.hasPermi('config:env:query')" )
     @GetMapping( value = "/{envCode}" )
     public RspBase<ConfigEnvironment> getInfo( @PathVariable( "envCode" ) String envCode ) {
         return RspBase.ok( configEnvironmentService.selectConfigEnvironmentById( envCode ) );
@@ -95,7 +59,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 新增环境参数配置
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:add')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:add')" )
     @Log( title = "新增环境参数配置", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody ConfigEnvironment configEnvironment ) {
@@ -109,7 +73,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 修改环境参数配置
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:edit')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:edit')" )
     @Log( title = "修改环境参数配置", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ConfigEnvironment configEnvironment ) {
@@ -119,7 +83,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 修改环境参数状态
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:edit')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:edit')" )
     @Log( title = "修改环境参数状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus" )
     public RspBase<?> changeStatus( @RequestBody ConfigEnvironment configEnvironment ) {
@@ -130,7 +94,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 修改环境参数配置
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:edit')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:edit')" )
     @Log( title = "批量修改环境参数配置", businessType = BusinessType.UPDATE )
     @PostMapping( "/editList" )
     public RspBase<?> edit( @RequestBody ArrayList<ConfigEnvironment> configEnvironments ) {
@@ -149,7 +113,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 获取环境参数头所对应的index
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:edit')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:edit')" )
     @GetMapping( "/getTitleIndex" )
     public RspBase<?> getTitleIndex( String title, String code ) {
         return RspBase.ok( configEnvironmentService.getTitleIndex( title, code ) );
@@ -158,7 +122,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 删除环境参数配置
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:remove')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:remove')" )
     @Log( title = "环境参数配置", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{envCodes}" )
     public RspBase<?> remove( @PathVariable String[] envCodes ) {
@@ -168,7 +132,7 @@ public class ConfigEnvironmentController extends BaseController {
     /**
      * 删除环境参数配置
      */
-    @PreAuthorize( "@ss.hasPermi('admin:configEnvironment:remove')" )
+    @PreAuthorize( "@ss.hasPermi('config:env:remove')" )
     @Log( title = "环境参数配置", businessType = BusinessType.CLEAN )
     @DeleteMapping( "/refreshCache" )
     public RspBase<?> refreshCache() {

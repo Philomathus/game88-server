@@ -10,7 +10,7 @@ import java.util.List;
  * @author MengJun
  * @date 2021-01-27
  */
-public interface IConfigEnvironmentService {
+public interface ConfigEnvironmentService {
 	/**
 	 * 查询环境参数配置
 	 *

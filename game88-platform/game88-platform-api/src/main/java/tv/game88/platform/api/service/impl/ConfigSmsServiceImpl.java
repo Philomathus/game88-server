@@ -1,9 +1,9 @@
-package tv.game88.admin.system.service.impl;
+package tv.game88.platform.api.service.impl;
 
 import org.springframework.stereotype.Service;
-import tv.game88.admin.system.service.IConfigSmsService;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
+import tv.game88.platform.api.service.ConfigSmsService;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 @Service
-public class ConfigSmsServiceImpl implements IConfigSmsService {
+public class ConfigSmsServiceImpl implements ConfigSmsService {
 
     @Resource
     private ConfigSmsMapper configSmsMapper;

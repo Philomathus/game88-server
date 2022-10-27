@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import tv.game88.admin.system.cache.DictUtils;
 import tv.game88.admin.system.entity.SysDictData;
 import tv.game88.admin.system.mapper.SysDictDataMapper;
-import tv.game88.admin.system.service.IConfigEnvironmentService;
+import tv.game88.admin.system.service.ConfigEnvironmentService;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
@@ -22,15 +22,15 @@ import java.util.List;
  * @date 2021-01-27
  */
 @Service
-public class ConfigEnvironmentServiceImpl implements IConfigEnvironmentService {
+public class ConfigEnvironmentServiceImpl implements ConfigEnvironmentService {
     @Resource
     private ConfigEnvironmentMapper configEnvironmentMapper;
     @Resource
-    private SysDictDataMapper  dictDataMapper;
+    private SysDictDataMapper       dictDataMapper;
     @Resource
-    private ConfigEnvCacheUtil configEnvCacheUtil;
+    private ConfigEnvCacheUtil      configEnvCacheUtil;
     @Resource
-    private DictUtils          dictUtils;
+    private DictUtils               dictUtils;
 
     /**
      * 查询环境参数配置
