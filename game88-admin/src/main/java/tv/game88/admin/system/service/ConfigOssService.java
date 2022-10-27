@@ -46,7 +46,6 @@ public interface ConfigOssService {
      * @param id oss文件存储服务配置ID
      * @return 结果
      */
-    public int deleteConfigOssById( Long id );
 
     int effect( long id );
 

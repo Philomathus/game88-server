@@ -27,6 +27,12 @@ public class ConfigOssController extends BaseController {
     @Autowired
     private ConfigOssService configOssService;
 
+    /**
+     * 查询oss文件存储服务配置列表
+     * select all ConfigOss controller
+     * @param configOss oss文件存储服务配置
+     * @return oss文件存储服务配置集合
+     */
     @PreAuthorize( "@ss.hasPermi('config:oss:list')" )
     @GetMapping("/list")
     public RspBase<List<ConfigOss>> list(ConfigOss configOss){
@@ -34,12 +40,24 @@ public class ConfigOssController extends BaseController {
        return RspBase.ok(list);
     }
 
+    /**
+     * 按 ID 选择 configOss
+     * select configOss By Id controller
+     * @param id oss
+     * @return 结果
+     */
     @PreAuthorize( "@ss.hasPermi('config:oss:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<ConfigOss> getInfo(@PathVariable Long id ) {
         return RspBase.ok( configOssService.selectConfigOssById( id ) );
     }
 
+    /**
+     * 修改oss文件存储服务配置控制器层
+     * insert Oss config controller
+     * @param configOss oss文件存储服务配置
+     * @return 结果
+     */
     @PreAuthorize( "@ss.hasPermi('config:oss:add')" )
     @Log( title = "oss文件存储服务配置", businessType = BusinessType.INSERT )
     @PostMapping
@@ -48,7 +66,10 @@ public class ConfigOssController extends BaseController {
     }
 
     /**
-     * update configOss
+     * 修改oss文件存储服务配置控制器层
+     * Modify the service configuration controller
+     * @param configOss oss文件存储服务配置
+     * @return 结果
      */
     @PreAuthorize( "@ss.hasPermi('config:oss:edit')" )
     @Log( title = "oss文件存储服务配置", businessType = BusinessType.UPDATE )
@@ -58,8 +79,10 @@ public class ConfigOssController extends BaseController {
     }
 
     /**
-     * Delete the oss configuration
-     * 删除oss配置
+     * 批量删除oss文件存储服务配置控制器层
+     * delete configOss by Ids service implementation
+     * @param ids 需要删除的oss文件存储服务配置ID
+     * @return 结果
      */
     @PreAuthorize( "@ss.hasPermi('config:oss:remove')" )
     @Log( title = "oss文件存储服务配置", businessType = BusinessType.DELETE )
