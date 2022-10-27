@@ -12,13 +12,13 @@ public class PageDomain {
     /**
      * 当前记录起始索引
      */
-    @Schema( name = "当前页", example = "1" )
+    @Schema( title = "当前页", example = "1" )
     private Integer pageNum = 1;
 
     /**
      * 每页显示记录数
      */
-    @Schema( name = "每页条数", example = "10" )
+    @Schema( title = "每页条数", example = "10" )
     private Integer pageSize = 10;
 
     /**

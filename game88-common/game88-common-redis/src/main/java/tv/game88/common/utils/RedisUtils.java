@@ -32,6 +32,10 @@ public class RedisUtils {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
+    public RedisConnectionFactory getConnectionFactory() {
+        return stringRedisTemplate.getConnectionFactory();
+    }
+
     // ---------------------- key操作 ---------------------
 
     /**

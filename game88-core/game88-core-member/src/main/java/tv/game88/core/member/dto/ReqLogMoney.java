@@ -7,10 +7,10 @@ import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.enums.EnumReqTime;
 
 @Data
-@Schema( name = "账户明细请求数据" )
+@Schema( title = "账户明细请求数据" )
 public class ReqLogMoney extends PageDomain {
-    @Schema( name = "交易状态" )
+    @Schema( title = "交易状态" )
     private EnumMoney   enumMoney;
-    @Schema( name = "交易时间" )
+    @Schema( title = "交易时间" )
     private EnumReqTime enumReqTime;
 }

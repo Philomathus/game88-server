@@ -1,4 +1,4 @@
-package tv.game88.core.session.vo;
+package tv.game88.core.member.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,17 +7,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.member.vo.PlatformUser;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Data
 public class MemberLoginUser implements UserDetails {
-    /**
-     * 用户唯一标识
-     */
-    private String        token;
     /**
      * 登录时间
      */
@@ -26,7 +21,7 @@ public class MemberLoginUser implements UserDetails {
     /**
      * 登录IP地址
      */
-    private String        ipAddr;
+    private String        loginIp;
     /**
      * 用户信息
      */
@@ -36,6 +31,9 @@ public class MemberLoginUser implements UserDetails {
     private String platformUserStr;
 
     private String userId;
+
+    public MemberLoginUser() {
+    }
 
     public MemberLoginUser( PlatformUser platformUser ) {
         this.setPlatformUser( platformUser );
@@ -73,7 +71,7 @@ public class MemberLoginUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return platformUser.getUserName();
+        return platformUser.getId();
     }
 
     @JsonIgnore

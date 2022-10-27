@@ -6,7 +6,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import tv.game88.common.security.context.AuthenticationContextHolder;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.constant.AdminConstants;
@@ -69,7 +68,7 @@ public class SysLoginService {
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken( loginBody.getUsername(), loginBody.getPassword() );
-            AuthenticationContextHolder.setContext( authenticationToken );
+            AuthContextHolderUtils.setContext( authenticationToken );
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
@@ -84,7 +83,7 @@ public class SysLoginService {
                 return RspBase.businessError( e.getMessage() );
             }
         } finally {
-            AuthenticationContextHolder.clearContext();
+            AuthContextHolderUtils.clearContext();
         }
 
         String ip = ServletUtil.getIp();

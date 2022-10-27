@@ -7,10 +7,6 @@ package tv.game88.core.config.constants;
  * @author admin
  */
 public class Constants {
-    /**
-     * 令牌前缀
-     */
-    public static final String USER_KEY    = "userKey";
     public static final String CONFIG_PREX = "config:";
     public static final String MEMBER_PREX = "member:";
 

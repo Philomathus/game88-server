@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.session.service.MemberTokenService;
-import tv.game88.core.session.utils.MemberSecurityUtils;
-import tv.game88.core.session.vo.MemberLoginUser;
+import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.core.member.vo.MemberLoginUser;
 
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;
@@ -23,7 +23,7 @@ import java.io.IOException;
  * @author MengJun
  */
 @Component
-public class MemberJwtAuthenticationTokenFilter extends OncePerRequestFilter {
+public class MemberAuthenticationTokenFilter extends OncePerRequestFilter {
 	@Resource
 	private MemberTokenService memberTokenService;
 
@@ -32,7 +32,7 @@ public class MemberJwtAuthenticationTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		MemberLoginUser loginUser = memberTokenService.getLoginUser( request );
 		if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( MemberSecurityUtils.getAuthentication() ) ) {
-			memberTokenService.refreshToken( loginUser );
+			memberTokenService.refreshLoginUserCache( loginUser );
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
 					loginUser.getAuthorities() );
 			authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );

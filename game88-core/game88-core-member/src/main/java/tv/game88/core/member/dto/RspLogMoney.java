@@ -6,20 +6,20 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-@Schema( name = "账户明细" )
+@Schema( title = "账户明细" )
 public class RspLogMoney {
 
-    @Schema( name = "时间" )
+    @Schema( title = "时间" )
     private String     createTime;
-    @Schema( name = "状态" )
+    @Schema( title = "状态" )
     private String     des;
-    @Schema( name = "支出" )
+    @Schema( title = "支出" )
     private BigDecimal pay;
-    @Schema( name = "收入" )
+    @Schema( title = "收入" )
     private BigDecimal income;
-    @Schema( name = "余额" )
+    @Schema( title = "余额" )
     private BigDecimal total;
-    @Schema( name = "余额" )
+    @Schema( title = "余额" )
     private BigDecimal totalBefore;
 
 }

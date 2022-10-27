@@ -1,11 +1,9 @@
 package tv.game88.core.session.service;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -13,15 +11,15 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.core.session.vo.MemberLoginUser;
+import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.vo.MemberLoginUser;
+import tv.game88.core.member.vo.PlatformUser;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,25 +32,31 @@ import java.util.Map;
 public class MemberTokenService {
     // 令牌有效期（默认1天）
     @Value( "${token.expireTime:1}" )
-    private int    expireTime;
+    private int expireTime;
 
     @Resource
     private RedisUtils redisUtil;
 
-    private static Key KEY_SECRET;
-
-    @Value( "${token.secret}" )
-    private void setKeySecret( String secret ) {
-        MemberTokenService.KEY_SECRET = Keys.hmacShaKeyFor( secret.getBytes( StandardCharsets.UTF_8 ) );
-    }
-
-    public static void main( String[] args ) throws Exception {
-        //SecretKey secretKey = Keys.secretKeyFor( SignatureAlgorithm.HS512);
-        //System.out.println( Base64Utils.encodeToString( secretKey.getEncoded() ));
-
-        //KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS512);
-        //System.out.println("公钥:" + Base64Utils.encodeToString( keyPair.getPublic().getEncoded() ));
-        //System.out.println("私钥:" + Base64Utils.encodeToString( keyPair.getPrivate().getEncoded() ));
+    /**
+     * 设置会员token
+     *
+     * @param rspMember 会员信息
+     * @param ip        登录IP
+     */
+    public void setRspMemberToken( RspMember rspMember, String ip ) {
+        if ( rspMember != null ) {
+            PlatformUser platformUser = new PlatformUser();
+            BeanUtils.copyProperties( rspMember, platformUser );
+            if ( StringUtils.isNotBlank( platformUser.getHeadImg() ) ) {
+                platformUser.setHeadImg( platformUser.getHeadImg().substring(
+                        platformUser.getHeadImg().lastIndexOf( "head" ) + 4, platformUser.getHeadImg().lastIndexOf( ".png" ) ) );
+            }
+            MemberLoginUser loginUser = new MemberLoginUser( platformUser );
+            loginUser.setLoginTime( LocalDateTime.now() );
+            loginUser.setLoginIp( ip );
+            String token = this.createToken( loginUser );
+            rspMember.setToken( token );
+        }
     }
 
     /**
@@ -64,16 +68,7 @@ public class MemberTokenService {
         // 获取请求携带的令牌
         String token = getToken( request );
         if ( StringUtils.isNotBlank( token ) ) {
-            Claims claims = parseToken( token );
-            if ( claims == null ) {
-                return null;
-            }
-            // 解析对应的权限以及用户信息
-            String userKey = ( String ) claims.get( Constants.USER_KEY );
-            if ( StringUtils.isBlank( userKey ) ) {
-                return null;
-            }
-            Map<Object, Object> loginUserMap = redisUtil.hGetAll( Constants.MEMBER_LOGIN_TOKEN + userKey );
+            Map<Object, Object> loginUserMap = redisUtil.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
             if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
                 return JsonUtil.map2Object( loginUserMap, MemberLoginUser.class );
             }
@@ -84,12 +79,13 @@ public class MemberTokenService {
     /**
      * 设置用户身份信息
      */
-    public void setLoginUser( MemberLoginUser loginUser ) {
-        if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNotBlank( loginUser.getToken() ) ) {
+    public void setLoginUserCache( MemberLoginUser loginUser, String token ) {
+        if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNotBlank( token ) ) {
+            this.delToken( loginUser.getUserId() );
             Duration duration = Duration.ofDays( expireTime );
-            redisUtil.strSet( Constants.MEMBER_LOGIN_USER + loginUser.getUserId(), loginUser.getToken(), duration );
-            redisUtil.hMSet( Constants.MEMBER_LOGIN_TOKEN + loginUser.getToken(), JsonUtil.object2Map( loginUser ) );
-            redisUtil.expire( Constants.MEMBER_LOGIN_TOKEN + loginUser.getToken(), duration );
+            redisUtil.strSet( Constants.MEMBER_LOGIN_USER + loginUser.getUserId(), token, duration );
+            redisUtil.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, JsonUtil.object2Map( loginUser ) );
+            redisUtil.expire( Constants.MEMBER_LOGIN_TOKEN + token, duration );
         }
     }
 
@@ -100,53 +96,22 @@ public class MemberTokenService {
      *
      * @return 令牌
      */
-    public String createToken( MemberLoginUser loginUser ) {
+    private String createToken( MemberLoginUser loginUser ) {
         String token = RandomStringUtils.randomAlphabetic( 2 ) + IdWorker.get32UUID();
-        loginUser.setToken( token );
-        setLoginUser( loginUser );
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put( Constants.USER_KEY, token );
-        return createToken( claims );
+        setLoginUserCache( loginUser, token );
+        return token;
     }
 
     /**
      * 刷新令牌有效期
      */
-    public void refreshToken( MemberLoginUser loginUser ) {
+    public void refreshLoginUserCache( MemberLoginUser loginUser ) {
         String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + loginUser.getUserId() );
         if ( StringUtils.isNotBlank( token ) ) {
             Duration duration = Duration.ofDays( expireTime );
             redisUtil.expire( Constants.MEMBER_LOGIN_USER + loginUser.getUserId(), duration );
             redisUtil.expire( Constants.MEMBER_LOGIN_TOKEN + token, duration );
         }
-    }
-
-    /**
-     * 从数据声明生成令牌
-     *
-     * @param claims 数据声明
-     *
-     * @return 令牌
-     */
-    private String createToken( Map<String, Object> claims ) {
-        return Jwts.builder().setClaims( claims ).signWith( KEY_SECRET ).compact();
-    }
-
-    /**
-     * 从令牌中获取数据声明
-     *
-     * @param token 令牌
-     *
-     * @return 数据声明
-     */
-    private Claims parseToken( String token ) {
-        try {
-            return Jwts.parserBuilder().setSigningKey( KEY_SECRET ).build().parseClaimsJws( token ).getBody();
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-        }
-        return null;
     }
 
     /**
