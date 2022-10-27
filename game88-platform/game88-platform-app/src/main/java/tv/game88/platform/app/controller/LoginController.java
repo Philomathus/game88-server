@@ -65,8 +65,10 @@ public class LoginController {
 
     @Operation( summary = "注册接口", description = "手机号验证码注册,同时也会更新密码以及直接登录" )
     @PostMapping( "/register" )
-    public RspBase<RspMember> register( @RequestBody MobileLogin mobileLogin ) {
-        RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin );
+    public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
+                                        @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
+                                        @RequestBody MobileLogin mobileLogin ) {
+        RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin, dev, version, loginUrl );
         memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }

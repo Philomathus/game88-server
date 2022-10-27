@@ -17,5 +17,5 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<RspMember> loginDevice( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
 
-    RspBase<RspMember> register( MobileLogin mobileLogin );
+    RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
 }

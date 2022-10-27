@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.*;
@@ -21,7 +20,6 @@ import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumDev;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.vo.MemberLoginUser;
 import tv.game88.platform.api.dto.MobileLogin;
 import tv.game88.platform.api.dto.RspInit;
 import tv.game88.platform.api.dto.RspManUpdateVersion;
@@ -143,9 +141,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "请勿重复登录" );
         }
 
-        this.baseMapper.updateById( update );
         if ( oldm != null ) {
+            this.baseMapper.insert( memberInfo );
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
+        } else {
+            this.baseMapper.updateById( update );
         }
 
         RspMember rspMember = new RspMember();
@@ -216,7 +216,19 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<RspMember> register( MobileLogin mobileLogin ) {
+    public RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) {
+        if ( StringUtils.isBlank( mobileLogin.getMobile() ) ) {
+            return RspBase.businessError( "请输入手机号码" );
+        }
+        if ( mobileLogin.getMobile().length() != 11 ) {
+            return RspBase.businessError( "请输入正确的手机号" );
+        }
+        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
+            return RspBase.businessError( "请输入登陆密码" );
+        }
+        if ( StringUtils.isBlank( mobileLogin.getCode() ) ) {
+            return RspBase.businessError( "请输入短信验证码" );
+        }
         return null;
     }
 

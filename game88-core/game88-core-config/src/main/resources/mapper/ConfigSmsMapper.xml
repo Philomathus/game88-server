@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.config.mapper.ConfigSmsMapper">
+	<resultMap type="tv.game88.core.config.entity.ConfigSms" id="ConfigSmsResult">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="provider" column="provider"/>
+		<result property="appKey" column="app_key"/>
+		<result property="appAccess" column="app_access"/>
+		<result property="region" column="region"/>
+		<result property="signature" column="signature"/>
+		<result property="template" column="template"/>
+		<result property="smsSdkAppid" column="sms_sdk_appid"/>
+		<result property="identify" column="identify"/>
+		<result property="isEffect" column="is_effect"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="endpoint" column="endpoint"/>
+	</resultMap>
+
+	<sql id="selectConfigSmsVo">
+		select id,
+			   name,
+			   provider,
+			   app_key,
+			   app_access,
+			   region,
+			   signature,
+			   template,
+			   sms_sdk_appid,
+			   identify,
+			   is_effect,
+			   endpoint,
+		       update_time
+		from config_sms
+	</sql>
+
+	<select id="selectConfigSmsList" parameterType="tv.game88.core.config.entity.ConfigSms" resultMap="ConfigSmsResult">
+		<include refid="selectConfigSmsVo"/>
+		<where>
+			<if test="name != null  and name != ''">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="provider != null">
+				and provider = #{provider}
+			</if>
+			<if test="isEffect != null">
+				and is_effect = #{isEffect}
+			</if>
+		</where>
+		order by is_effect desc, update_time asc
+	</select>
+
+	<select id="selectConfigOssByEffect" resultMap="ConfigSmsResult">
+		<include refid="selectConfigSmsVo"/>
+		where is_effect = 1 order by RAND()
+	</select>
+</mapper>
