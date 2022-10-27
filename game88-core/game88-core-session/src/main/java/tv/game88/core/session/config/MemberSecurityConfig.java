@@ -106,7 +106,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 )
                 .permitAll()
                 // 对于登录初始化相关 允许匿名访问
-                //.mvcMatchers( HttpMethod.POST,"/init" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/init" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/check-update" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/login" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/login-device" ).anonymous()

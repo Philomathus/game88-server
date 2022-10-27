@@ -94,7 +94,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<RspMember> login( MobileLogin mobileLogin ) {
+    public RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) {
         if ( StringUtils.isBlank( mobileLogin.getMobile() ) ) {
             return RspBase.businessError( "请输入手机号码" );
         }
@@ -103,24 +103,25 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
 
         MemberInfo memberInfo = this.baseMapper.findMemberByMobile( mobileLogin.getMobile() );
-        if ( memberInfo != null ) {
-
-        }else {
+        MemberInfo oldm       = null;
+        if ( memberInfo == null ) {
             //检查是不是归档会员回归
-            
+            oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
+            if ( oldm == null ) {
+                return RspBase.businessError( "手机号不存在/密码错误" );
+            }
+            memberInfo = oldm;
         }
         if ( memberInfo.getStatus() == 0 ) {
             return RspBase.businessError( "您被限制登录,请联系客服" );
         }
 
-        // 用户验证
-        Authentication authentication = null;
         try {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken( memberInfo.getId(), mobileLogin.getPasswd() );
             AuthContextHolderUtils.setContext( authenticationToken );
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
-            authentication = authenticationManager.authenticate( authenticationToken );
+            authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             return RspBase.businessError( "手机号不存在/密码错误" );
         } finally {
@@ -130,13 +131,23 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         String ip = ServletUtil.getIp();
         log.info( "会员{}手机号密码登录IP:{}", memberInfo.getId(), ip );
 
-        MemberLoginUser loginUser = ( MemberLoginUser ) authentication.getPrincipal();
+        MemberInfo update = new MemberInfo();
+        update.setId( memberInfo.getId() );
 
-        if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getDeviceId(), 5 ) ) {
+        this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
+
+        if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
             return RspBase.businessError( "请勿重复登录" );
         }
 
-        return null;
+        this.baseMapper.updateById( update );
+        if ( oldm != null ) {
+            this.baseMapper.deleteByHistoryKey( oldm.getId() );
+        }
+
+        RspMember rspMember = new RspMember();
+        BeanUtils.copyProperties( memberInfo, rspMember );
+        return RspBase.ok( rspMember );
     }
 
     @Override
@@ -201,6 +212,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         return RspBase.ok( rspMember );
     }
 
+    @Override
+    public RspBase<RspMember> register( MobileLogin mobileLogin ) {
+        return null;
+    }
+
     private void setMemberLoginParam( MobileLogin mobileLogin, Integer dev, String version, String loginUrl,
                                       String loginProvince, MemberInfo memberInfo ) {
         memberInfo.setLoginDev( dev );
@@ -219,17 +235,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             try {
                 memberInfo.setLoginProvince( this.baseMapper.funGetaddressProvinces( mobileLogin.getIp() ) );
             } catch ( Exception e ) {
-                log.error( e.getMessage(), e );
+                log.error( "获取ip所属省份失败，失败原因：{}", e.getMessage() );
             }
         }
         if ( StringUtils.isNotBlank( loginUrl ) ) {
             memberInfo.setLinkUrl( loginUrl );
         }
-    }
-
-    @Override
-    public RspBase<RspMember> register( MobileLogin mobileLogin ) {
-        return null;
     }
 
     private MemberInfo newMemberInfoReg( MobileLogin mobileLogin ) {

@@ -70,8 +70,6 @@ pagehelper:
 
 # token配置
 token:
-  # 令牌密钥 HS512算法
-  secret: +wllJK9nldGovP0MqRaq1HNtUPOkqslaOPtgAqCmdM7dE5PPRWYVojUzjZb9pePkJOrnUz+31H0rntvCam7CEg==
   # 令牌有效期（默认1天）
   expireTime: 6
 

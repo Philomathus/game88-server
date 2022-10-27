@@ -13,7 +13,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspManUpdateVersion checkManUpdateVersion( Integer dev, String version );
 
-    RspBase<RspMember> login( MobileLogin mobileLogin );
+    RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
 
     RspBase<RspMember> loginDevice( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
 

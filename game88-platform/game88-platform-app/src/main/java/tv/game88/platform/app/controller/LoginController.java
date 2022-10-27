@@ -38,15 +38,17 @@ public class LoginController {
 
     @Operation( summary = "人工更新请求版本" )
     @PostMapping( "/check-update" )
-    public RspBase<RspManUpdateVersion> getManUpdateVersion( @RequestHeader( "dev" ) Integer dev,
-                                                             @RequestHeader( "version" ) String version ) {
+    public RspBase<RspManUpdateVersion> checkManUpdateVersion( @RequestHeader( "dev" ) Integer dev,
+                                                               @RequestHeader( "version" ) String version ) {
         return RspBase.ok( memberInfoService.checkManUpdateVersion( dev, version ) );
     }
 
     @Operation( summary = "手机号密码登录接口" )
     @PostMapping( "/login" )
-    public RspBase<RspMember> login( @RequestBody MobileLogin mobileLogin ) {
-        RspBase<RspMember> rspMemberRspBase = memberInfoService.login( mobileLogin );
+    public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
+                                           @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
+                                           @RequestBody MobileLogin mobileLogin ) {
+        RspBase<RspMember> rspMemberRspBase = memberInfoService.login( mobileLogin, dev, version, loginUrl );
         memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }

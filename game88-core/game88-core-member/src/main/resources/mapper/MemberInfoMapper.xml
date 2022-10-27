@@ -177,6 +177,10 @@
 		select * from member_info_history where device_id = #{deviceId} limit 1
 	</select>
 
+	<select id="findMemberHistoryByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
+		select * from member_info_history where phone = #{phone} limit 1
+	</select>
+
 	<select id="findMemberByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
 		select * from member_info where phone = #{phone}
 	</select>
@@ -354,14 +358,7 @@
 		where id REGEXP concat('_', #{inviterCode}, '$')
 	</select>
 	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
-		select id,
-			   password,
-			   nick_name nickName,
-			   status,
-			   vip,
-			   inviter_code inviterCode,
-			   head_img headImg
-		where id = #{userId}
+		select id,password,nick_name,status,vip,register_type,head_img where id = #{userId}
 	</select>
 	<select id="funGetaddressProvinces" resultType="java.lang.String">
 		select fun_getaddress_provinces(#{ip})
