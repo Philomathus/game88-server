@@ -30,10 +30,6 @@ public interface ConfigEnvironmentMapper extends BaseMapper<ConfigEnvironment> {
 
 	public int checkCode( String envValue );
 
-	public int checkType2( String envTitle );
-
-	public int checkCode2( String envCode );
-
     public String getValue();
 
 }

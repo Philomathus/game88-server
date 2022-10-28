@@ -67,6 +67,13 @@ public class DictUtils {
     }
 
     /**
+     * 清空字典缓存
+     */
+    public void clearDictCache( String key ) {
+        redisUtil.hRemove( SYS_DICT_KEY, key );
+    }
+
+    /**
      * 获取字典缓存
      *
      * @param key 参数键

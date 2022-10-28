@@ -2,31 +2,30 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>tv.game88.platform</groupId>
-        <artifactId>game88-platform</artifactId>
+        <artifactId>game88-pay</artifactId>
+        <groupId>tv.game88.pay</groupId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>game88-platform-admin</artifactId>
+    <artifactId>game88-pay-api</artifactId>
 
-    <name>Game88 Server Platform Admin</name>
-    <description>88棋牌服务-平台和会员管理后台服务</description>
+    <name>Game88 Server Pay Api</name>
+    <description>88棋牌服务-会员出入款API服务</description>
 
     <dependencies>
         <dependency>
             <groupId>tv.game88.core</groupId>
-            <artifactId>game88-core-admin</artifactId>
+            <artifactId>game88-core-config</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>tv.game88.core</groupId>
-            <artifactId>game88-core-admin-dict</artifactId>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-http</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>tv.game88.platform</groupId>
-            <artifactId>game88-platform-api</artifactId>
-            <version>1.0</version>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-annotation</artifactId>
         </dependency>
     </dependencies>
 </project>

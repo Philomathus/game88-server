@@ -17,12 +17,6 @@
             <groupId>tv.game88.platform</groupId>
             <artifactId>game88-platform-api</artifactId>
             <version>1.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>tv.game88.core</groupId>
-                    <artifactId>game88-core-admin-dict</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

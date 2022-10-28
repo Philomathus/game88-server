@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>game88-pay</artifactId>
+        <groupId>tv.game88.pay</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>game88-pay-app</artifactId>
+
+    <name>Game88 Server Pay app</name>
+    <description>88棋牌服务-会员出入款APP服务</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>tv.game88.pay</groupId>
+            <artifactId>game88-pay-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,12 +1,17 @@
 package tv.game88.platform.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.cache.DictUtils;
+import tv.game88.core.admin.entity.SysDictData;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.mapper.SysDictDataMapper;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.platform.api.service.ConfigEnvironmentService;
 
@@ -25,6 +30,10 @@ import java.util.List;
 public class ConfigEnvironmentController extends BaseController {
     @Resource
     private ConfigEnvironmentService configEnvironmentService;
+    @Resource
+    private DictUtils                dictUtils;
+    @Resource
+    private SysDictDataMapper        sysDictDataMapper;
 
     /**
      * 查询环境参数配置列表
@@ -64,6 +73,30 @@ public class ConfigEnvironmentController extends BaseController {
     @PostMapping
     public RspBase<?> add( @RequestBody ConfigEnvironment configEnvironment ) {
         try {
+            if ( "M".equals( configEnvironment.getMenuType() ) ) {
+                //判断名称是否存在
+                QueryWrapper<SysDictData> queryLabel = new QueryWrapper<SysDictData>()
+                        .eq( "dict_type", "config_environment_group" ).eq( "dict_label", configEnvironment.getEnvTitle() );
+                if ( sysDictDataMapper.exists( queryLabel ) ) {
+                    throw new BusinessException( "名称已存在" );
+                }
+                QueryWrapper<SysDictData> queryValue = new QueryWrapper<SysDictData>()
+                        .eq( "dict_type", "config_environment_group" ).eq( "dict_value", configEnvironment.getEnvSort() );
+                //判断编码是否存在
+                if ( sysDictDataMapper.exists( queryValue ) ) {
+                    throw new BusinessException( "排序和值已存在" );
+                }
+                SysDictData dictData = new SysDictData();
+                dictData.setDictSort( configEnvironment.getEnvSort() );
+                dictData.setDictLabel( configEnvironment.getEnvTitle() );
+                dictData.setDictValue( configEnvironment.getEnvSort() + "" );
+                dictData.setDictType( "config_environment_group" );
+                dictData.setListClass( "default" );
+                dictData.setStatus( String.valueOf( 0 ) );
+                dictUtils.clearDictCache( "config_environment_group" );
+                //加入数据库
+                return toResult( sysDictDataMapper.insertDictData( dictData ) );
+            }
             return RspBase.ok( configEnvironmentService.insertConfigEnvironment( configEnvironment ) );
         } catch ( Exception e ) {
             return RspBase.businessError( e.getMessage() );

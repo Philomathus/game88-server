@@ -44,16 +44,11 @@
             <if test="code != null and code != ''">And env_code = #{code}</if>
         </where>
     </select>
+
     <select id="checkType" resultType="int">
-        SELECT COUNT(*) FROM sys_dict_data where dict_type= 'config_environment_group' and dict_label=#{envTitle}
-    </select>
-    <select id="checkCode" resultType="int">
-        SELECT COUNT(*) FROM sys_dict_data where dict_type= 'config_environment_group' and dict_value=#{envValue}
-    </select>
-    <select id="checkType2" resultType="int">
         SELECT COUNT(*) FROM `config_environment` where env_title=#{envTitle}
     </select>
-    <select id="checkCode2" resultType="int">
+    <select id="checkCode" resultType="int">
         SELECT COUNT(*) FROM `config_environment` where env_code=#{envValue}
     </select>
     <select id="getValue" resultType="java.lang.String">

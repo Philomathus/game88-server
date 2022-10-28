@@ -18,7 +18,6 @@ public interface ConfigEnvironmentService {
 	 * @return 环境参数配置
 	 */
 	public ConfigEnvironment selectConfigEnvironmentById( String envCode );
-	public ConfigEnvironment selectConfigEnvironmentByIdTwo(String envCode);
 
 	/**
 	 * 查询环境参数配置列表
@@ -27,7 +26,6 @@ public interface ConfigEnvironmentService {
 	 * @return 环境参数配置集合
 	 */
 	public List<ConfigEnvironment> selectConfigEnvironmentList(ConfigEnvironment configEnvironment);
-	public List<ConfigEnvironment> selectConfigEnvironmentTwo(ConfigEnvironment configEnvironment);
 
 	/**
 	 * 新增环境参数配置
@@ -55,14 +53,6 @@ public interface ConfigEnvironmentService {
 	 * @return 结果
 	 */
 	public int deleteConfigEnvironmentByIds(String[] envCodes );
-
-	/**
-	 * 删除环境参数配置信息
-	 *
-	 * @param envCode 环境参数配置ID
-	 * @return 结果
-	 */
-	public int deleteConfigEnvironmentById(String envCode);
 
     public int getTitleIndex(String title, String code);
 

@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>tv.game88.common</groupId>
-            <artifactId>game88-common-easypoi</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>tv.game88.common</groupId>
             <artifactId>game88-common-orm</artifactId>
             <version>1.0</version>
         </dependency>
@@ -32,6 +27,11 @@
             <groupId>tv.game88.common</groupId>
             <artifactId>game88-common-redis</artifactId>
             <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-annotation</artifactId>
         </dependency>
 
         <!-- 验证 -->
