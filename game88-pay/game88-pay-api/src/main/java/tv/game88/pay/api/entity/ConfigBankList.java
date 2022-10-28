@@ -39,16 +39,4 @@ public class ConfigBankList {
     @Schema( title = "结束颜色" )
     @Excel( name = "结束颜色" )
     private String colorEnd;
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE ).append( "id", getId() )
-                                                                          .append( "bankCode", getBankCode() )
-                                                                          .append( "bankName", getBankName() )
-                                                                          .append( "bankIcon", getBankIcon() )
-                                                                          .append( "status", getStatus() )
-                                                                          .append( "sort", getSort() )
-                                                                          .append( "colorStart", getColorStart() )
-                                                                          .append( "colorEnd", getColorEnd() ).toString();
-    }
 }
