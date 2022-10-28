@@ -6,13 +6,13 @@ server:
     buffer-size: 1024
     direct-buffers: true
   shutdown: graceful
-  port: 18811
+  port: 18802
   max-http-header-size: 65536
 spring:
   profiles:
     active: 8800
   application:
-    name: game88-platform-app
+    name: game88-pay-admin
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -36,7 +36,7 @@ spring:
 
   ## Redis 配置
   redis:
-    jedis:
+    lettuce:
       pool:
         ## 连接池最大连接数（使用负值表示没有限制）
         ##spring.redis.pool.max-active=8
@@ -60,8 +60,10 @@ spring:
   mvc:
     async:
       request-timeout: 20000
-    pathmatch:
-      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 5GB
+      max-request-size: 5GB
   lifecycle:
     timeout-per-shutdown-phase: 5s
 
@@ -70,18 +72,12 @@ pagehelper:
 
 # token配置
 token:
-  # 令牌有效期（默认1天）
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥 HS512算法
+  secret: F3bjHBhEm41jDTj2RFwM/Diofky+sW1gmNquvwnz3p0UZh6Yq6xxiPO4hTCbpYFVqjpxWDjEtclvXtkLo/zdtw==
+  # 令牌有效期（默认1小时）
   expireTime: 6
-
-swagger:
-  title: Game88 Platform App Swagger 3 Api Documentation
-  description: Game88 Platform App Spring Boot Plugin Swagger 3 Web Api Documentation
-  version: 1.0.0
-  terms-of-service-url:
-springdoc:
-  api-docs:
-    enabled: false
-  packages-to-scan: tv.game88.platform.app.controller
 
 management:
   endpoint:

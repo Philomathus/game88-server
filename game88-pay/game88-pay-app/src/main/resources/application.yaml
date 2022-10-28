@@ -6,13 +6,13 @@ server:
     buffer-size: 1024
     direct-buffers: true
   shutdown: graceful
-  port: 18811
+  port: 18812
   max-http-header-size: 65536
 spring:
   profiles:
     active: 8800
   application:
-    name: game88-platform-app
+    name: game88-pay-app
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -74,14 +74,14 @@ token:
   expireTime: 6
 
 swagger:
-  title: Game88 Platform App Swagger 3 Api Documentation
-  description: Game88 Platform App Spring Boot Plugin Swagger 3 Web Api Documentation
+  title: Game88 Pay App Swagger 3 Api Documentation
+  description: Game88 Pay App Spring Boot Plugin Swagger 3 Web Api Documentation
   version: 1.0.0
   terms-of-service-url:
 springdoc:
   api-docs:
     enabled: false
-  packages-to-scan: tv.game88.platform.app.controller
+  packages-to-scan: tv.game88.pay.app.controller
 
 management:
   endpoint:

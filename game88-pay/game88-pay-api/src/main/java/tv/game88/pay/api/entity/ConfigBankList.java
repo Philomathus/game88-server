@@ -18,14 +18,14 @@ public class ConfigBankList {
     @Schema( title = "系统编号" )
     @TableId( type = IdType.AUTO )
     private Long   id;
-    @Schema( title = "银行编码" )
-    @Excel( name = "银行编码" )
+    @Schema( title = "银行编码(选填)" )
+    @Excel( name = "银行编码(选填)" )
     private String bankCode;
     @Schema( title = "银行名称" )
     @Excel( name = "银行名称" )
     private String bankName;
-    @Schema( title = "银行图标地址" )
-    @Excel( name = "银行图标地址" )
+    @Schema( title = "银行图标" )
+    @Excel( name = "银行图标" )
     private String bankIcon;
     @Schema( title = "状态", description = "1激活 0隐藏" )
     @Excel( name = "状态" )

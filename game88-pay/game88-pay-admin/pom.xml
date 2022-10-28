@@ -14,6 +14,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-admin</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>tv.game88.pay</groupId>
             <artifactId>game88-pay-api</artifactId>
             <version>1.0</version>

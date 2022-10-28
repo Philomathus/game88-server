@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="INFO">
+
+    <Properties>
+
+        <!--日志文件路径-->
+        <Property name="LOG_FILE_PATH">logs</Property>
+        <Property name="log_level">info</Property>
+
+        <!--服务模块名称-->
+        <!--尽量要求这个配置属性的是英文代号以及是小写，使用下划线分隔标识多个单词-->
+        <Property name="SERVICE_MODULE_NAME">game88-platform-app</Property>
+        <Property name="LOG_MODULE_NAME">game88</Property>
+
+        <!--全局格式化模式-->
+        <!--服务日志时间戳 - 服务线程名称 - 服务线程编号 - 服务代码类 - 服务代码行号 - 服务模块名称 - 服务日志级别 - SFS=[服务流水号](服务流水号需要自行存入 MDC 中，
+        并 KEY 为 SERVICE_FEATURE_SERIAL 这个即可，无需再次修改配置文件) - (服务其它消息/服务功能名称 - 服务功能消息 - 服务功能参数) -->
+        <Property name="GLOBAL_FORMAT_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} - %t - %-3T - %-36.36c{1.} - %-4L - ${SERVICE_MODULE_NAME} - %-5p - SFS=[%X{SERVICE_FEATURE_SERIAL}] - %m</Property>
+        <!--通用格式化模式-->
+        <Property name="COMMON_FORMAT_PATTERN">${GLOBAL_FORMAT_PATTERN}%n</Property>
+        <!--通用彩色格式化模式,常用于标准输出，以及本地开发时或者测试时彩色的显示-->
+        <Property name="COMMON_COLOR_FORMAT_PATTERN">%highlight{${GLOBAL_FORMAT_PATTERN}%xEx{full}}%n</Property>
+        <!--通用异常格式化模式-->
+        <!--用于独立异常文件的输出-->
+        <Property name="COMMON_EXCEPTION_FORMAT_PATTERN">${GLOBAL_FORMAT_PATTERN}%xEx{full}%n</Property>
+
+    </Properties>
+
+    <Appenders>
+
+        <!--控制台-->
+        <Console name="Console">
+            <PatternLayout charset="UTF-8" alwaysWriteExceptions="false" pattern="${COMMON_COLOR_FORMAT_PATTERN}"/>
+        </Console>
+
+        <!--滚动日志默认文件-->
+        <RollingFile name="RollingFile" fileName="${LOG_FILE_PATH}/${SERVICE_MODULE_NAME}.log" filePattern="${LOG_FILE_PATH}/${SERVICE_MODULE_NAME}_%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="${log_level}" onMatch="ACCEPT" onMismatch="DENY"  />
+            <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%p] [%c:%L] -- %m%n" />
+            <TimeBasedTriggeringPolicy/>
+            <DefaultRolloverStrategy max="5">
+                <Delete basePath="${LOG_FILE_PATH}" maxDepth="1">
+                    <IfFileName glob="*.log"/>
+                    <IfLastModified age="7d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--滚动日志异常文件-->
+        <RollingFile name="ExceptionRollingFile" fileName="${LOG_FILE_PATH}/exception_${SERVICE_MODULE_NAME}.log" filePattern="${LOG_FILE_PATH}/exception_${SERVICE_MODULE_NAME}_%d{yyyy-MM-dd}.log">
+            <PatternLayout charset="UTF-8" alwaysWriteExceptions="false" pattern="${COMMON_EXCEPTION_FORMAT_PATTERN}"/>
+            <TimeBasedTriggeringPolicy/>
+            <DefaultRolloverStrategy max="5">
+                <Delete basePath="${LOG_FILE_PATH}" maxDepth="1">
+                    <IfFileName glob="*.log"/>
+                    <IfLastModified age="7d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef level="ERROR" ref="ExceptionRollingFile"/>
+        </Root>
+    </Loggers>
+</configuration>

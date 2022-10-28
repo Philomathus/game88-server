@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,20 +20,23 @@ import java.time.LocalDateTime;
 public class MemberRechargeBank {
     @Excel( name = "订单号", orderNum = "1" )
     @TableId( type = IdType.INPUT )
-    private String        orderNo;
+    private String        rechargeOrderNo;
     @Excel( name = "会员编号", orderNum = "2" )
     private String        memberId;
-    @Excel( name = "充值平台金额", orderNum = "3" )
+    @Excel( name = "充值金额", orderNum = "3" )
     private BigDecimal    rechargeMoney;
     // 0已提交1初级审核通过2审核不通过3终极审核通过4拒绝
-    @Excel( name = "订单状态", orderNum = "4" )
+    // 订单状态
     private Integer       status;
+    // payType的ID,用于区分银行卡/USDT..等其它虚拟币
+    @Excel( name = "存款类型", orderNum = "5" )
+    private Integer       rechargeType;
     @Excel( name = "存款人姓名", orderNum = "6" )
     private String        rechargeUserName;
     @Excel( name = "收款人", orderNum = "7" )
     private String        bankUserName;
-    @Excel( name = "收款银行", orderNum = "8" )
-    private String        bankName;
+    @Excel( name = "收款银行ID", orderNum = "8" )
+    private String        bankId;
     @Excel( name = "收款账号", orderNum = "9" )
     private String        bankAccount;
     @Excel( name = "开户地址", orderNum = "10" )
@@ -67,6 +68,7 @@ public class MemberRechargeBank {
     @TableField( exist = false )
     private Integer nameStatus;
     @TableField( exist = false )
+    @Excel( name = "订单状态", orderNum = "4" )
     private String  statusDesc;
 
     public String getStatusDesc() {
@@ -88,23 +90,4 @@ public class MemberRechargeBank {
         return "";
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE ).append( "orderId", getOrderNo() )
-                                                                          .append( "memberId", getMemberId() )
-                                                                          .append( "rechargeMoney", getRechargeMoney() )
-                                                                          .append( "bankName", getBankName() )
-                                                                          .append( "bankAccount", getBankAccount() )
-                                                                          .append( "status", getStatus() )
-                                                                          .append( "remark", getRemark() )
-                                                                          .append( "opName", getOpName() )
-                                                                          .append( "createTime", getCreateTime() )
-                                                                          .append( "updateTime", getUpdateTime() )
-                                                                          .append( "bankAddress", getBankAddress() )
-                                                                          .append( "rechargeUserName", getRechargeUserName() )
-                                                                          .append( "bankUserName", getBankUserName() )
-                                                                          .append( "orderNo", getOrderNo() )
-                                                                          .append( "discountBill", getDiscountBill() )
-                                                                          .append( "first", isFirst() ).toString();
-    }
 }

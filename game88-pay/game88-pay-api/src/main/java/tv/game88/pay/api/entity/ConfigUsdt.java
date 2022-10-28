@@ -9,12 +9,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 对象 ConfigUsdt
  *
- * @author 77tv
+ * @author mengJun
  * @date 2021-09-11
  */
 @Data
@@ -72,7 +72,7 @@ public class ConfigUsdt {
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "创建时间", isImportField = "true", exportFormat = "yyyy-MM-dd HH:mm:ss",
             importFormat = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新者
@@ -85,7 +85,7 @@ public class ConfigUsdt {
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "更新时间", isImportField = "true", exportFormat = "yyyy-MM-dd HH:mm:ss",
             importFormat = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 备注
