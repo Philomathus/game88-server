@@ -17,26 +17,20 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class ConfigBankList {
     @Schema( title = "系统编号" )
     @TableId( type = IdType.AUTO )
-    private Long   id;
+    private Long    id;
     @Schema( title = "银行编码(选填)" )
     @Excel( name = "银行编码(选填)" )
-    private String bankCode;
+    private String  bankCode;
     @Schema( title = "银行名称" )
     @Excel( name = "银行名称" )
-    private String bankName;
+    private String  bankName;
     @Schema( title = "银行图标" )
     @Excel( name = "银行图标" )
-    private String bankIcon;
-    @Schema( title = "状态", description = "1激活 0隐藏" )
-    @Excel( name = "状态" )
-    private String status;
+    private String  bankIcon;
+    @Schema( title = "激活状态" )
+    @Excel( name = "激活状态" )
+    private Boolean effect = false;
     @Schema( title = "排序" )
     @Excel( name = "排序" )
-    private Long   sort;
-    @Schema( title = "开始颜色" )
-    @Excel( name = "开始颜色" )
-    private String colorStart;
-    @Schema( title = "结束颜色" )
-    @Excel( name = "结束颜色" )
-    private String colorEnd;
+    private Long    sort;
 }

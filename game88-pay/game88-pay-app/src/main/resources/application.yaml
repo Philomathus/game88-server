@@ -77,7 +77,6 @@ swagger:
   title: Game88 Pay App Swagger 3 Api Documentation
   description: Game88 Pay App Spring Boot Plugin Swagger 3 Web Api Documentation
   version: 1.0.0
-  terms-of-service-url:
 springdoc:
   api-docs:
     enabled: false
