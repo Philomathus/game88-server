@@ -1,6 +1,6 @@
 package tv.game88.admin.system.service;
 
-import tv.game88.admin.system.entity.SysDictData;
+import tv.game88.core.admin.entity.SysDictData;
 
 import java.util.List;
 

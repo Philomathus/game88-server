@@ -1,15 +1,14 @@
-package tv.game88.admin.system.cache;
+package tv.game88.core.admin.cache;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import tv.game88.admin.system.entity.SysDictData;
-import tv.game88.admin.system.mapper.SysDictDataMapper;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.constant.AdminConstants;
+import tv.game88.core.admin.entity.SysDictData;
+import tv.game88.core.admin.mapper.SysDictDataMapper;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -22,6 +21,11 @@ import java.util.List;
 @Log4j2
 @Component
 public class DictUtils {
+
+    /**
+     * 字典管理 cache key
+     */
+    public static final String SYS_DICT_KEY = "sys:dictCache";
 
     /**
      * 分隔符
@@ -40,7 +44,7 @@ public class DictUtils {
      * @param dictDatas 字典数据列表
      */
     public void setDictCache( String key, List<SysDictData> dictDatas ) {
-        redisUtil.hSet( AdminConstants.SYS_DICT_KEY, key, JsonUtil.object2Json( dictDatas ) );
+        redisUtil.hSet( SYS_DICT_KEY, key, JsonUtil.object2Json( dictDatas ) );
     }
 
     /**
@@ -59,7 +63,7 @@ public class DictUtils {
      * 清空字典缓存
      */
     public void clearDictCache() {
-        redisUtil.unlink( AdminConstants.SYS_DICT_KEY );
+        redisUtil.unlink( SYS_DICT_KEY );
     }
 
     /**
@@ -70,13 +74,13 @@ public class DictUtils {
      * @return dictDatas 字典数据列表
      */
     public List<SysDictData> getDictCache( String key ) {
-        if ( !redisUtil.hHasKey( AdminConstants.SYS_DICT_KEY, key ) ) {
+        if ( !redisUtil.hHasKey( SYS_DICT_KEY, key ) ) {
             List<SysDictData> dictDataList = sysDictDataMapper.selectDictDataByType( key );
             if ( !CollectionUtils.isEmpty( dictDataList ) ) {
                 setDictCache( key, dictDataList );
             }
         }
-        String cacheObj = ( String ) redisUtil.hGet( AdminConstants.SYS_DICT_KEY, key );
+        String cacheObj = ( String ) redisUtil.hGet( SYS_DICT_KEY, key );
         if ( StringUtils.isNotNull( cacheObj ) ) {
             return JsonUtil.json2Array( cacheObj, new TypeReference<>() {} );
         }

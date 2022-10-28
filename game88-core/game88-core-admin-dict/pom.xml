@@ -2,48 +2,46 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>tv.game88.platform</groupId>
-        <artifactId>game88-platform</artifactId>
+        <groupId>tv.game88.core</groupId>
+        <artifactId>game88-core</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>game88-platform-app</artifactId>
+    <artifactId>game88-core-admin-dict</artifactId>
 
-    <name>Game88 Server Platform App</name>
-    <description>88棋牌服务-平台和会员APP服务</description>
+    <name>Game88 Server Core Admin Dict</name>
+    <description>88棋牌服务业务核心库 - 字典服务</description>
 
     <dependencies>
         <dependency>
-            <groupId>tv.game88.platform</groupId>
-            <artifactId>game88-platform-api</artifactId>
-            <version>1.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>tv.game88.core</groupId>
-                    <artifactId>game88-core-admin-dict</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>tv.game88.core</groupId>
-            <artifactId>game88-core-session</artifactId>
-            <version>1.0</version>
-        </dependency>
-
         <dependency>
             <groupId>tv.game88.common</groupId>
-            <artifactId>game88-common-swagger</artifactId>
+            <artifactId>game88-common-easypoi</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-orm</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-redis</artifactId>
             <version>1.0</version>
         </dependency>
 
+        <!-- 验证 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-validation</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <artifactId>spring-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

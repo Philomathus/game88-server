@@ -1,14 +1,14 @@
-package tv.game88.admin.system.controller;
+package tv.game88.platform.admin.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import tv.game88.admin.system.service.ConfigEnvironmentService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.config.entity.ConfigEnvironment;
+import tv.game88.platform.api.service.ConfigEnvironmentService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;

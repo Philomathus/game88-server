@@ -1,15 +1,15 @@
-package tv.game88.admin.system.service.impl;
+package tv.game88.platform.api.service.impl;
 
 import org.springframework.stereotype.Service;
-import tv.game88.admin.system.cache.DictUtils;
-import tv.game88.admin.system.entity.SysDictData;
-import tv.game88.admin.system.mapper.SysDictDataMapper;
-import tv.game88.admin.system.service.ConfigEnvironmentService;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.admin.cache.DictUtils;
+import tv.game88.core.admin.entity.SysDictData;
+import tv.game88.core.admin.mapper.SysDictDataMapper;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.config.mapper.ConfigEnvironmentMapper;
+import tv.game88.platform.api.service.ConfigEnvironmentService;
 
 import javax.annotation.Resource;
 import java.util.Arrays;

@@ -64,9 +64,4 @@ public class AdminConstants {
      * 令牌前缀
      */
     public static final String USER_KEY = "userKey";
-
-    /**
-     * 字典管理 cache key
-     */
-    public static final String SYS_DICT_KEY = "sys:dictCache";
 }

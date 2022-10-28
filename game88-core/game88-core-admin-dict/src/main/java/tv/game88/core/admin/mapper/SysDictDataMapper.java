@@ -1,8 +1,8 @@
-package tv.game88.admin.system.mapper;
+package tv.game88.core.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tv.game88.admin.system.entity.SysDictData;
 import org.apache.ibatis.annotations.Param;
+import tv.game88.core.admin.entity.SysDictData;
 
 import java.util.List;
 

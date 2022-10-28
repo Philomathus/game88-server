@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.admin.system.mapper.SysDictTypeMapper">
+<mapper namespace="tv.game88.core.admin.mapper.SysDictTypeMapper">
 
-	<resultMap type="tv.game88.admin.system.entity.SysDictType" id="SysDictTypeResult">
+	<resultMap type="tv.game88.core.admin.entity.SysDictType" id="SysDictTypeResult">
 		<id     property="dictId"     column="dict_id"     />
 		<result property="dictName"   column="dict_name"   />
 		<result property="dictType"   column="dict_type"   />
@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_dict_type
     </sql>
 
-	<select id="selectDictTypeList" parameterType="tv.game88.admin.system.entity.SysDictType" resultMap="SysDictTypeResult">
+	<select id="selectDictTypeList" parameterType="tv.game88.core.admin.entity.SysDictType" resultMap="SysDictTypeResult">
 	    <include refid="selectDictTypeVo"/>
 		<where>
 		    <if test="dictName != null and dictName != ''">
@@ -71,7 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
  	</delete>
 
- 	<update id="updateDictType" parameterType="tv.game88.admin.system.entity.SysDictType">
+ 	<update id="updateDictType" parameterType="tv.game88.core.admin.entity.SysDictType">
  		update sys_dict_type
  		<set>
  			<if test="dictName != null and dictName != ''">dict_name = #{dictName},</if>
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		where dict_id = #{dictId}
 	</update>
 
- 	<insert id="insertDictType" parameterType="tv.game88.admin.system.entity.SysDictType">
+ 	<insert id="insertDictType" parameterType="tv.game88.core.admin.entity.SysDictType">
  		insert into sys_dict_type(
  			<if test="dictName != null and dictName != ''">dict_name,</if>
  			<if test="dictType != null and dictType != ''">dict_type,</if>

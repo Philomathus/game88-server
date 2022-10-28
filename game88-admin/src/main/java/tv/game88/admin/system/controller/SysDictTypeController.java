@@ -3,7 +3,6 @@ package tv.game88.admin.system.controller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import tv.game88.admin.system.entity.SysDictType;
 import tv.game88.admin.system.service.ISysDictTypeService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
@@ -12,6 +11,7 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.UserConstants;
+import tv.game88.core.admin.entity.SysDictType;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 

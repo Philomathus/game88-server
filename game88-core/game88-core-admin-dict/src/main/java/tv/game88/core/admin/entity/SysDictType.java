@@ -1,4 +1,4 @@
-package tv.game88.admin.system.entity;
+package tv.game88.core.admin.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;

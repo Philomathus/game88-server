@@ -1,10 +1,10 @@
 package tv.game88.admin.system.service.impl;
 
-import tv.game88.admin.system.cache.DictUtils;
-import tv.game88.admin.system.entity.SysDictData;
-import tv.game88.admin.system.mapper.SysDictDataMapper;
-import tv.game88.admin.system.service.ISysDictDataService;
 import org.springframework.stereotype.Service;
+import tv.game88.admin.system.service.ISysDictDataService;
+import tv.game88.core.admin.cache.DictUtils;
+import tv.game88.core.admin.entity.SysDictData;
+import tv.game88.core.admin.mapper.SysDictDataMapper;
 
 import javax.annotation.Resource;
 import java.util.List;
