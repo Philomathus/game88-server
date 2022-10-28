@@ -221,9 +221,9 @@ public class MemberInfoController extends BaseController {
      */
     @PostMapping( value = "/updateMobile/{memberId}" )
     @Log( title = "更新会员手机号", businessType = BusinessType.UPDATE )
-    public RspBase<?> updateMobile( @PathVariable String memberId, String newMobile, String oldMobile, Integer googleAuthCode ) throws Exception {
+    public RspBase<?> updateMobile( @PathVariable String memberId, String newMobile, Integer googleAuthCode ) throws Exception {
         SecurityUtils.verifyMFACode( googleAuthCode );
-        return memberInfoService.updateMobile( newMobile, oldMobile, memberId );
+        return memberInfoService.updateMobile( newMobile, memberId );
     }
 
     /**
@@ -281,21 +281,8 @@ public class MemberInfoController extends BaseController {
 
     @Log( title = "修改vip等级", businessType = BusinessType.UPDATE )
     @PostMapping( "/updateVip/{memberId}" )
-    public RspBase<?> updateVip( @PathVariable String memberId, Integer vip ) throws Exception {
-        if ( vip > 50 ) {
-            return RspBase.businessError( "vip等级最大为50级" );
-        }
-        MemberInfo m = memberInfoService.getById( memberId );
-        if ( m == null ) {
-            return RspBase.businessError( "会员不存在" );
-        }
-        if ( m.getVip() > vip ) {
-            return RspBase.businessError( "vip等级修改不能小于之前的等级" );
-        }
-        MemberInfo update = new MemberInfo();
-        update.setId( memberId );
-        update.setVip( vip );
-        return toResult( memberInfoService.updateById( update ) );
+    public RspBase<?> updateVip( @PathVariable String memberId, Integer vip, String nickName ) {
+        return memberInfoService.updateVip( memberId, vip, nickName );
     }
 
     @Log( title = "解绑银行卡", businessType = BusinessType.UPDATE )

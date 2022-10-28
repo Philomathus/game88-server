@@ -30,7 +30,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     Map listCount( MemberInfo memberInfo );
 
-    RspBase<?> updateMobile( String newMobile, String oldMobile, String memberId );
+    RspBase<?> updateMobile( String newMobile, String memberId );
 
     List<MemberCard> selectMemberCardList( String memberId );
 
@@ -45,4 +45,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<?> personalReport( String startTime, String endTime, String memberId );
 
     RspBase<?> boxDish( String memberId );
+
+    RspBase<?> updateVip( String memberId, Integer vip, String nickName );
 }

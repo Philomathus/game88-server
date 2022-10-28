@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.ImmutableMap;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
@@ -21,14 +23,19 @@ import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumDev;
+import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
+import tv.game88.core.member.mapper.LogMoneyMapper;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.core.member.vo.MemberLoginUser;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
@@ -66,6 +73,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MemberBcodeMapper     memberBcodeMapper;
     @Resource
     private MemberMoneyManager    memberMoneyManager;
+    @Resource
+    private LogMoneyMapper        logMoneyMapper;
 
     @Override
     public RspInit getLoginInit( Integer dev, String version ) {
@@ -425,7 +434,48 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<?> addMemberMoneyOnly( String ip, String userName, ReqAddScore req ) {
-        return null;
+        String     userId        = req.getId();
+        BigDecimal money         = req.getScore();
+        BigDecimal beatNum       = req.getBeatNum();
+        String     Mk            = req.getMk() + ",操作人:" + userName;
+        String     markorder     = req.getOrdermk();
+        MemberInfo oldmemberInfo = this.baseMapper.selectById( userId );
+        BigDecimal total         = oldmemberInfo.getAccountNow();
+
+        if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
+            if ( money.compareTo( new BigDecimal( 1000000 ) ) > 0 ) {
+                return RspBase.businessError( "最大金额为1000000" );
+            }
+        } else if ( money.compareTo( BigDecimal.ZERO ) < 0 ) {
+            BigDecimal lat = total.add( money );
+            if ( lat.compareTo( BigDecimal.ZERO ) < 0 ) {
+                return RspBase.businessError( "余额" + money + "不足扣除" );
+            }
+            beatNum = new BigDecimal( 0 );
+        }
+
+        if ( !"0".equals( markorder ) ) {
+            List<LogMoney> markList = null;
+            if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
+                markList = logMoneyMapper.findMark( userId, markorder, money, null, userId.substring( userId.length() - 1 ) );
+            } else {
+                BigDecimal negate = money.negate();
+                markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring( userId.length() - 1 ) );
+            }
+            if ( markList.size() > 0 ) {
+                return RspBase.businessError( "请查看此笔金额是否已经入款过，如否请输入其他订单备注" );
+            }
+        }
+
+        if ( total != null ) {
+            if ( beatNum == null || beatNum.compareTo( BigDecimal.ZERO ) < 1 ) {
+                beatNum = new BigDecimal( 0 );
+            }
+            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.intValue(), Mk );
+        } else {
+            return RspBase.businessError( "该成员未初始化金额，或者您输入的金额有误" );
+        }
+        return RspBase.ok();
     }
 
     @Override
@@ -439,8 +489,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<?> updateMobile( String newMobile, String oldMobile, String memberId ) {
-        return null;
+    public RspBase<?> updateMobile( String newMobile, String memberId ) {
+        if ( this.baseMapper.exists( new QueryWrapper<MemberInfo>().eq( "phone", newMobile ) ) ) {
+            return RspBase.businessError( "此手机号已经存在" );
+        }
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setPhone( newMobile );
+        memberInfo.setId( memberId );
+        int i = this.baseMapper.updateById( memberInfo );
+        return i > 0 ? RspBase.ok( "更新成功" ) : RspBase.businessError( "更新失败" );
     }
 
     @Override
@@ -504,16 +561,22 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         List<Callable<Map<String, Object>>> forkJoinTasks = new ArrayList<>();
 
         // 线下充值 Offline recharge
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalRecharge", this.baseMapper.personalRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalRecharge", this.baseMapper.personalRecharge( startTime, endTime,
+                memberId ) ) );
         // 线上充值 online recharge
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalOnlineRecharge", this.baseMapper.personalOnlineRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalOnlineRecharge", this.baseMapper.personalOnlineRecharge( startTime,
+                endTime, memberId ) ) );
         // 线上充值2 online recharge 2
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime,
+                endTime, memberId ) ) );
         // 线上充值3 online recharge 3
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime,
+                endTime, memberId ) ) );
         // 提款 withdrawal
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge", this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
-        forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount", this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
+                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
+                this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
         List<Future<Map<String, Object>>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
         Set<Map<String, Object>> resultSet = futureList.stream().map( t -> {
@@ -528,7 +591,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
                                                  .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
-        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring( memberId.length() - 1 ) );
+        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
+                memberId.length() - 1 ) );
 
         resultMap.put( "bCodeList", mapList );
 
@@ -555,5 +619,39 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             throw new BusinessException( "保险箱余额提出失败" );
         }
         return RspBase.ok();
+    }
+
+    @Override
+    public RspBase<?> updateVip( String memberId, Integer vip, String nickName ) {
+        if ( vip > 50 ) {
+            return RspBase.businessError( "vip等级最大为50级" );
+        }
+        MemberInfo m = this.baseMapper.selectById( memberId );
+        if ( m == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( m.getVip() > vip ) {
+            return RspBase.businessError( "vip等级修改不能小于之前的等级" );
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( memberId );
+        update.setVip( vip );
+        update.setNickName( nickName );
+        int i = this.baseMapper.updateById( update );
+        if ( i > 0 ) {
+            String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
+            if ( StringUtils.isNotBlank( token ) ) {
+                Map<Object, Object> loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
+                if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
+                    MemberLoginUser memberLoginUser = JsonUtil.map2Object( loginUserMap, MemberLoginUser.class );
+                    PlatformUser    platformUser    = memberLoginUser.getPlatformUser();
+                    platformUser.setVip( vip );
+                    platformUser.setNickName( nickName );
+                    redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, JsonUtil.object2Map( memberLoginUser ) );
+                }
+            }
+            return RspBase.ok( "更新成功" );
+        }
+        return RspBase.businessError( "更新失败" );
     }
 }
