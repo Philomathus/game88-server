@@ -5,13 +5,17 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -154,4 +158,27 @@ public class MemberInfo implements Serializable {
     @Schema( title = "渠道号" )
     @Excel( name = "渠道号" )
     private String channelCode;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    private String searchValue;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    private Set<String> searchValues;
+
+    public Set<String> getSearchValues() {
+        if ( StringUtils.isNotBlank( searchValue ) ) {
+            String[]    strings        = searchValue.split( "," );
+            Set<String> searchValueSet = new HashSet<>();
+            for ( String s : strings ) {
+                if ( StringUtils.isNotBlank( s ) ) {
+                    searchValueSet.add( s.trim() );
+                }
+            }
+            return searchValueSet;
+        }
+        return searchValues;
+    }
+
 }
