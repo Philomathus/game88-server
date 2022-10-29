@@ -524,7 +524,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( Objects.isNull( memberCard ) ) {
             return RspBase.businessError( "卡号不存在" );
         }
-        if ( memberCardList.size() > 1 && memberCard.getDv() == 1 ) {
+        if ( memberCardList.size() > 1 && memberCard.isDv() ) {
             return RspBase.businessError( "请先解绑副卡" );
         }
         memberCardMapper.deleteById( id );
@@ -549,7 +549,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         MemberCard memberCard = memberCardMapper.selectById( id );
         memberCard.setRealName( member.getRealName() );
-        memberCard.setBankName( member.getBankName() );
+        memberCard.setBankId( member.getBankId() );
         memberCard.setBankAddress( member.getBankAddress() );
         memberCard.setBankAccount( member.getBankAccount() );
         memberCardMapper.updateById( memberCard );

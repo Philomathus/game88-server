@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.time.LocalDateTime;
 
@@ -60,28 +58,4 @@ public class PayType {
     private String tex4;
     @Excel( name = "文本5" )
     private String tex5;
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE )
-                .append( "id", getId() )
-                .append( "name", getName() )
-                .append( "iconUrl", getIconUrl() )
-                .append( "indexes", getIndexes() )
-                .append( "recommend", isRecommend() )
-                .append( "effect", isEffect() )
-                .append( "type", getType() )
-                .append( "createBy", getCreateBy() )
-                .append( "createTime", getCreateTime() )
-                .append( "updateBy", getUpdateBy() )
-                .append( "updateTime", getUpdateTime() )
-                .append( "tex1", getTex1() )
-                .append( "tex2", getTex2() )
-                .append( "tex3", getTex3() )
-                .append( "tex4", getTex4() )
-                .append( "tex5", getTex5() )
-                .append( "openLevelMin", getOpenLevelMin() )
-                .append( "openLevelMax", getOpenLevelMax() )
-                .toString();
-    }
 }
