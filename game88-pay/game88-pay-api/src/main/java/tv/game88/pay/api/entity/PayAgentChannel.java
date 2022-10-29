@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -15,13 +16,14 @@ import java.time.LocalDateTime;
  * @date 2021-01-26
  */
 @Data
+@NoArgsConstructor
 public class PayAgentChannel {
     @TableId( type = IdType.AUTO )
     private Long          id;
     @Excel( name = "代付通道名称" )
     private String        name;
     @Excel( name = "代付平台ID" )
-    private Integer       platformId;
+    private Long          platformId;
     @Excel( name = "商户ID" )
     private String        merId;
     /**
@@ -40,7 +42,7 @@ public class PayAgentChannel {
      * 解密私钥
      */
     private String        signPrivateKey;
-    @Excel( name = "状态" )
+    @Excel( name = "激活状态" )
     private Boolean       effect = false;
     @Excel( name = "创建人" )
     private String        createBy;
@@ -50,6 +52,6 @@ public class PayAgentChannel {
     @Excel( name = "修改人" )
     private String        updateBy;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "修改时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
 }

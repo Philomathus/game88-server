@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import lombok.NoArgsConstructor;
 
 /**
  * 银行卡列表对象 bank_list
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author mengJun
  */
 @Data
+@NoArgsConstructor
 public class ConfigBankList {
     @Schema( title = "系统编号" )
     @TableId( type = IdType.AUTO )

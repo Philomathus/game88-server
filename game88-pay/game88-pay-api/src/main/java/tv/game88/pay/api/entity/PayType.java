@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  * @author mengJun
  */
 @Data
+@NoArgsConstructor
 public class PayType {
     @TableId( type = IdType.AUTO )
     private Long          id;
@@ -22,16 +24,16 @@ public class PayType {
     @Excel( name = "图标" )
     private String        iconUrl;
     @Excel( name = "排序" )
-    private Long          indexes;
+    private Integer       sort;
     @Excel( name = "是否推荐" )
-    private boolean       recommend;
-    @Excel( name = "状态" )
-    private Boolean       effect = false;
-    // 1线上支付 2线下支付 3 代充支付 4 USDT
+    private Boolean       recommend = false;
+    @Excel( name = "激活状态" )
+    private Boolean       effect    = false;
+    // 支付类型 1线上支付 2线下支付 3 代充支付 4 USDT
     @Excel( name = "支付类型" )
-    private String        type;
-    // ios,安卓 以英文逗号分隔
-    @Excel( name = "设备类型" )
+    private Integer       type;
+    // 设备类型 1 ios 2 android 以英文逗号分隔
+    @Excel( name = "支持设备类型" )
     private String        deviceType;
     @Excel( name = "开放层级-最小" )
     private Integer       openLevelMin;
@@ -45,7 +47,7 @@ public class PayType {
     @Excel( name = "修改人" )
     private String        updateBy;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "修改时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
 
     @Excel( name = "文本1" )

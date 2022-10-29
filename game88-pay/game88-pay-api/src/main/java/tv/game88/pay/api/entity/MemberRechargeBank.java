@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
  * @author mengJun
  */
 @Data
+@NoArgsConstructor
 public class MemberRechargeBank {
     @Excel( name = "订单号", orderNum = "1" )
     @TableId( type = IdType.INPUT )

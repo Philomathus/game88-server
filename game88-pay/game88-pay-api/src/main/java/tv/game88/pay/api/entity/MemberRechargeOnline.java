@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  * @date 2021-10-06
  */
 @Data
+@NoArgsConstructor
 public class MemberRechargeOnline {
     @TableId( type = IdType.INPUT )
     @Excel( name = "本系统订单号" )

@@ -7,16 +7,18 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * USDT充值对象 pay_usdt_recharge
+ * USDT充值对象 member_recharge_usdt
  *
  * @author mengJun
  */
 @Data
+@NoArgsConstructor
 public class MemberRechargeUsdt {
     @Excel( name = "订单号", orderNum = "1" )
     @TableId( type = IdType.INPUT )
@@ -44,10 +46,10 @@ public class MemberRechargeUsdt {
     @Excel( name = "操作人" )
     private String        opName;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "创建时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "申请时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createTime;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "审核时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
     @Excel( name = "备注" )
     private String        remark;

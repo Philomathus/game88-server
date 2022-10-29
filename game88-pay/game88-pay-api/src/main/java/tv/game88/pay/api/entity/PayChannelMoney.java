@@ -3,6 +3,7 @@ package tv.game88.pay.api.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -10,9 +11,9 @@ import java.math.BigDecimal;
  * 支付通道金额对象 pay_channel_money
  *
  * @author mengJun
- * @date 2021-04-03
  */
 @Data
+@NoArgsConstructor
 public class PayChannelMoney {
     @TableId( type = IdType.AUTO )
     private Long       id;

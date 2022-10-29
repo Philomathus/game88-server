@@ -7,16 +7,18 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 会员提现信息对象 member_withdraw_log
+ * 会员提现信息对象 member_withdraw_detail
  *
  * @author mengJun
  */
 @Data
+@NoArgsConstructor
 public class MemberWithdrawDetail {
     @TableId( type = IdType.INPUT )
     @Excel( name = "提现订单号", orderNum = "1" )
