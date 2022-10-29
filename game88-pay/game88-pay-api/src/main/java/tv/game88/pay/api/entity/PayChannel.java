@@ -25,18 +25,18 @@ public class PayChannel {
     private String        name;
     @Excel( name = "通道编码" )
     private String        channelCode;
+    @Excel( name = "平台ID" )
+    private Long          platformId;
+    @Excel( name = "类型ID" )
+    private Long          typeId;
     @Excel( name = "状态" )
-    private Boolean       effect = false;
+    private Boolean       effect      = false;
     @Excel( name = "是否允许回调" )
     private Boolean       canCallback = true;
     @Excel( name = "开放层级-最小" )
     private Integer       openLevelMin;
     @Excel( name = "开放层级-最大" )
     private Integer       openLevelMax;
-    @Excel( name = "支付平台编号" )
-    private Integer       platformId;
-    @Excel( name = "支付类型编号" )
-    private Integer       typeId;
     @Excel( name = "优惠比例" )
     private String        discountBill;
     @Excel( name = "快捷金额" )

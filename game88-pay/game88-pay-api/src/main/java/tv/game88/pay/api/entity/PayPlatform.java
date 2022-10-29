@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +12,6 @@ import java.time.LocalDateTime;
  * 支付平台对象 pay_platform
  *
  * @author mengJun
- * @date 2021-01-27
  */
 @Data
 public class PayPlatform {
@@ -56,26 +53,6 @@ public class PayPlatform {
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
-
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE )
-                .append( "id", getId() )
-                .append( "name", getName() )
-                .append( "code", getCode() )
-                .append( "merId", getMerId() )
-                .append( "appId", getAppId() )
-                .append( "payUrl", getPayUrl() )
-                .append( "queryUrl", getQueryUrl() )
-                .append( "signMd5", getSignMd5() )
-                .append( "signPublicKey", getSignPublicKey() )
-                .append( "signPrivateKey", getSignPrivateKey() )
-                .append( "whiteIp", getWhiteIp() )
-                .append( "createBy", getCreateBy() )
-                .append( "createTime", getCreateTime() )
-                .append( "updateBy", getUpdateBy() )
-                .append( "updateTime", getUpdateTime() )
-                .toString();
-    }
+    @Excel( name = "备注" )
+    private String        remark;
 }

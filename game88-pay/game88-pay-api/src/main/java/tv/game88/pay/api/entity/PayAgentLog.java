@@ -34,10 +34,10 @@ public class PayAgentLog {
     @Excel( name = "三方代付订单号" )
     private String        agentOrderNo;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "提交时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd" )
+    @Excel( name = "提交时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createTime;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "回调时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd" )
+    @Excel( name = "回调时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime callbackTime;
     // 0 回调中 1 成功 2失败
     @Excel( name = "回调状态" )

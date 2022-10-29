@@ -30,13 +30,13 @@ public class PayAgentPlatform {
     private String whiteIp;
 
     @Excel( name = "是否配置头部值" )
-    private boolean headerValue;
+    private Boolean headerValue;
     @Excel( name = "是否配置MD5密钥" )
-    private boolean signMd5;
+    private Boolean signMd5;
     @Excel( name = "是否配置加密公钥" )
-    private boolean signPublicKey;
+    private Boolean signPublicKey;
     @Excel( name = "是否配置解密私钥" )
-    private boolean signPrivateKey;
+    private Boolean signPrivateKey;
 
     @Excel( name = "头部值配置说明" )
     private String headerValueExplain;
@@ -55,6 +55,6 @@ public class PayAgentPlatform {
     @Excel( name = "修改人" )
     private String        updateBy;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
+    @Excel( name = "修改时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
 }

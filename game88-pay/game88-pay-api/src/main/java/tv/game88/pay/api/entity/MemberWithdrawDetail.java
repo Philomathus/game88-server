@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 会员提现信息对象 member_withdraw_log
+ * 会员提现信息对象 member_withdraw_detail
  *
  * @author mengJun
  */

@@ -10,7 +10,6 @@ import java.math.BigDecimal;
  * 支付通道金额对象 pay_channel_money
  *
  * @author mengJun
- * @date 2021-04-03
  */
 @Data
 public class PayChannelMoney {
