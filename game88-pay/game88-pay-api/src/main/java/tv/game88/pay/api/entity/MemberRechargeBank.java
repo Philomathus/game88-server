@@ -28,15 +28,14 @@ public class MemberRechargeBank {
     // 0已提交1初级审核通过2审核不通过3终极审核通过4拒绝
     // 订单状态
     private Integer       status;
-    // payType的ID,用于区分银行卡/USDT..等其它虚拟币
-    @Excel( name = "存款类型", orderNum = "5" )
-    private Integer       rechargeType;
-    @Excel( name = "存款人姓名", orderNum = "6" )
-    private String        rechargeUserName;
-    @Excel( name = "收款人", orderNum = "7" )
+    @Excel( name = "绑卡姓名", orderNum = "5" )
+    private String        realName;
+    @Excel( name = "存款姓名", orderNum = "6" )
+    private String        rechargeRealName;
+    @Excel( name = "收款姓名", orderNum = "7" )
     private String        bankUserName;
     @Excel( name = "收款银行ID", orderNum = "8" )
-    private String        bankId;
+    private Long          bankId;
     @Excel( name = "收款账号", orderNum = "9" )
     private String        bankAccount;
     @Excel( name = "开户地址", orderNum = "10" )
@@ -46,12 +45,12 @@ public class MemberRechargeBank {
     @Excel( name = "备注", orderNum = "12" )
     private String        remark;
     @Excel( name = "是否首次", orderNum = "13" )
-    private boolean       first = false;
+    private Boolean       first = false;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "创建时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "14" )
+    @Excel( name = "存款时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "14" )
     private LocalDateTime createTime;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    @Excel( name = "更新时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "15" )
+    @Excel( name = "审核时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "15" )
     private LocalDateTime updateTime;
     @Excel( name = "请求IP", orderNum = "16" )
     private String        ip;

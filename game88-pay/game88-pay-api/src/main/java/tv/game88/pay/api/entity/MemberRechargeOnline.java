@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class MemberRechargeOnline {
     @Excel( name = "会员编号" )
     private String        memberId;
     @Excel( name = "支付平台编号" )
-    private Integer       platformId;
+    private Long          platformId;
     @Excel( name = "支付通道编号" )
     private Long          channelId;
     @Excel( name = "上游订单号" )
@@ -42,14 +43,14 @@ public class MemberRechargeOnline {
     @Excel( name = "状态(-1待确认0失败1成功)" )
     private Integer       status;
     @Excel( name = "是否是人工补单" )
-    private boolean       patchOrder;
+    private Boolean       patchOrder;
     @Excel( name = "备注" )
     private String        remark;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "更新时间", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
     @Excel( name = "是否首次" )
-    private boolean       first = false;
+    private Boolean       first = false;
     @Excel( name = "通道费率" )
     private BigDecimal    rate;
 
@@ -62,7 +63,9 @@ public class MemberRechargeOnline {
     @TableField( exist = false )
     private BigDecimal currentSuccessRateStr;
     @TableField( exist = false )
+    @JsonIgnore
     private String     googleAuthCode;
+    @TableField( exist = false )
     private String     rateStr;
 
     public String getCurrentSuccessRateStr() {
