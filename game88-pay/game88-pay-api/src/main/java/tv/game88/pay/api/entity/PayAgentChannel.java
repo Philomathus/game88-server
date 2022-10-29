@@ -41,7 +41,7 @@ public class PayAgentChannel {
      */
     private String        signPrivateKey;
     @Excel( name = "状态" )
-    private boolean       effect;
+    private Boolean       effect = false;
     @Excel( name = "创建人" )
     private String        createBy;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )

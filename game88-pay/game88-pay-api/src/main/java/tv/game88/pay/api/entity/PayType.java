@@ -28,7 +28,7 @@ public class PayType {
     @Excel( name = "是否推荐" )
     private boolean       recommend;
     @Excel( name = "状态" )
-    private boolean       effect;
+    private Boolean       effect = false;
     // 1线上支付 2线下支付 3 代充支付 4 USDT
     @Excel( name = "支付类型" )
     private String        type;

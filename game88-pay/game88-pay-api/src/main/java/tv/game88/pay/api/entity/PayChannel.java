@@ -26,9 +26,9 @@ public class PayChannel {
     @Excel( name = "通道编码" )
     private String        channelCode;
     @Excel( name = "状态" )
-    private boolean       effect;
+    private Boolean       effect = false;
     @Excel( name = "是否允许回调" )
-    private boolean       canCallback;
+    private Boolean       canCallback = true;
     @Excel( name = "开放层级-最小" )
     private Integer       openLevelMin;
     @Excel( name = "开放层级-最大" )

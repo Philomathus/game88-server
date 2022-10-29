@@ -35,7 +35,7 @@ public class ConfigBank {
     private Integer       openLevelMin;
     private Integer       openLevelMax;
     @Excel( name = "状态" )
-    private boolean       effect;
+    private Boolean       effect = false;
     @Excel( name = "备注信息" )
     private String        remark;
     @Excel( name = "创建人" )
