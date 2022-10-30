@@ -1,8 +1,6 @@
 package tv.game88.core.config.entity;
 
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -68,31 +66,9 @@ public class ConfigSms extends BaseEntity {
     /**
      * 更新者
      */
-    private String        updator;
+    private String        updateBy;
     /**
      * 创建者
      */
-    private String        creator;
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE )
-                .append( "id", getId() )
-                .append( "name", getName() )
-                .append( "provider", getProvider() )
-                .append( "appKey", getAppKey() )
-                .append( "appAccess", getAppAccess() )
-                .append( "region", getRegion() )
-                .append( "signature", getSignature() )
-                .append( "template", getTemplate() )
-                .append( "smsSdkAppid", getSmsSdkAppid() )
-                .append( "identify", getIdentify() )
-                .append( "isEffect", getIsEffect() )
-                .append( "endpoint", getEndpoint() )
-                .append( "updateTime", getUpdateTime() )
-                .append( "createTime", getCreateTime() )
-                .append( "updator", getUpdator() )
-                .append( "creator", getCreator() )
-                .toString();
-    }
+    private String        createBy;
 }

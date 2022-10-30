@@ -18,8 +18,8 @@
 		<result property="endpoint" column="endpoint"/>
 		<result property="updateTime" column="update_time"/>
 		<result property="createTime" column="create_time"/>
-		<result property="updator" column="updator"/>
-		<result property="creator" column="creator"/>
+		<result property="updateBy" column="update_by"/>
+		<result property="createBy" column="create_by"/>
 	</resultMap>
 
 	<sql id="selectConfigSmsVo">
@@ -37,8 +37,8 @@
 			   endpoint,
 		       update_time,
 			   create_time,
-			   updator,
-			   creator
+			   update_by,
+			   create_by
 		from config_sms
 	</sql>
     <select id="selectConfigSmsList" parameterType="tv.game88.core.config.entity.ConfigSms" resultMap="ConfigSmsResult">

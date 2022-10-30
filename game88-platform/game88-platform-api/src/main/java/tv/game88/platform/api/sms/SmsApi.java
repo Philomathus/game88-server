@@ -70,52 +70,55 @@ public class SmsApi {
         return code.toString();
     }
 
+    public String sendSms( String phone, ConfigSms configSms ) {
+        String code = createPhoneCode();
+        return this.sendSms( phone, code, configSms );
+    }
+
     public String sendSms( String phone, int index, String code ) {
         long countCache = configSmsCacheUtil.countCache();
         if ( index > ( countCache - 1 ) ) {
             index = 0;
         }
-        ConfigSms serverSms = configSmsCacheUtil.getConfigSmsCache( index );
+        ConfigSms configSms = configSmsCacheUtil.getConfigSmsCache( index );
         if ( StringUtils.isBlank( code ) ) {
             code = createPhoneCode();
         }
-        switch ( serverSms.getProvider() ) {
-        case 0:
-            this.sendSmsTencent( serverSms, phone, code );
-            break;
-        case 1:
-            this.sendSmsAliyun( serverSms, phone, code );
-            break;
-        case 2:
-            this.sendSmsBaidu( serverSms, phone, code );
-            break;
-        case 3:
-            this.sendSmsHuawei( serverSms, phone, code );
-            break;
-        default:
-        }
-        return code;
+        return this.sendSms( phone, code, configSms );
     }
 
-    private String sendSmsHuawei( ConfigSms serverSms, String phone, String code ) {
+    private String sendSms( String phone, String code, ConfigSms configSms ) {
+        return switch ( configSms.getProvider() ) {
+            case 0 -> this.sendSmsTencent( configSms, phone, code );
+            case 1 -> this.sendSmsAliyun( configSms, phone, code );
+            case 2 -> this.sendSmsBaidu( configSms, phone, code );
+            case 3 -> this.sendSmsHuawei( configSms, phone, code );
+        };
+    }
+
+    private String sendSmsHuawei( ConfigSms configSms, String phone, String code ) {
         String receiver      = "+86" + phone;
         String templateParas = "[\"" + code + "\"]";
 
         Map<String, String> params = new HashMap<>();
-        params.put( "from", serverSms.getSignature() );
+        params.put( "from", configSms.getSignature() );
         params.put( "to", receiver );
-        params.put( "templateId", serverSms.getTemplate() );
+        params.put( "templateId", configSms.getTemplate() );
         params.put( "templateParas", templateParas );
-        params.put( "signature", serverSms.getName() );
+        params.put( "signature", configSms.getName() );
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> {
-            sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) ).append( "&" );
+            sb
+                    .append( k )
+                    .append( "=" )
+                    .append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) )
+                    .append( "&" );
         } );
         String body = sb.substring( 0, sb.length() - 1 );
 
         //请求Headers中的X-WSSE参数值
-        String wsseHeader = buildWsseHeader( serverSms.getAppKey(), serverSms.getAppAccess() );
+        String wsseHeader = buildWsseHeader( configSms.getAppKey(), configSms.getAppAccess() );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
@@ -125,11 +128,15 @@ public class SmsApi {
 
         try {
             ResponseEntity<Map> responseEntity = restTemplate.postForEntity(
-                    serverSms.getEndpoint() + "/sms/batchSendSms/v1", httpEntity, Map.class );
+                    configSms.getEndpoint() + "/sms/batchSendSms/v1", httpEntity, Map.class );
             Map<String, Object> entityBody = responseEntity.getBody();
-            if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
+            if ( responseEntity
+                    .getStatusCode()
+                    .is2xxSuccessful() ) {
                 if ( !CollectionUtils.isEmpty( entityBody ) ) {
-                    String rspCode = entityBody.getOrDefault( "code", "" ).toString();
+                    String rspCode = entityBody
+                            .getOrDefault( "code", "" )
+                            .toString();
                     if ( "000000".equals( rspCode ) ) {
                         return code;
                     }
@@ -164,21 +171,21 @@ public class SmsApi {
         return null;
     }
 
-    private String sendSmsTencent( ConfigSms serverSms, String phone, String msg ) {
+    private String sendSmsTencent( ConfigSms configSms, String phone, String msg ) {
 
-        Credential  cred        = new Credential( serverSms.getAppKey(), serverSms.getAppAccess() );
+        Credential  cred        = new Credential( configSms.getAppKey(), configSms.getAppAccess() );
         HttpProfile httpProfile = new HttpProfile();
         httpProfile.setReqMethod( "POST" );
         httpProfile.setEndpoint( "sms.tencentcloudapi.com" );
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile( httpProfile );
         com.tencentcloudapi.sms.v20190711.SmsClient client = new com.tencentcloudapi.sms.v20190711.SmsClient( cred,
-                serverSms.getRegion(), clientProfile );
+                configSms.getRegion(), clientProfile );
         com.tencentcloudapi.sms.v20190711.models.SendSmsRequest req =
                 new com.tencentcloudapi.sms.v20190711.models.SendSmsRequest();
-        req.setSmsSdkAppid( serverSms.getSmsSdkAppid() );
-        req.setSign( serverSms.getSignature() );
-        req.setTemplateID( serverSms.getTemplate() );
+        req.setSmsSdkAppid( configSms.getSmsSdkAppid() );
+        req.setSign( configSms.getSignature() );
+        req.setTemplateID( configSms.getTemplate() );
         /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]
          * 例如+8613711112222， 其中前面有一个+号 ，86为国家码，13711112222为手机号，最多不要超过200个手机号*/
         String[] phoneNumbers = { "+86" + phone };
@@ -197,7 +204,7 @@ public class SmsApi {
             String rspCode    = res.getSendStatusSet()[ 0 ].getCode();
             String rspMessage = res.getSendStatusSet()[ 0 ].getMessage();
             String smsName    = "腾讯云";
-            String subname    = serverSms.getName();
+            String subname    = configSms.getName();
             errorLog( rspCode, rspMessage, phone, smsName, subname );
             log.warn( "短信发送失败:{}", JsonUtil.object2Json( res ) );
 
@@ -213,11 +220,11 @@ public class SmsApi {
 
     }
 
-    private String sendSmsAliyun( ConfigSms serverSms, String phone, String msg ) {
+    private String sendSmsAliyun( ConfigSms configSms, String phone, String msg ) {
         System.setProperty( "sun.net.client.defaultConnectTimeout", "10000" );
         System.setProperty( "sun.net.client.defaultReadTimeout", "10000" );
-        final String   regionId = serverSms.getRegion();
-        IClientProfile profile  = DefaultProfile.getProfile( regionId, serverSms.getAppKey(), serverSms.getAppAccess() );
+        final String   regionId = configSms.getRegion();
+        IClientProfile profile  = DefaultProfile.getProfile( regionId, configSms.getAppKey(), configSms.getAppAccess() );
         DefaultProfile.addEndpoint( regionId, "Dysmsapi", "dysmsapi.aliyuncs.com" );
         IAcsClient acsClient = new DefaultAcsClient( profile );
 
@@ -225,8 +232,8 @@ public class SmsApi {
         SendSmsRequest smsRequest = new SendSmsRequest();
         smsRequest.setSysMethod( MethodType.POST );
         smsRequest.setPhoneNumbers( phone );
-        smsRequest.setSignName( serverSms.getSignature() );
-        smsRequest.setTemplateCode( serverSms.getTemplate() );
+        smsRequest.setSignName( configSms.getSignature() );
+        smsRequest.setTemplateCode( configSms.getTemplate() );
         smsRequest.setTemplateParam( "{\"code\":" + msg + "}" );
 
         SendSmsResponse sendSmsResponse = null;
@@ -241,7 +248,7 @@ public class SmsApi {
             String rspCode    = sendSmsResponse.getCode();
             String rspMessage = sendSmsResponse.getMessage();
             String smsName    = "阿里云";
-            String subname    = serverSms.getName();
+            String subname    = configSms.getName();
             errorLog( rspCode, rspMessage, phone, smsName, subname );
 
             log.warn( "阿里云短信发送失败:{}", JsonUtil.object2Json( sendSmsResponse ) );
@@ -255,16 +262,16 @@ public class SmsApi {
 
     }
 
-    private String sendSmsBaidu( ConfigSms serverSms, String phone, String msg ) {
+    private String sendSmsBaidu( ConfigSms configSms, String phone, String msg ) {
         SmsClientConfiguration config = new SmsClientConfiguration();
-        config.setCredentials( new DefaultBceCredentials( serverSms.getAppKey(), serverSms.getAppAccess() ) );
-        config.setEndpoint( serverSms.getRegion() );
+        config.setCredentials( new DefaultBceCredentials( configSms.getAppKey(), configSms.getAppAccess() ) );
+        config.setEndpoint( configSms.getRegion() );
         SmsClient client = new SmsClient( config );
 
         SendMessageV3Request request = new SendMessageV3Request();
         request.setMobile( phone );
-        request.setSignatureId( serverSms.getSignature() );
-        request.setTemplate( serverSms.getTemplate() );
+        request.setSignatureId( configSms.getSignature() );
+        request.setTemplate( configSms.getTemplate() );
         Map<String, String> contentVar = new HashMap<>();
         contentVar.put( "code", msg );
         contentVar.put( "minute", "1" );
@@ -278,7 +285,7 @@ public class SmsApi {
                 String rspCode    = sendSmsResponse.getCode();
                 String rspMessage = sendSmsResponse.getMessage();
                 String smsName    = "百度云";
-                String subname    = serverSms.getName();
+                String subname    = configSms.getName();
                 errorLog( rspCode, rspMessage, phone, smsName, subname );
                 log.warn( "百度云短信发送失败:{}", JsonUtil.object2Json( sendSmsResponse ) );
                 throw new BusinessException( JsonUtil.object2Json( sendSmsResponse ) );

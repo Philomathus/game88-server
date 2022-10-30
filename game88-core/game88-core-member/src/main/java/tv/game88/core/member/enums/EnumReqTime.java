@@ -29,29 +29,21 @@ public enum EnumReqTime {
 
     public  String getBeginDay(){
         LocalDate l = LocalDate.now();
-        switch(this){
-            case today:
-                return  l.toString();
-            case yesterday:
-                return  l.plusDays(-1).toString();
-            case month:
-                return   l.plusMonths(-1).toString();
-
-        }
-        return l.toString();
+        return switch ( this ) {
+            case today -> l.toString();
+            case yesterday -> l.plusDays( -1 ).toString();
+            case month -> l.plusMonths( -1 ).toString();
+        };
     }
 
     public  String getEndDay(){
         LocalDate l = LocalDate.now();
-        switch(this){
-            case today:
-            case month:
-                return  l.toString();
-            case yesterday:
-                return  l.plusDays(-1).toString();
-
-        }
-        return l.toString();
+        return switch ( this ) {
+            case today, month -> l.toString();
+            case yesterday -> l
+                    .plusDays( -1 )
+                    .toString();
+        };
     }
 
 

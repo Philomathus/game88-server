@@ -53,8 +53,11 @@
 
         <tencentcloud.vesion>3.1.617</tencentcloud.vesion>
         <aliyun.core.version>4.6.2</aliyun.core.version>
+        <aliyun.oss.version>3.15.1</aliyun.oss.version>
+        <aliyun.sts.version>3.1.0</aliyun.sts.version>
         <aliyun.dysmsapi.version>2.2.1</aliyun.dysmsapi.version>
         <baidubce.version>0.10.233</baidubce.version>
+        <amazon.s3.version>1.12.331</amazon.s3.version>
 
         <!-- plugin -->
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -249,7 +252,21 @@
                         <groupId>org.glassfish.jaxb</groupId>
                         <artifactId>jaxb-runtime</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun.oss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-sts</artifactId>
+                <version>${aliyun.sts.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.aliyun</groupId>
@@ -261,6 +278,18 @@
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java</artifactId>
                 <version>${tencentcloud.vesion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- 亚马逊云s3 sdk -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${amazon.s3.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>

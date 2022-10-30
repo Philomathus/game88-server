@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ConfigOssService {
 
-    List<ConfigOss> list(ConfigOss configOss);
+    List<ConfigOss> selectConfigOssList(ConfigOss configOss);
 
     public ConfigOss selectConfigOssById( Long id );
 

@@ -74,19 +74,13 @@ public class MemberRechargeBank {
 
     public String getStatusDesc() {
         if ( status != null ) {
-            switch ( status ) {
-            case 0:
-                return "未收款";
-            case 1:
-                return "初级审核通过";
-            case 2:
-                return "审核不通过";
-            case 3:
-                return "终极审核通过";
-            case 4:
-                return "入库失败";
-            default:
-            }
+            return switch ( status ) {
+                case 0 -> "未收款";
+                case 1 -> "初级审核通过";
+                case 2 -> "审核不通过";
+                case 3 -> "终极审核通过";
+                case 4 -> "入库失败";
+            };
         }
         return "";
     }

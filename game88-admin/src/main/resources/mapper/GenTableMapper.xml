@@ -26,7 +26,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateTime"     column="update_time"       />
 		<result property="remark"         column="remark"            />
 		<result property="tableSchema"    column="table_schema"      />
-		<result property="parentMenuId"   column="parent_menu_id"    />
 		<collection  property="columns"  javaType="java.util.List"  resultMap="GenTableColumnResult" />
 	</resultMap>
 
@@ -57,8 +56,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<sql id="selectGenTableVo">
         select table_id, table_name, table_schema, table_comment, sub_table_name, sub_table_fk_name, class_name, tpl_category,
-			   package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, parent_menu_id,
-			   options, create_by, create_time, update_by, update_time, remark from sys_gen_table
+			   package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, options, create_by,
+			   create_time, update_by, update_time, remark from sys_gen_table
     </sql>
 
     <select id="selectGenTableList" parameterType="tv.game88.admin.system.entity.GenTable" resultMap="GenTableResult">
@@ -120,9 +119,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectGenTableById" parameterType="Long" resultMap="GenTableResult">
 	    SELECT t.table_id, t.table_name, t.table_schema, t.table_comment, t.sub_table_name, t.sub_table_fk_name, t.class_name,
 			   t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type,
-	           t.gen_path, t.parent_menu_id, t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type,
-	           c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list,
-	           c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
+	           t.gen_path, t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type,
+			   c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query,
+			   c.query_type, c.html_type, c.dict_type, c.sort
 		FROM sys_gen_table t
 			 LEFT JOIN sys_gen_table_column c ON t.table_id = c.table_id
 		where t.table_id = #{tableId} order by c.sort
@@ -131,7 +130,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectGenTableByName" parameterType="String" resultMap="GenTableResult">
 	    SELECT t.table_id, t.table_name, t.table_schema, t.table_comment, t.sub_table_name, t.sub_table_fk_name, t.class_name,
 	           t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type,
-	           t.gen_path, t.parent_menu_id, t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type,
+	           t.gen_path, t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type,
 	           c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list,
 	           c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
 		FROM sys_gen_table t
@@ -142,7 +141,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectGenTableAll" parameterType="String" resultMap="GenTableResult">
 	    SELECT t.table_id, t.table_name, t.table_schema, t.table_comment, t.sub_table_name, t.sub_table_fk_name, t.class_name,
 	           t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author,
-	           t.parent_menu_id, t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type,
+	           t.options, t.remark, c.column_id, c.column_name, c.column_comment, c.column_type,
 	           c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list,
 	           c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
 		FROM sys_gen_table t
@@ -202,7 +201,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="moduleName != null and moduleName != ''">module_name = #{moduleName},</if>
             <if test="businessName != null and businessName != ''">business_name = #{businessName},</if>
             <if test="functionName != null and functionName != ''">function_name = #{functionName},</if>
-            <if test="parentMenuId != null">parent_menu_id = #{parentMenuId},</if>
             <if test="options != null and options != ''">options = #{options},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>

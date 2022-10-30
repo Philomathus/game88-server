@@ -38,6 +38,9 @@ public class ConfigBank {
     private Integer       openLevelMax;
     @Excel( name = "状态" )
     private Boolean       effect = false;
+    @Excel( name = "充值限额" )
+    private BigDecimal    rechargeLimitMin;
+    private BigDecimal    rechargeLimitMax;
     @Excel( name = "备注信息" )
     private String        remark;
     @Excel( name = "创建人" )
