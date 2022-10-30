@@ -1,6 +1,5 @@
 package tv.game88.platform.admin.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -11,6 +10,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.platform.api.service.ConfigSmsService;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping( "/config/sms" )
 public class ConfigSmsController extends BaseController {
 
-    @Autowired
+    @Resource
     private ConfigSmsService configSmsService;
 
     /**
