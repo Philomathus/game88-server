@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.ConfigBankMapper">
+    <resultMap type="tv.game88.pay.api.entity.ConfigBank" id="ConfigBankResult">
+        <result property="id" column="id" />
+        <result property="bankId" column="bank_id" />
+        <result property="bankAccount" column="bank_account" />
+        <result property="accountName" column="account_name" />
+        <result property="bankAddress" column="bank_address" />
+        <result property="discountBill" column="discount_bill" />
+        <result property="openLevelMin" column="open_level_min" />
+        <result property="openLevelMax" column="open_level_max" />
+        <result property="rechargeLimitMin" column="recharge_limit_min" />
+        <result property="rechargeLimitMax" column="recharge_limit_max" />
+        <result property="effect" column="effect" />
+        <result property="remark" column="remark" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectConfigBankVo">
+        select id,bank_id,bank_account,account_name,bank_address,
+               discount_bill,open_level_min,open_level_max,
+               recharge_limit_min,recharge_limit_max,effect,
+               remark,create_by,create_time,update_by,update_time
+        from config_bank
+    </sql>
+
+    <select id="selectConfigBankList" parameterType="tv.game88.pay.api.entity.ConfigBank" resultMap="ConfigBankResult">
+        <include refid="selectConfigBankVo" />
+        <where>
+            <if test="bankId != null">
+                and bank_id = #{bankId}
+            </if>
+            <if test="accountName != null  and accountName != ''">
+                and account_name like concat('%', #{accountName}, '%')
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+        </where>
+    </select>
+</mapper>

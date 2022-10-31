@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayTypeMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayType" id="PayTypeResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="iconUrl" column="icon_url" />
+        <result property="sort" column="sort" />
+        <result property="recommend" column="recommend" />
+        <result property="effect" column="effect" />
+        <result property="type" column="type" />
+        <result property="deviceType" column="device_type" />
+        <result property="openLevelMin" column="open_level_min" />
+        <result property="openLevelMax" column="open_level_max" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="tex1" column="tex1" />
+        <result property="tex2" column="tex2" />
+        <result property="tex3" column="tex3" />
+        <result property="tex4" column="tex4" />
+        <result property="tex5" column="tex5" />
+    </resultMap>
+
+    <sql id="selectPayTypeVo">
+        select id,name,icon_url,sort,recommend,effect,type,device_type,open_level_min,open_level_max,
+               create_by,create_time,update_by,update_time,tex1,tex2,tex3,tex4,tex5
+        from pay_type
+    </sql>
+
+    <select id="selectPayTypeList" parameterType="tv.game88.pay.api.entity.PayType" resultMap="PayTypeResult">
+        <include refid="selectPayTypeVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="iconUrl != null  and iconUrl != ''">
+                and icon_url = #{iconUrl}
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
+            </if>
+            <if test="recommend != null">
+                and recommend = #{recommend}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="deviceType != null  and deviceType != ''">
+                and device_type = #{deviceType}
+            </if>
+            <if test="openLevelMin != null">
+                and open_level_min = #{openLevelMin}
+            </if>
+            <if test="openLevelMax != null">
+                and open_level_max = #{openLevelMax}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

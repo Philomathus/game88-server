@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayPlatformMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayPlatform" id="PayPlatformResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="code" column="code" />
+        <result property="merId" column="mer_id" />
+        <result property="appId" column="app_id" />
+        <result property="payUrl" column="pay_url" />
+        <result property="queryUrl" column="query_url" />
+        <result property="signMd5" column="sign_md5" />
+        <result property="signPublicKey" column="sign_public_key" />
+        <result property="signPrivateKey" column="sign_private_key" />
+        <result property="whiteIp" column="white_ip" />
+        <result property="createBy" column="create_by" />
+        <result property="updateBy" column="update_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectPayPlatformVo">
+        select id,name,code,mer_id,app_id,pay_url,query_url,sign_md5,sign_public_key,
+               sign_private_key,white_ip,create_by,update_by,create_time,update_time,remark
+        from pay_platform
+    </sql>
+
+    <select id="selectPayPlatformList" parameterType="tv.game88.pay.api.entity.PayPlatform"
+            resultMap="PayPlatformResult">
+        <include refid="selectPayPlatformVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="code != null  and code != ''">
+                and code = #{code}
+            </if>
+            <if test="merId != null  and merId != ''">
+                and mer_id = #{merId}
+            </if>
+            <if test="appId != null  and appId != ''">
+                and app_id = #{appId}
+            </if>
+            <if test="payUrl != null  and payUrl != ''">
+                and pay_url = #{payUrl}
+            </if>
+            <if test="queryUrl != null  and queryUrl != ''">
+                and query_url = #{queryUrl}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="remark != null  and remark != ''">
+                and remark = #{remark}
+            </if>
+        </where>
+    </select>
+</mapper>

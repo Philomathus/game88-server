@@ -14,13 +14,6 @@ import java.util.List;
  * @date 2021-04-03
  */
 public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {
-    /**
-     * 查询支付通道金额列表
-     *
-     * @param payChannelMoney 支付通道金额
-     *
-     * @return 支付通道金额集合
-     */
     public List<PayChannelMoney> selectPayChannelMoneyList( PayChannelMoney payChannelMoney );
 
     int deleteByChannelIds( @Param( "channelIds" ) List<Long> channelIds );

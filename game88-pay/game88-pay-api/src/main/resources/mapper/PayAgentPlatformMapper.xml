@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayAgentPlatformMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayAgentPlatform" id="PayAgentPlatformResult">
+        <result property="id" column="id" />
+        <result property="code" column="code" />
+        <result property="name" column="name" />
+        <result property="orderUrl" column="order_url" />
+        <result property="orderQueryUrl" column="order_query_url" />
+        <result property="whiteIp" column="white_ip" />
+        <result property="headerValue" column="header_value" />
+        <result property="signMd5" column="sign_md5" />
+        <result property="signPublicKey" column="sign_public_key" />
+        <result property="signPrivateKey" column="sign_private_key" />
+        <result property="headerValueExplain" column="header_value_explain" />
+        <result property="signMd5Explain" column="sign_md5_explain" />
+        <result property="signPublicKeyExplain" column="sign_public_key_explain" />
+        <result property="signPrivateKeyExplain" column="sign_private_key_explain" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectPayAgentPlatformVo">
+        select id,code,name,order_url,order_query_url,white_ip,header_value,
+               sign_md5,sign_public_key,sign_private_key,header_value_explain,
+               sign_md5_explain,sign_public_key_explain,sign_private_key_explain,
+               create_by,create_time,update_by,update_time
+        from pay_agent_platform
+    </sql>
+
+    <select id="selectPayAgentPlatformList" parameterType="tv.game88.pay.api.entity.PayAgentPlatform"
+            resultMap="PayAgentPlatformResult">
+        <include refid="selectPayAgentPlatformVo" />
+        <where>
+            <if test="code != null  and code != ''">
+                and code = #{code}
+            </if>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="orderUrl != null  and orderUrl != ''">
+                and order_url = #{orderUrl}
+            </if>
+            <if test="orderQueryUrl != null  and orderQueryUrl != ''">
+                and order_query_url = #{orderQueryUrl}
+            </if>
+            <if test="whiteIp != null  and whiteIp != ''">
+                and white_ip = #{whiteIp}
+            </if>
+            <if test="headerValue != null">
+                and header_value = #{headerValue}
+            </if>
+            <if test="signMd5 != null">
+                and sign_md5 = #{signMd5}
+            </if>
+            <if test="signPublicKey != null">
+                and sign_public_key = #{signPublicKey}
+            </if>
+            <if test="signPrivateKey != null">
+                and sign_private_key = #{signPrivateKey}
+            </if>
+            <if test="headerValueExplain != null  and headerValueExplain != ''">
+                and header_value_explain = #{headerValueExplain}
+            </if>
+            <if test="signMd5Explain != null  and signMd5Explain != ''">
+                and sign_md5_explain = #{signMd5Explain}
+            </if>
+            <if test="signPublicKeyExplain != null  and signPublicKeyExplain != ''">
+                and sign_public_key_explain = #{signPublicKeyExplain}
+            </if>
+            <if test="signPrivateKeyExplain != null  and signPrivateKeyExplain != ''">
+                and sign_private_key_explain = #{signPrivateKeyExplain}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

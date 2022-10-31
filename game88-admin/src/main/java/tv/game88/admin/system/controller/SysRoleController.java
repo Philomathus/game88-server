@@ -89,7 +89,7 @@ public class SysRoleController extends BaseController {
         role.setUpdateBy( SecurityUtils.getUsername() );
 
         if ( roleService.updateRole( role ) > 0 ) {
-            roleService.userRoleList( role.getRoleId() );//踢蹬，所有角色下的用户踢蹬
+            // TODO 测试阶段先禁用 roleService.userRoleList( role.getRoleId() );//踢蹬，所有角色下的用户踢蹬
             return RspBase.ok();
         }
         return RspBase.businessError( "修改角色'" + role.getRoleName() + "'失败，请联系管理员" );

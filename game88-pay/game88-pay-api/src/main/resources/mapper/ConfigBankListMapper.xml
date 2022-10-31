@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.ConfigBankListMapper">
+    <resultMap type="tv.game88.pay.api.entity.ConfigBankList" id="ConfigBankListResult">
+        <result property="id" column="id" />
+        <result property="bankCode" column="bank_code" />
+        <result property="bankName" column="bank_name" />
+        <result property="bankIcon" column="bank_icon" />
+        <result property="effect" column="effect" />
+        <result property="sort" column="sort" />
+    </resultMap>
+
+    <sql id="selectConfigBankListVo">
+        select id,bank_code,bank_name,bank_icon,effect,sort
+        from config_bank_list
+    </sql>
+
+    <select id="selectConfigBankListList" parameterType="tv.game88.pay.api.entity.ConfigBankList"
+            resultMap="ConfigBankListResult">
+        <include refid="selectConfigBankListVo" />
+        <where>
+            <if test="bankCode != null  and bankCode != ''">
+                and bank_code = #{bankCode}
+            </if>
+            <if test="bankName != null  and bankName != ''">
+                and bank_name like concat('%', #{bankName}, '%')
+            </if>
+            <if test="bankIcon != null  and bankIcon != ''">
+                and bank_icon = #{bankIcon}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
+            </if>
+        </where>
+    </select>
+</mapper>

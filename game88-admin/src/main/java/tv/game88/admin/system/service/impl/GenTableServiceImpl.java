@@ -431,18 +431,18 @@ public class GenTableServiceImpl implements IGenTableService {
      * @param genTable 设置后的生成对象
      */
     public void setTableFromOptions( GenTable genTable ) {
-        Map<String, String> paramsMap = JsonUtil.json2Map( genTable.getOptions() );
+        Map<String, Object> paramsMap = JsonUtil.json2Map( genTable.getOptions() );
         if ( !CollectionUtils.isEmpty( paramsMap ) ) {
-            String treeCode       = paramsMap.get( GenConstants.TREE_CODE );
-            String treeParentCode = paramsMap.get( GenConstants.TREE_PARENT_CODE );
-            String treeName       = paramsMap.get( GenConstants.TREE_NAME );
-            Long   parentMenuId   = Long.valueOf( paramsMap.get( GenConstants.PARENT_MENU_ID ) );
-            String parentMenuName = paramsMap.get( GenConstants.PARENT_MENU_NAME );
+            String  treeCode       = ( String ) paramsMap.get( GenConstants.TREE_CODE );
+            String  treeParentCode = ( String ) paramsMap.get( GenConstants.TREE_PARENT_CODE );
+            String  treeName       = ( String ) paramsMap.get( GenConstants.TREE_NAME );
+            Integer parentMenuId   = ( Integer ) paramsMap.get( GenConstants.PARENT_MENU_ID );
+            String  parentMenuName = ( String ) paramsMap.get( GenConstants.PARENT_MENU_NAME );
 
             genTable.setTreeCode( treeCode );
             genTable.setTreeParentCode( treeParentCode );
             genTable.setTreeName( treeName );
-            genTable.setParentMenuId( parentMenuId );
+            genTable.setParentMenuId( Long.valueOf( parentMenuId ) );
             genTable.setParentMenuName( parentMenuName );
         }
     }

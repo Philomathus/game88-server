@@ -8,6 +8,4 @@ import java.util.List;
 public interface ConfigBankMapper extends BaseMapper<ConfigBank> {
 
 	public List<ConfigBank> selectConfigBankList(ConfigBank configBank);
-
-	List<ConfigBank> findEffect();
 }

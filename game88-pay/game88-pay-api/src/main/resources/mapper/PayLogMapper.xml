@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayLogMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayLog" id="PayLogResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="platformId" column="platform_id" />
+        <result property="platformName" column="platform_name" />
+        <result property="channelId" column="channel_id" />
+        <result property="channelName" column="channel_name" />
+        <result property="money" column="money" />
+        <result property="success" column="success" />
+        <result property="failReason" column="fail_reason" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectPayLogVo">
+        select id,member_id,platform_id,platform_name,channel_id,channel_name,
+               money,success,fail_reason,create_time
+        from pay_log
+    </sql>
+
+    <select id="selectPayLogList" parameterType="tv.game88.pay.api.entity.PayLog" resultMap="PayLogResult">
+        <include refid="selectPayLogVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="platformName != null  and platformName != ''">
+                and platform_name like concat('%', #{platformName}, '%')
+            </if>
+            <if test="channelId != null">
+                and channel_id = #{channelId}
+            </if>
+            <if test="channelName != null  and channelName != ''">
+                and channel_name like concat('%', #{channelName}, '%')
+            </if>
+            <if test="money != null">
+                and money = #{money}
+            </if>
+            <if test="success != null">
+                and success = #{success}
+            </if>
+            <if test="failReason != null  and failReason != ''">
+                and fail_reason = #{failReason}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+</mapper>

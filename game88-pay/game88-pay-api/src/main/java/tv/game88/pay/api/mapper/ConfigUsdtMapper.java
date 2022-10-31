@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface ConfigUsdtMapper extends BaseMapper<ConfigUsdt> {
     public List<ConfigUsdt> selectConfigUsdtList( ConfigUsdt payRechargeUsdt );
-
-    List<ConfigUsdt> findEffect();
 }

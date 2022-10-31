@@ -6,6 +6,5 @@ import tv.game88.pay.api.entity.PayPlatform;
 import java.util.List;
 
 public interface PayPlatformMapper extends BaseMapper<PayPlatform> {
-
 	public List<PayPlatform> selectPayPlatformList(PayPlatform PayPlatform);
 }

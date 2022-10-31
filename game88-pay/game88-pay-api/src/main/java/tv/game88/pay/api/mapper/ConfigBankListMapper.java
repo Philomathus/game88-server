@@ -12,7 +12,5 @@ public interface ConfigBankListMapper extends BaseMapper<ConfigBankList> {
      * @param bankList 银行卡列表
      * @return 银行卡列表集合
      */
-    public List<ConfigBankList> selectBankListList( ConfigBankList bankList);
-
-    List<ConfigBankList> findByEffect();
+    public List<ConfigBankList> selectConfigBankListList( ConfigBankList bankList);
 }

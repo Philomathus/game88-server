@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.MemberRechargeOnlineMapper">
+    <resultMap type="tv.game88.pay.api.entity.MemberRechargeOnline" id="MemberRechargeOnlineResult">
+        <result property="orderNo" column="order_no" />
+        <result property="memberId" column="member_id" />
+        <result property="platformId" column="platform_id" />
+        <result property="channelId" column="channel_id" />
+        <result property="upperOrderNo" column="upper_order_no" />
+        <result property="money" column="money" />
+        <result property="realMoney" column="real_money" />
+        <result property="paymentAddress" column="payment_address" />
+        <result property="payTime" column="pay_time" />
+        <result property="status" column="status" />
+        <result property="patchOrder" column="patch_order" />
+        <result property="remark" column="remark" />
+        <result property="updateTime" column="update_time" />
+        <result property="first" column="first" />
+        <result property="rate" column="rate" />
+    </resultMap>
+
+    <sql id="selectMemberRechargeOnlineVo">
+        select order_no,member_id,platform_id,channel_id,upper_order_no,
+               money,real_money,payment_address,pay_time,status,
+               patch_order,remark,update_time, `first`, rate
+        from member_recharge_online
+    </sql>
+
+    <select id="selectMemberRechargeOnlineList" parameterType="tv.game88.pay.api.entity.MemberRechargeOnline"
+            resultMap="MemberRechargeOnlineResult">
+        <include refid="selectMemberRechargeOnlineVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="channelId != null">
+                and channel_id = #{channelId}
+            </if>
+            <if test="upperOrderNo != null  and upperOrderNo != ''">
+                and upper_order_no = #{upperOrderNo}
+            </if>
+            <if test="money != null">
+                and money = #{money}
+            </if>
+            <if test="realMoney != null">
+                and real_money = #{realMoney}
+            </if>
+            <if test="paymentAddress != null  and paymentAddress != ''">
+                and payment_address = #{paymentAddress}
+            </if>
+            <if test="payTime != null">
+                and pay_time = #{payTime}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="patchOrder != null">
+                and patch_order = #{patchOrder}
+            </if>
+            <if test="remark != null  and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="first != null">
+                and `first` = #{first}
+            </if>
+            <if test="rate != null">
+                and rate = #{rate}
+            </if>
+        </where>
+    </select>
+</mapper>

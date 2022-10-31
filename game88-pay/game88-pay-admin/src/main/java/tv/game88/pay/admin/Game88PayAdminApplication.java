@@ -1,11 +1,11 @@
-package tv.game88.platform.app;
+package tv.game88.pay.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication( scanBasePackages = { "tv.game88" } )
-public class Game88PlatformAppApplication {
+public class Game88PayAdminApplication {
     public static void main( String[] args ) {
-        SpringApplication.run( Game88PlatformAppApplication.class, args );
+        SpringApplication.run( Game88PayAdminApplication.class, args );
     }
 }

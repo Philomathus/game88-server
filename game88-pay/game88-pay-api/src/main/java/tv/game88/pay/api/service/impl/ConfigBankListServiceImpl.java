@@ -6,7 +6,13 @@ import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.mapper.ConfigBankListMapper;
 import tv.game88.pay.api.service.ConfigBankListService;
 
+import java.util.List;
+
 @Service
 public class ConfigBankListServiceImpl extends ServiceImpl<ConfigBankListMapper, ConfigBankList> implements ConfigBankListService {
+    @Override
+    public List<ConfigBankList> selectConfigBankListList( ConfigBankList configBankList ) {
+        return this.baseMapper.selectConfigBankListList( configBankList );
+    }
 }
 

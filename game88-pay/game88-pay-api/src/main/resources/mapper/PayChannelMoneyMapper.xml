@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayChannelMoneyMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayChannelMoney" id="PayChannelMoneyResult">
+        <result property="id" column="id" />
+        <result property="money" column="money" />
+        <result property="channelId" column="channel_id" />
+        <result property="channelPayRate" column="channel_pay_rate" />
+        <result property="typeId" column="type_id" />
+        <result property="openLevelMin" column="open_level_min" />
+        <result property="openLevelMax" column="open_level_max" />
+    </resultMap>
+
+    <sql id="selectPayChannelMoneyVo">
+        select id,money,channel_id,channel_pay_rate,type_id,open_level_min,open_level_max
+        from pay_channel_money
+    </sql>
+
+    <select id="selectPayChannelMoneyList" parameterType="tv.game88.pay.api.entity.PayChannelMoney"
+            resultMap="PayChannelMoneyResult">
+        <include refid="selectPayChannelMoneyVo" />
+        <where>
+            <if test="money != null">
+                and money = #{money}
+            </if>
+            <if test="channelId != null">
+                and channel_id = #{channelId}
+            </if>
+            <if test="channelPayRate != null">
+                and channel_pay_rate = #{channelPayRate}
+            </if>
+            <if test="typeId != null">
+                and type_id = #{typeId}
+            </if>
+            <if test="openLevelMin != null">
+                and open_level_min = #{openLevelMin}
+            </if>
+            <if test="openLevelMax != null">
+                and open_level_max = #{openLevelMax}
+            </if>
+        </where>
+    </select>
+</mapper>

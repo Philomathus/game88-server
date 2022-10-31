@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayAgentLogMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayAgentLog" id="PayAgentLogResult">
+        <result property="withdrawOrderNo" column="withdraw_order_no" />
+        <result property="channelId" column="channel_id" />
+        <result property="channelName" column="channel_name" />
+        <result property="withdrawId" column="withdraw_id" />
+        <result property="withdrawMoney" column="withdraw_money" />
+        <result property="agentOrderNo" column="agent_order_no" />
+        <result property="createTime" column="create_time" />
+        <result property="callbackTime" column="callback_time" />
+        <result property="callbackStatus" column="callback_status" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectPayAgentLogVo">
+        select withdraw_order_no,channel_id,channel_name,withdraw_id,withdraw_money,
+               agent_order_no,create_time,callback_time,callback_status,remark
+        from pay_agent_log
+    </sql>
+
+    <select id="selectPayAgentLogList" parameterType="tv.game88.pay.api.entity.PayAgentLog"
+            resultMap="PayAgentLogResult">
+        <include refid="selectPayAgentLogVo" />
+        <where>
+            <if test="channelId != null">
+                and channel_id = #{channelId}
+            </if>
+            <if test="channelName != null  and channelName != ''">
+                and channel_name like concat('%', #{channelName}, '%')
+            </if>
+            <if test="withdrawId != null  and withdrawId != ''">
+                and withdraw_id = #{withdrawId}
+            </if>
+            <if test="withdrawMoney != null">
+                and withdraw_money = #{withdrawMoney}
+            </if>
+            <if test="agentOrderNo != null  and agentOrderNo != ''">
+                and agent_order_no = #{agentOrderNo}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="callbackTime != null">
+                and callback_time = #{callbackTime}
+            </if>
+            <if test="callbackStatus != null">
+                and callback_status = #{callbackStatus}
+            </if>
+            <if test="remark != null  and remark != ''">
+                and remark = #{remark}
+            </if>
+        </where>
+    </select>
+</mapper>

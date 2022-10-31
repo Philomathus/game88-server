@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.MemberRechargeBankMapper">
+    <resultMap type="tv.game88.pay.api.entity.MemberRechargeBank" id="MemberRechargeBankResult">
+        <result property="rechargeOrderNo" column="recharge_order_no" />
+        <result property="memberId" column="member_id" />
+        <result property="rechargeMoney" column="recharge_money" />
+        <result property="status" column="status" />
+        <result property="realName" column="real_name" />
+        <result property="rechargeRealName" column="recharge_real_name" />
+        <result property="bankUserName" column="bank_user_name" />
+        <result property="bankId" column="bank_id" />
+        <result property="bankAccount" column="bank_account" />
+        <result property="bankAddress" column="bank_address" />
+        <result property="opName" column="op_name" />
+        <result property="remark" column="remark" />
+        <result property="first" column="first" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="ip" column="ip" />
+        <result property="discountBill" column="discount_bill" />
+    </resultMap>
+
+    <sql id="selectMemberRechargeBankVo">
+        select recharge_order_no,member_id,recharge_money,status,real_name,
+               recharge_real_name,bank_user_name,bank_id,bank_account,
+               bank_address,op_name,remark, `first`, create_time, update_time, ip, discount_bill
+        from member_recharge_bank
+    </sql>
+
+    <select id="selectMemberRechargeBankList" parameterType="tv.game88.pay.api.entity.MemberRechargeBank"
+            resultMap="MemberRechargeBankResult">
+        <include refid="selectMemberRechargeBankVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="rechargeMoney != null">
+                and recharge_money = #{rechargeMoney}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="realName != null  and realName != ''">
+                and real_name like concat('%', #{realName}, '%')
+            </if>
+            <if test="rechargeRealName != null  and rechargeRealName != ''">
+                and recharge_real_name like concat('%', #{rechargeRealName}, '%')
+            </if>
+            <if test="bankUserName != null  and bankUserName != ''">
+                and bank_user_name like concat('%', #{bankUserName}, '%')
+            </if>
+            <if test="bankId != null">
+                and bank_id = #{bankId}
+            </if>
+            <if test="bankAccount != null  and bankAccount != ''">
+                and bank_account = #{bankAccount}
+            </if>
+            <if test="bankAddress != null  and bankAddress != ''">
+                and bank_address = #{bankAddress}
+            </if>
+            <if test="opName != null  and opName != ''">
+                and op_name like concat('%', #{opName}, '%')
+            </if>
+            <if test="remark != null  and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="first != null">
+                and `first` = #{first}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="ip != null  and ip != ''">
+                and ip = #{ip}
+            </if>
+            <if test="discountBill != null">
+                and discount_bill = #{discountBill}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayChannelMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayChannel" id="PayChannelResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="channelCode" column="channel_code" />
+        <result property="platformId" column="platform_id" />
+        <result property="typeId" column="type_id" />
+        <result property="effect" column="effect" />
+        <result property="canCallback" column="can_callback" />
+        <result property="openLevelMin" column="open_level_min" />
+        <result property="openLevelMax" column="open_level_max" />
+        <result property="discountBill" column="discount_bill" />
+        <result property="quickAmount" column="quick_amount" />
+        <result property="rate" column="rate" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectPayChannelVo">
+        select id,name,channel_code,platform_id,type_id,effect,can_callback,open_level_min,
+               open_level_max,discount_bill,quick_amount,rate,create_by,create_time,update_by,update_time
+        from pay_channel
+    </sql>
+
+    <select id="selectPayChannelList" parameterType="tv.game88.pay.api.entity.PayChannel" resultMap="PayChannelResult">
+        <include refid="selectPayChannelVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="channelCode != null  and channelCode != ''">
+                and channel_code = #{channelCode}
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="typeId != null">
+                and type_id = #{typeId}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="canCallback != null">
+                and can_callback = #{canCallback}
+            </if>
+            <if test="openLevelMin != null">
+                and open_level_min = #{openLevelMin}
+            </if>
+            <if test="openLevelMax != null">
+                and open_level_max = #{openLevelMax}
+            </if>
+            <if test="discountBill != null  and discountBill != ''">
+                and discount_bill = #{discountBill}
+            </if>
+            <if test="quickAmount != null  and quickAmount != ''">
+                and quick_amount = #{quickAmount}
+            </if>
+            <if test="rate != null">
+                and rate = #{rate}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

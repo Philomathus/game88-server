@@ -6,7 +6,5 @@ import tv.game88.pay.api.entity.MemberRechargeOnline;
 import java.util.List;
 
 public interface MemberRechargeOnlineMapper extends BaseMapper<MemberRechargeOnline> {
-
     public List<MemberRechargeOnline> selectMemberRechargeOnlineList( MemberRechargeOnline memberRechargeOnline );
-
 }

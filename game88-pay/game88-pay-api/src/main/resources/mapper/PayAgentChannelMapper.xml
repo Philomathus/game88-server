@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayAgentChannelMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayAgentChannel" id="PayAgentChannelResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="platformId" column="platform_id" />
+        <result property="merId" column="mer_id" />
+        <result property="headerValue" column="header_value" />
+        <result property="signMd5" column="sign_md5" />
+        <result property="signPublicKey" column="sign_public_key" />
+        <result property="signPrivateKey" column="sign_private_key" />
+        <result property="effect" column="effect" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectPayAgentChannelVo">
+        select id,name,platform_id,mer_id,header_value,sign_md5,sign_public_key,
+               sign_private_key,effect,create_by,create_time,update_by,update_time
+        from pay_agent_channel
+    </sql>
+
+    <select id="selectPayAgentChannelList" parameterType="tv.game88.pay.api.entity.PayAgentChannel"
+            resultMap="PayAgentChannelResult">
+        <include refid="selectPayAgentChannelVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="merId != null  and merId != ''">
+                and mer_id = #{merId}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+</mapper>
