@@ -1,7 +1,7 @@
 package tv.game88.core.admin.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
@@ -52,7 +52,7 @@ public class LoginUser implements UserDetails {
     /**
      * 用户信息
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private SysUser user;
 
     private String userStr;
@@ -120,7 +120,7 @@ public class LoginUser implements UserDetails {
         this.token = token;
     }
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -134,7 +134,7 @@ public class LoginUser implements UserDetails {
     /**
      * 账户是否未过期,过期无法验证
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -145,7 +145,7 @@ public class LoginUser implements UserDetails {
      *
      * @return
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isAccountNonLocked() {
         return true;
@@ -156,7 +156,7 @@ public class LoginUser implements UserDetails {
      *
      * @return
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -167,7 +167,7 @@ public class LoginUser implements UserDetails {
      *
      * @return
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isEnabled() {
         return true;
@@ -205,7 +205,7 @@ public class LoginUser implements UserDetails {
         this.os = os;
     }
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

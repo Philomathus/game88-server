@@ -435,19 +435,11 @@ public class Convert {
 			return defaultValue;
 		}
 		valueStr = valueStr.trim().toLowerCase();
-		switch ( valueStr ) {
-		case "true":
-		case "ok":
-		case "1":
-		case "yes":
-			return true;
-		case "false":
-		case "no":
-		case "0":
-			return false;
-		default:
-			return defaultValue;
-		}
+		return switch ( valueStr ) {
+			case "true", "ok", "1", "yes" -> true;
+			case "false", "no", "0" -> false;
+			default -> defaultValue;
+		};
 	}
 
 	/**

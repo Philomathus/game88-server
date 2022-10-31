@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -68,49 +68,40 @@ public class MemberWithdrawDetail {
     private String statusDes;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String  statusName;
     //公司入款姓名与提现姓名状态
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer rechargeUserNameStatus;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String  payAgentOrderNo;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String[] searchTime;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String   startTime;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String   endTime;
 
     public String getStatusDes() {
         if ( status != null ) {
-            switch ( status ) {
-            case 0:
-                return "入账中";
-            case 1:
-                return "初级审核通过";
-            case 2:
-                return "审核不通过";
-            case 3:
-                return "终极审核通过";
-            case 4:
-                return "代付中";
-            case 5:
-                return "代付失败";
-            case 6:
-                return "代付成功";
-            case 7:
-                return "出款异常";
-            case 8:
-                return "人工代付中";
-            default:
-            }
+            return switch ( status ) {
+                case 0 -> "入账中";
+                case 1 -> "初级审核通过";
+                case 2 -> "审核不通过";
+                case 3 -> "终极审核通过";
+                case 4 -> "代付中";
+                case 5 -> "代付失败";
+                case 6 -> "代付成功";
+                case 7 -> "出款异常";
+                case 8 -> "人工代付中";
+                default -> "";
+            };
         }
         return "";
     }

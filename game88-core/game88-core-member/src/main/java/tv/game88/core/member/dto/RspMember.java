@@ -1,6 +1,6 @@
 package tv.game88.core.member.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +40,7 @@ public class RspMember {
     private Integer    registerType;
 
     @Schema( title = "登录密码", hidden = true )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     public String getHeadImg() {

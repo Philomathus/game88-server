@@ -9,6 +9,7 @@
 		<result property="accessKey" column="access_key"/>
 		<result property="accessSecret" column="access_secret"/>
 		<result property="endpoint" column="endpoint"/>
+		<result property="region" column="region"/>
 		<result property="bucket" column="bucket"/>
 		<result property="vhost" column="vhost"/>
 		<result property="isEffect" column="is_effect"/>
@@ -22,89 +23,18 @@
 	</resultMap>
 
 	<sql id="selectConfigOssVo">
-		select id,
-			   name,
-			   access_key,
-			   access_secret,
-			   endpoint,
-			   bucket,
-			   vhost,
-			   is_effect,
-		       provider,
-		       do_main,
-			   create_by,
-			   create_time,
-			   update_by,
-			   update_time,
-			   remark
-		from config_oss
+		select id,name,access_key,access_secret,endpoint,region,bucket,vhost,is_effect,provider,do_main,create_by,
+			   create_time,update_by,update_time,remark from config_oss
 	</sql>
-
-	<update id="updateConfigOss">
-		update config_oss
-		<trim prefix="SET" suffixOverrides=",">
-			<if test="name != null and name != ''">
-				name = #{name},
-			</if>
-
-			<if test="accessKey != null and accessKey != ''">
-				access_key = #{accessKey},
-			</if>
-
-			<if test="accessSecret != null and accessSecret != ''">
-				access_secret = #{accessSecret},
-			</if>
-
-			<if test="endpoint != null and endpoint != ''">
-				endpoint = #{endpoint},
-			</if>
-
-			<if test="bucket != null and bucket != ''">
-				bucket = #{bucket},
-			</if>
-
-			<if test="vhost != null and vhost != ''">
-				vhost = #{vhost},
-			</if>
-
-			<if test="isEffect != null">
-				is_effect = #{isEffect},
-			</if>
-
-			<if test="createBy != null">
-				create_by = #{createBy},
-			</if>
-
-			<if test="createTime != null">
-				create_time = #{createTime},
-			</if>
-
-			<if test="updateBy != null">
-				update_by = #{updateBy},
-			</if>
-
-			<if test="updateTime != null">
-				update_time = #{updateTime},
-			</if>
-			<if test="provider != null">
-				provider = #{provider},
-			</if>
-		</trim>
-		where id = #{id}
-	</update>
-
-	<delete id="deleteConfigOssDataByIds">
-		delete from config_oss where id in
-		<foreach collection="array" item="id" open="(" separator="," close=")">
-			#{id}
-		</foreach>
-	</delete>
 
 	<select id="selectConfigOssList" parameterType="tv.game88.core.config.entity.ConfigOss" resultMap="ConfigOssResult">
 		<include refid="selectConfigOssVo"/>
 		<where>
 			<if test="name != null  and name != ''">
 				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="isEffect != null">
+				is_effect = #{isEffect},
 			</if>
 		</where>
 	</select>

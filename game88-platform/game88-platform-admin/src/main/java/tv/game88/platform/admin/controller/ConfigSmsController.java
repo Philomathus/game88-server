@@ -1,15 +1,17 @@
 package tv.game88.platform.admin.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.platform.api.service.ConfigSmsService;
 
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,10 +22,10 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/config/sms")
+@RequestMapping( "/config/sms" )
 public class ConfigSmsController extends BaseController {
 
-    @Autowired
+    @Resource
     private ConfigSmsService configSmsService;
 
     /**
@@ -31,28 +33,20 @@ public class ConfigSmsController extends BaseController {
      * Query SMS config list controller
      */
     @PreAuthorize( "@ss.hasPermi('config:sms:list')" )
-    @GetMapping("/list")
-    public RspBase<List<ConfigSms>> list(ConfigSms configSms){
-        List<ConfigSms> list = configSmsService.selectConfigSmsList(configSms);
-        return RspBase.ok(list);
+    @GetMapping( "/list" )
+    public RspBase<List<ConfigSms>> list( ConfigSms configSms ) {
+        List<ConfigSms> list = configSmsService.selectConfigSmsList( configSms );
+        return RspBase.ok( list );
     }
-
-    @PreAuthorize( "@ss.hasPermi('config:sms:effectList')" )
-    @GetMapping("/effect")
-    public RspBase<List<ConfigSms>> effectList(){
-        List<ConfigSms> list = configSmsService.selectConfigSmsByEffect();
-        return RspBase.ok(list);
-    }
-
 
     /**
      * 通过 id 获取 SMS config 服务配置详细信息
      * Get SMS config by id service controller
      */
     @PreAuthorize( "@ss.hasPermi('config:sms:query')" )
-    @GetMapping("/id/{id}")
-    public RspBase<ConfigSms> getById(@PathVariable Long id){
-        return RspBase.ok(configSmsService.selectConfigSmsById(id));
+    @GetMapping( "/id/{id}" )
+    public RspBase<ConfigSms> getById( @PathVariable Long id ) {
+        return RspBase.ok( configSmsService.selectConfigSmsById( id ) );
     }
 
     /**
@@ -62,8 +56,10 @@ public class ConfigSmsController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:sms:add')" )
     @Log( title = "SMS短信服务配置", businessType = BusinessType.INSERT )
     @PostMapping
-    public RspBase<?> add(@RequestBody ConfigSms configSms){
-        return toResult(configSmsService.insertConfigSms(configSms));
+    public RspBase<?> add( @RequestBody ConfigSms configSms ) {
+        configSms.setCreateBy( SecurityUtils.getUsername() );
+        configSms.setCreateTime( LocalDateTime.now() );
+        return toResult( configSmsService.insertConfigSms( configSms ) );
     }
 
 
@@ -74,8 +70,10 @@ public class ConfigSmsController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:sms:edit')" )
     @Log( title = "SMS短信服务配置", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> update(@RequestBody ConfigSms configSms){
-        return toResult(configSmsService.updateConfigOSms(configSms));
+    public RspBase<?> update( @RequestBody ConfigSms configSms ) {
+        configSms.setUpdateBy( SecurityUtils.getUsername() );
+        configSms.setUpdateTime( LocalDateTime.now() );
+        return toResult( configSmsService.updateConfigOSms( configSms ) );
     }
 
 
@@ -85,9 +83,9 @@ public class ConfigSmsController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('config:sms:delete')" )
     @Log( title = "SMS短信服务配置", businessType = BusinessType.DELETE )
-    @DeleteMapping("/{ids}")
-    public RspBase<?> delete(@PathVariable Long[] ids){
-        return toResult(configSmsService.deleteServerSmsByIds(ids));
+    @DeleteMapping( "/{ids}" )
+    public RspBase<?> delete( @PathVariable Long[] ids ) {
+        return toResult( configSmsService.deleteServerSmsByIds( ids ) );
     }
 
     /**
@@ -96,10 +94,25 @@ public class ConfigSmsController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('config:sms:effect')" )
     @Log( title = "SMS短信服务配置-激活", businessType = BusinessType.EFFECT )
-    @PutMapping( "/effect" )
-    public RspBase<List<ConfigSms>> effect() {
-        return RspBase.ok( configSmsService.selectConfigSmsByEffect());
+    @PutMapping( "/effect/{id}" )
+    public RspBase<?> effect( @PathVariable Long id ) {
+        return RspBase.ok( configSmsService.effect( id, SecurityUtils.getUsername() ) );
     }
 
+    @PreAuthorize( "@ss.hasPermi('config:sms:effect')" )
+    @Log( title = "SMS短信服务配置-取消激活", businessType = BusinessType.EFFECT )
+    @PutMapping( "/noEffect/{id}" )
+    public RspBase<?> noEffect( @PathVariable Long id ) {
+        return RspBase.ok( configSmsService.noEffect( id, SecurityUtils.getUsername() ) );
+    }
 
+    /**
+     * 测试SMS短信服务配置
+     */
+    @PreAuthorize( "@ss.hasPermi('config:sms:smsTest')" )
+    @Log( title = "SMS短信服务配置", businessType = BusinessType.OTHER )
+    @PutMapping( "/smsTest/{id}/{mobile}" )
+    public RspBase<?> smsTest( @PathVariable long id, @PathVariable String mobile ) {
+        return configSmsService.smsTest( id, mobile );
+    }
 }

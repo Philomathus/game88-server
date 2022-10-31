@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,6 +38,9 @@ public class ConfigBank {
     private Integer       openLevelMax;
     @Excel( name = "状态" )
     private Boolean       effect = false;
+    @Excel( name = "充值限额" )
+    private BigDecimal    rechargeLimitMin;
+    private BigDecimal    rechargeLimitMax;
     @Excel( name = "备注信息" )
     private String        remark;
     @Excel( name = "创建人" )
@@ -52,6 +55,6 @@ public class ConfigBank {
     private LocalDateTime updateTime;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer googleAuthCode;
 }

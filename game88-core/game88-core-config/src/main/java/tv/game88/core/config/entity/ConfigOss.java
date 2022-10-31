@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 
 /**
  * 对象 config_oss
@@ -16,59 +15,76 @@ import java.io.Serial;
  * @author MengJun
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode( callSuper = true )
 public class ConfigOss extends BaseEntity {
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@TableId(value = "id",type = IdType.AUTO)
-	private Long id;
+    @TableId( value = "id", type = IdType.AUTO )
+    private Long id;
 
-	/** 名称 */
-	private String name;
+    /**
+     * 名称
+     */
+    private String name;
 
-	/** Access Key ID */
-	private String accessKey;
+    /**
+     * Access Key ID
+     */
+    private String accessKey;
 
-	/** Access Key Secret */
-	private String accessSecret;
+    /**
+     * Access Key Secret
+     */
+    private String accessSecret;
 
-	/** OSS Endpoint */
-	private String endpoint;
+    /**
+     * OSS Endpoint
+     */
+    private String endpoint;
+    /**
+     * 地区
+     */
+    private String region;
+    /**
+     * 文件存储
+     */
+    private String bucket;
 
-	/** 文件存储 */
-	private String bucket;
+    /**
+     * 上传域名
+     */
+    private String vhost;
 
-	/** 上传域名 */
-	private String vhost;
+    /**
+     * 状态
+     */
+    private Integer isEffect;
 
-	/** 状态 */
-	private Integer isEffect;
+    /**
+     * 0 阿里 1亚马逊 2快快云
+     */
+    private Integer provider;
 
-	/** 0 阿里 1亚马逊 2快快云 */
-	private Long provider;
+    /**
+     * 访问域名
+     */
+    private String doMain;
 
-	/** 访问域名 */
-	private String doMain;
-
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-				.append("id", getId())
-				.append("name", getName())
-				.append("accessKey", getAccessKey())
-				.append("accessSecret", getAccessSecret())
-				.append("endpoint", getEndpoint())
-				.append("bucket", getBucket())
-				.append("vhost", getVhost())
-				.append("isEffect", getIsEffect())
-				.append("provider", getProvider())
-				.append("doMain", getDoMain())
-				.append("createBy", getCreateBy())
-				.append("createTime", getCreateTime())
-				.append("updateBy", getUpdateBy())
-				.append("updateTime", getUpdateTime())
-				.append("remark" , getRemark())
-				.toString();
-	}
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 更新者
+     */
+    private String        updateBy;
+    /**
+     * 创建者
+     */
+    private String        createBy;
 }

@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service;
 
+import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.entity.ConfigSms;
 
 import java.util.List;
@@ -21,10 +22,6 @@ public interface ConfigSmsService {
      * @return SMS短信服务配置集合
      */
     public List<ConfigSms> selectConfigSmsList(ConfigSms configSms );
-
-
-    List<ConfigSms> selectConfigSmsByEffect();
-
 
     /**
      * insert config sms
@@ -52,4 +49,9 @@ public interface ConfigSmsService {
      */
     public ConfigSms selectConfigSmsById( Long id );
 
+    boolean effect( Long id, String opName );
+
+    boolean noEffect( Long id, String opName );
+
+    RspBase<?> smsTest( Long id, String mobile );
 }
