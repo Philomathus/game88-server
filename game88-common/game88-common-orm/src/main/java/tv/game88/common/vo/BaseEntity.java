@@ -2,7 +2,7 @@ package tv.game88.common.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,7 +26,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 搜索值
 	 */
-	@JsonIgnore
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@TableField(exist = false)
 	private String searchValue;
 
@@ -60,7 +60,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 请求参数
 	 */
-	@JsonIgnore
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@TableField(exist = false)
 	private Map<String, Object> params;
 

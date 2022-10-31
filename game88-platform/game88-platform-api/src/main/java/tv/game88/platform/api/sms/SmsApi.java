@@ -93,6 +93,7 @@ public class SmsApi {
             case 1 -> this.sendSmsAliyun( configSms, phone, code );
             case 2 -> this.sendSmsBaidu( configSms, phone, code );
             case 3 -> this.sendSmsHuawei( configSms, phone, code );
+            default -> throw new BusinessException( "not found provider" );
         };
     }
 

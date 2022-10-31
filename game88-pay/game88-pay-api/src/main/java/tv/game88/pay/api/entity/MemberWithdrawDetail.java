@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -68,24 +68,24 @@ public class MemberWithdrawDetail {
     private String statusDes;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String  statusName;
     //公司入款姓名与提现姓名状态
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer rechargeUserNameStatus;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String  payAgentOrderNo;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String[] searchTime;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String   startTime;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String   endTime;
 
     public String getStatusDes() {
@@ -100,6 +100,7 @@ public class MemberWithdrawDetail {
                 case 6 -> "代付成功";
                 case 7 -> "出款异常";
                 case 8 -> "人工代付中";
+                default -> "";
             };
         }
         return "";

@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -60,10 +60,10 @@ public class MemberRechargeBank {
     private BigDecimal    discountBill;
 
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String startDate;
     @TableField( exist = false )
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String endDate;
 
     @TableField( exist = false )
@@ -80,6 +80,7 @@ public class MemberRechargeBank {
                 case 2 -> "审核不通过";
                 case 3 -> "终极审核通过";
                 case 4 -> "入库失败";
+                default -> "";
             };
         }
         return "";
