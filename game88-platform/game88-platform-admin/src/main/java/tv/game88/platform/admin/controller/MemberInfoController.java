@@ -322,7 +322,8 @@ public class MemberInfoController extends BaseController {
 
     @Log( title = "保险箱余额转出", businessType = BusinessType.UPDATE )
     @PostMapping( "/boxDish/{memberId}" )
-    public RspBase<?> boxDish( @PathVariable String memberId ) {
+    public RspBase<?> boxDish( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
         return memberInfoService.boxDish( memberId );
     }
 }
