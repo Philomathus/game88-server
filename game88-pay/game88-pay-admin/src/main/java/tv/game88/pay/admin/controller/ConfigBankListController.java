@@ -9,6 +9,7 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.pay.api.cache.ConfigBankListCache;
 import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.service.ConfigBankListService;
 
@@ -27,6 +28,8 @@ import java.util.List;
 public class ConfigBankListController extends BaseController {
     @Resource
     private ConfigBankListService configBankListService;
+    @Resource
+    private ConfigBankListCache   configBankListCache;
 
     /**
      * 查询银行字典列表列表
@@ -70,7 +73,15 @@ public class ConfigBankListController extends BaseController {
         ConfigBankList update = new ConfigBankList();
         update.setId( id );
         update.setEffect( effect );
-        return RspBase.ok( configBankListService.updateById( update ) );
+        boolean success = configBankListService.updateById( update );
+        if ( success ) {
+            if ( effect ) {
+                configBankListCache.setEffectConfigBank( configBankListService.getById( id ) );
+            } else {
+                configBankListCache.delEffectConfigBank( id );
+            }
+        }
+        return RspBase.ok( success );
     }
 
     /**

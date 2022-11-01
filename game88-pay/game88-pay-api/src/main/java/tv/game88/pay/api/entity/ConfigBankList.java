@@ -3,7 +3,6 @@ package tv.game88.pay.api.entity;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,22 +14,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ConfigBankList {
-    @Schema( title = "系统编号" )
     @TableId( type = IdType.AUTO )
     private Long    id;
-    @Schema( title = "银行编码(选填)" )
     @Excel( name = "银行编码(选填)" )
     private String  bankCode;
-    @Schema( title = "银行名称" )
     @Excel( name = "银行名称" )
     private String  bankName;
-    @Schema( title = "银行图标" )
     @Excel( name = "银行图标" )
     private String  bankIcon;
-    @Schema( title = "激活状态" )
     @Excel( name = "激活状态" )
     private Boolean effect;
-    @Schema( title = "排序" )
     @Excel( name = "排序" )
     private Long    sort;
 }
