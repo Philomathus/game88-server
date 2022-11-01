@@ -29,7 +29,7 @@ public class ConfigBankList {
     private String  bankIcon;
     @Schema( title = "激活状态" )
     @Excel( name = "激活状态" )
-    private Boolean effect = false;
+    private Boolean effect;
     @Schema( title = "排序" )
     @Excel( name = "排序" )
     private Long    sort;

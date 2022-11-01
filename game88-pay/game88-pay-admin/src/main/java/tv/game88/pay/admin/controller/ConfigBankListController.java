@@ -2,7 +2,6 @@ package tv.game88.pay.admin.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
@@ -80,7 +79,7 @@ public class ConfigBankListController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:add')" )
     @Log( title = "银行字典列表", businessType = BusinessType.INSERT )
     @PostMapping
-    public RspBase<?> add( @RequestBody ConfigBankList configBankList, @RequestParam( "file" ) MultipartFile file ) {
+    public RspBase<?> add( @RequestBody ConfigBankList configBankList ) {
         configBankList.setEffect( false );
         return RspBase.ok( configBankListService.save( configBankList ) );
     }
@@ -91,7 +90,7 @@ public class ConfigBankListController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:edit')" )
     @Log( title = "银行字典列表", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> edit( @RequestBody ConfigBankList configBankList, @RequestParam( "file" ) MultipartFile file ) {
+    public RspBase<?> edit( @RequestBody ConfigBankList configBankList ) {
         return RspBase.ok( configBankListService.updateById( configBankList ) );
     }
 
