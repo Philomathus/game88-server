@@ -61,10 +61,10 @@ public class ConfigBankListController extends BaseController {
     }
 
     /**
-     * 出款银行状态修改
+     * 银行字典状态修改
      */
-    @PreAuthorize( "@ss.hasPermi('pay:configBankList:edit')" )
-    @Log( title = "出款银行状态", businessType = BusinessType.UPDATE )
+    @PreAuthorize( "@ss.hasPermi('pay:configBankList:effect')" )
+    @Log( title = "银行字典状态激活", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable( "id" ) Long id, @PathVariable( "effect" ) boolean effect ) {
         ConfigBankList update = new ConfigBankList();
