@@ -57,6 +57,13 @@ public class ConfigBank {
     private LocalDateTime updateTime;
 
     @TableField( exist = false )
+    @Excel( name = "银行名称" )
+    private String bankName;
+    @TableField( exist = false )
+    @Excel( name = "银行图标" )
+    private String bankIcon;
+
+    @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private Integer googleAuthCode;
 }
