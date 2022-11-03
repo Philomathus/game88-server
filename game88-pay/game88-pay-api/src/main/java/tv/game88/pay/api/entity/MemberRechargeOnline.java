@@ -52,7 +52,7 @@ public class MemberRechargeOnline {
     @Excel( name = "更新时间", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
     @Excel( name = "是否首次" )
-    private Boolean       first = false;
+    private Boolean       first;
     @Excel( name = "通道费率" )
     private BigDecimal    rate;
 

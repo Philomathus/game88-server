@@ -3,7 +3,7 @@
 <mapper namespace="tv.game88.pay.api.mapper.MemberWithdrawDetailMapper">
     <resultMap type="tv.game88.pay.api.entity.MemberWithdrawDetail" id="MemberWithdrawDetailResult">
         <result property="withdrawOrderNo" column="withdraw_order_no" />
-        <result property="memberId" column="member_id" />
+        <result property="withdrawId" column="withdraw_id" />
         <result property="withdrawMoney" column="withdraw_money" />
         <result property="bankId" column="bank_id" />
         <result property="bankAccount" column="bank_account" />
@@ -24,7 +24,7 @@
     </resultMap>
 
     <sql id="selectMemberWithdrawDetailVo">
-        select withdraw_order_no,member_id,withdraw_money,bank_id,bank_account,
+        select withdraw_order_no,withdraw_id,withdraw_money,bank_id,bank_account,
                bank_address,bank_user_name,status,member_status,`first`,op_name,
                remark,recharge_withdraw_rate,bank_recharge_num,real_bank_address,
                recharge_user_name,recharge_bcode_rate,create_time,update_time
@@ -35,8 +35,8 @@
             resultMap="MemberWithdrawDetailResult">
         <include refid="selectMemberWithdrawDetailVo" />
         <where>
-            <if test="memberId != null  and memberId != ''">
-                and member_id = #{memberId}
+            <if test="withdrawId != null  and withdrawId != ''">
+                and withdraw_id = #{withdrawId}
             </if>
             <if test="withdrawMoney != null">
                 and withdraw_money = #{withdrawMoney}

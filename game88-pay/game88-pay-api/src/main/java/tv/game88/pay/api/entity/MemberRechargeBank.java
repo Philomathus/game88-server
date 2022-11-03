@@ -47,7 +47,7 @@ public class MemberRechargeBank {
     @Excel( name = "备注", orderNum = "12" )
     private String        remark;
     @Excel( name = "是否首次", orderNum = "13" )
-    private Boolean       first = false;
+    private Boolean       first;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "存款时间", format = "yyyy-MM-dd HH:mm:ss", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "14" )
     private LocalDateTime createTime;
@@ -60,10 +60,10 @@ public class MemberRechargeBank {
     private BigDecimal    discountBill;
 
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String startDate;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String endDate;
 
     @TableField( exist = false )

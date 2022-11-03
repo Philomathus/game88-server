@@ -16,20 +16,16 @@ import java.util.List;
 public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {
     public List<PayChannelMoney> selectPayChannelMoneyList( PayChannelMoney payChannelMoney );
 
-    int deleteByChannelIds( @Param( "channelIds" ) List<Long> channelIds );
-
-    int deleteByChannelId( Long channelId );
-
     //-------------------------app--------------------------------
 
-    List<Long> selectMoney( @Param( "typeCode" ) Long typeCode, @Param( "vipLevel" ) Integer vipLevel );
+    List<Long> selectMoney( @Param( "typeId" ) Long typeId, @Param( "vipLevel" ) Integer vipLevel );
 
-    Integer randomChannelId( @Param( "typeCode" ) Integer typeCode, @Param( "money" ) BigDecimal money,
+    Integer randomChannelId( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
                              @Param( "vipLevel" ) Integer vipLevel );
 
-    Integer maxRateChannel( @Param( "typeCode" ) Integer typeCode, @Param( "money" ) BigDecimal money,
+    Integer maxRateChannel( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
                             @Param( "vipLevel" ) Integer vipLevel );
 
-    Integer minRateChannel( @Param( "typeCode" ) Integer typeCode, @Param( "money" ) BigDecimal money,
+    Integer minRateChannel( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
                             @Param( "vipLevel" ) Integer vipLevel );
 }

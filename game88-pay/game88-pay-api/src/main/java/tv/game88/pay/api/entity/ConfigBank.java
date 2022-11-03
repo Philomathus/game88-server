@@ -37,10 +37,12 @@ public class ConfigBank {
     private Integer       openLevelMin;
     private Integer       openLevelMax;
     @Excel( name = "状态" )
-    private Boolean       effect = false;
+    private Boolean       effect;
     @Excel( name = "充值限额" )
     private BigDecimal    rechargeLimitMin;
     private BigDecimal    rechargeLimitMax;
+    @Excel( name = "省份限制" )
+    private String        restProvince;
     @Excel( name = "备注信息" )
     private String        remark;
     @Excel( name = "创建人" )
@@ -55,6 +57,6 @@ public class ConfigBank {
     private LocalDateTime updateTime;
 
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private Integer googleAuthCode;
 }

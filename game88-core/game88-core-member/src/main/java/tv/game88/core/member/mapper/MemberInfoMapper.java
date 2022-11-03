@@ -59,8 +59,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
                            @Param( "level_integral" ) BigDecimal level_integral,
                            @Param( "code_account" ) BigDecimal code_account, @Param( "code_total" ) BigDecimal code_total );
 
-    int updateMemberInfoVip( @Param( "id" ) String id, @Param( "vip" ) Integer vip, @Param( "nickName" ) String nickName );
-
     //-------------------------app-------------------------------
 
     int subMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money );
@@ -103,4 +101,5 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     List<Map> personalGameData( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
                                 @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
 
+    String selectMemberProvince( String memberId );
 }

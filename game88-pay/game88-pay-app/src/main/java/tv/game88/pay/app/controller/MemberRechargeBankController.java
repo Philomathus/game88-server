@@ -1,0 +1,58 @@
+package tv.game88.pay.app.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.base.BaseController;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.pay.api.dto.ReqMemberCard;
+import tv.game88.pay.api.dto.ReqMemberCardCancel;
+import tv.game88.pay.api.dto.RspConfigBank;
+import tv.game88.pay.api.dto.RspWithdrawBank;
+import tv.game88.pay.api.service.MemberRechargeBankService;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@RestController
+@RequestMapping( "/pay" )
+@Tag( name = "银行卡绑定与申请入款相关接口" )
+@Log4j2
+public class MemberRechargeBankController extends BaseController {
+    @Resource
+    private MemberRechargeBankService memberRechargeBankService;
+
+    @Operation( summary = "获取充值银行卡列表" )
+    @PostMapping( "/rechargeBankList" )
+    public List<RspConfigBank> rechargeBankList() {
+        PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
+        return memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
+    }
+
+    @Operation( summary = "获取绑定的银行卡" )
+    @PostMapping( "/getBindCardList" )
+    public RspBase<RspWithdrawBank> getBindCardList() {
+        String memberId = MemberSecurityUtils.getUserId();
+        return memberRechargeBankService.getBindCardList( memberId );
+    }
+
+    @Operation( summary = "设置默认提现卡" )
+    @PostMapping( "/setBindCardDv" )
+    public RspBase<?> setBindCardDv( @RequestBody ReqMemberCardCancel reqMemberCard ) {
+        String memberId = MemberSecurityUtils.getUserId();
+        return toResult( memberRechargeBankService.setBindCardDv( memberId, reqMemberCard.getCardId() ) );
+    }
+
+    @Operation( summary = "绑定提现卡" )
+    @PostMapping( "/setBindCard" )
+    public RspBase<?> setBindCard( @RequestBody ReqMemberCard reqMemberCard ) {
+        String memberId = MemberSecurityUtils.getUserId();
+        return memberRechargeBankService.setBindCard( memberId, reqMemberCard );
+    }
+}

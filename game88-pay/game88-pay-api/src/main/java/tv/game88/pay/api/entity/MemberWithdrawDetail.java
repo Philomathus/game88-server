@@ -23,8 +23,8 @@ public class MemberWithdrawDetail {
     @TableId( type = IdType.INPUT )
     @Excel( name = "提现订单号", orderNum = "1" )
     private String     withdrawOrderNo;
-    @Excel( name = "会员编号", orderNum = "2" )
-    private String     memberId;
+    @Excel( name = "提现人", orderNum = "2" )
+    private String     withdrawId;
     @Excel( name = "提现金额", orderNum = "3" )
     private BigDecimal withdrawMoney;
     @Excel( name = "银行ID", orderNum = "4" )

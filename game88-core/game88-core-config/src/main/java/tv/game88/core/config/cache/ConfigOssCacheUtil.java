@@ -11,7 +11,7 @@ import tv.game88.core.config.mapper.ConfigOssMapper;
 import javax.annotation.Resource;
 
 /**
- * @author qicheng
+ * @author mengJun
  */
 @Log4j2
 @Component

@@ -15,8 +15,16 @@
     </resultMap>
 
     <sql id="selectPayAgentLogVo">
-        select withdraw_order_no,channel_id,channel_name,withdraw_id,withdraw_money,
-               agent_order_no,create_time,callback_time,callback_status,remark
+        select withdraw_order_no,
+               channel_id,
+               channel_name,
+               withdraw_id,
+               withdraw_money,
+               agent_order_no,
+               create_time,
+               callback_time,
+               callback_status,
+               remark
         from pay_agent_log
     </sql>
 
@@ -52,5 +60,11 @@
                 and remark = #{remark}
             </if>
         </where>
+    </select>
+
+    <select id="findNoCallback" resultMap="PayAgentLogResult">
+        <include refid="selectPayAgentLogVo" />
+        where (callback_status = 0 or callback_status is null)
+          and create_time <![CDATA[ <= ]]> DATE_SUB(NOW(), INTERVAL 5 MINUTE)
     </select>
 </mapper>

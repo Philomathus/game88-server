@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PayAgentLogMapper extends BaseMapper<PayAgentLog> {
 	public List<PayAgentLog> selectPayAgentLogList( PayAgentLog payAgentLog );
+
+    List<PayAgentLog> findNoCallback();
 }

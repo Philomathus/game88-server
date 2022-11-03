@@ -74,4 +74,12 @@
             </if>
         </where>
     </select>
+
+    <select id="countOrder" resultType="java.util.Map">
+        select `status`, COUNT(1) count
+        from member_recharge_online
+        where member_id = #{userId}
+        and pay_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+        GROUP BY `status`
+    </select>
 </mapper>

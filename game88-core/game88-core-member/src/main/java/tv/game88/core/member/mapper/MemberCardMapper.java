@@ -14,21 +14,16 @@ import java.util.List;
  */
 public interface MemberCardMapper extends BaseMapper<MemberCard> {
 
-	/**
-	 * 查询会员银行卡列表
-	 *
-	 * @param memberCard 会员银行卡
-	 * @return 会员银行卡集合
-	 */
-	public List<MemberCard> selectMemberCardList(MemberCard memberCard);
+    /**
+     * 查询会员银行卡列表
+     *
+     * @param memberCard 会员银行卡
+     *
+     * @return 会员银行卡集合
+     */
+    public List<MemberCard> selectMemberCardList( MemberCard memberCard );
 
-	int findByAccount(@Param("bankAccount") String bankAccount);
+    List<MemberCard> selectMemberCard( @Param( "memberId" ) String memberId );
 
-	List<RspMemberCard> findByMemberId( @Param("userId") String userId );
-
-	List<MemberCard> selectMemberCard(@Param("userId") String userId);
-
-	List<MemberCard> findList(@Param("memberId") String memberId);
-
-	List<MemberCard> memberCardList(String memberId);
+    List<RspMemberCard> selectRspList( @Param( "memberId" ) String memberId );
 }

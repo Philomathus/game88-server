@@ -13,6 +13,7 @@
         <result property="rechargeLimitMin" column="recharge_limit_min" />
         <result property="rechargeLimitMax" column="recharge_limit_max" />
         <result property="effect" column="effect" />
+        <result property="restProvince" column="rest_province" />
         <result property="remark" column="remark" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
@@ -23,7 +24,7 @@
     <sql id="selectConfigBankVo">
         select id,bank_id,bank_account,account_name,bank_address,
                discount_bill,open_level_min,open_level_max,
-               recharge_limit_min,recharge_limit_max,effect,
+               recharge_limit_min,recharge_limit_max,effect,rest_province,
                remark,create_by,create_time,update_by,update_time
         from config_bank
     </sql>
@@ -41,5 +42,14 @@
                 and effect = #{effect}
             </if>
         </where>
+    </select>
+
+    <select id="selectRspList" resultType="tv.game88.pay.api.dto.RspConfigBank">
+        select b.id,b.bank_account,b.account_name,b.bank_address,b.discount_bill,
+        b.recharge_limit_min,b.recharge_limit_max,b.rest_province,remark,l.bank_icon,l.bank_name
+        from config_bank b left join config_bank_list l on l.id = b.bank_id
+        where effect = true
+        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
+        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
     </select>
 </mapper>

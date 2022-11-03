@@ -13,4 +13,6 @@ public interface ConfigBankListMapper extends BaseMapper<ConfigBankList> {
      * @return 银行卡列表集合
      */
     public List<ConfigBankList> selectConfigBankListList( ConfigBankList bankList);
+
+    Long findBankIdByNameOrCode( String bankName );
 }

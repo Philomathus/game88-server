@@ -366,7 +366,7 @@
 	<select id="findRecommendByInviterCode" resultMap="MemberInfoResult">
 		select id, nick_name, inviter_code
 		from member_info
-		where id REGEXP concat('_', #{inviterCode}, '$')
+		where id = #{inviterCode}
 	</select>
 	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
 		select id,password,nick_name,status,vip,register_type,head_img where id = #{userId}
@@ -438,5 +438,9 @@
 	<select id="totalAccount" resultType="hashmap">
 		select account_now,box_account from member_info
 		where id = #{memberId}
+	</select>
+
+	<select id="selectMemberProvince" resultType="java.lang.String">
+		select login_province from member_info where id = #{memberId}
 	</select>
 </mapper>

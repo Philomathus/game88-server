@@ -1,0 +1,16 @@
+package tv.game88.pay.api.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+@Data
+public class RspMemberWithdrawLogInfo {
+    @Schema( title = "可提现金额" )
+    private BigDecimal canWithdrawMoney;
+    @Schema( title = "余额" )
+    private BigDecimal accountNow;
+    @Schema( title = "还需打码" )
+    private BigDecimal needBeat;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.ActivityCashBackFirstRechargeMapper">
+    <select id="selectByRechargeMoney" resultType="java.math.BigDecimal">
+        select rebate
+        from activity_cash_back_first_recharge
+        where status = 1
+          and deposit_total_max <![CDATA[ > ]]> #{rechargeMoney}
+          and deposit_total_min <![CDATA[ <= ]]> #{rechargeMoney}
+    </select>
+</mapper>
