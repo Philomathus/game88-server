@@ -14,7 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -166,6 +168,24 @@ public class MemberInfo implements Serializable {
     @TableField(exist = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<String> searchValues;
+
+    @TableField(exist = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private LocalDateTime selectStartDate;
+
+    /**
+     * 请求参数
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 
     public Set<String> getSearchValues() {
         if ( StringUtils.isNotBlank( searchValue ) ) {
