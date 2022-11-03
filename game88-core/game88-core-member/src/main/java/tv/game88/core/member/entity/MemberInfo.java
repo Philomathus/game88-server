@@ -167,6 +167,10 @@ public class MemberInfo implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<String> searchValues;
 
+    @TableField(exist = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private LocalDateTime selectStartDate;
+
     public Set<String> getSearchValues() {
         if ( StringUtils.isNotBlank( searchValue ) ) {
             String[]    strings        = searchValue.split( "," );
