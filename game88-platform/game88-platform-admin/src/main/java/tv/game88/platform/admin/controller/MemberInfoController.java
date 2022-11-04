@@ -313,10 +313,10 @@ public class MemberInfoController extends BaseController {
      * @param request
      */
     @GetMapping( "/personal-report/{memberId}" )
-    public RspBase<?> personalReport( @PathVariable String memberId, HttpServletRequest request ) {
+    public RspBase<?> personalReport( @PathVariable String memberId,String[] date, HttpServletRequest request ) {
         Map<String, String[]> parameterMap = request.getParameterMap();
-        String                startTime    = parameterMap.get( "dateRange[0]" )[ 0 ];
-        String                endTime      = parameterMap.get( "dateRange[1]" )[ 0 ];
+        String                startTime    = parameterMap.get( "date[0]" )[ 0 ];
+        String                endTime      = parameterMap.get( "date[1]" )[ 0 ];
         return memberInfoService.personalReport( startTime, endTime, memberId );
     }
 

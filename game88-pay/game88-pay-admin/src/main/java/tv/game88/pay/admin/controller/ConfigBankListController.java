@@ -44,6 +44,15 @@ public class ConfigBankListController extends BaseController {
     }
 
     /**
+     * 查询银行字典列表列表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:configBankList:list')" )
+    @GetMapping( "/listAll" )
+    public RspBase<List<ConfigBankList>> listAll() {
+        return RspBase.ok(configBankListService.list());
+    }
+
+    /**
      * 导出银行字典列表列表
      */
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:export')" )

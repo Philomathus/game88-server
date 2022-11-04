@@ -407,12 +407,12 @@
 			member_id= #{memberId}
 	</select>
 
-	<select id="personalAgentRecharge" resultType="java.math.BigDecimal">
+<!--	<select id="personalAgentRecharge" resultType="java.math.BigDecimal">
 		select ifnull(SUM(money),0) as n from pay_agent_recharge_log
 		where create_time >= #{startTime} and
 			create_time <![CDATA[ <= ]]> #{endTime} and
 			member_id= #{memberId}
-	</select>
+	</select>-->
 	<select id="personalUsdtRecharge" resultType="java.math.BigDecimal">
 		select ifnull(SUM(recharge_money),0) as n from member_recharge_usdt
 		WHERE status = 3 and
@@ -420,25 +420,25 @@
 			update_time <![CDATA[ <= ]]> #{endTime} and
 			member_id= #{memberId}
 	</select>
-	<select id="personalWithdrawRecharge" resultType="java.math.BigDecimal">
-		select ifnull(SUM(withdraw_money),0) as n from member_withdraw_log
-		where member_id = #{memberId} and
-			status in(3,6) and
-			update_time >= #{startTime} and
-			update_time <![CDATA[ <= ]]> #{endTime};
-	</select>
+<!--	<select id="personalWithdrawRecharge" resultType="java.math.BigDecimal">-->
+<!--		select ifnull(SUM(withdraw_money),0) as n from member_withdraw_log-->
+<!--		where member_id = #{memberId} and-->
+<!--			status in(3,6) and-->
+<!--			update_time >= #{startTime} and-->
+<!--			update_time <![CDATA[ <= ]]> #{endTime};-->
+<!--	</select>-->
 
-	<select id="personalGameData" resultType="Map">
-		select a.*,p.name platformName from(
-		   select ifnull(SUM(cell_score),0) as cellScore,
-				  ifnull(SUM(all_bet),0) as allBet,
-				  ifnull(SUM(profit),0) as profit,
-				  platform_id platformId
-		   from member_game_data${dbNodes}
-		   where account= #{memberId} and game_end_time >=  #{startTime}
-			 and game_end_time <![CDATA[ <= ]]> #{endTime}
-		   GROUP BY platform_id) a left join game_platform p on p.id = a.platformId
-	</select>
+<!--	<select id="personalGameData" resultType="Map">-->
+<!--		select a.*,p.name platformName from(-->
+<!--		   select ifnull(SUM(cell_score),0) as cellScore,-->
+<!--				  ifnull(SUM(all_bet),0) as allBet,-->
+<!--				  ifnull(SUM(profit),0) as profit,-->
+<!--				  platform_id platformId-->
+<!--		   from member_game_data${dbNodes}-->
+<!--		   where account= #{memberId} and game_end_time >=  #{startTime}-->
+<!--			 and game_end_time <![CDATA[ <= ]]> #{endTime}-->
+<!--		   GROUP BY platform_id) a left join game_platform p on p.id = a.platformId-->
+<!--	</select>-->
 	<select id="totalAccount" resultType="hashmap">
 		select account_now,box_account from member_info
 		where id = #{memberId}

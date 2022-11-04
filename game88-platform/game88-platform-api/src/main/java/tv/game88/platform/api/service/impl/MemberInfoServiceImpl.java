@@ -519,7 +519,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     public RspBase<?> unbindCard( MemberCard member ) {
         Long             id             = member.getId();
         String           memberId       = member.getMemberId();
-        List<MemberCard> memberCardList = memberCardMapper.memberCardList( memberId );
+        List<MemberCard> memberCardList = memberCardMapper.selectMemberCard( memberId );
         MemberCard       memberCard     = memberCardMapper.selectById( id );
         if ( Objects.isNull( memberCard ) ) {
             return RspBase.businessError( "卡号不存在" );
@@ -566,15 +566,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         // 线上充值 online recharge
         forkJoinTasks.add( () -> ImmutableMap.of( "personalOnlineRecharge", this.baseMapper.personalOnlineRecharge( startTime,
                 endTime, memberId ) ) );
-        // 线上充值2 online recharge 2
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime,
-                endTime, memberId ) ) );
+//        // 线上充值2 online recharge 2
+//        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime,
+//                endTime, memberId ) ) );
         // 线上充值3 online recharge 3
         forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime,
                 endTime, memberId ) ) );
         // 提款 withdrawal
-        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
-                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
+//        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
+//                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
@@ -591,10 +591,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
                                                  .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
-        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
-                memberId.length() - 1 ) );
+//        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
+//                memberId.length() - 1 ) );
 
-        resultMap.put( "bCodeList", mapList );
+//        resultMap.put( "bCodeList", mapList );
 
         return RspBase.ok( resultMap );
     }
