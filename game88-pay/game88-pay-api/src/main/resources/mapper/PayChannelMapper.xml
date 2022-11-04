@@ -14,6 +14,7 @@
         <result property="discountBill" column="discount_bill" />
         <result property="quickAmount" column="quick_amount" />
         <result property="rate" column="rate" />
+        <result property="delFlag" column="del_flag" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
@@ -62,6 +63,9 @@
             <if test="rate != null">
                 and rate = #{rate}
             </if>
+            <if test="delFlag != null">
+                and del_flag = #{delFlag}
+            </if>
             <if test="createBy != null  and createBy != ''">
                 and create_by = #{createBy}
             </if>
@@ -79,6 +83,6 @@
 
     <select id="selectRspListByTypeId" resultType="tv.game88.pay.api.dto.RspPayChannel">
         select id, name, recharge_max, recharge_min, quick_amount, input_type, remark, open_level_min, open_level_max
-        from pay_channel where type_id = #{typeId} and status = 1
+        from pay_channel where type_id = #{typeId} and status = 1 and del_flag = 0
     </select>
 </mapper>

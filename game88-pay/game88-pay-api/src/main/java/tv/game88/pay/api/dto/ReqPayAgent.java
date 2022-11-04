@@ -10,7 +10,7 @@ public class ReqPayAgent {
     private Long         payAgentChannelId;
     private String       withdrawOrderNo;
     private List<String> withdrawOrderNos;
-    private String       googleAuthCode;
+    private Integer      googleAuthCode;
 
     // 失败原因
     private String        failReason;

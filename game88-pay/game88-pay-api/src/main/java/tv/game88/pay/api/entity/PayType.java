@@ -26,9 +26,9 @@ public class PayType {
     @Excel( name = "排序" )
     private Integer       sort;
     @Excel( name = "是否推荐" )
-    private Boolean       recommend = false;
+    private Boolean       recommend;
     @Excel( name = "激活状态" )
-    private Boolean       effect    = false;
+    private Boolean       effect;
     // 支付类型 1线上支付 2线下支付 3 代充支付 4 USDT
     @Excel( name = "支付类型" )
     private Integer       type;

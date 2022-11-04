@@ -32,9 +32,9 @@ public class PayChannel {
     @Excel( name = "类型ID" )
     private Long          typeId;
     @Excel( name = "状态" )
-    private Boolean       effect      = false;
+    private Boolean       effect;
     @Excel( name = "是否允许回调" )
-    private Boolean       canCallback = true;
+    private Boolean       canCallback;
     @Excel( name = "开放层级-最小" )
     private Integer       openLevelMin;
     @Excel( name = "开放层级-最大" )
@@ -45,6 +45,8 @@ public class PayChannel {
     private String        quickAmount;
     @Excel( name = "通道费率" )
     private BigDecimal    rate;
+    @Excel( name = "是否删除" )
+    private Boolean       delFlag;
     @Excel( name = "创建人" )
     private String        createBy;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
@@ -64,11 +66,7 @@ public class PayChannel {
 
     public String getRateStr() {
         if ( rate != null ) {
-            return rate
-                    .multiply( new BigDecimal( 100 ) )
-                    .setScale( 1, RoundingMode.HALF_UP )
-                    .toString()
-                    .concat( "%" );
+            return rate.multiply( new BigDecimal( 100 ) ).setScale( 1, RoundingMode.HALF_UP ).toString().concat( "%" );
         }
         return "";
     }

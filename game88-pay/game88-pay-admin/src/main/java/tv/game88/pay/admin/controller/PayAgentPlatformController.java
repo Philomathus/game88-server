@@ -1,0 +1,131 @@
+package tv.game88.pay.admin.controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import tv.game88.common.base.BaseController;
+import tv.game88.common.page.PageDomain;
+import tv.game88.common.page.TableSupport;
+import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.pay.api.entity.PayAgentPlatform;
+import tv.game88.pay.api.service.PayAgentPlatformService;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * 代付平台Controller
+ *
+ * @author 77tv
+ * @date 2021-01-26
+ */
+@RestController
+@RequestMapping( "/pay/payAgentPlatform" )
+public class PayAgentPlatformController extends BaseController {
+    @Resource
+    private PayAgentPlatformService payAgentPlatformService;
+
+    /**
+     * 查询代付平台列表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:list')" )
+    @GetMapping( "/list" )
+    public RspBase<List<PayAgentPlatform>> list( PayAgentPlatform payAgentPlatform ) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        startPage( pageDomain );
+        List<PayAgentPlatform> list = payAgentPlatformService.selectPayAgentPlatformList( payAgentPlatform );
+        return getRspBasePage( list, pageDomain );
+    }
+
+    /**
+     * 查询代付平台列表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:list')" )
+    @GetMapping( "/listAll" )
+    public RspBase<List<PayAgentPlatform>> listAll() {
+        return RspBase.ok( payAgentPlatformService.selectPayAgentPlatformList( null ) );
+    }
+
+    /**
+     * 导出代付平台列表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:export')" )
+    @Log( title = "代付平台", businessType = BusinessType.EXPORT )
+    @GetMapping( "/export" )
+    public void export( PayAgentPlatform payAgentPlatform, HttpServletResponse response ) {
+        List<PayAgentPlatform> list = payAgentPlatformService.selectPayAgentPlatformList( payAgentPlatform );
+        ExportExcelUtil.exportExcel( list, "代付平台", "代付平台表", PayAgentPlatform.class, response );
+    }
+
+    /**
+     * 获取代付平台详细信息
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:query')" )
+    @GetMapping( value = "/{id}" )
+    public RspBase<PayAgentPlatform> getInfo( @PathVariable( "id" ) Long id ) {
+        return RspBase.ok( payAgentPlatformService.getById( id ) );
+    }
+
+    /**
+     * 新增代付平台
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:add')" )
+    @Log( title = "代付平台", businessType = BusinessType.INSERT )
+    @PostMapping
+    public RspBase<?> add( @RequestBody PayAgentPlatform payAgentPlatform ) {
+        //代付通道编码唯一校验
+        if ( StringUtils.isBlank( payAgentPlatform.getCode() ) ) {
+            return RspBase.businessError( "代付平台编码不能为空" );
+        }
+        if ( payAgentPlatformService.count( new QueryWrapper<PayAgentPlatform>().eq( "code", payAgentPlatform.getCode() ) )
+                > 0 ) {
+            return RspBase.businessError( "此代付平台编码已存在，请更换另一个编码" );
+        }
+        if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
+            payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
+        }
+        payAgentPlatform.setCreateBy( SecurityUtils.getUsername() );
+        payAgentPlatform.setCreateTime( LocalDateTime.now() );
+        return toResult( payAgentPlatformService.save( payAgentPlatform ) );
+    }
+
+    /**
+     * 修改代付平台
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:edit')" )
+    @Log( title = "代付平台", businessType = BusinessType.UPDATE )
+    @PutMapping
+    public RspBase<?> edit( @RequestBody PayAgentPlatform payAgentPlatform ) {
+        if ( StringUtils.isBlank( payAgentPlatform.getCode() ) ) {
+            return RspBase.businessError( "代付平台编码不能为空" );
+        }
+        if ( payAgentPlatformService.count( new QueryWrapper<PayAgentPlatform>().eq( "code", payAgentPlatform.getCode() )
+                .eq( "id", payAgentPlatform.getId() ) ) <= 0 ) {
+            return RspBase.businessError( "代付平台编码不允许修改" );
+        }
+        if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
+            payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
+        }
+        payAgentPlatform.setUpdateBy( SecurityUtils.getUsername() );
+        payAgentPlatform.setUpdateTime( LocalDateTime.now() );
+        return toResult( payAgentPlatformService.updateById( payAgentPlatform ) );
+    }
+
+    /**
+     * 删除代付平台
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:remove')" )
+    @Log( title = "代付平台", businessType = BusinessType.DELETE )
+    @DeleteMapping( "/{ids}" )
+    public RspBase<?> remove( @PathVariable Long[] ids ) {
+        return toResult( payAgentPlatformService.removeBatchByIds( Arrays.asList( ids ) ) );
+    }
+}

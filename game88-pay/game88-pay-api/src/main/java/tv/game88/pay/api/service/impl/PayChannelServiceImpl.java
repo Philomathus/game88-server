@@ -6,7 +6,13 @@ import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.mapper.PayChannelMapper;
 import tv.game88.pay.api.service.PayChannelService;
 
+import java.util.List;
+
 @Service
 public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChannel> implements PayChannelService {
+    @Override
+    public List<PayChannel> selectPayChannelList( PayChannel payChannel ) {
+        return this.baseMapper.selectPayChannelList( payChannel );
+    }
 }
 

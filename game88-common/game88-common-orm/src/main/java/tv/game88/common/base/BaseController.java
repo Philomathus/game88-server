@@ -3,6 +3,7 @@ package tv.game88.common.base;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import tv.game88.common.exception.ControllerExceptionHandler;
@@ -41,6 +42,8 @@ public class BaseController extends ControllerExceptionHandler {
                 }
             }
         } );
+        // 表单和URL去空格
+        binder.registerCustomEditor( String.class, new StringTrimmerEditor( false ) );
     }
 
     /**
