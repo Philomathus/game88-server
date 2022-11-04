@@ -10,6 +10,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.service.PayChannelService;
 
@@ -30,6 +31,8 @@ import java.util.List;
 public class PayChannelController extends BaseController {
     @Resource
     private PayChannelService payChannelService;
+    @Resource
+    private PayCacheUtil      payCacheUtil;
 
     /**
      * 查询支付通道列表
@@ -86,7 +89,11 @@ public class PayChannelController extends BaseController {
         payChannel.setQuickAmount( payChannel.getQuickAmount().trim().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         payChannel.setUpdateBy( SecurityUtils.getUsername() );
         payChannel.setUpdateTime( LocalDateTime.now() );
-        return toResult( payChannelService.updateById( payChannel ) );
+        boolean isUpdate = payChannelService.updateById( payChannel );
+        if ( isUpdate ) {
+            payCacheUtil.clearPayChannel( payChannel.getId() );
+        }
+        return toResult( isUpdate );
     }
 
     /**
@@ -130,6 +137,10 @@ public class PayChannelController extends BaseController {
         PayChannel update = new PayChannel();
         update.setId( id );
         update.setCanCallback( canCallback );
-        return toResult( payChannelService.updateById( update ) );
+        boolean isUpdate = payChannelService.updateById( update );
+        if ( isUpdate ) {
+            payCacheUtil.clearPayChannel( id );
+        }
+        return toResult( isUpdate );
     }
 }

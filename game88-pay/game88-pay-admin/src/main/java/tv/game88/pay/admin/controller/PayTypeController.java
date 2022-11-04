@@ -12,6 +12,7 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.entity.PayType;
 import tv.game88.pay.api.service.PayChannelService;
@@ -35,6 +36,8 @@ public class PayTypeController extends BaseController {
     private PayTypeService    payTypeService;
     @Resource
     private PayChannelService payChannelService;
+    @Resource
+    private PayCacheUtil      payCacheUtil;
 
     /**
      * 查询支付类型列表
@@ -109,7 +112,11 @@ public class PayTypeController extends BaseController {
         payType.setType( null );
         payType.setUpdateBy( SecurityUtils.getUsername() );
         payType.setUpdateTime( LocalDateTime.now() );
-        return toResult( payTypeService.updateById( payType ) );
+        boolean isUpdate = payTypeService.updateById( payType );
+        if ( isUpdate ) {
+            payCacheUtil.clearPayType( payType.getId() );
+        }
+        return toResult( isUpdate );
     }
 
     /**
@@ -118,13 +125,17 @@ public class PayTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payType:remove')" )
     @Log( title = "支付类型", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{id}" )
-    public RspBase<?> remove( @PathVariable String id ) {
+    public RspBase<?> remove( @PathVariable Long id ) {
         //查询此支付类型下还有无支付通道
         long a = payChannelService.count( new QueryWrapper<PayChannel>().eq( "type_id", id ).eq( "del_flag", 0 ) );
         if ( a > 0 ) {
             return RspBase.businessError( "此支付类型下还存在支付通道,删除失败" );
         }
-        return toResult( payTypeService.removeById( id ) );
+        boolean isDel = payTypeService.removeById( id );
+        if ( isDel ) {
+            payCacheUtil.clearPayType( id );
+        }
+        return toResult( isDel );
     }
 
     /**

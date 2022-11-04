@@ -100,8 +100,8 @@ public class PayCacheUtil {
         return StringUtils.isNotBlank( value ) ? JsonUtil.json2Object( value, PayType.class ) : null;
     }
 
-    public void clearPayType( String... payTypeIds ) {
-        for ( String payTypeId : payTypeIds ) {
+    public void clearPayType( Long... payTypeIds ) {
+        for ( Long payTypeId : payTypeIds ) {
             redisUtil.unlink( TYPE + payTypeId );
         }
     }
@@ -173,13 +173,6 @@ public class PayCacheUtil {
     }
 
     //---------------------------以下是admin--------------------------
-
-
-    public void clearPayChannel( Long... payChannelIds ) {
-        for ( Long payChannelId : payChannelIds ) {
-            redisUtil.unlink( CHANNEL + payChannelId );
-        }
-    }
 
     public boolean setPayChannelSuccessRateLock( Long id ) {
         return redisUtil.strSetIfAbsent( CHANNELSUCCESSRATE_LOCK + id, "0", Duration.ofMinutes( 10 ) );

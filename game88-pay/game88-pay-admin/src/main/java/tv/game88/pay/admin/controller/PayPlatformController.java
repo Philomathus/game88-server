@@ -13,6 +13,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.entity.PayPlatform;
 import tv.game88.pay.api.service.PayChannelService;
@@ -36,6 +37,8 @@ public class PayPlatformController extends BaseController {
     private PayPlatformService payPlatformService;
     @Resource
     private PayChannelService  payChannelService;
+    @Resource
+    private PayCacheUtil       payCacheUtil;
 
     /**
      * 查询支付平台列表
@@ -152,7 +155,11 @@ public class PayPlatformController extends BaseController {
         }
         payPlatform.setUpdateBy( SecurityUtils.getUsername() );
         payPlatform.setUpdateTime( LocalDateTime.now() );
-        return toResult( payPlatformService.updateById( payPlatform ) );
+        boolean isUpdate = payPlatformService.updateById( payPlatform );
+        if ( isUpdate ) {
+            payCacheUtil.clearPayPlatform( payPlatform.getId() );
+        }
+        return toResult( isUpdate );
     }
 
     /**
@@ -167,6 +174,10 @@ public class PayPlatformController extends BaseController {
         if ( a > 0 ) {
             return RspBase.businessError( "此支付类型下还存在支付通道,删除失败" );
         }
-        return toResult( payPlatformService.removeById( id ) );
+        boolean isDel = payPlatformService.removeById( id );
+        if ( isDel ) {
+            payCacheUtil.clearPayPlatform( id );
+        }
+        return toResult( isDel );
     }
 }
