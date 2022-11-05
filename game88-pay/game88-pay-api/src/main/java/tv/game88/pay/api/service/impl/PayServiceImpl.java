@@ -2,28 +2,21 @@ package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.StringUtils;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
-import tv.game88.core.member.entity.ConfigRecommend;
 import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.core.member.entity.MemberRecommend;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
-import tv.game88.core.member.mapper.ConfigRecommendMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.mapper.MemberRecommendMapper;
+import tv.game88.core.member.service.RecommendService;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
@@ -42,8 +35,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -61,11 +52,9 @@ public class PayServiceImpl implements PayService {
     @Resource
     private PayLogMapper                        payLogMapper;
     @Resource
-    private ConfigRecommendMapper               configRecommendMapper;
-    @Resource
-    private MemberRecommendMapper               memberRecommendMapper;
-    @Resource
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
+    @Resource
+    private RecommendService                    recommendService;
 
     @Resource
     private PayProcessorFactoryUtil payProcessorFactoryUtil;
@@ -157,12 +146,8 @@ public class PayServiceImpl implements PayService {
             }
         }
 
-        MemberRechargeOnline memberPayJour = memberRechargeOnlineMapper.selectById( memberRechargeOnline.getOrderNo() );
-        if ( memberPayJour.getStatus() == 1 ) {
-            return notifyResultWays[ 1 ];
-        }
         try {
-            this.updatePayJourStatus( memberRechargeOnline );
+            SpringUtils.getBean( PayService.class ).updatePayJourStatus( memberRechargeOnline );
             return notifyResultWays[ 0 ];
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -218,58 +203,11 @@ public class PayServiceImpl implements PayService {
         BigDecimal money = payJourMoney.add( chargeGive ).add( firstRechargeCashBack );
 
         memberMoneyManager.addMemberMoney( memberInfo.getId(), money, EnumMoney.PAY, 1, memberRechargeOnline.getRemark() );
+        //新增佣金记录
+        recommendService.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
+        memberRechargeOnlineMapper.updateById( updatePayJour );
 
         log.warn( "会员线上充值上分成功 - orderNo:{}", memberRechargeOnline.getOrderNo() );
-
-        //新增佣金记录
-        this.recommendProcess( memberRechargeOnline, memberInfo );
-
-        memberRechargeOnlineMapper.updateById( updatePayJour );
-    }
-
-    private void recommendProcess( MemberRechargeOnline payJour, MemberInfo memberInfo ) {
-        if ( StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
-            Map<Integer, ConfigRecommend> billMap = configRecommendMapper.selectList( null ).stream()
-                    .collect( Collectors.toMap( ConfigRecommend::getLevel, Function.identity() ) );
-
-            MemberInfo rd1 = memberInfoMapper.findRecommendByInviterCode( memberInfo.getInviterCode() );
-            MemberInfo rd2 = null;
-            if ( rd1 != null ) {//一级分佣
-                MemberRecommend recommendUserLog = new MemberRecommend();
-                BigDecimal      commission       = payJour.getMoney().multiply( billMap.get( 1 ).getBill() );
-                recommendUserLog.setId( IdWorker.get32UUID() );
-                recommendUserLog.setCreateTime( LocalDateTime.now() );
-                recommendUserLog.setMemberId( payJour.getMemberId() );
-                recommendUserLog.setMemberName( memberInfo.getNickName() );
-                recommendUserLog.setCommission( commission );
-                recommendUserLog.setStatus( 0 );
-                recommendUserLog.setCode( memberInfo.getId().substring( memberInfo.getId().lastIndexOf( "_" ) + 1 ) );
-                recommendUserLog.setOrderMoney( payJour.getMoney() );
-                recommendUserLog.setLevel( 1 );
-                recommendUserLog.setInviterId( rd1.getId() );
-                recommendUserLog.setInviter( rd1.getNickName() );
-                memberRecommendMapper.insert( recommendUserLog );
-                if ( StringUtils.isNotBlank( rd1.getInviterCode() ) ) {
-                    rd2 = memberInfoMapper.findRecommendByInviterCode( rd1.getInviterCode() );
-                }
-            }
-            if ( rd2 != null ) {//二级分佣
-                MemberRecommend recommendUserLog = new MemberRecommend();
-                BigDecimal      commission       = payJour.getMoney().multiply( billMap.get( 2 ).getBill() );
-                recommendUserLog.setId( IdWorker.get32UUID() );
-                recommendUserLog.setCreateTime( LocalDateTime.now() );
-                recommendUserLog.setMemberId( payJour.getMemberId() );
-                recommendUserLog.setMemberName( memberInfo.getNickName() );
-                recommendUserLog.setCommission( commission );
-                recommendUserLog.setStatus( 0 );
-                recommendUserLog.setCode( memberInfo.getId().substring( memberInfo.getId().lastIndexOf( "_" ) + 1 ) );
-                recommendUserLog.setOrderMoney( payJour.getMoney() );
-                recommendUserLog.setLevel( 2 );
-                recommendUserLog.setInviterId( rd2.getId() );
-                recommendUserLog.setInviter( rd2.getNickName() );
-                memberRecommendMapper.insert( recommendUserLog );
-            }
-        }
     }
 
     @Override

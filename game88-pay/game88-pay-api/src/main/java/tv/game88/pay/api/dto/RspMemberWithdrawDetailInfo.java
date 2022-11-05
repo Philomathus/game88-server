@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class RspMemberWithdrawLogInfo {
+public class RspMemberWithdrawDetailInfo {
     @Schema( title = "可提现金额" )
     private BigDecimal canWithdrawMoney;
     @Schema( title = "余额" )

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @NoArgsConstructor
-public class ConfigBank {
+public class PayRechargeBank {
     @TableId( type = IdType.AUTO )
     private Long          id;
     @Excel( name = "银行ID" )

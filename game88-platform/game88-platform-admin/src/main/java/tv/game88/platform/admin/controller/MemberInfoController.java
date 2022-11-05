@@ -16,7 +16,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.core.member.service.MemberTokenService;
+import tv.game88.core.member.manager.MemberTokenManager;
 import tv.game88.core.member.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
@@ -41,7 +41,7 @@ public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService  memberInfoService;
     @Resource
-    private MemberTokenService memberTokenService;
+    private MemberTokenManager memberTokenManager;
     @Resource
     private RedisUtils         redisUtil;
 
@@ -150,7 +150,7 @@ public class MemberInfoController extends BaseController {
 
         boolean b = memberInfoService.updateById( update );
         if ( status == 0 && b ) {
-            memberTokenService.delToken( memberId );
+            memberTokenManager.delToken( memberId );
         }
         return toResult( b );
     }
@@ -168,7 +168,7 @@ public class MemberInfoController extends BaseController {
         update.setPassword( MemberSecurityUtils.encryptPassword( passwd ) );
         boolean b = memberInfoService.updateById( update );
         if ( b ) {
-            memberTokenService.delToken( memberId );
+            memberTokenManager.delToken( memberId );
         }
         return toResult( b );
     }

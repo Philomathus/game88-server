@@ -23,5 +23,6 @@ public interface PayService {
     void payQuery10Min() throws Exception;
 
     String updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String[] notifyResultWays);
+    void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline);
 
 }

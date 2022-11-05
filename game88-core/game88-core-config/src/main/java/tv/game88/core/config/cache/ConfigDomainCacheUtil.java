@@ -2,12 +2,11 @@ package tv.game88.core.config.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import tv.game88.common.utils.RedisUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigOss;
-import tv.game88.core.config.mapper.ConfigOssMapper;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -30,7 +29,7 @@ public class ConfigDomainCacheUtil {
                                                                                   .build();
 
     @Resource
-    private ConfigOssMapper configOssMapper;
+    private ConfigOssCacheUtil configOssCacheUtil;
     @Resource
     private RedisUtils      redisUtil;
 
@@ -54,7 +53,7 @@ public class ConfigDomainCacheUtil {
 
     private void refreshDomainOssCache() {
         if (!redisUtil.exists( CONFIG_DOMAIN_OSS )) {
-            ConfigOss configOss = configOssMapper.selectConfigOssByEffect();
+            ConfigOss configOss = configOssCacheUtil.getEffect();
             if (configOss == null) {
                 return;
             }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.pay.api.mapper.ConfigBankMapper">
-    <resultMap type="tv.game88.pay.api.entity.ConfigBank" id="ConfigBankResult">
+<mapper namespace="tv.game88.pay.api.mapper.PayRechargeBankMapper">
+    <resultMap type="tv.game88.pay.api.entity.PayRechargeBank" id="PayRechargeBankResult">
         <result property="id" column="id" />
         <result property="bankId" column="bank_id" />
         <result property="bankAccount" column="bank_account" />
@@ -23,17 +23,17 @@
         <result property="bankIcon" column="bank_icon" />
     </resultMap>
 
-    <sql id="selectConfigBankVo">
+    <sql id="selectPayRechargeBankVo">
         select b.id,b.bank_id,b.bank_account,b.account_name,b.bank_address,
                b.discount_bill,b.open_level_min,b.open_level_max,
                b.recharge_limit_min,b.recharge_limit_max,b.effect,rest_province,
                b.remark,b.create_by,b.create_time,b.update_by,b.update_time,
                l.bank_icon,l.bank_name
-        from config_bank b left join config_bank_list l on l.id = b.bank_id
+        from pay_recharge_bank b left join config_bank_list l on l.id = b.bank_id
     </sql>
 
-    <select id="selectConfigBankList" parameterType="tv.game88.pay.api.entity.ConfigBank" resultMap="ConfigBankResult">
-        <include refid="selectConfigBankVo" />
+    <select id="selectPayRechargeBankList" parameterType="tv.game88.pay.api.entity.PayRechargeBank" resultMap="PayRechargeBankResult">
+        <include refid="selectPayRechargeBankVo" />
         <where>
             <if test="bankId != null">
                 and bank_id = #{bankId}
@@ -47,10 +47,10 @@
         </where>
     </select>
 
-    <select id="selectRspList" resultType="tv.game88.pay.api.dto.RspConfigBank">
+    <select id="selectRspList" resultType="tv.game88.pay.api.dto.RspPayRechargeBank">
         select b.id,b.bank_account,b.account_name,b.bank_address,b.discount_bill,
         b.recharge_limit_min,b.recharge_limit_max,b.rest_province,remark,l.bank_icon,l.bank_name
-        from config_bank b left join config_bank_list l on l.id = b.bank_id
+        from pay_recharge_bank b left join config_bank_list l on l.id = b.bank_id
         where effect = true
         and open_level_min <![CDATA[ <= ]]> #{vipLevel}
         and open_level_max <![CDATA[ >= ]]> #{vipLevel}

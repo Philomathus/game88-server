@@ -80,7 +80,7 @@ public class UploadServiceImpl implements UploadService {
         if ( StringUtils.isBlank( url ) ) {
             return RspBase.businessError( "上传失败,请联系技术人员" );
         }
-        RspBase<String> rspBase = RspBase.ok( "上传成功", configOss.getDoMain() + url );
+        RspBase<String> rspBase = RspBase.ok( "上传成功", url );
         rspBase.setOtherData( rFileName + "." + extension );
         return rspBase;
     }
@@ -102,9 +102,7 @@ public class UploadServiceImpl implements UploadService {
             //设置文件图片上传读写权限。访问继承桶的权限，不设置则单个图片无法显示。权限默认私有。
             BasicAWSCredentials creds = new BasicAWSCredentials( configOss.getAccessKey(), configOss.getAccessSecret() );
             //创建安全证书注册
-            AmazonS3 s3Client = AmazonS3ClientBuilder
-                    .standard()
-                    .withCredentials( new AWSStaticCredentialsProvider( creds ) )
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials( new AWSStaticCredentialsProvider( creds ) )
                     .withEndpointConfiguration( new AwsClientBuilder.EndpointConfiguration( configOss.getEndpoint(),
                             "oss-cn" + "-quanzhou.kz.cc" ) )//上传地址和区域
                     .build();
@@ -134,11 +132,8 @@ public class UploadServiceImpl implements UploadService {
         String bucketName = configOss.getBucket();//桶的名称
         try {
             BasicAWSCredentials creds = new BasicAWSCredentials( configOss.getAccessKey(), configOss.getAccessSecret() );
-            AmazonS3 s3Client = AmazonS3ClientBuilder
-                    .standard()
-                    .withRegion( clientRegion )
-                    .withCredentials( new AWSStaticCredentialsProvider( creds ) )
-                    .build();//创建证书及注册地址
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion( clientRegion )
+                    .withCredentials( new AWSStaticCredentialsProvider( creds ) ).build();//创建证书及注册地址
             s3Client.putObject( bucketName, fileKey, newFile );
             s3Client.shutdown();
             return "/" + fileKey;

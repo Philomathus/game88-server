@@ -16,7 +16,7 @@ import tv.game88.core.member.mapper.MemberInfoMapper;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Component
 @Log4j2
@@ -57,7 +57,7 @@ public class MemberMoneyManager {
         LogMoney log = new LogMoney();
         log.setId( IdWorker.get32UUID() );
         log.setUserId( userId );
-        log.setCreateTime( new Date() );
+        log.setCreateTime( LocalDateTime.now() );
         log.setIncome( addCount );
         log.setPay( BigDecimal.ZERO );
         log.setType( enumMoney.getType() );
@@ -71,7 +71,7 @@ public class MemberMoneyManager {
             MemberBcode code = new MemberBcode();
             code.setIncome( addCount );
             code.setCharge( addCount );
-            code.setCreateTime( new Date() );
+            code.setCreateTime( log.getCreateTime() );
             code.setCur( BigDecimal.ZERO );
             code.setStatus( 0 );
             code.setUserId( userId );
@@ -102,7 +102,7 @@ public class MemberMoneyManager {
         LogMoney log = new LogMoney();
         log.setId( IdWorker.get32UUID() );
         log.setUserId( userId );
-        log.setCreateTime( new Date() );
+        log.setCreateTime( LocalDateTime.now() );
         log.setIncome( BigDecimal.ZERO );
         log.setPay( reduceMoney );
         log.setType( enumMoney.getType() );
@@ -124,7 +124,7 @@ public class MemberMoneyManager {
         LogMoney log = new LogMoney();
         log.setId( IdWorker.get32UUID() );
         log.setUserId( userId );
-        log.setCreateTime( new Date() );
+        log.setCreateTime( LocalDateTime.now() );
         log.setIncome( BigDecimal.ZERO );
         log.setPay( reduceMoney );
         log.setType( EnumMoney.SAFE_BOX.getType() );

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-public class RspConfigBank {
+public class RspPayRechargeBank {
     private Long       id;
     @Schema( title = "图标" )
     private String     bankIcon;

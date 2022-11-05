@@ -6,7 +6,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.member.service.MemberTokenService;
+import tv.game88.core.member.manager.MemberTokenManager;
 import tv.game88.core.member.utils.MemberSecurityUtils;
 import tv.game88.core.member.vo.MemberLoginUser;
 
@@ -25,14 +25,14 @@ import java.io.IOException;
 @Component
 public class MemberAuthenticationTokenFilter extends OncePerRequestFilter {
 	@Resource
-	private MemberTokenService memberTokenService;
+	private MemberTokenManager memberTokenManager;
 
 	@Override
 	protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain chain )
 			throws ServletException, IOException {
-		MemberLoginUser loginUser = memberTokenService.getLoginUser( request );
+		MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
 		if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( MemberSecurityUtils.getAuthentication() ) ) {
-			memberTokenService.refreshLoginUserCache( loginUser );
+			memberTokenManager.refreshLoginUserCache( loginUser );
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
 					loginUser.getAuthorities() );
 			authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );

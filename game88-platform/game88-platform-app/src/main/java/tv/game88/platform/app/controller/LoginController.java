@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.member.service.MemberTokenService;
+import tv.game88.core.member.manager.MemberTokenManager;
 import tv.game88.platform.api.dto.MobileLogin;
 import tv.game88.platform.api.dto.Phone;
 import tv.game88.platform.api.dto.RspInit;
@@ -26,7 +26,7 @@ public class LoginController {
     @Resource
     private MemberInfoService  memberInfoService;
     @Resource
-    private MemberTokenService memberTokenService;
+    private MemberTokenManager memberTokenManager;
 
     @Operation( summary = "初始化接口" )
     @PostMapping( "/init" )
@@ -50,7 +50,7 @@ public class LoginController {
                                            @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                            @RequestBody MobileLogin mobileLogin ) {
         RspBase<RspMember> rspMemberRspBase = memberInfoService.login( mobileLogin, dev, version, loginUrl );
-        memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
+        memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }
 
@@ -60,7 +60,7 @@ public class LoginController {
                                            @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                            @RequestBody MobileLogin mobileLogin ) {
         RspBase<RspMember> rspMemberRspBase = memberInfoService.loginDevice( mobileLogin, dev, version, loginUrl );
-        memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
+        memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }
 
@@ -70,7 +70,7 @@ public class LoginController {
                                         @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                         @RequestBody MobileLogin mobileLogin ) {
         RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin, dev, version, loginUrl );
-        memberTokenService.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
+        memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }
 

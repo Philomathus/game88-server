@@ -11,9 +11,9 @@ import java.util.Map;
 @Data
 public class RspWithdrawBank {
     @Schema( title = "银行卡信息" )
-    private List<RspMemberCard>      memberCardList;
+    private List<RspMemberCard>         memberCardList;
     @Schema( title = "自助体现信息" )
-    private RspMemberWithdrawLogInfo rspWithdrawInfo;
+    private RspMemberWithdrawDetailInfo rspWithdrawInfo;
     @Schema( title = "特殊银行信息" )
-    private Map<String, Long>     specialBankInfoMap = new HashMap<>();
+    private Map<String, Long>           specialBankInfoMap = new HashMap<>();
 }

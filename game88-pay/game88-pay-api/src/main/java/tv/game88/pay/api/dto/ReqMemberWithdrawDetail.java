@@ -10,14 +10,13 @@ import java.util.List;
 public class ReqMemberWithdrawDetail {
 
 	private String[] downLoadDate = new String[2];
-	private Long       id;
+	private String       id;
 	private List<String> ids;
 	private String       memberId;
 	private String       remark;
-	private String       orderNo;
 	private String       searchCardBlack;
 	private String       cardBlack;
-	private Long         payAgentPlatId;
+	private Long         payAgentChannelId;
 	private Integer      status;
 	private String       opName;
 	private String       searchValue;

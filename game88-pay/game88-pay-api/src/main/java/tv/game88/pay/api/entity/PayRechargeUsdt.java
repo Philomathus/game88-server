@@ -11,14 +11,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 对象 ConfigUsdt
+ * 对象 PayRechargeUsdt
  *
  * @author mengJun
  * @date 2021-09-11
  */
 @Data
 @NoArgsConstructor
-public class ConfigUsdt {
+public class PayRechargeUsdt {
     @TableId(type = IdType.AUTO)
     private Long id;
     @Excel(name = "渠道名称")
@@ -31,6 +31,8 @@ public class ConfigUsdt {
     private BigDecimal discountBill;
     @Excel(name = "usdt汇率")
     private BigDecimal exchangeRate;
+    @Excel(name = "钱包二维码")
+    private String icon;
     @Excel(name = "排序")
     private Integer sort;
     @Excel(name = "激活状态")

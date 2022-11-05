@@ -1,4 +1,4 @@
-package tv.game88.core.member.service;
+package tv.game88.core.member.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Log4j2
 @Component
-public class MemberTokenService {
+public class MemberTokenManager {
     // 令牌有效期（默认1天）
     @Value( "${token.expireTime:1}" )
     private int expireTime;

@@ -37,8 +37,6 @@ public class MemberWithdrawDetail {
     private String     bankUserName;
     //0申请中 1锁定 2审核不通过 3人工入款成功 4代付中 5代付失败 6代付成功
     private Integer    status;
-    @Excel( name = "会员状态", orderNum = "9" )
-    private Integer    memberStatus;
     @Excel( name = "操作人", orderNum = "10" )
     private String     opName;
     @Excel( name = "备注", orderNum = "11" )
@@ -64,28 +62,38 @@ public class MemberWithdrawDetail {
     private LocalDateTime updateTime;
 
     @TableField( exist = false )
-    @Excel( name = "订单状态", orderNum = "7" )
-    private String statusDes;
-
+    @Excel( name = "会员状态", orderNum = "9" )
+    private Integer    memberStatus;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String  statusName;
+    @Excel( name = "订单状态", orderNum = "7" )
+    private String     statusDes;
+    //风控打码倍数环境变量
+    @TableField( exist = false )
+    private String     multipleCode;
+    //新会员在注册48个小时内申请提现，传到前端为1，整行显示颜色
+    //提款第一次和第二次，传到前端为1，整行显示颜色
+    @TableField( exist = false )
+    private Integer    registerColor;
+    @TableField( exist = false )
+    private Integer    times;
+    @TableField( exist = false )
+    private BigDecimal money;
     //公司入款姓名与提现姓名状态
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Integer rechargeUserNameStatus;
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Integer    rechargeUserNameStatus;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String  payAgentOrderNo;
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String     payAgentOrderNo;
 
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String[] searchTime;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   startTime;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   endTime;
 
     public String getStatusDes() {

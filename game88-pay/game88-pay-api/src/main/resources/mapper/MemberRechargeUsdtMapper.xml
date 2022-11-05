@@ -13,6 +13,7 @@
         <result property="rechargeRate" column="recharge_rate" />
         <result property="status" column="status" />
         <result property="discountBill" column="discount_bill" />
+        <result property="first" column="first" />
         <result property="opName" column="op_name" />
         <result property="createTime" column="create_time" />
         <result property="updateTime" column="update_time" />
@@ -22,56 +23,70 @@
     <sql id="selectMemberRechargeUsdtVo">
         select recharge_order_no,member_id,transaction_id,recharge_money,channel_name,
                chain_name,recharge_address,recharge_number,recharge_rate,status,
-               discount_bill,op_name,create_time,update_time,remark
+               discount_bill,`first`,op_name,create_time,update_time,remark
         from member_recharge_usdt
     </sql>
 
-    <select id="selectMemberRechargeUsdtList" parameterType="tv.game88.pay.api.entity.MemberRechargeUsdt"
+    <select id="selectMemberRechargeUsdtList" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt"
             resultMap="MemberRechargeUsdtResult">
         <include refid="selectMemberRechargeUsdtVo" />
         <where>
-            <if test="memberId != null  and memberId != ''">
-                and member_id = #{memberId}
-            </if>
-            <if test="transactionId != null  and transactionId != ''">
-                and transaction_id = #{transactionId}
-            </if>
-            <if test="rechargeMoney != null">
-                and recharge_money = #{rechargeMoney}
-            </if>
-            <if test="channelName != null  and channelName != ''">
-                and channel_name like concat('%', #{channelName}, '%')
-            </if>
-            <if test="chainName != null  and chainName != ''">
-                and chain_name like concat('%', #{chainName}, '%')
-            </if>
-            <if test="rechargeAddress != null  and rechargeAddress != ''">
-                and recharge_address = #{rechargeAddress}
-            </if>
-            <if test="rechargeNumber != null">
-                and recharge_number = #{rechargeNumber}
-            </if>
-            <if test="rechargeRate != null">
-                and recharge_rate = #{rechargeRate}
-            </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-            <if test="discountBill != null">
-                and discount_bill = #{discountBill}
-            </if>
-            <if test="opName != null  and opName != ''">
-                and op_name like concat('%', #{opName}, '%')
-            </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
-            </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
-            </if>
-            <if test="remark != null  and remark != ''">
-                and remark = #{remark}
+            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
+            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
+            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
+            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
+            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
+            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
+            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
+            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
+                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
             </if>
         </where>
     </select>
+
+    <select id="listCount" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt" resultType="java.util.Map">
+        select a.total, b.successMoney, totalSuccess / total successRate from (<include refid="totalCount"/>)a
+        left join (<include refid="successMoney"/>)b on 1 = 1
+    </select>
+
+    <sql id="totalCount">
+        SELECT COUNT(*) total,SUM(recharge_money) totalMoney FROM `member_recharge_usdt`
+        <where>
+            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
+            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
+            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
+            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
+            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
+            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
+            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
+            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
+                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="successMoney">
+        SELECT COUNT(*) totalSuccess,SUM(recharge_money) successMoney FROM `member_recharge_usdt`
+        <where>
+            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
+            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
+            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
+            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
+            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
+            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
+            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
+            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
+            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
+                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
+            </if>
+            and status = 3
+        </where>
+    </sql>
 </mapper>

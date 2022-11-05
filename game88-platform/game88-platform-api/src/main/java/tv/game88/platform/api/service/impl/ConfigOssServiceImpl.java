@@ -79,7 +79,12 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      */
     @Override
     public int updateConfigOss( ConfigOss configOss ) {
-        return configOssMapper.updateById( configOss );
+        int i = configOssMapper.updateById( configOss );
+        if ( i > 0 ) {
+            configOssCacheUtil.clear();
+            ConfigDomainCacheUtil.me.clear();
+        }
+        return i;
     }
 
     /**

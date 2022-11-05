@@ -7,7 +7,7 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.member.service.MemberTokenService;
+import tv.game88.core.member.manager.MemberTokenManager;
 import tv.game88.core.member.vo.MemberLoginUser;
 
 import javax.annotation.Resource;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class MemberLogoutSuccessHandle implements LogoutSuccessHandler {
 	@Resource
-	private MemberTokenService memberTokenService;
+	private MemberTokenManager memberTokenManager;
 
 	/**
 	 * 退出处理
@@ -31,10 +31,10 @@ public class MemberLogoutSuccessHandle implements LogoutSuccessHandler {
 	 */
 	@Override
 	public void onLogoutSuccess( HttpServletRequest request, HttpServletResponse response, Authentication authentication ) {
-		MemberLoginUser loginUser = memberTokenService.getLoginUser( request );
+		MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
 		if ( StringUtils.isNotNull( loginUser ) ) {
 			// 删除用户缓存记录
-			memberTokenService.delToken( loginUser.getUserId() );
+			memberTokenManager.delToken( loginUser.getUserId() );
 		}
 		ServletUtil.renderString( response, JsonUtil.object2Json( RspBase.ok( "退出登录" ) ) );
 	}

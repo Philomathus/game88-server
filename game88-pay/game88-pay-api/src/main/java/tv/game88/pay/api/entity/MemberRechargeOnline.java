@@ -65,17 +65,14 @@ public class MemberRechargeOnline {
     @TableField( exist = false )
     private BigDecimal currentSuccessRateStr;
     @TableField( exist = false )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String     googleAuthCode;
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Integer    googleAuthCode;
     @TableField( exist = false )
     private String     rateStr;
 
     public String getCurrentSuccessRateStr() {
         if ( currentSuccessRate != null ) {
-            return currentSuccessRate
-                    .multiply( new BigDecimal( 100 ) )
-                    .setScale( 0, RoundingMode.HALF_UP )
-                    .toString()
+            return currentSuccessRate.multiply( new BigDecimal( 100 ) ).setScale( 0, RoundingMode.HALF_UP ).toString()
                     .concat( "%" );
         }
         return "";
@@ -83,15 +80,9 @@ public class MemberRechargeOnline {
 
     public String getRateStr() {
         if ( rate != null ) {
-            String payRateStr = rate
-                    .multiply( new BigDecimal( 100 ) )
-                    .setScale( 1, RoundingMode.HALF_UP )
-                    .toString();
+            String payRateStr = rate.multiply( new BigDecimal( 100 ) ).setScale( 1, RoundingMode.HALF_UP ).toString();
             if ( payRateStr.endsWith( "0" ) ) {
-                payRateStr = rate
-                        .multiply( new BigDecimal( 100 ) )
-                        .setScale( 0, RoundingMode.HALF_UP )
-                        .toString();
+                payRateStr = rate.multiply( new BigDecimal( 100 ) ).setScale( 0, RoundingMode.HALF_UP ).toString();
             }
             return payRateStr.concat( "%" );
         }

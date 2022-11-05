@@ -31,55 +31,85 @@
     <select id="selectMemberRechargeBankList" parameterType="tv.game88.pay.api.entity.MemberRechargeBank"
             resultMap="MemberRechargeBankResult">
         <include refid="selectMemberRechargeBankVo" />
-        <where>
-            <if test="memberId != null  and memberId != ''">
-                and member_id = #{memberId}
-            </if>
-            <if test="rechargeMoney != null">
-                and recharge_money = #{rechargeMoney}
-            </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-            <if test="realName != null  and realName != ''">
-                and real_name like concat('%', #{realName}, '%')
-            </if>
-            <if test="rechargeRealName != null  and rechargeRealName != ''">
-                and recharge_real_name like concat('%', #{rechargeRealName}, '%')
-            </if>
-            <if test="bankUserName != null  and bankUserName != ''">
-                and bank_user_name like concat('%', #{bankUserName}, '%')
-            </if>
-            <if test="bankId != null">
-                and bank_id = #{bankId}
-            </if>
-            <if test="bankAccount != null  and bankAccount != ''">
-                and bank_account = #{bankAccount}
-            </if>
-            <if test="bankAddress != null  and bankAddress != ''">
-                and bank_address = #{bankAddress}
-            </if>
-            <if test="opName != null  and opName != ''">
-                and op_name like concat('%', #{opName}, '%')
-            </if>
-            <if test="remark != null  and remark != ''">
-                and remark = #{remark}
-            </if>
-            <if test="first != null">
-                and `first` = #{first}
-            </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
-            </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
-            </if>
-            <if test="ip != null  and ip != ''">
-                and ip = #{ip}
-            </if>
-            <if test="discountBill != null">
-                and discount_bill = #{discountBill}
-            </if>
-        </where>
+        <include refid="listWhere"/>
+    </select>
+
+    <sql id="listWhere">
+        where 1 = 1
+        <if test="req.bankUserName != null  and req.bankUserName != ''">
+            and bank_user_name = #{req.bankUserName}
+        </if>
+        <if test="req.opName != null  and req.opName != ''">
+            and op_name = #{req.opName}
+        </if>
+        <if test="req.rechargeUserName != null  and req.rechargeUserName != ''">
+            and recharge_user_name = #{req.rechargeUserName}
+        </if>
+        <if test="req.bankName != null  and req.bankName != ''">
+            and bank_name = #{req.bankName}
+        </if>
+        <if test="req.id != null  and req.id != ''">
+            and recharge_order_no = #{req.id}
+        </if>
+        <if test="req.status != null">
+            and status = #{req.status}
+        </if>
+        <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != ''  and req.priceMax != ''">
+            and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
+            and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
+        </if>
+        <if test="req.searchValue != null and req.searchValue != ''">
+            and member_id = #{req.searchValue}
+        </if>
+        <if test="req.selectStartDate != null and req.selectStartDate != ''">
+            and update_time <![CDATA[ >= ]]> #{req.selectStartDate} and update_time <![CDATA[ <= ]]> #{req.selectEndDate}
+        </if>
+        <if test="req.downLoadDate[0] != null "> and update_time <![CDATA[ >= ]]> '${req.downLoadDate[0]}'</if>
+        <if test="req.downLoadDate[1] != null "> and update_time <![CDATA[ <= ]]> '${req.downLoadDate[1]}'</if>
+    </sql>
+
+    <select id="selectReportList" resultType="tv.game88.pay.api.dto.RspRechargeBankReport">
+        SELECT bank_user_name as bankUserName,
+            bank_name as bankName,
+            bank_account as bankAccount,
+            recharge_money as rechargeMoney,
+            COUNT(1) as time,
+            update_time as updateTime
+        FROM member_recharge_bank
+        WHERE `STATUS` = '3'
+        <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != '' and req.priceMax != ''">
+            and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
+            and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
+        </if>
+        <if test="req.bankUserName != null and req.bankUserName != ''">
+            and bank_user_name = #{req.bankUserName}
+        </if>
+        <if test="req.updateTime != null and req.updateTime != ''">
+            and update_time like '${req.updateTime}%'
+        </if>
+        GROUP BY bank_user_name,bank_name,recharge_money,bank_account
+        ORDER BY bank_user_name,recharge_money
+    </select>
+
+    <select id="selectReportListCount" resultType="java.util.Map">
+        SELECT *,
+        sum(recharge_money) as rechargeMoney,
+        count(*) as totalcount
+        FROM member_recharge_bank
+        WHERE  STATUS = '3'
+        <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != ''  and req.priceMax != ''">
+            and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
+            and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
+        </if>
+        <if test="req.bankUserName != null and req.bankUserName != ''">
+            and bank_user_name = #{req.bankUserName}
+        </if>
+        <if test="req.updateTime != null and req.updateTime != ''">
+            and update_time like '${req.updateTime}%'
+        </if>
+    </select>
+
+    <select id="countRechargeDaySucess" resultType="int">
+        select COUNT(1) from member_recharge_bank where  date(update_time) = curdate() and  member_id = #{memberId} and status = 3;
     </select>
 </mapper>

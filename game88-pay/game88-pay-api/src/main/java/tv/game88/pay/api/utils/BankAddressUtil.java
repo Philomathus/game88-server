@@ -23,7 +23,7 @@ import java.util.*;
 @Log4j2
 public class BankAddressUtil {
 	public static String calcAuthorization( String source, String secretId, String secretKey, String datetime )
-			throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
+			throws NoSuchAlgorithmException, InvalidKeyException {
 		String signStr = "x-date: " + datetime + "\n" + "x-source: " + source;
 		Mac    mac     = Mac.getInstance( "HmacSHA1" );
 		Key    sKey    = new SecretKeySpec( secretKey.getBytes( StandardCharsets.UTF_8 ), mac.getAlgorithm() );

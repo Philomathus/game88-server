@@ -13,7 +13,7 @@ import tv.game88.core.member.utils.MemberSecurityUtils;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.ReqMemberCard;
 import tv.game88.pay.api.dto.ReqMemberCardCancel;
-import tv.game88.pay.api.dto.RspConfigBank;
+import tv.game88.pay.api.dto.RspPayRechargeBank;
 import tv.game88.pay.api.dto.RspWithdrawBank;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
@@ -30,7 +30,7 @@ public class MemberRechargeBankController extends BaseController {
 
     @Operation( summary = "获取充值银行卡列表" )
     @PostMapping( "/rechargeBankList" )
-    public List<RspConfigBank> rechargeBankList() {
+    public List<RspPayRechargeBank> rechargeBankList() {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         return memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
     }

@@ -43,6 +43,8 @@ public class MemberRechargeUsdt {
     private Integer       status;
     @Excel( name = "优惠比例" )
     private BigDecimal    discountBill;
+    @Excel( name = "是否首次" )
+    private Boolean       first;
     @Excel( name = "操作人" )
     private String        opName;
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
@@ -54,7 +56,7 @@ public class MemberRechargeUsdt {
     @Excel( name = "备注" )
     private String        remark;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @TableField( exist = false )
     private Integer googleAuthCode;
 }
