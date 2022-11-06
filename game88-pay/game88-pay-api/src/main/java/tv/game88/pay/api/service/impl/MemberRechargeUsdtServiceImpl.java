@@ -203,6 +203,9 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
 
     @Override
     public RspBase<?> usdtRecharge( String memberId, ReqMemberRechargeUsdt req ) {
+        if ( req.getRechargeNumber() <= 0 ) {
+            return RspBase.businessError( "您输入的充值USDT数量不正确" );
+        }
         return null;
     }
 }

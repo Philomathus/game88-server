@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 /**
  * 线上充值信息对象 member_pay_jour
  *
- * @author 77tv
+ * @author mengJun
  * @date 2021-01-26
  */
 @Data

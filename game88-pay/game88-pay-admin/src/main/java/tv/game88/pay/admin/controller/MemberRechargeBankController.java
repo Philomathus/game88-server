@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * 公司入款信息Controller
  *
- * @author 77tv
+ * @author mengJun
  */
 @RestController
 @RequestMapping( "/pay/memberRechargeBank" )

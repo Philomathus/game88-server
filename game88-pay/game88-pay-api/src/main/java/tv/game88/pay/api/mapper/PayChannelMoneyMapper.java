@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 支付通道金额Mapper接口
  *
- * @author 77tv
+ * @author mengJun
  * @date 2021-04-03
  */
 public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {

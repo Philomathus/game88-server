@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 公司入款信息Mapper接口
  *
- * @author 77tv
+ * @author mengJun
  */
 public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank> {
     public List<MemberRechargeBank> selectMemberRechargeBankList( @Param( "req" ) ReqMemberRechargeBank req );

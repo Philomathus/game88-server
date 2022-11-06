@@ -3,7 +3,7 @@ package tv.game88.pay.api.constants;
 /**
  * 支付code常量
  *
- * @author qicheng
+ * @author mengJun
  */
 public abstract class ConstantsPay {
 	//KOLA支付

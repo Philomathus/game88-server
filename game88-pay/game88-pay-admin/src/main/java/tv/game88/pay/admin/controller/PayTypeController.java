@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * 支付类型Controller
  *
- * @author 77tv
+ * @author mengJun
  * @date 2021-01-25
  */
 @RestController

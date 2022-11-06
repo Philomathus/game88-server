@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * USDT渠道 Controller
  *
- * @author 77tv
+ * @author mengJun
  * @date 2021-09-11
  */
 @RestController
