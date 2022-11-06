@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -12,6 +11,7 @@ import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
@@ -78,7 +78,7 @@ public class PayServiceImpl implements PayService {
                     && !payType.getDeviceType().contains( "1" ) ); //移除ios外的支付类型
             payTypeList.removeIf( payType -> "2".equals( deviceType ) && StringUtils.isNotBlank( payType.getDeviceType() )
                     && !payType.getDeviceType().contains( "2" ) ); //移除安卓外的支付类型
-            String domainValue = ConfigDomainCacheUtil.me.getValue( "domain.oss" );
+            String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( PayType payType : payTypeList ) {
                 if ( StringUtils.isNotBlank( payType.getIconUrl() ) && !payType.getIconUrl().startsWith( "http" ) ) {
                     payType.setIconUrl( domainValue + payType.getIconUrl() );
@@ -271,7 +271,7 @@ public class PayServiceImpl implements PayService {
         PayType     payType     = payCacheUtil.getPayType( payChannel.getTypeId() );
 
 
-        reqPayRecharge.setOrderNo( getPayOrder() );
+        reqPayRecharge.setOrderNo( GenerateOrderCacheUtils.me.getOrderId( "P", 2 ) );
         reqPayRecharge.setUserId( platformUser.getId() );
 
 
@@ -328,15 +328,6 @@ public class PayServiceImpl implements PayService {
         payLog.setPlatformId( payPlatform.getId() );
         payLog.setPlatformName( payPlatform.getName() );
         payLogMapper.insert( payLog );
-    }
-
-    private String getPayOrder() {
-        String orderNo = "P" + LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER )
-                + RandomStringUtils.randomAlphabetic( 2 );
-        if ( !redisUtil.strSetIfAbsent( PayCacheUtil.ORDER_ID + orderNo, "", Duration.ofSeconds( 10 ) ) ) {
-            return getPayOrder();
-        }
-        return orderNo;
     }
 
     //选择通道算法

@@ -200,5 +200,10 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
             throw new BusinessException( "更新状态失败" );
         }
     }
+
+    @Override
+    public RspBase<?> usdtRecharge( String memberId, ReqMemberRechargeUsdt req ) {
+        return null;
+    }
 }
 

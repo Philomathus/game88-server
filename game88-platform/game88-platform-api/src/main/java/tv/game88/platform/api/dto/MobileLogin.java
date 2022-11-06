@@ -20,7 +20,7 @@ public class MobileLogin extends MobileBind {
 
     public String getIp() {
         if ( StringUtils.isBlank( ip ) ) {
-            ip = ServletUtil.getIp();
+            return ServletUtil.getIp();
         }
         return ip;
     }

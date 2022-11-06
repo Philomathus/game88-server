@@ -2,6 +2,7 @@ package tv.game88.core.config.cache;
 
 import lombok.extern.log4j.Log4j2;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.config.mapper.ConfigEnvironmentMapper;
@@ -20,12 +21,23 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class ConfigEnvCacheUtil {
-    public static final String SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
+    private static final String SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
 
     @Resource
     private RedisUtils              redisUtil;
     @Resource
     private ConfigEnvironmentMapper configEnvironmentMapper;
+
+    public String dynamicValue( String value ) {
+        if ( value.contains( "${" ) && value.contains( "}" ) ) {
+            String param  = value.substring( value.indexOf( "${" ) + 2, value.indexOf( "}" ) );
+            String paramValue = this.getConf( param );
+            if ( StringUtils.isNotBlank( paramValue ) ) {
+                return value.replace( "${" + param + "}", paramValue );
+            }
+        }
+        return value;
+    }
 
     public List<String> getConf( List<Object> codes ) {
         Boolean exists = redisUtil.exists( SYS_CONFIG_KEY );
@@ -35,7 +47,7 @@ public class ConfigEnvCacheUtil {
         List<Object> objects    = redisUtil.hMGet( SYS_CONFIG_KEY, codes );
         List<String> resultList = new ArrayList<>( objects.size() );
         for ( Object object : objects ) {
-            String value = object != null ? ConfigDomainCacheUtil.me.dynamicValue( object.toString() ) : null;
+            String value = object != null ? this.dynamicValue( object.toString() ) : null;
             resultList.add( value );
         }
         return resultList;
@@ -47,7 +59,7 @@ public class ConfigEnvCacheUtil {
             this.refreshConfCache();
         }
         Object value = redisUtil.hGet( SYS_CONFIG_KEY, code );
-        return value != null ? ConfigDomainCacheUtil.me.dynamicValue( value.toString() ) : defaultValue;
+        return value != null ? this.dynamicValue( value.toString() ) : defaultValue;
     }
 
     public String getConf( String code ) {
@@ -96,6 +108,10 @@ public class ConfigEnvCacheUtil {
 
     public void setConfCache( ConfigEnvironment configEnvironment ) {
         redisUtil.hSet( SYS_CONFIG_KEY, configEnvironment.getEnvCode(), configEnvironment.getEnvValue() );
+    }
+
+    public void setConfCache( String code, String value ) {
+        redisUtil.hSet( SYS_CONFIG_KEY, code, value );
     }
 
     public void deleteCache( String... envCodes ) {

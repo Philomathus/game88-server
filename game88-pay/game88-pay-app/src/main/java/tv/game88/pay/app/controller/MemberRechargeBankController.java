@@ -55,7 +55,7 @@ public class MemberRechargeBankController extends BaseController {
     }
 
     @Operation( summary = "银行卡充值" )
-    @PostMapping( "/bankCardRecharge" )
+    @PostMapping( "/bankRecharge" )
     public RspBase<?> bankCardRecharge( @Validated @RequestBody ReqMemberCardRecharge req ) {
         String memberId = MemberSecurityUtils.getUserId();
         return memberRechargeBankService.bankCardRecharge( memberId, req );

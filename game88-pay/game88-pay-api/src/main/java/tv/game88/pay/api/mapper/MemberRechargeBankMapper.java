@@ -21,5 +21,5 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
 
     Map selectReportListCount( @Param( "req" ) ReqMemberRechargeBank req );
 
-    int countRechargeDaySucess( @Param("memberId") String memberId );
+    int countRechargeDaySucess( @Param( "memberId" ) String memberId );
 }

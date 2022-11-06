@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.ServletUtil;
-import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.ValidatorUtil;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.dto.RspMemberCard;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
@@ -297,14 +295,14 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         // 单日首次彩金
         BigDecimal ticketCattyRatio = configEnvCacheUtil.getConfBd( "recharge_day_first_rate" );
 
-        int daySucess = this.baseMapper.countRechargeDaySucess( memberInfo.getId() );
-
-        if ( daySucess == 0 ) {
+        long daySuccess = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeBank>().eq( "status", 3 )
+                .eq( "member_id", memberInfo.getId() ).ge( "update_time", LocalDateTimeUtils.getStartOfToday() ) );
+        if ( daySuccess == 0 ) {
             chargeGive = chargeGive.add( memberRechargeBank.getRechargeMoney().multiply( ticketCattyRatio )
                     .setScale( 2, RoundingMode.HALF_UP ) );
         }
         // 单日第二次彩金
-        if ( daySucess == 1 ) {
+        if ( daySuccess == 1 ) {
             //每日公司入款第二次优惠比例
             BigDecimal ticketCattyRatioSnd = configEnvCacheUtil.getConfBd( "recharge_day_second_rate" );
             chargeGive = chargeGive.add( memberRechargeBank.getRechargeMoney().multiply( ticketCattyRatioSnd )
@@ -407,8 +405,70 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( !payRechargeBank.getEffect() ) {
             return RspBase.businessError( "入款银行卡已停用,如有疑问请联系客服" );
         }
-
-        return null;
+        if ( !redisUtils.lock( "bankCardRecharge" + memberId, 5 ) ) {
+            return RspBase.businessError( "请勿重复提交" );
+        }
+        // 入款金额限制
+        String[] bank_charge_limits = configEnvCacheUtil.getConf( "bank_charge_limit" ).split( "," );
+        if ( payRechargeBank.getRechargeLimitMin() != null && payRechargeBank.getRechargeLimitMax() == null ) {
+            if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMin() ) < 0 ) {
+                return RspBase.businessError( "最低充值金额" + payRechargeBank.getRechargeLimitMin() + "元" );
+            }
+        } else if ( payRechargeBank.getRechargeLimitMin() == null && payRechargeBank.getRechargeLimitMax() != null ) {
+            if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMax() ) > 0 ) {
+                return RspBase.businessError( "最高充值金额" + payRechargeBank.getRechargeLimitMax() + "元" );
+            }
+        } else if ( payRechargeBank.getRechargeLimitMin() != null && payRechargeBank.getRechargeLimitMax() != null ) {
+            if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMin() ) < 0 ) {
+                return RspBase.businessError( "最低充值金额" + payRechargeBank.getRechargeLimitMin() + "元" );
+            }
+            if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMax() ) > 0 ) {
+                return RspBase.businessError( "最高充值金额" + payRechargeBank.getRechargeLimitMax() + "元" );
+            }
+        } else {
+            if ( req.getRechargeMoney().compareTo( new BigDecimal( bank_charge_limits[ 0 ] ) ) < 0 ) {
+                return RspBase.businessError( "最低充值金额" + bank_charge_limits[ 0 ] + "元" );
+            }
+            if ( req.getRechargeMoney().compareTo( new BigDecimal( bank_charge_limits[ 1 ] ) ) > 0 ) {
+                return RspBase.businessError( "最高充值金额" + bank_charge_limits[ 1 ] + "元" );
+            }
+        }
+        // 入款相同金额限制
+        int timeLimit = configEnvCacheUtil.getConfInt( "bank_charge_time_limit", 10 );
+        long count = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeBank>().ne( "status", 3 )
+                .eq( "recharge_user_name", req.getRechargeUserName() ).eq( "recharge_money", req.getRechargeMoney() )
+                .ge( "create_time", LocalDateTime.now().minusMinutes( timeLimit ) ) );
+        if ( count > 0 ) {
+            return RspBase.businessError( "请勿重复提交订单" );
+        }
+        //入款次数限制
+        int withdraw_times = configEnvCacheUtil.getConfInt( "member_recharge_times" );
+        long times = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeBank>().eq( "member_id", memberId )
+                .between( "create_time", LocalDateTimeUtils.getStartOfToday(), LocalDateTimeUtils.getEndOfToday() ) );
+        if ( withdraw_times > 0 && times >= withdraw_times ) {
+            return RspBase.businessError( "今日充值次数超过限制，请您改日申请充值" );
+        }
+        MemberCard memberCard = memberCardMapper.selectOne( new QueryWrapper<MemberCard>().eq( "member_id", memberId )
+                .select( "real_name", "id" ) );
+        String             realName     = memberCard != null ? memberCard.getRealName() : "";
+        MemberRechargeBank rechargeBank = new MemberRechargeBank();
+        rechargeBank.setRechargeOrderNo( GenerateOrderCacheUtils.me.getOrderId( "CZB", 3 ) );
+        rechargeBank.setMemberId( memberId );
+        rechargeBank.setRechargeMoney( req.getRechargeMoney() );
+        rechargeBank.setStatus( 0 );
+        rechargeBank.setRealName( realName );
+        rechargeBank.setRechargeRealName( req.getRechargeUserName() );
+        rechargeBank.setBankUserName( payRechargeBank.getAccountName() );
+        rechargeBank.setBankAccount( payRechargeBank.getBankAccount() );
+        rechargeBank.setBankId( payRechargeBank.getBankId() );
+        rechargeBank.setBankAddress( payRechargeBank.getBankAddress() );
+        rechargeBank.setFirst( memberInfo.getAccountCharge().compareTo( BigDecimal.ZERO ) == 0 );
+        rechargeBank.setCreateTime( LocalDateTime.now() );
+        rechargeBank.setUpdateTime( rechargeBank.getCreateTime() );
+        rechargeBank.setDiscountBill( configEnvCacheUtil.getConfBd( "recharge_discount_rate" ) );
+        rechargeBank.setIp( req.getIp() );
+        int i = this.baseMapper.insert( rechargeBank );
+        return i > 0 ? RspBase.ok( "充值请求成功" ) : RspBase.businessError( "充值请求失败" );
     }
 }
 

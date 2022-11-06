@@ -22,8 +22,8 @@ public class ConfigBankListController {
     private ConfigBankListCache configBankListCache;
 
     @Operation( summary = "获取银行字典列表" )
-    @PostMapping( "/bank-list" )
-    public RspBase<List<RspConfigBankList>> findList() {
+    @PostMapping( "/bankList" )
+    public RspBase<List<RspConfigBankList>> bankList() {
         return RspBase.ok( configBankListCache.getEffectList() );
     }
 }

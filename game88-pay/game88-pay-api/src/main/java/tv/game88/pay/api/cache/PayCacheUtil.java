@@ -30,7 +30,6 @@ public class PayCacheUtil {
     public static final String CHANNEL                 = "pay:channel:";
     public static final String CHANNELSUCCESSRATE      = "pay:channelSuccessRate:";
     public static final String CHANNELSUCCESSRATE_LOCK = "pay:channelSuccessRateLock:";
-    public static final String ORDER_ID                = "pay:orderId:";
 
     @Resource
     private RedisUtils        redisUtil;

@@ -79,7 +79,7 @@ public class PayTypeController extends BaseController {
     public RspBase<PayType> getInfo( @PathVariable( "id" ) Integer id ) {
         PayType payType = payTypeService.getById( id );
         if ( payType != null ) {
-            payType.setIconUrl( ConfigDomainCacheUtil.me.getValue( "domain.oss" ) + payType.getIconUrl() );
+            payType.setIconUrl( ConfigDomainCacheUtil.me.getDomainOssValue() + payType.getIconUrl() );
         }
         return RspBase.ok( payType );
     }

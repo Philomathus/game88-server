@@ -82,7 +82,7 @@ public class ConfigOssServiceImpl implements ConfigOssService {
         int i = configOssMapper.updateById( configOss );
         if ( i > 0 ) {
             configOssCacheUtil.clear();
-            ConfigDomainCacheUtil.me.clear();
+            ConfigDomainCacheUtil.me.clearDomainOss();
         }
         return i;
     }
@@ -116,7 +116,7 @@ public class ConfigOssServiceImpl implements ConfigOssService {
         int i = configOssMapper.updateById( update );
         if ( i > 0 ) {
             configOssCacheUtil.clear();
-            ConfigDomainCacheUtil.me.clear();
+            ConfigDomainCacheUtil.me.clearDomainOss();
         }
         return i;
     }

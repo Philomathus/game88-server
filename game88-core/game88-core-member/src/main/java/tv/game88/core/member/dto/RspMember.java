@@ -45,7 +45,7 @@ public class RspMember {
 
     public String getHeadImg() {
         if ( StringUtils.isNotBlank( headImg ) && !headImg.startsWith( "http" ) ) {
-            return ConfigDomainCacheUtil.me.getValue( "domain.oss" ) + "/88lm/publicImage/head" + headImg + ".png";
+            return ConfigDomainCacheUtil.me.getDomainOssValue() + "/88lm/publicImage/head" + headImg + ".png";
         }
         return headImg;
     }

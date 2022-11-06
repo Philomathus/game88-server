@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.PayRechargeUsdtMapper">
+
+    <resultMap type="tv.game88.pay.api.entity.PayRechargeUsdt" id="PayRechargeUsdtResult">
+        <result property="id"    column="id"    />
+        <result property="channelName"    column="channel_name"    />
+        <result property="chainName"    column="chain_name"    />
+        <result property="rechargeAddress"    column="recharge_address"    />
+        <result property="discountBill"    column="discount_bill"    />
+        <result property="exchangeRate"    column="exchange_rate"    />
+        <result property="sort"    column="sort"    />
+        <result property="icon"    column="icon"    />
+        <result property="effect"    column="effect"    />
+        <result property="openLevelMin"    column="open_level_min"    />
+        <result property="openLevelMax"    column="open_level_max"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectPayRechargeUsdtVo">
+        select id, channel_name, chain_name, recharge_address, discount_bill, exchange_rate, indexs, icon, status,
+               open_level_type, create_by, create_time ,  update_by, update_time ,remark from pay_recharge_usdt
+    </sql>
+
+    <select id="selectPayRechargeUsdtList" parameterType="tv.game88.pay.api.entity.PayRechargeUsdt" resultMap="PayRechargeUsdtResult">
+        <include refid="selectPayRechargeUsdtVo"/>
+        <where>
+            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
+            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
+            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
+            <if test="effect != null "> and effect = #{effect}</if>
+        </where>
+    </select>
+
+    <select id="selectEffectRspList" resultType="tv.game88.pay.api.dto.RspPayRechargeUsdt">
+        <include refid="selectPayRechargeUsdtVo"/>
+        where effect = 1
+        order by sort asc
+    </select>
+</mapper>

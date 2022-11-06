@@ -112,8 +112,13 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 .mvcMatchers( HttpMethod.POST,"/login-device" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/register" ).anonymous()
                 // 支付代付回调 允许匿名访问
-                .antMatchers( "/pay/callBack/**" ).anonymous()
-                .antMatchers( "/pay-agent/callBack/**" ).anonymous()
+                .mvcMatchers( HttpMethod.GET, "/pay/orderRedirect/**" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/pay/callBack/**" ).anonymous()
+                .mvcMatchers( HttpMethod.GET, "/pay/callBack/**" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/pay/agentCallBack/**" ).anonymous()
+                .mvcMatchers( HttpMethod.GET, "/pay/agentCallBack/**" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/pay/agentReverseCheck/**" ).anonymous()
+                .mvcMatchers( HttpMethod.GET, "/pay/agentReverseCheck/**" ).anonymous()
                 // actuator 健康检查
                 .antMatchers( "/actuator/**" ).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证

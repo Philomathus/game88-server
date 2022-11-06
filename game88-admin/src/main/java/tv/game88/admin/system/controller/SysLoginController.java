@@ -90,7 +90,7 @@ public class SysLoginController {
         List<SysMenu>       menus     = menuService.selectMenuTreeByUserId( user.getUserId() );
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "menus", menuService.buildMenus( menus ) );
-        resultMap.put( "vhostUrl", ConfigDomainCacheUtil.me.getValue( "domain.oss" ) );
+        resultMap.put( "vhostUrl", ConfigDomainCacheUtil.me.getDomainOssValue() );
         return RspBase.ok( resultMap );
     }
 }
