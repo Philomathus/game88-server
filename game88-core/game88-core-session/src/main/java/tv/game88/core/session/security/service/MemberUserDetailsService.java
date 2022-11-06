@@ -1,4 +1,4 @@
-package tv.game88.core.session.service;
+package tv.game88.core.session.security.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +9,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.core.member.vo.MemberLoginUser;
+import tv.game88.core.session.vo.MemberLoginUser;
 
 import javax.annotation.Resource;
 

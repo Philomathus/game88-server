@@ -25,6 +25,7 @@ import tv.game88.core.member.service.RecommendService;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.entity.MemberRechargeBank;
+import tv.game88.pay.api.entity.PayRechargeBank;
 import tv.game88.pay.api.mapper.ConfigBankListMapper;
 import tv.game88.pay.api.mapper.MemberRechargeBankMapper;
 import tv.game88.pay.api.mapper.PayRechargeBankMapper;
@@ -39,7 +40,6 @@ import java.math.RoundingMode;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -170,18 +170,9 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
 
     @Override
     public RspBase<?> setBindCard( String memberId, ReqMemberCard reqMemberCard ) {
-        if ( !org.springframework.util.StringUtils.hasText( reqMemberCard.getBankAccount() ) ) {
-            return RspBase.businessError( "银行卡号为空" );
-        }
-        reqMemberCard.setBankAccount( reqMemberCard.getBankAccount().trim() );
-        if ( reqMemberCard.getBankAccount().length() > 100 ) {
-            return RspBase.businessError( "请输入正确的银行卡号" );
-        }
+        reqMemberCard.setBankAccount( reqMemberCard.getBankAccount().trim().replaceAll( " ", "" ) );
         if ( !ValidatorUtil.isAccount( reqMemberCard.getBankAccount() ) ) {
             return RspBase.businessError( "请输入正确的银行卡号" );
-        }
-        if ( StringUtils.isBlank( reqMemberCard.getRealName() ) ) {
-            return RspBase.businessError( "姓名为空" );
         }
         ConfigBankList configBankList = configBankListMapper.selectById( reqMemberCard.getBankId() );
         if ( configBankList == null ) {
@@ -193,7 +184,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( countCard > 0 ) {
             return RspBase.businessError( "该银行卡已经绑定,请输入其它银行卡号" );
         }
-        Boolean          dfault     = true;
+        boolean          dfault     = true;
         List<MemberCard> resultList = memberCardMapper.selectMemberCard( memberId );
         if ( resultList.size() > 0 ) {
             dfault = false;
@@ -202,7 +193,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             }
         }
         if ( resultList.size() >= 10 ) {
-            return RspBase.businessError( "提现卡超过10个，请解绑弃用提现卡" );
+            return RspBase.businessError( "提现卡超过10个，请解绑其它提现卡" );
         }
         //加锁
         if ( !redisUtils.lock( "setBindCard" + reqMemberCard.getBankAccount(), 10 ) ) {
@@ -211,7 +202,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         MemberCard memberCard = new MemberCard();
         memberCard.setBankAccount( reqMemberCard.getBankAccount() );
         memberCard.setBankAddress( reqMemberCard.getBankAddress() );
-        memberCard.setCreateTime( new Date() );
+        memberCard.setCreateTime( LocalDateTime.now() );
         memberCard.setMemberId( memberId );
         memberCard.setRealName( reqMemberCard.getRealName() );
         memberCard.setDv( dfault );
@@ -395,6 +386,29 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         update.setOpName( userName );
         int i = this.baseMapper.updateById( update );
         return i > 0 ? RspBase.ok() : RspBase.businessError( "更改状态失败" );
+    }
+
+    @Override
+    public RspBase<?> bankCardRecharge( String memberId, ReqMemberCardRecharge req ) {
+        if ( !ValidatorUtil.isChinese( req.getRechargeUserName() ) ) {
+            return RspBase.businessError( "请输入真实的绑定银行卡姓名" );
+        }
+        MemberInfo memberInfo = memberInfoMapper.selectById( memberId );
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( memberInfo.getStatus() == 0 ) {
+            return RspBase.businessError( "账号异常，请联系客服" );
+        }
+        PayRechargeBank payRechargeBank = payRechargeBankMapper.selectById( req.getBankBaseId() );
+        if ( payRechargeBank == null ) {
+            return RspBase.businessError( "充值银行卡不存在" );
+        }
+        if ( !payRechargeBank.getEffect() ) {
+            return RspBase.businessError( "入款银行卡已停用,如有疑问请联系客服" );
+        }
+
+        return null;
     }
 }
 

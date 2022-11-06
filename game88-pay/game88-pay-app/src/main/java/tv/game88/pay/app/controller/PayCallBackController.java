@@ -27,8 +27,7 @@ public class PayCallBackController {
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
         BasePay basePay = payProcessorFactoryUtil.createPayProcessor( payCode );
-        log.warn( "{}回调数据 - realIp:{};result:{};requestMap:{}", basePay.getName(), realIp, JsonUtil.object2Json( map ),
-                JsonUtil.object2Json( requestMap ) );
+        log.warn( "{}回调数据 - realIp:{};result:{}", basePay.getName(), realIp, JsonUtil.object2Json( map ));
         return basePay.callbackPay( map, realIp );
     }
 

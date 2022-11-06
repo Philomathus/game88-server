@@ -1,4 +1,4 @@
-package tv.game88.core.member.vo;
+package tv.game88.core.session.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.member.vo.PlatformUser;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -21,12 +22,12 @@ public class MemberLoginUser implements UserDetails {
     /**
      * 登录IP地址
      */
-    private String        loginIp;
+    private String       loginIp;
     /**
      * 用户信息
      */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private PlatformUser  platformUser;
+    private PlatformUser platformUser;
 
     private String platformUserStr;
 

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class ReqMemberRechargeUsdt {
@@ -33,13 +33,13 @@ public class ReqMemberRechargeUsdt {
     @Schema( hidden = true )
     private String rechargeAddress;
     @Schema( hidden = true )
-    private String opName;
+    private String        opName;
     @Schema( hidden = true )
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private Date createTime;
+    private LocalDateTime createTime;
     @Schema( hidden = true )
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private Date updateTime;
+    private LocalDateTime          updateTime;
     @Schema( hidden = true )
     private String remark;
 

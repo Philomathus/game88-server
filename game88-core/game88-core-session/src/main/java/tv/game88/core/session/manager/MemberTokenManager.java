@@ -1,4 +1,4 @@
-package tv.game88.core.member.manager;
+package tv.game88.core.session.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +12,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.member.vo.MemberLoginUser;
+import tv.game88.core.session.vo.MemberLoginUser;
 import tv.game88.core.member.vo.PlatformUser;
 
 import javax.annotation.Resource;

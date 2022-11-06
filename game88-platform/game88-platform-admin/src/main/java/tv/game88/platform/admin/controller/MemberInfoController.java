@@ -14,10 +14,9 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.core.member.manager.MemberTokenManager;
-import tv.game88.core.member.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
@@ -25,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +40,6 @@ import java.util.Map;
 public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService  memberInfoService;
-    @Resource
-    private MemberTokenManager memberTokenManager;
     @Resource
     private RedisUtils         redisUtil;
 
@@ -150,7 +148,10 @@ public class MemberInfoController extends BaseController {
 
         boolean b = memberInfoService.updateById( update );
         if ( status == 0 && b ) {
-            memberTokenManager.delToken( memberId );
+            String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
+            if ( StringUtils.isNotBlank( token ) ) {
+                redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+            }
         }
         return toResult( b );
     }
@@ -165,10 +166,13 @@ public class MemberInfoController extends BaseController {
 
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
-        update.setPassword( MemberSecurityUtils.encryptPassword( passwd ) );
+        update.setPassword( SecurityUtils.encryptPassword( passwd ) );// 这里使用管理员的加密方法和会员的是一样的
         boolean b = memberInfoService.updateById( update );
         if ( b ) {
-            memberTokenManager.delToken( memberId );
+            String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
+            if ( StringUtils.isNotBlank( token ) ) {
+                redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+            }
         }
         return toResult( b );
     }
@@ -313,7 +317,7 @@ public class MemberInfoController extends BaseController {
      * @param request
      */
     @GetMapping( "/personal-report/{memberId}" )
-    public RspBase<?> personalReport( @PathVariable String memberId,String[] date, HttpServletRequest request ) {
+    public RspBase<?> personalReport( @PathVariable String memberId, String[] date, HttpServletRequest request ) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         String                startTime    = parameterMap.get( "date[0]" )[ 0 ];
         String                endTime      = parameterMap.get( "date[1]" )[ 0 ];

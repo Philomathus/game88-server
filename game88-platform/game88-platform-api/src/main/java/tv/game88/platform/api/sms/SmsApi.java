@@ -30,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.core.config.cache.ConfigSmsCacheUtil;
 import tv.game88.core.config.entity.ConfigSms;
@@ -41,8 +42,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,11 +111,7 @@ public class SmsApi {
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> {
-            sb
-                    .append( k )
-                    .append( "=" )
-                    .append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) )
-                    .append( "&" );
+            sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) ).append( "&" );
         } );
         String body = sb.substring( 0, sb.length() - 1 );
 
@@ -131,13 +128,9 @@ public class SmsApi {
             ResponseEntity<Map> responseEntity = restTemplate.postForEntity(
                     configSms.getEndpoint() + "/sms/batchSendSms/v1", httpEntity, Map.class );
             Map<String, Object> entityBody = responseEntity.getBody();
-            if ( responseEntity
-                    .getStatusCode()
-                    .is2xxSuccessful() ) {
+            if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
                 if ( !CollectionUtils.isEmpty( entityBody ) ) {
-                    String rspCode = entityBody
-                            .getOrDefault( "code", "" )
-                            .toString();
+                    String rspCode = entityBody.getOrDefault( "code", "" ).toString();
                     if ( "000000".equals( rspCode ) ) {
                         return code;
                     }
@@ -159,10 +152,10 @@ public class SmsApi {
      */
     private static String buildWsseHeader( String appKey, String appSecret ) {
         try {
-            SimpleDateFormat sdf   = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
-            String           time  = sdf.format( new Date() );
-            String           nonce = IdWorker.get32UUID();
-            MessageDigest    md    = MessageDigest.getInstance( "SHA-256" );
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
+            String            time              = LocalDateTimeUtils.format( LocalDateTime.now(), dateTimeFormatter );
+            String            nonce             = IdWorker.get32UUID();
+            MessageDigest     md                = MessageDigest.getInstance( "SHA-256" );
             md.update( ( nonce + time + appSecret ).getBytes() );
             String passwordDigestBase64Str = Base64Utils.encodeToString( md.digest() );
             return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
@@ -304,8 +297,7 @@ public class SmsApi {
         smsFainLog.setPhone( phone );
         smsFainLog.setSmsName( smsName );
         smsFainLog.setSmsSubname( subname );
-        Date date = new Date();
-        smsFainLog.setCreateTime( date );
+        smsFainLog.setCreateTime( LocalDateTime.now() );
         configSmsFaillogMapper.insert( smsFainLog );
     }
 }

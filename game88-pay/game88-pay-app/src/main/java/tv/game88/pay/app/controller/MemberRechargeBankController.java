@@ -3,18 +3,16 @@ package tv.game88.pay.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.pay.api.dto.ReqMemberCard;
-import tv.game88.pay.api.dto.ReqMemberCardCancel;
-import tv.game88.pay.api.dto.RspPayRechargeBank;
-import tv.game88.pay.api.dto.RspWithdrawBank;
+import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
 import javax.annotation.Resource;
@@ -51,8 +49,15 @@ public class MemberRechargeBankController extends BaseController {
 
     @Operation( summary = "绑定提现卡" )
     @PostMapping( "/setBindCard" )
-    public RspBase<?> setBindCard( @RequestBody ReqMemberCard reqMemberCard ) {
+    public RspBase<?> setBindCard( @Validated @RequestBody ReqMemberCard reqMemberCard ) {
         String memberId = MemberSecurityUtils.getUserId();
         return memberRechargeBankService.setBindCard( memberId, reqMemberCard );
+    }
+
+    @Operation( summary = "银行卡充值" )
+    @PostMapping( "/bankCardRecharge" )
+    public RspBase<?> bankCardRecharge( @Validated @RequestBody ReqMemberCardRecharge req ) {
+        String memberId = MemberSecurityUtils.getUserId();
+        return memberRechargeBankService.bankCardRecharge( memberId, req );
     }
 }

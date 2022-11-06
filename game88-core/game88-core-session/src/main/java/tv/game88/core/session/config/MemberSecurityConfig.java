@@ -111,6 +111,9 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 .mvcMatchers( HttpMethod.POST,"/login" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/login-device" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/register" ).anonymous()
+                // 支付代付回调 允许匿名访问
+                .antMatchers( "/pay/callBack/**" ).anonymous()
+                .antMatchers( "/pay-agent/callBack/**" ).anonymous()
                 // actuator 健康检查
                 .antMatchers( "/actuator/**" ).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
@@ -118,7 +121,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 .and()
                 .headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler );
-        // 添加JWT filter
+        // 添加token有效性校验 filter
         httpSecurity.addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class );
         // 添加CORS filter
         httpSecurity.addFilterBefore( corsFilter, MemberAuthenticationTokenFilter.class );

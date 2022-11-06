@@ -1,4 +1,4 @@
-package tv.game88.core.member.utils;
+package tv.game88.core.session.utils;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.core.member.vo.MemberLoginUser;
+import tv.game88.core.session.vo.MemberLoginUser;
 
 /**
  * 安全服务工具类

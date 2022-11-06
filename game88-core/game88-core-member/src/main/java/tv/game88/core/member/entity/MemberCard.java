@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 会员银行卡对象 member_card
@@ -34,5 +34,5 @@ public class MemberCard {
 
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     @Excel( name = "创建时间", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
-    private Date createTime;
+    private LocalDateTime createTime;
 }

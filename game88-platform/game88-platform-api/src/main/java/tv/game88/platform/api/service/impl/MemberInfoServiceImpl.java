@@ -33,8 +33,6 @@ import tv.game88.core.member.mapper.LogMoneyMapper;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.utils.MemberSecurityUtils;
-import tv.game88.core.member.vo.MemberLoginUser;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
@@ -334,7 +332,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             memberInfo.setLinkUrl( loginUrl );
         }
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            memberInfo.setPassword( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+            memberInfo.setPassword( mobileLogin.getPasswordEncrypt() );
         }
     }
 
@@ -566,15 +564,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         // 线上充值 online recharge
         forkJoinTasks.add( () -> ImmutableMap.of( "personalOnlineRecharge", this.baseMapper.personalOnlineRecharge( startTime,
                 endTime, memberId ) ) );
-//        // 线上充值2 online recharge 2
-//        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge( startTime,
-//                endTime, memberId ) ) );
+        //        // 线上充值2 online recharge 2
+        //        forkJoinTasks.add( () -> ImmutableMap.of( "personalAgentRecharge", this.baseMapper.personalAgentRecharge(
+        //        startTime,
+        //                endTime, memberId ) ) );
         // 线上充值3 online recharge 3
         forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime,
                 endTime, memberId ) ) );
         // 提款 withdrawal
-//        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
-//                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
+        //        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
+        //                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
@@ -589,12 +588,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         resultSet.add( ImmutableMap.of( "memberId", memberId ) );
 
         Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
-                                                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
+                .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
-//        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
-//                memberId.length() - 1 ) );
+        //        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
+        //                memberId.length() - 1 ) );
 
-//        resultMap.put( "bCodeList", mapList );
+        //        resultMap.put( "bCodeList", mapList );
 
         return RspBase.ok( resultMap );
     }
@@ -641,13 +640,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( i > 0 ) {
             String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) ) {
-                Map<Object, Object> loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
+                Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
                 if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
-                    MemberLoginUser memberLoginUser = JsonUtil.map2Object( loginUserMap, MemberLoginUser.class );
-                    PlatformUser    platformUser    = memberLoginUser.getPlatformUser();
+                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
+                            .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     platformUser.setNickName( nickName );
-                    redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, JsonUtil.object2Map( memberLoginUser ) );
+                    loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
+                    redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );
                 }
             }
             return RspBase.ok( "更新成功" );

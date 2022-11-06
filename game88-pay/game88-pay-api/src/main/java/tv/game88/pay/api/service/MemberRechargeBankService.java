@@ -30,5 +30,7 @@ public interface MemberRechargeBankService extends IService<MemberRechargeBank> 
     RspBase<?> refusedAudit( ReqMemberRechargeBank req, String userName );
 
     RspBase<?> recoverAudit( ReqMemberRechargeBank req, String userName );
+
+    RspBase<?> bankCardRecharge( String memberId, ReqMemberCardRecharge req );
 }
 

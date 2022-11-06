@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.member.manager.MemberTokenManager;
+import tv.game88.core.session.manager.MemberTokenManager;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.MobileLogin;
 import tv.game88.platform.api.dto.Phone;
 import tv.game88.platform.api.dto.RspInit;
@@ -49,6 +50,9 @@ public class LoginController {
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                            @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                            @RequestBody MobileLogin mobileLogin ) {
+        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
+            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+        }
         RspBase<RspMember> rspMemberRspBase = memberInfoService.login( mobileLogin, dev, version, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
@@ -69,6 +73,9 @@ public class LoginController {
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                         @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                         @RequestBody MobileLogin mobileLogin ) {
+        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
+            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+        }
         RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin, dev, version, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;

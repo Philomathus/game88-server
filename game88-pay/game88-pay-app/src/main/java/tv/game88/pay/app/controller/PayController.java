@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.member.utils.MemberSecurityUtils;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.ReqPayChannel;
 import tv.game88.pay.api.dto.ReqPayRecharge;
