@@ -1,4 +1,4 @@
-package tv.game88.core.admin.service.impl;
+package tv.game88.core.admin.security.service;
 
 import com.google.common.collect.Sets;
 import tv.game88.core.admin.entity.SysUser;
@@ -27,15 +27,16 @@ public class SysPermissionService {
      * 获取角色数据权限
      *
      * @param user 用户信息
+     *
      * @return 角色权限信息
      */
-    public Set<String> getRolePermission(SysUser user) {
+    public Set<String> getRolePermission( SysUser user ) {
         Set<String> roles = new HashSet<>();
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
-            roles.add("admin");
+        if ( user.isAdmin() ) {
+            roles.add( "admin" );
         } else {
-            roles.addAll(roleService.selectRolePermissionByUserId(user.getUserId()));
+            roles.addAll( roleService.selectRolePermissionByUserId( user.getUserId() ) );
         }
         return roles;
     }
@@ -44,14 +45,15 @@ public class SysPermissionService {
      * 获取菜单数据权限
      *
      * @param user 用户信息
+     *
      * @return 菜单权限信息
      */
-    public void getMenuPermission(SysUser user) {
+    public void getMenuPermission( SysUser user ) {
         // 管理员拥有所有权限
-        if (user.isAdmin()) {
-            user.setPermissions(Sets.newHashSet("*:*:*"));
+        if ( user.isAdmin() ) {
+            user.setPermissions( Sets.newHashSet( "*:*:*" ) );
         } else {
-            user.setPermissions(menuService.selectMenuPermsByUserId(user.getUserId()));
+            user.setPermissions( menuService.selectMenuPermsByUserId( user.getUserId() ) );
         }
     }
 }

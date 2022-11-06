@@ -9,7 +9,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.service.impl.TokenService;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.vo.LoginUser;
 import tv.game88.common.base.BaseController;
 import org.springframework.data.redis.core.Cursor;
@@ -36,7 +36,7 @@ public class SysUserOnlineController extends BaseController {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
-    private TokenService        tokenService;
+    private SysUserTokenService sysUserTokenService;
 
     @PreAuthorize( "@ss.hasPermi('monitor:online:list')" )
     @GetMapping( "/list" )
@@ -82,7 +82,7 @@ public class SysUserOnlineController extends BaseController {
     @Log( title = "强退用户", businessType = BusinessType.FORCE )
     @DeleteMapping( "/{userId}" )
     public RspBase<?> forceLogout( @PathVariable Long userId ) {
-        tokenService.delToken( userId );
+        sysUserTokenService.delToken( userId );
         return RspBase.ok();
     }
 }

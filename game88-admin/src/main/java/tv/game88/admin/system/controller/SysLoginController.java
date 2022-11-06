@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import tv.game88.admin.system.service.impl.SysLoginService;
+import tv.game88.admin.system.service.ISysLoginService;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RSACoder;
 import tv.game88.common.utils.StringUtils;
@@ -15,8 +15,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysMenu;
 import tv.game88.core.admin.entity.SysUser;
+import tv.game88.core.admin.security.service.SysPermissionService;
 import tv.game88.core.admin.service.ISysMenuService;
-import tv.game88.core.admin.service.impl.SysPermissionService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginBody;
 import tv.game88.core.admin.vo.LoginUser;
@@ -36,9 +36,9 @@ import java.util.Set;
 @RestController
 public class SysLoginController {
     @Resource
-    private SysLoginService      loginService;
+    private ISysLoginService sysLoginService;
     @Resource
-    private ISysMenuService      menuService;
+    private ISysMenuService  menuService;
     @Resource
     private SysPermissionService permissionService;
 
@@ -58,7 +58,7 @@ public class SysLoginController {
         LoginBody loginBody  = JsonUtil.json2Object( decryptStr, LoginBody.class );
         assert loginBody != null;
         // 生成令牌
-        return loginService.login( loginBody );
+        return sysLoginService.login( loginBody );
     }
 
     /**

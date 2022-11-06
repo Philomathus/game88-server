@@ -10,7 +10,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.factory.AsyncFactory;
 import tv.game88.core.admin.manager.AsyncManager;
-import tv.game88.core.admin.service.impl.TokenService;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.vo.LoginUser;
 
 import javax.annotation.Resource;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 	@Resource
-	private TokenService tokenService;
+	private SysUserTokenService sysUserTokenService;
 
 	/**
 	 * 退出处理
@@ -34,10 +34,10 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
 	 */
 	@Override
 	public void onLogoutSuccess( HttpServletRequest request, HttpServletResponse response, Authentication authentication ) {
-		LoginUser loginUser = tokenService.getLoginUser( request );
+		LoginUser loginUser = sysUserTokenService.getLoginUser( request );
 		if ( StringUtils.isNotNull( loginUser ) ) {
 			// 删除用户缓存记录
-			tokenService.delToken( loginUser.getUser().getUserId() );
+			sysUserTokenService.delToken( loginUser.getUser().getUserId() );
 			// 记录用户退出日志
 			AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginUser.getUsername(), AdminConstants.LOGOUT, "退出成功" ) );
 		}

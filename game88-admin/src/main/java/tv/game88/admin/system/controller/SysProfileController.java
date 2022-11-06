@@ -12,8 +12,8 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysUserService;
-import tv.game88.core.admin.service.impl.TokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
 
@@ -29,9 +29,9 @@ import java.util.Map;
 @RequestMapping( "/system/user/profile" )
 public class SysProfileController extends BaseController {
     @Resource
-    private ISysUserService userService;
+    private ISysUserService     userService;
     @Resource
-    private TokenService    tokenService;
+    private SysUserTokenService sysUserTokenService;
 
     /**
      * 个人信息
@@ -56,7 +56,7 @@ public class SysProfileController extends BaseController {
             // 更新缓存用户信息
             loginUser.getUser().setNickName( user.getNickName() );
             loginUser.getUser().setSex( user.getSex() );
-            tokenService.setLoginUser( loginUser );
+            sysUserTokenService.setLoginUser( loginUser );
             return RspBase.ok();
         }
         return RspBase.businessError( "修改个人信息异常，请联系管理员" );
@@ -90,7 +90,7 @@ public class SysProfileController extends BaseController {
         if ( userService.resetUserPwd( userName, SecurityUtils.encryptPassword( newPassword ) ) > 0 ) {
             // 更新缓存用户密码
             loginUser.getUser().setPassword( SecurityUtils.encryptPassword( newPassword ) );
-            tokenService.setLoginUser( loginUser );
+            sysUserTokenService.setLoginUser( loginUser );
             return RspBase.ok();
         }
         return RspBase.businessError( "修改密码异常，请联系管理员" );

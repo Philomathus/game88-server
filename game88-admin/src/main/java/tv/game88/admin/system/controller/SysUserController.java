@@ -25,7 +25,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.mapper.SysUserMapper;
 import tv.game88.core.admin.service.ISysRoleService;
 import tv.game88.core.admin.service.ISysUserService;
-import tv.game88.core.admin.service.impl.TokenService;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
 
 import javax.annotation.Resource;
@@ -46,11 +46,11 @@ public class SysUserController extends BaseController {
     @Resource
     private ISysUserService userService;
     @Resource
-    private ISysRoleService roleService;
+    private ISysRoleService     roleService;
     @Resource
-    private TokenService    tokenService;
+    private SysUserTokenService sysUserTokenService;
     @Resource
-    private SysUserMapper   sysUserMapper;
+    private SysUserMapper       sysUserMapper;
     @Value( "${spring.profiles.active}" )
     private String          profile;
 
@@ -182,7 +182,7 @@ public class SysUserController extends BaseController {
         SysUser sysUser = new SysUser( userId );
         sysUser.setOtpSecret( null );
         sysUserMapper.updateOtpSecret( sysUser );
-        tokenService.delToken( userId );
+        sysUserTokenService.delToken( userId );
         return RspBase.ok();
     }
 

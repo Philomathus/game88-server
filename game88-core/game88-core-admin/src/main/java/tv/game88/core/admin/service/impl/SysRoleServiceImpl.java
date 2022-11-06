@@ -13,6 +13,7 @@ import tv.game88.core.admin.entity.SysUserRole;
 import tv.game88.core.admin.mapper.SysRoleMapper;
 import tv.game88.core.admin.mapper.SysRoleMenuMapper;
 import tv.game88.core.admin.mapper.SysUserRoleMapper;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysRoleService;
 
 import javax.annotation.Resource;
@@ -30,9 +31,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Resource
     private SysRoleMenuMapper roleMenuMapper;
     @Resource
-    private SysUserRoleMapper userRoleMapper;
+    private SysUserRoleMapper   userRoleMapper;
     @Resource
-    private TokenService      tokenService;
+    private SysUserTokenService sysUserTokenService;
 
     /**
      * 根据条件分页查询角色数据
@@ -253,7 +254,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         List<SysUserRole> sysUserRolesList = userRoleMapper.userRoleList( roleId );
         for ( SysUserRole user : sysUserRolesList ) {
             Long userId1 = user.getUserId();
-            tokenService.delToken( userId1 );
+            sysUserTokenService.delToken( userId1 );
         }
     }
 }

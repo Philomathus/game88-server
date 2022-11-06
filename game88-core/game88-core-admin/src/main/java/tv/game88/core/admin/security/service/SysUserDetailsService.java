@@ -1,4 +1,4 @@
-package tv.game88.core.admin.service.impl;
+package tv.game88.core.admin.security.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +21,7 @@ import javax.annotation.Resource;
  */
 @Log4j2
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class SysUserDetailsService implements UserDetailsService {
     @Resource
     private ISysUserService      userService;
     @Resource

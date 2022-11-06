@@ -5,7 +5,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import tv.game88.admin.system.service.ISysLoginService;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.constant.AdminConstants;
@@ -13,8 +14,8 @@ import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.factory.AsyncFactory;
 import tv.game88.core.admin.manager.AsyncManager;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysUserService;
-import tv.game88.core.admin.service.impl.TokenService;
 import tv.game88.core.admin.vo.LoginBody;
 import tv.game88.core.admin.vo.LoginUser;
 
@@ -27,10 +28,10 @@ import java.time.LocalDateTime;
  * @author MengJun
  */
 @Log4j2
-@Component
-public class SysLoginService {
+@Service
+public class SysLoginServiceImpl implements ISysLoginService {
     @Resource
-    private TokenService          tokenService;
+    private SysUserTokenService   sysUserTokenService;
     @Resource
     private AuthenticationManager authenticationManager;
     @Resource
@@ -102,7 +103,7 @@ public class SysLoginService {
         loginUser.setIpaddr( sysUser.getLoginIp() );
 
         // 生成token
-        String token = tokenService.createToken( loginUser );
+        String token = sysUserTokenService.createToken( loginUser );
         redisUtil.unLock( "systemLogin:" + loginBody.getUsername() );
         return RspBase.ok( "登录成功", token );
     }

@@ -1,4 +1,4 @@
-package tv.game88.core.admin.service.impl;
+package tv.game88.core.admin.security.service;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Log4j2
 @Component
-public class TokenService {
+public class SysUserTokenService {
 
     // 令牌自定义标识
     @Value( "${token.header}" )
@@ -48,7 +48,7 @@ public class TokenService {
 
     @Value( "${token.secret}" )
     private void setKeySecret( String secret ) {
-        TokenService.KEY_SECRET = Keys.hmacShaKeyFor( secret.getBytes( StandardCharsets.UTF_8 ) );
+        SysUserTokenService.KEY_SECRET = Keys.hmacShaKeyFor( secret.getBytes( StandardCharsets.UTF_8 ) );
     }
 
     public static void main( String[] args ) throws Exception {

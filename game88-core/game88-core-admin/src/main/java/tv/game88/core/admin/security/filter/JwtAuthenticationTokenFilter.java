@@ -1,7 +1,7 @@
 package tv.game88.core.admin.security.filter;
 
 import tv.game88.common.utils.StringUtils;
-import tv.game88.core.admin.service.impl.TokenService;
+import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,14 +25,14 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	@Resource
-	private TokenService tokenService;
+	private SysUserTokenService sysUserTokenService;
 
 	@Override
 	protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain chain )
 			throws ServletException, IOException {
-		LoginUser loginUser = tokenService.getLoginUser( request );
+		LoginUser loginUser = sysUserTokenService.getLoginUser( request );
 		if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( SecurityUtils.getAuthentication() ) ) {
-			tokenService.refreshToken( loginUser );
+			sysUserTokenService.refreshToken( loginUser );
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
 					loginUser.getAuthorities() );
 			authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );
