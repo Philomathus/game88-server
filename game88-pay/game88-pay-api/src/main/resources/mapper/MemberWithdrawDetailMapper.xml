@@ -261,6 +261,6 @@
     </select>
 
     <select id="totalWithdrawMoney" resultType="java.math.BigDecimal">
-        SELECT IFNULL(SUM(withdraw_money),0) FROM member_withdraw_detail where withdraw_id = #{memberId}
+        SELECT IFNULL(SUM(withdraw_money),0) FROM member_withdraw_detail where withdraw_id = #{memberId} and status in (3,6)
     </select>
 </mapper>
