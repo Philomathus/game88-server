@@ -30,7 +30,9 @@ public class RecommendServiceImpl implements RecommendService {
     @Override
     public void recommendProcess( MemberInfo memberInfo, BigDecimal rechargeMoney ) {
         if ( StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
-            Map<Integer, ConfigRecommend> billMap = configRecommendMapper.selectList( null ).stream()
+            Map<Integer, ConfigRecommend> billMap = configRecommendMapper
+                    .selectList( null )
+                    .stream()
                     .collect( Collectors.toMap( ConfigRecommend::getLevel, Function.identity() ) );
 
             MemberInfo rd1 = memberInfoMapper.findRecommendByInviterCode( memberInfo.getInviterCode() );
@@ -49,19 +51,19 @@ public class RecommendServiceImpl implements RecommendService {
 
     private void saveRecommend( BigDecimal rechargeMoney, Map<Integer, ConfigRecommend> billMap, int key, MemberInfo memberInfo
             , MemberInfo rd ) {
-        MemberRecommend recommendUserLog = new MemberRecommend();
-        BigDecimal      commission       = rechargeMoney.multiply( billMap.get( key ).getBill() );
-        recommendUserLog.setId( IdWorker.get32UUID() );
-        recommendUserLog.setCreateTime( LocalDateTime.now() );
-        recommendUserLog.setMemberId( memberInfo.getId() );
-        recommendUserLog.setMemberName( memberInfo.getNickName() );
-        recommendUserLog.setCommission( commission );
-        recommendUserLog.setStatus( 0 );
-        recommendUserLog.setCode( memberInfo.getId() );
-        recommendUserLog.setOrderMoney( rechargeMoney );
-        recommendUserLog.setLevel( key );
-        recommendUserLog.setInviterId( rd.getId() );
-        recommendUserLog.setInviter( rd.getNickName() );
-        memberRecommendMapper.insert( recommendUserLog );
+        MemberRecommend memberRecommend = new MemberRecommend();
+        BigDecimal      commission      = rechargeMoney.multiply( billMap.get( key ).getBill() );
+        memberRecommend.setId( IdWorker.get32UUID() );
+        memberRecommend.setCreateTime( LocalDateTime.now() );
+        memberRecommend.setMemberId( memberInfo.getId() );
+        memberRecommend.setMemberName( memberInfo.getNickName() );
+        memberRecommend.setCommission( commission );
+        memberRecommend.setStatus( 0 );
+        memberRecommend.setCode( memberInfo.getId() );
+        memberRecommend.setOrderMoney( rechargeMoney );
+        memberRecommend.setLevel( key );
+        memberRecommend.setInviterId( rd.getId() );
+        memberRecommend.setInviter( rd.getNickName() );
+        memberRecommendMapper.insert( memberRecommend );
     }
 }

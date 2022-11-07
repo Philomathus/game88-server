@@ -6,6 +6,7 @@ import tv.game88.pay.api.dto.ReqMemberRechargeBank;
 import tv.game88.pay.api.dto.RspRechargeBankReport;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,6 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
     Map selectReportListCount( @Param( "req" ) ReqMemberRechargeBank req );
 
     int countRechargeDaySucess( @Param( "memberId" ) String memberId );
+
+    BigDecimal totalRechargeAll( @Param( "memberId" ) String memberId );
 }

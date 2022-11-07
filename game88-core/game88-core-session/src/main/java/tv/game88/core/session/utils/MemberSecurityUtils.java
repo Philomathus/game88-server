@@ -15,6 +15,9 @@ import tv.game88.core.session.vo.MemberLoginUser;
  */
 @Log4j2
 public class MemberSecurityUtils {
+
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
     /**
      * 获取用户ID
      **/
@@ -52,8 +55,7 @@ public class MemberSecurityUtils {
      * @return 加密字符串
      */
     public static String encryptPassword( String password ) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode( password );
+        return bCryptPasswordEncoder.encode( password );
     }
 
     /**
@@ -65,7 +67,6 @@ public class MemberSecurityUtils {
      * @return 结果
      */
     public static boolean matchesPassword( String rawPassword, String encodedPassword ) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.matches( rawPassword, encodedPassword );
+        return bCryptPasswordEncoder.matches( rawPassword, encodedPassword );
     }
 }

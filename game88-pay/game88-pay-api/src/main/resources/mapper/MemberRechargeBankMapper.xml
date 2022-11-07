@@ -112,4 +112,14 @@
     <select id="countRechargeDaySucess" resultType="int">
         select COUNT(1) from member_recharge_bank where  date(update_time) = curdate() and  member_id = #{memberId} and status = 3;
     </select>
+
+    <select id="totalRechargeAll" resultType="java.math.BigDecimal">
+        select sum(a.money) from(
+            select IFNULL(SUM(recharge_money),0) money from member_recharge_bank where `status` = 3 and member_id = #{memberId}
+            union all
+            select IFNULL(SUM(money),0) money from member_recharge_online  where `status` = 1 and member_id = #{memberId}
+            union all
+            select IFNULL(SUM(recharge_money),0) money from member_recharge_usdt where `status` = 3 and member_id = #{memberId}
+        ) a
+    </select>
 </mapper>

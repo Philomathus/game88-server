@@ -1,39 +1,35 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.ServletUtil;
-import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
+import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
+import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.pay.api.base.BasePayAgent;
 import tv.game88.pay.api.base.PayAgentProcessorFactoryUtil;
 import tv.game88.pay.api.dto.*;
-import tv.game88.pay.api.entity.MemberWithdrawDetail;
-import tv.game88.pay.api.entity.PayAgentChannel;
-import tv.game88.pay.api.entity.PayAgentLog;
-import tv.game88.pay.api.entity.PayAgentPlatform;
-import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
-import tv.game88.pay.api.mapper.PayAgentChannelMapper;
-import tv.game88.pay.api.mapper.PayAgentLogMapper;
-import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
+import tv.game88.pay.api.entity.*;
+import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -51,29 +47,39 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     @Resource
     private MemberMoneyManager           memberMoneyManager;
     @Resource
+    private MemberCardMapper             memberCardMapper;
+    @Resource
+    private MemberRechargeBankMapper     memberRechargeBankMapper;
+    @Resource
     private ConfigEnvCacheUtil           configEnvCacheUtil;
     @Resource
     private RedisUtils                   redisUtils;
     @Resource
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
 
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
     @Override
-    public RspMemberWithdrawDetailInfo getRspWithdrawDetail( MemberInfo memberInfo ) {
+    public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
+        MemberInfo memberInfo = memberInfoMapper.selectById( memberId );
+        return this.getRspWithdrawDetail( memberInfo.getCodeWill(), memberInfo.getCodeNow(), memberInfo.getAccountNow() );
+    }
+
+    private RspMemberWithdrawDetailInfo getRspWithdrawDetail( BigDecimal codeWill, BigDecimal codeNow, BigDecimal accountNow ) {
         //未打码金额 = 需求打码 - 累计有效打码
-        BigDecimal noClean = memberInfo.getCodeWill().subtract( memberInfo.getCodeNow() );
+        BigDecimal noClean = codeWill.subtract( codeNow );
         if ( noClean.compareTo( BigDecimal.ZERO ) < 0 ) {
             noClean = BigDecimal.ZERO;
         }
-        BigDecimal nowTotal = memberInfo.getAccountNow();
         //可提现金额 = 账户余额 - 未打码金额
-        BigDecimal canWithdrawMoney = nowTotal.subtract( noClean );
+        BigDecimal canWithdrawMoney = accountNow.subtract( noClean );
         if ( canWithdrawMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             canWithdrawMoney = BigDecimal.ZERO;
         }
         RspMemberWithdrawDetailInfo rsp = new RspMemberWithdrawDetailInfo();
         rsp.setNeedBeat( noClean );
         rsp.setCanWithdrawMoney( canWithdrawMoney );
-        rsp.setAccountNow( nowTotal );
+        rsp.setAccountNow( accountNow );
         return rsp;
     }
 
@@ -87,7 +93,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             String multipleCode = configEnvCacheUtil.getConf( "multiple_code" );
             for ( MemberWithdrawDetail me : withdrawDetails ) {
                 //入款人姓名不为空，并且入款人不包含提现人，整条数据标红警告
-                if ( Strings.isNotBlank( me.getRechargeUserName() ) && !me.getRechargeUserName()
+                if ( Strings.isNotBlank( me.getRechargeUserName() ) && !me
+                        .getRechargeUserName()
                         .contains( me.getBankUserName() ) ) {
                     me.setRechargeUserNameStatus( 1 );//等于1,数据警告
                 } else {
@@ -96,7 +103,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 memberIds.add( me.getWithdrawId() );
                 me.setMultipleCode( multipleCode );
             }
-            List<MemberInfo> memberInfoList = memberInfoMapper.selectList( new QueryWrapper<MemberInfo>().in( "id", memberIds )
+            List<MemberInfo> memberInfoList = memberInfoMapper.selectList( new QueryWrapper<MemberInfo>()
+                    .in( "id", memberIds )
                     .select( "id", "status", "register_time" ) );
             LocalDateTime date = LocalDateTime.now().minusHours( 48 );
             for ( MemberWithdrawDetail me : withdrawDetails ) {
@@ -173,7 +181,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
         RspWithdrawReport withdrawReportc = new RspWithdrawReport();
         withdrawReportc.setClass_twoname( "用户类型" );
-        if ( StringUtils.hasText( rspMemberInfo1.getRegisterType() ) ) {
+        if ( StringUtils.isNotBlank( rspMemberInfo1.getRegisterType() ) ) {
             if ( "0".equals( rspMemberInfo1.getRegisterType() ) ) {
                 withdrawReportc.setT_value( "游客" );
             } else {
@@ -292,7 +300,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
 
 
-        if ( StringUtils.hasText( memberWithdrawLog.getOpName() ) && !userName.equals( memberWithdrawLog.getOpName() ) ) {
+        if ( StringUtils.isNotBlank( memberWithdrawLog.getOpName() ) && !userName.equals( memberWithdrawLog.getOpName() ) ) {
             return RspBase.businessError( "该订单只能由" + memberWithdrawLog.getOpName() + "处理" );
         }
         if ( !redisUtils.lock( "WithdrawDetailRefused" + memberWithdrawLog.getWithdrawId(), 5 ) ) {
@@ -347,7 +355,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             if ( withdrawDetail == null ) {
                 return RspBase.businessError( "订单不存在" );
             }
-            if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+            if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
                 return RspBase.businessError(
                         "会员ID为" + withdrawDetail.getWithdrawId() + "该订单只能由" + withdrawDetail.getOpName() + "处理" );
             }
@@ -483,7 +491,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "审核流程非法" );
         }
 
-        if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+        if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
             return RspBase.businessError( "该订单只能由" + withdrawDetail.getOpName() + "处理" );
         }
 
@@ -515,7 +523,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 return RspBase.businessError( withdrawDetail.getWithdrawOrderNo() + "审核流程非法" );
             }
 
-            if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+            if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
                 return RspBase.businessError(
                         withdrawDetail.getWithdrawOrderNo() + "该订单只能由" + withdrawDetail.getOpName() + "处理" );
             }
@@ -545,7 +553,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
 
         if ( !contains ) {
-            if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+            if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
                 return RspBase.businessError( "该订单只能由" + withdrawDetail.getOpName() + "处理" );
             }
         }
@@ -586,7 +594,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "请勿重复提交" );
         }
 
-        if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+        if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
             return RspBase.businessError( "该订单已被" + withdrawDetail.getOpName() + "锁定" );
         }
         //判断是代付成功还是出款成功
@@ -642,7 +650,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "请勿重复提交" );
         }
 
-        if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+        if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
             return RspBase.businessError( "该订单已被" + withdrawDetail.getOpName() + "锁定" );
         }
 
@@ -679,7 +687,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "请勿重复提交" );
         }
 
-        if ( StringUtils.hasText( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+        if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
             return RspBase.businessError( "该订单已被" + withdrawDetail.getOpName() + "锁定" );
         }
 
@@ -695,6 +703,144 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
         redisUtils.unLock( "WithdrawDetailManualWithdrawal" + withdrawDetail.getWithdrawId() );
         return RspBase.businessError( "更新订单状态失败" );
+    }
+
+    @Override
+    public boolean memberWithdrawPassIsOpen( String memberId ) {
+
+        return false;
+    }
+
+    @Override
+    public RspBase<?> memberWithdrawPassSet( String memberId, ReqBoxPass boxPass ) {
+        return null;
+    }
+
+    @Override
+    public RspBase<?> withdrawBank( String memberId, ReqMemberCardWithdraw req ) {
+        MemberInfo memberInfo = memberInfoMapper.selectById( memberId );
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        // 1正常 4套利号 6投诉号 7审查号 : 可以提现 ; 2测试号 3超管号 5稀有号 : 不可以提现
+        if ( !Arrays.asList( 1, 4, 6, 7 ).contains( memberInfo.getStatus() ) ) {
+            return RspBase.businessError( "会员状态异常，不允许提现" );
+        }
+        if ( StringUtils.isBlank( memberInfo.getWithdrawalPass() ) ) {
+            return RspBase.businessError( "请设置提现密码!" );
+        }
+        if ( !bCryptPasswordEncoder.matches( req.getWithdrawalPass(), memberInfo.getWithdrawalPass() ) ) {
+            return RspBase.businessError( "提现密码错误，请联系客服!" );
+        }
+        if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
+            return RspBase.businessError( "请绑定手机号后提现" );
+        }
+        BigDecimal minimumWithdrawalAmount = configEnvCacheUtil.getConfBd( "minimum_withdrawal_amount" );
+        if ( req.getWithdrawMoney().compareTo( minimumWithdrawalAmount ) < 0 ) {
+            return RspBase.businessError( "提现金额必须大于" + minimumWithdrawalAmount );
+        }
+        if ( memberInfo.getAccountNow().compareTo( req.getWithdrawMoney() ) < 0 ) {
+            return RspBase.businessError( "账户余额不足" );
+        }
+        RspMemberWithdrawDetailInfo withdrawDetailInfo = this.getRspWithdrawDetail( memberInfo.getCodeWill(),
+                memberInfo.getCodeNow(), memberInfo.getAccountNow() );
+        if ( req.getWithdrawMoney().compareTo( withdrawDetailInfo.getCanWithdrawMoney() ) > 0 ) {
+            return RspBase.businessError( "未完成打码，超出可提现金额限制" );
+        }
+        if ( req.getWithdrawMoney().remainder( BigDecimal.ONE ).compareTo( BigDecimal.ZERO ) != 0 ) {
+            return RspBase.businessError( "提现金额必须整数" );
+        }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = now
+                .withHour( configEnvCacheUtil.getConfInt( "withdraw_limit_start_hour" ) )
+                .withMinute( configEnvCacheUtil.getConfInt( "withdraw_limit_start_minute" ) )
+                .withSecond( 0 )
+                .withNano( 0 );
+        LocalDateTime endTime = now.withHour( 23 ).withMinute( 59 ).withSecond( 59 ).withNano( 999999999 );
+
+        BigDecimal withdrawLimitMoney = configEnvCacheUtil.getConfBd( "withdraw_limit_money" );
+        if ( req.getWithdrawMoney().compareTo( withdrawLimitMoney ) < 0 && startTime.compareTo( now ) <= 0
+                && endTime.compareTo( now ) >= 0 ) {
+            return RspBase.businessError( configEnvCacheUtil.getConf( "withdraw_limit_msg" ) );
+        }
+        //每日提现次数
+        int withdraw_times = configEnvCacheUtil.getConfInt( "withdraw_times_day" );
+        if ( withdraw_times > 0 ) {
+            long times = this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
+                    .eq( "withdraw_id", memberId )
+                    .ge( "create_time", LocalDateTimeUtils.getStartOfToday() )
+                    .in( "status", 3, 6 )
+                    .eq( "withdraw_money", req.getWithdrawMoney() ) );
+            if ( times >= withdraw_times ) {
+                return RspBase.businessError( "今日提现次数超过限制，请您改日申请提现" );
+            }
+        }
+        MemberCard memberCard = memberCardMapper.selectById( req.getMemberCardId() );
+        if ( memberCard == null ) {
+            return RspBase.businessError( "提现银行卡不存在" );
+        }
+        String withdrawOrderNo = SpringUtils
+                .getBean( MemberWithdrawDetailService.class )
+                .withdrawBank( memberInfo, req.getWithdrawMoney(), memberCard );
+        MemberWithdrawDetail update = new MemberWithdrawDetail();
+        update.setWithdrawOrderNo( withdrawOrderNo );
+        //出款金额汇总
+        BigDecimal withdrawMoney = this.baseMapper.totalWithdrawMoney( memberId );
+        //入款:银行卡入款/线上充值/USDT充值
+        BigDecimal recharge = memberRechargeBankMapper.totalRechargeAll( memberId );
+        if ( recharge.compareTo( BigDecimal.ZERO ) > 0 && withdrawMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
+            update.setRechargeWithdrawRate( recharge.divide( withdrawLimitMoney, 2, RoundingMode.HALF_UP ) );
+        } else {
+            update.setRechargeWithdrawRate( BigDecimal.ZERO );
+        }
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok( "提现申请请求成功，请耐心等待" ) : RspBase.businessError( "提现申请请求失败" );
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    public String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard ) {
+        MemberWithdrawDetail memberWithdrawDetail = new MemberWithdrawDetail();
+        memberWithdrawDetail.setWithdrawOrderNo( GenerateOrderCacheUtils.me.getOrderId( "TX", 3 ) );
+        memberWithdrawDetail.setWithdrawId( memberInfo.getId() );
+        memberWithdrawDetail.setWithdrawMoney( withdrawMoney );
+        memberWithdrawDetail.setBankId( memberCard.getBankId() );
+        memberWithdrawDetail.setBankAccount( memberCard.getBankAccount() );
+        memberWithdrawDetail.setBankAddress( memberCard.getBankAddress() );
+        memberWithdrawDetail.setBankUserName( memberCard.getRealName() );
+        memberWithdrawDetail.setRealBankAddress( memberCard.getRealBankAddress() );
+        memberWithdrawDetail.setStatus( 0 );
+        memberWithdrawDetail.setFirst( this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
+                .eq( "withdraw_id", memberInfo.getId() )
+                .in( "status", 3, 6 ) ) <= 0 );
+
+        memberWithdrawDetail.setBankRechargeNum( new QueryChainWrapper<>( memberRechargeBankMapper )
+                .eq( "member_id", memberInfo.getId() )
+                .eq( "status", 3 )
+                .ge( "create_time", LocalDateTimeUtils.getStartOfToday() )
+                .count() );
+        List<MemberRechargeBank> memberRechargeBanks = new QueryChainWrapper<>( memberRechargeBankMapper )
+                .eq( "member_id", memberInfo.getId() )
+                .eq( "status", 3 )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .select( "recharge_real_name" )
+                .list();
+        List<String> rechargeRealNames = memberRechargeBanks
+                .stream()
+                .map( MemberRechargeBank::getRechargeRealName )
+                .distinct()
+                .toList();
+        memberWithdrawDetail.setRechargeUserName( StringUtils.join( rechargeRealNames.toArray(), "," ) );
+        BigDecimal code_total   = memberInfo.getCodeTotal();//累计有效投注
+        BigDecimal code_account = memberInfo.getCodeNow();//打码账户
+        if ( code_account != null && code_account.compareTo( BigDecimal.ZERO ) > 0 ) {
+            memberWithdrawDetail.setRechargeBcodeRate( code_total.divide( code_account, 2, RoundingMode.HALF_UP ) );
+        } else {
+            memberWithdrawDetail.setRechargeBcodeRate( BigDecimal.ZERO );
+        }
+        this.baseMapper.insert( memberWithdrawDetail );
+        memberMoneyManager.reduceMoney( memberInfo.getId(), withdrawMoney, EnumMoney.WITHDRAW,
+                memberCard.getRealName() + memberCard.getBankAccount() );
+        return memberWithdrawDetail.getWithdrawOrderNo();
     }
 }
 

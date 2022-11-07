@@ -9,8 +9,6 @@ public class PlatformUser {
     private String  id;
     @Schema( title = "会员昵称" )
     private String  nickName;
-    @Schema( title = "登录密码" )
-    private String  password;
     @Schema( title = "会员头像" )
     private String  headImg;
     @Schema( title = "会员vip" )

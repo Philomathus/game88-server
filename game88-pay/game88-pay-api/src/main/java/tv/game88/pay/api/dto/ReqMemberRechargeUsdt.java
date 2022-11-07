@@ -19,7 +19,7 @@ public class ReqMemberRechargeUsdt {
     private String transactionId;
     @Schema( title = "充值数量", required = true )
     @NotNull(message = "请输入充值USDT数量")
-    private Integer rechargeNumber;
+    private Long rechargeNumber;
 
     @Schema( hidden = true )
     private String        memberId;

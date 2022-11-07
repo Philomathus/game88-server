@@ -67,7 +67,7 @@ public class MemberLoginUser implements UserDetails {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public String getPassword() {
-        return platformUser.getPassword();
+        return null;
     }
 
     @Override

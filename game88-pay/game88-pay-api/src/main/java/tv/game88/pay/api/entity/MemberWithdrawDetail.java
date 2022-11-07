@@ -46,7 +46,7 @@ public class MemberWithdrawDetail {
     @Excel( name = "入款出款比", orderNum = "13" )
     private BigDecimal rechargeWithdrawRate;
     @Excel( name = "公司入款成功次数", orderNum = "14" )
-    private Integer    bankRechargeNum;
+    private Long       bankRechargeNum;
     @Excel( name = "真实银行卡地址(省/市)", orderNum = "15" )
     private String     realBankAddress;
     @Excel( name = "公司入款人姓名", orderNum = "16" )

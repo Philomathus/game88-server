@@ -259,4 +259,8 @@
     <select id="selectMemberInfoWithdrawByIdz" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
         SELECT IFNULL(SUM(recharge_money),0) usdtrechargemoney from member_recharge_usdt where status = '3' and member_id = #{userid}
     </select>
+
+    <select id="totalWithdrawMoney" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(withdraw_money),0) FROM member_withdraw_detail where withdraw_id = #{memberId}
+    </select>
 </mapper>

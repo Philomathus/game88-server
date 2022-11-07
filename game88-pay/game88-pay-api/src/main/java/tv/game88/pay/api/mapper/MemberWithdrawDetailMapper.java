@@ -7,6 +7,7 @@ import tv.game88.pay.api.dto.RspMemberInfoWithdraw;
 import tv.game88.pay.api.dto.RspMemberWithdrawDetailShunWei;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +33,5 @@ public interface MemberWithdrawDetailMapper extends BaseMapper<MemberWithdrawDet
     List<RspMemberInfoWithdraw> selectMemberInfoWithdrawByIdl(@Param("userid") String id, @Param("tableLast") String tableLast);
     RspMemberInfoWithdraw selectMemberInfoWithdrawByIdz(@Param("userid") String id, @Param("tableLast") String tableLast);
 
+    BigDecimal totalWithdrawMoney( String memberId );
 }

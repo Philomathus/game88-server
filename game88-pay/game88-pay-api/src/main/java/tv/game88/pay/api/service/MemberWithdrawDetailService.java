@@ -2,18 +2,17 @@ package tv.game88.pay.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.pay.api.dto.ReqMemberWithdrawDetail;
-import tv.game88.pay.api.dto.RspMemberWithdrawDetailShunWei;
-import tv.game88.pay.api.dto.RspMemberWithdrawDetailInfo;
-import tv.game88.pay.api.dto.RspWithdrawReport;
+import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 public interface MemberWithdrawDetailService extends IService<MemberWithdrawDetail> {
-    RspMemberWithdrawDetailInfo getRspWithdrawDetail( MemberInfo memberInfo );
+    RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId );
 
     List<MemberWithdrawDetail> selectMemberWithdrawDetailList( ReqMemberWithdrawDetail reqMemberWithdrawDetail );
 
@@ -50,4 +49,12 @@ public interface MemberWithdrawDetailService extends IService<MemberWithdrawDeta
     RspBase<?> abnormalWithdrawal( ReqMemberWithdrawDetail req, String userName );
 
     RspBase<?> manualWithdrawal( ReqMemberWithdrawDetail req, String userName );
+
+    boolean memberWithdrawPassIsOpen( String userId );
+
+    RspBase<?> memberWithdrawPassSet( String userId, ReqBoxPass boxPass );
+
+    RspBase<?> withdrawBank( String userId, ReqMemberCardWithdraw req );
+
+    String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard );
 }

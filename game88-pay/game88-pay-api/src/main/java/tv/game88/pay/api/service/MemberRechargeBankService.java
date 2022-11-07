@@ -1,6 +1,7 @@
 package tv.game88.pay.api.service;
 
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -31,6 +32,6 @@ public interface MemberRechargeBankService extends IService<MemberRechargeBank> 
 
     RspBase<?> recoverAudit( ReqMemberRechargeBank req, String userName );
 
-    RspBase<?> bankCardRecharge( String memberId, ReqMemberCardRecharge req );
+    RspBase<?> bankCardRecharge( PlatformUser platformUser, ReqMemberCardRecharge req );
 }
 

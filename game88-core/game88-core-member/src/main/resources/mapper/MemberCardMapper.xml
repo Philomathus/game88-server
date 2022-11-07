@@ -58,7 +58,7 @@
         </where>
     </select>
 
-    <select id="selectMemberCard" resultType="tv.game88.core.member.entity.MemberCard">
+    <select id="selectMemberCard" resultMap="MemberCardResult">
         <include refid="selectMemberCardVo" />
         where member_id = #{memberId}
     </select>

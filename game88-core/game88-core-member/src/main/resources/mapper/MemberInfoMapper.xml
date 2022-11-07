@@ -227,7 +227,10 @@
 
 
 	<select id="getUserBalance" resultType="java.math.BigDecimal">
-		select account_now from member_info where id = #{userId}
+		select account_now from member_info where id = #{memberId}
+	</select>
+	<select id="getUserCharge" resultType="java.math.BigDecimal">
+		select account_charge from member_info where id = #{memberId}
 	</select>
 
 	<update id="subMoney">
@@ -373,7 +376,7 @@
 		where id = #{inviterCode}
 	</select>
 	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
-		select id,password,nick_name,status,vip,register_type,head_img where id = #{userId}
+		select id,nick_name,status,vip,register_type,head_img where id = #{userId}
 	</select>
 	<select id="funGetaddressProvinces" resultType="java.lang.String">
 		select fun_getaddress_provinces(#{ip})

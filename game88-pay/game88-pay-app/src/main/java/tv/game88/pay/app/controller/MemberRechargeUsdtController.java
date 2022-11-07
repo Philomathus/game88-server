@@ -39,7 +39,7 @@ public class MemberRechargeUsdtController {
     @Operation( summary = "USDT充值" )
     @PostMapping( "/usdtRecharge" )
     public RspBase<?> usdtRecharge( @Validated @RequestBody ReqMemberRechargeUsdt req ) {
-        String memberId = MemberSecurityUtils.getUserId();
-        return memberRechargeUsdtService.usdtRecharge( memberId, req );
+        PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
+        return memberRechargeUsdtService.usdtRecharge( platformUser, req );
     }
 }

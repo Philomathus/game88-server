@@ -3,6 +3,7 @@ package tv.game88.pay.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.ReqMemberRechargeUsdt;
 import tv.game88.pay.api.entity.MemberRechargeUsdt;
 
@@ -26,6 +27,6 @@ public interface MemberRechargeUsdtService extends IService<MemberRechargeUsdt> 
     public void updateMemberRechargeUsdtLogic( MemberInfo memberInfo, MemberRechargeUsdt update, BigDecimal rechargeMoney,
                                                   BigDecimal discountBill );
 
-    RspBase<?> usdtRecharge( String memberId, ReqMemberRechargeUsdt req );
+    RspBase<?> usdtRecharge( PlatformUser platformUser, ReqMemberRechargeUsdt req );
 }
 

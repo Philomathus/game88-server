@@ -1,5 +1,7 @@
 package tv.game88.core.config.cache;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import lombok.extern.log4j.Log4j2;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -21,7 +24,16 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class ConfigEnvCacheUtil {
-    private static final String SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
+    private static final String                SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
+    // 最大容量 maximumSize
+    // 缓存过期时长 expireAfterWrite
+    // 设置并发级别为cpu核心数 concurrencyLevel
+    private static final Cache<String, String> LOCAL_CACHE    = CacheBuilder
+            .newBuilder()
+            .maximumSize( Integer.MAX_VALUE )
+            .expireAfterWrite( 2, TimeUnit.SECONDS )
+            .concurrencyLevel( Runtime.getRuntime().availableProcessors() * 2 )
+            .build();
 
     @Resource
     private RedisUtils              redisUtil;
@@ -29,8 +41,8 @@ public class ConfigEnvCacheUtil {
     private ConfigEnvironmentMapper configEnvironmentMapper;
 
     public String dynamicValue( String value ) {
-        if ( value.contains( "${" ) && value.contains( "}" ) ) {
-            String param  = value.substring( value.indexOf( "${" ) + 2, value.indexOf( "}" ) );
+        if ( value != null && value.contains( "${" ) && value.contains( "}" ) ) {
+            String param      = value.substring( value.indexOf( "${" ) + 2, value.indexOf( "}" ) );
             String paramValue = this.getConf( param );
             if ( StringUtils.isNotBlank( paramValue ) ) {
                 return value.replace( "${" + param + "}", paramValue );
@@ -41,7 +53,7 @@ public class ConfigEnvCacheUtil {
 
     public List<String> getConf( List<Object> codes ) {
         Boolean exists = redisUtil.exists( SYS_CONFIG_KEY );
-        if (exists == null || !exists) {
+        if ( exists == null || !exists ) {
             this.refreshConfCache();
         }
         List<Object> objects    = redisUtil.hMGet( SYS_CONFIG_KEY, codes );
@@ -54,12 +66,22 @@ public class ConfigEnvCacheUtil {
     }
 
     public String getConf( String code, String defaultValue ) {
-        Boolean exists = redisUtil.exists( SYS_CONFIG_KEY );
-        if (exists == null || !exists) {
-            this.refreshConfCache();
+        String cacheValue = LOCAL_CACHE.getIfPresent( code );
+        if ( StringUtils.isBlank( cacheValue ) ) {
+            Boolean exists = redisUtil.exists( SYS_CONFIG_KEY );
+            if ( exists == null || !exists ) {
+                this.refreshConfCache();
+            }
+            Object value = redisUtil.hGet( SYS_CONFIG_KEY, code );
+            if ( value == null ) {
+                return defaultValue;
+            }
+            LOCAL_CACHE.put( code, value.toString() );
+            return this.dynamicValue( LOCAL_CACHE.getIfPresent( code ) );
         }
-        Object value = redisUtil.hGet( SYS_CONFIG_KEY, code );
-        return value != null ? this.dynamicValue( value.toString() ) : defaultValue;
+        return cacheValue;
+
+
     }
 
     public String getConf( String code ) {
@@ -100,8 +122,10 @@ public class ConfigEnvCacheUtil {
         query.setEnvStatus( 1 );
         List<ConfigEnvironment> configEnvironments = configEnvironmentMapper.selectConfigEnvironmentList( query );
 
-        Map<String, String> map = configEnvironments.stream().collect( Collectors.toMap( ConfigEnvironment::getEnvCode, ( env ) ->
-                env.getEnvValue() == null ? "" : env.getEnvValue() ) );
+        Map<String, String> map = configEnvironments
+                .stream()
+                .collect( Collectors.toMap( ConfigEnvironment::getEnvCode, ( env ) ->
+                        env.getEnvValue() == null ? "" : env.getEnvValue() ) );
         redisUtil.unlink( SYS_CONFIG_KEY );
         redisUtil.hMSet( SYS_CONFIG_KEY, map );
     }

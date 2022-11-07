@@ -39,10 +39,13 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     /**
      * 获取用户余额
-     *
-     * @param pUserId
      */
-    BigDecimal getUserBalance( @Param( "userId" ) String pUserId );
+    BigDecimal getUserBalance( @Param( "memberId" ) String memberId );
+
+    /**
+     * 获取用户累计充值金额
+     */
+    BigDecimal getUserCharge( @Param( "memberId" ) String memberId );
 
     /**
      * @param userId   会员ID
@@ -86,20 +89,20 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     BigDecimal personalOnlineRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
             "memberId" ) String memberId );
 
-//    BigDecimal personalAgentRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
-//            "memberId" ) String memberId );
+    //    BigDecimal personalAgentRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
+    //            "memberId" ) String memberId );
 
     BigDecimal personalUsdtRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
             "memberId" ) String memberId );
 
-//    BigDecimal personalWithdrawRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
-//            "memberId" ) String memberId );
+    //    BigDecimal personalWithdrawRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
+    //            "memberId" ) String memberId );
 
     HashMap totalAccount( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
                           @Param( "memberId" ) String memberId );
 
-//    List<Map> personalGameData( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
-//                                @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
+    //    List<Map> personalGameData( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
+    //                                @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
 
     String selectMemberProvince( String memberId );
 }

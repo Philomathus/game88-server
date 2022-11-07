@@ -137,7 +137,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
     @Bean
     public AuthenticationManager authManager( HttpSecurity httpSecurity ) throws Exception {
         return httpSecurity.getSharedObject( AuthenticationManagerBuilder.class ).userDetailsService( userDetailsService )
-                           .passwordEncoder( bCryptPasswordEncoder() ).and().build();
+                           .passwordEncoder( new BCryptPasswordEncoder() ).and().build();
     }
 
     @Bean
@@ -145,13 +145,5 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowUrlEncodedDoubleSlash( true );
         return firewall;
-    }
-
-    /**
-     * 强散列哈希加密实现
-     */
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

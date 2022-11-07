@@ -19,6 +19,9 @@ import tv.game88.core.admin.vo.LoginUser;
  */
 @Log4j2
 public class SecurityUtils {
+
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
     /**
      * 获取用户账户
      **/
@@ -56,8 +59,7 @@ public class SecurityUtils {
      * @return 加密字符串
      */
     public static String encryptPassword( String password ) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode( password );
+        return bCryptPasswordEncoder.encode( password );
     }
 
     /**
@@ -69,12 +71,12 @@ public class SecurityUtils {
      */
     public static void verifyMFACode( int MFACode ) throws Exception {
         String otpSecret = getLoginUser().getUser().getOtpSecret();
-        if (StringUtils.isBlank( otpSecret )) {
+        if ( StringUtils.isBlank( otpSecret ) ) {
             throw new BusinessException( "请联系管理员绑定MFA验证秘钥" );
         }
         try {
             String otpSecretKey = RSACoder.decryptByPrivateKey( otpSecret, KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
-            if (!GoogleAuthUtil.verifyCode( otpSecretKey, MFACode )) {
+            if ( !GoogleAuthUtil.verifyCode( otpSecretKey, MFACode ) ) {
                 throw new BusinessException( "MFA验证码不正确，请检查" );
             }
         } catch ( Exception e ) {
@@ -92,8 +94,7 @@ public class SecurityUtils {
      * @return 结果
      */
     public static boolean matchesPassword( String rawPassword, String encodedPassword ) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.matches( rawPassword, encodedPassword );
+        return bCryptPasswordEncoder.matches( rawPassword, encodedPassword );
     }
 
     /**
