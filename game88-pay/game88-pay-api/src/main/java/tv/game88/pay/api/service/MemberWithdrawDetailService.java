@@ -6,6 +6,7 @@ import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
+import tv.game88.pay.api.type.WithdrawRechargeType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,11 +51,13 @@ public interface MemberWithdrawDetailService extends IService<MemberWithdrawDeta
 
     RspBase<?> manualWithdrawal( ReqMemberWithdrawDetail req, String userName );
 
-    boolean memberWithdrawPassIsOpen( String userId );
+    RspBase<?> memberWithdrawPassIsOpen( String userId );
 
     RspBase<?> memberWithdrawPassSet( String userId, ReqBoxPass boxPass );
 
     RspBase<?> withdrawBank( String userId, ReqMemberCardWithdraw req );
 
     String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard );
+
+    List<RspWithdrawRechargeDetail> withdrawRechargeDetail( String memberId, WithdrawRechargeType type );
 }

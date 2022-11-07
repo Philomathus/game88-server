@@ -26,6 +26,7 @@ import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.*;
 import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
+import tv.game88.pay.api.type.WithdrawRechargeType;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -706,14 +707,34 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     }
 
     @Override
-    public boolean memberWithdrawPassIsOpen( String memberId ) {
-
-        return false;
+    public RspBase<?> memberWithdrawPassIsOpen( String memberId ) {
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "id", "withdrawal_pass" )
+                .one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        return RspBase.ok( StringUtils.isNotBlank( memberInfo.getWithdrawalPass() ) );
     }
 
     @Override
     public RspBase<?> memberWithdrawPassSet( String memberId, ReqBoxPass boxPass ) {
-        return null;
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "id", "withdrawal_pass" )
+                .one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( StringUtils.isNotBlank( memberInfo.getWithdrawalPass() ) ) {
+            return RspBase.businessError( "提现已经设置过密码" );
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( memberId );
+        update.setWithdrawalPass( bCryptPasswordEncoder.encode( boxPass.getBoxPass() ) );
+        int i = memberInfoMapper.updateById( update );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "设置提现密码异常，请稍后再试" );
     }
 
     @Override
@@ -841,6 +862,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         memberMoneyManager.reduceMoney( memberInfo.getId(), withdrawMoney, EnumMoney.WITHDRAW,
                 memberCard.getRealName() + memberCard.getBankAccount() );
         return memberWithdrawDetail.getWithdrawOrderNo();
+    }
+
+    @Override
+    public List<RspWithdrawRechargeDetail> withdrawRechargeDetail( String memberId, WithdrawRechargeType type ) {
+        return null;
     }
 }
 

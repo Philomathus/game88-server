@@ -33,6 +33,7 @@ public class PageDomain {
     @Schema( hidden = true )
     private String isAsc = StringUtils.EMPTY;
 
+    @Schema( hidden = true )
     public String getOrderBy() {
         if ( StringUtils.isBlank( orderByColumn ) ) {
             return StringUtils.EMPTY;
