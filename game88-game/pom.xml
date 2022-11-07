@@ -14,4 +14,10 @@
 
     <name>Game88 Server Game Parent</name>
     <description>88棋牌服务-三方游戏以及自研游戏等服务</description>
+
+    <modules>
+        <module>game88-game-api</module>
+        <module>game88-game-admin</module>
+        <module>game88-game-app</module>
+    </modules>
 </project>
