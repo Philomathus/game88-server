@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import tv.game88.pay.api.dto.ReqMemberRechargeBank;
 import tv.game88.pay.api.dto.RspRechargeBankReport;
+import tv.game88.pay.api.dto.RspWithdrawRechargeDetail;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 
 import java.math.BigDecimal;
@@ -25,4 +26,6 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
     int countRechargeDaySucess( @Param( "memberId" ) String memberId );
 
     BigDecimal totalRechargeAll( @Param( "memberId" ) String memberId );
+
+    List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
 }

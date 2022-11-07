@@ -89,4 +89,18 @@
             and status = 3
         </where>
     </sql>
+
+    <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
+        select
+        w.recharge_money money,
+        w.recharge_order_no orderNo,
+        w.create_time requestTime,
+        w.chain_name bankName,
+        w.`status`,
+        w.remark
+        from member_recharge_usdt w
+        where w.member_id = #{memberId}
+        and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+        order by w.create_time desc
+    </select>
 </mapper>

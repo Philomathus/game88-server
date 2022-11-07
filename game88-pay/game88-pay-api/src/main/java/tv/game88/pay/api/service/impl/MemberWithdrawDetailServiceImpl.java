@@ -52,6 +52,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     @Resource
     private MemberRechargeBankMapper     memberRechargeBankMapper;
     @Resource
+    private MemberRechargeUsdtMapper     memberRechargeUsdtMapper;
+    @Resource
+    private MemberRechargeOnlineMapper   memberRechargeOnlineMapper;
+    @Resource
     private ConfigEnvCacheUtil           configEnvCacheUtil;
     @Resource
     private RedisUtils                   redisUtils;
@@ -866,7 +870,78 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public List<RspWithdrawRechargeDetail> withdrawRechargeDetail( String memberId, WithdrawRechargeType type ) {
-        return null;
+        List<RspWithdrawRechargeDetail> resultList = switch ( type ) {
+            case withdraw -> this.baseMapper.selectRspDetail( memberId );
+            case rechargeBank -> memberRechargeBankMapper.selectRspDetail( memberId );
+            case rechargeUsdt -> memberRechargeUsdtMapper.selectRspDetail( memberId );
+            case rechargeOnline -> memberRechargeOnlineMapper.selectRspDetail( memberId );
+        };
+        for ( RspWithdrawRechargeDetail detail : resultList ) {
+            switch ( type ) {
+            case withdraw -> this.setWithdrawColor( detail );
+            case rechargeBank, rechargeUsdt -> this.setRechargeBankColor( detail );
+            case rechargeOnline -> this.setRechargeOnlineColor( detail );
+            }
+        }
+        return resultList;
+    }
+
+    private void setRechargeOnlineColor( RspWithdrawRechargeDetail detail ) {
+        switch ( detail.getStatus() ) {
+        case -1 -> {
+            detail.setColor( "#FF2A4E" );
+            detail.setRemark( "申请入款" );
+        }
+        case 0 -> {
+            detail.setColor( "#FF0E0E" );
+            detail.setRemark( "入款失败" );
+        }
+        case 1 -> {
+            detail.setColor( "#12ED40" );
+            detail.setRemark( "入款成功" );
+        }
+        }
+    }
+
+    private void setRechargeBankColor( RspWithdrawRechargeDetail detail ) {
+        switch ( detail.getStatus() ) {
+        case 0, 1 -> {
+            detail.setColor( "#FF2A4E" );
+            detail.setRemark( "申请入款" );
+        }
+        case 2 -> {
+            detail.setColor( "#FF0E0E" );
+            if ( StringUtils.isBlank( detail.getRemark() ) ) {
+                detail.setRemark( "拒绝入款" );
+            } else {
+                detail.setRemark( "拒绝入款" + ":" + detail.getRemark() );
+            }
+        }
+        case 3 -> {
+            detail.setColor( "#12ED40" );
+            detail.setRemark( "入款成功" );
+        }
+        case 4 -> {
+            detail.setColor( "#FF0E0E" );
+            if ( StringUtils.isBlank( detail.getRemark() ) ) {
+                detail.setRemark( "入款失败" );
+            } else {
+                detail.setRemark( "入款失败" + ":" + detail.getRemark() );
+            }
+        }
+        }
+    }
+
+    private void setWithdrawColor( RspWithdrawRechargeDetail detail ) {
+        switch ( detail.getStatus() ) {
+        case 0, 1, 4, 8 -> detail.setRemark( "提现中" );
+        case 3, 6 -> detail.setRemark( "提现成功" );
+        case 7 -> detail.setRemark( "提现成功，请联系客服" );
+        case 2, 5 -> {
+            detail.setColor( "#FF0E0E" );
+            detail.setRemark( "提现失败" + ( detail.getStatus() == 2 ? ":" + detail.getRemark() : "" ) );
+        }
+        }
     }
 }
 

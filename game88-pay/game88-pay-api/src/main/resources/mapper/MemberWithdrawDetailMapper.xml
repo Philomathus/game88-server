@@ -263,4 +263,19 @@
     <select id="totalWithdrawMoney" resultType="java.math.BigDecimal">
         SELECT IFNULL(SUM(withdraw_money),0) FROM member_withdraw_detail where withdraw_id = #{memberId} and status in (3,6)
     </select>
+
+    <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
+        select
+        w.withdraw_money money,
+        w.withdraw_order_no orderNo,
+        w.create_time requestTime,
+        l.bank_name bankName,
+        w.`status`,
+        w.remark
+        from member_withdraw_detail w
+        left join config_bank_list l on l.id = w.bank_id
+        where w.withdraw_id = #{memberId}
+        and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+        order by w.create_time desc
+    </select>
 </mapper>

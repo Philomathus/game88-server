@@ -1,7 +1,9 @@
 package tv.game88.pay.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import tv.game88.pay.api.dto.ReqMemberRechargeUsdt;
+import tv.game88.pay.api.dto.RspWithdrawRechargeDetail;
 import tv.game88.pay.api.entity.MemberRechargeUsdt;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface MemberRechargeUsdtMapper extends BaseMapper<MemberRechargeUsdt>
     public List<MemberRechargeUsdt> selectMemberRechargeUsdtList( ReqMemberRechargeUsdt req );
 
     Map listCount( ReqMemberRechargeUsdt req );
+
+    List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
 }

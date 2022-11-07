@@ -122,4 +122,19 @@
             select IFNULL(SUM(recharge_money),0) money from member_recharge_usdt where `status` = 3 and member_id = #{memberId}
         ) a
     </select>
+
+    <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
+        select
+        w.recharge_money money,
+        w.recharge_order_no orderNo,
+        w.create_time requestTime,
+        l.bank_name bankName,
+        w.`status`,
+        w.remark
+        from member_recharge_bank w
+        left join config_bank_list l on l.id = w.bank_id
+        where w.member_id = #{memberId}
+        and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+        order by w.create_time desc
+    </select>
 </mapper>
