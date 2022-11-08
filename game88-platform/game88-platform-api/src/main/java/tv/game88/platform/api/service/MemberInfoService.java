@@ -2,6 +2,9 @@ package tv.game88.platform.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.dto.ReqLogMoney;
+import tv.game88.core.member.dto.RspCodeFlow;
+import tv.game88.core.member.dto.RspLogMoney;
 import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
@@ -47,4 +50,24 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<?> boxDish( String memberId );
 
     RspBase<?> updateVip( String memberId, Integer vip, String nickName );
+
+    RspBase<?> memberBoxPassIsOpen( String memberId );
+
+    RspBase<?> memberBoxPassSet( String memberId, ReqBoxPass boxPass );
+
+    RspBase<RspMoney> boxAccount( String memberId, ReqBoxPass boxPass );
+
+    RspBase<RspMoney> boxTransfer( String memberId, ReqBoxChange boxChange );
+
+    void updateSafeBox( MemberInfo memberInfo, BigDecimal addAccount, boolean flag );
+
+    RspBase<RspAccountMoney> getAccountNow( String memberId );
+
+    RspBase<RspMemberDetail> getAccountInfo( String memberId );
+
+    List<RspLogMoney> getFundDetails( String memberId, ReqLogMoney reqLogMoney );
+
+    List<RspConfigTradeType> getTradeTypes();
+
+    List<RspCodeFlow> getCodeFlowList( String memberId );
 }

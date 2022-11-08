@@ -196,10 +196,6 @@
 		select * from member_info_history where phone = #{phone} limit 1
 	</select>
 
-	<select id="findMemberByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
-		select * from member_info where phone = #{phone}
-	</select>
-
 	<select id="findMemberDetail" resultType="tv.game88.core.member.dto.RspMember">
 		select * from member_info where id = #{userId}
 	</select>

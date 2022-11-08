@@ -31,8 +31,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     MemberInfo findMemberHistoryByMobile( String mobile );
 
-    MemberInfo findMemberByMobile( String mobile );
-
     RspMember findMemberDetail( @Param( "userId" ) String userId );
 
     int reduceMoney( @Param( "userId" ) String pUserId, @Param( "money" ) BigDecimal money );

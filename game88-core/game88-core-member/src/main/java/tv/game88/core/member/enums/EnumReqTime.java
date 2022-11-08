@@ -1,5 +1,7 @@
 package tv.game88.core.member.enums;
 
+import tv.game88.common.utils.LocalDateTimeUtils;
+
 import java.time.LocalDate;
 
 public enum EnumReqTime {
@@ -27,23 +29,24 @@ public enum EnumReqTime {
     }
 
 
-    public  String getBeginDay(){
-        LocalDate l = LocalDate.now();
-        return switch ( this ) {
-            case today -> l.toString();
-            case yesterday -> l.plusDays( -1 ).toString();
-            case month -> l.plusMonths( -1 ).toString();
+    public  String getBeginDayTime(){
+        LocalDate localDate = LocalDate.now();
+        localDate =  switch ( this ) {
+            case today -> localDate;
+            case yesterday -> localDate.plusDays( -1 );
+            case month -> localDate.plusMonths( -1 );
         };
+        return LocalDateTimeUtils.format( localDate.atStartOfDay() );
     }
 
-    public  String getEndDay(){
-        LocalDate l = LocalDate.now();
-        return switch ( this ) {
-            case today, month -> l.toString();
-            case yesterday -> l
-                    .plusDays( -1 )
-                    .toString();
+    public  String getEndDayTime(){
+        LocalDate localDate = LocalDate.now();
+        localDate = switch ( this ) {
+            case today, month -> localDate;
+            case yesterday -> localDate
+                    .plusDays( -1 );
         };
+        return LocalDateTimeUtils.format( localDate.atTime( 23, 59, 59 ) );
     }
 
 

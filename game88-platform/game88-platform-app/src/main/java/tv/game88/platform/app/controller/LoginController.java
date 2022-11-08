@@ -3,10 +3,7 @@ package tv.game88.platform.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
@@ -23,6 +20,7 @@ import javax.annotation.Resource;
 @RestController
 @Tag( name = "登录和初始化接口" )
 @Log4j2
+@RequestMapping("/platform")
 public class LoginController {
     @Resource
     private MemberInfoService  memberInfoService;
@@ -39,9 +37,12 @@ public class LoginController {
     }
 
     @Operation( summary = "人工更新请求版本" )
-    @PostMapping( "/check-update" )
+    @PostMapping( "/checkUpdate" )
     public RspBase<RspManUpdateVersion> checkManUpdateVersion( @RequestHeader( "dev" ) Integer dev,
                                                                @RequestHeader( "version" ) String version ) {
+        if ( dev == null || StringUtils.isBlank( version ) ) {
+            return RspBase.businessError( "客户端版本较低" );
+        }
         return RspBase.ok( memberInfoService.checkManUpdateVersion( dev, version ) );
     }
 
@@ -59,7 +60,7 @@ public class LoginController {
     }
 
     @Operation( summary = "设备登录接口", description = "设备号登录,也称游客登录" )
-    @PostMapping( "/login-device" )
+    @PostMapping( "/loginDevice" )
     public RspBase<RspMember> loginDevice( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                            @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                            @RequestBody MobileLogin mobileLogin ) {
