@@ -119,7 +119,7 @@ public class MemberMoneyManager {
      * @param userId
      * @param reduceMoney
      */
-    public void logSafebox( String userId, BigDecimal reduceMoney, String mark, BigDecimal totalBefore, BigDecimal total ) {
+    public int logSafebox( String userId, BigDecimal reduceMoney, String mark, BigDecimal totalBefore, BigDecimal total ) {
         //日志
         LogMoney log = new LogMoney();
         log.setId( IdWorker.get32UUID() );
@@ -133,6 +133,6 @@ public class MemberMoneyManager {
         log.setTotalBefore( totalBefore );
         log.setTotal( total );
 
-        logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
+        return logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
     }
 }

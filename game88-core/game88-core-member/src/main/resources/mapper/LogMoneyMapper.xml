@@ -103,25 +103,22 @@
 
 	<select id="findLogMoneyList" resultType="tv.game88.core.member.dto.RspLogMoney">
 		select
-		lm.user_id,
-		lm.type,
-		lm.income,
-		lm.pay,
-		lm.total_before,
-		lm.total,
-		lm.create_time,
-	    ct.des
-		from log_money${dbNodes} lm
-		left join config_trade_type  ct
-		on lm.type=ct.type
-		where lm.user_id =  #{userId}
+		user_id,
+		type,
+		income,
+		pay,
+		total_before,
+		total,
+		create_time
+		from log_money${dbNodes}
+		where user_id =  #{userId}
 		<if test="req.enumMoney != null ">
-			and lm.type = #{req.enumMoney.type}
+			and type = #{req.enumMoney.type}
 		</if>
 		<if test="req.enumReqTime != null ">
-			and lm.create_time &gt;=  #{beginDay} and lm.create_time &lt;=  #{endDay}
+			and create_time &gt;=  #{beginDay} and create_time &lt;=  #{endDay}
 		</if>
-		order by lm.create_time desc
+		order by create_time desc
 	</select>
 
 	<select id="selectById" resultMap="LogMoneyResult" resultType="tv.game88.core.member.entity.LogMoney">

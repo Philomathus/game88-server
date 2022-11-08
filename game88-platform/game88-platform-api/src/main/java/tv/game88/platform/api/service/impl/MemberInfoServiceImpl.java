@@ -1,6 +1,7 @@
 package tv.game88.platform.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.ImmutableMap;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +24,9 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.core.member.dto.ReqLogMoney;
+import tv.game88.core.member.dto.RspCodeFlow;
+import tv.game88.core.member.dto.RspLogMoney;
 import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberCard;
@@ -40,6 +45,7 @@ import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -73,6 +79,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MemberMoneyManager    memberMoneyManager;
     @Resource
     private LogMoneyMapper        logMoneyMapper;
+
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public RspInit getLoginInit( Integer dev, String version ) {
@@ -134,7 +142,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "请输入登陆密码" );
         }
 
-        MemberInfo memberInfo = this.baseMapper.findMemberByMobile( mobileLogin.getMobile() );
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         MemberInfo oldm       = null;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
@@ -271,7 +279,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( !mobileLogin.getCode().equals( fcode ) ) {
             return RspBase.businessError( "验证码错误" );
         }
-        MemberInfo memberInfo = this.baseMapper.findMemberByMobile( mobileLogin.getMobile() );
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         MemberInfo oldm       = null;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
@@ -587,7 +595,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } ).filter( Objects::nonNull ).collect( Collectors.toSet() );
         resultSet.add( ImmutableMap.of( "memberId", memberId ) );
 
-        Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
+        Map<String, Object> resultMap = resultSet
+                .stream()
+                .map( Map::entrySet )
+                .flatMap( Set::stream )
                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
         //        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
@@ -611,10 +622,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         BigDecimal totalNow = totalAccount.add( boxAccount );
         String     name     = "保险箱存入:" + boxAccount.negate() + "现保险箱余额:0";
 
-        memberMoneyManager.logSafebox( memberId, boxAccount.negate(), name, totalAccount, totalNow );
-
-        int i = this.baseMapper.boxDish( memberId );
-        if ( i <= 0 ) {
+        int i = memberMoneyManager.logSafebox( memberId, boxAccount.negate(), name, totalAccount, totalNow );
+        int j = this.baseMapper.boxDish( memberId );
+        if ( i <= 0 || j <= 0 ) {
             throw new BusinessException( "保险箱余额提出失败" );
         }
         return RspBase.ok();
@@ -642,7 +652,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( StringUtils.isNotBlank( token ) ) {
                 Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
                 if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
-                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
+                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
+                            .getOrDefault( "platformUserStr", "" )
                             .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     platformUser.setNickName( nickName );
@@ -653,5 +664,150 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.ok( "更新成功" );
         }
         return RspBase.businessError( "更新失败" );
+    }
+
+    @Override
+    public RspBase<?> memberBoxPassIsOpen( String memberId ) {
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId ).select( "id", "box_pass" ).one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        return RspBase.ok( StringUtils.isNotBlank( memberInfo.getBoxPass() ) );
+    }
+
+    @Override
+    public RspBase<?> memberBoxPassSet( String memberId, ReqBoxPass boxPass ) {
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId ).select( "id", "box_pass" ).one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( StringUtils.isNotBlank( memberInfo.getWithdrawalPass() ) ) {
+            return RspBase.businessError( "提现已经设置过密码" );
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( memberId );
+        update.setBoxPass( bCryptPasswordEncoder.encode( boxPass.getBoxPass() ) );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "设置保险箱密码异常，请稍后再试" );
+    }
+
+    @Override
+    public RspBase<RspMoney> boxAccount( String memberId, ReqBoxPass boxPass ) {
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", memberId )
+                .select( "id", "box_account", "account_now" )
+                .one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( StringUtils.isNotBlank( memberInfo.getBoxPass() )
+                && !bCryptPasswordEncoder.matches( boxPass.getBoxPass(), memberInfo.getBoxPass() ) ) {
+            return RspBase.businessError( "保险箱密码错误，请重新输入" );
+        }
+        RspMoney money = new RspMoney();
+        money.setBoxAccount( memberInfo.getBoxAccount().setScale( 2, RoundingMode.HALF_UP ) );
+        money.setAccountNow( memberInfo.getAccountNow().setScale( 2, RoundingMode.HALF_UP ) );
+        return RspBase.ok( money );
+    }
+
+    @Override
+    public RspBase<RspMoney> boxTransfer( String memberId, ReqBoxChange boxChange ) {
+        BigDecimal addAccount = boxChange.getAddAccount().setScale( 0, RoundingMode.DOWN );
+        if ( addAccount.compareTo( BigDecimal.ZERO ) == 0 ) {
+            return RspBase.businessError( "转入或取出数量有误，请重新输入" );
+        }
+        if ( !redisUtils.lock( "boxTransfer" + memberId, 5 ) ) {
+            return RspBase.businessError( "处理中请稍后" );
+        }
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", memberId )
+                .select( "id", "box_account", "account_now" )
+                .one();
+        BigDecimal boxAccount = memberInfo.getBoxAccount();
+        BigDecimal accountNow = memberInfo.getAccountNow();
+        boolean    flag       = false;
+        if ( addAccount.compareTo( BigDecimal.ZERO ) > 0 ) {//转入保险箱
+            flag = true;
+            if ( addAccount.compareTo( accountNow ) > 0 ) {
+                return RspBase.businessError( "钱包余额少于转入量" );
+            }
+        } else {//取出保险箱
+            if ( addAccount.negate().compareTo( boxAccount ) > 0 ) {
+                return RspBase.businessError( "保险箱余额少于取出量" );
+            }
+        }
+        SpringUtils.getBean( MemberInfoService.class ).updateSafeBox( memberInfo, addAccount, flag );
+        MemberInfo newInfo = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", memberId )
+                .select( "id", "box_account", "account_now" )
+                .one();
+        RspMoney money = new RspMoney();
+        money.setBoxAccount( newInfo.getBoxAccount() );
+        money.setAccountNow( newInfo.getAccountNow() );
+        redisUtils.unLock( "boxTransfer" + memberId );
+        return RspBase.ok( money );
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void updateSafeBox( MemberInfo memberInfo, BigDecimal addAccount, boolean flag ) {
+        int i = this.baseMapper.updateSafeBox( memberInfo.getId(), addAccount );
+
+        BigDecimal boxAccount = memberInfo.getBoxAccount().add( addAccount );
+        BigDecimal accountNow = memberInfo.getAccountNow().subtract( addAccount );
+        String     remark     = "保险箱:" + ( flag ? "存入" : "取出" ) + addAccount + "现保险箱余额:" + boxAccount;
+
+        int j = memberMoneyManager.logSafebox( memberInfo.getId(), addAccount, remark, accountNow, memberInfo.getAccountNow() );
+        if ( i <= 0 || j <= 0 ) {
+            throw new BusinessException( "转入或取出数据异常，请稍后再试" );
+        }
+    }
+
+    @Override
+    public RspBase<RspAccountMoney> getAccountNow( String memberId ) {
+        RspAccountMoney accountMoney = new RspAccountMoney();
+        accountMoney.setBalance( this.baseMapper.getUserBalance( memberId ).setScale( 2, RoundingMode.HALF_UP ) );
+        return RspBase.ok( accountMoney );
+    }
+
+    @Override
+    public RspBase<RspMemberDetail> getAccountInfo( String memberId ) {
+        MemberInfo      memberInfo   = this.baseMapper.selectById( memberId );
+        RspMemberDetail memberDetail = new RspMemberDetail();
+        BeanUtils.copyProperties( memberInfo, memberDetail );
+        return RspBase.ok( memberDetail );
+    }
+
+    @Override
+    public List<RspLogMoney> getFundDetails( String memberId, ReqLogMoney reqLogMoney ) {
+        String beginDay = reqLogMoney.getEnumReqTime().getBeginDayTime();
+        String endDay   = reqLogMoney.getEnumReqTime().getEndDayTime();
+        List<RspLogMoney> logMoneyList = logMoneyMapper.findLogMoneyList( memberId, memberId.substring(
+                memberId.length() - 1 ), reqLogMoney, beginDay, endDay );
+        for ( RspLogMoney rspLogMoney : logMoneyList ) {
+            EnumMoney byType = EnumMoney.getByType( rspLogMoney.getType() );
+            if ( byType != null ) {
+                rspLogMoney.setDes( byType.getDes() );
+            }
+        }
+        return logMoneyList;
+    }
+
+    @Override
+    public List<RspConfigTradeType> getTradeTypes() {
+        List<RspConfigTradeType> tradeTypes = new ArrayList<>();
+        for ( EnumMoney value : EnumMoney.values() ) {
+            RspConfigTradeType tradeType = new RspConfigTradeType();
+            tradeType.setName( value.name() );
+            tradeType.setType( value.getType() );
+            tradeType.setDes( value.getDes() );
+            tradeTypes.add( tradeType );
+        }
+        return tradeTypes;
+    }
+
+    @Override
+    public List<RspCodeFlow> getCodeFlowList( String memberId ) {
+        return memberBcodeMapper.findByMemberId( memberId );
     }
 }

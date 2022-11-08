@@ -804,6 +804,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( memberCard == null ) {
             return RspBase.businessError( "提现银行卡不存在" );
         }
+        if ( !redisUtils.lock( "withdrawBank" + memberId, 5 ) ) {
+            return RspBase.businessError( "处理中请稍后" );
+        }
         String withdrawOrderNo = SpringUtils
                 .getBean( MemberWithdrawDetailService.class )
                 .withdrawBank( memberInfo, req.getWithdrawMoney(), memberCard );

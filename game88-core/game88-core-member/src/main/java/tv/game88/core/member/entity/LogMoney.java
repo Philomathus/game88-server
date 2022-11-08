@@ -25,7 +25,7 @@ public class LogMoney {
     @Excel( name = "会员账号" )
     private String        userName;
     @Excel( name = "变化类型" )
-    private Long          type;
+    private Integer       type;
     @Excel( name = "描述" )
     private String        des;
     @Excel( name = "收入" )
