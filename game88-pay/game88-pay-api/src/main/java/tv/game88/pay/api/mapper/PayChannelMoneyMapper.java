@@ -11,7 +11,6 @@ import java.util.List;
  * 支付通道金额Mapper接口
  *
  * @author mengJun
- * @date 2021-04-03
  */
 public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {
     public List<PayChannelMoney> selectPayChannelMoneyList( PayChannelMoney payChannelMoney );

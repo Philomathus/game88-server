@@ -10,7 +10,6 @@ import java.util.List;
  * 环境参数配置Mapper接口
  *
  * @author MengJun
- * @date 2021-01-27
  */
 public interface ConfigEnvironmentMapper extends BaseMapper<ConfigEnvironment> {
 

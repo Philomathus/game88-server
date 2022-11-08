@@ -10,7 +10,6 @@ import java.math.BigDecimal;
  * 线上充值信息对象 member_pay_jour
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @Data
 public class RspRechargeBankReport {

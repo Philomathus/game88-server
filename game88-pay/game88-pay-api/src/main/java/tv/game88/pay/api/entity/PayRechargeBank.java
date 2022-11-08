@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 /**
  * 对象 config_bank
  *
- * @author 77lm
- * @date 2021-10-14
+ * @author mengJun
  */
 @Data
 @NoArgsConstructor

@@ -10,8 +10,7 @@ import java.util.List;
 /**
  * 打码Mapper接口
  *
- * @author 77lm
- * @date 2021-10-12
+ * @author mengJun
  */
 public interface MemberBcodeMapper extends BaseMapper<MemberBcode> {
 

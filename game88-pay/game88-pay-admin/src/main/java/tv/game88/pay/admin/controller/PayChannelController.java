@@ -24,7 +24,6 @@ import java.util.List;
  * 支付通道Controller
  *
  * @author mengJun
- * @date 2021-01-27
  */
 @RestController
 @RequestMapping( "/pay/payChannel" )

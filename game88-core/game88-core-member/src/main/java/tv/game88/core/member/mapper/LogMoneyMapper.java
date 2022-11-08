@@ -13,8 +13,7 @@ import java.util.Map;
 /**
  * 资金日志Mapper接口
  *
- * @author 77lm
- * @date 2021-10-09
+ * @author mengJun
  */
 public interface LogMoneyMapper extends BaseMapper<LogMoney> {
 

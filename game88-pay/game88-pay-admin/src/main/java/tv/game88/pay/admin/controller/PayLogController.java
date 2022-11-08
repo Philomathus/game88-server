@@ -23,7 +23,6 @@ import java.util.List;
  * 支付日志Controller
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @RestController
 @RequestMapping( "/pay/payLog" )

@@ -17,7 +17,6 @@ import java.util.List;
  * oss文件存储服务配置Service implementation业务层处理
  *
  * @author Rajesh
- * @date 2022-10-26
  */
 
 @Service

@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
  * pay_channel
  *
  * @author mengJun
- * @date 2021-01-27
  */
 @Data
 @NoArgsConstructor

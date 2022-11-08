@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
  * 对象 PayRechargeUsdt
  *
  * @author mengJun
- * @date 2021-09-11
  */
 @Data
 @NoArgsConstructor

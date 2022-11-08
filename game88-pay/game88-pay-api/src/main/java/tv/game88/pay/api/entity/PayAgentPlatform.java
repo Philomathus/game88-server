@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
  * 代付通道对象 pay_agent_channel
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @Data
 @NoArgsConstructor

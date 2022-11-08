@@ -10,7 +10,6 @@ import java.util.List;
  * 代付平台Mapper接口
  *
  * @author mengJun
- * @date 2021-01-26
  */
 public interface PayAgentPlatformMapper extends BaseMapper<PayAgentPlatform> {
     public List<PayAgentPlatform> selectPayAgentPlatformList( PayAgentPlatform payAgentPlatform );

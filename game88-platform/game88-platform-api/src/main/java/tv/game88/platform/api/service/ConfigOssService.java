@@ -8,7 +8,6 @@ import java.util.List;
  * oss文件存储服务配置Service业务层处理
  *
  * @author Rajesh
- * @date 2022-10-26
  */
 public interface ConfigOssService {
 
