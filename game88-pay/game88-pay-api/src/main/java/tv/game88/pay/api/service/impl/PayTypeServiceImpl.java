@@ -16,7 +16,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType> impl
         List<PayType> payTypes = this.baseMapper.selectPayTypeList( payType );
         String        domain   = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( PayType type : payTypes ) {
-            type.setIconUrl( domain + payType.getIconUrl() );
+            type.setIconUrl( domain + type.getIconUrl() );
         }
         return payTypes;
     }
