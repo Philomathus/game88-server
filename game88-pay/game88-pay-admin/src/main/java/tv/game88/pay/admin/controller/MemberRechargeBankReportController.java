@@ -47,7 +47,7 @@ public class MemberRechargeBankReportController extends BaseController {
      * 查询线下充值信息列表
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:lists')" )
-    @GetMapping( "/lists" )
+    @GetMapping( "/list" )
     public RspBase<List<RspRechargeBankReport>> lists( ReqMemberRechargeBank req ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
