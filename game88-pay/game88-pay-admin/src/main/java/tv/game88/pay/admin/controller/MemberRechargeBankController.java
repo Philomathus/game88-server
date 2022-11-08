@@ -31,7 +31,7 @@ public class MemberRechargeBankController extends BaseController {
     private MemberRechargeBankService memberRechargeBankService;
 
     /**
-     * 查询公司入款信息列表
+     * 查询公 司入款信息列表
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBank:list')" )
     @GetMapping( "/list" )

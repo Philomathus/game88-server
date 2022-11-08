@@ -69,26 +69,27 @@
     </sql>
 
     <select id="selectReportList" resultType="tv.game88.pay.api.dto.RspRechargeBankReport">
-        SELECT bank_user_name as bankUserName,
-            bank_name as bankName,
-            bank_account as bankAccount,
-            recharge_money as rechargeMoney,
+        SELECT w.bank_user_name as bankUserName,
+            l.bank_name as bankName,
+            w.bank_account as bankAccount,
+            w.recharge_money as rechargeMoney,
             COUNT(1) as time,
-            update_time as updateTime
-        FROM member_recharge_bank
-        WHERE `STATUS` = '3'
+            w.update_time as updateTime
+        FROM member_recharge_bank w
+        left join config_bank_list l on l.id = w.bank_id
+        WHERE w.`STATUS` = '3'
         <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != '' and req.priceMax != ''">
-            and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
-            and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
+            and w.recharge_money <![CDATA[ >= ]]> #{req.priceMin}
+            and w.recharge_money <![CDATA[ <= ]]> #{req.priceMax}
         </if>
         <if test="req.bankUserName != null and req.bankUserName != ''">
-            and bank_user_name = #{req.bankUserName}
+            and w.bank_user_name = #{req.bankUserName}
         </if>
         <if test="req.updateTime != null and req.updateTime != ''">
-            and update_time like '${req.updateTime}%'
+            and w.update_time like '${req.updateTime}%'
         </if>
-        GROUP BY bank_user_name,bank_name,recharge_money,bank_account
-        ORDER BY bank_user_name,recharge_money
+        GROUP BY w.bank_user_name,l.bank_name,w.recharge_money,w.bank_account
+        ORDER BY w.bank_user_name,w.recharge_money
     </select>
 
     <select id="selectReportListCount" resultType="java.util.Map">
