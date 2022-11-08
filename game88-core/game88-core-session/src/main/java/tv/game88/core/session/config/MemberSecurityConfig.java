@@ -106,11 +106,11 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 )
                 .permitAll()
                 // 对于登录初始化相关 允许匿名访问
-                .mvcMatchers( HttpMethod.POST,"/platform/init" ).anonymous()
-                .mvcMatchers( HttpMethod.POST,"/platform/checkUpdate" ).anonymous()
-                .mvcMatchers( HttpMethod.POST,"/platform/login" ).anonymous()
-                .mvcMatchers( HttpMethod.POST,"/platform/loginDevice" ).anonymous()
-                .mvcMatchers( HttpMethod.POST,"/platform/register" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/init" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/checkUpdate" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/login" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/loginDevice" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/register" ).anonymous()
                 // 支付代付回调 允许匿名访问
                 .mvcMatchers( HttpMethod.GET, "/pay/orderRedirect/**" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/pay/callBack/**" ).anonymous()

@@ -6,12 +6,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
@@ -19,7 +18,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/pay" )
 @Tag( name = "银行卡绑定与申请入款相关接口" )
 @Log4j2
 public class MemberRechargeBankController extends BaseController {

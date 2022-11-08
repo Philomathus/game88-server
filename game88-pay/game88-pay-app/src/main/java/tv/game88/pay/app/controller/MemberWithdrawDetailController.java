@@ -20,7 +20,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/pay" )
 @Tag( name = "会员提现相关接口" )
 @Log4j2
 public class MemberWithdrawDetailController extends BaseController {

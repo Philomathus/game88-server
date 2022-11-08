@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author ${author}
  */
-public interface I${ClassName}Service extends IService<${ClassName}> {
+public interface ${ClassName}Service extends IService<${ClassName}> {
 	/**
 	 * 查询${functionName}列表
 	 *

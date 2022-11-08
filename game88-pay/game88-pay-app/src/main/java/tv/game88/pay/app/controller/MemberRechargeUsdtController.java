@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
@@ -20,7 +19,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/pay" )
 @Tag( name = "USDT充值相关接口" )
 @Log4j2
 public class MemberRechargeUsdtController {

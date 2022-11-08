@@ -1,0 +1,98 @@
+package tv.game88.platform.admin.controller;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import tv.game88.common.base.BaseController;
+import tv.game88.common.page.PageDomain;
+import tv.game88.common.page.TableSupport;
+import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.platform.api.entity.ActivityInfo;
+import tv.game88.platform.api.service.ActivityInfoService;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * 活动信息Controller
+ *
+ * @author mengJun
+ */
+@RestController
+@RequestMapping( "/activity/activityInfo" )
+public class ActivityInfoController extends BaseController {
+	@Resource
+	private ActivityInfoService activityInfoService;
+
+	/**
+	 * 查询活动信息列表
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:list')" )
+	@GetMapping( "/list" )
+	public RspBase<List<ActivityInfo>> list(ActivityInfo activityInfo) {
+		PageDomain pageDomain = TableSupport.buildPageRequest();
+		startPage( pageDomain );
+		List<ActivityInfo> list = activityInfoService.selectActivityInfoList(activityInfo);
+		return getRspBasePage( list, pageDomain );
+	}
+
+	/**
+	 * 导出活动信息列表
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:export')" )
+	@Log( title = "活动信息", businessType = BusinessType.EXPORT )
+	@GetMapping( "/export" )
+	public void export(ActivityInfo activityInfo, HttpServletResponse response) {
+		List<ActivityInfo>      list = activityInfoService.selectActivityInfoList(activityInfo);
+		ExportExcelUtil.exportExcel( list, "活动信息", "活动信息表", ActivityInfo.class, response );
+	}
+
+	/**
+	 * 获取活动信息详细信息
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:query')" )
+	@GetMapping( value = "/{id}" )
+	public RspBase<ActivityInfo> getInfo( @PathVariable( "id" ) Long id) {
+		return RspBase.ok( activityInfoService.getById(id) );
+	}
+
+	/**
+	 * 新增活动信息
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:add')" )
+	@Log( title = "活动信息", businessType = BusinessType.INSERT )
+	@PostMapping
+	public RspBase<?> add( @RequestBody ActivityInfo activityInfo) {
+		activityInfo.setCreateBy( SecurityUtils.getUsername() );
+		activityInfo.setCreateTime( LocalDateTime.now() );
+		return toResult( activityInfoService.save(activityInfo) );
+	}
+
+	/**
+	 * 修改活动信息
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:edit')" )
+	@Log( title = "活动信息", businessType = BusinessType.UPDATE )
+	@PutMapping
+	public RspBase<?> edit( @RequestBody ActivityInfo activityInfo) {
+		activityInfo.setUpdateBy( SecurityUtils.getUsername() );
+		activityInfo.setUpdateTime( LocalDateTime.now() );
+		return toResult( activityInfoService.updateById(activityInfo) );
+	}
+
+	/**
+	 * 删除活动信息
+	 */
+	@PreAuthorize( "@ss.hasPermi('activity:activityInfo:remove')" )
+	@Log( title = "活动信息", businessType = BusinessType.DELETE )
+	@DeleteMapping( "/{ids}" )
+	public RspBase<?> remove( @PathVariable Long[] ids ) {
+		return toResult( activityInfoService.removeByIds( Arrays.asList( ids ) ) );
+	}
+}

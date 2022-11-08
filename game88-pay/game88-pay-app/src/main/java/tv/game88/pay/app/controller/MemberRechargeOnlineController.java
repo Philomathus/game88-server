@@ -18,7 +18,6 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/pay" )
 @Tag( name = "在线支付充值相关接口" )
 @Log4j2
 public class MemberRechargeOnlineController {

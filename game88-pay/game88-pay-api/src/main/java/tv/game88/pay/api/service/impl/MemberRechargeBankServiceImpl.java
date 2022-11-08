@@ -25,6 +25,7 @@ import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 import tv.game88.pay.api.entity.PayRechargeBank;
+import tv.game88.pay.api.mapper.ActivityCashBackFirstRechargeMapper;
 import tv.game88.pay.api.mapper.ConfigBankListMapper;
 import tv.game88.pay.api.mapper.MemberRechargeBankMapper;
 import tv.game88.pay.api.mapper.PayRechargeBankMapper;
@@ -47,19 +48,21 @@ import java.util.Objects;
 @Service
 public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBankMapper, MemberRechargeBank> implements MemberRechargeBankService {
     @Resource
-    private PayRechargeBankMapper       payRechargeBankMapper;
+    private PayRechargeBankMapper               payRechargeBankMapper;
     @Resource
-    private ConfigBankListMapper        configBankListMapper;
+    private ConfigBankListMapper                configBankListMapper;
     @Resource
-    private MemberInfoMapper            memberInfoMapper;
+    private MemberInfoMapper                    memberInfoMapper;
     @Resource
-    private MemberCardMapper            memberCardMapper;
+    private MemberCardMapper                    memberCardMapper;
     @Resource
-    private MemberWithdrawDetailService memberWithdrawDetailService;
+    private MemberWithdrawDetailService         memberWithdrawDetailService;
     @Resource
-    private RecommendService            recommendService;
+    private RecommendService                    recommendService;
     @Resource
-    private MemberMoneyManager          memberMoneyManager;
+    private MemberMoneyManager                  memberMoneyManager;
+    @Resource
+    private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
 
     @Resource
     private ConfigEnvCacheUtil configEnvCacheUtil;
@@ -317,18 +320,25 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                     .setScale( 2, RoundingMode.HALF_UP ) );
         }
 
+        if ( memberRechargeBank.getFirst() && configEnvCacheUtil.getConfBool( "is_first_recharge_cash_back" ) ) {
+            BigDecimal rebate = cashBackFirstRechargeMapper.selectByRechargeMoney( memberRechargeBank.getRechargeMoney() );
+            if ( rebate != null && rebate.compareTo( BigDecimal.ZERO ) > 0 ) {
+                chargeGive = chargeGive.add( rebate );
+            }
+        }
+
         //套利号无优惠
         if ( memberInfo.getStatus() == 4 ) {
             chargeGive = BigDecimal.ZERO;
         }
 
+        String mark = "审核人：" + userName;
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, "审核人：" + userName );
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark );
         }
 
         memberMoneyManager.addMemberMoney( memberRechargeBank.getMemberId(), memberRechargeBank.getRechargeMoney(),
-                EnumMoney.DEPOSIT, 1,
-                "审核人：" + userName );
+                EnumMoney.DEPOSIT, 1, mark );
 
         MemberRechargeBank update = new MemberRechargeBank();
         update.setRechargeOrderNo( memberRechargeBank.getRechargeOrderNo() );
