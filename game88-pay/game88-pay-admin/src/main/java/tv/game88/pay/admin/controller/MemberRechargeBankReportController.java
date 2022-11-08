@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 线上充值信息Controller
+ * 公司入款信息Controller
  *
  * @author mengJun
  * @date 2021-01-26
@@ -33,18 +33,18 @@ public class MemberRechargeBankReportController extends BaseController {
     private MemberRechargeBankService memberRechargeBankService;
 
     /**
-     * 导出线下充值信息列表
+     * 导出公司入款信息列表
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:export')" )
-    @Log( title = "线下充值报表", businessType = BusinessType.EXPORT )
+    @Log( title = "公司入款报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( HttpServletResponse response, ReqMemberRechargeBank req ) {
         List<RspRechargeBankReport> list = memberRechargeBankService.selectReportList( req );
-        ExportExcelUtil.exportExcel( list, "线下充值", "线下充值表", RspRechargeBankReport.class, response );
+        ExportExcelUtil.exportExcel( list, "公司入款", "公司入款表", RspRechargeBankReport.class, response );
     }
 
     /**
-     * 查询线下充值信息列表
+     * 查询公司入款信息列表
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:lists')" )
     @GetMapping( "/list" )
