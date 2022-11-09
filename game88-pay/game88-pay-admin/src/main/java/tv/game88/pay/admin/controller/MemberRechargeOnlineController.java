@@ -59,8 +59,8 @@ public class MemberRechargeOnlineController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:query')" )
     @GetMapping( value = "/{id}" )
-    public RspBase<MemberRechargeOnline> getInfo( @PathVariable( "id" ) Long id ) {
-        return RspBase.ok( memberRechargeOnlineService.getById( id ) );
+    public RspBase<MemberRechargeOnline> getInfo( @PathVariable( "id" ) String id ) {
+        return RspBase.ok( memberRechargeOnlineService.selectMemberRechargeOnlineById( id ) );
     }
 
     /**

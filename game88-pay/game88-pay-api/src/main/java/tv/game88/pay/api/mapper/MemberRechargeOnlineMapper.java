@@ -17,4 +17,8 @@ public interface MemberRechargeOnlineMapper extends BaseMapper<MemberRechargeOnl
     Map listCount( ReqMemberRechargeOnline req );
 
     List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
+
+    MemberRechargeOnline selectMemberRechargeOnlineById(String id);
+
+
 }

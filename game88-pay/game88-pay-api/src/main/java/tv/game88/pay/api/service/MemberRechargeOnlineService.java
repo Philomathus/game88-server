@@ -14,5 +14,7 @@ public interface MemberRechargeOnlineService extends IService<MemberRechargeOnli
     Map listCount( ReqMemberRechargeOnline req );
 
     RspBase<?> payPatchOrder( MemberRechargeOnline memberRechargeOnline );
+
+    MemberRechargeOnline  selectMemberRechargeOnlineById( String id );
 }
 
