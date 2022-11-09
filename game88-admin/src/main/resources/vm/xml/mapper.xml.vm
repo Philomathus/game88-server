@@ -22,8 +22,7 @@
 
 	<sql id="select${ClassName}Vo">
 		select #foreach($column in $columns)
-			$column.columnName#if($foreach.count != $columns.size()),#end
-		#end
+			$column.columnName#if($foreach.count != $columns.size()),#end#end
 		from ${tableName}
 	</sql>
 

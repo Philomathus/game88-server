@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
  * pay_log
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @Data
 @NoArgsConstructor

@@ -25,7 +25,6 @@ import java.util.List;
  * 代付平台Controller
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @RestController
 @RequestMapping( "/pay/payAgentPlatform" )

@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 公司入款信息Controller
+ * 公司入款银行卡简易统计Controller
  *
  * @author mengJun
- * @date 2021-01-26
  */
 @RestController
 @RequestMapping( "/pay/memberRechargeBankReport" )
@@ -32,9 +31,6 @@ public class MemberRechargeBankReportController extends BaseController {
     @Resource
     private MemberRechargeBankService memberRechargeBankService;
 
-    /**
-     * 导出公司入款信息列表
-     */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:export')" )
     @Log( title = "公司入款报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
@@ -43,9 +39,6 @@ public class MemberRechargeBankReportController extends BaseController {
         ExportExcelUtil.exportExcel( list, "公司入款", "公司入款表", RspRechargeBankReport.class, response );
     }
 
-    /**
-     * 查询公司入款信息列表
-     */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:lists')" )
     @GetMapping( "/list" )
     public RspBase<List<RspRechargeBankReport>> lists( ReqMemberRechargeBank req ) {
@@ -55,9 +48,6 @@ public class MemberRechargeBankReportController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
-    /**
-     * 列表统计
-     */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:query')" )
     @GetMapping( "/listCounts" )
     public Map listCounts( ReqMemberRechargeBank req ) {

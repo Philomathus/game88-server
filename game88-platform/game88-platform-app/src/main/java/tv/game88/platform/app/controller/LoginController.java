@@ -20,7 +20,6 @@ import javax.annotation.Resource;
 @RestController
 @Tag( name = "登录和初始化接口" )
 @Log4j2
-@RequestMapping("/platform")
 public class LoginController {
     @Resource
     private MemberInfoService  memberInfoService;

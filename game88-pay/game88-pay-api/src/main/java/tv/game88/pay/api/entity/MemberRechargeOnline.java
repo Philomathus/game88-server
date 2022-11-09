@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 /**
  * memberRechargeOnline对象 member_recharge_online
  *
- * @author 77lm
- * @date 2021-10-06
+ * @author mengJun
  */
 @Data
 @NoArgsConstructor

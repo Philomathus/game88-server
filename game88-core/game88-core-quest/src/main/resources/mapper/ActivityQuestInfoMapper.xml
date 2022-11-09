@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.quest.mapper.ActivityQuestInfoMapper">
+    <resultMap type="tv.game88.core.quest.entity.ActivityQuestInfo" id="ActivityQuestInfoResult">
+        <result property="id" column="id" />
+        <result property="icon" column="icon" />
+        <result property="title" column="title" />
+        <result property="typeId" column="type_id" />
+        <result property="target" column="target" />
+        <result property="reward" column="reward" />
+        <result property="detail" column="detail" />
+        <result property="content" column="content" />
+        <result property="gameId" column="game_id" />
+        <result property="kindId" column="kind_id" />
+        <result property="platformId" column="platform_id" />
+        <result property="taskMode" column="task_mode" />
+        <result property="effect" column="effect" />
+        <result property="sort" column="sort" />
+    </resultMap>
+
+    <sql id="selectActivityQuestInfoVo">
+        select id,
+               icon,
+               title,
+               type_id,
+               target,
+               reward,
+               detail,
+               content,
+               game_id,
+               kind_id,
+               platform_id,
+               task_mode,
+               effect,
+               sort
+        from activity_quest_info
+    </sql>
+
+    <select id="selectActivityQuestInfoList" parameterType="tv.game88.core.quest.entity.ActivityQuestInfo"
+            resultMap="ActivityQuestInfoResult">
+        <include refid="selectActivityQuestInfoVo" />
+        <where>
+            <if test="icon != null  and icon != ''">
+                and icon = #{icon}
+            </if>
+            <if test="title != null  and title != ''">
+                and title = #{title}
+            </if>
+            <if test="typeId != null">
+                and type_id = #{typeId}
+            </if>
+            <if test="target != null">
+                and target = #{target}
+            </if>
+            <if test="reward != null">
+                and reward = #{reward}
+            </if>
+            <if test="detail != null  and detail != ''">
+                and detail = #{detail}
+            </if>
+            <if test="content != null  and content != ''">
+                and content = #{content}
+            </if>
+            <if test="gameId != null">
+                and game_id = #{gameId}
+            </if>
+            <if test="kindId != null  and kindId != ''">
+                and kind_id = #{kindId}
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="taskMode != null">
+                and task_mode = #{taskMode}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -27,7 +27,6 @@ import java.util.List;
  * 支付类型Controller
  *
  * @author mengJun
- * @date 2021-01-25
  */
 @RestController
 @RequestMapping( "/pay/payType" )

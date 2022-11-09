@@ -14,7 +14,6 @@ import java.util.Map;
  * USDT充值提交记录Mapper接口
  *
  * @author mengJun
- * @date 2021-09-14
  */
 public interface MemberRechargeUsdtMapper extends BaseMapper<MemberRechargeUsdt> {
     public List<MemberRechargeUsdt> selectMemberRechargeUsdtList( ReqMemberRechargeUsdt req );

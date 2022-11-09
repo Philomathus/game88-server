@@ -22,8 +22,7 @@ import java.util.List;
 /**
  * Controller
  *
- * @author 77lm
- * @date 2021-10-14
+ * @author mengJun
  */
 @RestController
 @RequestMapping( "/pay/payRechargeBank" )
