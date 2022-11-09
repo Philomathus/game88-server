@@ -9,7 +9,7 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.platform.api.entity.ActivityQuestInfo;
+import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.platform.api.service.ActivityQuestInfoService;
 
 import javax.annotation.Resource;

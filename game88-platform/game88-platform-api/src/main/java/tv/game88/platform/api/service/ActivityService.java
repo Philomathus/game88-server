@@ -9,9 +9,9 @@ import tv.game88.platform.api.dto.RspQuestType;
 import java.util.List;
 
 public interface ActivityService {
-    List<RspActivityType> getActivityTypes();
+    List<RspActivityType> getActivityTypes( String token );
 
-    List<RspActivityInfo> getActivityInfos( Long typeId, String memberId );
+    List<RspActivityInfo> getActivityInfos( Long typeId, String token );
 
     List<RspQuestType> getActivityQuestTypes( String memberId );
 

@@ -21,5 +21,6 @@
         <module>game88-core-config</module>
         <module>game88-core-member</module>
         <module>game88-core-session</module>
+        <module>game88-core-quest</module>
     </modules>
 </project>

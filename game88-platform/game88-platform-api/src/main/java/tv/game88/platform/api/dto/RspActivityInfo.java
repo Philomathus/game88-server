@@ -19,8 +19,8 @@ public class RspActivityInfo {
     private LocalDateTime createTime;
     @Schema( title = "活动明细" )
     private String        content;
-    @Schema( title = "0停用1启用" )
-    private String        status;
+    @Schema( title = "false停用true启用" )
+    private boolean       effect;
     @Schema( title = "0=活动详情 1=跳转链接" )
     private Integer       type;
     @Schema( title = "图标跳转链接" )

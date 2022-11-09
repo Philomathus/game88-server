@@ -11,7 +11,7 @@ public class ActivityInfo {
     /**
      * 系统编号
      */
-    private Integer id;
+    private Long id;
 
     /**
      * 图标
@@ -26,7 +26,7 @@ public class ActivityInfo {
     /**
      * 活动类型id
      */
-    private Integer typeId;
+    private Long typeId;
 
     /**
      * 活动详情

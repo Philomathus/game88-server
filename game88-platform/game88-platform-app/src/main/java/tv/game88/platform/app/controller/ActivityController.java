@@ -3,7 +3,6 @@ package tv.game88.platform.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +25,15 @@ public class ActivityController {
 
     @Operation( summary = "获取活动分类列表" )
     @PostMapping( "/getActivityTypes" )
-    public RspBase<List<RspActivityType>> getActivityTypes() {
-        return RspBase.ok( activityService.getActivityTypes() );
+    public RspBase<List<RspActivityType>> getActivityTypes( @RequestHeader( "token" ) String token ) {
+        return RspBase.ok( activityService.getActivityTypes( token ) );
     }
 
     @Operation( summary = "获取活动列表" )
     @PostMapping( "/getActivityInfos" )
-    public RspBase<List<RspActivityInfo>> getActivityInfos( @Validated @RequestBody ReqActivityType req ) {
-        return RspBase.ok( activityService.getActivityInfos( req.getId(), MemberSecurityUtils.getUserId() ) );
+    public RspBase<List<RspActivityInfo>> getActivityInfos( @RequestHeader( "token" ) String token,
+                                                            @Validated @RequestBody ReqActivityType req ) {
+        return RspBase.ok( activityService.getActivityInfos( req.getId(), token ) );
     }
 
     @Operation( summary = "获取任务分类列表" )
@@ -48,7 +48,7 @@ public class ActivityController {
         return RspBase.ok( activityService.getActivityQuestInfos( req.getId(), MemberSecurityUtils.getUserId() ) );
     }
 
-    @Operation( summary = "获取任务列表" )
+    @Operation( summary = "领取任务奖励" )
     @PostMapping( "/receiveQuestReward" )
     public RspBase<?> receiveQuestReward( @Validated @RequestBody ReqActivityType req ) {
         return activityService.receiveQuestReward( req.getId(), MemberSecurityUtils.getUserId() );

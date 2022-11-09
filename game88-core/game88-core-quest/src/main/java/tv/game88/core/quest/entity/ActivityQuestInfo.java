@@ -1,4 +1,4 @@
-package tv.game88.platform.api.entity;
+package tv.game88.core.quest.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ public class ActivityQuestInfo {
     /**
     * 系统编号
     */
-    private Integer id;
+    private Long id;
 
     /**
     * 图标
@@ -26,7 +26,7 @@ public class ActivityQuestInfo {
     /**
     * 任务类型id
     */
-    private Integer typeId;
+    private Long typeId;
 
     /**
     * 目标任务量
@@ -51,7 +51,7 @@ public class ActivityQuestInfo {
     /**
     * 所属游戏id
     */
-    private Integer gameId;
+    private Long gameId;
 
     /**
     * 平台游戏类型

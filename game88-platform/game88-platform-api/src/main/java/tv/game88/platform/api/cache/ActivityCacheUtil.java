@@ -6,11 +6,11 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.platform.api.entity.ActivityInfo;
-import tv.game88.platform.api.entity.ActivityQuestInfo;
+import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.platform.api.entity.ActivityQuestType;
 import tv.game88.platform.api.entity.ActivityType;
 import tv.game88.platform.api.mapper.ActivityInfoMapper;
-import tv.game88.platform.api.mapper.ActivityQuestInfoMapper;
+import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.platform.api.mapper.ActivityQuestTypeMapper;
 import tv.game88.platform.api.mapper.ActivityTypeMapper;
 
@@ -46,8 +46,11 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_INFO_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).list();
-            if ( activityInfos.size() > 0 && activityInfos != null ) {
+            List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper )
+                    .eq( "effect", 1 )
+                    .orderByDesc( "create_time" )
+                    .list();
+            if ( activityInfos.size() > 0 ) {
                 redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos
                         .stream()
                         .map( JsonUtil::object2Json )
@@ -66,8 +69,8 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_TYPE_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).list();
-            if ( activityInfos.size() > 0 && activityInfos != null ) {
+            List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).orderByDesc( "create_time" ).list();
+            if ( activityInfos.size() > 0 ) {
                 redisUtil.lRightPushAll( ACTIVITY_TYPE_KEY, activityInfos
                         .stream()
                         .map( JsonUtil::object2Json )
@@ -86,8 +89,11 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_QUEST_INFO_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityQuestInfo> activityQuestInfos = new QueryChainWrapper<>( activityQuestInfoMapper ).list();
-            if ( activityQuestInfos.size() > 0 && activityQuestInfos != null ) {
+            List<ActivityQuestInfo> activityQuestInfos = new QueryChainWrapper<>( activityQuestInfoMapper )
+                    .eq( "effect", 1 )
+                    .orderByAsc( "sort" )
+                    .list();
+            if ( activityQuestInfos.size() > 0 ) {
                 redisUtil.lRightPushAll( ACTIVITY_QUEST_INFO_KEY, activityQuestInfos
                         .stream()
                         .map( JsonUtil::object2Json )
@@ -107,7 +113,7 @@ public class ActivityCacheUtil {
         Boolean exists = redisUtil.exists( ACTIVITY_QUEST_TYPE_KEY );
         if ( exists == null || !exists ) {
             List<ActivityQuestType> activityQuestTypes = new QueryChainWrapper<>( activityQuestTypeMapper ).list();
-            if ( activityQuestTypes.size() > 0 && activityQuestTypes != null ) {
+            if ( activityQuestTypes.size() > 0 ) {
                 redisUtil.lRightPushAll( ACTIVITY_QUEST_TYPE_KEY, activityQuestTypes
                         .stream()
                         .map( JsonUtil::object2Json )
@@ -123,7 +129,6 @@ public class ActivityCacheUtil {
      * 活动信息
      */
     public void addActivityInfo( ActivityInfo activityInfo ) {
-        String  key    = ACTIVITY_INFO_KEY;
         Boolean exists = redisUtil.exists( ACTIVITY_INFO_KEY );
         if ( exists == null || !exists ) {
             List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).list();
@@ -134,7 +139,7 @@ public class ActivityCacheUtil {
                         .collect( Collectors.toList() ) );
             }
         } else {
-            redisUtil.lRightPushAll( key, JsonUtil.object2Json( activityInfo ) );
+            redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, JsonUtil.object2Json( activityInfo ) );
         }
     }
 

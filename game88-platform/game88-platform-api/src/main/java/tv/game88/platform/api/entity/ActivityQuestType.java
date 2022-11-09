@@ -11,7 +11,7 @@ public class ActivityQuestType {
     /**
      * 系统编号
      */
-    private Integer id;
+    private Long id;
 
     /**
      * 名称
