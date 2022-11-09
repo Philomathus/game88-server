@@ -16,7 +16,7 @@ import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.service.RecommendService;
+import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
@@ -54,7 +54,7 @@ public class PayServiceImpl implements PayService {
     @Resource
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
     @Resource
-    private RecommendService                    recommendService;
+    private MemberRecommendManager              memberRecommendManager;
 
     @Resource
     private PayProcessorFactoryUtil payProcessorFactoryUtil;
@@ -204,7 +204,7 @@ public class PayServiceImpl implements PayService {
 
         memberMoneyManager.addMemberMoney( memberInfo.getId(), money, EnumMoney.PAY, 1, memberRechargeOnline.getRemark() );
         //新增佣金记录
-        recommendService.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
+        memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
         memberRechargeOnlineMapper.updateById( updatePayJour );
 
         log.warn( "会员线上充值上分成功 - orderNo:{}", memberRechargeOnline.getOrderNo() );

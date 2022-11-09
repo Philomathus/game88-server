@@ -1,4 +1,4 @@
-package tv.game88.core.member.service.impl;
+package tv.game88.core.member.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,6 @@ import tv.game88.core.member.entity.MemberRecommend;
 import tv.game88.core.member.mapper.ConfigRecommendMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.mapper.MemberRecommendMapper;
-import tv.game88.core.member.service.RecommendService;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -19,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class RecommendServiceImpl implements RecommendService {
+public class MemberRecommendManager {
     @Resource
     private MemberInfoMapper      memberInfoMapper;
     @Resource
@@ -27,7 +26,6 @@ public class RecommendServiceImpl implements RecommendService {
     @Resource
     private MemberRecommendMapper memberRecommendMapper;
 
-    @Override
     public void recommendProcess( MemberInfo memberInfo, BigDecimal rechargeMoney ) {
         if ( StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
             Map<Integer, ConfigRecommend> billMap = configRecommendMapper

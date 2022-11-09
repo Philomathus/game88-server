@@ -3,7 +3,11 @@ package tv.game88.platform.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
@@ -20,7 +24,7 @@ import javax.annotation.Resource;
 @RestController
 @Tag( name = "登录和初始化接口" )
 @Log4j2
-public class LoginController {
+public class LoginController extends BaseController {
     @Resource
     private MemberInfoService  memberInfoService;
     @Resource

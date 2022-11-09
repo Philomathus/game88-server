@@ -1,5 +1,6 @@
 package tv.game88.pay.app.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.TreeMap;
 
 @RestController
 @RequestMapping( "/pay" )
+@Hidden
 @Log4j2
 public class PayCallBackController {
     @Resource

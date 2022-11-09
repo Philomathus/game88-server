@@ -50,7 +50,7 @@ public class MemberWithdrawDetailController extends BaseController {
         return memberWithdrawDetailService.withdrawBank( MemberSecurityUtils.getUserId(), req );
     }
 
-    @Operation( summary = "人工提现申请" )
+    @Operation( summary = "提现充值详情" )
     @PostMapping( "/withdrawRechargeDetail/{type}" )
     public RspBase<List<RspWithdrawRechargeDetail>> withdrawDetail( @RequestBody PageDomain pageDomain,
                                                                     @PathVariable( "type" ) WithdrawRechargeType type ) {

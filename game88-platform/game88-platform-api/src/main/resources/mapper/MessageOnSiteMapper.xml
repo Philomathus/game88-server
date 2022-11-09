@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.MessageOnSiteMapper">
+    <resultMap type="tv.game88.platform.api.entity.MessageOnSite" id="MessageOnSiteResult">
+        <result property="id" column="id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="createTime" column="create_time" />
+        <result property="createBy" column="create_by" />
+    </resultMap>
+
+    <sql id="selectMessageOnSiteVo">
+        select id, title, content, create_time, create_by
+        from message_on_site
+    </sql>
+
+    <select id="selectMessageOnSiteList" parameterType="tv.game88.platform.api.entity.MessageOnSite"
+            resultMap="MessageOnSiteResult">
+        <include refid="selectMessageOnSiteVo" />
+        <where>
+            <if test="title != null  and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null  and content != ''">
+                and content = #{content}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+        </where>
+    </select>
+</mapper>

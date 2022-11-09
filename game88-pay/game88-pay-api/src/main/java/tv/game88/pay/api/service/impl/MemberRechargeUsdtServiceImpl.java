@@ -16,7 +16,7 @@ import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.service.RecommendService;
+import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.ReqMemberRechargeUsdt;
 import tv.game88.pay.api.entity.MemberRechargeUsdt;
@@ -36,9 +36,9 @@ import java.util.Map;
 @Service
 public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsdtMapper, MemberRechargeUsdt> implements MemberRechargeUsdtService {
     @Resource
-    private RecommendService                    recommendService;
+    private MemberRecommendManager memberRecommendManager;
     @Resource
-    private MemberMoneyManager                  memberMoneyManager;
+    private MemberMoneyManager     memberMoneyManager;
     @Resource
     private MemberInfoMapper                    memberInfoMapper;
     @Resource
@@ -200,7 +200,7 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         //usdt充值日志
         memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, 1, update.getRemark() );
         //新增佣金记录
-        recommendService.recommendProcess( memberInfo, rechargeMoney );
+        memberRecommendManager.recommendProcess( memberInfo, rechargeMoney );
         //更新usdt充值记录表状态
         int i = this.baseMapper.updateById( update );
         if ( i < 0 ) {

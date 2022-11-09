@@ -9,6 +9,8 @@ package tv.game88.core.config.constants;
 public class Constants {
     public static final String CONFIG_PREX = "config:";
     public static final String MEMBER_PREX = "member:";
+    public static final String MESSAGE     = "message:";
+    public static final String ACTIVITY    = "activity:";
 
     public static final String MEMBER_CODE      = MEMBER_PREX + "member-code";
     public static final Long   MEMBER_CODE_INIT = 10000L;
@@ -21,5 +23,6 @@ public class Constants {
      * 登录会员 redis user key
      */
     public static final String MEMBER_LOGIN_USER  = MEMBER_PREX + "login:user:";
+
 
 }

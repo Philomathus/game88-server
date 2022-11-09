@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
@@ -19,7 +20,7 @@ import java.util.List;
 @RestController
 @Tag( name = "活动及任务相关接口" )
 @Log4j2
-public class ActivityController {
+public class ActivityController extends BaseController {
     @Resource
     private ActivityService activityService;
 

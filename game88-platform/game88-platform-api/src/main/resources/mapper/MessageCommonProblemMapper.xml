@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.MessageCommonProblemMapper">
+    <resultMap type="tv.game88.platform.api.entity.MessageCommonProblem" id="MessageCommonProblemResult">
+        <result property="id" column="id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="sort" column="sort" />
+        <result property="effect" column="effect" />
+        <result property="createTime" column="create_time" />
+        <result property="createBy" column="create_by" />
+    </resultMap>
+
+    <sql id="selectMessageCommonProblemVo">
+        select id, title, content, sort, effect, create_time, create_by
+        from message_common_problem
+    </sql>
+
+    <select id="selectMessageCommonProblemList" parameterType="tv.game88.platform.api.entity.MessageCommonProblem"
+            resultMap="MessageCommonProblemResult">
+        <include refid="selectMessageCommonProblemVo" />
+        <where>
+            <if test="title != null  and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null  and content != ''">
+                and content = #{content}
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+        </where>
+    </select>
+</mapper>

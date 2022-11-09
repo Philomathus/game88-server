@@ -2,7 +2,7 @@ package tv.game88.core.member.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.exception.NoMoneyException;
@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
-@Component
+@Service
 @Log4j2
 public class MemberMoneyManager {
 
