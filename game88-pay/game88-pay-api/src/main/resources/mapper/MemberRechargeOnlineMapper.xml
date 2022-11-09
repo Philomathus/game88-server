@@ -20,10 +20,12 @@
     </resultMap>
 
     <sql id="selectMemberRechargeOnlineVo">
-        select order_no,member_id,platform_id,channel_id,upper_order_no,
-               money,real_money,payment_address,pay_time,status,
-               patch_order,remark,update_time, `first`, rate
-        from member_recharge_online
+        select mro.order_no,mro.member_id,pp.name as platformName,pc.name as channelName,mro.upper_order_no,
+               mro.money,mro.real_money,mro.payment_address,mro.pay_time,mro.status,
+               mro.patch_order,mro.remark,mro.update_time, mro.`first`, mro.rate
+        from member_recharge_online mro
+        left join pay_platform pp on pp.id = mro.platform_id
+        left join pay_channel pc on pc.id = mro.channel_id
     </sql>
 
     <select id="selectMemberRechargeOnlineList" parameterType="tv.game88.pay.api.entity.MemberRechargeOnline"
@@ -80,7 +82,7 @@
     </sql>
 
     <sql id="replenishmentTotal">
-        select sum(sub_money) replenishmentTotalMoney
+        select sum(real_money) replenishmentTotalMoney
         from member_recharge_online
         where 1=1
         <include refid="listWhere"/>
@@ -106,4 +108,10 @@
         and pay_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
         order by pay_time desc
     </select>
+
+    <select id="selectMemberRechargeOnlineById" parameterType="java.lang.String" resultType="tv.game88.pay.api.entity.MemberRechargeOnline">
+        <include refid="selectMemberRechargeOnlineVo" />
+       Where order_no = #{id}
+    </select>
+
 </mapper>
