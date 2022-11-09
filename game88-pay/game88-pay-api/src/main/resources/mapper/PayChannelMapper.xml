@@ -85,4 +85,13 @@
         select id, name, recharge_max, recharge_min, quick_amount, input_type, remark, open_level_min, open_level_max
         from pay_channel where type_id = #{typeId} and status = 1 and del_flag = 0
     </select>
+
+    <select id="selectPayChannelName" resultType="tv.game88.pay.api.dto.RspPayChannelName">
+        select c.id, p.name platformName, c.name channelName, c.rate payRate
+        from pay_channel c left join pay_platform p on c.platform_id = p.id
+        where c.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
