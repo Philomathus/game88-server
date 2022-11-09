@@ -1,6 +1,7 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import tv.game88.common.vo.RspBase;
 import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
@@ -25,7 +26,13 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
             req.setSelectStartDate( selectDate[ 0 ] );
             req.setSelectEndDate( selectDate[ 1 ] );
         }
-        return this.baseMapper.selectMemberRechargeOnlineList( req );
+        List<MemberRechargeOnline> memberRechargeOnlines = this.baseMapper.selectMemberRechargeOnlineList( req );
+        for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlines ) {
+            if( BooleanUtils.isTrue( memberRechargeOnline.getPatchOrder() ) && memberRechargeOnline.getStatus() == 1){
+                memberRechargeOnline.setStatus( 2 );
+            }
+        }
+        return memberRechargeOnlines;
     }
 
     @Override
@@ -50,6 +57,11 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
 
         payService.updatePayJourStatus( memberRechargeOnline );
         return RspBase.ok( "人工补单成功" );
+    }
+
+    @Override
+    public MemberRechargeOnline selectMemberRechargeOnlineById( String id ) {
+        return this.baseMapper.selectMemberRechargeOnlineById(id);
     }
 }
 

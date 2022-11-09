@@ -194,7 +194,7 @@ public class PayServiceImpl implements PayService {
         }
 
         BigDecimal firstRechargeCashBack = BigDecimal.ZERO; // 首冲赠送彩金
-        if ( updatePayJour.getFirst() && configEnvCacheUtil.getConfBool( "is_first_recharge_cash_back" ) ) {
+        if ( BooleanUtils.isTrue( updatePayJour.getFirst() ) && configEnvCacheUtil.getConfBool( "is_first_recharge_cash_back" ) ) {
             BigDecimal rebate = cashBackFirstRechargeMapper.selectByRechargeMoney( payJourMoney );
             if ( rebate != null && rebate.compareTo( BigDecimal.ZERO ) > 0 ) {
                 firstRechargeCashBack = rebate;
