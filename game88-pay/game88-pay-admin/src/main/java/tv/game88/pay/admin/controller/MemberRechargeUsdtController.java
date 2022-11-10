@@ -47,7 +47,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 查询USDT充值信息列表统计
      */
-    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeLog:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:list')" )
     @GetMapping( "/listCount" )
     public RspBase<Map> listCount( ReqMemberRechargeUsdt req ) {
         return memberRechargeUsdtService.listCount( req );
