@@ -48,7 +48,7 @@ public class PayChannelController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payChannel:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<PayChannel>> listAll(){
-        return RspBase.ok(payChannelService.selectPayChannelList( null ));
+        return RspBase.ok(payChannelService.list());
     }
 
     /**
