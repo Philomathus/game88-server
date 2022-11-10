@@ -1,6 +1,7 @@
 package tv.game88.common.utils;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -135,5 +136,29 @@ public class LocalDateTimeUtils {
     public static LocalDateTime getEndOfToday() {
         LocalDate localDate = LocalDate.now();
         return localDate.atTime( 23, 59, 59 );
+    }
+
+    /**
+     * 判断是否同一周
+     *
+     * @param one
+     * @param two
+     */
+    public static boolean isSameWeek( LocalDateTime one, LocalDateTime two ) {
+        LocalDate oneLocalDate = one.with( DayOfWeek.MONDAY ).toLocalDate();
+        LocalDate twoLocalDate = two.with( DayOfWeek.MONDAY ).toLocalDate();
+        return oneLocalDate.compareTo( twoLocalDate ) == 0;
+    }
+
+    /**
+     * 判断是否同一个月
+     *
+     * @param one
+     * @param two
+     */
+    public static boolean isSameMonth( LocalDateTime one, LocalDateTime two ) {
+        LocalDate oneLocalDate = LocalDate.of( one.getYear(), one.getMonth(), 1 );
+        LocalDate twoLocalDate = LocalDate.of( two.getYear(), two.getMonth(), 1 );
+        return oneLocalDate.compareTo( twoLocalDate ) == 0;
     }
 }

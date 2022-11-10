@@ -9,6 +9,7 @@ import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.platform.api.dto.*;
+import tv.game88.platform.api.entity.MemberVipGift;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -67,7 +68,11 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     List<RspLogMoney> getFundDetails( String memberId, ReqLogMoney reqLogMoney );
 
-    List<RspConfigTradeType> getTradeTypes();
-
     List<RspCodeFlow> getCodeFlowList( String memberId );
+
+    RspVipInfo getVipGiftInfo( String memberId );
+
+    RspBase<?> receiveVipGift( String userId, Integer type );
+
+    void receiveVipGift( String memberId, boolean isInsert, MemberVipGift saveOrUpdate, String name, BigDecimal addMoney );
 }

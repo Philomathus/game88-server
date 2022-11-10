@@ -228,6 +228,9 @@
 	<select id="getUserCharge" resultType="java.math.BigDecimal">
 		select account_charge from member_info where id = #{memberId}
 	</select>
+	<select id="getUserVip" resultType="int">
+		select vip from member_info where id = #{memberId}
+	</select>
 
 	<update id="subMoney">
 		update member_info set account_now = account_now - #{money} where id = #{userId} and account_now - #{money} >=0

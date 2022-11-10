@@ -1,8 +1,13 @@
 package tv.game88.core.member.enums;
 
 import lombok.Getter;
+import tv.game88.core.member.dto.RspConfigTradeType;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 交易类型 type>0  为入金 type>0&&type<100  为充值
@@ -53,5 +58,15 @@ public enum EnumMoney {
 			}
 		}
 		return null;
+	}
+
+	public static List<RspConfigTradeType> getTradeTypes() {
+		return Arrays.stream( EnumMoney.values() ).map( m -> {
+			RspConfigTradeType tradeType = new RspConfigTradeType();
+			tradeType.setName( m.name() );
+			tradeType.setType( m.getType() );
+			tradeType.setDes( m.getDes() );
+			return tradeType;
+		} ).sorted( Comparator.comparing( RspConfigTradeType::getType ) ).collect( Collectors.toList() );
 	}
 }
