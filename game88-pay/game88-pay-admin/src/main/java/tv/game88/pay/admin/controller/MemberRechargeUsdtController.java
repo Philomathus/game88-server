@@ -27,7 +27,7 @@ import java.util.Map;
  * @author mengJun
  */
 @RestController
-@RequestMapping( "/admin/memberRechargeUsdt" )
+@RequestMapping( "/pay/memberRechargeUsdt" )
 public class MemberRechargeUsdtController extends BaseController {
     @Resource
     private MemberRechargeUsdtService memberRechargeUsdtService;
@@ -35,7 +35,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 查询USDT充值信息列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MemberRechargeUsdt>> list( ReqMemberRechargeUsdt reqMemberRechargeUsdt ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -47,7 +47,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 查询USDT充值信息列表统计
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeLog:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeLog:list')" )
     @GetMapping( "/listCount" )
     public RspBase<Map> listCount( ReqMemberRechargeUsdt req ) {
         return memberRechargeUsdtService.listCount( req );
@@ -56,7 +56,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 导出USDT充值信息列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:export')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:export')" )
     @Log( title = "USDT充值信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReqMemberRechargeUsdt req, HttpServletResponse response ) {
@@ -67,7 +67,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 获取USDT充值信息详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:query')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:query')" )
     @GetMapping( value = "/{orderNo}" )
     public RspBase<?> getInfo( @PathVariable( "orderNo" ) String orderNo ) {
         return RspBase.ok( memberRechargeUsdtService.getById( orderNo ) );
@@ -76,7 +76,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 锁定USDT充值信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
     @GetMapping( value = "/lock/{orderNo}" )
     public RspBase<?> lock( @PathVariable( "orderNo" ) String orderNo ) {
         return memberRechargeUsdtService.lock( orderNo, SecurityUtils.getUsername() );
@@ -85,7 +85,7 @@ public class MemberRechargeUsdtController extends BaseController {
     /**
      * 解锁USDT充值信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
     @GetMapping( value = "/unLock/{orderNo}" )
     public RspBase<?> unLock( @PathVariable( "orderNo" ) String orderNo ) {
         LoginUser     loginUser = SecurityUtils.getLoginUser();
@@ -95,14 +95,14 @@ public class MemberRechargeUsdtController extends BaseController {
         return memberRechargeUsdtService.unLock( orderNo, userName, contains );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
     @Log( title = "拒绝USDT充值信息", businessType = BusinessType.UPDATE )
     @PutMapping( "/refused/{orderNo}" )
     public RspBase<?> refuse( @PathVariable( "orderNo" ) String orderNo ) {
         return memberRechargeUsdtService.refused( orderNo, SecurityUtils.getUsername() );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:memberRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
     @Log( title = "通过USDT充值信息", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody MemberRechargeUsdt memberRechargeUsdt ) throws Exception {
