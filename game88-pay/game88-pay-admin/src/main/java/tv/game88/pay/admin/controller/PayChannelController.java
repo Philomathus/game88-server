@@ -45,6 +45,12 @@ public class PayChannelController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
+    @PreAuthorize( "@ss.hasPermi('pay:payChannel:list')" )
+    @GetMapping( "/listAll" )
+    public RspBase<List<PayChannel>> listAll(){
+        return RspBase.ok(payChannelService.selectPayChannelList( null ));
+    }
+
     /**
      * 导出支付通道列表
      */
