@@ -1,6 +1,7 @@
 package tv.game88.core.member.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class MemberRecommend implements Serializable {
+    @TableId
     private String        id;
     @Excel( name = "充值人ID" )
     private String        memberId;
@@ -29,10 +31,6 @@ public class MemberRecommend implements Serializable {
     private BigDecimal    orderMoney;
     @Excel( name = "推广等级" )
     private Integer       level;
-    @Excel( name = "充值人账号" )
-    private String        memberName;
-    @Excel( name = "推广人账号" )
-    private String        inviter;
     @Excel( name = "创建时间" )
     private LocalDateTime createTime;
 }

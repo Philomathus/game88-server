@@ -3,10 +3,10 @@ package tv.game88.core.member.manager;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.member.cache.ConfigRecommendCacheUtils;
 import tv.game88.core.member.entity.ConfigRecommend;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.entity.MemberRecommend;
-import tv.game88.core.member.mapper.ConfigRecommendMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.mapper.MemberRecommendMapper;
 
@@ -14,24 +14,19 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class MemberRecommendManager {
     @Resource
-    private MemberInfoMapper      memberInfoMapper;
+    private MemberInfoMapper          memberInfoMapper;
     @Resource
-    private ConfigRecommendMapper configRecommendMapper;
+    private ConfigRecommendCacheUtils configRecommendCacheUtils;
     @Resource
-    private MemberRecommendMapper memberRecommendMapper;
+    private MemberRecommendMapper     memberRecommendMapper;
 
     public void recommendProcess( MemberInfo memberInfo, BigDecimal rechargeMoney ) {
         if ( StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
-            Map<Integer, ConfigRecommend> billMap = configRecommendMapper
-                    .selectList( null )
-                    .stream()
-                    .collect( Collectors.toMap( ConfigRecommend::getLevel, Function.identity() ) );
+            Map<Integer, ConfigRecommend> billMap = configRecommendCacheUtils.getBillMap();
 
             MemberInfo rd1 = memberInfoMapper.findRecommendByInviterCode( memberInfo.getInviterCode() );
             MemberInfo rd2 = null;
@@ -54,14 +49,12 @@ public class MemberRecommendManager {
         memberRecommend.setId( IdWorker.get32UUID() );
         memberRecommend.setCreateTime( LocalDateTime.now() );
         memberRecommend.setMemberId( memberInfo.getId() );
-        memberRecommend.setMemberName( memberInfo.getNickName() );
         memberRecommend.setCommission( commission );
         memberRecommend.setStatus( 0 );
         memberRecommend.setCode( memberInfo.getId() );
         memberRecommend.setOrderMoney( rechargeMoney );
         memberRecommend.setLevel( key );
         memberRecommend.setInviterId( rd.getId() );
-        memberRecommend.setInviter( rd.getNickName() );
         memberRecommendMapper.insert( memberRecommend );
     }
 }

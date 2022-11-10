@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ConfigVipMapper">
+    <resultMap id="ConfigVipResult" type="tv.game88.platform.api.entity.ConfigVip">
+        <id column="level" property="level" />
+        <result column="level_bonus" property="levelBonus" />
+        <result column="week_bonus" property="weekBonus" />
+        <result column="month_bonus" property="monthBonus" />
+        <result column="channel" property="channel" />
+        <result column="client" property="client" />
+        <result column="bcode" property="bcode" />
+    </resultMap>
+    <sql id="selectConfigVipVo">
+        select `level`,
+               level_bonus,
+               week_bonus,
+               month_bonus,
+               channel,
+               client,
+               bcode
+        from config_vip
+    </sql>
+
+    <select id="selectConfigVipList" parameterType="tv.game88.platform.api.entity.ConfigVip" resultMap="ConfigVipResult">
+        <include refid="selectConfigVipVo" />
+        <where>
+            <if test="level != null">
+                and `level` = #{level}
+            </if>
+        </where>
+    </select>
+</mapper>

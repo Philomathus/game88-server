@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.MemberVipGiftMapper">
+    <resultMap type="tv.game88.platform.api.entity.MemberVipGift" id="MemberVipGiftResult">
+        <result property="memberId" column="member_id" />
+        <result property="levelBonusVip" column="level_bonus_vip" />
+        <result property="weekBonusTime" column="week_bonus_time" />
+        <result property="monthBonusTime" column="month_bonus_time" />
+    </resultMap>
+
+    <sql id="selectMemberVipGiftVo">
+        select member_id, level_bonus_vip, week_bonus_time, month_bonus_time
+        from member_vip_gift
+    </sql>
+
+    <select id="selectMemberVipGiftList" parameterType="tv.game88.platform.api.entity.MemberVipGift"
+            resultMap="MemberVipGiftResult">
+        <include refid="selectMemberVipGiftVo" />
+        <where>
+            <if test="levelBonusVip != null">
+                and level_bonus_vip = #{levelBonusVip}
+            </if>
+        </where>
+    </select>
+</mapper>

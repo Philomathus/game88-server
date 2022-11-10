@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="tv.game88.platform.api.mapper.LogCommissionMapper">
+    <resultMap type="tv.game88.platform.api.entity.LogCommission" id="CommissionRecordsResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="commission" column="commission" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectCommissionRecordsVo">
+        select id, member_id, commission, create_time
+        from log_commission
+    </sql>
+
+    <select id="selectCommissionRecordsList" parameterType="tv.game88.platform.api.entity.LogCommission"
+            resultMap="CommissionRecordsResult">
+        <include refid="selectCommissionRecordsVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="commission != null">
+                and commission = #{commission}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByMemberId" resultType="tv.game88.platform.api.dto.RspDetailCommission">
+        select commission, create_time
+        from log_commission
+        where member_id = #{memberId}
+        order by create_time desc
+    </select>
+</mapper>

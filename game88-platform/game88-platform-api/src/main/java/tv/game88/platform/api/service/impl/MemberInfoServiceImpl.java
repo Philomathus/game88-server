@@ -39,7 +39,11 @@ import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.platform.api.cache.ConfigVipCacheUtils;
 import tv.game88.platform.api.dto.*;
+import tv.game88.platform.api.entity.ConfigVip;
+import tv.game88.platform.api.entity.MemberVipGift;
+import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
 
@@ -68,6 +72,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Resource
     private SmsPhoneCacheUtil     smsPhoneCacheUtil;
     @Resource
+    private ConfigVipCacheUtils   configVipCacheUtils;
+    @Resource
     private SmsApi                smsApi;
     @Resource
     private ForkJoinPool          forkJoinPool;
@@ -75,6 +81,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MemberCardMapper      memberCardMapper;
     @Resource
     private MemberBcodeMapper     memberBcodeMapper;
+    @Resource
+    private MemberVipGiftMapper   memberVipGiftMapper;
     @Resource
     private MemberMoneyManager    memberMoneyManager;
     @Resource
@@ -794,20 +802,136 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public List<RspConfigTradeType> getTradeTypes() {
-        List<RspConfigTradeType> tradeTypes = new ArrayList<>();
-        for ( EnumMoney value : EnumMoney.values() ) {
-            RspConfigTradeType tradeType = new RspConfigTradeType();
-            tradeType.setName( value.name() );
-            tradeType.setType( value.getType() );
-            tradeType.setDes( value.getDes() );
-            tradeTypes.add( tradeType );
-        }
-        return tradeTypes;
+    public List<RspCodeFlow> getCodeFlowList( String memberId ) {
+        return memberBcodeMapper.findByMemberId( memberId );
     }
 
     @Override
-    public List<RspCodeFlow> getCodeFlowList( String memberId ) {
-        return memberBcodeMapper.findByMemberId( memberId );
+    public RspVipInfo getVipGiftInfo( String memberId ) {
+        RspVipInfo              rsp          = new RspVipInfo();
+        Integer       vip           = this.baseMapper.getUserVip( memberId );
+        Map<Integer, ConfigVip> configVipMap = configVipCacheUtils.getConfigVipMap();
+        rsp.setVipSetList( configVipMap.values().stream().map( v -> {
+            RspVipSet rspVipSet = new RspVipSet();
+            BeanUtils.copyProperties( v, rspVipSet );
+            return rspVipSet;
+        } ).sorted( Comparator.comparing( RspVipSet::getLevel ) ).collect( Collectors.toList() ) );
+        ConfigVip     vipSet        = configVipMap.get( vip );
+        MemberVipGift memberVipGift = memberVipGiftMapper.selectById( memberId );
+        if ( memberVipGift == null ) {
+            rsp.setLevelBonusStatus( 1 );
+            rsp.setWeekBonusStatus( 1 );
+            rsp.setMonthBonusStatus( 1 );
+        } else {
+            rsp.setLevelBonusStatus( 2 );
+            rsp.setWeekBonusStatus( 2 );
+            rsp.setMonthBonusStatus( 2 );
+            if ( vip > memberVipGift.getLevelBonusVip() ) {
+                rsp.setLevelBonusStatus( 1 );
+            }
+            LocalDateTime now = LocalDateTime.now();
+            if ( memberVipGift.getWeekBonusTime() == null
+                    || !LocalDateTimeUtils.isSameWeek( memberVipGift.getWeekBonusTime(), now ) ) {
+                rsp.setWeekBonusStatus( 1 );
+            }
+            if ( memberVipGift.getMonthBonusTime() == null
+                    || !LocalDateTimeUtils.isSameMonth( memberVipGift.getMonthBonusTime(), now ) ) {
+                rsp.setMonthBonusStatus( 1 );
+            }
+        }
+        if ( vipSet.getLevelBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
+            rsp.setLevelBonusStatus( 0 );
+        }
+        if ( vipSet.getWeekBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
+            rsp.setWeekBonusStatus( 0 );
+        }
+        if ( vipSet.getMonthBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
+            rsp.setMonthBonusStatus( 0 );
+        }
+        return rsp;
+    }
+
+    @Override
+    public RspBase<?> receiveVipGift( String memberId, Integer type ) {
+        if ( type == null || type < 1 || type > 3 ) {
+            return RspBase.businessError( "参数有误" );
+        }
+        if ( !redisUtils.lock( "receiveVipGift" + memberId, 5 ) ) {
+            return RspBase.businessError( "请勿重复提交" );
+        }
+        Integer       vip           = this.baseMapper.getUserVip( memberId );
+        MemberVipGift memberVipGift = memberVipGiftMapper.selectById( memberId );
+        ConfigVip     configVip     = configVipCacheUtils.getConfigVipMap().get( vip );
+        boolean       isInsert;
+        LocalDateTime now           = LocalDateTime.now();
+        MemberVipGift saveOrUpdate  = new MemberVipGift();
+        if ( memberVipGift == null ) {
+            saveOrUpdate.setMemberId( memberId );
+            isInsert = true;
+            if ( type == 1 ) {
+                saveOrUpdate.setLevelBonusVip( vip );
+            } else if ( type == 2 ) {
+                saveOrUpdate.setWeekBonusTime( now );
+                saveOrUpdate.setLevelBonusVip( 0 );
+            } else {
+                saveOrUpdate.setMonthBonusTime( now );
+                saveOrUpdate.setLevelBonusVip( 0 );
+            }
+
+        } else {
+            isInsert = false;
+            saveOrUpdate.setMemberId( memberId );
+            if ( type == 1 ) {
+                if ( Objects.equals( memberVipGift.getLevelBonusVip(), vip ) ) {
+                    return RspBase.businessError( "晋级彩金重复领取" );
+                }
+                saveOrUpdate.setLevelBonusVip( vip );
+            } else if ( type == 2 ) {
+                if ( memberVipGift.getWeekBonusTime() != null
+                        && LocalDateTimeUtils.isSameWeek( memberVipGift.getWeekBonusTime(), now ) ) {
+                    return RspBase.businessError( "周彩金重复领取" );
+                }
+                saveOrUpdate.setWeekBonusTime( now );
+            } else {
+                if ( memberVipGift.getMonthBonusTime() != null
+                        && LocalDateTimeUtils.isSameMonth( memberVipGift.getMonthBonusTime(), now ) ) {
+                    return RspBase.businessError( "月彩金重复领取" );
+                }
+                saveOrUpdate.setMonthBonusTime( now );
+            }
+
+        }
+        String     name = "vip:" + vip;
+        BigDecimal addMoney;
+        if ( type == 1 ) {
+            name     = name + "晋级彩金";
+            addMoney = configVip.getLevelBonus();
+        } else if ( type == 2 ) {
+            name     = name + "周俸禄";
+            addMoney = configVip.getWeekBonus();
+        } else {
+            name     = name + "月俸禄";
+            addMoney = configVip.getMonthBonus();
+        }
+        SpringUtils.getBean( MemberInfoService.class ).receiveVipGift( memberId, isInsert, saveOrUpdate, name, addMoney );
+
+        redisUtils.unLock( "receiveVipGift" + memberId );
+        return RspBase.ok( "领取成功" );
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    public void receiveVipGift( String memberId, boolean isInsert, MemberVipGift saveOrUpdate, String name,
+                                BigDecimal addMoney ) {
+        int i;
+        if ( isInsert ) {
+            i = memberVipGiftMapper.insert( saveOrUpdate );
+        } else {
+            i = memberVipGiftMapper.updateById( saveOrUpdate );
+        }
+        if ( i <= 0 ) {
+            throw new BusinessException( "领取异常,请重试" );
+        }
+        //会员加钱，日志
+        memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, 1, name + "奖励:" + addMoney.toString() );
     }
 }

@@ -12,7 +12,9 @@ import tv.game88.common.page.PageDomain;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.ReqLogMoney;
 import tv.game88.core.member.dto.RspCodeFlow;
+import tv.game88.core.member.dto.RspConfigTradeType;
 import tv.game88.core.member.dto.RspLogMoney;
+import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
@@ -74,7 +76,7 @@ public class MemberInfoController extends BaseController {
     @Operation( summary = "获取交易状态列表" )
     @PostMapping( "/getTradeTypes" )
     public RspBase<List<RspConfigTradeType>> getTradeTypes() {
-        return RspBase.ok( memberInfoService.getTradeTypes() );
+        return RspBase.ok( EnumMoney.getTradeTypes() );
     }
 
     @Operation( summary = "获取会员资金明细" )
@@ -83,5 +85,17 @@ public class MemberInfoController extends BaseController {
         startPage( pageDomain );
         List<RspCodeFlow> codeFlows = memberInfoService.getCodeFlowList( MemberSecurityUtils.getUserId() );
         return getRspBasePage( codeFlows, pageDomain );
+    }
+
+    @Operation( summary = "获取VIP特权信息" )
+    @PostMapping( "/getVipGiftInfo" )
+    public RspBase<RspVipInfo> getVipGiftInfo() {
+        return RspBase.ok( memberInfoService.getVipGiftInfo( MemberSecurityUtils.getUserId() ) );
+    }
+
+    @Operation( summary = "领取vip奖励" )
+    @PostMapping( "/receiveVipGift" )
+    public RspBase<?> receiveVipGift( @RequestBody ReqReceiveVipGift req ) {
+        return memberInfoService.receiveVipGift( MemberSecurityUtils.getUserId(), req.getType() );
     }
 }

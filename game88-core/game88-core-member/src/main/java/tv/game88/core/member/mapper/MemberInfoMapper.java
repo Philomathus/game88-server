@@ -45,6 +45,8 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
      */
     BigDecimal getUserCharge( @Param( "memberId" ) String memberId );
 
+    Integer getUserVip( @Param( "memberId" ) String memberId );
+
     /**
      * @param userId   会员ID
      * @param money    增加的金额
