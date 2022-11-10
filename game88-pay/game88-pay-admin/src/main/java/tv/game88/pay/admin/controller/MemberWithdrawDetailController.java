@@ -175,7 +175,7 @@ public class MemberWithdrawDetailController extends BaseController {
     }
 
     @Log( title = "修改备注", businessType = BusinessType.AUDIT )
-    @PostMapping( "/updateRemark" )
+    @PutMapping( "/updateRemark" )
     public RspBase<?> updateRemark( @RequestBody ReqMemberWithdrawDetail req ) {
         return memberWithdrawDetailService.updateRemark( req, SecurityUtils.getUsername() );
     }
