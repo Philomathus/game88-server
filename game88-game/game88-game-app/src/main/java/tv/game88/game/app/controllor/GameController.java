@@ -1,0 +1,36 @@
+package tv.game88.game.app.controllor;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.vo.RspBase;
+import tv.game88.game.api.dto.ReqGame;
+import tv.game88.game.api.dto.RspGameInfo;
+import tv.game88.game.api.dto.RspGameTypes;
+import tv.game88.game.api.service.GameService;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@RestController
+@Tag( name = "游戏相关接口" )
+@Log4j2
+public class GameController {
+    @Resource
+    private GameService gameService;
+
+    @Operation( summary = "获取游戏分类列表" )
+    @PostMapping( "/getGameTypes" )
+    public RspBase<RspGameTypes> getGameTypes() {
+        return RspBase.ok( gameService.getGameTypes() );
+    }
+
+    @Operation( summary = "根据类型获取游戏列表" )
+    @PostMapping( "/getGameInfoList" )
+    public RspBase<List<RspGameInfo>> getGameInfoList( @RequestBody ReqGame req ) {
+        return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
+    }
+}

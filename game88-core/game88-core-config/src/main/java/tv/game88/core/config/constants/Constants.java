@@ -7,10 +7,11 @@ package tv.game88.core.config.constants;
  * @author admin
  */
 public class Constants {
-    public static final String CONFIG_PREX = "config:";
-    public static final String MEMBER_PREX = "member:";
-    public static final String MESSAGE     = "message:";
-    public static final String ACTIVITY    = "activity:";
+    public static final String CONFIG_PREX   = "config:";
+    public static final String MEMBER_PREX   = "member:";
+    public static final String MESSAGE_PREX  = "message:";
+    public static final String ACTIVITY_PREX = "activity:";
+    public static final String GAME_PREX     = "game:";
 
     public static final String MEMBER_CODE      = MEMBER_PREX + "member-code";
     public static final Long   MEMBER_CODE_INIT = 10000L;

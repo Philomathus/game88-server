@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.GameTypeWithMapper">
+    <insert id="insertBatch">
+        insert into game_type_with (type_id, game_info_id, sort) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.typeId}, #{item.gameInfoId}, #{item.sort})
+        </foreach>
+    </insert>
+</mapper>

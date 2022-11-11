@@ -49,7 +49,7 @@
         <googleauth.version>1.5.0</googleauth.version>
         <bitwalker.version>1.21</bitwalker.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <guava.version>31.1-jre</guava.version>
+        <caffeine.version>3.1.1</caffeine.version>
 
         <tencentcloud.vesion>3.1.617</tencentcloud.vesion>
         <aliyun.core.version>4.6.2</aliyun.core.version>
@@ -175,11 +175,11 @@
                 <version>${googleauth.version}</version>
             </dependency>
 
-            <!-- guava -->
+            <!-- caffeine -->
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
             </dependency>
 
             <!-- 百度SDK -->

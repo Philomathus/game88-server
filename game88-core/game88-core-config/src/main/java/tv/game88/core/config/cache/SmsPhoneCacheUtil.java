@@ -22,14 +22,14 @@ public class SmsPhoneCacheUtil {
     @Resource
     private RedisUtils redisUtil;
 
-    public String getPhoneCode( String phone ) {//获取缓存中的手机号
+    public String getPhoneCode( String phone ) {// 获取缓存中的手机号
         if ( phone != null && phone.startsWith( "0" ) ) {
             phone = phone.replaceFirst( "0", "" );
         }
         return redisUtil.strGet( SMS_PHONE + phone );
     }
 
-    public String getPhoneIndex( String phone ) {//获取缓存中的短信运行商下表
+    public String getPhoneIndex( String phone ) {// 获取缓存中的短信运行商下表
         if ( phone != null && phone.startsWith( "0" ) ) {
             phone = phone.replaceFirst( "0", "" );
         }
@@ -41,9 +41,9 @@ public class SmsPhoneCacheUtil {
             phone = phone.replaceFirst( "0", "" );
         }
         redisUtil.strSet( SMS_PHONE + phone, code, Duration.ofMinutes( 10 ) );
-        redisUtil.strSet( SMS_PHONE_INDEX + phone, index, Duration.ofMinutes( 10 ) );//有效期
-        redisUtil.strSet( SMS_PHONE_EXPIRE + phone, index, Duration.ofMinutes( 1 ) );//一分钟
-        redisUtil.strSet( SMS_PHONE_NUMBER + phone, "0", Duration.ofMinutes( 10 ) );//五分钟
+        redisUtil.strSet( SMS_PHONE_INDEX + phone, index, Duration.ofMinutes( 10 ) );
+        redisUtil.strSet( SMS_PHONE_EXPIRE + phone, index, Duration.ofMinutes( 1 ) );
+        redisUtil.strSet( SMS_PHONE_NUMBER + phone, "0", Duration.ofMinutes( 10 ) );
     }
 
     public String getSmsPhoneExpire( String phone ) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.GameTypeMapper">
+    <resultMap type="tv.game88.game.api.entity.GameType" id="GameTypeResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="effect" column="effect" />
+        <result property="icon" column="icon" />
+        <result property="sort" column="sort" />
+    </resultMap>
+
+    <sql id="selectGameTypeVo">
+        select id, name, effect, icon, sort
+        from game_type
+    </sql>
+
+    <select id="selectGameTypeList" parameterType="tv.game88.game.api.entity.GameType" resultMap="GameTypeResult">
+        <include refid="selectGameTypeVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+        </where>
+    </select>
+</mapper>

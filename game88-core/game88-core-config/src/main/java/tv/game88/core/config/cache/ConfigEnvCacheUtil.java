@@ -1,21 +1,19 @@
 package tv.game88.core.config.cache;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.config.mapper.ConfigEnvironmentMapper;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -24,23 +22,16 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class ConfigEnvCacheUtil {
-    private static final String                SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
-    // 最大容量 maximumSize
-    // 缓存过期时长 expireAfterWrite
-    // 设置并发级别为cpu核心数 concurrencyLevel
-    private static final Cache<String, String> LOCAL_CACHE    = CacheBuilder
-            .newBuilder()
-            .maximumSize( Integer.MAX_VALUE )
-            .expireAfterWrite( 2, TimeUnit.SECONDS )
-            .concurrencyLevel( Runtime.getRuntime().availableProcessors() * 2 )
-            .build();
+    private static final String SYS_CONFIG_KEY = Constants.CONFIG_PREX + "env";
 
     @Resource
     private RedisUtils              redisUtil;
     @Resource
+    private Cache<String, String>   caffeineCache;
+    @Resource
     private ConfigEnvironmentMapper configEnvironmentMapper;
 
-    public String dynamicValue( String value ) {
+    private String dynamicValue( String value ) {
         if ( value != null && value.contains( "${" ) && value.contains( "}" ) ) {
             String param      = value.substring( value.indexOf( "${" ) + 2, value.indexOf( "}" ) );
             String paramValue = this.getConf( param );
@@ -59,14 +50,13 @@ public class ConfigEnvCacheUtil {
         List<Object> objects    = redisUtil.hMGet( SYS_CONFIG_KEY, codes );
         List<String> resultList = new ArrayList<>( objects.size() );
         for ( Object object : objects ) {
-            String value = object != null ? this.dynamicValue( object.toString() ) : null;
-            resultList.add( value );
+            resultList.add( this.dynamicValue( object.toString() ) );
         }
         return resultList;
     }
 
     public String getConf( String code, String defaultValue ) {
-        String cacheValue = LOCAL_CACHE.getIfPresent( code );
+        String cacheValue = caffeineCache.getIfPresent( code );
         if ( StringUtils.isBlank( cacheValue ) ) {
             Boolean exists = redisUtil.exists( SYS_CONFIG_KEY );
             if ( exists == null || !exists ) {
@@ -76,10 +66,10 @@ public class ConfigEnvCacheUtil {
             if ( value == null ) {
                 return defaultValue;
             }
-            LOCAL_CACHE.put( code, value.toString() );
-            return this.dynamicValue( LOCAL_CACHE.getIfPresent( code ) );
+            caffeineCache.put( code, value.toString() );
+            return this.dynamicValue( caffeineCache.getIfPresent( code ) );
         }
-        return cacheValue;
+        return this.dynamicValue( cacheValue );
 
 
     }

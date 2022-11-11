@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 @Component
 public class ActivityCacheUtil {
     // 活动类型
-    public static final String ACTIVITY_TYPE_KEY       = Constants.ACTIVITY + "activityType";
-    public static final String ACTIVITY_INFO_KEY       = Constants.ACTIVITY + "activityInfo";
+    public static final String ACTIVITY_TYPE_KEY       = Constants.ACTIVITY_PREX + "activityType";
+    public static final String ACTIVITY_INFO_KEY       = Constants.ACTIVITY_PREX + "activityInfo";
     //任务
-    public static final String ACTIVITY_QUEST_INFO_KEY = Constants.ACTIVITY + "activityQuestInfo";
-    public static final String ACTIVITY_QUEST_TYPE_KEY = Constants.ACTIVITY + "activityQuestType";
+    public static final String ACTIVITY_QUEST_INFO_KEY = Constants.ACTIVITY_PREX + "activityQuestInfo";
+    public static final String ACTIVITY_QUEST_TYPE_KEY = Constants.ACTIVITY_PREX + "activityQuestType";
 
     @Resource
     private RedisUtils redisUtil;

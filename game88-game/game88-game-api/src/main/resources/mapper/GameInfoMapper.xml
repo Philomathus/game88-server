@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.GameInfoMapper">
+    <resultMap type="tv.game88.game.api.entity.GameInfo" id="GameInfoResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="platformId" column="platform_id" />
+        <result property="kindId" column="kind_id" />
+        <result property="icon" column="icon" />
+        <result property="maintain" column="maintain" />
+        <result property="recommend" column="recommend" />
+        <result property="largeIcon" column="large_icon" />
+        <result property="effect" column="effect" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectGameInfoVo">
+        select id,
+               name,
+               platform_id,
+               kind_id,
+               icon,
+               maintain,
+               recommend,
+               large_icon,
+               effect,
+               create_time
+        from game_info
+    </sql>
+
+    <select id="selectGameInfoList" parameterType="tv.game88.game.api.entity.GameInfo" resultMap="GameInfoResult">
+        <include refid="selectGameInfoVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="kindId != null  and kindId != ''">
+                and kind_id = #{kindId}
+            </if>
+            <if test="maintain != null">
+                and maintain = #{maintain}
+            </if>
+            <if test="recommend != null">
+                and recommend = #{recommend}
+            </if>
+            <if test="largeIcon != null">
+                and large_icon = #{largeIcon}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListByType" resultMap="GameInfoResult">
+        select id, name, icon from game_info
+        where id in (select game_info_id from game_type_with where type_id = #{typeId})
+    </select>
+
+    <select id="selectListNotType" resultMap="GameInfoResult">
+        select id, name, icon from game_info
+        where id not in (select game_info_id from game_type_with where type_id = #{typeId})
+    </select>
+</mapper>

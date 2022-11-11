@@ -1,7 +1,6 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -250,7 +249,7 @@ public class PayAgentServiceImpl implements PayAgentService {
             }
         }
         redisUtil.unLock( "payAgent" + userName );
-        return RspBase.ok( ImmutableMap.of( "fail", failReasonList, "success", sucessNum ) );
+        return RspBase.ok( Map.of( "fail", failReasonList, "success", sucessNum ) );
     }
 
     @Override

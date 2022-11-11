@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 @Component
 public class MessageCacheUtil {
 
-    public static final String HOME_NOTICE    = Constants.MESSAGE + "homeNotices";
-    public static final String COMMON_PROBLEM = Constants.MESSAGE + "commonProblem";
-    public static final String ON_SITE        = Constants.MESSAGE + "onSite";
+    public static final String HOME_NOTICE    = Constants.MESSAGE_PREX + "homeNotices";
+    public static final String COMMON_PROBLEM = Constants.MESSAGE_PREX + "commonProblem";
+    public static final String ON_SITE        = Constants.MESSAGE_PREX + "onSite";
 
     @Resource
     private RedisUtils redisUtils;
