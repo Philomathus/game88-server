@@ -88,6 +88,10 @@ public class MemberWithdrawDetail {
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Long  payAgentChannelId;
+
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String[] searchTime;
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
