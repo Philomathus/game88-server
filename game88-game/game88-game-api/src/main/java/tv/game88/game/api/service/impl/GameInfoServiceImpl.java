@@ -2,11 +2,14 @@ package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.dto.ReqGameTypeWith;
 import tv.game88.game.api.entity.GameInfo;
+import tv.game88.game.api.entity.GameType;
 import tv.game88.game.api.entity.GameTypeWith;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GameTypeWithMapper;
@@ -36,7 +39,14 @@ public class GameInfoServiceImpl extends ServiceImpl<GameInfoMapper, GameInfo> i
      */
     @Override
     public List<GameInfo> selectGameInfoList( GameInfo gameInfo ) {
-        return this.baseMapper.selectGameInfoList( gameInfo );
+        List<GameInfo> gameInfos = this.baseMapper.selectGameInfoList( gameInfo );
+        String         domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( GameInfo info : gameInfos ) {
+            if ( StringUtils.isNotBlank( info.getIcon() ) && !info.getIcon().startsWith( "http" ) ) {
+                info.setIcon( domainValue + info.getIcon() );
+            }
+        }
+        return gameInfos;
     }
 
     @Override
