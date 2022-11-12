@@ -1,6 +1,8 @@
 package tv.game88.game.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +19,7 @@ public class GameType {
     /**
      * 系统编号
      */
+    @TableId( type = IdType.AUTO )
     private Long id;
 
     /**

@@ -323,7 +323,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             MemberWithdrawDetailService detailService = SpringUtils.getBean( MemberWithdrawDetailService.class );
 
             String mark = "操作人:" + userName + " ip:" + ServletUtil.getIp();
-            detailService.refusedUpdateProcess( update, mark );
+            detailService.refusedUpdateProcess( update, mark, memberWithdrawLog.getWithdrawId(),
+                    memberWithdrawLog.getWithdrawMoney() );
         } else {
             return RspBase.businessError(
                     "会员ID为" + memberWithdrawLog.getWithdrawId() + "该笔订单状态" + memberWithdrawLog.getStatus()
@@ -335,14 +336,13 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void refusedUpdateProcess( MemberWithdrawDetail memberWithdrawLog, String mark ) {
-        int i = this.baseMapper.updateById( memberWithdrawLog );
+    public void refusedUpdateProcess( MemberWithdrawDetail update, String mark, String withdrawId, BigDecimal withdrawMoney ) {
+        int i = this.baseMapper.updateById( update );
         if ( i <= 0 ) {
             throw new BusinessException( "回退失败" );
         }
         //回退提现金额
-        memberMoneyManager.addMemberMoney( memberWithdrawLog.getWithdrawId(), memberWithdrawLog.getWithdrawMoney(),
-                EnumMoney.BOHUI, 1, mark );
+        memberMoneyManager.addMemberMoney( withdrawId, withdrawMoney, EnumMoney.BOHUI, 1, mark );
     }
 
     @Override
@@ -374,7 +374,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 update.setStatus( 2 );//审核不通过
                 update.setOpName( userName );
                 update.setUpdateTime( LocalDateTime.now() );
-                detailService.refusedUpdateProcess( update, mark );
+                detailService.refusedUpdateProcess( update, mark, withdrawDetail.getWithdrawId(),
+                        withdrawDetail.getWithdrawMoney() );
             } else {
                 return RspBase.businessError(
                         "会员ID为" + withdrawDetail.getWithdrawId() + "该笔订单状态" + withdrawDetail.getStatus()

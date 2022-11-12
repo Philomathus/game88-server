@@ -282,16 +282,21 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     @Transactional( rollbackFor = Exception.class )
     public void synchDb( String tableName ) {
-        GenTable             table        = genTableMapper.selectGenTableByName( tableName );
-        List<GenTableColumn> tableColumns = table.getColumns();
-        List<String> tableColumnNames = tableColumns.stream().map( GenTableColumn::getColumnName ).collect( Collectors.toList() );
+        GenTable             table            = genTableMapper.selectGenTableByName( tableName );
+        List<GenTableColumn> tableColumns     = table.getColumns();
+        List<String>         tableColumnNames = tableColumns
+                .stream()
+                .map( GenTableColumn::getColumnName )
+                .collect( Collectors.toList() );
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName( tableName );
         if ( CollectionUtils.isEmpty( dbTableColumns ) ) {
             throw new BusinessException( "同步数据失败，原表结构不存在" );
         }
-        List<String> dbTableColumnNames = dbTableColumns.stream().map( GenTableColumn::getColumnName )
-                                                        .collect( Collectors.toList() );
+        List<String> dbTableColumnNames = dbTableColumns
+                .stream()
+                .map( GenTableColumn::getColumnName )
+                .collect( Collectors.toList() );
 
         dbTableColumns.forEach( column -> {
             if ( !tableColumnNames.contains( column.getColumnName() ) ) {
@@ -300,9 +305,10 @@ public class GenTableServiceImpl implements IGenTableService {
             }
         } );
 
-        List<GenTableColumn> delColumns = tableColumns.stream()
-                                                      .filter( column -> !dbTableColumnNames.contains( column.getColumnName() ) )
-                                                      .collect( Collectors.toList() );
+        List<GenTableColumn> delColumns = tableColumns
+                .stream()
+                .filter( column -> !dbTableColumnNames.contains( column.getColumnName() ) )
+                .collect( Collectors.toList() );
         if ( CollectionUtils.isEmpty( delColumns ) ) {
             genTableColumnMapper.deleteGenTableColumns( delColumns );
         }
@@ -433,11 +439,12 @@ public class GenTableServiceImpl implements IGenTableService {
     public void setTableFromOptions( GenTable genTable ) {
         Map<String, Object> paramsMap = JsonUtil.json2Map( genTable.getOptions() );
         if ( !CollectionUtils.isEmpty( paramsMap ) ) {
-            String  treeCode       = ( String ) paramsMap.get( GenConstants.TREE_CODE );
-            String  treeParentCode = ( String ) paramsMap.get( GenConstants.TREE_PARENT_CODE );
-            String  treeName       = ( String ) paramsMap.get( GenConstants.TREE_NAME );
-            Integer parentMenuId   = ( Integer ) paramsMap.get( GenConstants.PARENT_MENU_ID );
-            String  parentMenuName = ( String ) paramsMap.get( GenConstants.PARENT_MENU_NAME );
+            String treeCode       = ( String ) paramsMap.get( GenConstants.TREE_CODE );
+            String treeParentCode = ( String ) paramsMap.get( GenConstants.TREE_PARENT_CODE );
+            String treeName       = ( String ) paramsMap.get( GenConstants.TREE_NAME );
+            Object o              = paramsMap.get( GenConstants.PARENT_MENU_ID );
+            int    parentMenuId   = o != null && StringUtils.isNotBlank( o.toString() ) ? ( Integer ) o : 0;
+            String parentMenuName = ( String ) paramsMap.get( GenConstants.PARENT_MENU_NAME );
 
             genTable.setTreeCode( treeCode );
             genTable.setTreeParentCode( treeParentCode );

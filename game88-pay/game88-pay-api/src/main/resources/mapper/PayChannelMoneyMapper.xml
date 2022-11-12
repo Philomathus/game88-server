@@ -12,7 +12,7 @@
     </resultMap>
 
     <sql id="selectPayChannelMoneyVo">
-        select id,money,channel_id,channel_pay_rate,type_id,open_level_min,open_level_max
+        select id, money, channel_id, channel_pay_rate, type_id, open_level_min, open_level_max
         from pay_channel_money
     </sql>
 
@@ -45,8 +45,8 @@
         select distinct money
         from pay_channel_money
         where type_id = #{typeId}
-        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
+          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
+          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
         order by money
     </select>
 
@@ -54,32 +54,36 @@
         select channel_id
         from pay_channel_money
         where type_id = #{typeId}
-        and money = #{money}
-        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        ORDER BY RAND()
-        LIMIT 1
+          and money = #{money}
+          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
+          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
+        ORDER BY RAND() LIMIT 1
     </select>
 
     <select id="maxRateChannel" resultType="java.lang.Integer">
         select channel_id
         from pay_channel_money
         where type_id = #{typeId}
-        and money = #{money}
-        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        order by channel_pay_rate desc
-        LIMIT 1
+          and money = #{money}
+          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
+          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
+        order by channel_pay_rate desc LIMIT 1
     </select>
 
     <select id="minRateChannel" resultType="java.lang.Integer">
         select channel_id
         from pay_channel_money
         where type_id = #{typeId}
-        and money = #{money}
-        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        order by channel_pay_rate asc
-        LIMIT 1
+          and money = #{money}
+          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
+          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
+        order by channel_pay_rate asc LIMIT 1
     </select>
+
+    <delete id="deleteByChannelIds">
+        delete from pay_channel_money where channel_id in
+        <foreach item="id" collection="channelIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

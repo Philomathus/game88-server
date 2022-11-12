@@ -15,4 +15,6 @@ public interface PayChannelMapper extends BaseMapper<PayChannel> {
     List<RspPayChannel> selectRspListByTypeId( Long typeId );
 
     List<RspPayChannelName> selectPayChannelName( @Param( "array" ) Set<Long> channelIds );
+
+    String successRate( @Param( "id" ) Long id );
 }

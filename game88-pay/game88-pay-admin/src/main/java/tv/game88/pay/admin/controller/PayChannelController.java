@@ -1,8 +1,10 @@
 package tv.game88.pay.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
@@ -18,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,8 +50,8 @@ public class PayChannelController extends BaseController {
 
     @PreAuthorize( "@ss.hasPermi('pay:payChannel:list')" )
     @GetMapping( "/listAll" )
-    public RspBase<List<PayChannel>> listAll(){
-        return RspBase.ok(payChannelService.list());
+    public RspBase<List<PayChannel>> listAll() {
+        return RspBase.ok( payChannelService.list() );
     }
 
     /**
@@ -78,10 +81,9 @@ public class PayChannelController extends BaseController {
     @Log( title = "支付通道", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody PayChannel payChannel ) {
-        payChannel.setQuickAmount( payChannel.getQuickAmount().trim().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         payChannel.setCreateBy( SecurityUtils.getUsername() );
         payChannel.setCreateTime( LocalDateTime.now() );
-        return toResult( payChannelService.save( payChannel ) );
+        return payChannelService.insertPayChannel( payChannel );
     }
 
     /**
@@ -91,14 +93,13 @@ public class PayChannelController extends BaseController {
     @Log( title = "支付通道", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody PayChannel payChannel ) {
-        payChannel.setQuickAmount( payChannel.getQuickAmount().trim().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         payChannel.setUpdateBy( SecurityUtils.getUsername() );
         payChannel.setUpdateTime( LocalDateTime.now() );
-        boolean isUpdate = payChannelService.updateById( payChannel );
-        if ( isUpdate ) {
+        RspBase<?> rspBase = payChannelService.updatePayChannel( payChannel );
+        if ( rspBase.getCode() == HttpStatus.SUCCESS ) {
             payCacheUtil.clearPayChannel( payChannel.getId() );
         }
-        return toResult( isUpdate );
+        return rspBase;
     }
 
     /**
@@ -108,15 +109,28 @@ public class PayChannelController extends BaseController {
     @Log( title = "支付通道", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
+        List<PayChannel> list = payChannelService.list( new QueryWrapper<PayChannel>()
+                .in( "id", Arrays.asList( ids ) )
+                .select( "id", "effect" ) );
+        for ( PayChannel payChannel : list ) {
+            if ( payChannel.getEffect() ) {
+                return RspBase.businessError( "激活中的通道不允许删除,请先关闭通道" );
+            }
+        }
         List<PayChannel> updateBatch = new ArrayList<>();
         for ( Long id : ids ) {
             PayChannel update = new PayChannel();
             update.setId( id );
-            update.setEffect( false );
             update.setDelFlag( true );
             updateBatch.add( update );
         }
-        return toResult( payChannelService.updateBatchById( updateBatch ) );
+        boolean isSave = payChannelService.updateBatchById( updateBatch );
+        if ( isSave ) {
+            for ( Long id : ids ) {
+                payCacheUtil.clearPayChannel( id );
+            }
+        }
+        return toResult( isSave );
     }
 
     /**
@@ -126,10 +140,11 @@ public class PayChannelController extends BaseController {
     @Log( title = "支付通道激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {
-        PayChannel update = new PayChannel();
-        update.setId( id );
-        update.setEffect( effect );
-        return toResult( payChannelService.updateById( update ) );
+        RspBase<?> rspBase = payChannelService.updateEffect( id, effect );
+        if ( rspBase.getCode() == HttpStatus.SUCCESS ) {
+            payCacheUtil.clearPayChannel( id );
+        }
+        return rspBase;
     }
 
     /**

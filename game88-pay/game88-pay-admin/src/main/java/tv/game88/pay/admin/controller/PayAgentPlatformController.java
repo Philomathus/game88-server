@@ -91,6 +91,18 @@ public class PayAgentPlatformController extends BaseController {
         if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
             payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         }
+        if ( !payAgentPlatform.getHeaderValue() ) {
+            payAgentPlatform.setHeaderValueExplain( "" );
+        }
+        if ( !payAgentPlatform.getSignMd5() ) {
+            payAgentPlatform.setSignMd5Explain( "" );
+        }
+        if ( !payAgentPlatform.getSignPublicKey() ) {
+            payAgentPlatform.setSignPublicKeyExplain( "" );
+        }
+        if ( !payAgentPlatform.getSignPrivateKey() ) {
+            payAgentPlatform.setSignPrivateKeyExplain( "" );
+        }
         payAgentPlatform.setCreateBy( SecurityUtils.getUsername() );
         payAgentPlatform.setCreateTime( LocalDateTime.now() );
         return toResult( payAgentPlatformService.save( payAgentPlatform ) );
@@ -106,12 +118,25 @@ public class PayAgentPlatformController extends BaseController {
         if ( StringUtils.isBlank( payAgentPlatform.getCode() ) ) {
             return RspBase.businessError( "代付平台编码不能为空" );
         }
-        if ( payAgentPlatformService.count( new QueryWrapper<PayAgentPlatform>().eq( "code", payAgentPlatform.getCode() )
+        if ( payAgentPlatformService.count( new QueryWrapper<PayAgentPlatform>()
+                .eq( "code", payAgentPlatform.getCode() )
                 .eq( "id", payAgentPlatform.getId() ) ) <= 0 ) {
             return RspBase.businessError( "代付平台编码不允许修改" );
         }
         if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
             payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
+        }
+        if ( !payAgentPlatform.getHeaderValue() ) {
+            payAgentPlatform.setHeaderValueExplain( "" );
+        }
+        if ( !payAgentPlatform.getSignMd5() ) {
+            payAgentPlatform.setSignMd5Explain( "" );
+        }
+        if ( !payAgentPlatform.getSignPublicKey() ) {
+            payAgentPlatform.setSignPublicKeyExplain( "" );
+        }
+        if ( !payAgentPlatform.getSignPrivateKey() ) {
+            payAgentPlatform.setSignPrivateKeyExplain( "" );
         }
         payAgentPlatform.setUpdateBy( SecurityUtils.getUsername() );
         payAgentPlatform.setUpdateTime( LocalDateTime.now() );

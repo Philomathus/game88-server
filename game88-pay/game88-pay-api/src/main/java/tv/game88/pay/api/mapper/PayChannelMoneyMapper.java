@@ -27,4 +27,6 @@ public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {
 
     Integer minRateChannel( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
                             @Param( "vipLevel" ) Integer vipLevel );
+
+    int deleteByChannelIds( @Param( "channelIds" ) List<Long> channelIds );
 }

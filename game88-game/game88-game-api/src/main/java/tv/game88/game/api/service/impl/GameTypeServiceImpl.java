@@ -1,7 +1,9 @@
 package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.entity.GameType;
 import tv.game88.game.api.mapper.GameTypeMapper;
 import tv.game88.game.api.service.GameTypeService;
@@ -24,6 +26,13 @@ public class GameTypeServiceImpl extends ServiceImpl<GameTypeMapper, GameType> i
      */
     @Override
     public List<GameType> selectGameTypeList( GameType gameType ) {
-        return this.baseMapper.selectGameTypeList( gameType );
+        List<GameType> gameTypes   = this.baseMapper.selectGameTypeList( gameType );
+        String         domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( GameType type : gameTypes ) {
+            if ( StringUtils.isNotBlank( type.getIcon() ) && !type.getIcon().startsWith( "http" ) ) {
+                type.setIcon( domainValue + type.getIcon() );
+            }
+        }
+        return gameTypes;
     }
 }
