@@ -56,12 +56,33 @@
     </select>
 
     <select id="selectListByType" resultMap="GameInfoResult">
-        select id, name, icon from game_info
+        select id, name, icon
+        from game_info
         where id in (select game_info_id from game_type_with where type_id = #{typeId})
     </select>
 
     <select id="selectListNotType" resultMap="GameInfoResult">
-        select id, name, icon from game_info
+        select id, name, icon
+        from game_info
         where id not in (select game_info_id from game_type_with where type_id = #{typeId})
+    </select>
+
+    <select id="selectRspList" resultType="tv.game88.game.api.dto.RspGameInfo">
+        select i.id,
+               i.name,
+               i.icon,
+               i.maintain,
+               i.recommend,
+               i.large_icon,
+               p.game_category,
+               p.maintain platform_maintain
+        from game_info i
+                 left join game_platform p on p.id = i.platform_id
+        where i.effect = 1
+          and p.effect = 1
+          and i.id in
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item}
+        </foreach>
     </select>
 </mapper>

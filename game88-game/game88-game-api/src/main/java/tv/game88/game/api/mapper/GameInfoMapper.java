@@ -1,6 +1,7 @@
 package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GameInfo;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface GameInfoMapper extends BaseMapper<GameInfo> {
     List<GameInfo> selectListByType( Long typeId );
 
     List<GameInfo> selectListNotType( Long typeId );
+
+    List<RspGameInfo> selectRspList( List<Long> infoIds );
 }

@@ -100,15 +100,7 @@ public class GameCacheUtils {
                     .stream()
                     .map( o -> ( Long ) o )
                     .toList();
-            List<RspGameInfo> rspGameInfoList = gameInfoMapper
-                    .selectList( new QueryWrapper<GameInfo>().in( "id", infoIds ) )
-                    .stream()
-                    .map( info -> {
-                        RspGameInfo rspGameInfo = new RspGameInfo();
-                        BeanUtils.copyProperties( info, rspGameInfo );
-                        return rspGameInfo;
-                    } )
-                    .collect( Collectors.toList() );
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( infoIds );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
                 redisUtils.sAdd( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );
             }
@@ -129,5 +121,9 @@ public class GameCacheUtils {
                 .stream()
                 .map( o -> ( Long ) o )
                 .forEach( typeId -> this.clear( GAME_TYPE_INFO_WITH + typeId ) );
+    }
+
+    public void clearTypeWithByPlatformId( Long platformId ) {
+        gameTypeWithMapper.selectTypeIdByPlatformId( platformId ).forEach( typeId -> this.clear( GAME_TYPE_INFO_WITH + typeId ) );
     }
 }

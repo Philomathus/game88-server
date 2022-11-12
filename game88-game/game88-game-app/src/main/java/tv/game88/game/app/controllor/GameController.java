@@ -3,10 +3,12 @@ package tv.game88.game.app.controllor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.ReqGame;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.dto.RspGameTypes;
@@ -30,7 +32,13 @@ public class GameController {
 
     @Operation( summary = "根据类型获取游戏列表" )
     @PostMapping( "/getGameInfoList" )
-    public RspBase<List<RspGameInfo>> getGameInfoList( @RequestBody ReqGame req ) {
+    public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
         return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
+    }
+
+    @Operation( summary = "进入游戏" )
+    @PostMapping( "/joinGame" )
+    public RspBase<?> joinGame( @Validated @RequestBody ReqGame req ) {
+        return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
 }

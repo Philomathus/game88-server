@@ -1,9 +1,11 @@
 package tv.game88.game.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.game.api.type.EnumGameCategory;
 
 @Data
 public class RspGameInfo {
@@ -19,6 +21,17 @@ public class RspGameInfo {
     private Boolean recommend;
     @Schema( title = "是否大图标" )
     private Boolean largeIcon;
+
+    @Schema( title = "游戏类别" )
+    private EnumGameCategory gameCategory;
+
+    @Schema( title = "平台维护", hidden = true )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Boolean platformMaintain;
+
+    public Boolean getMaintain() {
+        return maintain || platformMaintain;
+    }
 
     public String getIcon() {
         if ( StringUtils.isNotBlank( icon ) && !icon.startsWith( "http" ) ) {

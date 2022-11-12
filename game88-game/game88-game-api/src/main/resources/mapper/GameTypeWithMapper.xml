@@ -7,4 +7,10 @@
             (#{item.typeId}, #{item.gameInfoId}, #{item.sort})
         </foreach>
     </insert>
+
+    <select id="selectTypeIdByPlatformId" resultType="java.lang.Long">
+        select distinct type_id
+        from game_type_with
+        where game_info_id in (select id from game_info where platform_id = #{platformId})
+    </select>
 </mapper>
