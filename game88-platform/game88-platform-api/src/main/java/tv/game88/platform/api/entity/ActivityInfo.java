@@ -1,5 +1,7 @@
 package tv.game88.platform.api.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,7 @@ public class ActivityInfo {
     /**
      * 系统编号
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

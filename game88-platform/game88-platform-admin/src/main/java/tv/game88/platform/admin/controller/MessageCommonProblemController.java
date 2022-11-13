@@ -26,7 +26,7 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/message/messageCommonProblem" )
+@RequestMapping( "/message/commonProblem" )
 public class MessageCommonProblemController extends BaseController {
     @Resource
     private MessageCommonProblemService messageCommonProblemService;
@@ -36,7 +36,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 查询常用问题列表
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:list')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MessageCommonProblem>> list( MessageCommonProblem messageCommonProblem ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -48,7 +48,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 导出常用问题列表
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:export')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:export')" )
     @Log( title = "常用问题", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( MessageCommonProblem messageCommonProblem, HttpServletResponse response ) {
@@ -59,7 +59,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 获取常用问题详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:query')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<MessageCommonProblem> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( messageCommonProblemService.getById( id ) );
@@ -68,7 +68,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 新增常用问题
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:add')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:add')" )
     @Log( title = "常用问题", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody MessageCommonProblem messageCommonProblem ) {
@@ -81,7 +81,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 修改常用问题
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:edit')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:edit')" )
     @Log( title = "常用问题", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody MessageCommonProblem messageCommonProblem ) {
@@ -96,7 +96,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 删除常用问题
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:remove')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:remove')" )
     @Log( title = "常用问题", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
@@ -110,7 +110,7 @@ public class MessageCommonProblemController extends BaseController {
     /**
      * 修改常用问题激活状态
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageCommonProblem:effect')" )
+    @PreAuthorize( "@ss.hasPermi('message:commonProblem:effect')" )
     @Log( title = "常用问题激活状态", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {

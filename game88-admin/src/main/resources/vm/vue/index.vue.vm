@@ -196,9 +196,9 @@
         <el-form-item label="${comment}">
           <file-upload v-model="form.${field}"/>
         </el-form-item>
-#elseif($column.htmlType == "editor")
+#elseif($column.htmlType == "WangEditor")
         <el-form-item label="${comment}">
-          <editor v-model="form.${field}" :min-height="192"/>
+            <WangEditor v-model="form.${field}" image-path="${moduleName}"/>
         </el-form-item>
 #elseif($column.htmlType == "select" && "" != $dictType)
         <el-form-item label="${comment}" prop="${field}">

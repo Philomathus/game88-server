@@ -133,7 +133,7 @@
 	</insert>
 
 	<insert id="insertDefault">
-		insert into log_money${dbNodes}(id, user_id,type, des, income,
+		insert into log_money(id, user_id,type, des, income,
 		pay, total_before, total, agent,create_time, mark,markorder)
 		values (#{req.id},#{req.userId},#{req.type},#{req.des},#{req.income},
 				#{req.pay}, #{req.totalBefore}, #{req.total},#{req.createTime},#{req.mark},#{req.markorder})

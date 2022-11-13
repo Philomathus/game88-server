@@ -135,7 +135,7 @@ public class GenConstants {
 	/**
 	 * 富文本控件
 	 */
-	public static final String HTML_EDITOR = "editor";
+	public static final String HTML_EDITOR = "WangEditor";
 
 	/**
 	 * 字符串类型

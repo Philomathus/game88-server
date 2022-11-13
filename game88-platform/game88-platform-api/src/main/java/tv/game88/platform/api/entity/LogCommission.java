@@ -1,5 +1,7 @@
 package tv.game88.platform.api.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class LogCommission {
     @Schema( title = "系统编号" )
+    @TableId(type = IdType.AUTO)
     private Long          id;
     @Schema( title = "会员ID" )
     private String        memberId;

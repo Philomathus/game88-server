@@ -6,12 +6,10 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
-import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.platform.api.cache.ActivityCacheUtil;
 import tv.game88.platform.api.entity.ActivityInfo;
 import tv.game88.platform.api.service.ActivityInfoService;
@@ -74,11 +72,6 @@ public class ActivityInfoController extends BaseController {
     @Log( title = "活动信息", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody ActivityInfo activityInfo ) {
-        if ( activityInfo.getType() == 0 && StringUtils.isNotBlank( activityInfo.getContent() ) ) {
-            activityInfo.setContent( activityInfo
-                    .getContent()
-                    .replaceAll( ConfigDomainCacheUtil.me.getDomainOssValue(), "\\$\\{domain\\.oss\\}" ) );
-        }
         activityInfo.setCreateBy( SecurityUtils.getUsername() );
         activityInfo.setCreateTime( LocalDateTime.now() );
         activityInfo.setEffect( false );
@@ -92,11 +85,6 @@ public class ActivityInfoController extends BaseController {
     @Log( title = "活动信息", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ActivityInfo activityInfo ) {
-        if ( activityInfo.getType() == 0 && StringUtils.isNotBlank( activityInfo.getContent() ) ) {
-            activityInfo.setContent( activityInfo
-                    .getContent()
-                    .replaceAll( ConfigDomainCacheUtil.me.getDomainOssValue(), "\\$\\{domain\\.oss\\}" ) );
-        }
         activityInfo.setUpdateBy( SecurityUtils.getUsername() );
         activityInfo.setUpdateTime( LocalDateTime.now() );
         boolean isUpdate = activityInfoService.updateById( activityInfo );
