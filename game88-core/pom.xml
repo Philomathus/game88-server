@@ -23,4 +23,16 @@
         <module>game88-core-session</module>
         <module>game88-core-quest</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
