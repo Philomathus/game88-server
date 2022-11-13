@@ -6,6 +6,6 @@ package tv.game88.pay.api.constants;
  * @author mengJun
  */
 public abstract class ConstantsPay {
-	//KOLA支付
-	public static final String KOLA_PAY     = "kolaPay";
+    // LB支付
+    public static final String LB_PAY = "LBPay";
 }
