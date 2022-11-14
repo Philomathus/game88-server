@@ -85,7 +85,7 @@ public abstract class AbstractPay implements BasePay {
     protected boolean diffPayTime12Hour( LocalDateTime payTime, String merOrderNo ) {
         // 计算当前时间与下单时间相差的小时数
         // 超过48小时拒绝回调，可人工补单
-        if ( LocalDateTime.now().minusHours( 48 ).compareTo( payTime ) <= 0 ) {
+        if ( LocalDateTime.now().minusHours( 48 ).compareTo( payTime ) > 0 ) {
             log.warn( "超过48小时拒绝回调 - orderNo:{};payTime:{}", merOrderNo, payTime );
             return true;
         }
@@ -95,7 +95,7 @@ public abstract class AbstractPay implements BasePay {
     protected boolean verifyIP( Map<String, ?> requestMap, String realIp, PayPlatform payPlatform ) {
         if ( StringUtils.isNotBlank( payPlatform.getWhiteIp() ) ) {
             Set<String> whiteIpSet = Arrays.stream( payPlatform.getWhiteIp().split( "," ) ).collect( Collectors.toSet() );
-            if ( !whiteIpSet.contains( realIp ) && !"0:0:0:0:0:0:0:1".equals( realIp ) ) {
+            if ( !whiteIpSet.contains( realIp ) && !"0:0:0:0:0:0:0:1".equals( realIp ) && !"127.0.0.1".equals( realIp ) ) {
                 log.warn( "请求ip非白名单:{};支付平台:{};request:{}", realIp, payPlatform.getName(), JsonUtil.object2Json( requestMap ) );
                 return true;
             }

@@ -14,7 +14,7 @@ public interface PayService {
 
     List<RspPayChannel> findPayChannelList( Long typeId, PlatformUser platformUser );
 
-    List<RspPayChannel> findPayChannel(Long typeId, PlatformUser platformUser );
+    List<RspPayChannel> findPayChannel( Long typeId, PlatformUser platformUser );
 
     String payRedirect( String orderNo );
 
@@ -22,7 +22,8 @@ public interface PayService {
 
     void payQuery10Min() throws Exception;
 
-    String updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String[] notifyResultWays);
-    void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline);
+    String updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String[] notifyResultWays, String mark );
+
+    void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String mark );
 
 }

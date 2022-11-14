@@ -8,14 +8,12 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
 import tv.game88.pay.api.dto.RspPayChannelName;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
-import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
 import tv.game88.pay.api.mapper.PayChannelMapper;
 import tv.game88.pay.api.service.MemberRechargeOnlineService;
 import tv.game88.pay.api.service.PayService;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -77,7 +75,7 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
         memberRechargeOnline.setPatchOrder( true );
         memberRechargeOnline.setRemark( req.getRemark() );
 
-        payService.updatePayJourStatus( memberRechargeOnline );
+        payService.updatePayJourStatus( memberRechargeOnline, req.getRemark() );
         return RspBase.ok( "人工补单成功" );
     }
 
