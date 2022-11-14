@@ -26,7 +26,7 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/admin/activityQuestType" )
+@RequestMapping( "/activity/activityQuestType" )
 public class ActivityQuestTypeController extends BaseController {
     @Resource
     private ActivityQuestTypeService activityQuestTypeService;
@@ -36,7 +36,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 查询任务类型列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:list')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ActivityQuestType>> list( ActivityQuestType activityQuestType ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -48,7 +48,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 导出任务类型列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:export')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:export')" )
     @Log( title = "任务类型", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ActivityQuestType activityQuestType, HttpServletResponse response ) {
@@ -59,7 +59,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 获取任务类型详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:query')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<ActivityQuestType> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( activityQuestTypeService.getById( id ) );
@@ -68,7 +68,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 新增任务类型
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:add')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:add')" )
     @Log( title = "任务类型", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody ActivityQuestType activityQuestType ) {
@@ -84,7 +84,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 修改任务类型
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:edit')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:edit')" )
     @Log( title = "任务类型", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ActivityQuestType activityQuestType ) {
@@ -98,7 +98,7 @@ public class ActivityQuestTypeController extends BaseController {
     /**
      * 删除任务类型
      */
-    @PreAuthorize( "@ss.hasPermi('admin:activityQuestType:remove')" )
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:remove')" )
     @Log( title = "任务类型", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
