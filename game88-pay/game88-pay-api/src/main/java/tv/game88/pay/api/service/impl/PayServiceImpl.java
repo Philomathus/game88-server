@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Log4j2
@@ -123,7 +124,7 @@ public class PayServiceImpl implements PayService {
     }
 
     @Override
-    public String updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String[] notifyResultWays ) {
+    public String updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String[] notifyResultWays, String mark ) {
         // 下单金额与实际金额不符拒绝回调
         if ( memberRechargeOnline.getRealMoney() == null ) {
             log.warn( "请注意保存实际金额!!!" );
@@ -132,9 +133,8 @@ public class PayServiceImpl implements PayService {
         if ( memberRechargeOnline.getRealMoney() != null
                 && memberRechargeOnline.getRealMoney().compareTo( memberRechargeOnline.getMoney() ) != 0 ) {
             // 35是新火箭支付平台ID，0.85是扣除15%费率后的值，判断下单金额扣除15%费率后是否与实际金额相等，不相等拒绝回调
-            if ( memberRechargeOnline.getPlatformId() == 35 ) {
-                if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) )
-                        .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
+            if ( memberRechargeOnline.getPlatformId() == -1 ) {
+                if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) ).compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
                     log.warn( "下单金额与实际金额不符拒绝回调 - orderNo:{};money:{};subMoney:{}", memberRechargeOnline.getOrderNo(),
                             memberRechargeOnline.getMoney(), memberRechargeOnline.getRealMoney() );
                     return notifyResultWays[ 1 ];
@@ -147,7 +147,7 @@ public class PayServiceImpl implements PayService {
         }
 
         try {
-            SpringUtils.getBean( PayService.class ).updatePayJourStatus( memberRechargeOnline );
+            SpringUtils.getBean( PayService.class ).updatePayJourStatus( memberRechargeOnline, mark );
             return notifyResultWays[ 0 ];
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -157,7 +157,7 @@ public class PayServiceImpl implements PayService {
 
 
     @Transactional( rollbackFor = Exception.class )
-    public void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline ) {
+    public void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String mark ) {
         //更新支付订单状态
         MemberRechargeOnline updatePayJour = new MemberRechargeOnline();
         updatePayJour.setOrderNo( memberRechargeOnline.getOrderNo() );
@@ -182,7 +182,8 @@ public class PayServiceImpl implements PayService {
         BigDecimal chargeGive = null;
         PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
         if ( StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
-            chargeGive = new BigDecimal( payChannel.getDiscountBill() ).multiply( payJourMoney )
+            chargeGive = new BigDecimal( payChannel.getDiscountBill() )
+                    .multiply( payJourMoney )
                     .setScale( 2, RoundingMode.HALF_UP );
         } else {
             chargeGive = new BigDecimal( 0 );
@@ -194,7 +195,8 @@ public class PayServiceImpl implements PayService {
         }
 
         BigDecimal firstRechargeCashBack = BigDecimal.ZERO; // 首冲赠送彩金
-        if ( BooleanUtils.isTrue( updatePayJour.getFirst() ) && configEnvCacheUtil.getConfBool( "is_first_recharge_cash_back" ) ) {
+        if ( BooleanUtils.isTrue( updatePayJour.getFirst() )
+                && configEnvCacheUtil.getConfBool( "is_first_recharge_cash_back" ) ) {
             BigDecimal rebate = cashBackFirstRechargeMapper.selectByRechargeMoney( payJourMoney );
             if ( rebate != null && rebate.compareTo( BigDecimal.ZERO ) > 0 ) {
                 firstRechargeCashBack = rebate;
@@ -202,7 +204,7 @@ public class PayServiceImpl implements PayService {
         }
         BigDecimal money = payJourMoney.add( chargeGive ).add( firstRechargeCashBack );
 
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), money, EnumMoney.PAY, 1, memberRechargeOnline.getRemark() );
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), money, EnumMoney.PAY, 1, mark + "-充值:" + payJourMoney );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
         memberRechargeOnlineMapper.updateById( updatePayJour );
@@ -225,7 +227,8 @@ public class PayServiceImpl implements PayService {
     @Override
     @Transactional( rollbackFor = Exception.class )
     public void payQuery10Min() throws Exception {
-        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>().eq( "status", -1 )
+        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>()
+                .eq( "status", -1 )
                 .le( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) );
         List<MemberRechargeOnline> memberRechargeOnlineList = memberRechargeOnlineMapper.selectList( queryWrapper );
         for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlineList ) {
@@ -254,7 +257,8 @@ public class PayServiceImpl implements PayService {
             return RspBase.businessError( String.format( "请求订单过于频繁哦，请%s秒后再试", payIntervalExpire ) );
         }
         long payOrderNum = memberRechargeOnlineMapper.selectCount( new QueryWrapper<MemberRechargeOnline>()
-                .eq( "member_id", platformUser.getId() ).le( "status", 0 )
+                .eq( "member_id", platformUser.getId() )
+                .le( "status", 0 )
                 .ge( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) ) );
         if ( payOrderNum >= configEnvCacheUtil.getConfInt( "pay_order_num_5min", 10 ) ) {
             log.warn( "您请求订单次数过多{}", platformUser.getId() );
@@ -290,7 +294,7 @@ public class PayServiceImpl implements PayService {
                     + platformUser.getId(), "0", Duration.ofSeconds( configEnvCacheUtil.getConfInt( "pay_interval_sec" ) ) );
 
             insertPayLog( reqPayRecharge, platformUser, payChannel, payPlatform, paymentCode );
-            if ( ( reqPayRecharge.getUrlType() ) == 1 ) {
+            if ( Objects.equals( reqPayRecharge.getUrlType(), 1 ) ) {
                 return RspBase.ok( "获取充值连接成功",
                         configEnvCacheUtil.getConf( "payRedirectUrl" ) + reqPayRecharge.getOrderNo() );
             } else {

@@ -118,7 +118,8 @@ public class LBPayProcessor extends AbstractPay {
                 memberRechargeOnline.setRealMoney( pay_amount.setScale( 2, RoundingMode.HALF_UP ) );
                 String trade_no = requestMap.getOrDefault( "transaction_id", "" ).toString();
                 memberRechargeOnline.setUpperOrderNo( trade_no );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "OK", "FAIL" } );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "OK", "FAIL" },
+                        payPlatform.getName() + "-" + payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
