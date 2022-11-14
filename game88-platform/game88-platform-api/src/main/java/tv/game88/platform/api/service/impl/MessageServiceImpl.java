@@ -38,7 +38,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<RspMessageOnSite> getMessageOnSites( String userId ) {
+    public List<RspMessageOnSite> getMessageOnSites() {
         return messageCacheUtil.getMessageOnSites();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
@@ -26,13 +27,15 @@ public class ActivityController extends BaseController {
 
     @Operation( summary = "获取活动分类列表" )
     @PostMapping( "/getActivityTypes" )
-    public RspBase<List<RspActivityType>> getActivityTypes( @RequestHeader( "token" ) String token ) {
+    @Anonymous
+    public RspBase<List<RspActivityType>> getActivityTypes( @RequestHeader( value = "token", required = false ) String token ) {
         return RspBase.ok( activityService.getActivityTypes( token ) );
     }
 
     @Operation( summary = "获取活动列表" )
     @PostMapping( "/getActivityInfos" )
-    public RspBase<List<RspActivityInfo>> getActivityInfos( @RequestHeader( "token" ) String token,
+    @Anonymous
+    public RspBase<List<RspActivityInfo>> getActivityInfos( @RequestHeader( value = "token", required = false ) String token,
                                                             @Validated @RequestBody ReqActivityType req ) {
         return RspBase.ok( activityService.getActivityInfos( req.getId(), token ) );
     }

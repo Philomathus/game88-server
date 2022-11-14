@@ -11,5 +11,5 @@ public interface MessageService {
 
     List<RspMessageCommonProblem> getMessageCommonProblems();
 
-    List<RspMessageOnSite> getMessageOnSites( String userId );
+    List<RspMessageOnSite> getMessageOnSites();
 }

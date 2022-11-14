@@ -6,8 +6,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.RspMessageCommonProblem;
 import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
@@ -25,19 +25,22 @@ public class MessageController extends BaseController {
 
     @Operation( summary = "获取首页公告列表" )
     @PostMapping( "/getMessageHomeNotices" )
+    @Anonymous
     public RspBase<List<RspMessageHomeNotice>> getHomeNotices() {
         return RspBase.ok( messageService.getMessageHomeNotices() );
     }
 
     @Operation( summary = "常见问题列表" )
     @PostMapping( value = "/getMessageCommonProblems" )
+    @Anonymous
     public RspBase<List<RspMessageCommonProblem>> getCommonProblems() {
         return RspBase.ok( messageService.getMessageCommonProblems() );
     }
 
     @Operation( summary = "获取站内信息列表" )
     @PostMapping( "/getMessageOnSites" )
+    @Anonymous
     public RspBase<List<RspMessageOnSite>> getOnSiteMessages() {
-        return RspBase.ok( messageService.getMessageOnSites( MemberSecurityUtils.getUserId() ) );
+        return RspBase.ok( messageService.getMessageOnSites() );
     }
 }
