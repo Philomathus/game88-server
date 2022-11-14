@@ -12,6 +12,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqPayAgent;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.service.PayAgentChannelService;
@@ -35,6 +36,8 @@ public class PayAgentChannelController extends BaseController {
     private PayAgentChannelService payAgentChannelService;
     @Resource
     private PayAgentService        payAgentService;
+    @Resource
+    private PayCacheUtil           payCacheUtil;
 
     /**
      * 查询代付通道列表
@@ -128,7 +131,7 @@ public class PayAgentChannelController extends BaseController {
     public RspBase<?> edit( @RequestBody PayAgentChannel payAgentChannel ) {
         //如果还有*号加密的保存用原来的
         PayAgentChannel payAgentChannelOld = payAgentChannelService.getById( payAgentChannel.getId() );
-        String      a              = "***";
+        String          a                  = "***";
         if ( StringUtils.isNotBlank( payAgentChannel.getHeaderValue() ) ) {
             if ( payAgentChannel.getHeaderValue().contains( a ) ) {
                 payAgentChannel.setHeaderValue( payAgentChannelOld.getHeaderValue() );
@@ -159,7 +162,11 @@ public class PayAgentChannelController extends BaseController {
         }
         payAgentChannel.setUpdateBy( SecurityUtils.getUsername() );
         payAgentChannel.setUpdateTime( LocalDateTime.now() );
-        return toResult( payAgentChannelService.updateById( payAgentChannel ) );
+        boolean isSave = payAgentChannelService.updateById( payAgentChannel );
+        if ( isSave ) {
+            payCacheUtil.clearPayAgentChannel( payAgentChannel.getId() );
+        }
+        return toResult( isSave );
     }
 
     /**
@@ -169,7 +176,13 @@ public class PayAgentChannelController extends BaseController {
     @Log( title = "代付通道", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
-        return toResult( payAgentChannelService.removeBatchByIds( Arrays.asList( ids ) ) );
+        boolean isSave = payAgentChannelService.removeBatchByIds( Arrays.asList( ids ) );
+        if ( isSave ) {
+            for ( Long id : ids ) {
+                payCacheUtil.clearPayAgentChannel( id );
+            }
+        }
+        return toResult( isSave );
     }
 
     /**

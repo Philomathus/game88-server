@@ -5,9 +5,10 @@ import org.apache.commons.compress.utils.Sets;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
-import tv.game88.pay.api.mapper.PayAgentChannelMapper;
 import tv.game88.pay.api.mapper.PayAgentLogMapper;
+import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
 import tv.game88.pay.api.service.PayAgentService;
 
 import javax.annotation.Resource;
@@ -17,7 +18,9 @@ import java.util.Set;
 @Log4j2
 public abstract class AbstractPayAgent implements BasePayAgent {
     @Resource
-    protected PayAgentChannelMapper      payAgentChannelMapper;
+    protected PayCacheUtil               payCacheUtil;
+    @Resource
+    protected PayAgentPlatformMapper     payAgentPlatformMapper;
     @Resource
     protected MemberWithdrawDetailMapper withdrawDetailMapper;
     @Resource

@@ -6,12 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
-import tv.game88.pay.api.entity.PayChannel;
-import tv.game88.pay.api.entity.PayPlatform;
-import tv.game88.pay.api.entity.PayType;
-import tv.game88.pay.api.mapper.PayChannelMapper;
-import tv.game88.pay.api.mapper.PayPlatformMapper;
-import tv.game88.pay.api.mapper.PayTypeMapper;
+import tv.game88.pay.api.entity.*;
+import tv.game88.pay.api.mapper.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
@@ -28,17 +24,23 @@ public class PayCacheUtil {
     public static final String TYPE                    = "pay:type:";
     public static final String PLATFORM                = "pay:platform:";
     public static final String CHANNEL                 = "pay:channel:";
+    public static final String AGENT_PLATFORM          = "pay:agentPlatform:";
+    public static final String AGENT_CHANNEL           = "pay:agentChannel:";
     public static final String CHANNELSUCCESSRATE      = "pay:channelSuccessRate:";
     public static final String CHANNELSUCCESSRATE_LOCK = "pay:channelSuccessRateLock:";
 
     @Resource
-    private RedisUtils        redisUtil;
+    private RedisUtils             redisUtil;
     @Resource
-    private PayTypeMapper     payTypeMapper;
+    private PayTypeMapper          payTypeMapper;
     @Resource
-    private PayPlatformMapper payPlatformMapper;
+    private PayPlatformMapper      payPlatformMapper;
     @Resource
-    private PayChannelMapper  payChannelMapper;
+    private PayChannelMapper       payChannelMapper;
+    @Resource
+    private PayAgentPlatformMapper payAgentPlatformMapper;
+    @Resource
+    private PayAgentChannelMapper  payAgentChannelMapper;
 
     public void existsPayTypeList() {
         if ( !redisUtil.exists( TYPE_LIST ) ) {
@@ -168,6 +170,60 @@ public class PayCacheUtil {
     public void clearPayChannel( Serializable... payChannelIds ) {
         for ( Serializable payChannelId : payChannelIds ) {
             redisUtil.unlink( CHANNEL + payChannelId );
+        }
+    }
+
+    public void existsPayAgentPlatform( String code ) {
+        if ( !redisUtil.exists( AGENT_PLATFORM + code ) ) {
+            PayAgentPlatform payAgentPlatform = payAgentPlatformMapper.selectById( code );
+            if ( payAgentPlatform != null ) {
+                this.setPayAgentPlatform( payAgentPlatform );
+            }
+        }
+    }
+
+    public void setPayAgentPlatform( PayAgentPlatform payAgentPlatform ) {
+        redisUtil.unlink( AGENT_PLATFORM + payAgentPlatform.getCode() );
+        redisUtil.strSet(
+                AGENT_PLATFORM + payAgentPlatform.getCode(), JsonUtil.object2Json( payAgentPlatform ), Duration.ofHours( 6 ) );
+    }
+
+    public PayAgentPlatform getPayAgentPlatform( String code ) {
+        this.existsPayAgentPlatform( code );
+        String value = redisUtil.strGet( AGENT_PLATFORM + code );
+        return StringUtils.isNotBlank( value ) ? JsonUtil.json2Object( value, PayAgentPlatform.class ) : null;
+    }
+
+    public void clearPayAgentPlatform( String... codes ) {
+        for ( String code : codes ) {
+            redisUtil.unlink( AGENT_PLATFORM + code );
+        }
+    }
+
+    public void existsPayAgentChannel( Serializable payAgentChannelId ) {
+        if ( !redisUtil.exists( AGENT_CHANNEL + payAgentChannelId ) ) {
+            PayAgentChannel payAgentChannel = payAgentChannelMapper.selectById( payAgentChannelId );
+            if ( payAgentChannel != null ) {
+                this.setPayAgentChannel( payAgentChannel );
+            }
+        }
+    }
+
+    public void setPayAgentChannel( PayAgentChannel payAgentChannel ) {
+        redisUtil.unlink( AGENT_CHANNEL + payAgentChannel.getId() );
+        redisUtil.strSet(
+                AGENT_CHANNEL + payAgentChannel.getId(), JsonUtil.object2Json( payAgentChannel ), Duration.ofHours( 6 ) );
+    }
+
+    public PayAgentChannel getPayAgentChannel( Serializable payAgentChannelId ) {
+        this.existsPayAgentChannel( payAgentChannelId );
+        String value = redisUtil.strGet( AGENT_CHANNEL + payAgentChannelId );
+        return StringUtils.isNotBlank( value ) ? JsonUtil.json2Object( value, PayAgentChannel.class ) : null;
+    }
+
+    public void clearPayAgentChannel( Serializable... payAgentChannelIds ) {
+        for ( Serializable payAgentChannelId : payAgentChannelIds ) {
+            redisUtil.unlink( AGENT_CHANNEL + payAgentChannelId );
         }
     }
 

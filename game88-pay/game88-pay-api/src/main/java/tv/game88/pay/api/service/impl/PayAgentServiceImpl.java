@@ -46,8 +46,8 @@ public class PayAgentServiceImpl implements PayAgentService {
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
     @Resource
     private RedisUtils                   redisUtil;
-    @Value( "${payAgentLimitKoLaPay:10000}" )
-    private Integer                      payAgentLimitKoLaPay;
+    @Value( "${payAgentLimitLianFuBao:5000}" )
+    private Integer                      payAgentLimitLianFuBao;
 
     @Override
     @Transactional( rollbackFor = Exception.class )
@@ -143,13 +143,14 @@ public class PayAgentServiceImpl implements PayAgentService {
             return RspBase.businessError( "审核流程非法" );
         }
 
-        if ( payAgentPlatform.getCode().contains( ConstantsPayAgent.KOLA )
-                && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitKoLaPay ) ) > 0 ) {
-            return RspBase.businessError( "此代付暂不支持" + payAgentLimitKoLaPay + "以上出款" );
+        if ( payAgentPlatform.getCode().contains( ConstantsPayAgent.LIAN_FU_BAO )
+                && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitLianFuBao ) ) > 0 ) {
+            return RspBase.businessError( "此代付暂不支持" + payAgentLimitLianFuBao + "以上出款" );
         }
 
         long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() ).ne( "callback_status", 2 ) );
+                .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                .ne( "callback_status", 2 ) );
         if ( noFailCount > 0 ) {
             return RspBase.businessError( "此订单已被代付，请在三方后台跟踪订单状态" );
         }
@@ -164,7 +165,7 @@ public class PayAgentServiceImpl implements PayAgentService {
         PayAgentService payAgentService = SpringUtils.getBean( PayAgentService.class );
         payAgentService.processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4, 0 );
         BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
-        if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, reqPayAgent ) ) {
+        if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, reqPayAgent ) ) {
             return RspBase.ok( "代付订单提交成功" );
         }
 
@@ -218,7 +219,8 @@ public class PayAgentServiceImpl implements PayAgentService {
         PayAgentService     payAgentService = SpringUtils.getBean( PayAgentService.class );
         for ( MemberWithdrawDetail withdrawLog : withdrawLogs ) {
             long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                    .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() ).ne( "callback_status", 2 ) );
+                    .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                    .ne( "callback_status", 2 ) );
             if ( noFailCount > 0 ) {
                 failReasonList.put( withdrawLog.getWithdrawOrderNo(), "此订单已被代付，请在三方后台跟踪订单状态" );
                 continue;
@@ -238,7 +240,7 @@ public class PayAgentServiceImpl implements PayAgentService {
             try {
                 payAgentService.processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4, 0 );
 
-                if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, newReqPayAgent ) ) {
+                if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, newReqPayAgent ) ) {
                     sucessNum++;
                 } else {
                     failReasonList.put( withdrawLog.getWithdrawOrderNo(), newReqPayAgent.getFailReason() );

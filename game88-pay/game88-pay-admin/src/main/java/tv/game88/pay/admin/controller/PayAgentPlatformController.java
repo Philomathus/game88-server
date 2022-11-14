@@ -1,6 +1,7 @@
 package tv.game88.pay.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -12,6 +13,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 import tv.game88.pay.api.service.PayAgentPlatformService;
 
@@ -31,6 +33,8 @@ import java.util.List;
 public class PayAgentPlatformController extends BaseController {
     @Resource
     private PayAgentPlatformService payAgentPlatformService;
+    @Resource
+    private PayCacheUtil            payCacheUtil;
 
     /**
      * 查询代付平台列表
@@ -91,16 +95,16 @@ public class PayAgentPlatformController extends BaseController {
         if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
             payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         }
-        if ( !payAgentPlatform.getHeaderValue() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getHeaderValue() ) ) {
             payAgentPlatform.setHeaderValueExplain( "" );
         }
-        if ( !payAgentPlatform.getSignMd5() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignMd5() ) ) {
             payAgentPlatform.setSignMd5Explain( "" );
         }
-        if ( !payAgentPlatform.getSignPublicKey() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignPublicKey() ) ) {
             payAgentPlatform.setSignPublicKeyExplain( "" );
         }
-        if ( !payAgentPlatform.getSignPrivateKey() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignPrivateKey() ) ) {
             payAgentPlatform.setSignPrivateKeyExplain( "" );
         }
         payAgentPlatform.setCreateBy( SecurityUtils.getUsername() );
@@ -126,21 +130,25 @@ public class PayAgentPlatformController extends BaseController {
         if ( StringUtils.isNotBlank( payAgentPlatform.getWhiteIp() ) ) {
             payAgentPlatform.setWhiteIp( payAgentPlatform.getWhiteIp().replaceAll( " ", "" ).replaceAll( "，", "," ) );
         }
-        if ( !payAgentPlatform.getHeaderValue() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getHeaderValue() ) ) {
             payAgentPlatform.setHeaderValueExplain( "" );
         }
-        if ( !payAgentPlatform.getSignMd5() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignMd5() ) ) {
             payAgentPlatform.setSignMd5Explain( "" );
         }
-        if ( !payAgentPlatform.getSignPublicKey() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignPublicKey() ) ) {
             payAgentPlatform.setSignPublicKeyExplain( "" );
         }
-        if ( !payAgentPlatform.getSignPrivateKey() ) {
+        if ( BooleanUtils.isNotTrue( payAgentPlatform.getSignPrivateKey() ) ) {
             payAgentPlatform.setSignPrivateKeyExplain( "" );
         }
         payAgentPlatform.setUpdateBy( SecurityUtils.getUsername() );
         payAgentPlatform.setUpdateTime( LocalDateTime.now() );
-        return toResult( payAgentPlatformService.updateById( payAgentPlatform ) );
+        boolean isSave = payAgentPlatformService.updateById( payAgentPlatform );
+        if ( isSave ) {
+            payCacheUtil.clearPayAgentPlatform( payAgentPlatform.getCode() );
+        }
+        return toResult( isSave );
     }
 
     /**
@@ -150,6 +158,14 @@ public class PayAgentPlatformController extends BaseController {
     @Log( title = "代付平台", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
-        return toResult( payAgentPlatformService.removeBatchByIds( Arrays.asList( ids ) ) );
+        List<Long>             idList            = Arrays.asList( ids );
+        List<PayAgentPlatform> payAgentPlatforms = payAgentPlatformService.listByIds( idList );
+        boolean                isSave            = payAgentPlatformService.removeBatchByIds( idList );
+        if ( isSave ) {
+            for ( PayAgentPlatform payAgentPlatform : payAgentPlatforms ) {
+                payCacheUtil.clearPayAgentPlatform( payAgentPlatform.getCode() );
+            }
+        }
+        return toResult( isSave );
     }
 }

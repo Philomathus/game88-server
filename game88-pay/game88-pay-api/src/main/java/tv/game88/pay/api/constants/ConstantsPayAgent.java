@@ -1,6 +1,7 @@
 package tv.game88.pay.api.constants;
 
 public abstract class ConstantsPayAgent {
-    // KOLA代付
-    public static final String KOLA          = "kola";
+    public static final String    PROCESSOR = "PayAgentProcessor";
+
+    public static final String    LIAN_FU_BAO = "lianFuBao";
 }

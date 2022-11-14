@@ -13,6 +13,8 @@ import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.BasePayAgent;
 import tv.game88.pay.api.base.PayAgentProcessorFactoryUtil;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
+import tv.game88.pay.api.cache.PayCacheUtil;
+import tv.game88.pay.api.entity.PayAgentPlatform;
 import tv.game88.pay.api.service.PayService;
 
 import javax.annotation.Resource;
@@ -31,6 +33,8 @@ public class PayCallBackController {
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
     @Resource
     private PayService                   payService;
+    @Resource
+    private PayCacheUtil                 payCacheUtil;
 
     @GetMapping( value = "/orderRedirect/{orderNo}", produces = MediaType.TEXT_HTML_VALUE )
     @ResponseBody
@@ -109,18 +113,20 @@ public class PayCallBackController {
         Map<String, String[]> requestMap = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}回调 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.callbackPay( map, realIp );
+        return basePayAgent.callbackPay( payAgentPlatform, map, realIp );
     }
 
     //统一回调JSON请求
     @PostMapping( value = "/agentCallBack/{code}", consumes = { MediaType.APPLICATION_JSON_VALUE } )
     public String agentCallBackJson( @RequestBody Map<String, Object> requestMap, @PathVariable( "code" ) String code ) throws Exception {
-        String       realIp       = ServletUtil.getIp();
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        String           realIp           = ServletUtil.getIp();
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}回调 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( requestMap ) );
-        return basePayAgent.callbackPay( requestMap, realIp );
+        return basePayAgent.callbackPay( payAgentPlatform, requestMap, realIp );
     }
 
     //统一回调TEXT请求
@@ -129,9 +135,10 @@ public class PayCallBackController {
         String              realIp = ServletUtil.getIp();
         Map<String, Object> map    = new HashMap<>();
         map.put( "data", body );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}回调 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, body );
-        return basePayAgent.callbackPay( map, realIp );
+        return basePayAgent.callbackPay( payAgentPlatform, map, realIp );
     }
 
     //统一回调POST请求
@@ -141,9 +148,10 @@ public class PayCallBackController {
         Map<String, String[]> requestMap = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}回调 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.callbackPay( map, realIp );
+        return basePayAgent.callbackPay( payAgentPlatform, map, realIp );
     }
 
     //统一回调GET请求
@@ -153,9 +161,10 @@ public class PayCallBackController {
         Map<String, String[]> requestMap = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}回调 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.callbackPay( map, realIp );
+        return basePayAgent.callbackPay( payAgentPlatform, map, realIp );
     }
 
     //-------------------------反查--------------------------
@@ -167,19 +176,21 @@ public class PayCallBackController {
         Map<String, String[]> requestMap = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}反查 - realIp:{};requestMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.reverseCheckOrderPay( map, realIp );
+        return basePayAgent.reverseCheckOrderPay( payAgentPlatform, map, realIp );
     }
 
     //统一反查JSON请求
     @PostMapping( value = "/agentReverseCheck/{code}", consumes = { MediaType.APPLICATION_JSON_VALUE } )
     public Map<String, Object> orderReverseCheckJson( @RequestBody Map<String, Object> requestMap,
                                                       @PathVariable( "code" ) String code ) throws Exception {
-        String       realIp       = ServletUtil.getIp();
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        String           realIp           = ServletUtil.getIp();
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}反查 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( requestMap ) );
-        return basePayAgent.reverseCheckOrderPay( requestMap, realIp );
+        return basePayAgent.reverseCheckOrderPay( payAgentPlatform, requestMap, realIp );
     }
 
     //统一反查TEXT请求
@@ -188,9 +199,10 @@ public class PayCallBackController {
         String              realIp = ServletUtil.getIp();
         Map<String, Object> map    = new HashMap<>();
         map.put( "data", body );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}反查 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, body );
-        return basePayAgent.reverseCheckOrderPay( map, realIp );
+        return basePayAgent.reverseCheckOrderPay( payAgentPlatform, map, realIp );
     }
 
     //统一反查POST请求
@@ -200,9 +212,10 @@ public class PayCallBackController {
         Map<String, String[]> map        = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   requestMap = new TreeMap<>();
         map.forEach( ( k, v ) -> requestMap.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}反查 - realIp:{};requestMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.reverseCheckOrderPay( requestMap, realIp );
+        return basePayAgent.reverseCheckOrderPay( payAgentPlatform, requestMap, realIp );
     }
 
     //统一反查GET请求
@@ -212,8 +225,9 @@ public class PayCallBackController {
         Map<String, String[]> requestMap = ServletUtil.getHttpServletRequest().getParameterMap();
         Map<String, Object>   map        = new HashMap<>();
         requestMap.forEach( ( k, v ) -> map.put( k, v[ 0 ] ) );
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        BasePayAgent     basePayAgent     = payAgentProcessorFactoryUtil.createPayProcessor( code );
+        PayAgentPlatform payAgentPlatform = payCacheUtil.getPayAgentPlatform( code );
         log.warn( "{}反查 - realIp:{};bodyMap:{}", basePayAgent.getName(), realIp, JsonUtil.object2Json( map ) );
-        return basePayAgent.reverseCheckOrderPay( map, realIp );
+        return basePayAgent.reverseCheckOrderPay( payAgentPlatform, map, realIp );
     }
 }
