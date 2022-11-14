@@ -66,6 +66,10 @@ spring:
       max-request-size: 5GB
   lifecycle:
     timeout-per-shutdown-phase: 5s
+  task:
+    scheduling:
+      pool:
+        size: 10
 
 pagehelper:
   autoRuntimeDialect: true

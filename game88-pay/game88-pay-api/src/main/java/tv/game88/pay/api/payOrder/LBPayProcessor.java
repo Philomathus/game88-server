@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.pay.api.base.AbstractPay;
@@ -39,7 +40,7 @@ public class LBPayProcessor extends AbstractPay {
         reqMap.put( "pay_notifyurl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         reqMap.put( "pay_callbackurl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
         reqMap.put( "pay_amount", reqPayRecharge.getMoney().setScale( 0, RoundingMode.HALF_UP ).toString() );
-        String signTemp = this.assemblyUrl( reqMap ) + "&key=" + payPlatform.getSignMd5();
+        String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign     = DigestUtils.md5Hex( signTemp ).toUpperCase();
         reqMap.put( "pay_md5sign", sign );
         reqMap.put( "pay_productname", "pay_productname" );
@@ -61,7 +62,7 @@ public class LBPayProcessor extends AbstractPay {
         Map<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "pay_memberid", payPlatform.getMerId() );
         bodyMap.put( "pay_orderid", memberRechargeOnline.getOrderNo() );
-        String sign = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "pay_md5sign", DigestUtils.md5Hex( sign ).toUpperCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( bodyMap ), null );
@@ -106,7 +107,7 @@ public class LBPayProcessor extends AbstractPay {
         SortedMap<String, Object> treeMap = new TreeMap<>( requestMap );
         String                    sign    = ( String ) treeMap.remove( "sign" );
         treeMap.remove( "attach" );
-        String tempStr = this.assemblyUrl( treeMap ) + "&key=" + payPlatform.getSignMd5();
+        String tempStr = this.assemblyUrl( treeMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String mySign  = DigestUtils.md5Hex( tempStr ).toUpperCase();
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + mySign );
