@@ -2,6 +2,9 @@ package tv.game88.platform.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.platform.api.entity.ActivityInfo;
 import tv.game88.platform.api.mapper.ActivityInfoMapper;
 import tv.game88.platform.api.service.ActivityInfoService;
@@ -23,6 +26,16 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
      */
     @Override
     public List<ActivityInfo> selectActivityInfoList(ActivityInfo activityInfo) {
-        return this.baseMapper.selectActivityInfoList(activityInfo);
+        List<ActivityInfo> activityInfos = this.baseMapper.selectActivityInfoList( activityInfo );
+
+        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        if ( !CollectionUtils.isEmpty( activityInfos ) ) {
+            for ( ActivityInfo activityInfo1 : activityInfos ) {
+                if ( StringUtils.isNotBlank( activityInfo1.getIcon() ) && !activityInfo1.getIcon().startsWith( "http" ) ) {
+                    activityInfo1.setIcon( domainValue + activityInfo1.getIcon() );
+                }
+            }
+        }
+        return activityInfos;
     }
 }
