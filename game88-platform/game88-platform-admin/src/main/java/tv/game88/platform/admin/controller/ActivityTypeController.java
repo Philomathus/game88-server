@@ -46,6 +46,15 @@ public class ActivityTypeController extends BaseController {
     }
 
     /**
+     * Activity Type List All
+     */
+    @PreAuthorize( "@ss.hasPermi('activity:activityType:list')" )
+    @GetMapping( "/listAll" )
+    public List<ActivityType> listAll() {
+       return activityTypeService.list();
+    }
+
+    /**
      * 导出活动类型列表
      */
     @PreAuthorize( "@ss.hasPermi('activity:activityType:export')" )
