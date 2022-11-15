@@ -42,7 +42,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 查询代付通道列表
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:list')" )
     @GetMapping( "/list" )
     public RspBase<List<PayAgentChannel>> list( PayAgentChannel payAgentChannel ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -54,7 +54,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 激活中的代付通道选择列表
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:list')" )
     @GetMapping( "/effectList" )
     public RspBase<List<PayAgentChannel>> effectList() {
         PayAgentChannel payAgentChannel = new PayAgentChannel();
@@ -65,7 +65,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 导出代付通道列表
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:export')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:export')" )
     @Log( title = "代付通道", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( PayAgentChannel payAgentChannel, HttpServletResponse response ) {
@@ -76,7 +76,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 获取代付通道详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:query')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<PayAgentChannel> getInfo( @PathVariable( "id" ) Long id ) {
         PayAgentChannel payAgentChannel = payAgentChannelService.getById( id );
@@ -101,7 +101,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 新增代付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:add')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:add')" )
     @Log( title = "代付通道", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody PayAgentChannel payAgentChannel ) {
@@ -125,7 +125,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 修改代付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:edit')" )
     @Log( title = "代付通道", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody PayAgentChannel payAgentChannel ) {
@@ -172,7 +172,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 删除代付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:remove')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:remove')" )
     @Log( title = "代付通道", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
@@ -188,7 +188,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 代付通道状态修改
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:effect')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:effect')" )
     @Log( title = "代付通道激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {
@@ -201,7 +201,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 代付下单
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:order')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:order')" )
     @Log( title = "代付下单", businessType = BusinessType.ORDER )
     @PostMapping( "/payAgentOrder" )
     public RspBase<?> payAgentOrder( @RequestBody ReqPayAgent reqPayAgent ) throws Exception {
@@ -212,7 +212,7 @@ public class PayAgentChannelController extends BaseController {
     /**
      * 批量代付下单
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payAgentChannel:order')" )
+    @PreAuthorize( "@ss.hasPermi('pay:agentChannel:order')" )
     @Log( title = "批量代付下单", businessType = BusinessType.ORDER )
     @PostMapping( "/payAgentOrders" )
     public RspBase<?> payAgentOrders( @RequestBody ReqPayAgent reqPayAgent ) throws Exception {
