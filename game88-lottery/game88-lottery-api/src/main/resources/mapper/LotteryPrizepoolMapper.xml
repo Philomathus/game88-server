@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryPrizepoolMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryPrizepool" id="LotteryPrizepoolResult">
+        <result property="id" column="id" />
+        <result property="lotteryId" column="lottery_id" />
+        <result property="lotteryDate" column="lottery_date" />
+        <result property="lotteryHour" column="lottery_hour" />
+        <result property="betTotal" column="bet_total" />
+        <result property="awardTotal" column="award_total" />
+        <result property="overTotal" column="over_total" />
+        <result property="killRate" column="kill_rate" />
+        <result property="poolUseMoney" column="pool_use_money" />
+    </resultMap>
+
+    <sql id="selectLotteryPrizepoolVo">
+        select id,
+               lottery_id,
+               lottery_date,
+               lottery_hour,
+               bet_total,
+               award_total,
+               over_total,
+               kill_rate,
+               pool_use_money
+        from lottery_prizepool
+    </sql>
+</mapper>

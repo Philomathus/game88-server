@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryGameMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryGame" id="LotteryGameResult">
+        <result property="id" column="id" />
+        <result property="methodId" column="method_id" />
+        <result property="type" column="type" />
+        <result property="info" column="info" />
+        <result property="odds" column="odds" />
+        <result property="index" column="index" />
+    </resultMap>
+
+    <sql id="selectLotteryGameVo">
+        select id, method_id, type, info, odds, index
+        from lottery_game
+    </sql>
+</mapper>

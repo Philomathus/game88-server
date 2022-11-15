@@ -9,7 +9,7 @@
 
         <!--服务模块名称-->
         <!--尽量要求这个配置属性的是英文代号以及是小写，使用下划线分隔标识多个单词-->
-        <Property name="SERVICE_MODULE_NAME">game88-pay-admin</Property>
+        <Property name="SERVICE_MODULE_NAME">game88-lottery-admin</Property>
         <Property name="LOG_MODULE_NAME">game88</Property>
 
         <!--全局格式化模式-->

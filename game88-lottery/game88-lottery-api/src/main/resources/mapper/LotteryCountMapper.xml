@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryCountMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryCount" id="LotteryCountResult">
+        <result property="id" column="id" />
+        <result property="agent" column="agent" />
+        <result property="lotteryId" column="lottery_id" />
+        <result property="memberId" column="member_id" />
+        <result property="issue" column="issue" />
+        <result property="betInfo" column="bet_info" />
+        <result property="chip" column="chip" />
+        <result property="ip" column="ip" />
+    </resultMap>
+
+    <sql id="selectLotteryCountVo">
+        select id,
+               agent,
+               lottery_id,
+               member_id,
+               issue,
+               bet_info,
+               chip,
+               ip
+        from lottery_count
+    </sql>
+</mapper>

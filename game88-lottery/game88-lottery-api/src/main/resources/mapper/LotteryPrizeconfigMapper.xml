@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryPrizeconfigMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryPrizeconfig" id="LotteryPrizeconfigResult">
+        <result property="lotteryId" column="lottery_id" />
+        <result property="lotteryName" column="lottery_name" />
+        <result property="lotteryKillrate" column="lottery_killrate" />
+        <result property="lotteryNokillratehour" column="lottery_nokillratehour" />
+        <result property="lotteryRandom" column="lottery_random" />
+    </resultMap>
+
+    <sql id="selectLotteryPrizeconfigVo">
+        select lottery_id, lottery_name, lottery_killrate, lottery_nokillratehour, lottery_random
+        from lottery_prizeconfig
+    </sql>
+</mapper>

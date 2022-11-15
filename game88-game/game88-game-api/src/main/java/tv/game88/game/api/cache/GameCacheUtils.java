@@ -58,19 +58,19 @@ public class GameCacheUtils {
                     } )
                     .collect( Collectors.toList() );
             if ( !CollectionUtils.isEmpty( gameTypes ) ) {
-                redisUtils.sAdd( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
+                redisUtils.strSet( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
             }
             return gameTypes;
         }
         String s = redisUtils.strGet( GAME_TYPE_KEY );
-        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, new TypeReference<>() {} );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
     public GamePlatform getGamePlatform( Long platformId ) {
         if ( !redisUtils.exists( GAME_PLATFORM_KEY + platformId ) ) {
             GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper ).eq( "id", platformId ).one();
             if ( gamePlatform != null ) {
-                redisUtils.sAdd( GAME_PLATFORM_KEY + platformId, JsonUtil.object2Json( gamePlatform ) );
+                redisUtils.strSet( GAME_PLATFORM_KEY + platformId, JsonUtil.object2Json( gamePlatform ) );
             }
             return gamePlatform;
         }
@@ -82,7 +82,7 @@ public class GameCacheUtils {
         if ( !redisUtils.exists( GAME_INFO_KEY + infoId ) ) {
             GameInfo gameInfo = new QueryChainWrapper<>( gameInfoMapper ).eq( "id", infoId ).one();
             if ( gameInfo != null ) {
-                redisUtils.sAdd( GAME_INFO_KEY + infoId, JsonUtil.object2Json( gameInfo ) );
+                redisUtils.strSet( GAME_INFO_KEY + infoId, JsonUtil.object2Json( gameInfo ) );
             }
             return gameInfo;
         }
@@ -102,12 +102,12 @@ public class GameCacheUtils {
                     .toList();
             List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( infoIds );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
-                redisUtils.sAdd( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );
+                redisUtils.strSet( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );
             }
             return rspGameInfoList;
         }
         String s = redisUtils.strGet( GAME_TYPE_INFO_WITH + typeId );
-        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, new TypeReference<>() {} );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
     public void clear( String key ) {
