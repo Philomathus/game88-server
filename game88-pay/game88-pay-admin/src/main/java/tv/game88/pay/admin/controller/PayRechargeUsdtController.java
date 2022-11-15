@@ -30,7 +30,7 @@ public class PayRechargeUsdtController extends BaseController {
     @Resource
     private PayRechargeUsdtService payRechargeUsdtService;
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:list')" )
     @GetMapping( "/list" )
     public RspBase<List<PayRechargeUsdt>> list( PayRechargeUsdt payRechargeUsdt ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -39,14 +39,13 @@ public class PayRechargeUsdtController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<PayRechargeUsdt>> listAll() {
-        List<PayRechargeUsdt> list = payRechargeUsdtService.selectPayRechargeUsdtList( null );
-        return RspBase.ok(list);
+        return RspBase.ok(payRechargeUsdtService.list());
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:export')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:export')" )
     @Log( title = "导出USDT渠道列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( PayRechargeUsdt payRechargeUsdt, HttpServletResponse response ) {
@@ -54,13 +53,13 @@ public class PayRechargeUsdtController extends BaseController {
         ExportExcelUtil.exportExcel( list, "USDT渠道", "USDT渠道表", PayRechargeUsdt.class, response );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:query')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<PayRechargeUsdt> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( payRechargeUsdtService.getById( id ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:add')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:add')" )
     @Log( title = "新增USDT渠道", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody PayRechargeUsdt payRechargeUsdt ) {
@@ -69,7 +68,7 @@ public class PayRechargeUsdtController extends BaseController {
         return toResult( payRechargeUsdtService.save( payRechargeUsdt ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:edit')" )
     @Log( title = "修改USDT渠道", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody PayRechargeUsdt payRechargeUsdt ) {
@@ -78,14 +77,14 @@ public class PayRechargeUsdtController extends BaseController {
         return toResult( payRechargeUsdtService.updateById( payRechargeUsdt ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:remove')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:remove')" )
     @Log( title = "删除USDT渠道", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable String[] ids ) {
         return toResult( payRechargeUsdtService.removeBatchByIds( Arrays.asList( ids ) ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:payRechargeUsdt:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:edit')" )
     @Log( title = "USDT渠道激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {

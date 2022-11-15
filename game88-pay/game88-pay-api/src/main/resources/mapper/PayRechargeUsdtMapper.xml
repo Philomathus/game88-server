@@ -22,8 +22,8 @@
     </resultMap>
 
     <sql id="selectPayRechargeUsdtVo">
-        select id, channel_name, chain_name, recharge_address, discount_bill, exchange_rate, indexs, icon, status,
-               open_level_type, create_by, create_time ,  update_by, update_time ,remark from pay_recharge_usdt
+        select id, channel_name, chain_name, recharge_address, discount_bill, exchange_rate, sort, icon,
+               effect,open_level_min,open_level_max, create_by, create_time ,  update_by, update_time ,remark from pay_recharge_usdt
     </sql>
 
     <select id="selectPayRechargeUsdtList" parameterType="tv.game88.pay.api.entity.PayRechargeUsdt" resultMap="PayRechargeUsdtResult">
