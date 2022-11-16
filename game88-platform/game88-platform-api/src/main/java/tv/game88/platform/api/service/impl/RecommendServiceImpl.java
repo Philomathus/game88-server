@@ -91,7 +91,7 @@ public class RecommendServiceImpl implements RecommendService {
         if ( i <= 0 || j <= 0 ) {
             throw new BusinessException( "佣金领取失败" );
         }
-        memberMoneyManager.addMemberMoney( memberId, sionSum, EnumMoney.COMMISSION, 1, memberId + "的推广佣金" );
+        memberMoneyManager.addMemberMoney( memberId, sionSum, EnumMoney.COMMISSION, 1, memberId + "的推广佣金", null, null );
     }
 
     @Override

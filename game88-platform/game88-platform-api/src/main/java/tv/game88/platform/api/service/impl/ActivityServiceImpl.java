@@ -197,8 +197,10 @@ public class ActivityServiceImpl implements ActivityService {
         update.setId( memberQuest.getId() );
         update.setStatus( 2 );
         if ( memberQuestMapper.updateById( update ) > 0 ) {
-            String name = questInfo.getContent() + "奖金:" + questInfo.getReward().toString();
-            memberMoneyManager.addMemberMoney( memberId, questInfo.getReward(), EnumMoney.QUEST_BONUS, 1, name );
+            String name    = questInfo.getContent() + "奖金:" + questInfo.getReward().toString();
+            String orderId = "memberQuest-" + memberQuest.getId() + "-" + memberId;
+            memberMoneyManager.addMemberMoney( memberId, questInfo.getReward(), EnumMoney.QUEST_BONUS, 1, name, orderId,
+                    orderId );
             return RspBase.ok( "领取成功", questInfo.getReward() );
         }
         throw new BusinessException( "领取失败,请重试" );

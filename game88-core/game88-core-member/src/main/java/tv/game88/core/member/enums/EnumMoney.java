@@ -27,7 +27,7 @@ public enum EnumMoney {
 	UP_SCORE( 105, "补分", false ),
 	WONGIVE(113,"赠送彩金",false),
 	COMMISSION( 104, "推广佣金", true ),
-	DICE_BONUS( 105, "投注中奖", false ),
+	LOTTERY_BONUS( 105, "彩票中奖", false ),
 	QUEST_BONUS( 106, "任务奖金", false ),
 	SAFE_BOX( 107, "保险箱记录", false ),
 	CODE_CLEAN(108,"洗码",false),
@@ -38,7 +38,7 @@ public enum EnumMoney {
 	/****************type>0 入款type<0  消费  *************************/
 	GAME_IN( -101, "游戏上分", false ),
 	WITHDRAW( -103, "人工取款", false ),
-	LOTTERY_BET( -104, "筹码投注", false ),
+	LOTTERY_BET( -104, "彩票投注", false ),
 	PLATFORM(-1,"平台资金切换",false);
 
 	private Integer type;

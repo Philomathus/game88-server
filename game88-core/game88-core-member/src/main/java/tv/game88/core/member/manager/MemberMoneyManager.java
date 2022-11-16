@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.exception.NoMoneyException;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberBcode;
 import tv.game88.core.member.enums.EnumMoney;
@@ -38,7 +39,8 @@ public class MemberMoneyManager {
      * @param mult      打码倍数
      */
     @Transactional( rollbackFor = Exception.class )
-    public void addMemberMoney( String userId, BigDecimal addCount, EnumMoney enumMoney, int mult, String mark ) {
+    public void addMemberMoney( String userId, BigDecimal addCount, EnumMoney enumMoney, int mult, String mark,
+                                String businessId, String markorder ) {
         if ( enumMoney.getType() < 0 ) {
             throw new BusinessException( "服务器异常" );
         }
@@ -55,7 +57,11 @@ public class MemberMoneyManager {
         memberInfoMapper.addMoneySelect( userId, addCount, charge, codeMult );
         //日志
         LogMoney log = new LogMoney();
-        log.setId( IdWorker.get32UUID() );
+        if ( StringUtils.isNotBlank( businessId ) ) {
+            log.setId( businessId );
+        } else {
+            log.setId( IdWorker.get32UUID() );
+        }
         log.setUserId( userId );
         log.setCreateTime( LocalDateTime.now() );
         log.setIncome( addCount );
@@ -65,6 +71,7 @@ public class MemberMoneyManager {
         log.setMark( mark );
         log.setTotalBefore( memberMoney );
         log.setTotal( memberMoney.add( addCount ) );
+        log.setMarkorder( markorder );
         logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
         //打码
         if ( enumMoney.getBcode() ) {

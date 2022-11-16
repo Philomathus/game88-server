@@ -485,7 +485,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( beatNum == null || beatNum.compareTo( BigDecimal.ZERO ) < 1 ) {
                 beatNum = new BigDecimal( 0 );
             }
-            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.intValue(), Mk );
+            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.intValue(), Mk, null, markorder );
         } else {
             return RspBase.businessError( "该成员未初始化金额，或者您输入的金额有误" );
         }
@@ -809,7 +809,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Override
     public RspVipInfo getVipGiftInfo( String memberId ) {
         RspVipInfo              rsp          = new RspVipInfo();
-        Integer       vip           = this.baseMapper.getUserVip( memberId );
+        Integer                 vip          = this.baseMapper.getUserVip( memberId );
         Map<Integer, ConfigVip> configVipMap = configVipCacheUtils.getConfigVipMap();
         rsp.setVipSetList( configVipMap.values().stream().map( v -> {
             RspVipSet rspVipSet = new RspVipSet();
@@ -932,6 +932,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             throw new BusinessException( "领取异常,请重试" );
         }
         //会员加钱，日志
-        memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, 1, name + "奖励:" + addMoney.toString() );
+        memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, 1,
+                name + "奖励:" + addMoney.toString(), null, null );
     }
 }

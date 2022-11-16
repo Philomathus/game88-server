@@ -36,7 +36,7 @@ public class LotteryBet {
     @Excel( name = "状态" )
     private Integer       status;
     @Excel( name = "下注选择菜单" )
-    private String        methodId;
+    private Integer       methodId;
     @Excel( name = "下注选择" )
     private String        betSelect;
     @Excel( name = "下注索引" )
@@ -58,5 +58,5 @@ public class LotteryBet {
 
     // 直播间外-1
     @Excel( name = "主播ID" )
-    private Long anchor;
+    private Integer anchor;
 }

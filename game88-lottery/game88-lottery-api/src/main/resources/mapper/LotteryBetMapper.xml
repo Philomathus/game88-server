@@ -69,4 +69,86 @@
             </if>
         </where>
     </select>
+
+    <select id="getBetRecordList" resultType="tv.game88.lottery.api.dto.RspBetRecord">
+        select *
+        from lottery_bet${dbNodes}
+        where member_id = #{memberId}
+          and lottery_id = #{lotteryId}
+        order by issue desc
+    </select>
+
+    <insert id="insertLotteryBet">
+        insert into lottery_bet${dbNodes}
+        (id, lottery_id, member_id, member_status, issue, status, method_id, bet_select, bet_ids, chip, cost,
+         lottery_name, anchor, bet_time)
+        values (#{req.id}, #{req.lotteryId}, #{req.memberId}, #{req.memberStatus}, #{req.issue}, #{req.status},
+                #{req.methodId}, #{req.betSelect}, #{req.betIds}, #{req.chip}, #{req.cost}, #{req.lotteryName},
+                #{req.anchor}, #{req.betTime})
+    </insert>
+
+    <select id="selectLotteryWaiteList" resultMap="LotteryBetResult">
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet0
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet1
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet2
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet3
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet4
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet5
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet6
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet7
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet8
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet9
+        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+    </select>
+
+    <select id="selectLotteryWaiteCount" resultType="java.lang.Integer">
+        select sum(c) from (
+        select count(*) c from lottery_bet0  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet1  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet2  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet3  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet4  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet5  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet6  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet7  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet8  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        UNION ALL
+        select count(*) c from lottery_bet9  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        ) a
+    </select>
+
+    <update id="updateStatusPrize">
+        update lottery_bet${dbNodes}
+        set status      = #{status}
+        , code        = #{code}
+        , prize       = #{prize}
+        , update_time = #{updateTime}
+        where id = #{id}
+    </update>
 </mapper>

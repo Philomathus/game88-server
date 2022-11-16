@@ -36,6 +36,14 @@ public class RedisUtils {
         return stringRedisTemplate.getConnectionFactory();
     }
 
+    public <T> T execute( RedisCallback<T> redisCallback ) {
+        return stringRedisTemplate.execute( redisCallback );
+    }
+
+    public <T> T execute( SessionCallback<T> sessionCallback ) {
+        return stringRedisTemplate.execute( sessionCallback );
+    }
+
     // ---------------------- key操作 ---------------------
 
     /**

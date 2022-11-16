@@ -67,7 +67,7 @@ spring:
   task:
     scheduling:
       pool:
-        size: 20
+        size: 50
 
 pagehelper:
   autoRuntimeDialect: true
@@ -76,6 +76,12 @@ pagehelper:
 token:
   # 令牌有效期（默认1天）
   expireTime: 6
+
+im:
+  # 群聊
+  sendGroupMsg: http://alb-c8bpqf3la2md9yeih2.cn-hongkong.alb.aliyuncs.com/chat/sendGroupMsg/
+  # 单聊
+  sendMsg: http://alb-c8bpqf3la2md9yeih2.cn-hongkong.alb.aliyuncs.com/chat/sendMsg/
 
 swagger:
   title: Game88 Lottery App Swagger 3 Api Documentation
