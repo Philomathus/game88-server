@@ -26,7 +26,7 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/admin/messageOnSite" )
+@RequestMapping( "/message/messageOnSite" )
 public class MessageOnSiteController extends BaseController {
     @Resource
     private MessageOnSiteService messageOnSiteService;
@@ -36,7 +36,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 查询站内信列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:list')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MessageOnSite>> list( MessageOnSite messageOnSite ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -48,7 +48,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 导出站内信列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:export')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:export')" )
     @Log( title = "站内信", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( MessageOnSite messageOnSite, HttpServletResponse response ) {
@@ -59,7 +59,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 获取站内信详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:query')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<MessageOnSite> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( messageOnSiteService.getById( id ) );
@@ -68,7 +68,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 新增站内信
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:add')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:add')" )
     @Log( title = "站内信", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody MessageOnSite messageOnSite ) {
@@ -84,7 +84,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 修改站内信
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:edit')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:edit')" )
     @Log( title = "站内信", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody MessageOnSite messageOnSite ) {
@@ -98,7 +98,7 @@ public class MessageOnSiteController extends BaseController {
     /**
      * 删除站内信
      */
-    @PreAuthorize( "@ss.hasPermi('admin:messageOnSite:remove')" )
+    @PreAuthorize( "@ss.hasPermi('message:onSite:remove')" )
     @Log( title = "站内信", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
