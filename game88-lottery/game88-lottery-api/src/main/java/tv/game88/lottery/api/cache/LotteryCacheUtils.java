@@ -11,10 +11,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.lottery.api.dto.*;
 import tv.game88.lottery.api.entity.LotteryTemp;
-import tv.game88.lottery.api.mapper.LotteryGameMapper;
-import tv.game88.lottery.api.mapper.LotteryInfoMapper;
-import tv.game88.lottery.api.mapper.LotteryMethodMapper;
-import tv.game88.lottery.api.mapper.LotteryTempMapper;
+import tv.game88.lottery.api.mapper.*;
 import tv.game88.lottery.api.utils.LotteryUtils;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +36,7 @@ public class LotteryCacheUtils {
     private static final String LOTTERY_ODDS_KEY   = Constants.LOTTERY_PREX + "odds:";
 
     private static final String LOTTERY_TEMP_KEY = Constants.LOTTERY_PREX + "temp:";
+    private static final String LOTTERY_RULE_KEY = Constants.LOTTERY_PREX + "rule:";
 
     private static final String LOTTERY_INFO_BASE_KEY   = Constants.LOTTERY_PREX + "infoBase";
     private static final String LOTTERY_KIND_METHOD_KEY = Constants.LOTTERY_PREX + "kindMethod";
@@ -56,6 +54,8 @@ public class LotteryCacheUtils {
     private LotteryMethodMapper lotteryMethodMapper;
     @Resource
     private LotteryTempMapper   lotteryTempMapper;
+    @Resource
+    private LotteryRuleMapper   lotteryRuleMapper;
 
     public Map<String, BigDecimal> getOddsMap( Integer kindId ) {
         if ( !redisUtils.exists( LOTTERY_ODDS_KEY + kindId ) ) {
@@ -218,5 +218,26 @@ public class LotteryCacheUtils {
         if ( lotteryTemp != null ) {
             redisUtils.strSet( LOTTERY_TEMP_KEY + lotteryTemp.getId(), JsonUtil.object2Json( lotteryTemp ) );
         }
+    }
+
+    public List<RuleVo> getLotteryRule( Integer kindId ) {
+        String s = redisUtils.strGet( LOTTERY_RULE_KEY + kindId );
+        if ( StringUtils.isBlank( s ) || !redisUtils.exists( LOTTERY_RULE_KEY + kindId ) ) {
+            List<RuleVo> ruleVos = new QueryChainWrapper<>( lotteryRuleMapper )
+                    .eq( "kind", kindId )
+                    .orderByAsc( "sort" )
+                    .select( "name", "des" )
+                    .list()
+                    .stream()
+                    .map( rule -> {
+                        RuleVo ruleVo = new RuleVo();
+                        BeanUtils.copyProperties( rule, ruleVo );
+                        return ruleVo;
+                    } )
+                    .toList();
+            redisUtils.strSet( LOTTERY_RULE_KEY + kindId, JsonUtil.object2Json( ruleVos ) );
+            return ruleVos;
+        }
+        return JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 }

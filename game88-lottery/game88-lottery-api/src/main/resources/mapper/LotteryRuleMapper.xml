@@ -6,10 +6,11 @@
         <result property="name" column="name" />
         <result property="kind" column="kind" />
         <result property="des" column="des" />
+        <result property="sort" column="sort" />
     </resultMap>
 
     <sql id="selectLotteryRuleVo">
-        select id, name, kind, des
+        select id, name, kind, des, sort
         from lottery_rule
     </sql>
 

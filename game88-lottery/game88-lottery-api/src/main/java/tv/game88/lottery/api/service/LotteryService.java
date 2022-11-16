@@ -20,4 +20,6 @@ public interface LotteryService {
     void computeResult( Integer lotteryId );
 
     void awardLottery( Integer lotteryId );
+
+    List<RuleVo> getLotteryRule( Integer lotteryId );
 }

@@ -671,4 +671,9 @@ public class LotteryServiceImpl implements LotteryService {
             default -> BigDecimal.ZERO;
         };
     }
+
+    @Override
+    public List<RuleVo> getLotteryRule( Integer lotteryId ) {
+        return LotteryCacheUtils.me.getLotteryRule( LotteryUtils.getKindId( lotteryId ) );
+    }
 }
