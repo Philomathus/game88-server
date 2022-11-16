@@ -1,9 +1,9 @@
 package tv.game88.lottery.api.extents;
 
 
-import com.lottery.common.dto.LocalMethod;
-import com.lottery.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.lottery.api.dto.LocalMethod;
 
 import java.math.BigDecimal;
 import java.util.*;

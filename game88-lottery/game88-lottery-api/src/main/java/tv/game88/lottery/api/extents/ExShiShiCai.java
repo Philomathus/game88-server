@@ -1,8 +1,8 @@
 package tv.game88.lottery.api.extents;
 
 
-import com.lottery.common.dto.LocalMethod;
 import lombok.extern.slf4j.Slf4j;
+import tv.game88.lottery.api.dto.LocalMethod;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -12,11 +12,11 @@ import java.util.Map;
 @Slf4j
 public class ExShiShiCai {
 
-    public static Map<String,Integer> weightableMap = new HashMap<>();
+    public static Map<String,Integer>            weightableMap = new HashMap<>();
     //methodID:methods
-    public static final Map<String, LocalMethod> methodsMap = new HashMap<>();
+    public static final Map<String, LocalMethod> methodsMap    = new HashMap<>();
     //赔率
-    public static final Map<String, BigDecimal> oddsMap = new HashMap<>();
+    public static final Map<String, BigDecimal>  oddsMap       = new HashMap<>();
 
     static {
         weightableMap.put("0",100);
