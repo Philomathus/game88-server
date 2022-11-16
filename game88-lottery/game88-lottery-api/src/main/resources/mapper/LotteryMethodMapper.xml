@@ -5,14 +5,14 @@
         <result property="id" column="id" />
         <result property="lotteryType" column="lottery_type" />
         <result property="name" column="name" />
-        <result property="order" column="order" />
+        <result property="sort" column="sort" />
     </resultMap>
 
     <sql id="selectLotteryMethodVo">
         select id,
                lottery_type,
                name,
-               `order`
+               sort
         from lottery_method
     </sql>
 </mapper>

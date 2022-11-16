@@ -31,4 +31,34 @@
                analyse
         from lottery_history
     </sql>
+
+    <select id="selectIssueWaite" resultType="java.lang.String">
+        select id
+        from lottery_history
+        where status = 0
+          and ktime &lt;= #{time}
+          and lottery_id = #{lotteryId}
+    </select>
+
+    <update id="updateAlreadyPrize">
+        update lottery_history
+        set total_prize = #{totalPrize},
+            code        = #{code},
+            status      = #{status},
+            kill_rate   = #{killRate},
+            total_bet   = #{totalBet},
+            total_prize = #{totalPrize},
+            analyse     = #{analyse},
+            ctl         = #{ctl}
+        where id = #{id}
+          and status = 0
+    </update>
+
+    <select id="selectHistoryResult" resultType="tv.game88.lottery.api.dto.HistoryResult">
+        SELECT id, code
+        from lottery_history
+        WHERE status = #{status}
+          and lottery_id = #{lotteryId}
+        order by issue desc limit 200
+    </select>
 </mapper>

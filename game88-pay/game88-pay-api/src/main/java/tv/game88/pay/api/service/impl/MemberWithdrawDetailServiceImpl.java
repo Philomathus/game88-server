@@ -342,7 +342,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             throw new BusinessException( "回退失败" );
         }
         //回退提现金额
-        memberMoneyManager.addMemberMoney( withdrawId, withdrawMoney, EnumMoney.BOHUI, 1, mark );
+        memberMoneyManager.addMemberMoney( withdrawId, withdrawMoney, EnumMoney.BOHUI, 1, mark,
+                update.getWithdrawOrderNo() + "bohui", update.getWithdrawOrderNo() + "bohui" );
     }
 
     @Override

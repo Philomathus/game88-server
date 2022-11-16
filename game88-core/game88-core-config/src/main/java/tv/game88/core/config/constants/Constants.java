@@ -17,6 +17,8 @@ public class Constants {
     public static final String MEMBER_CODE      = MEMBER_PREX + "member-code";
     public static final Long   MEMBER_CODE_INIT = 10000L;
 
+    public static final int BACCARAT_BEGIN_BET_TIME = 10;
+
     /**
      * 登录会员 redis token key
      */

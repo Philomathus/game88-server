@@ -21,7 +21,7 @@ public class LotteryGame {
     @TableId( type = IdType.AUTO )
     private Integer    id;
     @Excel( name = "菜单id" )
-    private String     methodId;
+    private Integer    methodId;
     @Excel( name = "类型" )
     private String     type;
     @Excel( name = "简介" )
@@ -29,5 +29,5 @@ public class LotteryGame {
     @Excel( name = "赔率" )
     private BigDecimal odds;
     @Excel( name = "排序" )
-    private Integer    index;
+    private Integer    sort;
 }

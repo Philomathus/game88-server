@@ -7,11 +7,11 @@
         <result property="type" column="type" />
         <result property="info" column="info" />
         <result property="odds" column="odds" />
-        <result property="index" column="index" />
+        <result property="sort" column="sort" />
     </resultMap>
 
     <sql id="selectLotteryGameVo">
-        select id, method_id, type, info, odds, index
+        select id, method_id, type, info, odds, sort
         from lottery_game
     </sql>
 </mapper>

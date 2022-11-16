@@ -23,4 +23,21 @@
                ip
         from lottery_count
     </sql>
+
+    <select id="selectCountTotal" resultType="tv.game88.lottery.api.dto.BetCount">
+        SELECT bet_info betinfo, SUM(chip) totalbet
+        FROM lottery_count
+        where lottery_id = #{lotteryId}
+          and issue = #{issue}
+          and member_id = #{memberId}
+        GROUP BY bet_info
+    </select>
+
+    <select id="countBet" resultType="tv.game88.lottery.api.dto.BetCount">
+        SELECT bet_info betinfo, sum(chip) totalbet
+        FROM lottery_count
+        where issue = #{issue}
+          and lottery_id = #{lotteryId}
+        GROUP BY bet_info
+    </select>
 </mapper>

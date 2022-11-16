@@ -23,5 +23,5 @@ public class LotteryMethod {
     @Excel( name = "投注名称" )
     private String  name;
     @Excel( name = "排序" )
-    private Integer order;
+    private Integer sort;
 }

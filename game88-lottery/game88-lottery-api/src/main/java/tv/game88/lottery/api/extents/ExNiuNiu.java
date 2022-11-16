@@ -1,19 +1,17 @@
 package tv.game88.lottery.api.extents;
 
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.LocalMethod;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
-@Slf4j
+@Log4j2
 public class ExNiuNiu {
-    //methodID:methods
-    public static final Map<String, LocalMethod> methodsMap = new HashMap<>();
-    //赔率
-    public static final Map<String, BigDecimal>  oddsMap    = new HashMap<>();
 
     private static final List<String> zeroList     = Arrays.asList( "10", "J", "Q", "K" );
     private static final List<String> colorNiuList = Arrays.asList( "J", "Q", "K" );
@@ -21,16 +19,17 @@ public class ExNiuNiu {
     private static final String[]     suits        = { "S", "H", "C", "D" };
     private static final String[]     cardValues   = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
-    public static BigDecimal handle( String methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
-        BigDecimal  prize   = BigDecimal.ZERO;
-        String[]    betarrs = betSelect.split( "&" );
-        String      des     = "";
-        LocalMethod method  = methodsMap.get( methodId );
+    public static BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
+        BigDecimal              prize   = BigDecimal.ZERO;
+        String[]                betarrs = betSelect.split( "&" );
+        String                  des     = "";
+        LocalMethod             method  = LotteryCacheUtils.me.getLocalMethod( methodId );
+        Map<String, BigDecimal> oddsMap = LotteryCacheUtils.me.getOddsMap( 12 );
         if ( method == null ) {
             log.error( "非法投注:" + methodId );
             return BigDecimal.ZERO;
         }
-        switch ( methodsMap.get( methodId ).getName() ) {
+        switch ( method.getName() ) {
         case "胜负":
             break;
         case "龙虎 牌1VS牌5":
@@ -53,7 +52,7 @@ public class ExNiuNiu {
         String[] values = new String[ keys.length ];
 
         for ( int i = 0; i < keys.length; i++ ) {
-            values[ i ] = betMap.getOrDefault( keys[ i ], BigDecimal.ZERO ).setScale( 2, BigDecimal.ROUND_HALF_UP ).toString();
+            values[ i ] = betMap.getOrDefault( keys[ i ], BigDecimal.ZERO ).setScale( 2, RoundingMode.HALF_UP ).toString();
         }
 
         return String.format( "0:%s-1:%s-2:%s-3:%s-4:%s-5:%s-6:%s-7:%s-8:%s-9:%s-单:%s-双:%s-大:%s-小:%s-质:%s-合:%s-龙:%s-虎:%s-和:%s",
@@ -156,43 +155,37 @@ public class ExNiuNiu {
     }
 
     public static String numToNiu( int count ) {
-        String niu;
-        switch ( count ) {
-        case 0:
-            niu = "牛";
-            break;
-        case 1:
-            niu = "一";
-            break;
-        case 2:
-            niu = "二";
-            break;
-        case 3:
-            niu = "三";
-            break;
-        case 4:
-            niu = "四";
-            break;
-        case 5:
-            niu = "五";
-            break;
-        case 6:
-            niu = "六";
-            break;
-        case 7:
-            niu = "七";
-            break;
-        case 8:
-            niu = "八";
-            break;
-        case 9:
-            niu = "九";
-            break;
-        default:
-            niu = "";
-            break;
-        }
-        return niu;
+        return switch ( count ) {
+            case 0 -> "牛";
+            case 1 -> "一";
+            case 2 -> "二";
+            case 3 -> "三";
+            case 4 -> "四";
+            case 5 -> "五";
+            case 6 -> "六";
+            case 7 -> "七";
+            case 8 -> "八";
+            case 9 -> "九";
+            default -> "";
+        };
+    }
+
+    public static int niuToNum( String niuStr ) {
+        return switch ( niuStr ) {
+            case "无牛" -> 0;
+            case "牛一" -> 1;
+            case "牛二" -> 2;
+            case "牛三" -> 3;
+            case "牛四" -> 4;
+            case "牛五" -> 5;
+            case "牛六" -> 6;
+            case "牛七" -> 7;
+            case "牛八" -> 8;
+            case "牛九" -> 9;
+            case "牛牛" -> 10;
+            case "花色牛" -> 11;
+            default -> -1;
+        };
     }
 
     /**
@@ -208,52 +201,6 @@ public class ExNiuNiu {
         } else {
             return "牛" + numToNiu( countTotal( shuffledDeck ) );
         }
-    }
-
-    public static int setNiuSize( String niuStr ) {
-        int res;
-        switch ( niuStr ) {
-        case "无牛":
-            res = 0;
-            break;
-        case "牛一":
-            res = 1;
-            break;
-        case "牛二":
-            res = 2;
-            break;
-        case "牛三":
-            res = 3;
-            break;
-        case "牛四":
-            res = 4;
-            break;
-        case "牛五":
-            res = 5;
-            break;
-        case "牛六":
-            res = 6;
-            break;
-        case "牛七":
-            res = 7;
-            break;
-        case "牛八":
-            res = 8;
-            break;
-        case "牛九":
-            res = 9;
-            break;
-        case "牛牛":
-            res = 10;
-            break;
-        case "花色牛":
-            res = 11;
-            break;
-        default:
-            res = -1;
-            break;
-        }
-        return res;
     }
 
     public static List<String> compareCard( List<String> blueShuffledDeck, List<String> redShuffledDeck ) {
@@ -289,7 +236,7 @@ public class ExNiuNiu {
                     }
                 }
             }
-        } else if ( setNiuSize( blueNiuStr ) > setNiuSize( redNiuStr ) ) {
+        } else if ( niuToNum( blueNiuStr ) > niuToNum( redNiuStr ) ) {
             return blueShuffledDeck;
         } else {
             return redShuffledDeck;

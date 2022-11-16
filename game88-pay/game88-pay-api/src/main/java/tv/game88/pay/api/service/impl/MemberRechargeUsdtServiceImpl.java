@@ -36,9 +36,9 @@ import java.util.Map;
 @Service
 public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsdtMapper, MemberRechargeUsdt> implements MemberRechargeUsdtService {
     @Resource
-    private MemberRecommendManager memberRecommendManager;
+    private MemberRecommendManager              memberRecommendManager;
     @Resource
-    private MemberMoneyManager     memberMoneyManager;
+    private MemberMoneyManager                  memberMoneyManager;
     @Resource
     private MemberInfoMapper                    memberInfoMapper;
     @Resource
@@ -151,6 +151,7 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
             return RspBase.businessError( "请勿重复提交" );
         }
         MemberRechargeUsdt update = new MemberRechargeUsdt();
+        update.setRechargeOrderNo( req.getRechargeOrderNo() );
         update.setOpName( userName );
         update.setUpdateTime( LocalDateTime.now() );
         update.setRemark( req.getRemark() );
@@ -195,10 +196,14 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         if ( memberInfo.getStatus() == 4 ) {
             chargeGive = BigDecimal.ZERO;
         }
-        //充值彩金日志
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, update.getRemark() );
+        if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
+            //充值彩金日志
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, update.getRemark(), null,
+                    update.getRechargeOrderNo() );
+        }
         //usdt充值日志
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, 1, update.getRemark() );
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, 1, update.getRemark(),
+                update.getRechargeOrderNo(), update.getRechargeOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, rechargeMoney );
         //更新usdt充值记录表状态

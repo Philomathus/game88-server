@@ -36,7 +36,7 @@ public class LotteryHistory {
     @Excel( name = "自开实际杀率" )
     private BigDecimal    killRate;
     @Excel( name = "总投注" )
-    private Long          totalBet;
+    private Integer          totalBet;
     @Excel( name = "预计派奖总额" )
     private BigDecimal    totalPrize;
     @Excel( name = "控杀" )

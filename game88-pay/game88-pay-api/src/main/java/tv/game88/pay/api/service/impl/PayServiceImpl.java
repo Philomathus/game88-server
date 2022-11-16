@@ -134,7 +134,10 @@ public class PayServiceImpl implements PayService {
                 && memberRechargeOnline.getRealMoney().compareTo( memberRechargeOnline.getMoney() ) != 0 ) {
             // 35是新火箭支付平台ID，0.85是扣除15%费率后的值，判断下单金额扣除15%费率后是否与实际金额相等，不相等拒绝回调
             if ( memberRechargeOnline.getPlatformId() == -1 ) {
-                if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) ).compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
+                if ( memberRechargeOnline
+                        .getMoney()
+                        .multiply( new BigDecimal( "0.85" ) )
+                        .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
                     log.warn( "下单金额与实际金额不符拒绝回调 - orderNo:{};money:{};subMoney:{}", memberRechargeOnline.getOrderNo(),
                             memberRechargeOnline.getMoney(), memberRechargeOnline.getRealMoney() );
                     return notifyResultWays[ 1 ];
@@ -202,9 +205,16 @@ public class PayServiceImpl implements PayService {
                 firstRechargeCashBack = rebate;
             }
         }
-        BigDecimal money = payJourMoney.add( chargeGive ).add( firstRechargeCashBack );
+        chargeGive = chargeGive.add( firstRechargeCashBack );
 
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), money, EnumMoney.PAY, 1, mark + "-充值:" + payJourMoney );
+        if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
+            //充值彩金日志
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark, null,
+                    memberRechargeOnline.getOrderNo() );
+        }
+
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), payJourMoney, EnumMoney.PAY, 1,
+                mark + "-充值:" + payJourMoney, memberRechargeOnline.getOrderNo(), memberRechargeOnline.getOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
         memberRechargeOnlineMapper.updateById( updatePayJour );

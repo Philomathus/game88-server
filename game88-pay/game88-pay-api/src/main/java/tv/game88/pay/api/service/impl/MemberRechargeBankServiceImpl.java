@@ -56,11 +56,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     @Resource
     private MemberCardMapper                    memberCardMapper;
     @Resource
-    private MemberWithdrawDetailService memberWithdrawDetailService;
+    private MemberWithdrawDetailService         memberWithdrawDetailService;
     @Resource
-    private MemberRecommendManager      memberRecommendManager;
+    private MemberRecommendManager              memberRecommendManager;
     @Resource
-    private MemberMoneyManager          memberMoneyManager;
+    private MemberMoneyManager                  memberMoneyManager;
     @Resource
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
 
@@ -334,11 +334,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
 
         String mark = "审核人：" + userName;
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark );
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark, null, req.getId() );
         }
 
         memberMoneyManager.addMemberMoney( memberRechargeBank.getMemberId(), memberRechargeBank.getRechargeMoney(),
-                EnumMoney.DEPOSIT, 1, mark );
+                EnumMoney.DEPOSIT, 1, mark, req.getId(), req.getId() );
 
         MemberRechargeBank update = new MemberRechargeBank();
         update.setRechargeOrderNo( memberRechargeBank.getRechargeOrderNo() );
