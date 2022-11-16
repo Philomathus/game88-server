@@ -36,7 +36,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 查询首页公告列表
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:list')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MessageHomeNotice>> list( MessageHomeNotice messageHomeNotice ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -48,7 +48,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 导出首页公告列表
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:export')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:export')" )
     @Log( title = "首页公告", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( MessageHomeNotice messageHomeNotice, HttpServletResponse response ) {
@@ -59,7 +59,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 获取首页公告详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:query')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<MessageHomeNotice> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( messageHomeNoticeService.getById( id ) );
@@ -68,7 +68,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 新增首页公告
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:add')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:add')" )
     @Log( title = "首页公告", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody MessageHomeNotice messageHomeNotice ) {
@@ -81,7 +81,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 修改首页公告
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:edit')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:edit')" )
     @Log( title = "首页公告", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody MessageHomeNotice messageHomeNotice ) {
@@ -96,7 +96,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 删除首页公告
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:remove')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:remove')" )
     @Log( title = "首页公告", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
@@ -110,7 +110,7 @@ public class MessageHomeNoticeController extends BaseController {
     /**
      * 修改首页公告激活状态
      */
-    @PreAuthorize( "@ss.hasPermi('message:messageHomeNotice:effect')" )
+    @PreAuthorize( "@ss.hasPermi('message:homeNotice:effect')" )
     @Log( title = "首页公告激活状态", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryInfoMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryInfo" id="LotteryInfoResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="type" column="type" />
+        <result property="effect" column="effect" />
+        <result property="icon" column="icon" />
+        <result property="killRate" column="kill_rate" />
+        <result property="minCost" column="min_cost" />
+        <result property="cycle" column="cycle" />
+    </resultMap>
+
+    <sql id="selectLotteryInfoVo">
+        select id,
+               name,
+               type,
+               effect,
+               icon,
+               kill_rate,
+               min_cost,
+               cycle
+        from lottery_info
+    </sql>
+
+    <select id="selectLotteryInfoList" parameterType="tv.game88.lottery.api.entity.LotteryInfo"
+            resultMap="LotteryInfoResult">
+        <include refid="selectLotteryInfoVo" />
+        <where>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+        </where>
+    </select>
+</mapper>

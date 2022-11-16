@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.lottery.api.mapper.LotteryHistoryMapper">
+    <resultMap type="tv.game88.lottery.api.entity.LotteryHistory" id="LotteryHistoryResult">
+        <result property="id" column="id" />
+        <result property="issue" column="issue" />
+        <result property="lotteryId" column="lottery_id" />
+        <result property="code" column="code" />
+        <result property="ktime" column="ktime" />
+        <result property="status" column="status" />
+        <result property="name" column="name" />
+        <result property="killRate" column="kill_rate" />
+        <result property="totalBet" column="total_bet" />
+        <result property="totalPrize" column="total_prize" />
+        <result property="ctl" column="ctl" />
+        <result property="analyse" column="analyse" />
+    </resultMap>
+
+    <sql id="selectLotteryHistoryVo">
+        select id,
+               issue,
+               lottery_id,
+               code,
+               ktime,
+               status,
+               name,
+               kill_rate,
+               total_bet,
+               total_prize,
+               ctl,
+               analyse
+        from lottery_history
+    </sql>
+</mapper>
