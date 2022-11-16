@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.member.mapper.ConfigRecommendMapper">
+
+    <resultMap type="tv.game88.core.member.entity.ConfigRecommend" id="ConfigRecommendResult">
+        <result property="id" column="id" />
+        <result property="level" column="level" />
+        <result property="name" column="name" />
+        <result property="bill" column="bill" />
+    </resultMap>
+
+    <sql id="selectConfigRecommendVo">
+        select id, level, name, bill
+        from config_recommend
+    </sql>
+
+    <select id="selectConfigRecommendList" parameterType="tv.game88.core.member.entity.ConfigRecommend"
+            resultMap="ConfigRecommendResult">
+        <include refid="selectConfigRecommendVo" />
+        <where>
+            <if test="level != null ">and level = #{level}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="bill != null ">and bill = #{bill}</if>
+        </where>
+    </select>
+
+</mapper>
