@@ -31,7 +31,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 查询彩票规则说明列表
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:list')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:list')" )
 	@GetMapping( "/list" )
 	public RspBase<List<LotteryRule>> list(LotteryRule lotteryRule) {
 		PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -43,7 +43,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 导出彩票规则说明列表
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:export')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:export')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.EXPORT )
 	@GetMapping( "/export" )
 	public void export(LotteryRule lotteryRule, HttpServletResponse response) {
@@ -54,7 +54,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 获取彩票规则说明详细信息
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:query')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:query')" )
 	@GetMapping( value = "/{id}" )
 	public RspBase<LotteryRule> getInfo( @PathVariable( "id" ) Integer id) {
 		return RspBase.ok( lotteryRuleService.getById(id) );
@@ -63,7 +63,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 新增彩票规则说明
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:add')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:add')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.INSERT )
 	@PostMapping
 	public RspBase<?> add( @RequestBody LotteryRule lotteryRule) {
@@ -73,7 +73,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 修改彩票规则说明
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:edit')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:edit')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.UPDATE )
 	@PutMapping
 	public RspBase<?> edit( @RequestBody LotteryRule lotteryRule) {
@@ -83,7 +83,7 @@ public class LotteryRuleController extends BaseController {
 	/**
 	 * 删除彩票规则说明
 	 */
-	@PreAuthorize( "@ss.hasPermi('lottery:lotteryRule:remove')" )
+	@PreAuthorize( "@ss.hasPermi('lottery:rule:remove')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.DELETE )
 	@DeleteMapping( "/{ids}" )
 	public RspBase<?> remove( @PathVariable Integer[] ids ) {
