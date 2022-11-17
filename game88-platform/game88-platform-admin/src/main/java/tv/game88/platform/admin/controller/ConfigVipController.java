@@ -55,7 +55,7 @@ public class ConfigVipController extends BaseController {
     /**
      * 获取会员VIP配置详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('config:vip:edit')" )
+    @PreAuthorize( "@ss.hasPermi('config:vip:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<ConfigVip> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( configVipService.getById( id ) );
