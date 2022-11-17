@@ -82,8 +82,8 @@ public class LotteryInfoController extends BaseController {
     @PutMapping
     public RspBase<?> edit( @RequestBody LotteryInfo lotteryInfo ) {
         LotteryInfo update = new LotteryInfo();
-        lotteryInfo.setId( lotteryInfo.getId() );
-        lotteryInfo.setIcon( lotteryInfo.getIcon() );
+        update.setId( lotteryInfo.getId() );
+        update.setIcon( lotteryInfo.getIcon() );
         return toResult( lotteryInfoService.updateById( update ) );
     }
 
