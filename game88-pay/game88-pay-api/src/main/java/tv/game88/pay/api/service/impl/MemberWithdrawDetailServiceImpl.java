@@ -66,7 +66,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
-        MemberInfo memberInfo = memberInfoMapper.selectById( memberId );
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "code_will", "code_now", "account_now" )
+                .one();
         return this.getRspWithdrawDetail( memberInfo.getCodeWill(), memberInfo.getCodeNow(), memberInfo.getAccountNow() );
     }
 

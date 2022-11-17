@@ -157,6 +157,10 @@ public class MemberInfo implements Serializable {
     @Excel( name = "邀请码" )
     private String inviterCode;
 
+    @Schema( title = "佣金" )
+    @Excel( name = "佣金" )
+    private String inviterMoney;
+
     @Schema( title = "渠道号" )
     @Excel( name = "渠道号" )
     private String channelCode;

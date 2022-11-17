@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class ReqBoxPass {
-    @Schema( title = "保险箱/提现密码", required = true )
+    @Schema( title = "保险箱/提现密码", requiredMode = Schema.RequiredMode.REQUIRED )
     @NotBlank( message = "密码不能为空" )
     private String boxPass;
 }

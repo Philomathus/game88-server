@@ -26,9 +26,9 @@ public class MemberRechargeBankController extends BaseController {
 
     @Operation( summary = "获取充值银行卡列表" )
     @PostMapping( "/rechargeBankList" )
-    public List<RspPayRechargeBank> rechargeBankList() {
+    public RspBase<List<RspPayRechargeBank>> rechargeBankList() {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        return memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
+        return RspBase.ok( memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() ) );
     }
 
     @Operation( summary = "获取绑定的银行卡" )

@@ -29,9 +29,9 @@ public class MemberRechargeUsdtController {
 
     @Operation( summary = "获取充值USDT列表" )
     @PostMapping( "/rechargeUsdtList" )
-    public List<RspPayRechargeUsdt> rechargeUsdtList() {
+    public RspBase<List<RspPayRechargeUsdt>> rechargeUsdtList() {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        return payRechargeUsdtService.selectList( platformUser.getId(), platformUser.getVip() );
+        return RspBase.ok( payRechargeUsdtService.selectList( platformUser.getId(), platformUser.getVip() ) );
     }
 
     @Operation( summary = "USDT充值" )

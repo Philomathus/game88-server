@@ -24,5 +24,6 @@ public class LotteryRule {
     private Integer kind;
     @Excel( name = "开奖说明" )
     private String  des;
-
+    @Excel( name = "排序" )
+    private Integer sort;
 }

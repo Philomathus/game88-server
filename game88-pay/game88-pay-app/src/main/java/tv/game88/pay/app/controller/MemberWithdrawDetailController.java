@@ -4,17 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
-import tv.game88.common.page.PageDomain;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
-import tv.game88.pay.api.dto.ReqBoxPass;
-import tv.game88.pay.api.dto.ReqMemberCardWithdraw;
-import tv.game88.pay.api.dto.RspMemberWithdrawDetailInfo;
-import tv.game88.pay.api.dto.RspWithdrawRechargeDetail;
+import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
-import tv.game88.pay.api.type.WithdrawRechargeType;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -51,12 +48,11 @@ public class MemberWithdrawDetailController extends BaseController {
     }
 
     @Operation( summary = "提现充值详情" )
-    @PostMapping( "/withdrawRechargeDetail/{type}" )
-    public RspBase<List<RspWithdrawRechargeDetail>> withdrawDetail( @RequestBody PageDomain pageDomain,
-                                                                    @PathVariable( "type" ) WithdrawRechargeType type ) {
-        startPage( pageDomain );
-        String                          memberId   = MemberSecurityUtils.getUserId();
-        List<RspWithdrawRechargeDetail> resultList = memberWithdrawDetailService.withdrawRechargeDetail( memberId, type );
-        return getRspBasePage( resultList, pageDomain );
+    @PostMapping( "/withdrawRechargeDetail" )
+    public RspBase<List<RspWithdrawRechargeDetail>> withdrawDetail( @RequestBody ReqDetailType reqDetailType ) {
+        startPage( reqDetailType );
+        List<RspWithdrawRechargeDetail> resultList =
+                memberWithdrawDetailService.withdrawRechargeDetail( MemberSecurityUtils.getUserId(), reqDetailType.getType() );
+        return getRspBasePage( resultList, reqDetailType );
     }
 }

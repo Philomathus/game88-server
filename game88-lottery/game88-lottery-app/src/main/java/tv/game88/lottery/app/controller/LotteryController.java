@@ -51,6 +51,12 @@ public class LotteryController extends BaseController {
         return getRspBasePage( rspBetRecordList, req );
     }
 
+    @Operation( summary = "规则说明" )
+    @PostMapping( "rule" )
+    public RspBase<List<RuleVo>> rule( @Validated @RequestBody ReqLottery req ) {
+        return RspBase.ok( lotteryService.getLotteryRule( req.getId() ) );
+    }
+
     @Operation( summary = "投注" )
     @PostMapping( "bet" )
     public RspBase<RspBet> bet( @RequestBody ReqBet reqBet ) {
