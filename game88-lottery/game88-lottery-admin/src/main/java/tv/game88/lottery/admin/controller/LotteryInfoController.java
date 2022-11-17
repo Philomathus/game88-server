@@ -31,7 +31,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 查询彩票信息列表
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:list')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:list')" )
     @GetMapping( "/list" )
     public RspBase<List<LotteryInfo>> list( LotteryInfo lotteryInfo ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -43,7 +43,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 导出彩票信息列表
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:export')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:export')" )
     @Log( title = "彩票信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( LotteryInfo lotteryInfo, HttpServletResponse response ) {
@@ -54,7 +54,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 获取彩票信息详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:query')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<LotteryInfo> getInfo( @PathVariable( "id" ) Integer id ) {
         return RspBase.ok( lotteryInfoService.getById( id ) );
@@ -63,7 +63,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 新增彩票信息
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:add')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:add')" )
     @Log( title = "彩票信息", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody LotteryInfo lotteryInfo ) {
@@ -73,7 +73,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 修改彩票信息
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:edit')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:edit')" )
     @Log( title = "彩票信息", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody LotteryInfo lotteryInfo ) {
@@ -83,7 +83,7 @@ public class LotteryInfoController extends BaseController {
     /**
      * 删除彩票信息
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryInfo:remove')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:info:remove')" )
     @Log( title = "彩票信息", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Integer[] ids ) {
