@@ -6,11 +6,10 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.config.constants.Constants;
+import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.entity.LotteryInfo;
 import tv.game88.lottery.api.service.LotteryInfoService;
 
@@ -29,9 +28,8 @@ import java.util.List;
 public class LotteryInfoController extends BaseController {
     @Resource
     private LotteryInfoService lotteryInfoService;
-
     @Resource
-    private RedisUtils redisUtil;
+    private LotteryCacheUtils  lotteryCacheUtils;
 
     /**
      * 查询彩票信息列表
@@ -107,7 +105,7 @@ public class LotteryInfoController extends BaseController {
         lotteryInfo.setEffect( effect );
         boolean isUpdate = lotteryInfoService.updateById( lotteryInfo );
         if ( isUpdate ) {
-            redisUtil.unlink( Constants.LOTTERY_PREX + "lotteryInfo" );
+            lotteryCacheUtils.clear();
         }
         return toResult( isUpdate );
     }
