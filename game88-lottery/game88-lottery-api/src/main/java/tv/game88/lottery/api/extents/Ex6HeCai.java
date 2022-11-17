@@ -1,19 +1,20 @@
 package tv.game88.lottery.api.extents;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.CollectionUtils;
+import org.springframework.stereotype.Repository;
 import tv.game88.common.utils.RandomUtils;
+import tv.game88.lottery.api.base.AbstractExLottery;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.LocalMethod;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Log4j2
-public class Ex6HeCai {
+@Repository( value = "Ex4Processor" )
+public class Ex6HeCai extends AbstractExLottery {
     //methodID:methods
     public static Map<String, Integer> weightableMap = new HashMap<>();
 
@@ -23,7 +24,7 @@ public class Ex6HeCai {
         }
     }
 
-    public static BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
+    public BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
         BigDecimal              prize   = BigDecimal.ZERO;
         String                  tarCode = officialSpl[ officialSpl.length - 1 ];
         String[]                betarrs = betSelect.split( "&" );
@@ -118,7 +119,7 @@ public class Ex6HeCai {
 
     }
 
-    public static String concatBetString( Map<String, BigDecimal> betMap ) {
+    public String concatBetString( Map<String, BigDecimal> betMap ) {
         String sp           = "-";
         String betCountinfo = "";
         String bt           = "鼠";
@@ -163,7 +164,7 @@ public class Ex6HeCai {
         return betCountinfo;
     }
 
-    public static BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
+    public BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
         String     tarCode       = list.get( list.size() - 1 );
         BigDecimal paijiangTotal = BigDecimal.ZERO;
         paijiangTotal = paijiangTotal.add( peiMap.get( getDanShuang( tarCode ) ) );
@@ -176,94 +177,7 @@ public class Ex6HeCai {
         return paijiangTotal;
     }
 
-    public static List<String> randomResult(){
+    public List<String> randomResult(){
         return RandomUtils.randomWeight( 7, new HashMap<>( weightableMap ), true );
-    }
-
-    public static Map<String, Object> killResult( Map<String, BigDecimal> prizeMap, Map<String, BigDecimal> betMap, BigDecimal totalBet ) {
-        Map<String, Object> resultMap = new HashMap<>();
-        if ( CollectionUtils.isEmpty( prizeMap ) || totalBet.compareTo( BigDecimal.ZERO ) == 0 ) {
-            resultMap.put( "resultsList", ExBaccarat.randomResult() );
-            resultMap.put( "killRate", BigDecimal.ZERO );
-            resultMap.put( "totalPrize", BigDecimal.ZERO );
-            return resultMap;
-        }
-        // 先生成10组随机牌
-        List<String> randomResult1  = randomResult();
-        List<String> randomResult2  = randomResult();
-        List<String> randomResult3  = randomResult();
-        List<String> randomResult4  = randomResult();
-        List<String> randomResult5  = randomResult();
-        List<String> randomResult6  = randomResult();
-        List<String> randomResult7  = randomResult();
-        List<String> randomResult8  = randomResult();
-        List<String> randomResult9  = randomResult();
-        List<String> randomResult10 = randomResult();
-
-        // 判断10组随机牌谁的派奖最少
-        BigDecimal randomResultPrize1  = coutPrize( randomResult1, prizeMap );
-        BigDecimal randomResultPrize2  = coutPrize( randomResult2, prizeMap );
-        BigDecimal randomResultPrize3  = coutPrize( randomResult3, prizeMap );
-        BigDecimal randomResultPrize4  = coutPrize( randomResult4, prizeMap );
-        BigDecimal randomResultPrize5  = coutPrize( randomResult5, prizeMap );
-        BigDecimal randomResultPrize6  = coutPrize( randomResult6, prizeMap );
-        BigDecimal randomResultPrize7  = coutPrize( randomResult7, prizeMap );
-        BigDecimal randomResultPrize8  = coutPrize( randomResult8, prizeMap );
-        BigDecimal randomResultPrize9  = coutPrize( randomResult9, prizeMap );
-        BigDecimal randomResultPrize10 = coutPrize( randomResult10, prizeMap );
-
-        BigDecimal min = randomResultPrize1
-                .min( randomResultPrize2 )
-                .min( randomResultPrize3 )
-                .min( randomResultPrize4 )
-                .min( randomResultPrize5 )
-                .min( randomResultPrize6 )
-                .min( randomResultPrize7 )
-                .min( randomResultPrize8 )
-                .min( randomResultPrize9 )
-                .min( randomResultPrize10 );
-
-        if ( min.compareTo( randomResultPrize1 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult1 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize1 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize1 );
-        } else if ( min.compareTo( randomResultPrize2 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult2 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize2 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize2 );
-        } else if ( min.compareTo( randomResultPrize3 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult3 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize3 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize3 );
-        } else if ( min.compareTo( randomResultPrize4 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult4 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize4 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize4 );
-        } else if ( min.compareTo( randomResultPrize5 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult5 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize5 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize5 );
-        } else if ( min.compareTo( randomResultPrize6 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult6 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize6 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize6 );
-        } else if ( min.compareTo( randomResultPrize7 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult7 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize7 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize7 );
-        } else if ( min.compareTo( randomResultPrize8 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult8 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize8 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize8 );
-        } else if ( min.compareTo( randomResultPrize9 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult9 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize9 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize9 );
-        } else if ( min.compareTo( randomResultPrize10 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult10 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize10 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize10 );
-        }
-        return resultMap;
     }
 }

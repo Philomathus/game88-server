@@ -2,7 +2,9 @@ package tv.game88.lottery.api.extents;
 
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Repository;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.lottery.api.base.AbstractExLottery;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.LocalMethod;
 
@@ -11,7 +13,8 @@ import java.math.RoundingMode;
 import java.util.*;
 
 @Log4j2
-public class ExNiuNiu {
+@Repository( value = "Ex12Processor" )
+public class ExNiuNiu extends AbstractExLottery {
 
     private static final List<String> zeroList     = Arrays.asList( "10", "J", "Q", "K" );
     private static final List<String> colorNiuList = Arrays.asList( "J", "Q", "K" );
@@ -19,7 +22,7 @@ public class ExNiuNiu {
     private static final String[]     suits        = { "S", "H", "C", "D" };
     private static final String[]     cardValues   = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
-    public static BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
+    public BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
         BigDecimal              prize   = BigDecimal.ZERO;
         String[]                betarrs = betSelect.split( "&" );
         String                  des     = "";
@@ -45,7 +48,7 @@ public class ExNiuNiu {
 
     }
 
-    public static String concatBetString( Map<String, BigDecimal> betMap ) {
+    public String concatBetString( Map<String, BigDecimal> betMap ) {
 
         String[] keys = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "单", "双", "大", "小", "质", "合", "龙", "虎", "和" };
 
@@ -59,13 +62,13 @@ public class ExNiuNiu {
                 values );
     }
 
-    public static BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
+    public BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
         BigDecimal paijiangTotal = BigDecimal.ZERO;
         return paijiangTotal;
     }
 
 
-    public static List<String> randomResult() {
+    public List<String> randomResult() {
         List<String> deck = new ArrayList<>( 52 );
         for ( String suit : suits ) {
             for ( String cardValue : cardValues ) {

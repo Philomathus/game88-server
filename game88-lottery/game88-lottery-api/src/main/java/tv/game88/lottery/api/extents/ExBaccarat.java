@@ -1,22 +1,23 @@
 package tv.game88.lottery.api.extents;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.CollectionUtils;
+import org.springframework.stereotype.Repository;
+import tv.game88.lottery.api.base.AbstractExLottery;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 @Log4j2
-public class ExBaccarat {
+@Repository( value = "Ex11Processor" )
+public class ExBaccarat extends AbstractExLottery {
 
     private static final List<String> zeroList = Arrays.asList( "10", "J", "Q", "K" );
 
     private static final String[] suits      = { "C", "D", "H", "S" };
     private static final String[] cardValues = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
-    public static BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
+    public BigDecimal handle( Integer methodId, String[] officialSpl, BigDecimal chip, String betSelect ) {
         BigDecimal              prize   = BigDecimal.ZERO;
         List<String>            offList = Arrays.asList( officialSpl );
         String                  analyse = getBaccaratAnalyse( offList );
@@ -41,11 +42,11 @@ public class ExBaccarat {
         return prize;
     }
 
-    public static String concatBetString( Map<String, BigDecimal> betMap ) {
+    public String concatBetString( Map<String, BigDecimal> betMap ) {
         return null;
     }
 
-    public static BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
+    public BigDecimal coutPrize( List<String> list, Map<String, BigDecimal> peiMap ) {
         String     detailAnalyse = getBaccaratAnalyse( list );
         BigDecimal paijiangTotal = BigDecimal.ZERO;
         //System.out.println(detailAnalyse);
@@ -68,180 +69,7 @@ public class ExBaccarat {
         return paijiangTotal;
     }
 
-    /**
-     * 百家乐根据杀率生成不同牌型
-     *
-     * @param prizeMap
-     * @param betMap
-     * @param handResultsList
-     */
-    @Deprecated
-    public static Map<String, Object> getBaccaratKillResult( Map<String, BigDecimal> prizeMap, Map<String, BigDecimal> betMap,
-                                                             List<String> handResultsList, BigDecimal totalBet ) {
-        Map<String, Object> resultMap = new HashMap<>();
-        if ( CollectionUtils.isEmpty( prizeMap ) || totalBet.compareTo( BigDecimal.ZERO ) == 0 ) {
-            resultMap.put( "resultsList", handResultsList );
-            resultMap.put( "killRate", BigDecimal.ZERO );
-            resultMap.put( "totalPrize", BigDecimal.ZERO );
-            return resultMap;
-        }
-        //获取庄闲手牌
-        List<String> playerResultList = Arrays.asList( handResultsList.get( 0 ).split( "," ) );
-        List<String> bankerResultList = Arrays.asList( handResultsList.get( 1 ).split( "," ) );
-        //获取最新的结果列表
-        //计算总和
-        int playerTotal = countTotal( playerResultList );
-        int bankerTotal = countTotal( bankerResultList );
-
-        BigDecimal bankerPrize      = Objects.isNull( prizeMap.get( "庄" ) ) ? BigDecimal.ZERO : prizeMap.get( "庄" );
-        BigDecimal playerPrize      = Objects.isNull( prizeMap.get( "闲" ) ) ? BigDecimal.ZERO : prizeMap.get( "闲" );
-        BigDecimal bankerPairsPrize = Objects.isNull( prizeMap.get( "庄对" ) ) ? BigDecimal.ZERO : prizeMap.get( "庄对" );
-        BigDecimal playerPairsPrize = Objects.isNull( prizeMap.get( "闲对" ) ) ? BigDecimal.ZERO : prizeMap.get( "闲对" );
-        BigDecimal tiePrize         = Objects.isNull( prizeMap.get( "和" ) ) ? BigDecimal.ZERO : prizeMap.get( "和" );
-
-        BigDecimal bankerBetAmount      = Objects.isNull( betMap.get( "庄" ) ) ? BigDecimal.ZERO : betMap.get( "庄" );
-        BigDecimal playerBetAmount      = Objects.isNull( betMap.get( "闲" ) ) ? BigDecimal.ZERO : betMap.get( "闲" );
-        BigDecimal tieBetAmount         = Objects.isNull( betMap.get( "和" ) ) ? BigDecimal.ZERO : betMap.get( "和" );
-        BigDecimal bankerPairsBetAmount = Objects.isNull( betMap.get( "庄对" ) ) ? BigDecimal.ZERO : betMap.get( "庄对" );
-        BigDecimal playerPairsBetAmount = Objects.isNull( betMap.get( "闲对" ) ) ? BigDecimal.ZERO : betMap.get( "闲对" );
-
-        //计算结果为庄  玩家总盈利多少
-        BigDecimal bankWinMoney = bankerPrize;
-        if ( isPairs( bankerResultList ) ) {
-            bankWinMoney = bankWinMoney.add( bankerPairsPrize );
-        }
-
-        //下闲 玩家赢多少钱
-        BigDecimal playerWinMoney = playerPrize;
-        if ( isPairs( playerResultList ) ) {
-            playerWinMoney = playerWinMoney.add( playerPairsPrize );
-        }
-
-        //判定当前牌型 庄赢还是闲赢
-        if ( bankerTotal > playerTotal ) {
-            if ( bankWinMoney.compareTo( playerWinMoney ) > 0 ) {
-                resultMap.put( "totalPrize", playerWinMoney );
-                //交换庄闲手牌
-                resultMap.put( "resultsList", Arrays.asList( String.join( ",", bankerResultList ), String.join( ",",
-                        playerResultList ) ) );
-            } else {
-                resultMap.put( "totalPrize", bankWinMoney );
-                resultMap.put( "resultsList", handResultsList );
-            }
-        } else if ( playerTotal > bankerTotal ) {
-            if ( playerWinMoney.compareTo( bankWinMoney ) > 0 ) {
-                resultMap.put( "totalPrize", bankWinMoney );
-                //交换庄闲手牌
-                resultMap.put( "resultsList", Arrays.asList( String.join( ",", bankerResultList ), String.join( ",",
-                        playerResultList ) ) );
-            } else {
-                resultMap.put( "totalPrize", playerWinMoney );
-                resultMap.put( "resultsList", handResultsList );
-            }
-        } else {
-            // 和局派奖要加上庄闲下注金
-            resultMap.put( "totalPrize", tiePrize.add( bankerBetAmount ).add( playerBetAmount ) );
-            //和牌不杀
-            resultMap.put( "resultsList", Arrays.asList( String.join( ",", playerResultList ), String.join( ",",
-                    bankerResultList ) ) );
-        }
-        BigDecimal totalPrize = ( BigDecimal ) resultMap.getOrDefault( "totalPrize", BigDecimal.ZERO );
-        resultMap.put( "killRate", totalBet.subtract( totalPrize ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-        return resultMap;
-    }
-
-    /**
-     * 百家乐开杀逻辑
-     */
-    public static Map<String, Object> killResult( Map<String, BigDecimal> prizeMap, Map<String, BigDecimal> betMap,
-                                                  BigDecimal totalBet ) {
-        Map<String, Object> resultMap = new HashMap<>();
-        if ( CollectionUtils.isEmpty( prizeMap ) || totalBet.compareTo( BigDecimal.ZERO ) == 0 ) {
-            resultMap.put( "resultsList", ExBaccarat.randomResult() );
-            resultMap.put( "killRate", BigDecimal.ZERO );
-            resultMap.put( "totalPrize", BigDecimal.ZERO );
-            return resultMap;
-        }
-
-        // 先生成10组随机牌
-        List<String> randomResult1  = randomResult();
-        List<String> randomResult2  = randomResult();
-        List<String> randomResult3  = randomResult();
-        List<String> randomResult4  = randomResult();
-        List<String> randomResult5  = randomResult();
-        List<String> randomResult6  = randomResult();
-        List<String> randomResult7  = randomResult();
-        List<String> randomResult8  = randomResult();
-        List<String> randomResult9  = randomResult();
-        List<String> randomResult10 = randomResult();
-
-        // 判断10组随机牌谁的派奖最少
-        BigDecimal randomResultPrize1  = coutPrize( randomResult1, prizeMap );
-        BigDecimal randomResultPrize2  = coutPrize( randomResult2, prizeMap );
-        BigDecimal randomResultPrize3  = coutPrize( randomResult3, prizeMap );
-        BigDecimal randomResultPrize4  = coutPrize( randomResult4, prizeMap );
-        BigDecimal randomResultPrize5  = coutPrize( randomResult5, prizeMap );
-        BigDecimal randomResultPrize6  = coutPrize( randomResult6, prizeMap );
-        BigDecimal randomResultPrize7  = coutPrize( randomResult7, prizeMap );
-        BigDecimal randomResultPrize8  = coutPrize( randomResult8, prizeMap );
-        BigDecimal randomResultPrize9  = coutPrize( randomResult9, prizeMap );
-        BigDecimal randomResultPrize10 = coutPrize( randomResult10, prizeMap );
-
-        BigDecimal min = randomResultPrize1
-                .min( randomResultPrize2 )
-                .min( randomResultPrize3 )
-                .min( randomResultPrize4 )
-                .min( randomResultPrize5 )
-                .min( randomResultPrize6 )
-                .min( randomResultPrize7 )
-                .min( randomResultPrize8 )
-                .min( randomResultPrize9 )
-                .min( randomResultPrize10 );
-        if ( min.compareTo( randomResultPrize1 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult1 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize1 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize1 );
-        } else if ( min.compareTo( randomResultPrize2 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult2 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize2 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize2 );
-        } else if ( min.compareTo( randomResultPrize3 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult3 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize3 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize3 );
-        } else if ( min.compareTo( randomResultPrize4 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult4 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize4 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize4 );
-        } else if ( min.compareTo( randomResultPrize5 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult5 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize5 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize5 );
-        } else if ( min.compareTo( randomResultPrize6 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult6 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize6 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize6 );
-        } else if ( min.compareTo( randomResultPrize7 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult7 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize7 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize7 );
-        } else if ( min.compareTo( randomResultPrize8 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult8 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize8 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize8 );
-        } else if ( min.compareTo( randomResultPrize9 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult9 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize9 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize9 );
-        } else if ( min.compareTo( randomResultPrize10 ) == 0 ) {
-            resultMap.put( "resultsList", randomResult10 );
-            resultMap.put( "killRate", totalBet.subtract( randomResultPrize10 ).divide( totalBet, 2, RoundingMode.HALF_UP ) );
-            resultMap.put( "totalPrize", randomResultPrize10 );
-        }
-        return resultMap;
-    }
-
-    public static List<String> randomResult() {
+    public List<String> randomResult() {
         List<String> deck = new ArrayList<>( 52 );
         for ( String suit : suits ) {
             for ( String cardValue : cardValues ) {

@@ -16,6 +16,8 @@ import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.lottery.api.base.ExLottery;
+import tv.game88.lottery.api.base.ExLotteryFactoryUtil;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.*;
 import tv.game88.lottery.api.entity.*;
@@ -66,11 +68,13 @@ public class LotteryServiceImpl implements LotteryService {
     private SqlSessionTemplate sqlSessionTemplate;
 
     @Resource
-    private RedisUtils         redisUtils;
+    private RedisUtils           redisUtils;
     @Resource
-    private ImServerUtils      imServerUtils;
+    private ImServerUtils        imServerUtils;
     @Resource
-    private ConfigEnvCacheUtil configEnvCacheUtil;
+    private ConfigEnvCacheUtil   configEnvCacheUtil;
+    @Resource
+    private ExLotteryFactoryUtil exLotteryFactoryUtil;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
@@ -345,39 +349,18 @@ public class LotteryServiceImpl implements LotteryService {
 
     public Map<String, Object> killResult( Integer kindId, Map<String, BigDecimal> prizeMap, Map<String, BigDecimal> betMap,
                                            BigDecimal totalBet ) {
-        return switch ( kindId ) {
-            case 1 -> Ex11xuan5.killResult( prizeMap, betMap, totalBet );
-            case 4 -> Ex6HeCai.killResult( prizeMap, betMap, totalBet );
-            case 2 -> ExKuai3.killResult( prizeMap, betMap, totalBet );
-            case 3 -> ExSanChe.killResult( prizeMap, betMap, totalBet );
-            case 0 -> ExShiShiCai.killResult( prizeMap, betMap, totalBet );
-            case 11 -> ExBaccarat.killResult( prizeMap, betMap, totalBet );
-            default -> null;
-        };
+        ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
+        return exLottery.killResult( prizeMap, totalBet );
     }
 
     public List<String> randomResult( Integer kindId ) {
-        return switch ( kindId ) {
-            case 1 -> Ex11xuan5.randomResult();
-            case 4 -> Ex6HeCai.randomResult();
-            case 2 -> ExKuai3.randomResult();
-            case 3 -> ExSanChe.randomResult();
-            case 0 -> ExShiShiCai.randomResult();
-            case 11 -> ExBaccarat.randomResult();
-            default -> null;
-        };
+        ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
+        return exLottery.randomResult();
     }
 
     public BigDecimal coutPrize( int kindId, List<String> list, Map<String, BigDecimal> peiMap ) {
-        return switch ( kindId ) {
-            case 1 -> Ex11xuan5.coutPrize( list, peiMap );
-            case 4 -> Ex6HeCai.coutPrize( list, peiMap );
-            case 2 -> ExKuai3.coutPrize( list, peiMap );
-            case 3 -> ExSanChe.coutPrize( list, peiMap );
-            case 0 -> ExShiShiCai.coutPrize( list, peiMap );
-            case 11 -> ExBaccarat.coutPrize( list, peiMap );
-            default -> null;
-        };
+        ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
+        return exLottery.coutPrize( list, peiMap );
     }
 
     private HistoryResult getHistoryResult( HistoryResult h, List<String> resultList, LotteryHistory update, BigDecimal prize,
@@ -661,15 +644,8 @@ public class LotteryServiceImpl implements LotteryService {
 
     private BigDecimal handlePrize( Integer lotteryId, Integer methodId, String[] officialCode, BigDecimal chip,
                                     String betSelect ) {
-        return switch ( LotteryUtils.getKindId( lotteryId ) ) {
-            case 1 -> Ex11xuan5.handle( methodId, officialCode, chip, betSelect );
-            case 4 -> Ex6HeCai.handle( methodId, officialCode, chip, betSelect );
-            case 2 -> ExKuai3.handle( methodId, officialCode, chip, betSelect );
-            case 3 -> ExSanChe.handle( methodId, officialCode, chip, betSelect );
-            case 0 -> ExShiShiCai.handle( methodId, officialCode, chip, betSelect );
-            case 11 -> ExBaccarat.handle( methodId, officialCode, chip, betSelect );
-            default -> BigDecimal.ZERO;
-        };
+        ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( LotteryUtils.getKindId( lotteryId ) );
+        return exLottery.handle( methodId, officialCode, chip, betSelect );
     }
 
     @Override
