@@ -1,4 +1,4 @@
-package tv.game88.game.app.controllor;
+package tv.game88.game.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.ReqGame;
@@ -20,7 +21,7 @@ import java.util.List;
 @RestController
 @Tag( name = "游戏相关接口" )
 @Log4j2
-public class GameController {
+public class GameController extends BaseController {
     @Resource
     private GameService gameService;
 
