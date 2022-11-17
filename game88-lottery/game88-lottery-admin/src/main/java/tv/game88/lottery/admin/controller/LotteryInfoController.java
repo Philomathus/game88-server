@@ -6,9 +6,11 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.lottery.api.entity.LotteryInfo;
 import tv.game88.lottery.api.service.LotteryInfoService;
 
@@ -27,6 +29,9 @@ import java.util.List;
 public class LotteryInfoController extends BaseController {
     @Resource
     private LotteryInfoService lotteryInfoService;
+
+    @Resource
+    private RedisUtils redisUtil;
 
     /**
      * 查询彩票信息列表
@@ -89,4 +94,22 @@ public class LotteryInfoController extends BaseController {
     public RspBase<?> remove( @PathVariable Integer[] ids ) {
         return toResult( lotteryInfoService.removeByIds( Arrays.asList( ids ) ) );
     }
+
+    /**
+     * 修改活动信息激活状态 change status
+     */
+    @PreAuthorize( "@ss.hasPermi('lottery:info:effect')" )
+    @Log( title = "激活状态", businessType = BusinessType.EFFECT )
+    @PutMapping( "/changeStatus/{id}/{effect}" )
+    public RspBase<?> changeStatus( @PathVariable Integer id, @PathVariable Boolean effect ) {
+        LotteryInfo lotteryInfo = new LotteryInfo();
+        lotteryInfo.setId( id );
+        lotteryInfo.setEffect( effect );
+        boolean isUpdate = lotteryInfoService.updateById( lotteryInfo );
+        if ( isUpdate ) {
+            redisUtil.unlink( Constants.LOTTERY_PREX + "lotteryInfo" );
+        }
+        return toResult( isUpdate );
+    }
+
 }
