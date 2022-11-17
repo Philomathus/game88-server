@@ -79,7 +79,7 @@ public class MemberInfoController extends BaseController {
         return RspBase.ok( EnumMoney.getTradeTypes() );
     }
 
-    @Operation( summary = "获取会员资金明细" )
+    @Operation( summary = "获取会员打码列表" )
     @PostMapping( "/getCodeFlowList" )
     public RspBase<List<RspCodeFlow>> getCodeFlowList( @RequestBody PageDomain pageDomain ) {
         startPage( pageDomain );
@@ -97,5 +97,11 @@ public class MemberInfoController extends BaseController {
     @PostMapping( "/receiveVipGift" )
     public RspBase<?> receiveVipGift( @RequestBody ReqReceiveVipGift req ) {
         return memberInfoService.receiveVipGift( MemberSecurityUtils.getUserId(), req.getType() );
+    }
+
+    @Operation( summary = "获取IM的校验token" )
+    @PostMapping( "/getImToken" )
+    public RspBase<RspImToken> getImToken() {
+        return memberInfoService.getImToken( MemberSecurityUtils.getUserId() );
     }
 }

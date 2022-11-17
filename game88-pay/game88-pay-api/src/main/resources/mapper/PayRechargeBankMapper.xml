@@ -51,8 +51,8 @@
         select b.id,b.bank_account,b.account_name,b.bank_address,b.discount_bill,
         b.recharge_limit_min,b.recharge_limit_max,b.rest_province,remark,l.bank_icon,l.bank_name
         from pay_recharge_bank b left join config_bank_list l on l.id = b.bank_id
-        where effect = true
-        and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-        and open_level_max <![CDATA[ >= ]]> #{vipLevel}
+        where b.effect = 1
+        and b.open_level_min <![CDATA[ <= ]]> #{vipLevel}
+        and b.open_level_max <![CDATA[ >= ]]> #{vipLevel}
     </select>
 </mapper>

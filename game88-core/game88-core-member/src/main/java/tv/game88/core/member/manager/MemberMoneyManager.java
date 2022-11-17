@@ -55,6 +55,11 @@ public class MemberMoneyManager {
         BigDecimal memberMoney = memberInfoMapper.getUserBalance( userId );
 
         memberInfoMapper.addMoneySelect( userId, addCount, charge, codeMult );
+
+        if ( enumMoney == EnumMoney.COMMISSION ) {
+            memberInfoMapper.addInviterMoney( userId, addCount );
+        }
+
         //日志
         LogMoney log = new LogMoney();
         if ( StringUtils.isNotBlank( businessId ) ) {

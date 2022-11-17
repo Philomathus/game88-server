@@ -50,7 +50,7 @@ public class ConfigEnvCacheUtil {
         List<Object> objects    = redisUtil.hMGet( SYS_CONFIG_KEY, codes );
         List<String> resultList = new ArrayList<>( objects.size() );
         for ( Object object : objects ) {
-            resultList.add( this.dynamicValue( object.toString() ) );
+            resultList.add( object == null ? null : this.dynamicValue( object.toString() ) );
         }
         return resultList;
     }

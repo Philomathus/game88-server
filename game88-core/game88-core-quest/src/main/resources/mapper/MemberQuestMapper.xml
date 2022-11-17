@@ -6,18 +6,18 @@
         <result property="memberId" column="member_id" />
         <result property="questId" column="quest_id" />
         <result property="status" column="status" />
-        <result property="curNum" column="curNum" />
+        <result property="curNum" column="cur_num" />
         <result property="taskMode" column="task_mode" />
     </resultMap>
 
     <sql id="selectMemberQuestVo">
-        SELECT id, member_id, quest_id, status, curNum, task_mode
+        SELECT id, member_id, quest_id, status, cur_num, task_mode
         FROM member_quest
     </sql>
 
     <select id="selectMemberQuestList" parameterType="tv.game88.core.quest.entity.MemberQuest"
             resultMap="MemberQuestResult">
-        SELECT mq.id, mq.member_id, mq.status, mq.curNum, aqi.target, mq.task_mode
+        SELECT mq.id, mq.member_id, mq.status, mq.cur_num, aqi.target, mq.task_mode
         FROM member_quest mq,
              activity_quest_info aqi
         <where>

@@ -15,6 +15,7 @@
 		<result property="codeWill" column="code_will"/>
 		<result property="phone" column="phone"/>
 		<result property="inviterCode" column="inviter_code"/>
+		<result property="inviterMoney" column="inviter_money"/>
 		<result property="channelCode" column="channel_code"/>
 		<result property="registerTime" column="register_time"/>
 		<result property="registerIp" column="register_ip"/>
@@ -49,6 +50,7 @@
 			   code_will,
 			   phone,
 			   inviter_code,
+			   inviter_money,
 			   channel_code,
 			   register_time,
 			   register_ip,
@@ -221,6 +223,15 @@
 		where id = #{userId}
 	</update>
 
+	<update id="addInviterMoney">
+		update member_info
+		<set>
+			<if test="inviterMoney != null">
+				inviter_money = inviter_money + #{inviterMoney},
+			</if>
+		</set>
+		where id = #{userId}
+	</update>
 
 	<select id="getUserBalance" resultType="java.math.BigDecimal">
 		select account_now from member_info where id = #{memberId}
@@ -231,10 +242,6 @@
 	<select id="getUserVip" resultType="int">
 		select vip from member_info where id = #{memberId}
 	</select>
-
-	<update id="subMoney">
-		update member_info set account_now = account_now - #{money} where id = #{userId} and account_now - #{money} >=0
-	</update>
 
 	<update id="updateSafeBox">
 		update member_info
@@ -252,36 +259,11 @@
 		</set>
 		where id = #{userId} and status in (1,4,6,7)
 	</update>
-	<update id="updateMemberInfoById">
-		update member_info
-		set nick_name=#{nickName},vip=#{vip}
-		where id = #{id}
-	</update>
+
 	<update id="updateVipById">
 		update member_info
 		set nick_name=#{nickName},vip=#{vip}
 		where id = #{id}
-	</update>
-
-	<update id="updateMoneySelect">
-		update member_info
-		<set>
-			<if test="money != null">
-				account_now = account_now + #{money},
-			</if>
-			<if test="level_integral != null">
-				level_integral = level_integral + #{level_integral},
-			</if>
-
-			<if test="code_account != null">
-				code_account = code_account + #{code_account},
-			</if>
-
-			<if test="code_total != null">
-				code_total = code_total + #{code_total}
-			</if>
-		</set>
-		where id = #{userId}
 	</update>
 
 	<select id="listCount" resultType="java.util.Map">

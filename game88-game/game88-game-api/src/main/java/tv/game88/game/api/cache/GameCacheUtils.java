@@ -100,6 +100,9 @@ public class GameCacheUtils {
                     .stream()
                     .map( o -> ( Long ) o )
                     .toList();
+            if ( CollectionUtils.isEmpty( infoIds ) ) {
+                return null;
+            }
             List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( infoIds );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
                 redisUtils.strSet( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );

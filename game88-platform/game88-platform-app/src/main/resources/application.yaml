@@ -73,6 +73,9 @@ token:
   # 令牌有效期（默认1天）
   expireTime: 6
 
+im:
+  tokenUrl: http://alb-c8bpqf3la2md9yeih2.cn-hongkong.alb.aliyuncs.com/token/auth
+
 swagger:
   title: Game88 Platform App Swagger 3 Api Documentation
   description: Game88 Platform App Spring Boot Plugin Swagger 3 Web Api Documentation

@@ -5,11 +5,15 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +52,9 @@ import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -87,6 +94,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MemberMoneyManager    memberMoneyManager;
     @Resource
     private LogMoneyMapper        logMoneyMapper;
+
+    @Value( "${im.tokenUrl:null}" )
+    private String getImTokenUrl;
+    @Value( "${spring.profiles.active}" )
+    private String profile;
 
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
@@ -703,7 +715,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     public RspBase<RspMoney> boxAccount( String memberId, ReqBoxPass boxPass ) {
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", memberId )
-                .select( "id", "box_account", "account_now" )
+                .select( "id", "box_account", "account_now", "box_pass" )
                 .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
@@ -934,5 +946,42 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         //会员加钱，日志
         memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, 1,
                 name + "奖励:" + addMoney.toString(), null, null );
+    }
+
+    @Override
+    public RspBase<RspImToken> getImToken( String userId ) {
+        String newImHosts = configEnvCacheUtil.getConf( "new_im_hosts" );
+        if ( StringUtils.isBlank( this.getImTokenUrl ) || StringUtils.isBlank( newImHosts ) ) {
+            return RspBase.businessError( "未初始化参数" );
+        }
+        Map<String, String> requestMap = Maps.newHashMap();
+        requestMap.put( "memberId", userId );
+        requestMap.put( "agentCenter", profile );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
+
+        String token = null;
+        try {
+            token = restTemplate.execute( this.getImTokenUrl, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ),
+                    response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return text;
+            } );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        if ( StringUtils.isBlank( token ) ) {
+            return RspBase.businessError( "获取token失败" );
+        }
+        RspImToken rspImToken = new RspImToken();
+        rspImToken.setToken( token );
+        rspImToken.setImHostlist( Arrays.asList( newImHosts.split( "," ) ) );
+        return RspBase.ok( rspImToken );
     }
 }

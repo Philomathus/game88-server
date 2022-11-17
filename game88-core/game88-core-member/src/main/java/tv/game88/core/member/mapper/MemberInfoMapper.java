@@ -56,15 +56,11 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     int addMoneySelect( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money,
                         @Param( "charge" ) BigDecimal charge, @Param( "code_mult" ) BigDecimal codeMult );
 
+    int addInviterMoney( @Param( "userId" ) String userId, @Param( "inviterMoney" ) BigDecimal inviterMoney );
+
     int updateVipById( MemberInfo memberInfo );
 
-    int updateMoneySelect( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money,
-                           @Param( "level_integral" ) BigDecimal level_integral,
-                           @Param( "code_account" ) BigDecimal code_account, @Param( "code_total" ) BigDecimal code_total );
-
     //-------------------------app-------------------------------
-
-    int subMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal money );
 
     int updateSafeBox( @Param( "userId" ) String memberId, @Param( "addBox" ) BigDecimal addBox );
 

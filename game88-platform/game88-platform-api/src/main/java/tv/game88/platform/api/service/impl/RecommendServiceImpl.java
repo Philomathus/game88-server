@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.member.cache.ConfigRecommendCacheUtils;
@@ -55,7 +56,10 @@ public class RecommendServiceImpl implements RecommendService {
 
         List<String> valueList = configEnvCacheUtil.getConf( Arrays.asList( "share_url", "share_background", "share_icon" ) );
         rspMyRecommend.setMemberCode( memberId );
-        rspMyRecommend.setUrl( valueList.get( 0 ).concat( "channelCode=" ).concat( memberId ) );
+        String val = valueList.get( 0 );
+        if ( StringUtils.isNotBlank( val ) ) {
+            rspMyRecommend.setUrl( val.concat( "channelCode=" ).concat( memberId ) );
+        }
         rspMyRecommend.setShareBackground( valueList.get( 1 ) );
         rspMyRecommend.setShareIcon( valueList.get( 2 ) );
         return rspMyRecommend;
