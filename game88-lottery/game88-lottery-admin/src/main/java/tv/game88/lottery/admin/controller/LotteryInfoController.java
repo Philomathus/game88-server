@@ -45,6 +45,12 @@ public class LotteryInfoController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
+    @PreAuthorize( "@ss.hasPermi('lottery:info:list')" )
+    @GetMapping( "/listAll" )
+    public RspBase<List<LotteryInfo>> listAll(){
+        return RspBase.ok(lotteryInfoService.list());
+    }
+
     /**
      * 导出彩票信息列表
      */
