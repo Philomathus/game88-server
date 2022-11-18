@@ -136,22 +136,15 @@ public class GameServiceImpl implements GameService {
 
     }
 
-    private String getGameOrderId( String memberId, String agent, EnumGameCategory gameCategory ) {
+    private String getGameOrderId( String gameMemberId, String agent, EnumGameCategory gameCategory ) {
         return switch ( gameCategory ) {
             case AG -> agent
-                    .concat( memberId )
+                    .concat( gameMemberId )
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-            case BBIN -> IdWorker.getIdStr( this.profile );
+            case BBIN -> gameMemberId + IdWorker.getIdStr();
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
-                    .concat( memberId );
+                    .concat( gameMemberId );
         };
-    }
-
-    public static void main( String[] args ) {
-        for ( int i = 0; i < 100; i++ ) {
-            System.out.print( IdWorker.getId( "8800" ) + " - " );
-            System.out.println( IdWorker.getId( "8801" ) );
-        }
     }
 }
