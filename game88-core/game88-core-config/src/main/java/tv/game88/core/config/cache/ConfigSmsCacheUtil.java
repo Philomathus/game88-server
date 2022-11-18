@@ -2,7 +2,6 @@ package tv.game88.core.config.cache;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
@@ -12,7 +11,6 @@ import tv.game88.core.config.mapper.ConfigSmsMapper;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author mengJun
@@ -38,12 +36,12 @@ public class ConfigSmsCacheUtil {
         if ( size > 0 ) {
             List<String> keys = redisUtil.lRange( SERVER_SMS_LIST, 0, size - 1 );
             if ( keys.contains( smsId ) ) {
-                redisUtil.hMSet( SERVER_SMS_HASH + smsId, JsonUtil.object2Map( configSms ) );
+                redisUtil.strSet( SERVER_SMS_HASH + smsId, JsonUtil.object2Json( configSms ) );
                 return;
             }
         }
         redisUtil.lRightPush( SERVER_SMS_LIST, smsId );
-        redisUtil.hMSet( SERVER_SMS_HASH + smsId, JsonUtil.object2Map( configSms ) );
+        redisUtil.strSet( SERVER_SMS_HASH + smsId, JsonUtil.object2Json( configSms ) );
     }
 
     public ConfigSms getConfigSmsCache( long index ) {
@@ -56,8 +54,8 @@ public class ConfigSmsCacheUtil {
                 return this.getConfigSmsCache( 0 );
             }
         }
-        Map<Object, Object> resultMap = redisUtil.hGetAll( SERVER_SMS_HASH + smsId );
-        return CollectionUtils.isEmpty( resultMap ) ? null : JsonUtil.map2Object( resultMap, ConfigSms.class );
+        String s = redisUtil.strGet( SERVER_SMS_HASH + smsId );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, ConfigSms.class );
     }
 
     private void existsCache() {
@@ -68,7 +66,7 @@ public class ConfigSmsCacheUtil {
             }
             for ( ConfigSms configSms : configSmsList ) {
                 redisUtil.lRightPush( SERVER_SMS_LIST, configSms.getId().toString() );
-                redisUtil.hMSet( SERVER_SMS_HASH + configSms.getId(), JsonUtil.object2Map( configSms ) );
+                redisUtil.strSet( SERVER_SMS_HASH + configSms.getId(), JsonUtil.object2Json( configSms ) );
             }
         }
     }
