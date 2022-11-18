@@ -29,7 +29,7 @@ public class LotteryInfoServiceImpl extends ServiceImpl<LotteryInfoMapper, Lotte
     public List<LotteryInfo> selectLotteryInfoList( LotteryInfo lotteryInfo ) {
         List<LotteryInfo> lotteryInfos = this.baseMapper.selectLotteryInfoList( lotteryInfo );
 
-        String                domainValue      = ConfigDomainCacheUtil.me.getDomainOssValue();
+        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         if ( !CollectionUtils.isEmpty( lotteryInfos ) ) {
             for ( LotteryInfo info : lotteryInfos ) {
                 if ( StringUtils.isNotBlank( info.getIcon() ) && !info.getIcon().startsWith( "http" ) ) {

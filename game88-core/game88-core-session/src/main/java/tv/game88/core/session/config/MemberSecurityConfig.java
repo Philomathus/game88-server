@@ -111,6 +111,7 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 .mvcMatchers( HttpMethod.POST,"/login" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/loginDevice" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/register" ).anonymous()
+                .mvcMatchers( HttpMethod.POST,"/sendSmsVerifyCode" ).anonymous()
                 // 支付代付回调 允许匿名访问
                 .mvcMatchers( HttpMethod.GET, "/pay/orderRedirect/**" ).anonymous()
                 .mvcMatchers( HttpMethod.POST,"/pay/callBack/**" ).anonymous()

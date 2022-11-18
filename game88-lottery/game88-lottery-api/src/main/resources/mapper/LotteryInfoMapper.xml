@@ -34,6 +34,9 @@
             <if test="effect != null">
                 and effect = #{effect}
             </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
         </where>
     </select>
 </mapper>

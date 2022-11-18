@@ -240,4 +240,12 @@ public class LotteryCacheUtils {
         }
         return JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
+
+    public void clear() {
+        redisUtils.unlink( LOTTERY_INFO_KEY );
+        redisUtils.unlink( LOTTERY_INFO_BASE_KEY );
+        redisUtils.unlink( LOTTERY_METHOD_KEY );
+        redisUtils.unlink( LOTTERY_METHOD_GAME_KEY );
+        redisUtils.unlink( LOTTERY_KIND_METHOD_KEY );
+    }
 }

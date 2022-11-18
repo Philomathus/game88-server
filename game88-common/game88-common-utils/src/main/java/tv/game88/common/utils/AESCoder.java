@@ -98,7 +98,7 @@ public class AESCoder {
      * @param content 加密内容
      */
     public static String encrypt( String content ) {
-        return AESEncode( content, secretKey );
+        return StringUtils.isBlank( content ) ? null : AESEncode( content, secretKey );
     }
 
     /**
@@ -107,7 +107,7 @@ public class AESCoder {
      * @param content 解密内容
      */
     public static String decrypt( String content ) {
-        return AESDecode( content, secretKey );
+        return StringUtils.isBlank( content ) ? null : AESDecode( content, secretKey );
     }
 
 }

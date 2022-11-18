@@ -6,11 +6,11 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.config.constants.Constants;
+import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.entity.LotteryInfo;
 import tv.game88.lottery.api.service.LotteryInfoService;
 
@@ -29,9 +29,8 @@ import java.util.List;
 public class LotteryInfoController extends BaseController {
     @Resource
     private LotteryInfoService lotteryInfoService;
-
     @Resource
-    private RedisUtils redisUtil;
+    private LotteryCacheUtils  lotteryCacheUtils;
 
     /**
      * 查询彩票信息列表
@@ -88,7 +87,10 @@ public class LotteryInfoController extends BaseController {
     @Log( title = "彩票信息", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody LotteryInfo lotteryInfo ) {
-        return toResult( lotteryInfoService.updateById( lotteryInfo ) );
+        LotteryInfo update = new LotteryInfo();
+        update.setId( lotteryInfo.getId() );
+        update.setIcon( lotteryInfo.getIcon() );
+        return toResult( lotteryInfoService.updateById( update ) );
     }
 
     /**
@@ -108,12 +110,15 @@ public class LotteryInfoController extends BaseController {
     @Log( title = "激活状态", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Integer id, @PathVariable Boolean effect ) {
+        if ( !SecurityUtils.getUsername().equals( "mengjun" ) ) {
+            return RspBase.businessError( "您无权激活或关闭彩票" );
+        }
         LotteryInfo lotteryInfo = new LotteryInfo();
         lotteryInfo.setId( id );
         lotteryInfo.setEffect( effect );
         boolean isUpdate = lotteryInfoService.updateById( lotteryInfo );
         if ( isUpdate ) {
-            redisUtil.unlink( Constants.LOTTERY_PREX + "lotteryInfo" );
+            lotteryCacheUtils.clear();
         }
         return toResult( isUpdate );
     }

@@ -20,5 +20,11 @@
         <if test="id != null  and id != ''">
             where id = #{id}
         </if>
+        <if test="name != null  and name != ''">
+            where `name` like concat('%', #{name}, '%')
+        </if>
+        <if test="kind != null">
+            where kind = #{kind}
+        </if>
     </select>
 </mapper>
