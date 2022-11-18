@@ -33,7 +33,7 @@ public class LotteryBetController extends BaseController {
     /**
      * 查询彩票会员下注详情列表
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryBet:list')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:bet:list')" )
     @GetMapping( "/list" )
     public RspBase<List<LotteryBet>> list( LotteryBet lotteryBet ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -45,7 +45,7 @@ public class LotteryBetController extends BaseController {
     /**
      * 导出彩票会员下注详情列表
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryBet:export')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:bet:export')" )
     @Log( title = "彩票会员下注详情", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( LotteryBet lotteryBet, HttpServletResponse response ) {
@@ -56,7 +56,7 @@ public class LotteryBetController extends BaseController {
     /**
      * 获取彩票会员下注详情详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('lottery:lotteryBet:query')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:bet:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<LotteryBet> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( lotteryBetService.getById( id ) );
