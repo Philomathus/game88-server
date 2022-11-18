@@ -14,6 +14,9 @@ public class Constants {
     public static final String GAME_PREX     = "game:";
     public static final String LOTTERY_PREX  = "lottery:";
 
+    public static final String GAME_TOKEN_PREX = GAME_PREX + "token:";
+    public static final String GAME_USERS_PREX = GAME_PREX + "users:";
+
     public static final String MEMBER_CODE      = MEMBER_PREX + "member-code";
     public static final Long   MEMBER_CODE_INIT = 10000L;
 

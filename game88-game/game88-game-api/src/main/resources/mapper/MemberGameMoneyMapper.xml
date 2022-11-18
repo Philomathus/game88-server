@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.MemberGameMoneyMapper">
+    <resultMap type="tv.game88.game.api.entity.MemberGameMoney" id="MemberGameMoneyResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="platformId" column="platform_id" />
+        <result property="status" column="status" />
+        <result property="money" column="money" />
+        <result property="createTime" column="create_time" />
+        <result property="orderId" column="order_id" />
+    </resultMap>
+
+    <sql id="selectMemberGameMoneyVo">
+        select id, member_id, platform_id, status, money, create_time, order_id
+        from member_game_money
+    </sql>
+</mapper>

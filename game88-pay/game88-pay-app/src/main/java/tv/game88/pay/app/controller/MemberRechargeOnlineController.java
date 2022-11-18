@@ -26,7 +26,7 @@ public class MemberRechargeOnlineController {
 
     @Operation( summary = "获取充值类型列表" )
     @PostMapping( "/payTypeList" )
-    public RspBase<List<PayType>> securityFindTypeList( @RequestHeader( "dv" ) String deviceType ) {
+    public RspBase<List<PayType>> payTypeList( @RequestHeader( "dv" ) String deviceType ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         log.info( "获取充值类型列表 - memberId:{}", platformUser.getId() );
         return RspBase.ok( payService.findPayTypeList( platformUser, deviceType ) );
@@ -34,7 +34,7 @@ public class MemberRechargeOnlineController {
 
     @Operation( summary = "获取充值通道列表" )
     @PostMapping( "/payChannelList" )
-    public RspBase<List<RspPayChannel>> securityFindChannelList( @RequestBody ReqPayChannel reqPayChannel ) {
+    public RspBase<List<RspPayChannel>> payChannelList( @RequestBody ReqPayChannel reqPayChannel ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         log.info( "获取充值通道列表 - memberId:{}", platformUser.getId() );
         if ( platformUser.getStatus() == 2 ) {
@@ -46,7 +46,7 @@ public class MemberRechargeOnlineController {
 
     @Operation( summary = "支付充值请求" )
     @PostMapping( "/onlineRecharge" )
-    public RspBase<?> securityPayRechargeNew( @RequestBody ReqPayRecharge reqPayRecharge ) throws Exception {
+    public RspBase<?> onlineRecharge( @RequestBody ReqPayRecharge reqPayRecharge ) throws Exception {
         log.info( "充值请求对象:{}", JsonUtil.object2Json( reqPayRecharge ) );
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         log.info( "充值请求,userId:{},realIp:{}", platformUser.getId(), reqPayRecharge.getRealIp() );

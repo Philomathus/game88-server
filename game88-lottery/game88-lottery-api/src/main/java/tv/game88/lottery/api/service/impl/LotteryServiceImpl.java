@@ -323,7 +323,7 @@ public class LotteryServiceImpl implements LotteryService {
 
         if ( !isNoKill( lotteryId ) && info.getMinCost().compareTo( totalBetBig ) < 0 ) {
             // 杀率开奖
-            Map<String, Object> killResultMap = this.killResult( kindId, peiMap, betMap, totalBetBig );
+            Map<String, Object> killResultMap = this.killResult( kindId, peiMap, totalBetBig );
 
             List<String> resultList = ( List<String> ) killResultMap.get( "resultsList" );
             BigDecimal   totalPrize = ( BigDecimal ) killResultMap.get( "totalPrize" );
@@ -347,8 +347,7 @@ public class LotteryServiceImpl implements LotteryService {
         return getHistoryResult( h, listTem, update, prize, killNeed, 0, lotteryId, historyId );
     }
 
-    public Map<String, Object> killResult( Integer kindId, Map<String, BigDecimal> prizeMap, Map<String, BigDecimal> betMap,
-                                           BigDecimal totalBet ) {
+    public Map<String, Object> killResult( Integer kindId, Map<String, BigDecimal> prizeMap, BigDecimal totalBet ) {
         ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
         return exLottery.killResult( prizeMap, totalBet );
     }
@@ -488,9 +487,11 @@ public class LotteryServiceImpl implements LotteryService {
             session.close();
         }
 
-        int cost = reqBet.getChip() * bet_select.length;
-        this.lotteryBetBroadcast( platformUser, reqBet.getAnchor(), reqBet.getLotteryId(), reqBet.getMethodId(),
-                reqBet.getBetIds(), lotteryName, cost, reqBet.getChip() );
+        if ( reqBet.getLotteryId() == 2001 ) {
+            int cost = reqBet.getChip() * bet_select.length;
+            this.lotteryBetBroadcast( platformUser, reqBet.getAnchor(), reqBet.getLotteryId(), reqBet.getMethodId(),
+                    reqBet.getBetIds(), lotteryName, cost, reqBet.getChip() );
+        }
     }
 
     private void lotteryBetBroadcast( PlatformUser platformUser, Integer anchor, Integer lotteryId, Integer methodId,
@@ -591,13 +592,13 @@ public class LotteryServiceImpl implements LotteryService {
             log.error( "派奖结束后检查发现有未派奖-尝试在下个周期重新派奖historyId:{}", result.getId() );
         }
 
-        BigDecimal boardCast = configEnvCacheUtil.getConfBd( "lottery_boardcast_mony" );
+        /*BigDecimal boardCast = configEnvCacheUtil.getConfBd( "lottery_boardcast_mony" );
         for ( LotteryBet bet : betList ) {
             if ( bet.getPrize().compareTo( boardCast ) >= 0 ) {
                 bet.setLotteryId( lotteryId );
                 this.sendLottertAwardMsg( bet, nowMoney.get( bet.getMemberId() ), boardCast );
             }
-        }
+        }*/
     }
 
     private void sendLottertAwardMsg( LotteryBet bet, BigDecimal nowMoney, BigDecimal boardCast ) {

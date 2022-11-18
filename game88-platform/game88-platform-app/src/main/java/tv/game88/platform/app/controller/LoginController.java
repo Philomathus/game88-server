@@ -88,6 +88,6 @@ public class LoginController extends BaseController {
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/sendSmsVerifyCode" )
     public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
-        return memberInfoService.sendSmsVerifyCode(phone);
+        return memberInfoService.sendSmsVerifyCode( phone );
     }
 }
