@@ -52,6 +52,9 @@
             <if test="lotteryId != null">
                 and lottery_id = #{lotteryId}
             </if>
+            <if test="lotteryName != null and lotteryName != ''">
+                and lottery_name = #{lotteryName}
+            </if>
             <if test="issue != null  and issue != ''">
                 and issue = #{issue}
             </if>
