@@ -39,7 +39,7 @@ public class PayChannelController extends BaseController {
     /**
      * 查询支付通道列表
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:list')" )
     @GetMapping( "/list" )
     public RspBase<List<PayChannel>> list( PayChannel payChannel ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -48,7 +48,7 @@ public class PayChannelController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:list')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<PayChannel>> listAll() {
         return RspBase.ok( payChannelService.list() );
@@ -57,7 +57,7 @@ public class PayChannelController extends BaseController {
     /**
      * 导出支付通道列表
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:export')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:export')" )
     @Log( title = "支付通道", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( PayChannel payChannel, HttpServletResponse response ) {
@@ -68,7 +68,7 @@ public class PayChannelController extends BaseController {
     /**
      * 获取支付通道详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:query')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<PayChannel> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( payChannelService.getById( id ) );
@@ -77,7 +77,7 @@ public class PayChannelController extends BaseController {
     /**
      * 新增支付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:add')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:add')" )
     @Log( title = "支付通道", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody PayChannel payChannel ) {
@@ -89,7 +89,7 @@ public class PayChannelController extends BaseController {
     /**
      * 修改支付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:edit')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:edit')" )
     @Log( title = "支付通道", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody PayChannel payChannel ) {
@@ -105,7 +105,7 @@ public class PayChannelController extends BaseController {
     /**
      * 删除支付通道
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:remove')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:remove')" )
     @Log( title = "支付通道", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
@@ -136,7 +136,7 @@ public class PayChannelController extends BaseController {
     /**
      * 修改支付通道状态
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:effect')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:effect')" )
     @Log( title = "支付通道激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {
@@ -150,7 +150,7 @@ public class PayChannelController extends BaseController {
     /**
      * 修改支付通道回调状态
      */
-    @PreAuthorize( "@ss.hasPermi('pay:payChannel:effect')" )
+    @PreAuthorize( "@ss.hasPermi('pay:channel:effect')" )
     @Log( title = "支付通道回调状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeCallback/{id}/{canCallback}" )
     public RspBase<?> changeCallback( @PathVariable Long id, @PathVariable Boolean canCallback ) {
