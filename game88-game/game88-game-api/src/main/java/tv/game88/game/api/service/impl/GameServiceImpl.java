@@ -235,6 +235,7 @@ public class GameServiceImpl implements GameService {
         }
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
-        return gameOrderPrefix + String.valueOf( Constants.GAME_ATOMIC_INIT + entityIdCounter.getAndIncrement() );
+        return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
+                + entityIdCounter.getAndIncrement() );
     }
 }
