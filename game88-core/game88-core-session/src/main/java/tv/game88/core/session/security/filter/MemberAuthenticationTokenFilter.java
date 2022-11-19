@@ -24,20 +24,20 @@ import java.io.IOException;
  */
 @Component
 public class MemberAuthenticationTokenFilter extends OncePerRequestFilter {
-	@Resource
-	private MemberTokenManager memberTokenManager;
+    @Resource
+    private MemberTokenManager memberTokenManager;
 
-	@Override
-	protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain chain )
-			throws ServletException, IOException {
-		MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
-		if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( MemberSecurityUtils.getAuthentication() ) ) {
-			memberTokenManager.refreshLoginUserCache( loginUser );
-			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
-					loginUser.getAuthorities() );
-			authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );
-			SecurityContextHolder.getContext().setAuthentication( authenticationToken );
-		}
-		chain.doFilter( request, response );
-	}
+    @Override
+    protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain chain ) throws ServletException, IOException {
+        MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
+        if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( MemberSecurityUtils.getAuthentication() ) ) {
+            memberTokenManager.refreshLoginUserCache( loginUser );
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
+                    loginUser.getAuthorities() );
+            authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );
+            SecurityContextHolder.getContext().setAuthentication( authenticationToken );
+        }
+        chain.doFilter( request, response );
+
+    }
 }
