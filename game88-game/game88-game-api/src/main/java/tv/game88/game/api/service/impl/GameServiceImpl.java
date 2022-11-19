@@ -100,21 +100,7 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
-        String gameMemberId = profile + "_" + platformUser.getId();
-        ReqJoinGame reqJoinGame = ReqJoinGame
-                .builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo.getKindId() )
-                .gameMemberId( gameMemberId )
-                .memberId( platformUser.getId() )
-                .transferMoney( changeMoney )
-                .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .build();
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
@@ -151,6 +137,25 @@ public class GameServiceImpl implements GameService {
 
     }
 
+    private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
+                                           BigDecimal changeMoney ) {
+        String gameMemberId = profile + "_" + memberId;
+        return ReqJoinGame
+                .builder()
+                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
+                .agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() )
+                .linecode( gamePlatform.getLinecode() )
+                .kindId( gameInfo.getKindId() )
+                .gameMemberId( gameMemberId )
+                .memberId( memberId )
+                .transferMoney( changeMoney )
+                .platformId( gamePlatform.getId() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                .build();
+    }
+
     @Override
     public RspBase<?> escGame( Long infoId, PlatformUser platformUser ) {
         GameInfo gameInfo = gameCacheUtils.getGameInfo( infoId );
@@ -171,31 +176,19 @@ public class GameServiceImpl implements GameService {
         if ( !redisUtils.lock( "escGame" + platformUser.getId(), 10 ) ) {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
-        String gameMemberId = profile + "_" + platformUser.getId();
-        ReqJoinGame reqJoinGame = ReqJoinGame
-                .builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo.getKindId() )
-                .gameMemberId( gameMemberId )
-                .memberId( platformUser.getId() )
-                .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .build();
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), null );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
             baseGameButt.getToken( reqJoinGame );
             BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
-            reqJoinGame.setTransferMoney( balance.compareTo( BigDecimal.ZERO ) <= 0 ? BigDecimal.ZERO : balance );
             // 金额高于0元才下分
-            if ( balance.compareTo( BigDecimal.ZERO ) > 0 ) {
-                baseGameButt.withdrawal( reqJoinGame );
-                memberGameMoneyService.outGameSuccess( reqJoinGame );
+            if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
+                return RspBase.ok( "游戏余额为0，无需下分" );
             }
+            reqJoinGame.setTransferMoney( balance );
+            baseGameButt.withdrawal( reqJoinGame );
+            memberGameMoneyService.outGameSuccess( reqJoinGame );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             // 如果发生提现异常
