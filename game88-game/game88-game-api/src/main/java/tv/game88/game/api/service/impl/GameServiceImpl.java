@@ -1,14 +1,15 @@
 package tv.game88.game.api.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.base.BaseGameButt;
@@ -20,9 +21,9 @@ import tv.game88.game.api.dto.RspGameType;
 import tv.game88.game.api.dto.RspGameTypes;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.exception.GameTransferException;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
-import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -49,6 +50,8 @@ public class GameServiceImpl implements GameService {
 
     @Value( "${spring.profiles.active}" )
     private String profile;
+    @Value( "${gameOrderPrefix:null}" )
+    private int    gameOrderPrefix;
 
     @Override
     public RspGameTypes getGameTypes() {
@@ -110,7 +113,7 @@ public class GameServiceImpl implements GameService {
                 .memberId( platformUser.getId() )
                 .transferMoney( changeMoney )
                 .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform.getGameCategory() ) )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
                 .build();
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
@@ -118,17 +121,27 @@ public class GameServiceImpl implements GameService {
             baseGameButt.getToken( reqJoinGame );
             // 创建账号
             baseGameButt.createAccount( reqJoinGame );
+            // 获取游戏链接
+            baseGameButt.getJoinGameUrl( reqJoinGame );
             // 扣除会员金额
             memberGameMoneyService.beginGameEnter( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
                 // 上分
                 baseGameButt.transferMoney( reqJoinGame );
             }
-            // 获取游戏链接
-            String url = baseGameButt.getJoinGameUrl( reqJoinGame );
+            memberGameMoneyService.enterGameSuccess( reqJoinGame );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
-            return RspBase.ok( "获取游戏链接成功", url );
+            return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
+            if ( e instanceof GameTransferException ) {
+                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
+                    memberGameMoneyService.enterGameSuccess( reqJoinGame );
+                    return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
+                } else {
+                    // 回退会员上分金额
+                    memberGameMoneyService.enterGameFail( reqJoinGame );
+                }
+            }
             log.error( "进入游戏失败,失败原因:" + e.getMessage(), e );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
             return RspBase.businessError( "进入游戏失败,请重试" );
@@ -136,15 +149,27 @@ public class GameServiceImpl implements GameService {
 
     }
 
-    private String getGameOrderId( String gameMemberId, String agent, EnumGameCategory gameCategory ) {
-        return switch ( gameCategory ) {
-            case AG -> agent
-                    .concat( gameMemberId )
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-            case BBIN -> gameMemberId + IdWorker.getIdStr();
+    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
+        return switch ( gamePlatform.getGameCategory() ) {
+            case AG, BBIN -> this.getGameAtomicId( gamePlatform.getId() );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
         };
+    }
+
+    private String getGameAtomicId( Long platformId ) {
+        if ( !redisUtils.exists( Constants.GAME_ATOMIC_PREX + platformId ) ) {
+            String orderId = memberGameMoneyService.selectMaxGameOrderCode( platformId );
+            if ( "0".equals( orderId ) ) {
+                redisUtils.strSet( Constants.GAME_ATOMIC_PREX + platformId, "0" );
+            } else {
+                long num = Long.parseLong( orderId.replaceFirst( gameOrderPrefix + "", "" ) ) - Constants.GAME_ATOMIC_INIT;
+                redisUtils.strSet( Constants.GAME_ATOMIC_PREX + platformId, String.valueOf( num + 1 ) );
+            }
+        }
+        RedisAtomicLong entityIdCounter = new RedisAtomicLong(
+                Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
+        return gameOrderPrefix + String.valueOf( Constants.GAME_ATOMIC_INIT + entityIdCounter.getAndIncrement() );
     }
 }

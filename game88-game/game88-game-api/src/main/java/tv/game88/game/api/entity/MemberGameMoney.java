@@ -36,6 +36,10 @@ public class MemberGameMoney {
      */
     private LocalDateTime createTime;
     /**
+     * 创建时间
+     */
+    private LocalDateTime updateTime;
+    /**
      * 订单ID
      */
     private String        orderId;

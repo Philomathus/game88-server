@@ -22,6 +22,11 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
     private MemberMoneyManager memberMoneyManager;
 
     @Override
+    public String selectMaxGameOrderCode( Long platformId ) {
+        return this.baseMapper.selectMaxGameOrderCode( platformId );
+    }
+
+    @Override
     @Transactional( rollbackFor = Exception.class )
     public void beginGameEnter( ReqJoinGame reqJoinGame ) {
         if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
@@ -53,5 +58,28 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
         memberMoneyManager.reduceMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_IN, mark );
         log.info( "游戏上分 - 扣款成功 - 会员:{},交易号:{},平台:{},上分金额:{}", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
                 reqJoinGame.getPlatformId(), reqJoinGame.getTransferMoney() );
+    }
+
+    @Override
+    @Transactional( rollbackFor = Exception.class )
+    public void enterGameFail( ReqJoinGame reqJoinGame ) {
+        MemberGameMoney update = new MemberGameMoney();
+        update.setId( reqJoinGame.getMemberId().concat( "_" ).concat( reqJoinGame.getPlatformId() + "" ) );
+        update.setStatus( -1 );
+        update.setUpdateTime( LocalDateTime.now() );
+        this.baseMapper.updateById( update );
+
+        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_FAIL, 0,
+                "游戏上分回退", null, reqJoinGame.getOrderId() );
+        log.error( "进入游戏失败，回滚会员上分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
+    }
+
+    @Override
+    public void enterGameSuccess( ReqJoinGame reqJoinGame ) {
+        MemberGameMoney update = new MemberGameMoney();
+        update.setId( reqJoinGame.getMemberId().concat( "_" ).concat( reqJoinGame.getPlatformId() + "" ) );
+        update.setStatus( 1 );
+        update.setUpdateTime( LocalDateTime.now() );
+        this.baseMapper.updateById( update );
     }
 }

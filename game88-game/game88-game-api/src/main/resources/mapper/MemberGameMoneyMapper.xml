@@ -8,11 +8,25 @@
         <result property="status" column="status" />
         <result property="money" column="money" />
         <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
         <result property="orderId" column="order_id" />
     </resultMap>
 
     <sql id="selectMemberGameMoneyVo">
-        select id, member_id, platform_id, status, money, create_time, order_id
+        select id,
+               member_id,
+               platform_id,
+               status,
+               money,
+               create_time,
+               update_time,
+               order_id
         from member_game_money
     </sql>
+
+    <select id="selectMaxGameOrderCode" resultType="java.lang.String">
+        select IFNULL(max(order_id), 0)
+        from member_game_money
+        where platform_id = #{platform_id}
+    </select>
 </mapper>

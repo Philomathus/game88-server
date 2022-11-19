@@ -23,13 +23,11 @@ public class GameButtKaiYuan extends AbstractGameButt {
     }
 
     @Override
-    public String getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        return null;
+    public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
     }
 
     @Override
-    public boolean transferMoney( ReqJoinGame reqJoinGame ) {
-        return false;
+    public void transferMoney( ReqJoinGame reqJoinGame ) {
     }
 
     @Override
@@ -40,5 +38,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         return null;
+    }
+
+    @Override
+    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
+        return false;
     }
 }

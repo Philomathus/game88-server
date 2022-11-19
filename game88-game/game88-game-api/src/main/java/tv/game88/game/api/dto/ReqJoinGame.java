@@ -22,4 +22,6 @@ public class ReqJoinGame {
     private String orderId;
     private Long   platformId;
     private String token;
+
+    private String gameUrl;
 }
