@@ -133,12 +133,14 @@ public class GameServiceImpl implements GameService {
             redisUtils.unLock( "joinGame" + platformUser.getId() );
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
+            // 如果发生转账异常
             if ( e instanceof GameTransferException ) {
+                // 查询转账记录
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.enterGameSuccess( reqJoinGame );
                     return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
                 } else {
-                    // 回退会员上分金额
+                    // 如果转账记录不存在则回退会员上分金额
                     memberGameMoneyService.enterGameFail( reqJoinGame );
                 }
             }
@@ -147,6 +149,69 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "进入游戏失败,请重试" );
         }
 
+    }
+
+    @Override
+    public RspBase<?> escGame( Long infoId, PlatformUser platformUser ) {
+        GameInfo gameInfo = gameCacheUtils.getGameInfo( infoId );
+        if ( gameInfo == null ) {
+            return RspBase.businessError( "该游戏不存在" );
+        }
+        if ( gameInfo.getMaintain() && platformUser.getStatus() != 2 ) {
+            return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
+        }
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( gameInfo.getPlatformId() );
+        if ( gamePlatform == null ) {
+            return RspBase.businessError( "该游戏不存在" );
+        }
+        if ( gamePlatform.getMaintain() && platformUser.getStatus() != 2 ) {
+            return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
+        }
+
+        if ( !redisUtils.lock( "escGame" + platformUser.getId(), 10 ) ) {
+            return RspBase.businessError( "操作频繁,请稍后再试" );
+        }
+        String gameMemberId = profile + "_" + platformUser.getId();
+        ReqJoinGame reqJoinGame = ReqJoinGame
+                .builder()
+                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
+                .agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() )
+                .linecode( gamePlatform.getLinecode() )
+                .kindId( gameInfo.getKindId() )
+                .gameMemberId( gameMemberId )
+                .memberId( platformUser.getId() )
+                .platformId( gamePlatform.getId() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                .build();
+        BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+        try {
+            // 获取token
+            baseGameButt.getToken( reqJoinGame );
+            BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
+            reqJoinGame.setTransferMoney( balance.compareTo( BigDecimal.ZERO ) <= 0 ? BigDecimal.ZERO : balance );
+            // 金额高于0元才下分
+            if ( balance.compareTo( BigDecimal.ZERO ) > 0 ) {
+                baseGameButt.withdrawal( reqJoinGame );
+                memberGameMoneyService.outGameSuccess( reqJoinGame );
+            }
+            return RspBase.ok( "下分成功" );
+        } catch ( Exception e ) {
+            // 如果发生提现异常
+            if ( e instanceof GameTransferException ) {
+                BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
+                if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
+                    memberGameMoneyService.outGameSuccess( reqJoinGame );
+                    return RspBase.ok( "下分成功" );
+                } else {
+                    memberGameMoneyService.outGameFail( reqJoinGame );
+                }
+            }
+            log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
+            redisUtils.unLock( "escGame" + platformUser.getId() );
+            return RspBase.businessError( "下分失败,请重试" );
+        }
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {

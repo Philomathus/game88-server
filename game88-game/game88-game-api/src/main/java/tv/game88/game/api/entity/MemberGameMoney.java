@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @Data
 public class MemberGameMoney {
     /**
-     * 主键
+     * 订单ID
      */
     @TableId( type = IdType.INPUT )
-    private String        id;
+    private String        orderId;
     /**
      * 玩家ID
      */
@@ -25,7 +25,7 @@ public class MemberGameMoney {
     /**
      * 状态
      */
-    // -1=上分失败0=上分开始1=上分成功
+    // 0=上分开始1=上分失败2=上分成功3下分失败4下分成功
     private Integer       status;
     /**
      * 上分金额
@@ -39,9 +39,4 @@ public class MemberGameMoney {
      * 创建时间
      */
     private LocalDateTime updateTime;
-    /**
-     * 订单ID
-     */
-    private String        orderId;
-
 }

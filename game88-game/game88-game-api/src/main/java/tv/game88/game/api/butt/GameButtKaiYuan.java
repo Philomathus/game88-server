@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import tv.game88.game.api.base.AbstractGameButt;
 import tv.game88.game.api.constants.ConstantsGame;
 import tv.game88.game.api.dto.ReqJoinGame;
-import tv.game88.game.api.dto.XiaFenResult;
 
 import java.math.BigDecimal;
 
@@ -31,8 +30,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
     }
 
     @Override
-    public XiaFenResult withdrawal( ReqJoinGame reqJoinGame ) {
-        return null;
+    public void withdrawal( ReqJoinGame reqJoinGame ) {
     }
 
     @Override

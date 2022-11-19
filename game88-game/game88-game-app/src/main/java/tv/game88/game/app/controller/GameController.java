@@ -45,4 +45,10 @@ public class GameController extends BaseController {
     public RspBase<?> joinGame( @Validated @RequestBody ReqGame req ) {
         return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
+
+    @Operation( summary = "会员游戏下分" )
+    @PostMapping( "/escGame" )
+    public RspBase<?> escGame( @Validated @RequestBody ReqGame req ) {
+        return gameService.escGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
+    }
 }

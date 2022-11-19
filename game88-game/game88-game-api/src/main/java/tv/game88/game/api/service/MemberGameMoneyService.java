@@ -12,4 +12,8 @@ public interface MemberGameMoneyService extends IService<MemberGameMoney> {
     void enterGameFail( ReqJoinGame reqJoinGame );
 
     void enterGameSuccess( ReqJoinGame reqJoinGame );
+
+    void outGameSuccess( ReqJoinGame reqJoinGame );
+
+    void outGameFail( ReqJoinGame reqJoinGame );
 }
