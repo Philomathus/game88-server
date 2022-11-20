@@ -45,7 +45,7 @@ public class GameButtICG extends AbstractGameButt {
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
-        if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + ConstantsGame.ICG ) ) {
+        if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId() ) ) {
             Map<String, String> map = new HashMap<>();
             map.put( "username", reqJoinGame.getAgent() );
             map.put( "password", reqJoinGame.getDes() );
@@ -60,16 +60,16 @@ public class GameButtICG extends AbstractGameButt {
                 throw new BusinessException( "ICG - 获取token失败" );
             }
             reqJoinGame.setToken( token );
-            redisUtils.strSet( Constants.GAME_TOKEN_PREX + ConstantsGame.ICG, token, Duration.ofDays( 80 ) );
+            redisUtils.strSet( Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId(), token, Duration.ofDays( 80 ) );
         } else {
-            String token = redisUtils.strGet( Constants.GAME_TOKEN_PREX + ConstantsGame.ICG );
+            String token = redisUtils.strGet( Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId() );
             reqJoinGame.setToken( token );
         }
     }
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        if ( !redisUtils.sIsMember( Constants.GAME_USERS_PREX + ConstantsGame.ICG, reqJoinGame.getGameMemberId() ) ) {
+        if ( !redisUtils.sIsMember( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
             Map<String, String> map = new HashMap<>();
             map.put( "username", reqJoinGame.getGameMemberId() );
             map.put( "nickname", reqJoinGame.getGameMemberId() );
@@ -90,7 +90,7 @@ public class GameButtICG extends AbstractGameButt {
                 log.error( "ICG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
                 throw new BusinessException( "ICG - 创建玩家失败" );
             }
-            redisUtils.sAdd( Constants.GAME_USERS_PREX + ConstantsGame.ICG, reqJoinGame.getGameMemberId() );
+            redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
         }
     }
 
@@ -202,7 +202,6 @@ public class GameButtICG extends AbstractGameButt {
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "player", reqJoinGame.getGameMemberId() );
         requestMap.set( "id", reqJoinGame.getOrderId() );
-        requestMap.set( "method", DEPOSIT );
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );

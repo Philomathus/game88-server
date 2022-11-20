@@ -146,6 +146,7 @@ public class GameServiceImpl implements GameService {
                 .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
                 .agent( gamePlatform.getAgent() )
                 .apiUrl( gamePlatform.getApiUrl() )
+                .recordUrl( gamePlatform.getRecordUrl() )
                 .linecode( gamePlatform.getLinecode() )
                 .kindId( gameInfo.getKindId() )
                 .gameMemberId( gameMemberId )
@@ -193,8 +194,7 @@ public class GameServiceImpl implements GameService {
         } catch ( Exception e ) {
             // 如果发生提现异常
             if ( e instanceof GameTransferException ) {
-                BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
-                if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
+                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.outGameSuccess( reqJoinGame );
                     return RspBase.ok( "下分成功" );
                 } else {
@@ -217,15 +217,6 @@ public class GameServiceImpl implements GameService {
     }
 
     private String getGameAtomicId( Long platformId ) {
-        if ( !redisUtils.exists( Constants.GAME_ATOMIC_PREX + platformId ) ) {
-            String orderId = memberGameMoneyService.selectMaxGameOrderCode( platformId );
-            if ( "0".equals( orderId ) ) {
-                redisUtils.strSet( Constants.GAME_ATOMIC_PREX + platformId, "0" );
-            } else {
-                long num = Long.parseLong( orderId.replaceFirst( gameOrderPrefix + "", "" ) ) - Constants.GAME_ATOMIC_INIT;
-                redisUtils.strSet( Constants.GAME_ATOMIC_PREX + platformId, String.valueOf( num + 1 ) );
-            }
-        }
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT

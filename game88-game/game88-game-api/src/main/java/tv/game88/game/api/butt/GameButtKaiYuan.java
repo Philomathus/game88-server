@@ -65,7 +65,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -113,7 +113,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -167,7 +167,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -220,7 +220,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -268,7 +268,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
