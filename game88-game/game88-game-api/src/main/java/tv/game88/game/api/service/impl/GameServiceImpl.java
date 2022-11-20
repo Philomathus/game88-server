@@ -50,7 +50,7 @@ public class GameServiceImpl implements GameService {
 
     @Value( "${spring.profiles.active}" )
     private String profile;
-    @Value( "${gameOrderPrefix:null}" )
+    @Value( "${gameOrderPrefix:0}" )
     private int    gameOrderPrefix;
 
     @Override
