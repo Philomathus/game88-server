@@ -81,8 +81,8 @@
         where i.effect = 1
           and p.effect = 1
           and i.id in
-        <foreach collection="list" item="item" index="index" separator=",">
-            (#{item}
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
         </foreach>
     </select>
 </mapper>
