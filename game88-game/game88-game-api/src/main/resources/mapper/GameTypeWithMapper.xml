@@ -15,7 +15,7 @@
     </select>
 
     <select id="selectGameTypeWithList" resultType="tv.game88.game.api.entity.GameTypeWith">
-        select w.type_id typeId, w.game_info_id gameInfoId, w.sort, i.name, i.icon gameInfoIcon gameInfoName
+        select w.type_id typeId, w.game_info_id gameInfoId, w.sort, i.name gameInfoName, i.icon gameInfoIcon
         from game_type_with w
                  left join game_info i on i.id = w.game_info_id
         where w.type_id = #{typeId}
