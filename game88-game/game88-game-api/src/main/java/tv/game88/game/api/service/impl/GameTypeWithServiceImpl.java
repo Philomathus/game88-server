@@ -51,9 +51,22 @@ public class GameTypeWithServiceImpl extends ServiceImpl<GameTypeWithMapper, Gam
         return gameInfos;
     }
 
+    @Override
+    public RspBase<?> updateTypeWith( GameTypeWith gameTypeWith ) {
+        GameTypeWith update = new GameTypeWith();
+        update.setSort( gameTypeWith.getSort() );
+        int updateNum = this.baseMapper.update( update, new QueryWrapper<GameTypeWith>()
+                .eq( "type_id", gameTypeWith.getTypeId() )
+                .eq( "game_info_id", gameTypeWith.getGameInfoId() ) );
+        if ( updateNum > 0 ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_INFO_WITH + gameTypeWith.getTypeId() );
+        }
+        return updateNum > 0 ? RspBase.ok( "更新成功" ) : RspBase.businessError( "更新失败" );
+    }
+
     @Transactional( rollbackFor = Exception.class )
     @Override
-    public RspBase<?> editTypeWith( Long typeId, List<Long> gameInfoIds ) {
+    public RspBase<?> insertTypeWith( Long typeId, List<Long> gameInfoIds ) {
         this.baseMapper.delete( new QueryWrapper<GameTypeWith>().eq( "type_id", typeId ) );
         List<GameTypeWith> gameTypeWiths = new ArrayList<>();
         for ( Long gameInfoId : gameInfoIds ) {
@@ -71,6 +84,17 @@ public class GameTypeWithServiceImpl extends ServiceImpl<GameTypeWithMapper, Gam
             this.baseMapper.insertBatch( gameTypeWiths );
         }
         gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_INFO_WITH + typeId );
-        return RspBase.ok();
+        return RspBase.ok( "新增成功" );
+    }
+
+    @Override
+    public RspBase<?> deleteTypeWith( Long typeId, List<Long> gameInfoIds ) {
+        int delete = this.baseMapper.delete( new QueryWrapper<GameTypeWith>()
+                .eq( "type_id", typeId )
+                .in( "game_info_id", gameInfoIds ) );
+        if ( delete > 0 ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_INFO_WITH + typeId );
+        }
+        return delete > 0 ? RspBase.ok( "剔除成功" ) : RspBase.businessError( "剔除失败" );
     }
 }

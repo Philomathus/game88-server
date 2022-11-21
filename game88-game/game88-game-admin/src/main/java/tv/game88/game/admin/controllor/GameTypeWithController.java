@@ -44,13 +44,30 @@ public class GameTypeWithController extends BaseController {
         return RspBase.ok( gameTypeWithService.selectListNotType( typeId, name ) );
     }
 
+    @PreAuthorize( "@ss.hasPermi('game:typeWith:insert')" )
+    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.INSERT )
+    @PutMapping
+    public RspBase<?> insertTypeWith( @RequestBody GameTypeWith gameTypeWith ) {
+        return gameTypeWithService.updateTypeWith( gameTypeWith );
+    }
+
     /**
      * 游戏信息ID类型关联
      */
-    @PreAuthorize( "@ss.hasPermi('game:typeWith:edit')" )
-    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.UPDATE )
-    @PutMapping( "/{typeId}" )
-    public RspBase<?> editTypeWith( @PathVariable Long typeId, @RequestBody List<Long> gameInfoIds ) {
-        return gameTypeWithService.editTypeWith( typeId, gameInfoIds );
+    @PreAuthorize( "@ss.hasPermi('game:typeWith:insert')" )
+    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.INSERT )
+    @PostMapping( "/{typeId}" )
+    public RspBase<?> insertTypeWith( @PathVariable Long typeId, @RequestBody List<Long> gameInfoIds ) {
+        return gameTypeWithService.insertTypeWith( typeId, gameInfoIds );
+    }
+
+    /**
+     * 游戏信息ID类型关联
+     */
+    @PreAuthorize( "@ss.hasPermi('game:typeWith:delete')" )
+    @Log( title = "游戏信息ID类型剔除关联", businessType = BusinessType.DELETE )
+    @DeleteMapping( "/{typeId}" )
+    public RspBase<?> deleteTypeWith( @PathVariable Long typeId, @RequestBody List<Long> gameInfoIds ) {
+        return gameTypeWithService.deleteTypeWith( typeId, gameInfoIds );
     }
 }
