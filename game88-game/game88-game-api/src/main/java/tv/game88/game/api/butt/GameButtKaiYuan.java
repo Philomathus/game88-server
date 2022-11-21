@@ -44,8 +44,8 @@ public class GameButtKaiYuan extends AbstractGameButt {
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
         reqJoinGame.setIp( ServletUtil.getIp() );
-        String params = String.format( "s=%s&account=%s&money=%s&orderid=%s&ip=%s&lineCode=%s&KindID=%s", 0,
-                reqJoinGame.getGameMemberId(), 0, reqJoinGame.getOrderId(), reqJoinGame.getIp(), reqJoinGame.getLinecode(),
+        String params = String.format( "s=%s&account=%s&money=0&orderid=%s&ip=%s&lineCode=%s&KindID=%s", 0,
+                reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(), reqJoinGame.getIp(), reqJoinGame.getLinecode(),
                 reqJoinGame.getKindId() );
         String param = null;
         try {

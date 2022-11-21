@@ -19,6 +19,7 @@ import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
 import tv.game88.game.api.mapper.GameTypeWithMapper;
+import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -98,13 +99,19 @@ public class GameCacheUtils {
                             .orderByAsc( "sort" )
                             .select( "game_info_id" ) )
                     .stream()
-                    .map( o -> Long.parseLong( o.toString() )  )
+                    .map( o -> Long.parseLong( o.toString() ) )
                     .toList();
             if ( CollectionUtils.isEmpty( infoIds ) ) {
                 return null;
             }
             List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( infoIds );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
+                for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
+                    if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
+                            && StringUtils.isNotBlank( rspGameInfo.getKindId() ) ) {
+                        rspGameInfo.setLotteryId( Long.parseLong( rspGameInfo.getKindId() ) );
+                    }
+                }
                 redisUtils.strSet( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );
             }
             return rspGameInfoList;

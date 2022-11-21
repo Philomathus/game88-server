@@ -15,6 +15,9 @@ public class GameButtFactoryUtil {
         if ( enumGameCategory == EnumGameCategory.UPG ) {
             return ( BaseGameButt ) context.getBean( EnumGameCategory.MG.getType() + "GameProcessor" );
         }
+        if ( enumGameCategory == EnumGameCategory.KAIXUAN || enumGameCategory == EnumGameCategory.NEWWORLD ) {
+            return ( BaseGameButt ) context.getBean( EnumGameCategory.KAIYUAN.getType() + "GameProcessor" );
+        }
         return ( BaseGameButt ) context.getBean( enumGameCategory.getType() + "GameProcessor" );
     }
 }

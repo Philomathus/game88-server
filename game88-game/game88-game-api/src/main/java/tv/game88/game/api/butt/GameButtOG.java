@@ -48,7 +48,7 @@ public class GameButtOG extends AbstractGameButt {
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 String              status  = resultMap.getOrDefault( "status", "" ).toString();
                 Map<String, String> dataMap = ( Map<String, String> ) resultMap.getOrDefault( "data", new HashMap<>() );
-                if ( "success".equals( status ) && CollectionUtils.isEmpty( dataMap ) && dataMap.containsKey( "token" ) ) {
+                if ( "success".equals( status ) && !CollectionUtils.isEmpty( dataMap ) && dataMap.containsKey( "token" ) ) {
                     reqJoinGame.setToken( dataMap.get( "token" ) );
                     redisUtils.strSet( Constants.GAME_TOKEN_PREX
                             + reqJoinGame.getPlatformId(), reqJoinGame.getToken(), Duration.ofMinutes( 29 ) );
@@ -102,7 +102,50 @@ public class GameButtOG extends AbstractGameButt {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
+        String url = reqJoinGame.getApiUrl() + "/game-providers/30/games/" + reqJoinGame.getKindId() + "/key?username="
+                + reqJoinGame.getGameMemberId();
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        headers.set( "X-Token", reqJoinGame.getToken() );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( headers );
+
+        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
+                restTemplate.httpEntityCallback( requestEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String              status  = resultMap.getOrDefault( "status", "" ).toString();
+            Map<String, String> dataMap = ( Map<String, String> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            if ( "success".equals( status ) && !CollectionUtils.isEmpty( dataMap ) && dataMap.containsKey( "key" ) ) {
+                String key = dataMap.get( "key" );
+                url = reqJoinGame.getApiUrl() + "/game-providers/30/play?key=" + key + "&type=mobile";
+                Map<String, Object> joinGameMap = restTemplate.getForObject( url, Map.class );
+                if ( !CollectionUtils.isEmpty( joinGameMap ) ) {
+                    String joinGameStatus = joinGameMap.getOrDefault( "status", "" ).toString();
+                    Map<String, String> joinGameDataMap = ( Map<String, String> ) joinGameMap.getOrDefault( "data",
+                            new HashMap<>() );
+                    if ( "success".equals( joinGameStatus ) && !CollectionUtils.isEmpty( joinGameDataMap )
+                            && joinGameDataMap.containsKey( "url" ) ) {
+                        reqJoinGame.setGameUrl( joinGameDataMap.get( "url" ) );
+                    }
+                }
+                if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+                    log.error( "MG获取游戏链接失败 resultMap:{}; joinGameMap:{}; userId:{}", JsonUtil.object2Json( resultMap ),
+                            JsonUtil.object2Json( joinGameMap ), reqJoinGame.getGameMemberId() );
+                    throw new BusinessException( "获取游戏链接失败" );
+                }
+            }
+        }
+        if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+            log.error( "MG获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            throw new BusinessException( "获取游戏链接失败" );
+        }
     }
 
     @Override
@@ -110,7 +153,7 @@ public class GameButtOG extends AbstractGameButt {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "username", reqJoinGame.getGameMemberId() );
         params.add( "balance", reqJoinGame.getTransferMoney().toString() );
-        params.add( "action", "in" );
+        params.add( "action", "IN" );
         params.add( "transferId", reqJoinGame.getOrderId() );
 
         HttpHeaders headers = new HttpHeaders();
@@ -145,12 +188,66 @@ public class GameButtOG extends AbstractGameButt {
 
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "username", reqJoinGame.getGameMemberId() );
+        params.add( "balance", reqJoinGame.getTransferMoney().toString() );
+        params.add( "action", "OUT" );
+        params.add( "transferId", reqJoinGame.getOrderId() );
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        headers.set( "X-Token", reqJoinGame.getToken() );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( reqJoinGame.getApiUrl()
+                    + "/game-providers/30/balance", HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
+                    response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            throw new GameTransferException( e.getMessage() );
+        }
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String status = resultMap.getOrDefault( "status", "" ).toString();
+            if ( "success".equals( status ) ) {
+                return;
+            }
+        }
+        throw new GameTransferException( "OG下分异常 - 下分失败或数据为空" );
     }
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        return null;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        headers.set( "X-Token", reqJoinGame.getToken() );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( headers );
+
+        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + "/game-providers/30/balance?username="
+                + reqJoinGame.getGameMemberId(), HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String              status  = resultMap.getOrDefault( "status", "" ).toString();
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            if ( "success".equals( status ) && !CollectionUtils.isEmpty( dataMap ) && dataMap.containsKey( "balance" ) ) {
+                return new BigDecimal( dataMap.get( "balance" ).toString() );
+            }
+        }
+        return BigDecimal.ZERO;
     }
 
     @Override

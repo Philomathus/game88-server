@@ -26,6 +26,14 @@ public class RspGameInfo {
     @Schema( title = "游戏类别" )
     private EnumGameCategory gameCategory;
 
+    @Schema( title = "彩票ID gameCategory为LOTTERY时有值", description = "1001:一分11选5 1002:一分快三 1003:一分赛车 1004:一分六合彩 1005:一分时时彩 "
+            + "2001:百家乐" )
+    private Long lotteryId;
+
+    @Schema( hidden = true )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String kindId;
+
     @Schema( title = "平台维护", hidden = true )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private Boolean platformMaintain;

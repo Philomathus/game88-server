@@ -9,8 +9,8 @@ import tv.game88.game.api.dto.ReqJoinGame;
 import java.math.BigDecimal;
 
 @Log4j2
-@Repository( value = ConstantsGame.UPG + "GameProcessor" )
-public class GameButtUPG extends AbstractGameButt {
+@Repository( value = ConstantsGame.NEWWORLD + "GameProcessor" )
+public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
 
