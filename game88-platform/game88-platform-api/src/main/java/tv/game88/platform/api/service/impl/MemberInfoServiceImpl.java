@@ -188,7 +188,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( e instanceof BadCredentialsException ) {
                 return RspBase.businessError( "手机号不存在/密码错误" );
             } else {
-                return RspBase.businessError( e.getMessage() );
+                return RspBase.businessError( "登录异常,请联系客服" );
             }
         } finally {
             AuthContextHolderUtils.clearContext();
