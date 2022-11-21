@@ -283,7 +283,7 @@ public class GameButtNewWorld extends AbstractGameButt {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
+                int status = Integer.parseInt( d.getOrDefault( "state", "-1" ).toString() );
                 return code == 0 && status == 0;
             }
         }

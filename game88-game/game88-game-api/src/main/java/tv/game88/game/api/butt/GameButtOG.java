@@ -91,13 +91,15 @@ public class GameButtOG extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
-        log.info( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String status = resultMap.getOrDefault( "status", "" ).toString();
             if ( "success".equals( status ) ) {
                 redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
+                return;
             }
         }
+        log.error( "OG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( "OG - 创建玩家失败" );
     }
 
     @Override

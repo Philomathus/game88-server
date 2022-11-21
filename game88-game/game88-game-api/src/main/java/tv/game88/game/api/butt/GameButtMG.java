@@ -66,7 +66,10 @@ public class GameButtMG extends AbstractGameButt {
         log.info( JsonUtil.object2Json( result ) );
         if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
+            return;
         }
+        log.error( "MG 创建玩家失败 ->{}", JsonUtil.object2Json( result ) );
+        throw new BusinessException( "MG - 创建玩家失败" );
     }
 
     @Override
