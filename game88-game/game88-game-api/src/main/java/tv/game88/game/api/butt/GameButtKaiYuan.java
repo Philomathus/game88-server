@@ -287,7 +287,6 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 return code == 0 && status == 0;
             }
         }
-        log.error( "KaiYuan查询转账失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        return false;
+        throw new RuntimeException( "查询结果为空,需要重试" );
     }
 }
