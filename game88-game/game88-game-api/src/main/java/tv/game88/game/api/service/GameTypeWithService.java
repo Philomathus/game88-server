@@ -12,5 +12,9 @@ public interface GameTypeWithService extends IService<GameTypeWith> {
 
     List<GameInfo> selectListNotType( Long typeId, String name );
 
-    RspBase<?> editTypeWith( Long typeId, List<Long> gameInfoIds );
+    RspBase<?> insertTypeWith( Long typeId, List<Long> gameInfoIds );
+
+    RspBase<?> deleteTypeWith( Long typeId, List<Long> gameInfoIds );
+
+    RspBase<?> updateTypeWith( GameTypeWith gameTypeWith );
 }
