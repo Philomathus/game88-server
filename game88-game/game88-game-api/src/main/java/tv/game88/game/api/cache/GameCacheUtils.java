@@ -129,7 +129,7 @@ public class GameCacheUtils {
         gameTypeWithMapper
                 .selectObjs( new QueryWrapper<GameTypeWith>().eq( "game_info_id", gameInfoId ).select( "type_id" ) )
                 .stream()
-                .map( o -> ( Long ) o )
+                .map( o -> Long.parseLong( o.toString() ) )
                 .forEach( typeId -> this.clear( GAME_TYPE_INFO_WITH + typeId ) );
     }
 
