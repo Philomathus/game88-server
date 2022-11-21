@@ -1,14 +1,15 @@
 package tv.game88.game.api.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.base.BaseGameButt;
@@ -20,9 +21,9 @@ import tv.game88.game.api.dto.RspGameType;
 import tv.game88.game.api.dto.RspGameTypes;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.exception.GameTransferException;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
-import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -49,6 +50,8 @@ public class GameServiceImpl implements GameService {
 
     @Value( "${spring.profiles.active}" )
     private String profile;
+    @Value( "${gameOrderPrefix:0}" )
+    private int    gameOrderPrefix;
 
     @Override
     public RspGameTypes getGameTypes() {
@@ -97,38 +100,36 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
-        String gameMemberId = profile + "_" + platformUser.getId();
-        ReqJoinGame reqJoinGame = ReqJoinGame
-                .builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo.getKindId() )
-                .gameMemberId( gameMemberId )
-                .memberId( platformUser.getId() )
-                .transferMoney( changeMoney )
-                .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform.getGameCategory() ) )
-                .build();
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
             baseGameButt.getToken( reqJoinGame );
             // 创建账号
             baseGameButt.createAccount( reqJoinGame );
+            // 获取游戏链接
+            baseGameButt.getJoinGameUrl( reqJoinGame );
             // 扣除会员金额
             memberGameMoneyService.beginGameEnter( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
                 // 上分
                 baseGameButt.transferMoney( reqJoinGame );
             }
-            // 获取游戏链接
-            String url = baseGameButt.getJoinGameUrl( reqJoinGame );
+            memberGameMoneyService.enterGameSuccess( reqJoinGame );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
-            return RspBase.ok( "获取游戏链接成功", url );
+            return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
+            // 如果发生转账异常
+            if ( e instanceof GameTransferException ) {
+                // 查询转账记录
+                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
+                    memberGameMoneyService.enterGameSuccess( reqJoinGame );
+                    return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
+                } else {
+                    // 如果转账记录不存在则回退会员上分金额
+                    memberGameMoneyService.enterGameFail( reqJoinGame );
+                }
+            }
             log.error( "进入游戏失败,失败原因:" + e.getMessage(), e );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
             return RspBase.businessError( "进入游戏失败,请重试" );
@@ -136,22 +137,89 @@ public class GameServiceImpl implements GameService {
 
     }
 
-    private String getGameOrderId( String memberId, String agent, EnumGameCategory gameCategory ) {
-        return switch ( gameCategory ) {
-            case AG -> agent
-                    .concat( memberId )
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-            case BBIN -> IdWorker.getIdStr( this.profile );
+    private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
+                                           BigDecimal changeMoney ) {
+        String gameMemberId = profile + "_" + memberId;
+        return ReqJoinGame
+                .builder()
+                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
+                .agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() )
+                .recordUrl( gamePlatform.getRecordUrl() )
+                .linecode( gamePlatform.getLinecode() )
+                .kindId( gameInfo.getKindId() )
+                .gameMemberId( gameMemberId )
+                .memberId( memberId )
+                .transferMoney( changeMoney )
+                .platformId( gamePlatform.getId() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                .build();
+    }
+
+    @Override
+    public RspBase<?> escGame( Long infoId, PlatformUser platformUser ) {
+        GameInfo gameInfo = gameCacheUtils.getGameInfo( infoId );
+        if ( gameInfo == null ) {
+            return RspBase.businessError( "该游戏不存在" );
+        }
+        if ( gameInfo.getMaintain() && platformUser.getStatus() != 2 ) {
+            return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
+        }
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( gameInfo.getPlatformId() );
+        if ( gamePlatform == null ) {
+            return RspBase.businessError( "该游戏不存在" );
+        }
+        if ( gamePlatform.getMaintain() && platformUser.getStatus() != 2 ) {
+            return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
+        }
+
+        if ( !redisUtils.lock( "escGame" + platformUser.getId(), 10 ) ) {
+            return RspBase.businessError( "操作频繁,请稍后再试" );
+        }
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), null );
+        BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+        try {
+            // 获取token
+            baseGameButt.getToken( reqJoinGame );
+            BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
+            // 金额高于0元才下分
+            if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
+                return RspBase.ok( "游戏余额为0，无需下分" );
+            }
+            reqJoinGame.setTransferMoney( balance );
+            baseGameButt.withdrawal( reqJoinGame );
+            memberGameMoneyService.outGameSuccess( reqJoinGame );
+            return RspBase.ok( "下分成功" );
+        } catch ( Exception e ) {
+            // 如果发生提现异常
+            if ( e instanceof GameTransferException ) {
+                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
+                    memberGameMoneyService.outGameSuccess( reqJoinGame );
+                    return RspBase.ok( "下分成功" );
+                } else {
+                    memberGameMoneyService.outGameFail( reqJoinGame );
+                }
+            }
+            log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
+            redisUtils.unLock( "escGame" + platformUser.getId() );
+            return RspBase.businessError( "下分失败,请重试" );
+        }
+    }
+
+    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
+        return switch ( gamePlatform.getGameCategory() ) {
+            case AG, BBIN -> this.getGameAtomicId( gamePlatform.getId() );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
-                    .concat( memberId );
+                    .concat( gameMemberId );
         };
     }
 
-    public static void main( String[] args ) {
-        for ( int i = 0; i < 100; i++ ) {
-            System.out.print( IdWorker.getId( "8800" ) + " - " );
-            System.out.println( IdWorker.getId( "8801" ) );
-        }
+    private String getGameAtomicId( Long platformId ) {
+        RedisAtomicLong entityIdCounter = new RedisAtomicLong(
+                Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
+        return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
+                + entityIdCounter.getAndIncrement() );
     }
 }

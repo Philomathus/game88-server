@@ -13,4 +13,6 @@ public interface GameService {
     List<RspGameInfo> getGameInfoList( Long typeId );
 
     RspBase<?> joinGame( Long infoId, PlatformUser platformUser );
+
+    RspBase<?> escGame( Long infoId, PlatformUser platformUser );
 }

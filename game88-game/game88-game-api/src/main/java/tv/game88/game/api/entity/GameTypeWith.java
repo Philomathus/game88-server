@@ -1,5 +1,6 @@
 package tv.game88.game.api.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,4 +26,10 @@ public class GameTypeWith {
      * 排序号
      */
     private Long sort;
+
+    @TableField( exist = false )
+    private String gameInfoName;
+
+    @TableField( exist = false )
+    private String gameInfoIcon;
 }

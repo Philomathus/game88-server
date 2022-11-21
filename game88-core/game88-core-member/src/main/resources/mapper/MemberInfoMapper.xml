@@ -357,7 +357,7 @@
 		where id = #{inviterCode}
 	</select>
 	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
-		select id,nick_name,status,vip,register_type,head_img where id = #{userId}
+		select id,nick_name,status,vip,register_type,head_img,password from member_info where id = #{userId}
 	</select>
 	<select id="funGetaddressProvinces" resultType="java.lang.String">
 		select fun_getaddress_provinces(#{ip})

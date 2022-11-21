@@ -99,4 +99,12 @@ public class RspBase<T> {
         return new RspBase<>( HttpStatus.UNAUTHORIZED, error );
     }
 
+    /**
+     * 权限异常
+     *
+     * @return
+     */
+    public static <T> RspBase<T> forbiddenError( String error ) {
+        return new RspBase<>( HttpStatus.FORBIDDEN, error );
+    }
 }

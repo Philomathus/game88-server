@@ -9,6 +9,8 @@ spring:
     password: EvYsN39ViArDumx4pWyH
     database: 2
 
+gameOrderPrefix: 100
+
 springdoc:
   api-docs:
     enabled: true

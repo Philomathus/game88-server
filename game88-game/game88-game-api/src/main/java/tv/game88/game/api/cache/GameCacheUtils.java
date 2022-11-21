@@ -98,7 +98,7 @@ public class GameCacheUtils {
                             .orderByAsc( "sort" )
                             .select( "game_info_id" ) )
                     .stream()
-                    .map( o -> ( Long ) o )
+                    .map( o -> Long.parseLong( o.toString() )  )
                     .toList();
             if ( CollectionUtils.isEmpty( infoIds ) ) {
                 return null;

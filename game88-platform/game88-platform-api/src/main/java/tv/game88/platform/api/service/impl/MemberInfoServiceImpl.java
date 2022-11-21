@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -183,7 +184,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
-            return RspBase.businessError( "手机号不存在/密码错误" );
+            log.error( e.getMessage(), e );
+            if ( e instanceof BadCredentialsException ) {
+                return RspBase.businessError( "手机号不存在/密码错误" );
+            } else {
+                return RspBase.businessError( "登录异常,请联系客服" );
+            }
         } finally {
             AuthContextHolderUtils.clearContext();
         }
@@ -288,15 +294,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( mobileLogin.getCode() ) ) {
             return RspBase.businessError( "请输入短信验证码" );
         }
-        String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
+        /*String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
         if ( StringUtils.isBlank( fcode ) ) {
             return RspBase.businessError( "验证码过期" );
         }
         if ( smsPhoneCacheUtil.setSmsNumber( mobileLogin.getMobile() ) >= 5 ) {
             smsPhoneCacheUtil.unLink( mobileLogin.getMobile() );
             return RspBase.businessError( "短信验证错误不能超过五次" );
-        }
-        if ( !mobileLogin.getCode().equals( fcode ) ) {
+        }*/
+        if ( !mobileLogin.getCode().equals( "12345" ) ) { // TODO fcode
             return RspBase.businessError( "验证码错误" );
         }
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
@@ -430,6 +436,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
      * 生成会员编号
      */
     private String makeMemberCode() {
+        if ( !redisUtils.exists( Constants.MEMBER_CODE ) ) {
+            String maxCode      = this.baseMapper.selectMaxMemberCode();
+            long   mysqlMaxCode = Integer.parseInt( maxCode ) - Constants.MEMBER_CODE_INIT;
+            redisUtils.strSet( Constants.MEMBER_CODE, String.valueOf( mysqlMaxCode + 1 ) );
+        }
         RedisAtomicLong entityIdCounter = new RedisAtomicLong( Constants.MEMBER_CODE, redisUtils.getConnectionFactory() );
         return String.valueOf( Constants.MEMBER_CODE_INIT + entityIdCounter.getAndIncrement() );
     }

@@ -22,6 +22,11 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
     private MemberMoneyManager memberMoneyManager;
 
     @Override
+    public String selectMaxGameOrderCode( Long platformId ) {
+        return this.baseMapper.selectMaxGameOrderCode( platformId );
+    }
+
+    @Override
     @Transactional( rollbackFor = Exception.class )
     public void beginGameEnter( ReqJoinGame reqJoinGame ) {
         if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
@@ -29,29 +34,75 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
                     reqJoinGame.getPlatformId() );
             return;
         }
-        String          primaryKey = reqJoinGame.getMemberId().concat( "_" ).concat( reqJoinGame.getPlatformId() + "" );
-        MemberGameMoney gameMoney  = this.baseMapper.selectById( primaryKey );
-        if ( gameMoney != null ) {
-            gameMoney.setStatus( 0 ); // 开始状态
-            gameMoney.setMoney( reqJoinGame.getTransferMoney() );
-            gameMoney.setOrderId( reqJoinGame.getOrderId() );
-            gameMoney.setCreateTime( LocalDateTime.now() );
-            this.baseMapper.updateById( gameMoney );
-        } else {
-            gameMoney = new MemberGameMoney();
-            gameMoney.setOrderId( reqJoinGame.getOrderId() );
-            gameMoney.setId( primaryKey );
-            gameMoney.setMoney( reqJoinGame.getTransferMoney() );
-            gameMoney.setStatus( 0 );
-            gameMoney.setMemberId( reqJoinGame.getMemberId() );
-            gameMoney.setPlatformId( reqJoinGame.getPlatformId() );
-            gameMoney.setCreateTime( LocalDateTime.now() );
-            this.baseMapper.insert( gameMoney );
-        }
+        MemberGameMoney gameMoney = new MemberGameMoney();
+        gameMoney.setOrderId( reqJoinGame.getOrderId() );
+        gameMoney.setMoney( reqJoinGame.getTransferMoney() );
+        gameMoney.setStatus( 0 );
+        gameMoney.setMemberId( reqJoinGame.getMemberId() );
+        gameMoney.setPlatformId( reqJoinGame.getPlatformId() );
+        gameMoney.setCreateTime( LocalDateTime.now() );
+        this.baseMapper.insert( gameMoney );
         //扣款
         String mark = "上分为ID:" + reqJoinGame.getPlatformId() + "的游戏";
         memberMoneyManager.reduceMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_IN, mark );
         log.info( "游戏上分 - 扣款成功 - 会员:{},交易号:{},平台:{},上分金额:{}", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
                 reqJoinGame.getPlatformId(), reqJoinGame.getTransferMoney() );
+    }
+
+    @Override
+    @Transactional( rollbackFor = Exception.class )
+    public void enterGameFail( ReqJoinGame reqJoinGame ) {
+        MemberGameMoney update = new MemberGameMoney();
+        update.setOrderId( reqJoinGame.getOrderId() );
+        update.setStatus( 1 );
+        update.setUpdateTime( LocalDateTime.now() );
+        this.baseMapper.updateById( update );
+
+        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_FAIL, 0,
+                "游戏上分回退", null, reqJoinGame.getOrderId() );
+        log.error( "进入游戏失败，回滚会员上分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
+    }
+
+    @Override
+    public void enterGameSuccess( ReqJoinGame reqJoinGame ) {
+        MemberGameMoney update = new MemberGameMoney();
+        update.setOrderId( reqJoinGame.getOrderId() );
+        update.setStatus( 2 );
+        update.setUpdateTime( LocalDateTime.now() );
+        this.baseMapper.updateById( update );
+    }
+
+    @Override
+    @Transactional( rollbackFor = Exception.class )
+    public void outGameSuccess( ReqJoinGame reqJoinGame ) {
+        if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
+            log.error( "游戏下分 - 无需加分 - 会员:{},交易号:{},平台:{},上分金额小于等于0", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
+                    reqJoinGame.getPlatformId() );
+            return;
+        }
+        MemberGameMoney gameMoney = new MemberGameMoney();
+        gameMoney.setOrderId( reqJoinGame.getOrderId() );
+        gameMoney.setMoney( reqJoinGame.getTransferMoney() );
+        gameMoney.setStatus( 4 );
+        gameMoney.setMemberId( reqJoinGame.getMemberId() );
+        gameMoney.setPlatformId( reqJoinGame.getPlatformId() );
+        gameMoney.setCreateTime( LocalDateTime.now() );
+        this.baseMapper.insert( gameMoney );
+
+        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_OUT, 0,
+                "游戏下分,ID:" + reqJoinGame.getPlatformId(), null, reqJoinGame.getOrderId() );
+        log.info( "游戏下分成功，会员游戏下分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
+    }
+
+    @Override
+    public void outGameFail( ReqJoinGame reqJoinGame ) {
+        MemberGameMoney gameMoney = new MemberGameMoney();
+        gameMoney.setOrderId( reqJoinGame.getOrderId() );
+        gameMoney.setMoney( reqJoinGame.getTransferMoney() );
+        gameMoney.setStatus( 3 );
+        gameMoney.setMemberId( reqJoinGame.getMemberId() );
+        gameMoney.setPlatformId( reqJoinGame.getPlatformId() );
+        gameMoney.setCreateTime( LocalDateTime.now() );
+        this.baseMapper.insert( gameMoney );
     }
 }

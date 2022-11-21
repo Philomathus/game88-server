@@ -1,8 +1,6 @@
 package tv.game88.game.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import tv.game88.common.vo.RspBase;
-import tv.game88.game.api.dto.ReqGameTypeWith;
 import tv.game88.game.api.entity.GameInfo;
 
 import java.util.List;
@@ -21,10 +19,4 @@ public interface GameInfoService extends IService<GameInfo> {
      * @return 游戏信息集合
      */
     public List<GameInfo> selectGameInfoList( GameInfo gameInfo );
-
-    List<GameInfo> selectListByType( Long typeId );
-
-    List<GameInfo> selectListNotType( Long typeId );
-
-    RspBase<?> editTypeWith( Long typeId, List<ReqGameTypeWith> reqGameTypeWiths );
 }

@@ -13,6 +13,7 @@ public class ReqJoinGame {
     private String agent;
     private String linecode;
     private String apiUrl;
+    private String recordUrl;
     private String kindId;
 
     private String     memberId;
@@ -22,4 +23,7 @@ public class ReqJoinGame {
     private String orderId;
     private Long   platformId;
     private String token;
+    private String ip;
+
+    private String gameUrl;
 }

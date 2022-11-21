@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.ReqGame;
@@ -27,12 +28,14 @@ public class GameController extends BaseController {
 
     @Operation( summary = "获取游戏分类列表" )
     @PostMapping( "/getGameTypes" )
+    @Anonymous
     public RspBase<RspGameTypes> getGameTypes() {
         return RspBase.ok( gameService.getGameTypes() );
     }
 
     @Operation( summary = "根据类型获取游戏列表" )
     @PostMapping( "/getGameInfoList" )
+    @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
         return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
     }
@@ -41,5 +44,11 @@ public class GameController extends BaseController {
     @PostMapping( "/joinGame" )
     public RspBase<?> joinGame( @Validated @RequestBody ReqGame req ) {
         return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
+    }
+
+    @Operation( summary = "会员游戏下分" )
+    @PostMapping( "/escGame" )
+    public RspBase<?> escGame( @Validated @RequestBody ReqGame req ) {
+        return gameService.escGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
 }
