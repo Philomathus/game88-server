@@ -48,6 +48,9 @@ public class GameButtMG extends AbstractGameButt {
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
+        if ( redisUtils.sIsMember( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
+            return;
+        }
         String url = reqJoinGame.getApiUrl() + reqJoinGame.getAgent() + "/players?agentCode=" + reqJoinGame.getAgent();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -59,9 +62,10 @@ public class GameButtMG extends AbstractGameButt {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
 
         ResponseEntity<Map> responseEntity = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
+        Map                 result         = responseEntity.getBody();
+        log.info( JsonUtil.object2Json( result ) );
         if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
-            Map result = responseEntity.getBody();
-            log.info( JsonUtil.object2Json( result ) );
+            redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
         }
     }
 
@@ -193,6 +197,9 @@ public class GameButtMG extends AbstractGameButt {
         ResponseEntity<Map> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, Map.class );
         Map                 resultMap          = responseGameResult.getBody();
         log.info( "MG用户:{}获交易明细返回结果:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
-        return responseGameResult.getStatusCode().is2xxSuccessful() && "Succeeded".equals( resultMap.get( "status" ) );
+        if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
+            return "Succeeded".equals( resultMap.get( "status" ) );
+        }
+        throw new RuntimeException( "查询结果为空,需要重试" );
     }
 }

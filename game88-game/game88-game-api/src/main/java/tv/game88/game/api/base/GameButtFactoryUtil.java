@@ -12,6 +12,9 @@ public class GameButtFactoryUtil {
     private ApplicationContext context;
 
     public BaseGameButt createGameButtProcessor( EnumGameCategory enumGameCategory ) {
+        if ( enumGameCategory == EnumGameCategory.UPG ) {
+            return ( BaseGameButt ) context.getBean( EnumGameCategory.MG.getType() + "GameProcessor" );
+        }
         return ( BaseGameButt ) context.getBean( enumGameCategory.getType() + "GameProcessor" );
     }
 }

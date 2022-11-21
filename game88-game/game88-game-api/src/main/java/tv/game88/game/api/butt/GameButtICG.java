@@ -69,29 +69,30 @@ public class GameButtICG extends AbstractGameButt {
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        if ( !redisUtils.sIsMember( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
-            Map<String, String> map = new HashMap<>();
-            map.put( "username", reqJoinGame.getGameMemberId() );
-            map.put( "nickname", reqJoinGame.getGameMemberId() );
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-            httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
-            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>( map, httpHeaders );
-            Map<String, Object>             resultMap  = null;
-            try {
-                resultMap = restTemplate.postForObject( reqJoinGame.getApiUrl() + COMMON_URL, httpEntity, Map.class );
-            } catch ( Exception e ) {
-                if ( !e.getMessage().contains( "username already exists" ) ) {
-                    log.error( "ICG - 创建玩家失败 - 失败原因:" + e.getMessage(), e );
-                    throw new BusinessException( "ICG - 创建玩家失败" );
-                }
-            }
-            if ( resultMap.get( "data" ) == null ) {
-                log.error( "ICG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        if ( redisUtils.sIsMember( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
+            return;
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put( "username", reqJoinGame.getGameMemberId() );
+        map.put( "nickname", reqJoinGame.getGameMemberId() );
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>( map, httpHeaders );
+        Map<String, Object>             resultMap  = null;
+        try {
+            resultMap = restTemplate.postForObject( reqJoinGame.getApiUrl() + COMMON_URL, httpEntity, Map.class );
+        } catch ( Exception e ) {
+            if ( !e.getMessage().contains( "username already exists" ) ) {
+                log.error( "ICG - 创建玩家失败 - 失败原因:" + e.getMessage(), e );
                 throw new BusinessException( "ICG - 创建玩家失败" );
             }
-            redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
         }
+        if ( resultMap.get( "data" ) == null ) {
+            log.error( "ICG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+            throw new BusinessException( "ICG - 创建玩家失败" );
+        }
+        redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
     }
 
     @Override
@@ -233,7 +234,6 @@ public class GameButtICG extends AbstractGameButt {
                 }
             }
         }
-        log.error( "ICG查询转账失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        return false;
+        throw new RuntimeException( "查询结果为空,需要重试" );
     }
 }
