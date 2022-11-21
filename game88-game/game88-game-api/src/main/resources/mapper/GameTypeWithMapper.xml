@@ -15,16 +15,10 @@
     </select>
 
     <select id="selectGameTypeWithList" resultType="tv.game88.game.api.entity.GameTypeWith">
-        select w.type_id typeId, w.game_info_id gameInfoId, w.sort, i.name gameInfoName
+        select w.type_id typeId, w.game_info_id gameInfoId, w.sort, i.name, i.icon gameInfoIcon gameInfoName
         from game_type_with w
                  left join game_info i on i.id = w.game_info_id
         where w.type_id = #{typeId}
         order by w.sort
-    </select>
-
-    <select id="selectListNotType" resultMap="GameInfoResult">
-        select id, name, icon
-        from game_info
-        where id not in (select game_info_id from game_type_with where type_id = #{typeId})
     </select>
 </mapper>

@@ -3,9 +3,11 @@ package tv.game88.game.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GameTypeWith;
@@ -27,12 +29,26 @@ public class GameTypeWithServiceImpl extends ServiceImpl<GameTypeWithMapper, Gam
 
     @Override
     public List<GameTypeWith> selectGameTypeWithList( Long typeId ) {
-        return this.baseMapper.selectGameTypeWithList( typeId );
+        List<GameTypeWith> gameTypeWiths = this.baseMapper.selectGameTypeWithList( typeId );
+        String             domainValue   = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( GameTypeWith type : gameTypeWiths ) {
+            if ( StringUtils.isNotBlank( type.getGameInfoIcon() ) && !type.getGameInfoIcon().startsWith( "http" ) ) {
+                type.setGameInfoIcon( domainValue + type.getGameInfoIcon() );
+            }
+        }
+        return gameTypeWiths;
     }
 
     @Override
     public List<GameInfo> selectListNotType( Long typeId, String name ) {
-        return gameInfoMapper.selectListNotType( typeId, name );
+        List<GameInfo> gameInfos   = gameInfoMapper.selectListNotType( typeId, name );
+        String         domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( GameInfo info : gameInfos ) {
+            if ( StringUtils.isNotBlank( info.getIcon() ) && !info.getIcon().startsWith( "http" ) ) {
+                info.setIcon( domainValue + info.getIcon() );
+            }
+        }
+        return gameInfos;
     }
 
     @Transactional( rollbackFor = Exception.class )
