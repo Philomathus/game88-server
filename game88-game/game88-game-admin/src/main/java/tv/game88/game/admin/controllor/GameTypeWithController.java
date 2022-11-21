@@ -54,8 +54,8 @@ public class GameTypeWithController extends BaseController {
     /**
      * 游戏信息ID类型关联
      */
-    @PreAuthorize( "@ss.hasPermi('game:typeWith:insert')" )
-    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.INSERT )
+    @PreAuthorize( "@ss.hasPermi('game:typeWith:edit')" )
+    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.UPDATE )
     @PostMapping( "/{typeId}" )
     public RspBase<?> insertTypeWith( @PathVariable Long typeId, @RequestBody List<Long> gameInfoIds ) {
         return gameTypeWithService.insertTypeWith( typeId, gameInfoIds );
