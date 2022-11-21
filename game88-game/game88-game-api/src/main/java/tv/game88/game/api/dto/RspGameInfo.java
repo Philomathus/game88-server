@@ -3,6 +3,7 @@ package tv.game88.game.api.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.commons.lang3.BooleanUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.type.EnumGameCategory;
@@ -30,7 +31,7 @@ public class RspGameInfo {
     private Boolean platformMaintain;
 
     public Boolean getMaintain() {
-        return maintain || platformMaintain;
+        return BooleanUtils.isTrue( maintain ) || BooleanUtils.isTrue( platformMaintain );
     }
 
     public String getIcon() {
