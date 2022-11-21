@@ -14,4 +14,6 @@ public interface GameTypeWithMapper extends BaseMapper<GameTypeWith> {
     int insertBatch( List<GameTypeWith> gameTypeWiths );
 
     List<Long> selectTypeIdByPlatformId( Long platformId );
+
+    List<GameTypeWith> selectGameTypeWithList( Long typeId );
 }

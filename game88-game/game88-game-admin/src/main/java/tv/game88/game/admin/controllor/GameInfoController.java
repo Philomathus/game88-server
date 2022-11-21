@@ -11,7 +11,6 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.game.api.cache.GameCacheUtils;
-import tv.game88.game.api.dto.ReqGameTypeWith;
 import tv.game88.game.api.dto.RspGame;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.service.GameInfoService;
@@ -65,18 +64,6 @@ public class GameInfoController extends BaseController {
         return RspBase.ok( list );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:info:list')" )
-    @GetMapping( "/listByType/{typeId}" )
-    public RspBase<List<GameInfo>> listByType( @PathVariable Long typeId ) {
-        return RspBase.ok( gameInfoService.selectListByType( typeId ) );
-    }
-
-    @PreAuthorize( "@ss.hasPermi('game:info:list')" )
-    @GetMapping( "/listNotType/{typeId}" )
-    public RspBase<List<GameInfo>> listNotType( @PathVariable Long typeId ) {
-        return RspBase.ok( gameInfoService.selectListNotType( typeId ) );
-    }
-
     /**
      * 获取游戏信息详细信息
      */
@@ -115,16 +102,6 @@ public class GameInfoController extends BaseController {
             gameCacheUtils.clearByInfoId( gameInfo.getId() );
         }
         return toResult( isSave );
-    }
-
-    /**
-     * 游戏信息ID类型关联
-     */
-    @PreAuthorize( "@ss.hasPermi('game:info:edit')" )
-    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.UPDATE )
-    @PutMapping( "/{typeId}" )
-    public RspBase<?> editTypeWith( @PathVariable Long typeId, @RequestBody List<ReqGameTypeWith> reqGameTypeWiths ) {
-        return gameInfoService.editTypeWith( typeId, reqGameTypeWiths );
     }
 
     /**
