@@ -38,7 +38,7 @@ public class GameTypeWithController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:info:list')" )
+    @PreAuthorize( "@ss.hasPermi('game:typeWith:list')" )
     @GetMapping( "/listNotType/{typeId}" )
     public RspBase<List<GameInfo>> listNotType( @PathVariable Long typeId, @RequestParam( required = false ) String name ) {
         return RspBase.ok( gameTypeWithService.selectListNotType( typeId, name ) );
