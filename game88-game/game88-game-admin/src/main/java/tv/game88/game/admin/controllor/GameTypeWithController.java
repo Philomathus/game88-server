@@ -48,6 +48,7 @@ public class GameTypeWithController extends BaseController {
     @Log( title = "游戏信息ID类型关联", businessType = BusinessType.INSERT )
     @PutMapping
     public RspBase<?> insertTypeWith( @RequestBody GameTypeWith gameTypeWith ) {
+
         return gameTypeWithService.updateTypeWith( gameTypeWith );
     }
 
