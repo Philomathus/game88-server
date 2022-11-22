@@ -24,6 +24,7 @@ import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.exception.GameTransferException;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
+import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -139,7 +140,9 @@ public class GameServiceImpl implements GameService {
 
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
                                            BigDecimal changeMoney ) {
-        String gameMemberId = profile + "_" + memberId;
+        // BBIN会员ID只能是英文加数字
+        String gameMemberId =
+                gamePlatform.getGameCategory() == EnumGameCategory.BBIN ? profile + "bbin" + memberId : profile + "_" + memberId;
         return ReqJoinGame
                 .builder()
                 .des( AESCoder.decrypt( gamePlatform.getDes() ) )
@@ -209,8 +212,7 @@ public class GameServiceImpl implements GameService {
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
         return switch ( gamePlatform.getGameCategory() ) {
-            case AG -> this.getGameAtomicId( gamePlatform.getId() );
-            case BBIN_DIANZI, BBIN_FISH, BBIN_LIVE, BBIN_SPORT -> this.getGameAtomicId( gamePlatform.getId() );
+            case AG, BBIN -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );

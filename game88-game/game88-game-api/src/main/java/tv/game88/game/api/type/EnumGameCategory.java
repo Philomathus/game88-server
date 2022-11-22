@@ -21,10 +21,7 @@ public enum EnumGameCategory {
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
     KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
     NEWWORLD( ConstantsGame.NEWWORLD, "新世界棋牌" ),
-    BBIN_DIANZI( ConstantsGame.BBIN, "BBIN电子" ),
-    BBIN_SPORT( ConstantsGame.BBIN, "BBIN体育" ),
-    BBIN_LIVE( ConstantsGame.BBIN, "BBIN视讯" ),
-    BBIN_FISH( ConstantsGame.BBIN, "BBIN捕鱼" ),
+    BBIN( ConstantsGame.BBIN, "BBIN电子" ),
     ;
 
     private final String type;
