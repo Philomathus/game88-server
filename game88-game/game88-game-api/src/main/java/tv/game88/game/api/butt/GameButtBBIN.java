@@ -34,11 +34,12 @@ import java.util.Map;
 @Repository( value = ConstantsGame.BBIN + "GameProcessor" )
 public class GameButtBBIN extends AbstractGameButt {
 
-    private static final String WEBSSITE           = "rtwrt1";
-    private static final String createSession_key8 = "0P2McG5jG";
-    private static final String transfer_key8      = "un5zaZl";
-    private static final String joinGame_key8      = "7G7kc84PxB";
-    private static final String query_balance_key8 = "5HdRJ";
+    private static final String WEBSSITE            = "rtwrt1";
+    private static final String CREATE_SESSION_KEY8 = "0P2McG5jG";
+    private static final String TRANSFER_KEY8       = "un5zaZl";
+    private static final String JOIN_GAME_KEY8      = "7G7kc84PxB";
+    private static final String QUERY_BALANCE_KEY8  = "5HdRJ";
+    private static final String CHECK_TRANSFER_KEY8 = "e1Fg2";
 
     private String convertTime() {
         return LocalDateTimeUtils.format( LocalDate.now( ZoneId.of( "America/Caracas" ) ),
@@ -49,7 +50,7 @@ public class GameButtBBIN extends AbstractGameButt {
     public void getToken( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 9 );
         String c   = RandomStringUtils.randomAlphabetic( 9 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + createSession_key8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + CREATE_SESSION_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "website", WEBSSITE );
@@ -59,9 +60,9 @@ public class GameButtBBIN extends AbstractGameButt {
         requestMap.set( "ingress", "2" );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + "CreateSession" )
+                .fromUriString( reqJoinGame.getApiUrl() + "/CreateSession" )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
@@ -92,18 +93,18 @@ public class GameButtBBIN extends AbstractGameButt {
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 4 );
         String c   = RandomStringUtils.randomAlphabetic( 1 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + joinGame_key8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( WEBSSITE + JOIN_GAME_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "website", WEBSSITE );
         requestMap.set( "lang", "zh-cn" );
         requestMap.set( "sessionid", reqJoinGame.getToken() );
-        // TODO kindId
+        requestMap.set( "active_site", reqJoinGame.getKindId() );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + reqJoinGame.getRecordUrl() )
+                .fromUriString( reqJoinGame.getApiUrl() + "/LobbyUrl" )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
@@ -119,9 +120,7 @@ public class GameButtBBIN extends AbstractGameButt {
             List<Map<String, Object>> dataList = ( List<Map<String, Object>> ) resultMap.get( "data" );
             if ( !CollectionUtils.isEmpty( dataList ) ) {
                 Map<String, Object> dataMap = dataList.get( 0 );
-                String              html5   = dataMap.getOrDefault( "html5", "" ).toString();
-                String              mobile  = dataMap.getOrDefault( "mobile", "" ).toString();
-                reqJoinGame.setGameUrl( StringUtils.isBlank( mobile ) ? html5 : mobile );
+                reqJoinGame.setGameUrl( dataMap.getOrDefault( "mobile", "" ).toString() );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
@@ -132,9 +131,10 @@ public class GameButtBBIN extends AbstractGameButt {
 
     @Override
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String a   = RandomStringUtils.randomAlphabetic( 9 );
-        String c   = RandomStringUtils.randomAlphabetic( 1 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + transfer_key8 + convertTime() );
+        String a = RandomStringUtils.randomAlphabetic( 9 );
+        String c = RandomStringUtils.randomAlphabetic( 1 );
+        String md5 = DigestUtils.md5Hex(
+                WEBSSITE + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "website", WEBSSITE );
@@ -145,9 +145,9 @@ public class GameButtBBIN extends AbstractGameButt {
         requestMap.set( "remit", reqJoinGame.getTransferMoney().toString() );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + "Transfer" )
+                .fromUriString( reqJoinGame.getApiUrl() + "/Transfer" )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
@@ -178,7 +178,8 @@ public class GameButtBBIN extends AbstractGameButt {
     public void withdrawal( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 9 );
         String c   = RandomStringUtils.randomAlphabetic( 1 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + transfer_key8 + convertTime() );
+        String md5 = DigestUtils.md5Hex(
+                WEBSSITE + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "website", WEBSSITE );
@@ -189,9 +190,9 @@ public class GameButtBBIN extends AbstractGameButt {
         requestMap.set( "remit", reqJoinGame.getTransferMoney().toString() );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + "Transfer" )
+                .fromUriString( reqJoinGame.getApiUrl() + "/Transfer" )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
@@ -222,7 +223,7 @@ public class GameButtBBIN extends AbstractGameButt {
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 2 );
         String c   = RandomStringUtils.randomAlphabetic( 2 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + query_balance_key8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + QUERY_BALANCE_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "website", WEBSSITE );
@@ -230,9 +231,9 @@ public class GameButtBBIN extends AbstractGameButt {
         requestMap.set( "uppername", reqJoinGame.getAgent() );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + "CheckUsrBalance" )
+                .fromUriString( reqJoinGame.getApiUrl() + "/CheckUsrBalance" )
                 .queryParams( requestMap )
-                .build();
+                .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
@@ -256,7 +257,34 @@ public class GameButtBBIN extends AbstractGameButt {
 
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
+        String a   = RandomStringUtils.randomAlphabetic( 4 );
+        String c   = RandomStringUtils.randomAlphabetic( 9 );
+        String md5 = DigestUtils.md5Hex( WEBSSITE + CHECK_TRANSFER_KEY8 + convertTime() );
 
-        return false;
+        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "transid", reqJoinGame.getOrderId() );
+        requestMap.set( "key", a + md5 + c );
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( reqJoinGame.getApiUrl() + "/CheckTransfer" )
+                .queryParams( requestMap )
+                .build( true );
+        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+        if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
+                .getOrDefault( "result", "false" )
+                .toString() ) ) {
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+            String              status  = dataMap.getOrDefault( "Status", 99 ).toString();
+            return "1".equals( status ) || "-2".equals( status );
+        }
+        throw new RuntimeException( "查询结果为空,需要重试" );
     }
 }
