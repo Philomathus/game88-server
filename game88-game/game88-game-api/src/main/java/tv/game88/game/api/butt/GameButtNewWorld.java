@@ -13,7 +13,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.game.api.base.AbstractGameButt;
 import tv.game88.game.api.constants.ConstantsGame;
@@ -43,7 +42,6 @@ public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        reqJoinGame.setIp( ServletUtil.getIp() );
         String params = String.format( "s=%s&account=%s&money=0&orderid=%s&ip=%s&lineCode=%s&KindID=%s", 0,
                 reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(), reqJoinGame.getIp(), reqJoinGame.getLinecode(),
                 reqJoinGame.getKindId() );
@@ -92,7 +90,6 @@ public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public void transferMoney( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        reqJoinGame.setIp( ServletUtil.getIp() );
         String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 2, reqJoinGame.getGameMemberId(),
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
@@ -146,7 +143,6 @@ public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        reqJoinGame.setIp( ServletUtil.getIp() );
         String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 3, reqJoinGame.getGameMemberId(),
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
@@ -200,7 +196,6 @@ public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        reqJoinGame.setIp( ServletUtil.getIp() );
         String params = String.format( "s=%s&account=%s", 1, reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
@@ -248,7 +243,6 @@ public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        reqJoinGame.setIp( ServletUtil.getIp() );
         String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
         String param  = null;
         try {

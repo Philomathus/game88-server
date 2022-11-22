@@ -1,9 +1,11 @@
 package tv.game88.game.app.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +15,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.ReqGame;
 import tv.game88.game.api.dto.RspGameInfo;
+import tv.game88.game.api.dto.RspGameMoney;
 import tv.game88.game.api.dto.RspGameTypes;
 import tv.game88.game.api.service.GameService;
 
@@ -40,6 +43,13 @@ public class GameController extends BaseController {
         return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
     }
 
+    // 获取游戏token,内部接口
+    @GetMapping( "/getGameToken" )
+    @Hidden
+    public RspBase<String> getGameToken( String agent, String gameCategory ) {
+        return gameService.getGameTokenByAgent( agent, gameCategory );
+    }
+
     @Operation( summary = "进入游戏" )
     @PostMapping( "/joinGame" )
     public RspBase<?> joinGame( @Validated @RequestBody ReqGame req ) {
@@ -49,6 +59,18 @@ public class GameController extends BaseController {
     @Operation( summary = "会员游戏下分" )
     @PostMapping( "/escGame" )
     public RspBase<?> escGame( @Validated @RequestBody ReqGame req ) {
-        return gameService.escGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
+        return gameService.escGame( req.getId(), MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "自主查询游戏余额" )
+    @PostMapping( "/getGameBalance" )
+    public RspBase<List<RspGameMoney>> getGameBalance() {
+        return gameService.getGameBalance( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "自主游戏下分" )
+    @PostMapping( "/gameWithdrawal" )
+    public RspBase<?> gameWithdrawal( @Validated @RequestBody ReqGame req ) {
+        return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
     }
 }

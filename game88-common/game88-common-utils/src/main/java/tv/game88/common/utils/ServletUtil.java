@@ -21,7 +21,7 @@ public class ServletUtil {
      * 获取当前请求request
      */
     public static HttpServletRequest getHttpServletRequest() {
-        return (( ServletRequestAttributes ) RequestContextHolder.getRequestAttributes()).getRequest();
+        return ( ( ServletRequestAttributes ) RequestContextHolder.getRequestAttributes() ).getRequest();
     }
 
     /**
@@ -35,7 +35,7 @@ public class ServletUtil {
      * 获取当前请求response * @return
      */
     public static HttpServletResponse getHttpServletResponse() {
-        return (( ServletRequestAttributes ) RequestContextHolder.getRequestAttributes()).getResponse();
+        return ( ( ServletRequestAttributes ) RequestContextHolder.getRequestAttributes() ).getResponse();
     }
 
     /**
@@ -88,15 +88,15 @@ public class ServletUtil {
      */
     public static boolean isAjaxRequest( HttpServletRequest request ) {
         String accept = request.getHeader( "accept" );
-        if (accept != null && accept.contains( "application/json" ) ) {
+        if ( accept != null && accept.contains( "application/json" ) ) {
             return true;
         }
         String xRequestedWith = request.getHeader( "X-Requested-With" );
-        if (xRequestedWith != null && xRequestedWith.contains( "XMLHttpRequest" ) ) {
+        if ( xRequestedWith != null && xRequestedWith.contains( "XMLHttpRequest" ) ) {
             return true;
         }
         String uri = request.getRequestURI();
-        if (StringUtils.inStringIgnoreCase( uri, ".json", ".xml" )) {
+        if ( StringUtils.inStringIgnoreCase( uri, ".json", ".xml" ) ) {
             return true;
         }
         String ajax = request.getParameter( "__ajax" );
@@ -115,7 +115,7 @@ public class ServletUtil {
      * @return String 客户端请求ip
      */
     public static String getIp( HttpServletRequest request ) {
-        String             ip      = request.getHeader( "cf-pseudo-ipv4" );
+        String ip = request.getHeader( "cf-pseudo-ipv4" );
         if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "client-ip" );
         }
@@ -137,10 +137,10 @@ public class ServletUtil {
         if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "wl-proxy-client-ip" );
         }
-        if (ip != null && ip.contains( "," )) {
-            ip = ip.split( "," )[0];
+        if ( ip != null && ip.contains( "," ) ) {
+            ip = ip.split( "," )[ 0 ];
         }
-        if (org.apache.commons.lang3.StringUtils.isBlank( ip )) {
+        if ( org.apache.commons.lang3.StringUtils.isBlank( ip ) ) {
             ip = request.getRemoteAddr();
             log.warn( JsonUtil.object2Json( getRequestInfo( request ) ) );
         }
@@ -167,11 +167,11 @@ public class ServletUtil {
     }
 
     private static boolean internalIp( byte[] addr ) {
-        if (StringUtils.isNull( addr ) || addr.length < 2) {
+        if ( StringUtils.isNull( addr ) || addr.length < 2 ) {
             return true;
         }
-        final byte b0 = addr[0];
-        final byte b1 = addr[1];
+        final byte b0 = addr[ 0 ];
+        final byte b1 = addr[ 1 ];
         // 10.x.x.x/8
         final byte SECTION_1 = 0x0A;
         // 172.16.x.x/12
@@ -185,11 +185,11 @@ public class ServletUtil {
         case SECTION_1:
             return true;
         case SECTION_2:
-            if (b1 >= SECTION_3 && b1 <= SECTION_4) {
+            if ( b1 >= SECTION_3 && b1 <= SECTION_4 ) {
                 return true;
             }
         case SECTION_5:
-            if (b1 == SECTION_6) {
+            if ( b1 == SECTION_6 ) {
                 return true;
             }
         default:
@@ -205,61 +205,61 @@ public class ServletUtil {
      * @return byte 字节
      */
     public static byte[] textToNumericFormatV4( String text ) {
-        if (text.length() == 0) {
+        if ( text.length() == 0 ) {
             return null;
         }
-        byte[]   bytes    = new byte[4];
+        byte[]   bytes    = new byte[ 4 ];
         String[] elements = text.split( "\\.", -1 );
         try {
             long l;
             int  i;
             switch ( elements.length ) {
             case 1:
-                l = Long.parseLong( elements[0] );
-                if ((l < 0L) || (l > 4294967295L)) {
+                l = Long.parseLong( elements[ 0 ] );
+                if ( ( l < 0L ) || ( l > 4294967295L ) ) {
                     return null;
                 }
-                bytes[0] = ( byte ) ( int ) (l >> 24 & 0xFF);
-                bytes[1] = ( byte ) ( int ) ((l & 0xFFFFFF) >> 16 & 0xFF);
-                bytes[2] = ( byte ) ( int ) ((l & 0xFFFF) >> 8 & 0xFF);
-                bytes[3] = ( byte ) ( int ) (l & 0xFF);
+                bytes[ 0 ] = ( byte ) ( int ) ( l >> 24 & 0xFF );
+                bytes[ 1 ] = ( byte ) ( int ) ( ( l & 0xFFFFFF ) >> 16 & 0xFF );
+                bytes[ 2 ] = ( byte ) ( int ) ( ( l & 0xFFFF ) >> 8 & 0xFF );
+                bytes[ 3 ] = ( byte ) ( int ) ( l & 0xFF );
                 break;
             case 2:
-                l = Integer.parseInt( elements[0] );
-                if ((l < 0L) || (l > 255L)) {
+                l = Integer.parseInt( elements[ 0 ] );
+                if ( ( l < 0L ) || ( l > 255L ) ) {
                     return null;
                 }
-                bytes[0] = ( byte ) ( int ) (l & 0xFF);
-                l = Integer.parseInt( elements[1] );
-                if ((l < 0L) || (l > 16777215L)) {
+                bytes[ 0 ] = ( byte ) ( int ) ( l & 0xFF );
+                l = Integer.parseInt( elements[ 1 ] );
+                if ( ( l < 0L ) || ( l > 16777215L ) ) {
                     return null;
                 }
-                bytes[1] = ( byte ) ( int ) (l >> 16 & 0xFF);
-                bytes[2] = ( byte ) ( int ) ((l & 0xFFFF) >> 8 & 0xFF);
-                bytes[3] = ( byte ) ( int ) (l & 0xFF);
+                bytes[ 1 ] = ( byte ) ( int ) ( l >> 16 & 0xFF );
+                bytes[ 2 ] = ( byte ) ( int ) ( ( l & 0xFFFF ) >> 8 & 0xFF );
+                bytes[ 3 ] = ( byte ) ( int ) ( l & 0xFF );
                 break;
             case 3:
                 for ( i = 0; i < 2; ++i ) {
-                    l = Integer.parseInt( elements[i] );
-                    if ((l < 0L) || (l > 255L)) {
+                    l = Integer.parseInt( elements[ i ] );
+                    if ( ( l < 0L ) || ( l > 255L ) ) {
                         return null;
                     }
-                    bytes[i] = ( byte ) ( int ) (l & 0xFF);
+                    bytes[ i ] = ( byte ) ( int ) ( l & 0xFF );
                 }
-                l = Integer.parseInt( elements[2] );
-                if ((l < 0L) || (l > 65535L)) {
+                l = Integer.parseInt( elements[ 2 ] );
+                if ( ( l < 0L ) || ( l > 65535L ) ) {
                     return null;
                 }
-                bytes[2] = ( byte ) ( int ) (l >> 8 & 0xFF);
-                bytes[3] = ( byte ) ( int ) (l & 0xFF);
+                bytes[ 2 ] = ( byte ) ( int ) ( l >> 8 & 0xFF );
+                bytes[ 3 ] = ( byte ) ( int ) ( l & 0xFF );
                 break;
             case 4:
                 for ( i = 0; i < 4; ++i ) {
-                    l = Integer.parseInt( elements[i] );
-                    if ((l < 0L) || (l > 255L)) {
+                    l = Integer.parseInt( elements[ i ] );
+                    if ( ( l < 0L ) || ( l > 255L ) ) {
                         return null;
                     }
-                    bytes[i] = ( byte ) ( int ) (l & 0xFF);
+                    bytes[ i ] = ( byte ) ( int ) ( l & 0xFF );
                 }
                 break;
             default:
@@ -280,7 +280,7 @@ public class ServletUtil {
      */
     public static String getMultistageReverseProxyIp( String ip ) {
         // 多级反向代理检测
-        if (ip != null && ip.indexOf( "," ) > 0) {
+        if ( ip != null && ip.indexOf( "," ) > 0 ) {
             final String[] ips = ip.trim().split( "," );
             for ( String subIp : ips ) {
                 if ( !isUnknown( subIp ) ) {

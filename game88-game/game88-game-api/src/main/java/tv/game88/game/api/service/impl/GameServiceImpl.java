@@ -1,6 +1,8 @@
 package tv.game88.game.api.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
@@ -15,13 +18,13 @@ import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.base.BaseGameButt;
 import tv.game88.game.api.base.GameButtFactoryUtil;
 import tv.game88.game.api.cache.GameCacheUtils;
-import tv.game88.game.api.dto.ReqJoinGame;
-import tv.game88.game.api.dto.RspGameInfo;
-import tv.game88.game.api.dto.RspGameType;
-import tv.game88.game.api.dto.RspGameTypes;
+import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.entity.MemberGameMoney;
 import tv.game88.game.api.exception.GameTransferException;
+import tv.game88.game.api.mapper.GamePlatformMapper;
+import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
 import tv.game88.game.api.type.EnumGameCategory;
@@ -30,7 +33,15 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -47,12 +58,19 @@ public class GameServiceImpl implements GameService {
     @Resource
     private MemberInfoMapper       memberInfoMapper;
     @Resource
+    private GamePlatformMapper     gamePlatformMapper;
+    @Resource
+    private MemberGameMoneyMapper  memberGameMoneyMapper;
+    @Resource
     private MemberGameMoneyService memberGameMoneyService;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
     @Value( "${gameOrderPrefix:0}" )
     private int    gameOrderPrefix;
+
+    @Resource
+    private ForkJoinPool forkJoinPool;
 
     @Override
     public RspGameTypes getGameTypes() {
@@ -138,49 +156,29 @@ public class GameServiceImpl implements GameService {
 
     }
 
-    private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
-                                           BigDecimal changeMoney ) {
-        // BBIN会员ID只能是英文加数字
-        String gameMemberId =
-                gamePlatform.getGameCategory() == EnumGameCategory.BBIN ? profile + "bbin" + memberId : profile + "_" + memberId;
-        return ReqJoinGame
-                .builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .recordUrl( gamePlatform.getRecordUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo.getKindId() )
-                .gameMemberId( gameMemberId )
-                .memberId( memberId )
-                .transferMoney( changeMoney )
-                .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .build();
-    }
-
     @Override
-    public RspBase<?> escGame( Long infoId, PlatformUser platformUser ) {
+    public RspBase<?> escGame( Long infoId, String memberId ) {
         GameInfo gameInfo = gameCacheUtils.getGameInfo( infoId );
         if ( gameInfo == null ) {
             return RspBase.businessError( "该游戏不存在" );
         }
-        if ( gameInfo.getMaintain() && platformUser.getStatus() != 2 ) {
-            return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
-        }
-        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( gameInfo.getPlatformId() );
+        return this.gameWithdrawal( memberId, gameInfo.getPlatformId() );
+    }
+
+    @NotNull
+    private RspBase<Object> gameWithdrawal( String memberId, Long platformId ) {
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( platformId );
         if ( gamePlatform == null ) {
             return RspBase.businessError( "该游戏不存在" );
         }
-        if ( gamePlatform.getMaintain() && platformUser.getStatus() != 2 ) {
+        if ( gamePlatform.getMaintain() ) {
             return RspBase.businessError( "该游戏正在维护,暂停游戏转账功能" );
         }
 
-        if ( !redisUtils.lock( "escGame" + platformUser.getId(), 10 ) ) {
+        if ( !redisUtils.lock( "escGame" + memberId, 10 ) ) {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), null );
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
@@ -207,9 +205,104 @@ public class GameServiceImpl implements GameService {
                 }
             }
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
-            redisUtils.unLock( "escGame" + platformUser.getId() );
+            redisUtils.unLock( "escGame" + memberId );
             return RspBase.businessError( "下分失败,请重试" );
         }
+    }
+
+    @Override
+    public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
+        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
+                .eq( "member_id", memberId )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .select( "platform_id", "order_id" )
+                .list()
+                .stream()
+                .map( MemberGameMoney::getPlatformId )
+                .collect( Collectors.toSet() );
+        List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
+        Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
+        for ( GamePlatform gamePlatform : gamePlatforms ) {
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null );
+            BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+            forkJoinTasks.add( () -> {
+                BigDecimal balance = null;
+                try {
+                    // 获取token
+                    if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+                        baseGameButt.getToken( reqJoinGame );
+                    }
+                    balance = baseGameButt.queryBalance( reqJoinGame );
+                } catch ( Exception e ) {
+                    log.error( "查询游戏余额异常:" + e.getMessage(), e );
+                    balance = new BigDecimal( -1 );
+                }
+                RspGameMoney rspGameMoney = new RspGameMoney();
+                rspGameMoney.setMoney( balance );
+                rspGameMoney.setPlatformId( gamePlatform.getId() );
+                rspGameMoney.setPlatformName( gamePlatform.getName() );
+                return rspGameMoney;
+            } );
+        }
+        List<Future<RspGameMoney>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
+        List<RspGameMoney> resultList = futureList.stream().map( t -> {
+            try {
+                return t.get();
+            } catch ( InterruptedException | ExecutionException e ) {
+                throw new IllegalStateException( e );
+            }
+        } ).filter( Objects::nonNull ).collect( Collectors.toList() );
+        return RspBase.ok( resultList );
+    }
+
+    @Override
+    public RspBase<?> gameWithdrawal( Long platformId, String memberId ) {
+        GamePlatform gamePlatform = gamePlatformMapper.selectById( platformId );
+        if ( gamePlatform == null ) {
+            return RspBase.businessError( "游戏平台不存在" );
+        }
+        return this.gameWithdrawal( memberId, platformId );
+    }
+
+    @Override
+    public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) {
+        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
+                .eq( "agent", agent )
+                .eq( "game_category", gameCategory )
+                .one();
+        if ( gamePlatform == null ) {
+            return RspBase.businessError( "游戏平台不存在" );
+        }
+        if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null );
+            BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+            baseGameButt.getToken( reqJoinGame );
+            return RspBase.ok( "", reqJoinGame.getToken() );
+        }
+        return RspBase.ok( "", redisUtils.strGet( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) );
+    }
+
+    private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
+                                           BigDecimal changeMoney ) {
+        // BBIN会员ID只能是英文加数字
+        String gameMemberId =
+                gamePlatform.getGameCategory() == EnumGameCategory.BBIN ? profile + "BBIN" + memberId : profile + "_" + memberId;
+        return ReqJoinGame
+                .builder()
+                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
+                .agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() )
+                .recordUrl( gamePlatform.getRecordUrl() )
+                .linecode( gamePlatform.getLinecode() )
+                .kindId( gameInfo == null ? null : gameInfo.getKindId() )
+                .gameMemberId( gameMemberId )
+                .memberId( memberId )
+                .transferMoney( changeMoney )
+                .platformId( gamePlatform.getId() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                .ip( ServletUtil.getIp() )
+                .build();
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
