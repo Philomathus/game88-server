@@ -91,6 +91,13 @@ public class GameButtBBIN extends AbstractGameButt {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
+        String gameUrlId   = null;
+        String gameUrlKind = null;
+        if ( reqJoinGame.getKindId().contains( "-" ) ) {
+            gameUrlId   = reqJoinGame.getKindId().split( "-" )[ 0 ];
+            gameUrlKind = reqJoinGame.getKindId().split( "-" )[ 1 ];
+        }
+
         String a   = RandomStringUtils.randomAlphabetic( 4 );
         String c   = RandomStringUtils.randomAlphabetic( 1 );
         String md5 = DigestUtils.md5Hex( WEBSSITE + JOIN_GAME_KEY8 + convertTime() );
@@ -99,10 +106,18 @@ public class GameButtBBIN extends AbstractGameButt {
         requestMap.set( "website", WEBSSITE );
         requestMap.set( "lang", "zh-cn" );
         requestMap.set( "sessionid", reqJoinGame.getToken() );
-        requestMap.set( "active_site", reqJoinGame.getKindId() );
+        if ( StringUtils.isNotBlank( gameUrlId ) ) {
+            requestMap.set( "exit_option", "3" );
+            if ( StringUtils.isNotBlank( gameUrlKind ) && !gameUrlKind.equals( "0" ) ) {
+                requestMap.set( "gametype", gameUrlKind );
+            }
+        } else {
+            requestMap.set( "active_site", reqJoinGame.getKindId() );
+        }
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + "/LobbyUrl" )
+                .fromUriString( reqJoinGame.getApiUrl() + ( StringUtils.isNotBlank( gameUrlId ) ?
+                        "/GameUrlBy" + gameUrlId : "/LobbyUrl" ) )
                 .queryParams( requestMap )
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
@@ -176,8 +191,8 @@ public class GameButtBBIN extends AbstractGameButt {
 
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String a   = RandomStringUtils.randomAlphabetic( 9 );
-        String c   = RandomStringUtils.randomAlphabetic( 1 );
+        String a = RandomStringUtils.randomAlphabetic( 9 );
+        String c = RandomStringUtils.randomAlphabetic( 1 );
         String md5 = DigestUtils.md5Hex(
                 WEBSSITE + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
 

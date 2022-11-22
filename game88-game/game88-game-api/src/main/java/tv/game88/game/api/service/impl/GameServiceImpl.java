@@ -184,7 +184,9 @@ public class GameServiceImpl implements GameService {
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
-            baseGameButt.getToken( reqJoinGame );
+            if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+                baseGameButt.getToken( reqJoinGame );
+            }
             BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
             // 金额高于0元才下分
             if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
