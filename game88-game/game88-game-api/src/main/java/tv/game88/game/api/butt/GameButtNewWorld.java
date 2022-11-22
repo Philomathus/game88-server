@@ -28,16 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.KAI_YUAN + "GameProcessor" )
-public class GameButtKaiYuan extends AbstractGameButt {
+@Repository( value = ConstantsGame.NEWWORLD + "GameProcessor" )
+public class GameButtNewWorld extends AbstractGameButt {
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
-        // 开元没有token,忽略
+
     }
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        // 开元无需创建账号,进入游戏附带创建账号,忽略
+
     }
 
     @Override
@@ -57,9 +57,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
+        requestMap.set( "channel", reqJoinGame.getAgent() );
+        requestMap.set( "mTime", time );
+        requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder
@@ -77,14 +77,14 @@ public class GameButtKaiYuan extends AbstractGameButt {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 String url = d.getOrDefault( "url", "" ).toString();
                 reqJoinGame.setGameUrl( url );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "KaiYuan获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( "NewWorld获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -105,9 +105,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
+        requestMap.set( "channel", reqJoinGame.getAgent() );
+        requestMap.set( "mTime", time );
+        requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder
@@ -130,9 +130,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "KaiYuan上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( "NewWorld上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
                 if ( code == 0 ) {
@@ -140,7 +140,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 }
             }
         }
-        throw new GameTransferException( "KaiYuan上分异常 - 上分失败或数据为空" );
+        throw new GameTransferException( "NewWorld上分异常 - 上分失败或数据为空" );
     }
 
     @Override
@@ -159,9 +159,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
+        requestMap.set( "channel", reqJoinGame.getAgent() );
+        requestMap.set( "mTime", time );
+        requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder
@@ -184,9 +184,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "KaiYuan下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( "NewWorld下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
                 if ( code == 0 ) {
@@ -194,7 +194,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 }
             }
         }
-        throw new GameTransferException( "KaiYuan下分异常 - 下分失败或数据为空" );
+        throw new GameTransferException( "NewWorld下分异常 - 下分失败或数据为空" );
     }
 
     @Override
@@ -212,9 +212,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
+        requestMap.set( "channel", reqJoinGame.getAgent() );
+        requestMap.set( "mTime", time );
+        requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder
@@ -232,16 +232,16 @@ public class GameButtKaiYuan extends AbstractGameButt {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 int        code  = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                BigDecimal money = new BigDecimal( d.getOrDefault( "money", "0" ).toString() );
+                BigDecimal money = new BigDecimal( d.getOrDefault( "score", "0" ).toString() );
                 if ( code == 0 ) {
                     return money;
                 }
             }
         }
-        log.error( "KaiYuan查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( "NewWorld查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 
@@ -260,9 +260,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
+        requestMap.set( "channel", reqJoinGame.getAgent() );
+        requestMap.set( "mTime", time );
+        requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder
@@ -280,10 +280,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
                 int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
+                int status = Integer.parseInt( d.getOrDefault( "state", "-1" ).toString() );
                 return code == 0 && status == 0;
             }
         }

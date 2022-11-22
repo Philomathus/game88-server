@@ -63,7 +63,8 @@
                i.recommend,
                i.large_icon,
                p.game_category,
-               p.maintain platform_maintain
+               p.maintain platform_maintain,
+               i.kind_id
         from game_info i
                  left join game_platform p on p.id = i.platform_id
         where i.effect = 1

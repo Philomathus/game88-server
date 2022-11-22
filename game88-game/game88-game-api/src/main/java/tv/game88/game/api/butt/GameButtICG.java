@@ -142,7 +142,7 @@ public class GameButtICG extends AbstractGameButt {
             throw new GameTransferException( e.getMessage() );
         }
         log.info( "ICG上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( resultMap == null || !resultMap.containsKey( "data" ) ) {
+        if ( CollectionUtils.isEmpty( resultMap ) || !resultMap.containsKey( "data" ) ) {
             throw new GameTransferException( "ICG上分异常 - 上分失败或数据为空" );
         }
     }
@@ -166,7 +166,7 @@ public class GameButtICG extends AbstractGameButt {
             throw new GameTransferException( e.getMessage() );
         }
         log.info( "ICG下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( resultMap == null || !resultMap.containsKey( "data" ) ) {
+        if ( CollectionUtils.isEmpty( resultMap ) || !resultMap.containsKey( "data" ) ) {
             throw new GameTransferException( "ICG下分异常 - 下分失败或数据为空" );
         }
     }

@@ -12,9 +12,10 @@ public class GameButtFactoryUtil {
     private ApplicationContext context;
 
     public BaseGameButt createGameButtProcessor( EnumGameCategory enumGameCategory ) {
-        if ( enumGameCategory == EnumGameCategory.UPG ) {
-            return ( BaseGameButt ) context.getBean( EnumGameCategory.MG.getType() + "GameProcessor" );
-        }
-        return ( BaseGameButt ) context.getBean( enumGameCategory.getType() + "GameProcessor" );
+        return switch ( enumGameCategory ) {
+            case UPG, MG -> ( BaseGameButt ) context.getBean( EnumGameCategory.MG.getType() + "GameProcessor" );
+            case KAIXUAN, KAIYUAN -> ( BaseGameButt ) context.getBean( EnumGameCategory.KAIYUAN.getType() + "GameProcessor" );
+            default -> ( BaseGameButt ) context.getBean( enumGameCategory.getType() + "GameProcessor" );
+        };
     }
 }
