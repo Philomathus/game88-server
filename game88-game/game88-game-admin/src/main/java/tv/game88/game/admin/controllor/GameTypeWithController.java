@@ -13,6 +13,8 @@ import tv.game88.game.api.entity.GameTypeWith;
 import tv.game88.game.api.service.GameTypeWithService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,10 +47,9 @@ public class GameTypeWithController extends BaseController {
     }
 
     @PreAuthorize( "@ss.hasPermi('game:typeWith:edit')" )
-    @Log( title = "游戏信息ID类型关联", businessType = BusinessType.UPDATE )
+    @Log( title = "修改类型关联排序", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> insertTypeWith( @RequestBody GameTypeWith gameTypeWith ) {
-
+    public RspBase<?> updateTypeWith( @RequestBody GameTypeWith gameTypeWith ) {
         return gameTypeWithService.updateTypeWith( gameTypeWith );
     }
 
@@ -58,8 +59,11 @@ public class GameTypeWithController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:typeWith:insert')" )
     @Log( title = "游戏信息ID类型关联", businessType = BusinessType.INSERT )
     @PostMapping( "/{typeId}" )
-    public RspBase<?> insertTypeWith( @PathVariable Long typeId, @RequestBody List<Long> gameInfoIds ) {
-        return gameTypeWithService.insertTypeWith( typeId, gameInfoIds );
+    public RspBase<?> insertTypeWith( @PathVariable Long typeId, String gameInfoIds ) {
+        return gameTypeWithService.insertTypeWith( typeId, Arrays
+                .stream( gameInfoIds.split( "," ) )
+                .map( Long::parseLong )
+                .toList() );
     }
 
     /**
