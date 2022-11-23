@@ -73,7 +73,7 @@ public class GameTypeWithServiceImpl extends ServiceImpl<GameTypeWithMapper, Gam
             GameTypeWith gameTypeWith = new GameTypeWith();
             gameTypeWith.setTypeId( typeId );
             gameTypeWith.setGameInfoId( gameInfoId );
-            gameTypeWith.setSort( null );
+            gameTypeWith.setSort( 99L );
             gameTypeWiths.add( gameTypeWith );
             if ( gameTypeWiths.size() >= 100 ) {
                 this.baseMapper.insertBatch( gameTypeWiths );
