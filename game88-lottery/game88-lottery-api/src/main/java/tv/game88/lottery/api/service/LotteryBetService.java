@@ -27,4 +27,6 @@ public interface LotteryBetService extends IService<LotteryBet> {
 
     RspBase<RspBet> userBet( PlatformUser platformUser, ReqBet reqBet, String[] bet_select, String lotteryName, String issue,
                              BigDecimal cost );
+
+    String procherckQuzhiImport( Integer lotteryId );
 }

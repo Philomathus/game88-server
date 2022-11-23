@@ -59,6 +59,18 @@
         from lottery_history
         WHERE status = #{status}
           and lottery_id = #{lotteryId}
-        order by issue desc limit 200
+        order by issue desc
+        limit 200
+    </select>
+
+    <select id="selectResultWaite" resultType="tv.game88.lottery.api.dto.HistoryResult">
+        SELECT id, code, analyse
+        FROM ${lotteryAgent}.lottery_history
+        WHERE id IN (select id
+                     from lottery_history
+                     where status = 0
+                       and ktime &lt;= date_add(NOW(), interval 60 second)
+                       and lottery_id = #{lotteryId})
+          and status > 0
     </select>
 </mapper>

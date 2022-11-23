@@ -1,7 +1,10 @@
 package tv.game88.lottery.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.mapping.StatementType;
 import tv.game88.lottery.api.dto.RspBetRecord;
 import tv.game88.lottery.api.entity.LotteryBet;
 
@@ -37,4 +40,8 @@ public interface LotteryBetMapper extends BaseMapper<LotteryBet> {
     void updateStatusPrize( @Param( "id" ) String id, @Param( "dbNodes" ) String dbNodes, @Param( "prize" ) BigDecimal prize,
                             @Param( "code" ) String code, @Param( "updateTime" ) LocalDateTime updateTime,
                             @Param( "status" ) Integer status );
+
+    @Select( { "{call procherck_quzhi_import(#{lottery_id,mode=IN},#{kj_result,mode=OUT,jdbcType=VARCHAR})}" } )
+    @Options( statementType = StatementType.CALLABLE )
+    String procherckQuzhiImport( @Param( "lottery_id" ) Integer lotteryId, @Param( "kj_result" ) String kj_result );
 }

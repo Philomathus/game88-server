@@ -8,4 +8,5 @@ import java.math.BigDecimal;
 public class BetCount {
     private String     betinfo;
     private BigDecimal totalbet;
+    private String     agent;
 }

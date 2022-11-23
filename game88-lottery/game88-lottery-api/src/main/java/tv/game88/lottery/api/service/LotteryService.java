@@ -7,6 +7,8 @@ import tv.game88.lottery.api.dto.*;
 import java.util.List;
 
 public interface LotteryService {
+    public boolean isLotteryCenter();
+
     RspLotteryInit getRspLotteryInit( Integer lotteryId );
 
     public IssueVo getIssueVo( Integer lotteryId );
@@ -22,4 +24,6 @@ public interface LotteryService {
     void awardLottery( Integer lotteryId );
 
     List<RuleVo> getLotteryRule( Integer lotteryId );
+
+    void catchResult( Integer lotteryId );
 }

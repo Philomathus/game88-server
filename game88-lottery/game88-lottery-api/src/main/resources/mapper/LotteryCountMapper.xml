@@ -34,10 +34,28 @@
     </select>
 
     <select id="countBet" resultType="tv.game88.lottery.api.dto.BetCount">
-        SELECT bet_info betinfo, sum(chip) totalbet
+        SELECT bet_info betinfo, sum(chip) totalbet, agent
         FROM lottery_count
         where issue = #{issue}
           and lottery_id = #{lotteryId}
         GROUP BY bet_info
     </select>
+
+    <insert id="insertBatch">
+        insert into lottery_count
+            (agent, lottery_id, member_id, issue, bet_info, chip, ip) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.agent}, #{item.lotteryId}, #{item.memberId},
+             #{item.issue}, #{item.betInfo}, #{item.chip}, #{item.ip})
+        </foreach>
+    </insert>
+
+    <insert id="insertBatchCenter">
+        insert into ${lotteryAgent}.lottery_count
+        (agent, lottery_id, member_id, issue, bet_info, chip, ip) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.agent}, #{item.lotteryId}, #{item.memberId},
+            #{item.issue}, #{item.betInfo}, #{item.chip}, #{item.ip})
+        </foreach>
+    </insert>
 </mapper>

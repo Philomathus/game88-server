@@ -8,10 +8,12 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
+import tv.game88.lottery.api.dto.HistoryResult;
 import tv.game88.lottery.api.dto.RspLotteryInfo;
 import tv.game88.lottery.api.entity.LotteryBet;
 import tv.game88.lottery.api.entity.LotteryHistory;
@@ -26,6 +28,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +61,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
             history.setStatus( 0 );
             history.setKtime( ktimes );
             history.setName( lotteryInfo.getName() );
-            history.setTotalBet( 0 );
+            history.setTotalBet( 0L );
             history.setTotalPrize( BigDecimal.ZERO );
             this.baseMapper.insert( history );
         }
@@ -130,5 +133,25 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
                     lotteryName + "派奖", historyId.concat( "-" ).concat( memberId ), historyId );
         }
         log.info( "awardPrize更新投注状态条数：{},执行时间:{}ms", updateList.size(), System.currentTimeMillis() - now );
+    }
+
+    @Override
+    public List<HistoryResult> selectResultWaite( String lotteryAgent, Integer lotteryId ) {
+        List<HistoryResult> list = baseMapper.selectResultWaite( lotteryAgent, lotteryId );
+        if ( list.size() == 0 ) {
+            return list;
+        }
+        List<LotteryHistory> upList = new ArrayList<>();
+        for ( HistoryResult r : list ) {
+            LotteryHistory h = new LotteryHistory();
+            h.setId( r.getId() );
+            h.setCode( r.getCode() );
+            h.setStatus( 1 );
+            h.setAnalyse( r.getAnalyse() );
+            upList.add( h );
+        }
+        this.updateBatchById( upList );
+        log.error( "lotteryId:{} - 抓奖 - {}", lotteryId, JsonUtil.object2Json( list ) );
+        return list;
     }
 }

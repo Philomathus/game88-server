@@ -79,4 +79,10 @@ public class LotteryBetServiceImpl extends ServiceImpl<LotteryBetMapper, Lottery
         this.baseMapper.insertLotteryBet( db, idLatest );
         return rspBase;
     }
+
+    @Override
+    public String procherckQuzhiImport( Integer lotteryId ) {
+        String out = "";
+        return this.baseMapper.procherckQuzhiImport( lotteryId, out );
+    }
 }

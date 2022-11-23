@@ -17,4 +17,8 @@ public interface LotteryCountMapper extends BaseMapper<LotteryCount> {
     ) String memberId );
 
     List<BetCount> countBet( @Param( "issue" ) String issue, @Param( "lotteryId" ) Integer lotteryId );
+
+    void insertBatch( List<LotteryCount> list );
+
+    void insertBatchCenter( @Param( "lotteryAgent" ) String lotteryAgent, @Param( "list" ) List<LotteryCount> list );
 }

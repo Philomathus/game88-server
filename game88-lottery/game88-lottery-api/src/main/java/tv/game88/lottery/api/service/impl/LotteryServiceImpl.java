@@ -3,8 +3,6 @@ package tv.game88.lottery.api.service.impl;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +19,9 @@ import tv.game88.lottery.api.base.ExLotteryFactoryUtil;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.*;
 import tv.game88.lottery.api.entity.*;
-import tv.game88.lottery.api.extents.*;
+import tv.game88.lottery.api.extents.Ex6HeCai;
+import tv.game88.lottery.api.extents.ExBaccarat;
+import tv.game88.lottery.api.extents.ExKuai3;
 import tv.game88.lottery.api.mapper.*;
 import tv.game88.lottery.api.service.LotteryBetService;
 import tv.game88.lottery.api.service.LotteryHistoryService;
@@ -78,6 +78,15 @@ public class LotteryServiceImpl implements LotteryService {
 
     @Value( "${spring.profiles.active}" )
     private String profile;
+    @Value( "${lotteryCenter:7701}" )
+    private String lotteryAgent;
+
+    /**
+     * 是否是开奖中心
+     **/
+    public boolean isLotteryCenter() {
+        return lotteryAgent.equals( profile );
+    }
 
     @Override
     public RspLotteryInit getRspLotteryInit( Integer lotteryId ) {
@@ -296,38 +305,76 @@ public class LotteryServiceImpl implements LotteryService {
         update.setId( historyId );
         update.setStatus( 1 );
 
-        Map<String, BigDecimal> betMap = lotteryCountMapper
-                .countBet( issueJust, lotteryId )
+        List<BetCount> betCountList = lotteryCountMapper.countBet( issueJust, lotteryId );
+        Map<String, BigDecimal> betMap = betCountList
                 .stream()
                 .collect( Collectors.toMap( BetCount::getBetinfo, BetCount::getTotalbet ) );
         //派奖分布图
-        Map<String, BigDecimal> peiMap   = new HashMap<>();
-        BigDecimal              temBet;
-        int                     totalBet = 0;
-        for ( String bt : rateMap.keySet() ) {
-            temBet = betMap.get( bt );
-            if ( temBet == null ) {
-                peiMap.put( bt, BigDecimal.ZERO );
-            } else {
-                totalBet += temBet.intValue();
-                peiMap.put( bt, temBet.multiply( rateMap.get( bt ) ).setScale( 2, RoundingMode.DOWN ) );
-            }
-        }
-        if ( lotteryId == 2001 ) {
-            peiMap.put( "庄和", betMap.get( "庄" ) == null ? BigDecimal.ZERO : betMap.get( "庄" ) );
-            peiMap.put( "闲和", betMap.get( "闲" ) == null ? BigDecimal.ZERO : betMap.get( "闲" ) );
-        }
-        BigDecimal totalBetBig = new BigDecimal( totalBet );
+        Map<String, BigDecimal> peiMap      = new HashMap<>();
+        long                    totalBet    = this.toPeiMap( rateMap, betMap, peiMap, lotteryId );
+        BigDecimal              totalBetBig = new BigDecimal( totalBet );
 
         update.setTotalBet( totalBet );
 
-        if ( !isNoKill( lotteryId ) && info.getMinCost().compareTo( totalBetBig ) < 0 ) {
-            // 杀率开奖
-            Map<String, Object> killResultMap = this.killResult( kindId, peiMap, totalBetBig );
+        String toKillProfile = lotteryBetService.procherckQuzhiImport( lotteryId );
 
-            List<String> resultList = ( List<String> ) killResultMap.get( "resultsList" );
-            BigDecimal   totalPrize = ( BigDecimal ) killResultMap.get( "totalPrize" );
-            BigDecimal   killRate   = ( BigDecimal ) killResultMap.get( "killRate" );
+        if ( StringUtils.isNotBlank( toKillProfile ) && totalBet > 0 ) {
+            Map<String, BigDecimal> betMapProfile = betCountList
+                    .stream()
+                    .filter( betCount -> toKillProfile.equals( betCount.getAgent() ) )
+                    .collect( Collectors.toMap( BetCount::getBetinfo, BetCount::getTotalbet ) );
+            //派奖分布图
+            Map<String, BigDecimal> peiMapProfile      = new HashMap<>();
+            long                    totalBetProfile    = this.toPeiMap( rateMap, betMapProfile, peiMapProfile, lotteryId );
+            BigDecimal              totalBetBigProfile = new BigDecimal( totalBetProfile );
+
+            List<String> resultList = null;
+            if ( kindId >= 11 ) {
+                // 杀率计算
+                ExLottery           exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
+                Map<String, Object> resultMap = exLottery.killResult( peiMapProfile, totalBetBigProfile );
+
+                resultList = ( List<String> ) resultMap.get( "resultsList" );
+            } else if ( totalBetProfile > 0 ) {
+                String result = countLotteryResultById( lotteryId, totalBetProfile, info.getKillRate(), peiMapProfile );
+                if ( result != null ) {
+                    log.info( "存储过程返回开奖结果:{}", result );
+                    String[] re = result.split( "," );
+
+                    resultList = Arrays.asList( re[ 0 ].split( "-" ) );
+                }
+            }
+            if ( resultList != null ) {
+                BigDecimal prize    = this.coutPrize( lotteryId, resultList, peiMap );
+                BigDecimal killNeed = totalBetBig.subtract( prize ).divide( totalBetBig, 2, RoundingMode.HALF_UP );
+                return getHistoryResult( h, resultList, update, prize, killNeed, 2, lotteryId, historyId );
+            } else {
+                log.warn( "单平台计算杀率开奖异常，投注金额{}, historyId：{}", totalBetBig, historyId );
+            }
+        } else if ( !isNoKill( lotteryId ) && info.getMinCost().compareTo( totalBetBig ) < 0 ) {
+            List<String> resultList = null;
+            BigDecimal   totalPrize = BigDecimal.ZERO;
+            BigDecimal   killRate   = BigDecimal.ZERO;
+            if ( lotteryId == 2001 ) {
+                // 杀率计算
+                ExLottery           exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
+                Map<String, Object> resultMap = exLottery.killResult( peiMap, totalBetBig );
+
+                resultList = ( List<String> ) resultMap.get( "resultsList" );
+
+                totalPrize = ( BigDecimal ) resultMap.get( "totalPrize" );
+                killRate   = ( BigDecimal ) resultMap.get( "killRate" );
+            } else {
+                String result = countLotteryResultById( lotteryId, totalBet, info.getKillRate(), peiMap );
+                if ( result != null ) {
+                    log.info( "存储过程返回开奖结果:{}", result );
+                    String[] re = result.split( "," );
+
+                    resultList = Arrays.asList( re[ 0 ].split( "-" ) );
+                    totalPrize = new BigDecimal( re[ 2 ] );
+                    killRate   = new BigDecimal( re[ 1 ] );
+                }
+            }
             if ( resultList != null ) {
                 return getHistoryResult( h, resultList, update, totalPrize, killRate, 1, lotteryId, historyId );
             } else {
@@ -347,9 +394,36 @@ public class LotteryServiceImpl implements LotteryService {
         return getHistoryResult( h, listTem, update, prize, killNeed, 0, lotteryId, historyId );
     }
 
-    public Map<String, Object> killResult( Integer kindId, Map<String, BigDecimal> prizeMap, BigDecimal totalBet ) {
-        ExLottery exLottery = exLotteryFactoryUtil.createExProcessor( kindId );
-        return exLottery.killResult( prizeMap, totalBet );
+    private String countLotteryResultById( int lotteryId, long totalBet, BigDecimal killRate, Map<String, BigDecimal> betMap ) {
+        ExLottery exLottery       = exLotteryFactoryUtil.createExProcessor( LotteryUtils.getKindId( lotteryId ) );
+        String    concatBetString = exLottery.concatBetString( betMap );
+        try {
+            return lotteryHistoryMapper.countLotteryResult( lotteryId, totalBet, killRate, concatBetString, new HashMap<>() );
+        } catch ( Exception e ) {
+            log.error( "$$$###### {}调用存储过程出错,totalBet:{},killRate：{},betString:{}", lotteryId, totalBet, killRate,
+                    concatBetString );
+            log.error( e.getMessage(), e );
+            return null;
+        }
+    }
+
+    private long toPeiMap( Map<String, BigDecimal> rateMap, Map<String, BigDecimal> betMap, Map<String, BigDecimal> peiMap,
+                           int lotteryId ) {
+        long totalBet = 0;
+        for ( String bt : rateMap.keySet() ) {
+            BigDecimal temBet = betMap.get( bt );
+            if ( temBet == null ) {
+                peiMap.put( bt, BigDecimal.ZERO );
+            } else {
+                totalBet += temBet.intValue();
+                peiMap.put( bt, temBet.multiply( rateMap.get( bt ) ).setScale( 2, RoundingMode.DOWN ) );
+            }
+        }
+        if ( lotteryId == 2001 ) {
+            peiMap.put( "庄和", betMap.get( "庄" ) == null ? BigDecimal.ZERO : betMap.get( "庄" ) );
+            peiMap.put( "闲和", betMap.get( "闲" ) == null ? BigDecimal.ZERO : betMap.get( "闲" ) );
+        }
+        return totalBet;
     }
 
     public List<String> randomResult( Integer kindId ) {
@@ -470,8 +544,7 @@ public class LotteryServiceImpl implements LotteryService {
             if ( ip != null && ip.length() > 99 ) {
                 ip = ip.substring( 0, 80 );
             }
-            SqlSession         session = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
-            LotteryCountMapper mapper  = session.getMapper( LotteryCountMapper.class );
+            List<LotteryCount> list = new ArrayList<>();
             for ( String bet : bet_select ) {
                 LotteryCount lotteryCount = new LotteryCount();
                 lotteryCount.setAgent( profile );
@@ -481,21 +554,24 @@ public class LotteryServiceImpl implements LotteryService {
                 lotteryCount.setBetInfo( bet );
                 lotteryCount.setMemberId( platformUser.getId() );
                 lotteryCount.setIp( ip );
-                mapper.insert( lotteryCount );
+                list.add( lotteryCount );
             }
-            session.commit();
-            session.close();
+            if ( isLotteryCenter() ) {
+                lotteryCountMapper.insertBatch( list );
+            } else {
+                lotteryCountMapper.insertBatchCenter( lotteryAgent, list );
+            }
         }
 
         if ( reqBet.getLotteryId() == 2001 ) {
             int cost = reqBet.getChip() * bet_select.length;
-            this.lotteryBetBroadcast( platformUser, reqBet.getAnchor(), reqBet.getLotteryId(), reqBet.getMethodId(),
-                    reqBet.getBetIds(), lotteryName, cost, reqBet.getChip() );
+            this.lotteryBetBroadcast( platformUser, reqBet.getLotteryId(), reqBet.getMethodId(), reqBet.getBetIds(),
+                    lotteryName, cost, reqBet.getChip() );
         }
     }
 
-    private void lotteryBetBroadcast( PlatformUser platformUser, Integer anchor, Integer lotteryId, Integer methodId,
-                                      String bet_select, String lotteryName, int cost, Integer per_price ) {
+    private void lotteryBetBroadcast( PlatformUser platformUser, Integer lotteryId, Integer methodId, String bet_select,
+                                      String lotteryName, int cost, Integer per_price ) {
         String                  msg  = platformUser.getNickName() + "在" + lotteryName + "中," + "下注了" + cost + "元";
         HashMap<String, Object> data = new HashMap<>();
         data.put( "userId", platformUser.getId() );
@@ -561,6 +637,8 @@ public class LotteryServiceImpl implements LotteryService {
         List<LotteryBet>        updateList = new ArrayList<>();
         Map<String, BigDecimal> prizeMap   = new HashMap<>();
         Map<String, BigDecimal> nowMoney   = new HashMap<>();
+        BigDecimal              totalBet   = BigDecimal.ZERO;
+        BigDecimal              totalPrize = BigDecimal.ZERO;
         for ( LotteryBet bet : betList ) {
             BigDecimal prize = handlePrize( lotteryId, bet.getMethodId(), officialCode, bet.getChip(), bet.getBetSelect() );
             bet.setPrize( prize );
@@ -582,6 +660,9 @@ public class LotteryServiceImpl implements LotteryService {
                 updateBet.setStatus( 2 );
             }
             updateList.add( updateBet );
+
+            totalPrize = totalPrize.add( prize );
+            totalBet   = totalBet.add( bet.getCost() );
         }
         LotteryBase lotteryBase = LotteryCacheUtils.me.getLotteryBase( lotteryId );
         lotteryHistoryService.awardByLotteryResult( updateList, prizeMap, result.getId(), nowMoney, lotteryBase.getName() );
@@ -590,6 +671,29 @@ public class LotteryServiceImpl implements LotteryService {
         if ( count != null && count > 0 ) {
             awardRepair( result.getId() );
             log.error( "派奖结束后检查发现有未派奖-尝试在下个周期重新派奖historyId:{}", result.getId() );
+        }
+
+        if ( !isLotteryCenter() ) {
+            LotteryHistory db = lotteryHistoryMapper.selectById( result.getId() );
+
+            if ( db.getLotteryId() == 1004 ) {
+                log.error( "更新彩票历史记录 - 1:{};2:{}", db.getTotalPrize(), totalPrize );
+            }
+
+            totalPrize = totalPrize.add( db.getTotalPrize() );
+            totalBet   = totalBet.add( new BigDecimal( db.getTotalBet() ) );
+            BigDecimal killRate = BigDecimal.ZERO;
+            if ( totalBet.intValue() > 0 ) {
+                killRate = totalBet.subtract( totalPrize );
+                killRate = killRate.divide( totalBet, 4, RoundingMode.DOWN );
+            }
+
+            LotteryHistory up = new LotteryHistory();
+            up.setKillRate( killRate );
+            up.setId( result.getId() );
+            up.setTotalPrize( totalPrize );
+            up.setTotalBet( totalBet.longValue() );
+            lotteryHistoryService.updateById( up );
         }
 
         /*BigDecimal boardCast = configEnvCacheUtil.getConfBd( "lottery_boardcast_mony" );
@@ -652,5 +756,28 @@ public class LotteryServiceImpl implements LotteryService {
     @Override
     public List<RuleVo> getLotteryRule( Integer lotteryId ) {
         return LotteryCacheUtils.me.getLotteryRule( LotteryUtils.getKindId( lotteryId ) );
+    }
+
+    @Override
+    public void catchResult( Integer lotteryId ) {
+        List<LotteryTemp>   temList        = new ArrayList<>();
+        List<HistoryResult> historyResults = lotteryHistoryService.selectResultWaite( lotteryAgent, lotteryId );
+        for ( HistoryResult historyResult : historyResults ) {
+            LotteryTemp temp = LotteryCacheUtils.me.getLotteryTemp( lotteryId );
+            if ( historyResult.getId().substring( 0, 13 ).compareTo( temp.getIssueJust() ) >= 0 ) {
+                temp.setCodeJust( historyResult.getCode() );
+                LotteryCacheUtils.me.setLotteryTemp( temp );
+
+                LotteryTemp up = new LotteryTemp();
+                up.setId( lotteryId );
+                up.setCodeJust( historyResult.getCode() );
+                temList.add( up );
+            }
+
+            historyResult.setAnalyseGameId( this.getGameIdByMethodName( lotteryId, historyResult.getAnalyse() ) );
+        }
+        for ( LotteryTemp lotteryTemp : temList ) {
+            lotteryTempMapper.updateById( lotteryTemp );
+        }
     }
 }

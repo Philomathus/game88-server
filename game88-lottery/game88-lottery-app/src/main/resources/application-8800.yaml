@@ -9,6 +9,9 @@ spring:
     password: EvYsN39ViArDumx4pWyH
     database: 2
 
+## 彩票奖池代理
+lotteryCenter : 8800
+
 springdoc:
   api-docs:
     enabled: true

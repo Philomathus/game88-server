@@ -12,21 +12,23 @@ import tv.game88.lottery.api.service.LotteryService;
 import javax.annotation.Resource;
 
 /**
- * 开奖逻辑
+ * 抓奖逻辑
  */
 @Log4j2
 @Component
-public class ComputeTask {
+public class RemoteGrabTask {
     @Resource
     private RedisUtils     redisUtils;
     @Resource
     private LotteryService lotteryService;
 
-    @Scheduled( cron = "0 * * * * *" )
+    @Scheduled( cron = "2 * * * * *" )
     public void runTask() {
-        if ( !lotteryService.isLotteryCenter() ) {
+
+        if ( lotteryService.isLotteryCenter() ) {
             return;
         }
+        //获取执行权
         if ( !redisUtils.lock( Constants.LOTTERY_PREX + "Compute", 20 ) ) {
             return;
         }
@@ -35,23 +37,26 @@ public class ComputeTask {
                 continue;
             }
             try {
-                lotteryService.computeResult( lotteryInfo.getId() );
+                lotteryService.catchResult( lotteryInfo.getId() );
             } catch ( Exception e ) {
                 log.error( e.getMessage(), e );
             }
         }
     }
 
-    @Scheduled( cron = "51 * * * * *" )
+    @Scheduled( cron = "54 * * * * *" )
     public void runTask2001() {
-        if ( !lotteryService.isLotteryCenter() ) {
+
+        if ( lotteryService.isLotteryCenter() ) {
             return;
         }
+        //获取执行权
         if ( !redisUtils.lock( Constants.LOTTERY_PREX + "Compute2001", 20 ) ) {
             return;
         }
         try {
-            lotteryService.computeResult( 2001 );
+            //抓开奖结果
+            lotteryService.catchResult( 2001 );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
