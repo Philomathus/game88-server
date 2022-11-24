@@ -147,7 +147,11 @@ public class PayTypeController extends BaseController {
         PayType payType = new PayType();
         payType.setId( id );
         payType.setEffect( effect );
-        return toResult( payTypeService.updateById( payType ) );
+        boolean isSave = payTypeService.updateById( payType );
+        if ( isSave ) {
+            payCacheUtil.clearPayType( id );
+        }
+        return toResult( isSave );
     }
 
     /**
@@ -160,6 +164,10 @@ public class PayTypeController extends BaseController {
         PayType payType = new PayType();
         payType.setId( id );
         payType.setRecommend( recommend );
-        return toResult( payTypeService.updateById( payType ) );
+        boolean isSave = payTypeService.updateById( payType );
+        if ( isSave ) {
+            payCacheUtil.clearPayType( id );
+        }
+        return toResult( isSave );
     }
 }
