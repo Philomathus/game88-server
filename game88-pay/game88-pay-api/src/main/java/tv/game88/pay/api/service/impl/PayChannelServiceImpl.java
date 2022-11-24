@@ -117,35 +117,32 @@ public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChan
     @Transactional( rollbackFor = Exception.class )
     @Override
     public RspBase<?> updateEffect( Long id, Boolean effect ) {
+        if ( effect ) {
+            PayChannel channelNew    = this.baseMapper.selectById( id );
+            RspBase<?> businessError = saveCheck( channelNew );
+            if ( businessError != null ) {
+                return businessError;
+            }
+            payChannelMoneyMapper.deleteByChannelIds( Collections.singletonList( id ) );
+            String[] moneys = channelNew.getQuickAmount().split( "," );
+            for ( String money : moneys ) {
+                PayChannelMoney payChannelMoney = new PayChannelMoney();
+                payChannelMoney.setMoney( Long.parseLong( money.trim() ) );
+                payChannelMoney.setChannelId( channelNew.getId() );
+                payChannelMoney.setChannelPayRate( channelNew.getRate() );
+                payChannelMoney.setTypeId( channelNew.getTypeId() );
+                payChannelMoney.setOpenLevelMin( channelNew.getOpenLevelMin() == null ? 1 : channelNew.getOpenLevelMin() );
+                payChannelMoney.setOpenLevelMax( channelNew.getOpenLevelMax() == null ? 50 : channelNew.getOpenLevelMax() );
+                payChannelMoneyMapper.insert( payChannelMoney );
+            }
+        } else {
+            payChannelMoneyMapper.deleteByChannelIds( Collections.singletonList( id ) );
+        }
         PayChannel update = new PayChannel();
         update.setId( id );
         update.setEffect( effect );
         int i = this.baseMapper.updateById( update );
-        if ( i > 0 ) {
-            if ( effect ) {
-                PayChannel channelNew    = this.baseMapper.selectById( id );
-                RspBase<?> businessError = saveCheck( channelNew );
-                if ( businessError != null ) {
-                    return businessError;
-                }
-                payChannelMoneyMapper.deleteByChannelIds( Collections.singletonList( id ) );
-                String[] moneys = channelNew.getQuickAmount().split( "," );
-                for ( String money : moneys ) {
-                    PayChannelMoney payChannelMoney = new PayChannelMoney();
-                    payChannelMoney.setMoney( Long.parseLong( money.trim() ) );
-                    payChannelMoney.setChannelId( channelNew.getId() );
-                    payChannelMoney.setChannelPayRate( channelNew.getRate() );
-                    payChannelMoney.setTypeId( channelNew.getTypeId() );
-                    payChannelMoney.setOpenLevelMin( channelNew.getOpenLevelMin() == null ? 1 : channelNew.getOpenLevelMin() );
-                    payChannelMoney.setOpenLevelMax( channelNew.getOpenLevelMax() == null ? 50 : channelNew.getOpenLevelMax() );
-                    payChannelMoneyMapper.insert( payChannelMoney );
-                }
-            } else {
-                payChannelMoneyMapper.deleteByChannelIds( Collections.singletonList( id ) );
-            }
-            return RspBase.ok();
-        }
-        return RspBase.businessError( "更新失败" );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "更新失败" );
     }
 }
 

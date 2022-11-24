@@ -95,6 +95,9 @@ public class PayTypeController extends BaseController {
             if ( a > 0 ) {
                 return RspBase.businessError( "此支付类型已存在,不允许添加多个" );
             }
+        } else {
+            Long id = payTypeService.minId();
+            payType.setId( id >= 0 ? -1L : id - 1 );
         }
         payType.setCreateBy( SecurityUtils.getUsername() );
         payType.setCreateTime( LocalDateTime.now() );

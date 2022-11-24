@@ -80,4 +80,8 @@
         or type in (2, 3, 4)) and effect = 1
         order by sort
     </select>
+
+    <select id="minId" resultType="java.lang.Long">
+        select ifnull(min(id), 0) from pay_type
+    </select>
 </mapper>

@@ -114,7 +114,7 @@ public class PayServiceImpl implements PayService {
         }
         RspPayChannel rspPayChannel = new RspPayChannel();
         rspPayChannel.setQuickAmount( StringUtils.join( moneyList, "," ) );
-        rspPayChannel.setId( -1L );
+        rspPayChannel.setId( typeId );
         rspPayChannel.setName( "固定金额" );
         rspPayChannel.setRechargeMin( new BigDecimal( moneyList.get( 0 ) ) );
         rspPayChannel.setRechargeMax( new BigDecimal( moneyList.get( moneyList.size() - 1 ) ) );

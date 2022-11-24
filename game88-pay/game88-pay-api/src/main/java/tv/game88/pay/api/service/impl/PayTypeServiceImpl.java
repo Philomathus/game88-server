@@ -20,5 +20,10 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType> impl
         }
         return payTypes;
     }
+
+    @Override
+    public Long minId() {
+        return this.baseMapper.minId();
+    }
 }
 

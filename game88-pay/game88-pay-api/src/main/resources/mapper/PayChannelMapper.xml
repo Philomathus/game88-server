@@ -76,16 +76,12 @@
     <select id="selectRspListByTypeId" resultType="tv.game88.pay.api.dto.RspPayChannel">
         select id,
                name,
-               recharge_max,
-               recharge_min,
                quick_amount,
-               input_type,
-               remark,
                open_level_min,
                open_level_max
         from pay_channel
         where type_id = #{typeId}
-          and status = 1
+          and effect = 1
           and del_flag = 0
     </select>
 
