@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.LogCleanCodeMapper">
+    <resultMap type="tv.game88.game.api.entity.LogCleanCode" id="LogCleanCodeResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="codeAmount" column="code_amount" />
+        <result property="cleanAmount" column="clean_amount" />
+        <result property="cleanTime" column="clean_time" />
+    </resultMap>
+
+    <sql id="selectLogCleanCodeVo">
+        select id, member_id, code_amount, clean_amount, clean_time
+        from log_clean_code
+    </sql>
+
+    <select id="selectLogCleanCodeList" parameterType="tv.game88.game.api.entity.LogCleanCode"
+            resultMap="LogCleanCodeResult">
+        <include refid="selectLogCleanCodeVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectRspByMemberId" resultType="tv.game88.game.api.dto.RspCleanCodeLog">
+        <include refid="selectLogCleanCodeVo" />
+        where member_id = #{memberId}
+        order by clean_time desc
+    </select>
+</mapper>

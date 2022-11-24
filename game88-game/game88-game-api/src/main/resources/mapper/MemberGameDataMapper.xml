@@ -104,4 +104,19 @@
                 #{req.gameStartTime},
                 #{req.serverId})
     </insert>
+
+    <select id="findMemCleanPlatformLists" resultType="tv.game88.game.api.dto.RspCleanPlatform">
+        select platform_id id, sum(ABS(profit)) codeAmount
+        from member_game_data${dbNodes}
+        where account = #{memberId}
+          and status = 0
+        GROUP BY platform_id
+    </select>
+
+    <update id="updateByBatchClean">
+        UPDATE member_game_data${dbNodes}
+        SET status =1
+        where account = #{memberId}
+          and status = 0
+    </update>
 </mapper>

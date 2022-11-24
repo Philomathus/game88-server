@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.LogCleanCodeInfoMapper">
+    <resultMap type="tv.game88.game.api.entity.LogCleanCodeInfo" id="LogCleanCodeInfoResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="cleanId" column="clean_id" />
+        <result property="codeAmount" column="code_amount" />
+        <result property="rateClean" column="rate_clean" />
+        <result property="cleanAmount" column="clean_amount" />
+        <result property="agent" column="agent" />
+        <result property="name" column="name" />
+        <result property="cleanTime" column="clean_time" />
+    </resultMap>
+
+    <sql id="selectLogCleanCodeInfoVo">
+        select id,
+               member_id,
+               clean_id,
+               code_amount,
+               rate_clean,
+               clean_amount,
+               agent,
+               name,
+               clean_time
+        from log_clean_code_info
+    </sql>
+
+    <select id="selectLogCleanCodeInfoList" parameterType="tv.game88.game.api.entity.LogCleanCodeInfo"
+            resultMap="LogCleanCodeInfoResult">
+        <include refid="selectLogCleanCodeInfoVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="cleanId != null  and cleanId != ''">
+                and clean_id = #{cleanId}
+            </if>
+            <if test="agent != null  and agent != ''">
+                and agent = #{agent}
+            </if>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="cleanTime != null">
+                and clean_time = #{cleanTime}
+            </if>
+        </where>
+    </select>
+</mapper>
