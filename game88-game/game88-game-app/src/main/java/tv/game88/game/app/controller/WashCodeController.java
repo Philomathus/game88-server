@@ -2,7 +2,7 @@ package tv.game88.game.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @Tag( name = "洗码相关接口" )
-@Slf4j
+@Log4j2
 public class WashCodeController extends BaseController {
     @Resource
     private MemberGameDataService memberGameDataService;
