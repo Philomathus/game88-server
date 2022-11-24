@@ -105,6 +105,7 @@ public class PayCacheUtil {
         for ( Long payTypeId : payTypeIds ) {
             redisUtil.unlink( TYPE + payTypeId );
         }
+        redisUtil.unlink( TYPE_LIST );
     }
 
     public void existsPayPlatform( Serializable payPlatformId ) {
