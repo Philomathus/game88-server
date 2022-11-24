@@ -29,7 +29,7 @@ public class PayChannel {
     @Excel( name = "平台ID" )
     private Long          platformId;
     @Excel( name = "类型ID" )
-    private Long          typeId;
+    private Integer       typeId;
     @Excel( name = "状态" )
     private Boolean       effect;
     @Excel( name = "是否允许回调" )

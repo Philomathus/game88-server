@@ -32,7 +32,7 @@ public class PayChannelMoney {
     /**
      * 支付类型ID
      */
-    private Long       typeId;
+    private Integer    typeId;
     /**
      * 开放层级
      */

@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class PayType {
-    @TableId( type = IdType.AUTO )
-    private Long          id;
+    @TableId( type = IdType.INPUT )
+    private Integer       id;
     @Excel( name = "名称" )
     private String        name;
     @Excel( name = "图标" )

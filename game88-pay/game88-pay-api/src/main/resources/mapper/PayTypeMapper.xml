@@ -81,7 +81,11 @@
         order by sort
     </select>
 
-    <select id="minId" resultType="java.lang.Long">
+    <select id="minId" resultType="java.lang.Integer">
         select ifnull(min(id), 0) from pay_type
+    </select>
+
+    <select id="maxId" resultType="java.lang.Integer">
+        select ifnull(max(id), 0) from pay_type
     </select>
 </mapper>

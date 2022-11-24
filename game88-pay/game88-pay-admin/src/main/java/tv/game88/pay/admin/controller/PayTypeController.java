@@ -56,7 +56,9 @@ public class PayTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payType:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<PayType>> listAll() {
-        return RspBase.ok( payTypeService.selectPayTypeList( null ) );
+        PayType payType = new PayType();
+        payType.setType( 1 );
+        return RspBase.ok( payTypeService.selectPayTypeList( payType ) );
     }
 
     /**
@@ -95,12 +97,22 @@ public class PayTypeController extends BaseController {
             if ( a > 0 ) {
                 return RspBase.businessError( "此支付类型已存在,不允许添加多个" );
             }
+            Integer id = payTypeService.maxId();
+            payType.setId( id <= 0 ? 1 : id + 1 );
         } else {
-            Long id = payTypeService.minId();
-            payType.setId( id >= 0 ? -1L : id - 1 );
+            Integer id = payTypeService.minId();
+            payType.setId( id >= 0 ? -1 : id - 1 );
         }
         payType.setCreateBy( SecurityUtils.getUsername() );
         payType.setCreateTime( LocalDateTime.now() );
+        payType.setEffect( false );
+        payType.setRecommend( false );
+        if ( payType.getOpenLevelMin() == null ) {
+            payType.setOpenLevelMin( 0 );
+        }
+        if ( payType.getOpenLevelMax() == null ) {
+            payType.setOpenLevelMax( 50 );
+        }
         return toResult( payTypeService.save( payType ) );
     }
 
@@ -114,6 +126,14 @@ public class PayTypeController extends BaseController {
         payType.setType( null );
         payType.setUpdateBy( SecurityUtils.getUsername() );
         payType.setUpdateTime( LocalDateTime.now() );
+        payType.setEffect( null );
+        payType.setRecommend( null );
+        if ( payType.getOpenLevelMin() == null ) {
+            payType.setOpenLevelMin( 0 );
+        }
+        if ( payType.getOpenLevelMax() == null ) {
+            payType.setOpenLevelMax( 50 );
+        }
         boolean isUpdate = payTypeService.updateById( payType );
         if ( isUpdate ) {
             payCacheUtil.clearPayType( payType.getId() );
@@ -127,7 +147,7 @@ public class PayTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payType:remove')" )
     @Log( title = "支付类型", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{id}" )
-    public RspBase<?> remove( @PathVariable Long id ) {
+    public RspBase<?> remove( @PathVariable Integer id ) {
         //查询此支付类型下还有无支付通道
         long a = payChannelService.count( new QueryWrapper<PayChannel>().eq( "type_id", id ).eq( "del_flag", 0 ) );
         if ( a > 0 ) {
@@ -146,7 +166,7 @@ public class PayTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payType:effect')" )
     @Log( title = "支付类型激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{id}/{effect}" )
-    public RspBase<?> changeStatus( @PathVariable Long id, @PathVariable Boolean effect ) {
+    public RspBase<?> changeStatus( @PathVariable Integer id, @PathVariable Boolean effect ) {
         PayType payType = new PayType();
         payType.setId( id );
         payType.setEffect( effect );
@@ -163,7 +183,7 @@ public class PayTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payType:effect')" )
     @Log( title = "支付类型推荐状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeRecommend/{id}/{recommend}" )
-    public RspBase<?> changeRecommend( @PathVariable Long id, @PathVariable Boolean recommend ) {
+    public RspBase<?> changeRecommend( @PathVariable Integer id, @PathVariable Boolean recommend ) {
         PayType payType = new PayType();
         payType.setId( id );
         payType.setRecommend( recommend );

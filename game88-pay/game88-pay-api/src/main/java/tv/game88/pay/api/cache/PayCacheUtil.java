@@ -74,7 +74,7 @@ public class PayCacheUtil {
         redisUtil.unlink( TYPE_LIST );
     }
 
-    public void existsPayType( Long payTypeId ) {
+    public void existsPayType( Integer payTypeId ) {
         if ( !redisUtil.exists( TYPE + payTypeId ) ) {
             PayType payType = payTypeMapper.selectById( payTypeId );
             if ( payType != null ) {
@@ -95,14 +95,14 @@ public class PayCacheUtil {
      *
      * @return 支付类型
      */
-    public PayType getPayType( Long payTypeId ) {
+    public PayType getPayType( Integer payTypeId ) {
         this.existsPayType( payTypeId );
         String value = redisUtil.strGet( TYPE + payTypeId );
         return StringUtils.isNotBlank( value ) ? JsonUtil.json2Object( value, PayType.class ) : null;
     }
 
-    public void clearPayType( Long... payTypeIds ) {
-        for ( Long payTypeId : payTypeIds ) {
+    public void clearPayType( Integer... payTypeIds ) {
+        for ( Integer payTypeId : payTypeIds ) {
             redisUtil.unlink( TYPE + payTypeId );
         }
         redisUtil.unlink( TYPE_LIST );

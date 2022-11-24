@@ -10,5 +10,7 @@ public interface PayTypeMapper extends BaseMapper<PayType> {
 
     List<PayType> selectCachePayTypeList();
 
-    Long minId();
+    Integer minId();
+
+    Integer maxId();
 }

@@ -8,6 +8,8 @@ import java.util.List;
 public interface PayTypeService extends IService<PayType> {
     List<PayType> selectPayTypeList( PayType payType );
 
-    Long minId();
+    Integer minId();
+
+    Integer maxId();
 }
 
