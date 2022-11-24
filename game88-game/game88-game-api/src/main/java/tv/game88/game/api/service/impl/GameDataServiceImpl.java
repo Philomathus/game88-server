@@ -40,7 +40,9 @@ public class GameDataServiceImpl implements GameDataService {
         SqlSession              session      = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         MemberGameDataMapper    mapper       = session.getMapper( MemberGameDataMapper.class );
         for ( RspGameDataLog dataLog : rspGameDataLogs ) {
-
+            if (mapper.findExist(dataLog.getAccount().substring(dataLog.getAccount().length() - 1), dataLog.getId()) != null) {
+                continue;
+            }
         }
     }
 
