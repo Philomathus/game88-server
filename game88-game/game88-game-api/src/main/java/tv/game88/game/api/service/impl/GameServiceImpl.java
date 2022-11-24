@@ -326,8 +326,7 @@ public class GameServiceImpl implements GameService {
 
     public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
         Map<String, Object> map = new HashMap<>();
-        //map.put( "agent", profile );
-        map.put( "agent", "7701" );
+        map.put( "agent", profile );
         map.put( "account", account );
         map.put( "platformIds", platformIds );
         map.put( "startTime", start );
