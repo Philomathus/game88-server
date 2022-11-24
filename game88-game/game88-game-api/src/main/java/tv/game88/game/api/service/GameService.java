@@ -1,7 +1,10 @@
 package tv.game88.game.api.service;
 
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.game.api.dto.RspGameDataLog;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.dto.RspGameMoney;
 import tv.game88.game.api.dto.RspGameTypes;
@@ -22,4 +25,7 @@ public interface GameService {
     RspBase<List<RspGameMoney>> getGameBalance( String memberId );
 
     RspBase<?> gameWithdrawal( Long platformId, String memberId );
+
+    @Retryable( value = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
+    List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds );
 }

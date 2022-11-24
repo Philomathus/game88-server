@@ -5,12 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.ServletUtil;
+import org.springframework.web.client.RestTemplate;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
@@ -33,10 +34,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -49,6 +47,8 @@ public class GameServiceImpl implements GameService {
 
     public static final BigDecimal ONE_HUNDRED = new BigDecimal( 100 );
 
+    @Resource
+    private RestTemplate           restTemplate;
     @Resource
     private RedisUtils             redisUtils;
     @Resource
@@ -322,5 +322,28 @@ public class GameServiceImpl implements GameService {
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
                 + entityIdCounter.getAndIncrement() );
+    }
+
+    public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put( "agent", profile );
+        map.put( "account", account );
+        map.put( "platformIds", platformIds );
+        map.put( "startTime", start );
+        map.put( "endTime", end );
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
+
+        List<Map<String, Object>> resultList = restTemplate.postForObject( "/game-data-log/getDataByAgent", httpEntity,
+                List.class );
+        if ( !CollectionUtils.isEmpty( resultList ) ) {
+            List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
+            for ( Map<String, Object> resultMap : resultList ) {
+                rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
+            }
+            return rspGameDataLogs;
+        }
+        return new ArrayList<>();
     }
 }

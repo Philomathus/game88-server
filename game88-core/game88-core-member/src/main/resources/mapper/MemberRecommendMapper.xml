@@ -13,7 +13,7 @@
 
     <select id="getMyRecommend" resultType="tv.game88.core.member.dto.RspMyRecommend">
         select *
-        from (SELECT invite_money historySion, inviter_code FROM member_info WHERE id = #{inviterId}) t1,
+        from (SELECT inviter_money historySion, inviter_code FROM member_info WHERE id = #{inviterId}) t1,
              (SELECT ifnull(SUM(commission), 0) todaySion FROM `member_recommend` WHERE inviter_id = #{inviterId} and DATEDIFF(create_time,NOW()) = 0) t2,
              (SELECT ifnull(SUM(commission), 0) yesterdaySion FROM `member_recommend` WHERE inviter_id = #{inviterId} and DATEDIFF(create_time,NOW()) = -1) t3,
              (SELECT ifnull(SUM(commission), 0) canSion FROM `member_recommend` WHERE inviter_id = #{inviterId} and status = 0) t4

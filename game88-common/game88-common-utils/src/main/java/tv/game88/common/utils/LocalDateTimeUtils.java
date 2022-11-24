@@ -161,4 +161,14 @@ public class LocalDateTimeUtils {
         LocalDate twoLocalDate = LocalDate.of( two.getYear(), two.getMonth(), 1 );
         return oneLocalDate.compareTo( twoLocalDate ) == 0;
     }
+
+    /**
+     * 判断是否同一天
+     *
+     * @param one
+     * @param two
+     */
+    public static boolean isSameDay( LocalDateTime one, LocalDateTime two ) {
+        return one.toLocalDate().compareTo( two.toLocalDate() ) == 0;
+    }
 }

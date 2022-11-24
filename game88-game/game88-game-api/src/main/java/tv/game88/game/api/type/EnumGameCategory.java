@@ -49,4 +49,21 @@ public enum EnumGameCategory {
         }
         return null;
     }
+
+    public static List<Integer> getDataRemoteByEnum( EnumGameCategory enumGameCategory ) {
+        return switch ( enumGameCategory ) {
+            case LOTTERY -> List.of();
+            case KAIYUAN -> List.of( 50 );
+            case OG -> List.of( 2 );
+            case AG -> List.of( 5 );
+            case MG -> List.of( 6 );
+            case UPG -> List.of( 7 );
+            case SHABA -> List.of( 12 );
+            case ICG -> List.of( 13 );
+            case MEITIAN -> List.of( 14 );
+            case KAIXUAN -> List.of( 51 );
+            case NEWWORLD -> List.of( 17 );
+            case BBIN -> List.of( 8, 9, 10, 11 );
+        };
+    }
 }
