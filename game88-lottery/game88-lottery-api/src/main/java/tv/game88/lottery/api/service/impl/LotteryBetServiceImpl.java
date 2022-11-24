@@ -5,14 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.lottery.entity.LotteryBet;
+import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.lottery.api.dto.ReqBet;
 import tv.game88.lottery.api.dto.RspBet;
-import tv.game88.lottery.api.entity.LotteryBet;
-import tv.game88.lottery.api.mapper.LotteryBetMapper;
 import tv.game88.lottery.api.service.LotteryBetService;
 
 import javax.annotation.Resource;

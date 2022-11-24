@@ -53,7 +53,6 @@ public enum EnumGameCategory {
     public static List<Integer> getDataRemoteByEnum( EnumGameCategory enumGameCategory ) {
         return switch ( enumGameCategory ) {
             case LOTTERY -> List.of();
-            case KAIYUAN -> List.of( 50 );
             case OG -> List.of( 2 );
             case AG -> List.of( 5 );
             case MG -> List.of( 6 );
@@ -61,9 +60,27 @@ public enum EnumGameCategory {
             case SHABA -> List.of( 12 );
             case ICG -> List.of( 13 );
             case MEITIAN -> List.of( 14 );
-            case KAIXUAN -> List.of( 51 );
             case NEWWORLD -> List.of( 17 );
             case BBIN -> List.of( 8, 9, 10, 11 );
+            case KAIYUAN -> List.of( 50 );
+            case KAIXUAN -> List.of( 51 );
+        };
+    }
+
+    public static EnumGameCategory getEnumByDataRemote( int platformId ) {
+        return switch ( platformId ) {
+            case 2 -> OG;
+            case 5 -> AG;
+            case 6 -> MG;
+            case 7 -> UPG;
+            case 12 -> SHABA;
+            case 13 -> ICG;
+            case 14 -> MEITIAN;
+            case 17 -> NEWWORLD;
+            case 8, 9, 10, 11 -> BBIN;
+            case 50 -> KAIYUAN;
+            case 51 -> KAIXUAN;
+            default -> null;
         };
     }
 }

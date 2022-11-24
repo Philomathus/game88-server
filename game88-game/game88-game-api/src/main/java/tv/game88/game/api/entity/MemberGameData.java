@@ -23,7 +23,7 @@ public class MemberGameData {
     @Excel( name = "账号" )
     private String  account;
     @Excel( name = "本地平台id" )
-    private Long    platformId;
+    private Integer platformId;
     @Excel( name = "游戏局号" )
     private String  gameId;
     @Excel( name = "游戏id" )
@@ -38,8 +38,6 @@ public class MemberGameData {
     private String  profit;
     @Excel( name = "抽水" )
     private String  revenue;
-    @Excel( name = "游戏平台类型" )
-    private String  platformType;
     @Excel( name = "0:未洗码1已经洗码" )
     private Integer status;
     @Excel( name = "游戏开始时间" )

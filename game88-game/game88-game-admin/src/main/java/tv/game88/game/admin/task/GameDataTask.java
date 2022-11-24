@@ -41,14 +41,14 @@ public class GameDataTask {
             try {
                 gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
             } catch ( Exception e ) {
-                log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
+                log.error( "2游戏拉取注单异常{}", e.getMessage(), e );
             }
             begin = end;
             end   = LocalDateTimeUtils.format( endDay );
             try {
                 gameDataService.beatGameCodeAgent( end, begin, end, null, null );
             } catch ( Exception e ) {
-                log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
+                log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }
         }
     }

@@ -39,4 +39,6 @@ public interface MemberBcodeMapper extends BaseMapper<MemberBcode> {
     int repairMemberInfo( @Param( "memberId" ) String memberId );
 
     MemberBcode getTotalData( MemberBcode memberBcode );
+
+    int updateMemberBcode( MemberBcode codeFlow );
 }

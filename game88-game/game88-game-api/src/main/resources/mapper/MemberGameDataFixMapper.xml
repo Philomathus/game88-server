@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.MemberGameDataFixMapper">
+    <resultMap type="tv.game88.game.api.entity.MemberGameDataFix" id="MemberGameDataFixResult">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="gameStartTime" column="game_start_time" />
+        <result property="gameEndTime" column="game_end_time" />
+        <result property="platformId" column="platform_id" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <sql id="selectMemberGameDataFixVo">
+        select id, member_id, game_start_time, game_end_time, platform_id, status
+        from member_game_data_fix
+    </sql>
+</mapper>

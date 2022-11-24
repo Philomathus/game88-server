@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.lottery.api.mapper.LotteryBetMapper">
-    <resultMap type="tv.game88.lottery.api.entity.LotteryBet" id="LotteryBetResult">
+<mapper namespace="tv.game88.core.lottery.mapper.LotteryBetMapper">
+    <resultMap type="tv.game88.core.lottery.entity.LotteryBet" id="LotteryBetResult">
         <result property="id" column="id" />
         <result property="memberId" column="member_id" />
         <result property="memberStatus" column="member_status" />
@@ -42,7 +42,7 @@
         from lottery_bet
     </sql>
 
-    <select id="selectLotteryBetList" parameterType="tv.game88.lottery.api.entity.LotteryBet"
+    <select id="selectLotteryBetList" parameterType="tv.game88.core.lottery.entity.LotteryBet"
             resultMap="LotteryBetResult">
         <include refid="selectLotteryBetVo" />
         <where>
@@ -73,7 +73,7 @@
         </where>
     </select>
 
-    <select id="getBetRecordList" resultType="tv.game88.lottery.api.dto.RspBetRecord">
+    <select id="getBetRecordList" resultType="tv.game88.core.lottery.dto.RspBetRecord">
         select *
         from lottery_bet${dbNodes}
         where member_id = #{memberId}
@@ -154,4 +154,36 @@
         , update_time = #{updateTime}
         where id = #{id}
     </update>
+
+    <select id="selectListByTime" resultMap="LotteryBetResult">
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet0
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet1
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet2
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet3
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet4
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet5
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet6
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet7
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet8
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        UNION ALL
+        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet9
+        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+    </select>
 </mapper>

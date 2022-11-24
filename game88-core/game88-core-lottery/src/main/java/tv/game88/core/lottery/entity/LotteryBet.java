@@ -1,4 +1,4 @@
-package tv.game88.lottery.api.entity;
+package tv.game88.core.lottery.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;

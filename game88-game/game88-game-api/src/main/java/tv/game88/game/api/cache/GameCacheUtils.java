@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 @Component
 public class GameCacheUtils {
 
-    public static final String GAME_TYPE_KEY     = Constants.GAME_PREX + "type:effect";
-    public static final String GAME_PLATFORM_KEY = Constants.GAME_PREX + "platform:";
-    public static final String GAME_INFO_KEY     = Constants.GAME_PREX + "info:";
-
-    public static final String GAME_TYPE_INFO_WITH = Constants.GAME_PREX + "typeWithInfo:";
+    public static final String GAME_TYPE_KEY          = Constants.GAME_PREX + "type:effect";
+    public static final String GAME_PLATFORM_KEY      = Constants.GAME_PREX + "platform:";
+    public static final String GAME_PLATFORM_LIST_KEY = Constants.GAME_PREX + "platformList";
+    public static final String GAME_INFO_KEY          = Constants.GAME_PREX + "info:";
+    public static final String GAME_TYPE_INFO_WITH    = Constants.GAME_PREX + "typeWithInfo:";
 
     @Resource
     private RedisUtils         redisUtils;
@@ -79,6 +79,18 @@ public class GameCacheUtils {
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, GamePlatform.class );
     }
 
+    public List<GamePlatform> getGamePlatformList() {
+        if ( !redisUtils.exists( GAME_PLATFORM_LIST_KEY ) ) {
+            List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+            if ( !CollectionUtils.isEmpty( gamePlatforms ) ) {
+                redisUtils.strSet( GAME_PLATFORM_LIST_KEY, JsonUtil.object2Json( gamePlatforms ) );
+            }
+            return gamePlatforms;
+        }
+        String s = redisUtils.strGet( GAME_PLATFORM_LIST_KEY );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
+    }
+
     public GameInfo getGameInfo( Long infoId ) {
         if ( !redisUtils.exists( GAME_INFO_KEY + infoId ) ) {
             GameInfo gameInfo = new QueryChainWrapper<>( gameInfoMapper ).eq( "id", infoId ).one();
@@ -122,6 +134,9 @@ public class GameCacheUtils {
 
     public void clear( String key ) {
         redisUtils.unlink( key );
+        if ( key.startsWith( GAME_PLATFORM_KEY ) ) {
+            redisUtils.unlink( GAME_PLATFORM_LIST_KEY );
+        }
     }
 
     public void clearByInfoId( Long gameInfoId ) {

@@ -1,4 +1,4 @@
-package tv.game88.lottery.api.dto;
+package tv.game88.core.lottery.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -1,12 +1,12 @@
-package tv.game88.lottery.api.mapper;
+package tv.game88.core.lottery.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.mapping.StatementType;
-import tv.game88.lottery.api.dto.RspBetRecord;
-import tv.game88.lottery.api.entity.LotteryBet;
+import tv.game88.core.lottery.dto.RspBetRecord;
+import tv.game88.core.lottery.entity.LotteryBet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +27,8 @@ public interface LotteryBetMapper extends BaseMapper<LotteryBet> {
      * @return 彩票会员下注详情集合
      */
     public List<LotteryBet> selectLotteryBetList( LotteryBet lotteryBet );
+
+    public List<LotteryBet> selectListByTime( @Param( "start" ) String start, @Param( "end" ) String end );
 
     List<RspBetRecord> getBetRecordList( @Param( "dbNodes" ) String dbNodes, @Param( "lotteryId" ) Integer lotteryId, @Param(
             "memberId" ) String memberId );

@@ -3,7 +3,7 @@ package tv.game88.lottery.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.lottery.api.dto.HistoryResult;
 import tv.game88.lottery.api.dto.RspLotteryInfo;
-import tv.game88.lottery.api.entity.LotteryBet;
+import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.lottery.api.entity.LotteryHistory;
 
 import java.math.BigDecimal;

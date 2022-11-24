@@ -1,5 +1,7 @@
 package tv.game88.core.quest.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -14,7 +16,8 @@ import lombok.Data;
 @Data
 public class MemberQuest {
     @Schema( title = "系统编号" )
-    private Long    id;
+    @TableId( type = IdType.INPUT )
+    private String  id;
     @Schema( title = "会员id" )
     private String  memberId;
     @Schema( title = "任务id" )

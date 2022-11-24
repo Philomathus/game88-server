@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.lottery.dto.RspBetRecord;
+import tv.game88.core.lottery.dto.RspLotteryHistory;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.lottery.api.dto.*;
 import tv.game88.lottery.api.service.LotteryService;

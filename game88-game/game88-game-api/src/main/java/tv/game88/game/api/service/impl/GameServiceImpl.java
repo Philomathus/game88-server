@@ -326,7 +326,8 @@ public class GameServiceImpl implements GameService {
 
     public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
         Map<String, Object> map = new HashMap<>();
-        map.put( "agent", profile );
+        //map.put( "agent", profile );
+        map.put( "agent", "7701" );
         map.put( "account", account );
         map.put( "platformIds", platformIds );
         map.put( "startTime", start );
@@ -335,8 +336,10 @@ public class GameServiceImpl implements GameService {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
 
-        List<Map<String, Object>> resultList = restTemplate.postForObject( "/game-data-log/getDataByAgent", httpEntity,
-                List.class );
+        List<String> hosts = Arrays.asList( "http://47.57.4.185:42000", "http://47.57.230.133:42000" );
+
+        List<Map<String, Object>> resultList = restTemplate.postForObject(
+                hosts.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/game-data-log/getDataByAgent", httpEntity, List.class );
         if ( !CollectionUtils.isEmpty( resultList ) ) {
             List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
             for ( Map<String, Object> resultMap : resultList ) {

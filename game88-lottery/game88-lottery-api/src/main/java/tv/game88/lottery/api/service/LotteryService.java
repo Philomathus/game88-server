@@ -1,6 +1,8 @@
 package tv.game88.lottery.api.service;
 
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.lottery.dto.RspBetRecord;
+import tv.game88.core.lottery.dto.RspLotteryHistory;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.lottery.api.dto.*;
 

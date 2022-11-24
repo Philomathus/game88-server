@@ -13,7 +13,6 @@
         <result property="allBet" column="all_bet" />
         <result property="profit" column="profit" />
         <result property="revenue" column="revenue" />
-        <result property="platformType" column="platform_type" />
         <result property="status" column="status" />
         <result property="gameStartTime" column="game_start_time" />
         <result property="gameEndTime" column="game_end_time" />
@@ -31,7 +30,6 @@
                all_bet,
                profit,
                revenue,
-               platform_type,
                status,
                game_start_time,
                game_end_time
@@ -68,4 +66,42 @@
             </if>
         </where>
     </select>
+
+    <select id="findExist" resultType="java.lang.Integer">
+        SELECT status
+        FROM member_game_data${dbNodes}
+        WHERE id = #{keyId}
+    </select>
+
+    <insert id="insertMemberGameData">
+        insert ignore into member_game_data${dbNodes}
+        (id,
+         game_id,
+         account,
+         kind_id,
+         cell_score,
+         all_bet,
+         profit,
+         revenue,
+         game_end_time,
+         platform_id,
+         agent,
+         status,
+         game_start_time,
+         server_id)
+        values (#{req.id},
+                #{req.gameId},
+                #{req.account},
+                #{req.kindId},
+                #{req.cellScore},
+                #{req.allBet},
+                #{req.profit},
+                #{req.revenue},
+                #{req.gameEndTime},
+                #{req.platformId},
+                #{req.agent},
+                #{req.status},
+                #{req.gameStartTime},
+                #{req.serverId})
+    </insert>
 </mapper>

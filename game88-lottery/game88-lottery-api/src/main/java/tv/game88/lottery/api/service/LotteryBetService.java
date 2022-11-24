@@ -5,7 +5,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.lottery.api.dto.ReqBet;
 import tv.game88.lottery.api.dto.RspBet;
-import tv.game88.lottery.api.entity.LotteryBet;
+import tv.game88.core.lottery.entity.LotteryBet;
 
 import java.math.BigDecimal;
 import java.util.List;

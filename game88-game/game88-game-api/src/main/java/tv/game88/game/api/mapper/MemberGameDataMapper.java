@@ -22,5 +22,7 @@ public interface MemberGameDataMapper extends BaseMapper<MemberGameData> {
      */
     public List<MemberGameData> selectMemberGameDataList( MemberGameData memberGameData );
 
-    Integer findExist( @Param( "dbNodes" ) String dbNodes, @Param("keyId") String id );
+    Integer findExist( @Param( "dbNodes" ) String dbNodes, @Param( "keyId" ) String id );
+
+    int insertMemberGameData( @Param( "req" ) MemberGameData memberGameData, @Param( "dbNodes" ) String dbNodes );
 }

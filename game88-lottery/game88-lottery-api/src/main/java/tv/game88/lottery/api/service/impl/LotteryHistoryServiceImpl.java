@@ -9,16 +9,15 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.core.lottery.entity.LotteryBet;
+import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
-import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.HistoryResult;
 import tv.game88.lottery.api.dto.RspLotteryInfo;
-import tv.game88.lottery.api.entity.LotteryBet;
 import tv.game88.lottery.api.entity.LotteryHistory;
 import tv.game88.lottery.api.entity.LotteryTemp;
-import tv.game88.lottery.api.mapper.LotteryBetMapper;
 import tv.game88.lottery.api.mapper.LotteryHistoryMapper;
 import tv.game88.lottery.api.mapper.LotteryTempMapper;
 import tv.game88.lottery.api.service.LotteryHistoryService;
@@ -38,8 +37,6 @@ import java.util.Map;
 public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper, LotteryHistory> implements LotteryHistoryService {
     @Resource
     private LotteryTempMapper  lotteryTempMapper;
-    @Resource
-    private MemberInfoMapper   memberInfoMapper;
     @Resource
     private MemberMoneyManager memberMoneyManager;
 

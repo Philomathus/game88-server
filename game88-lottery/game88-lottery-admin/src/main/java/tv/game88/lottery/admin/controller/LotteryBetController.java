@@ -12,7 +12,7 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.lottery.api.entity.LotteryBet;
+import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.lottery.api.service.LotteryBetService;
 
 import javax.annotation.Resource;

@@ -114,7 +114,11 @@ public class GamePlatformController extends BaseController {
         if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
             gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5() ) );
         }
-        return toResult( gamePlatformService.save( gamePlatform ) );
+        boolean save = gamePlatformService.save( gamePlatform );
+        if ( save ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_LIST_KEY );
+        }
+        return toResult( save );
     }
 
     /**

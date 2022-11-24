@@ -22,6 +22,7 @@
         <module>game88-core-member</module>
         <module>game88-core-session</module>
         <module>game88-core-quest</module>
+        <module>game88-core-lottery</module>
     </modules>
 
     <build>
