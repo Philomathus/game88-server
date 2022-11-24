@@ -26,7 +26,7 @@ public class MemberRechargeOnlineController {
 
     @Operation( summary = "获取充值类型列表" )
     @PostMapping( "/payTypeList" )
-    public RspBase<List<PayType>> payTypeList( @RequestHeader( "dv" ) String deviceType ) {
+    public RspBase<List<PayType>> payTypeList( @RequestHeader( "dev" ) String deviceType ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         log.info( "获取充值类型列表 - memberId:{}", platformUser.getId() );
         return RspBase.ok( payService.findPayTypeList( platformUser, deviceType ) );
