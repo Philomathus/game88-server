@@ -49,7 +49,7 @@ public class ConfigBankListController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<ConfigBankList>> listAll() {
-        return RspBase.ok(configBankListService.list());
+        return RspBase.ok( configBankListService.list() );
     }
 
     /**
@@ -111,7 +111,11 @@ public class ConfigBankListController extends BaseController {
     @Log( title = "银行字典列表", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ConfigBankList configBankList ) {
-        return RspBase.ok( configBankListService.updateById( configBankList ) );
+        boolean data = configBankListService.updateById( configBankList );
+        if ( data ) {
+            configBankListCache.setEffectConfigBank( configBankListService.getById( configBankList.getId() ) );
+        }
+        return RspBase.ok( data );
     }
 
     /**
@@ -121,6 +125,12 @@ public class ConfigBankListController extends BaseController {
     @Log( title = "银行字典列表", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {
-        return RspBase.ok( configBankListService.removeByIds( Arrays.asList( ids ) ) );
+        boolean data = configBankListService.removeByIds( Arrays.asList( ids ) );
+        if ( data ) {
+            for ( Long id : ids ) {
+                configBankListCache.delEffectConfigBank( id );
+            }
+        }
+        return RspBase.ok( data );
     }
 }
