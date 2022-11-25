@@ -58,8 +58,7 @@ public class LotteryBetServiceImpl extends ServiceImpl<LotteryBetMapper, Lottery
         rspBet.setLotteryId( reqBet.getLotteryId() );
         rspBet.setChip( reqBet.getChip() );
         rspBet.setIssue( issue );
-        RspBase<RspBet> rspBase = new RspBase<>();
-        rspBase.setData( rspBet );
+        RspBase<RspBet> rspBase = RspBase.ok( rspBet );
 
         LotteryBet db = new LotteryBet();
         db.setId( IdWorker.get32UUID() );

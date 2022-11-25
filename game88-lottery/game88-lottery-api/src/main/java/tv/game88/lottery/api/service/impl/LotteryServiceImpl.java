@@ -256,7 +256,7 @@ public class LotteryServiceImpl implements LotteryService {
         String          issue       = LotteryUtils.getLotteryIssue( lotteryBase.getCycle(), LocalDateTime.now() );
         String          lotteryName = lotteryBase.getName();
         RspBase<RspBet> rspBase     = lotteryBetService.userBet( platformUser, reqBet, bet_select, lotteryName, issue, cost );
-        if ( rspBase.getCode() == 0 ) {
+        if ( rspBase.getCode() == 200 ) {
             this.pushLotteryCenter( platformUser, reqBet, bet_select, issue, lotteryName, ServletUtil.getIp() );
             if ( reqBet.getLotteryId() == 2001 ) {
                 RspBet data = rspBase.getData();
