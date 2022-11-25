@@ -224,6 +224,12 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     public List<RspGameData> getGameDataList( String memberId, ReqGameData reqGameData ) {
         String beginDay = reqGameData.getEnumReqTime().getBeginDayTime();
         String endDay   = reqGameData.getEnumReqTime().getEndDayTime();
+        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gameCacheUtils
+                .getGamePlatformList()
+                .stream()
+                .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
+        GamePlatform gamePlatform = gamePlatformMap.get( reqGameData.getGameCategory() );
+        reqGameData.setPlatformId( gamePlatform.getId() );
         return this.baseMapper.findByAccount( memberId.substring(
                 memberId.length() - 1 ), memberId, reqGameData, beginDay, endDay );
     }
