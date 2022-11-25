@@ -6,7 +6,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.pay.api.cache.ConfigBankListCache;
 import tv.game88.pay.api.dto.RspConfigBankList;
 
@@ -23,6 +25,13 @@ public class ConfigBankListController extends BaseController {
     @Operation( summary = "获取银行字典列表" )
     @PostMapping( "/bankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
-        return RspBase.ok( configBankListCache.getEffectList() );
+        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
+        String                  domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( RspConfigBankList bankList : effectList ) {
+            if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
+                bankList.setBankIcon( domainValue + bankList.getBankIcon() );
+            }
+        }
+        return RspBase.ok( effectList );
     }
 }
