@@ -69,7 +69,7 @@ public class UploadServiceImpl implements UploadService {
         IOUtils.copy( inputStream, Files.newOutputStream( newFileToPath ) );
         InputStream newInputStream = Files.newInputStream( newFileToPath );
         String      rFileName      = DigestUtils.md5Hex( newInputStream );
-        String      fileKey        = profile + "/" + path + "/" + rFileName + "." + extension;
+        String      fileKey        = path + "/" + rFileName + "." + extension;
         String url = switch ( configOss.getProvider() ) {
             case 0 -> this.uploadAliyun( configOss, fileKey, newFile );
             case 1 -> this.uploadAmazon( configOss, fileKey, newFile );
