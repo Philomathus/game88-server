@@ -46,6 +46,15 @@ public class ActivityQuestTypeController extends BaseController {
     }
 
     /**
+     * 查询任务类型列表
+     */
+    @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:list')" )
+    @GetMapping("/listAll")
+    public RspBase<List<ActivityQuestType>> listAll(){
+        return RspBase.ok(activityQuestTypeService.list());
+    }
+
+    /**
      * 导出任务类型列表
      */
     @PreAuthorize( "@ss.hasPermi('activity:activityQuestType:export')" )
