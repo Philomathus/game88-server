@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.enums.EnumReqTime;
 import tv.game88.core.session.utils.MemberSecurityUtils;
+import tv.game88.game.api.dto.ReqGameData;
 import tv.game88.game.api.dto.RspCleanCodeInfo;
 import tv.game88.game.api.dto.RspCleanCodeLog;
+import tv.game88.game.api.dto.RspGameData;
 import tv.game88.game.api.service.MemberGameDataService;
 
 import javax.annotation.Resource;
@@ -43,4 +46,16 @@ public class WashCodeController extends BaseController {
         return getRspBasePage( memberGameDataService.cleanCodeLogs( MemberSecurityUtils.getUserId() ), pageDomain );
     }
 
+    @Operation( summary = "投注记录" )
+    @PostMapping( "/getGameDataList" )
+    public RspBase<List<RspGameData>> getGameDataList( @RequestBody ReqGameData reqGameData ) {
+        startPage( reqGameData );
+        if ( reqGameData.getEnumReqTime() == null ) {
+            reqGameData.setEnumReqTime( EnumReqTime.today );
+        }
+        if ( reqGameData.getPlatformId() == 0 ) {
+            reqGameData.setPlatformId( null );
+        }
+        return getRspBasePage( memberGameDataService.getGameDataList( MemberSecurityUtils.getUserId(), reqGameData ), reqGameData );
+    }
 }

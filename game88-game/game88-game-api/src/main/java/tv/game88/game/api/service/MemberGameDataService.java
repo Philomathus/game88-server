@@ -2,9 +2,7 @@ package tv.game88.game.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
-import tv.game88.game.api.dto.RspCleanCodeInfo;
-import tv.game88.game.api.dto.RspCleanCodeLog;
-import tv.game88.game.api.dto.RspCleanCodeResult;
+import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
 
@@ -35,4 +33,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
                              String cleanId, LocalDateTime ntime );
 
     List<RspCleanCodeLog> cleanCodeLogs( String memberId );
+
+    List<RspGameData> getGameDataList( String memberId, ReqGameData reqGameData );
 }

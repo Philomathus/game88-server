@@ -2,7 +2,9 @@ package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import tv.game88.game.api.dto.ReqGameData;
 import tv.game88.game.api.dto.RspCleanPlatform;
+import tv.game88.game.api.dto.RspGameData;
 import tv.game88.game.api.entity.MemberGameData;
 
 import java.util.List;
@@ -30,4 +32,8 @@ public interface MemberGameDataMapper extends BaseMapper<MemberGameData> {
     List<RspCleanPlatform> findMemCleanPlatformLists( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId );
 
     void updateByBatchClean( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId );
+
+    List<RspGameData> findByAccount( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId,
+                                     @Param( "req" ) ReqGameData reqGameData, @Param( "beginTime" ) String beginDay, @Param(
+                                             "endTime" ) String endDay );
 }

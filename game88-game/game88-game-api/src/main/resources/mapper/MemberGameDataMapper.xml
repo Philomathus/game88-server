@@ -119,4 +119,18 @@
         where account = #{memberId}
           and status = 0
     </update>
+
+    <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
+        select game_id,cell_score,profit,game_end_time create_time,all_bet,agent,platform_id
+        from member_game_data${dbNodes}
+        where 1=1
+        <if test="memberId != null and memberId != ''">
+            and account = #{memberId}
+        </if>
+        <if test="req != null and req.platformId != null ">
+            and platform_id = #{req.platformId}
+        </if>
+        and game_end_time &gt;= #{beginTime} and game_end_time &lt;= #{endTime}
+        order by game_end_time desc
+    </select>
 </mapper>

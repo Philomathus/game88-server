@@ -219,4 +219,12 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     public List<RspCleanCodeLog> cleanCodeLogs( String memberId ) {
         return logCleanCodeMapper.selectRspByMemberId( memberId );
     }
+
+    @Override
+    public List<RspGameData> getGameDataList( String memberId, ReqGameData reqGameData ) {
+        String beginDay = reqGameData.getEnumReqTime().getBeginDayTime();
+        String endDay   = reqGameData.getEnumReqTime().getEndDayTime();
+        return this.baseMapper.findByAccount( memberId.substring(
+                memberId.length() - 1 ), memberId, reqGameData, beginDay, endDay );
+    }
 }

@@ -33,6 +33,7 @@ public class LoginController extends BaseController {
     @Operation( summary = "初始化接口" )
     @PostMapping( "/init" )
     public RspBase<RspInit> loginInit( @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version ) {
+        log.info( "初始化 dev:{};version:{}", dev, version );
         if ( dev == null || StringUtils.isBlank( version ) ) {
             return RspBase.businessError( "客户端版本较低" );
         }
