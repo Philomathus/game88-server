@@ -190,7 +190,7 @@ public class LotteryServiceImpl implements LotteryService {
     public List<RspLotteryHistory> getLotteryHistory( Integer lotteryId ) {
         List<RspLotteryHistory> rspLotteryHistories = new QueryChainWrapper<>( lotteryHistoryMapper )
                 .eq( "lottery_id", lotteryId )
-                .in( "status", 1, 2 )
+                .ne( "status", 0 )
                 .orderByDesc( "id" )
                 .select( "issue", "code", "analyse" )
                 .list()

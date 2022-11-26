@@ -45,7 +45,7 @@ public class LotteryController extends BaseController {
         return getRspBasePage( rspBetRecordList, req );
     }
 
-    @Operation( summary = "首页开奖记录查询" )
+    @Operation( summary = "开奖记录查询" )
     @PostMapping( "issueRecord" )
     public RspBase<List<RspLotteryHistory>> issueRecord( @Validated @RequestBody ReqLottery req ) {
         startPage( req );
