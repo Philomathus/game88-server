@@ -14,22 +14,28 @@
         <result property="taskMode" column="task_mode" />
         <result property="effect" column="effect" />
         <result property="sort" column="sort" />
+        <result property="platformName" column="platformName" />
+        <result property="infoName" column="infoName" />
     </resultMap>
 
     <sql id="selectActivityQuestInfoVo">
-        select id,
-               icon,
-               title,
-               type_id,
-               target,
-               reward,
-               content,
-               info_id,
-               platform_id,
-               task_mode,
-               effect,
-               sort
-        from activity_quest_info
+        select q.id,
+               q.icon,
+               q.title,
+               q.type_id,
+               q.target,
+               q.reward,
+               q.content,
+               q.info_id,
+               q.platform_id,
+               q.task_mode,
+               q.effect,
+               q.sort,
+               gp.name platformName,
+               gi.name infoName
+        from activity_quest_info q
+        left join game_platform gp on q.platform_id = gp.id
+        left join game_info gi on q.info_id = gi.id
     </sql>
 
     <select id="selectActivityQuestInfoList" parameterType="tv.game88.core.quest.entity.ActivityQuestInfo"
@@ -37,29 +43,24 @@
         <include refid="selectActivityQuestInfoVo" />
         <where>
             <if test="title != null  and title != ''">
-                and title = #{title}
+                and q.title like concat('%', #{title}, '%')
             </if>
             <if test="typeId != null">
-                and type_id = #{typeId}
-            </if>
-            <if test="target != null">
-                and target = #{target}
-            </if>
-            <if test="reward != null">
-                and reward = #{reward}
+                and q.type_id = #{typeId}
             </if>
             <if test="infoId != null">
-                and info_id = #{infoId}
+                and q.info_id = #{infoId}
             </if>
             <if test="platformId != null">
-                and platform_id = #{platformId}
+                and q.platform_id = #{platformId}
             </if>
             <if test="taskMode != null">
-                and task_mode = #{taskMode}
+                and q.task_mode = #{taskMode}
             </if>
             <if test="effect != null">
-                and effect = #{effect}
+                and q.effect = #{effect}
             </if>
         </where>
+        order by q.sort
     </select>
 </mapper>
