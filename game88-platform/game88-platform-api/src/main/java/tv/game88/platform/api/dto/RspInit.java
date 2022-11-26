@@ -6,22 +6,23 @@ import lombok.Data;
 @Data
 public class RspInit {
     @Schema( title = "最新版本号" )
-    private String  latestVersion = "";
-    @Schema( title = "是否强更", description = "1=强更0=不强更")
-    private String  latestFore    = "";
+    private String      latestVersion = "";
+    @Schema( title = "是否强更", description = "1=强更0=不强更" )
+    private String      latestFore    = "";
     @Schema( title = "下载地址" )
-    private String  downUrl       = "";
+    private String      downUrl       = "";
     @Schema( title = "是否有新版本" )
-    private boolean hasNew        = false;
+    private boolean     hasNew        = false;
     @Schema( title = "更新内容" )
-    private String  updateText;
+    private String      updateText;
     @Schema( title = "客服地址" )
-    private String  customerUrl;
+    private String      customerUrl;
     @Schema( title = "客服地址2" )
-    private String  customerUrl2;
+    private String      customerUrl2;
     @Schema( title = "官方网址" )
-    private String  webUrl;
-    @Schema( title = "启动图地址", description = "为空则不显示启动图")
-    private String  starPic;
-
+    private String      webUrl;
+    @Schema( title = "启动图地址", description = "为空则不显示启动图" )
+    private String      starPic;
+    @Schema( title = "6合彩色" )
+    private HeCai6Color heCai6        = new HeCai6Color();
 }
