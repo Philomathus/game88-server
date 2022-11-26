@@ -118,7 +118,7 @@ public class MessageCacheUtil {
                             .stream()
                             .map( JsonUtil::object2Json )
                             .collect( Collectors.toList() ) );
-                    redisUtils.expire( ON_SITE, Duration.ofDays( 30 ) );
+                    redisUtils.expire( ON_SITE, Duration.ofDays( 1 ) );
                     redisUtils.unLock( ON_SITE );
                 }
             }

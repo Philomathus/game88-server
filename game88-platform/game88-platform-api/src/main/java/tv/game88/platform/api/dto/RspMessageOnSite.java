@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 public class RspMessageOnSite {
     @Schema( title = "主键" )
-    private String        id;
+    private Long          id;
     @Schema( title = "信息标题" )
     private String        title;
     @Schema( title = "内容" )

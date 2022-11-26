@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class RspMessageCommonProblem {
+    @Schema( title = "ID" )
+    private Long   id;
     @Schema( title = "标题" )
     private String title;
     @Schema( title = "内容" )

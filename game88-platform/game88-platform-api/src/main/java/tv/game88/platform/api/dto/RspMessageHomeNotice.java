@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 public class RspMessageHomeNotice {
-
+    @Schema( title = "ID" )
+    private Long   id;
     @Schema( title = "标题" )
     private String title;
     @Schema( title = "内容" )
