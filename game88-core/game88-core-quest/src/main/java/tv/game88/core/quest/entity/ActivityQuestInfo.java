@@ -42,11 +42,6 @@ public class ActivityQuestInfo {
     private BigDecimal reward;
 
     /**
-    * 任务详情
-    */
-    private String detail;
-
-    /**
     * 描述
     */
     private String content;
@@ -54,12 +49,7 @@ public class ActivityQuestInfo {
     /**
     * 所属游戏id
     */
-    private Long gameId;
-
-    /**
-    * 平台游戏类型
-    */
-    private String kindId;
+    private Long infoId;
 
     /**
     * 平台类型

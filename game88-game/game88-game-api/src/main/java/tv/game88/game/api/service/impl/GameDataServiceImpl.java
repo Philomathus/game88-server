@@ -19,6 +19,7 @@ import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.core.quest.mapper.MemberQuestMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.RspGameDataLog;
+import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
@@ -269,7 +270,8 @@ public class GameDataServiceImpl implements GameDataService {
                 if ( !Objects.equals( confQuest.getPlatformId(), data.getPlatformId() ) ) {
                     continue;
                 }
-                if ( !confQuest.getKindId().equals( "0" ) && !confQuest.getKindId().equals( data.getKindId() ) ) {
+                GameInfo gameInfo = gameCacheUtils.getGameInfo( confQuest.getInfoId() );
+                if ( !gameInfo.getKindId().equals( "0" ) && !gameInfo.getKindId().equals( data.getKindId() ) ) {
                     continue;
                 }
                 MemberQuest memberQuest = memberQuestMapper.selectById( data

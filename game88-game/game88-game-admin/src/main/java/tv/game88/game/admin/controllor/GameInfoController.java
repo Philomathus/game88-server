@@ -51,16 +51,16 @@ public class GameInfoController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('game:info:list')" )
     @GetMapping( "/listAll" )
-    public RspBase<List<RspGame>> listAll() {
-        List<RspGame> list = gameInfoService
-                .list( new QueryWrapper<GameInfo>().select( "id", "name", "icon" ) )
-                .stream()
-                .map( p -> {
-                    RspGame rspGame = new RspGame();
-                    BeanUtils.copyProperties( p, rspGame );
-                    return rspGame;
-                } )
-                .collect( Collectors.toList() );
+    public RspBase<List<RspGame>> listAll( @RequestParam( required = false ) Long platformId ) {
+        QueryWrapper<GameInfo> select = new QueryWrapper<GameInfo>().select( "id", "name", "icon" );
+        if ( platformId != null ) {
+            select.eq( "platform_id", platformId );
+        }
+        List<RspGame> list = gameInfoService.list( select ).stream().map( p -> {
+            RspGame rspGame = new RspGame();
+            BeanUtils.copyProperties( p, rspGame );
+            return rspGame;
+        } ).collect( Collectors.toList() );
         return RspBase.ok( list );
     }
 

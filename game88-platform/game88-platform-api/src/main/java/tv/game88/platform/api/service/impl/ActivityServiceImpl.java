@@ -145,15 +145,11 @@ public class ActivityServiceImpl implements ActivityService {
             for ( ActivityQuestInfo activityQuestInfo : lists ) {
                 RspQuestInfo info = new RspQuestInfo();
                 info.setContent( activityQuestInfo.getContent() );
-                info.setDetail( activityQuestInfo.getDetail() );
-                info.setGameId( activityQuestInfo.getGameId() );
-                if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo
-                        .getIcon()
-                        .startsWith( "http" ) ) {
+                info.setInfoId( activityQuestInfo.getInfoId() );
+                if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo.getIcon().startsWith( "http" ) ) {
                     info.setIcon( domainValue + activityQuestInfo.getIcon() );
                 }
                 info.setId( activityQuestInfo.getId() );
-                info.setKindId( activityQuestInfo.getKindId() );
                 info.setPlatformId( activityQuestInfo.getPlatformId() );
                 info.setReward( activityQuestInfo.getReward() );
                 info.setTarget( activityQuestInfo.getTarget() );
