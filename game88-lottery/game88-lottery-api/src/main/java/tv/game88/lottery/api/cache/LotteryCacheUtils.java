@@ -154,19 +154,19 @@ public class LotteryCacheUtils {
                 if ( CollectionUtils.isEmpty( kindMethods ) ) {
                     continue;
                 }
+                Map<String, String> oddsMap = new HashMap<>();
                 for ( RspMethod md : kindMethods ) {
                     methodsGamesMap.put( md.getId(), gamelistall
                             .stream()
                             .filter( u -> md.getId().equals( u.getMethodId() ) )
                             .collect( Collectors.toList() ) );
                     methodMap.put( md.getId().toString(), JsonUtil.object2Json( md ) );
-                    Map<String, String> oddsMap = new HashMap<>();
                     for ( LotteryGameVo g : methodsGamesMap.get( md.getId() ) ) {
                         oddsMap.put( g.getInfo(), g.getOdds().toString() );
                     }
-                    redisUtils.unlink( LOTTERY_ODDS_KEY + kindId );
-                    redisUtils.hMSet( LOTTERY_ODDS_KEY + kindId, oddsMap );
                 }
+                redisUtils.unlink( LOTTERY_ODDS_KEY + kindId );
+                redisUtils.hMSet( LOTTERY_ODDS_KEY + kindId, oddsMap );
             }
             redisUtils.unlink( LOTTERY_METHOD_KEY );
             redisUtils.hMSet( LOTTERY_METHOD_KEY, methodMap );
