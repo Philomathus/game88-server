@@ -1,5 +1,6 @@
 package tv.game88.common.utils;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -32,13 +33,13 @@ public class ValidatorUtil {
     /**
      * 正则表达式：验证邮箱
      */
-    public static final String REGEX_EMAIL = "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,"
-            + "}$";
+    public static final String REGEX_EMAIL =
+            "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2," + "}$";
 
     /**
      * 正则表达式：验证汉字
      */
-    public static final String REGEX_CHINESE = "^[\u4e00-\u9fa5],{0,}$";
+    public static final String REGEX_CHINESE = "[\u4e00-\u9fa5]";
 
     /**
      * 正则表达式：验证身份证
@@ -120,7 +121,15 @@ public class ValidatorUtil {
      * @return 校验通过返回true，否则返回false
      */
     public static boolean isChinese( String chinese ) {
-        return Pattern.matches( REGEX_CHINESE, chinese );
+        Pattern pattern = Pattern.compile( REGEX_CHINESE );
+        char[]  c       = chinese.toCharArray();
+        for ( char value : c ) {
+            Matcher matcher = pattern.matcher( String.valueOf( value ) );
+            if ( !matcher.matches() ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
