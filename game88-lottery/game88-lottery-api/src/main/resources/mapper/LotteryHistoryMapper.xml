@@ -32,6 +32,28 @@
         from lottery_history
     </sql>
 
+    <select id="selectLotteryHistoryList" parameterType="tv.game88.lottery.api.entity.LotteryHistory" resultMap="LotteryHistoryResult">
+        <include refid="selectLotteryHistoryVo"/>
+        <where>
+            <if test="issue != null  and issue != ''"> and issue = #{issue}</if>
+            <if test="lotteryId != null "> and lottery_id = #{lotteryId}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(ktime,'%y%m%d') <![CDATA[ >= ]]> date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(ktime,'%y%m%d') <![CDATA[ <= ]]> date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="killRate != null "> and kill_rate = #{killRate}</if>
+            <if test="totalBet != null "> and total_bet = #{totalBet}</if>
+            <if test="totalPrize != null "> and total_prize = #{totalPrize}</if>
+            <if test="ctl != null "> and ctl = #{ctl}</if>
+            <if test="analyse != null  and analyse != ''"> and analyse = #{analyse}</if>
+        </where>
+    </select>
+
     <select id="selectIssueWaite" resultType="java.lang.String">
         select id
         from lottery_history

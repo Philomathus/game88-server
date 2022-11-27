@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface LotteryHistoryService extends IService<LotteryHistory> {
+    List<LotteryHistory> selectLotteryHistoryList( LotteryHistory lotteryHistory );
+
     void newIssue( RspLotteryInfo lotteryInfo, String issue, LocalDateTime time, int i );
 
     void awardByLotteryResult( List<LotteryBet> updateList, Map<String, BigDecimal> prizeMap, String historyId, Map<String,

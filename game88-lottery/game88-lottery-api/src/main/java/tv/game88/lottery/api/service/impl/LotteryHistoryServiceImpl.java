@@ -47,6 +47,11 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
     private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
+    public List<LotteryHistory> selectLotteryHistoryList( LotteryHistory lotteryHistory ) {
+        return this.baseMapper.selectLotteryHistoryList( lotteryHistory );
+    }
+
+    @Override
     public void newIssue( RspLotteryInfo lotteryInfo, String issue, LocalDateTime time, int i ) {
         String        issueId = issue + "-" + lotteryInfo.getId();
         LocalDateTime ktimes  = time.plusMinutes( 1 ).withSecond( 0 );

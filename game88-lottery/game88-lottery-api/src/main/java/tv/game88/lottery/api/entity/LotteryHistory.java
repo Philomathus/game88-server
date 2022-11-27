@@ -2,13 +2,16 @@ package tv.game88.lottery.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 彩票开奖历史对象 lottery_history
@@ -43,4 +46,11 @@ public class LotteryHistory {
     private Integer       ctl;
     @Excel( name = "开奖分析" )
     private String        analyse;
+
+    /**
+     * 请求参数
+     */
+    @JsonIgnore
+    @TableField( exist = false )
+    private Map<String, Object> params;
 }

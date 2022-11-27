@@ -19,6 +19,8 @@ import java.util.Map;
  * @author mengJun
  */
 public interface LotteryHistoryMapper extends BaseMapper<LotteryHistory> {
+    List<LotteryHistory> selectLotteryHistoryList( LotteryHistory lotteryHistory );
+
     List<String> selectIssueWaite( @Param( "time" ) LocalDateTime time, @Param( "lotteryId" ) Integer lotteryId );
 
     Integer updateAlreadyPrize( @Param( "id" ) String historyId, @Param( "status" ) Integer status, @Param( "ctl" ) Integer ctl

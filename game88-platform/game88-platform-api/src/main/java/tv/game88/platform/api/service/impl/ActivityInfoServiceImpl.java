@@ -30,9 +30,12 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         if ( !CollectionUtils.isEmpty( activityInfos ) ) {
-            for ( ActivityInfo activityInfo1 : activityInfos ) {
-                if ( StringUtils.isNotBlank( activityInfo1.getIcon() ) && !activityInfo1.getIcon().startsWith( "http" ) ) {
-                    activityInfo1.setIcon( domainValue + activityInfo1.getIcon() );
+            for ( ActivityInfo info : activityInfos ) {
+                if ( StringUtils.isNotBlank( info.getIcon() ) && !info.getIcon().startsWith( "http" ) ) {
+                    info.setIcon( domainValue + info.getIcon() );
+                }
+                if(info.getContent().contains( "domain.oss" )){
+                    info.setContent( info.getContent().replaceAll( "\\$\\{domain\\.oss\\}", domainValue ) );
                 }
             }
         }
