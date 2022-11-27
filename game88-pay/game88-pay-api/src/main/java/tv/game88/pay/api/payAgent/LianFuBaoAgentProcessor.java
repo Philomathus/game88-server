@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RSACoder;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -195,7 +196,7 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
         signMap.put( "message", "签名错误" );
         signMap.put( "merId", payAgentChannel.getMerId() );
         signMap.put( "merOrderNo", merOrderNo );
-        if ( org.apache.commons.lang3.StringUtils.equalsIgnoreCase( sign, mySign ) ) {
+        if ( StringUtils.equalsIgnoreCase( sign, mySign ) ) {
             if ( amount.compareTo( memberWithdrawDetail.getWithdrawMoney() ) != 0 ) {
                 signMap.put( "code", "1004" );
                 signMap.put( "message", "金额不匹配" );
