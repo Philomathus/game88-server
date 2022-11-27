@@ -33,8 +33,6 @@ public class PayRechargeUsdtServiceImpl extends ServiceImpl<PayRechargeUsdtMappe
     public List<RspPayRechargeUsdt> selectList( String memberId, Integer vip ) {
         List<RspPayRechargeUsdt> resultList = this.baseMapper.selectEffectRspList();
         if ( !CollectionUtils.isEmpty( resultList ) ) {
-            resultList.removeIf( rsp -> rsp.getOpenLevelMin() != null && rsp.getOpenLevelMax() != null && vip != null && (
-                    vip < rsp.getOpenLevelMin() || vip > rsp.getOpenLevelMax() ) );
             String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( RspPayRechargeUsdt rsp : resultList ) {
                 if ( StringUtils.isNotBlank( rsp.getIcon() ) && !rsp.getIcon().startsWith( "http" ) ) {

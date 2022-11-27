@@ -25,11 +25,6 @@ public class RspPayRechargeUsdt {
     @Schema( title = "优惠比例格式化" )
     private String     discountBillStr;
 
-    @Schema( title = "开放层级 小", hidden = true )
-    private Long openLevelMin;
-    @Schema( title = "开放层级 大", hidden = true )
-    private Long openLevelMax;
-
     public void setDiscountBill( BigDecimal discount_bill ) {
         if ( discount_bill != null ) {
             this.discountBillStr = discount_bill.multiply( BigDecimal.valueOf( 100 ) ).setScale( 1, RoundingMode.HALF_UP )

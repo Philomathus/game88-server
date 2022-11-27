@@ -12,8 +12,6 @@
         <result property="sort"    column="sort"    />
         <result property="icon"    column="icon"    />
         <result property="effect"    column="effect"    />
-        <result property="openLevelMin"    column="open_level_min"    />
-        <result property="openLevelMax"    column="open_level_max"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -23,7 +21,7 @@
 
     <sql id="selectPayRechargeUsdtVo">
         select id, channel_name, chain_name, recharge_address, discount_bill, exchange_rate, sort, icon,
-               effect,open_level_min,open_level_max, create_by, create_time ,  update_by, update_time ,remark from pay_recharge_usdt
+               effect, create_by, create_time ,  update_by, update_time ,remark from pay_recharge_usdt
     </sql>
 
     <select id="selectPayRechargeUsdtList" parameterType="tv.game88.pay.api.entity.PayRechargeUsdt" resultMap="PayRechargeUsdtResult">

@@ -36,10 +36,6 @@ public class PayRechargeUsdt {
     private Integer sort;
     @Excel(name = "激活状态")
     private Boolean effect;
-    @Excel(name = "开放层级 小")
-    private Long openLevelMin;
-    @Excel(name = "开放层级 大")
-    private Long openLevelMax;
 
     @Excel(name = "创建人")
     private String createBy;
