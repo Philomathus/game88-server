@@ -88,13 +88,13 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
         }
     }
 
-    private void sendNewLotteryIssueMsg( Integer id, LocalDateTime ktimes, String issue ) {
+    private void sendNewLotteryIssueMsg( Integer lotteryId, LocalDateTime ktimes, String issue ) {
         long cutDown = ktimes.until( LocalDateTime.now(), ChronoUnit.SECONDS );
         if ( cutDown < 0 ) {
             return;
         }
         HashMap<String, Object> data = new HashMap<>();
-        data.put( "id", id );
+        data.put( "id", lotteryId );
         data.put( "cutDown", cutDown );
         data.put( "curIssue", issue );
         data.put( "at", 1 );//1= 开新期2=投注  3=中奖
@@ -104,7 +104,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
         ext.put( "data", data );
         // 1 =新开启 2 = 投注, 中奖
         ext.put( "act", 1 );
-        imServerUtils.sendOnlineGroupMessage( ext );
+        imServerUtils.sendGroupMessage( lotteryId + "", ext );
     }
 
     @Override

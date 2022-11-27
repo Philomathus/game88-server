@@ -515,17 +515,17 @@ public class LotteryServiceImpl implements LotteryService {
         return noKill;
     }
 
-    private void sendNewLotteryIssueMsg( int id, String code, String issue, String analyse, String analyseGameId ) {
-        LotteryBase info = LotteryCacheUtils.me.getLotteryBase( id );
+    private void sendNewLotteryIssueMsg( int lotteryId, String code, String issue, String analyse, String analyseGameId ) {
+        LotteryBase info = LotteryCacheUtils.me.getLotteryBase( lotteryId );
         if ( info == null ) {
-            log.error( "彩票信息为空" + id );
+            log.error( "彩票信息为空" + lotteryId );
             return;
         }
         if ( info.getCycle() != 1 ) {
             return;
         }
         HashMap<String, Object> data = new HashMap<>();
-        data.put( "id", id );
+        data.put( "id", lotteryId );
         data.put( "name", info.getName() );
         data.put( "lotteryType", info.getName().substring( 2 ) );
         data.put( "lotteryIssue", issue );
@@ -539,7 +539,7 @@ public class LotteryServiceImpl implements LotteryService {
         // 4=开奖公告
         ext.put( "act", 4 );
 
-        imServerUtils.sendOnlineGroupMessage( ext );
+        imServerUtils.sendGroupMessage( lotteryId + "", ext );
     }
 
     private void pushLotteryCenter( PlatformUser platformUser, ReqBet reqBet, String[] bet_select, String issue,
@@ -598,7 +598,7 @@ public class LotteryServiceImpl implements LotteryService {
         ext.put( "act", 2 );
         ext.put( "groupId", profile );
 
-        imServerUtils.sendOnlineGroupMessage( ext );
+        imServerUtils.sendGroupMessage( lotteryId + "", ext );
     }
 
     public boolean checkOkMethod( Integer lotteryId, Integer methodId ) {
@@ -741,7 +741,7 @@ public class LotteryServiceImpl implements LotteryService {
         HashMap<String, Object> ext = new HashMap<>();
         ext.put( "type", 103 );
         ext.put( "data", data );
-        imServerUtils.sendOnlineGroupMessage( ext );
+        imServerUtils.sendGroupMessage( bet.getLotteryId() + "", ext );
     }
 
     private void awardRepair( String id ) {
