@@ -3,14 +3,17 @@ package tv.game88.pay.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Data
 public class ReqPayRecharge {
 	@Schema( title = "支付通道ID", required = true )
+	@NotNull(message = "请选择通道")
 	private Integer    channelId;
 	@Schema( title = "充值金额", required = true )
+	@NotNull(message = "请选择金额")
 	private BigDecimal money;
 	@Schema( title = "真实IP", required = true )
 	private String     realIp;
