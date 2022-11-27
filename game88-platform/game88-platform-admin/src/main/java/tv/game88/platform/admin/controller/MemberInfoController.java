@@ -38,9 +38,9 @@ import java.util.Map;
 @Log4j2
 public class MemberInfoController extends BaseController {
     @Resource
-    private MemberInfoService  memberInfoService;
+    private MemberInfoService memberInfoService;
     @Resource
-    private RedisUtils         redisUtil;
+    private RedisUtils        redisUtil;
 
     /**
      * 查询用户信息列表
@@ -113,20 +113,7 @@ public class MemberInfoController extends BaseController {
     @Log( title = "用户信息", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody MemberInfo memberInfo ) {
-        String password = memberInfo.getPassword();
-        String phone    = memberInfo.getPhone();
-        if ( phone == null ) {
-            return RspBase.businessError( "手机号不能为空" );
-        }
-
-        if ( StringUtils.isEmpty( password ) ) {
-            return RspBase.businessError( "密码不能为空" );
-        }
-
-        if ( password.length() < 6 || password.length() > 15 ) {
-            return RspBase.businessError( "密码长度必须大于等于6小于15" );
-        }
-        return toResult( memberInfoService.save( memberInfo ) );
+        return memberInfoService.insertMemberInfo( memberInfo.getPhone(), memberInfo.getPassword() );
     }
 
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:changeStatus')" )

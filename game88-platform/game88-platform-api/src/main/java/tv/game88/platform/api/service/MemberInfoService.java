@@ -77,4 +77,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
     void receiveVipGift( String memberId, boolean isInsert, MemberVipGift saveOrUpdate, String name, BigDecimal addMoney );
 
     RspBase<RspImToken> getImToken( String userId );
+
+    RspBase<?> insertMemberInfo( String phone, String password );
 }

@@ -995,4 +995,43 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         rspImToken.setImHostlist( Arrays.asList( newImHosts.split( "," ) ) );
         return RspBase.ok( rspImToken );
     }
+
+    @Override
+    public RspBase<?> insertMemberInfo( String phone, String password ) {
+        if ( phone == null ) {
+            return RspBase.businessError( "手机号不能为空" );
+        }
+
+        if ( StringUtils.isBlank( password ) ) {
+            return RspBase.businessError( "密码不能为空" );
+        }
+
+        if ( password.length() < 6 || password.length() > 15 ) {
+            return RspBase.businessError( "密码长度必须大于等于6小于15" );
+        }
+        //校验是不是手机号
+        if ( !ValidatorUtil.isNumber11( phone ) ) {
+            return RspBase.businessError( "手机号必须是11位数字" );
+        }
+        if ( this.baseMapper.selectCount( new QueryWrapper<MemberInfo>().eq( "phone", phone ) ) > 0 ) {
+            return RspBase.businessError( "此手机号已经存在" );
+        }
+        MemberInfo m = new MemberInfo();
+        m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
+        m.setId( makeMemberCode() );
+        m.setNickName( m.getId() );
+        m.setPhone( phone );
+        m.setStatus( 2 );
+        m.setVip( 1 );//默认vip1
+        m.setRegisterTime( LocalDateTime.now() );
+        m.setAccountNow( BigDecimal.ZERO );
+        m.setAccountCharge( BigDecimal.ZERO );
+        m.setBoxAccount( BigDecimal.ZERO );
+        m.setCodeNow( BigDecimal.ZERO );
+        m.setCodeWill( BigDecimal.ZERO );
+        m.setCodeTotal( BigDecimal.ZERO );
+        m.setLoginNum( 0 );
+        int insert = this.baseMapper.insert( m );
+        return insert > 0 ? RspBase.ok( "新增成功" ) : RspBase.businessError( "新增失败" );
+    }
 }
