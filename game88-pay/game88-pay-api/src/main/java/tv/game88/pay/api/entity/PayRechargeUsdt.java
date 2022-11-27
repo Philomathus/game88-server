@@ -30,8 +30,6 @@ public class PayRechargeUsdt {
     private BigDecimal discountBill;
     @Excel(name = "usdt汇率")
     private BigDecimal exchangeRate;
-    @Excel(name = "钱包二维码")
-    private String icon;
     @Excel(name = "排序")
     private Integer sort;
     @Excel(name = "激活状态")

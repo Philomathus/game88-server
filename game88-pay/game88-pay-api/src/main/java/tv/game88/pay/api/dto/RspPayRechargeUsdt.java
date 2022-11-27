@@ -12,8 +12,6 @@ public class RspPayRechargeUsdt {
     private String     id;
     @Schema( title = "渠道名称" )
     private String     channelName;
-    @Schema( title = "钱包二维码" )
-    private String     icon;
     @Schema( title = "链名称" )
     private String     chainName;
     @Schema( title = "充值地址" )

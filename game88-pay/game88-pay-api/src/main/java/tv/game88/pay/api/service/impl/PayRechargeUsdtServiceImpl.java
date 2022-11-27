@@ -1,10 +1,8 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.pay.api.dto.RspPayRechargeUsdt;
 import tv.game88.pay.api.entity.PayRechargeUsdt;
 import tv.game88.pay.api.mapper.PayRechargeUsdtMapper;
@@ -17,28 +15,13 @@ import java.util.List;
 public class PayRechargeUsdtServiceImpl extends ServiceImpl<PayRechargeUsdtMapper, PayRechargeUsdt> implements PayRechargeUsdtService {
     @Override
     public List<PayRechargeUsdt> selectPayRechargeUsdtList( PayRechargeUsdt payRechargeUsdt ) {
-        List<PayRechargeUsdt> payRechargeUsdts = this.baseMapper.selectPayRechargeUsdtList( payRechargeUsdt );
-        String                domainValue      = ConfigDomainCacheUtil.me.getDomainOssValue();
-        if ( !CollectionUtils.isEmpty( payRechargeUsdts ) ) {
-            for ( PayRechargeUsdt info : payRechargeUsdts ) {
-                if ( StringUtils.isNotBlank( info.getIcon() ) && !info.getIcon().startsWith( "http" ) ) {
-                    info.setIcon( domainValue + info.getIcon() );
-                }
-            }
-        }
-        return payRechargeUsdts;
+        return this.baseMapper.selectPayRechargeUsdtList( payRechargeUsdt );
     }
 
     @Override
     public List<RspPayRechargeUsdt> selectList( String memberId, Integer vip ) {
         List<RspPayRechargeUsdt> resultList = this.baseMapper.selectEffectRspList();
         if ( !CollectionUtils.isEmpty( resultList ) ) {
-            String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
-            for ( RspPayRechargeUsdt rsp : resultList ) {
-                if ( StringUtils.isNotBlank( rsp.getIcon() ) && !rsp.getIcon().startsWith( "http" ) ) {
-                    rsp.setIcon( domainValue + rsp.getIcon() );
-                }
-            }
             Collections.shuffle( resultList );
         }
         return resultList;
