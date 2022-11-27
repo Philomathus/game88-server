@@ -275,7 +275,7 @@ public class PayServiceImpl implements PayService {
             return RspBase.businessError( "您请求订单次数过多，请稍后重试" );
         }
 
-        if ( reqPayRecharge.getChannelId() == -1 ) {
+        if ( reqPayRecharge.getChannelId() < 0 ) {
             //把code转化成通道id
             this.payNewLogicRecharge( reqPayRecharge, platformUser );
         }
