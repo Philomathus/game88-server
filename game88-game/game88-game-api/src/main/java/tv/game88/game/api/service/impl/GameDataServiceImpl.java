@@ -268,9 +268,7 @@ public class GameDataServiceImpl implements GameDataService {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
-                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) || !rspGameInfo
-                            .getKindId()
-                            .equals( data.getKindId() ) ) {
+                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() )) {
                         continue;
                     }
                     MemberQuest memberQuest = memberQuestMapper.selectById( data
