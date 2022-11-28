@@ -19,7 +19,7 @@ import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.core.quest.mapper.MemberQuestMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.RspGameDataLog;
-import tv.game88.game.api.entity.GameInfo;
+import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
@@ -30,7 +30,10 @@ import tv.game88.game.api.type.EnumGameCategory;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -252,52 +255,49 @@ public class GameDataServiceImpl implements GameDataService {
 
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
-        List<ActivityQuestInfo> listConfQuet = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>().eq( "effect",
+        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>().eq( "effect",
                 1 ) );
 
-        Set<Integer> questSet = listConfQuet.stream().map( ActivityQuestInfo::getPlatformId ).collect( Collectors.toSet() );
         for ( MemberGameData data : list ) {
-            //过滤没参加活动的游戏平台
-            if ( !questSet.contains( data.getPlatformId() ) ) {
-                continue;
-            }
             // 过滤百家乐和局庄闲下注，不计入打码和任务
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
                 continue;
             }
             int add = new BigDecimal( data.getCellScore() ).intValue();
-            for ( ActivityQuestInfo confQuest : listConfQuet ) {
-                if ( !Objects.equals( confQuest.getPlatformId(), data.getPlatformId() ) ) {
-                    continue;
-                }
-                GameInfo gameInfo = gameCacheUtils.getGameInfo( confQuest.getInfoId() );
-                if ( !gameInfo.getKindId().equals( "0" ) && !gameInfo.getKindId().equals( data.getKindId() ) ) {
-                    continue;
-                }
-                MemberQuest memberQuest = memberQuestMapper.selectById( data
-                        .getAccount()
-                        .concat( "_" )
-                        .concat( confQuest.getId().toString() ) );
-                if ( memberQuest == null ) {
-                    memberQuest = new MemberQuest();
-                    memberQuest.setMemberId( data.getAccount() );
-                    memberQuest.setQuestId( confQuest.getId() );
-                    memberQuest.setId( data.getAccount().concat( "_" ).concat( confQuest.getId().toString() ) );
-                    memberQuest.setStatus( 0 );
-                    memberQuest.setCurNum( add );
-                    if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
-                        memberQuest.setCurNum( confQuest.getTarget() );
-                        memberQuest.setStatus( 1 );
+            for ( ActivityQuestInfo confQuest : listConfQuest ) {
+                Long              gameTypeId     = confQuest.getGameTypeId();
+                List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
+                for ( RspGameInfo rspGameInfo : effectInfoList ) {
+                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) || !rspGameInfo
+                            .getKindId()
+                            .equals( data.getKindId() ) ) {
+                        continue;
                     }
-                    memberQuest.setTaskMode( confQuest.getTaskMode() );
-                    memberQuestMapper.insert( memberQuest );
-                } else if ( memberQuest.getStatus() == 0 ) {
-                    memberQuest.setCurNum( memberQuest.getCurNum() + add );
-                    if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
-                        memberQuest.setCurNum( confQuest.getTarget() );
-                        memberQuest.setStatus( 1 );
+                    MemberQuest memberQuest = memberQuestMapper.selectById( data
+                            .getAccount()
+                            .concat( "_" )
+                            .concat( confQuest.getId().toString() ) );
+                    if ( memberQuest == null ) {
+                        memberQuest = new MemberQuest();
+                        memberQuest.setMemberId( data.getAccount() );
+                        memberQuest.setQuestId( confQuest.getId() );
+                        memberQuest.setId( data.getAccount().concat( "_" ).concat( confQuest.getId().toString() ) );
+                        memberQuest.setStatus( 0 );
+                        memberQuest.setCurNum( add );
+                        if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
+                            memberQuest.setCurNum( confQuest.getTarget() );
+                            memberQuest.setStatus( 1 );
+                        }
+                        memberQuest.setTaskMode( confQuest.getTaskMode() );
+                        memberQuestMapper.insert( memberQuest );
+                    } else if ( memberQuest.getStatus() == 0 ) {
+                        memberQuest.setCurNum( memberQuest.getCurNum() + add );
+                        if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
+                            memberQuest.setCurNum( confQuest.getTarget() );
+                            memberQuest.setStatus( 1 );
+                        }
+                        memberQuestMapper.updateById( memberQuest );
                     }
-                    memberQuestMapper.updateById( memberQuest );
                 }
             }
         }

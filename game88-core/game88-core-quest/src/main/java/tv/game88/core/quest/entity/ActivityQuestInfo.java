@@ -1,7 +1,6 @@
 package tv.game88.core.quest.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +32,11 @@ public class ActivityQuestInfo {
     private Long typeId;
 
     /**
+     * 游戏类型id
+     */
+    private Long gameTypeId;
+
+    /**
      * 目标任务量
      */
     private Integer target;
@@ -48,16 +52,6 @@ public class ActivityQuestInfo {
     private String content;
 
     /**
-     * 所属游戏id
-     */
-    private Long infoId;
-
-    /**
-     * 平台类型
-     */
-    private Integer platformId;
-
-    /**
      * 任务模式（0一次性 1每日任务）默认为0
      */
     private Integer taskMode;
@@ -71,9 +65,4 @@ public class ActivityQuestInfo {
      * 排序号
      */
     private Integer sort;
-
-    @TableField( exist = false )
-    private String platformName;
-    @TableField( exist = false )
-    private String infoName;
 }

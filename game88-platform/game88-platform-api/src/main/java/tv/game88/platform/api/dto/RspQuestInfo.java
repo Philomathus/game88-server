@@ -23,10 +23,8 @@ public class RspQuestInfo {
     private Integer    curNum     = 0;
     @Schema( title = "0=进行中1=已经完成2 领奖完成" )
     private Integer    status     = 0;
-    @Schema( title = "平台ID" )
-    private Integer    platformId = 0;
-    @Schema( title = "游戏ID" )
-    private Long       infoId;
+    @Schema( title = "游戏类型ID" )
+    private Integer    gameTypeId;
 
     private Long typeId;
 

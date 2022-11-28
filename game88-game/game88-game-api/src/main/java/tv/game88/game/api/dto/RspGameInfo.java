@@ -31,8 +31,10 @@ public class RspGameInfo {
     private Long lotteryId;
 
     @Schema( hidden = true )
-    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String kindId;
+
+    @Schema( hidden = true )
+    private Integer platformId;
 
     @Schema( title = "平台维护", hidden = true )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )

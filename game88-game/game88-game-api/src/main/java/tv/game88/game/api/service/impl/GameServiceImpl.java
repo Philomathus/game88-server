@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
@@ -75,7 +76,12 @@ public class GameServiceImpl implements GameService {
     @Override
     public RspGameTypes getGameTypes() {
         List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
-        RspGameTypes      rspGameTypes = new RspGameTypes();
+        for ( RspGameType rspGameType : gameTypeList ) {
+            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
+                rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
+            }
+        }
+        RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
             Long typeId = gameTypeList.get( 0 ).getId();

@@ -23,7 +23,7 @@ public class GameInfo {
     /**
      * 系统编号
      */
-    @TableId(type = IdType.AUTO)
+    @TableId( type = IdType.AUTO )
     private Long id;
 
     /**
@@ -37,6 +37,12 @@ public class GameInfo {
      */
     @Excel( name = "游戏平台ID" )
     private Long platformId;
+
+    /**
+     * 游戏类型ID
+     */
+    @Excel( name = "游戏类型ID" )
+    private Long typeId;
 
     /**
      * 游戏码
@@ -80,4 +86,7 @@ public class GameInfo {
     @Excel( name = "创建时间" )
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createTime;
+
+    @Excel( name = "排序" )
+    private Integer sort;
 }

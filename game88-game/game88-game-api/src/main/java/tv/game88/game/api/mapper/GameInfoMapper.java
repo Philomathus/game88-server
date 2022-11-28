@@ -1,7 +1,6 @@
 package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GameInfo;
 
@@ -23,7 +22,5 @@ public interface GameInfoMapper extends BaseMapper<GameInfo> {
      */
     public List<GameInfo> selectGameInfoList( GameInfo gameInfo );
 
-    List<RspGameInfo> selectRspList( List<Long> infoIds );
-
-    List<GameInfo> selectListNotType( @Param( "typeId" ) Long typeId, @Param( "infoName" ) String name );
+    List<RspGameInfo> selectRspList( Long typeId );
 }

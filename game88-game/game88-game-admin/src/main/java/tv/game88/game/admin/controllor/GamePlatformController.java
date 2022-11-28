@@ -182,7 +182,6 @@ public class GamePlatformController extends BaseController {
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
             gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
-            gameCacheUtils.clearTypeWithByPlatformId( id );
         }
         return toResult( isSave );
     }
@@ -197,7 +196,6 @@ public class GamePlatformController extends BaseController {
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
             gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
-            gameCacheUtils.clearTypeWithByPlatformId( id );
         }
         return toResult( isSave );
     }

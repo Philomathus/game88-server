@@ -6,36 +6,28 @@
         <result property="icon" column="icon" />
         <result property="title" column="title" />
         <result property="typeId" column="type_id" />
+        <result property="gameTypeId" column="game_type_id" />
         <result property="target" column="target" />
         <result property="reward" column="reward" />
         <result property="content" column="content" />
-        <result property="infoId" column="info_id" />
-        <result property="platformId" column="platform_id" />
         <result property="taskMode" column="task_mode" />
         <result property="effect" column="effect" />
         <result property="sort" column="sort" />
-        <result property="platformName" column="platformName" />
-        <result property="infoName" column="infoName" />
     </resultMap>
 
     <sql id="selectActivityQuestInfoVo">
-        select q.id,
-               q.icon,
-               q.title,
-               q.type_id,
-               q.target,
-               q.reward,
-               q.content,
-               q.info_id,
-               q.platform_id,
-               q.task_mode,
-               q.effect,
-               q.sort,
-               gp.name platformName,
-               gi.name infoName
-        from activity_quest_info q
-        left join game_platform gp on q.platform_id = gp.id
-        left join game_info gi on q.info_id = gi.id
+        select id,
+               icon,
+               title,
+               type_id,
+               game_type_id,
+               target,
+               reward,
+               content,
+               task_mode,
+               effect,
+               sort
+        from activity_quest_info
     </sql>
 
     <select id="selectActivityQuestInfoList" parameterType="tv.game88.core.quest.entity.ActivityQuestInfo"
@@ -43,24 +35,21 @@
         <include refid="selectActivityQuestInfoVo" />
         <where>
             <if test="title != null  and title != ''">
-                and q.title like concat('%', #{title}, '%')
+                and title like concat('%', #{title}, '%')
             </if>
             <if test="typeId != null">
-                and q.type_id = #{typeId}
+                and type_id = #{typeId}
             </if>
-            <if test="infoId != null">
-                and q.info_id = #{infoId}
-            </if>
-            <if test="platformId != null">
-                and q.platform_id = #{platformId}
+            <if test="gameTypeId != null">
+                and game_type_id = #{gameTypeId}
             </if>
             <if test="taskMode != null">
-                and q.task_mode = #{taskMode}
+                and task_mode = #{taskMode}
             </if>
             <if test="effect != null">
-                and q.effect = #{effect}
+                and effect = #{effect}
             </if>
         </where>
-        order by q.sort
+        order by sort
     </select>
 </mapper>

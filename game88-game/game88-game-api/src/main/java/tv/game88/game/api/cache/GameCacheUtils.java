@@ -1,6 +1,5 @@
 package tv.game88.game.api.cache;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.BeanUtils;
@@ -14,11 +13,9 @@ import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.dto.RspGameType;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
-import tv.game88.game.api.entity.GameTypeWith;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
-import tv.game88.game.api.mapper.GameTypeWithMapper;
 import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
@@ -32,7 +29,7 @@ public class GameCacheUtils {
     public static final String GAME_PLATFORM_KEY      = Constants.GAME_PREX + "platform:";
     public static final String GAME_PLATFORM_LIST_KEY = Constants.GAME_PREX + "platformList";
     public static final String GAME_INFO_KEY          = Constants.GAME_PREX + "info:";
-    public static final String GAME_TYPE_INFO_WITH    = Constants.GAME_PREX + "typeWithInfo:";
+    public static final String GAME_INFO_LIST_KEY     = Constants.GAME_PREX + "infoList:";
 
     @Resource
     private RedisUtils         redisUtils;
@@ -42,8 +39,6 @@ public class GameCacheUtils {
     private GamePlatformMapper gamePlatformMapper;
     @Resource
     private GameInfoMapper     gameInfoMapper;
-    @Resource
-    private GameTypeWithMapper gameTypeWithMapper;
 
     public List<RspGameType> getEffectTypeList() {
         if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
@@ -104,19 +99,8 @@ public class GameCacheUtils {
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId ) {
-        if ( !redisUtils.exists( GAME_TYPE_INFO_WITH + typeId ) ) {
-            List<Long> infoIds = gameTypeWithMapper
-                    .selectObjs( new QueryWrapper<GameTypeWith>()
-                            .eq( "type_id", typeId )
-                            .orderByAsc( "sort" )
-                            .select( "game_info_id" ) )
-                    .stream()
-                    .map( o -> Long.parseLong( o.toString() ) )
-                    .toList();
-            if ( CollectionUtils.isEmpty( infoIds ) ) {
-                return null;
-            }
-            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( infoIds );
+        if ( !redisUtils.exists( GAME_INFO_LIST_KEY + typeId ) ) {
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( typeId );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
                 for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
                     if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
@@ -124,11 +108,11 @@ public class GameCacheUtils {
                         rspGameInfo.setLotteryId( Long.parseLong( rspGameInfo.getKindId() ) );
                     }
                 }
-                redisUtils.strSet( GAME_TYPE_INFO_WITH + typeId, JsonUtil.object2Json( rspGameInfoList ) );
+                redisUtils.strSet( GAME_INFO_LIST_KEY + typeId, JsonUtil.object2Json( rspGameInfoList ) );
             }
             return rspGameInfoList;
         }
-        String s = redisUtils.strGet( GAME_TYPE_INFO_WITH + typeId );
+        String s = redisUtils.strGet( GAME_INFO_LIST_KEY + typeId );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
@@ -140,15 +124,10 @@ public class GameCacheUtils {
     }
 
     public void clearByInfoId( Long gameInfoId ) {
-        this.clear( GAME_INFO_KEY + gameInfoId );
-        gameTypeWithMapper
-                .selectObjs( new QueryWrapper<GameTypeWith>().eq( "game_info_id", gameInfoId ).select( "type_id" ) )
-                .stream()
-                .map( o -> Long.parseLong( o.toString() ) )
-                .forEach( typeId -> this.clear( GAME_TYPE_INFO_WITH + typeId ) );
-    }
-
-    public void clearTypeWithByPlatformId( Long platformId ) {
-        gameTypeWithMapper.selectTypeIdByPlatformId( platformId ).forEach( typeId -> this.clear( GAME_TYPE_INFO_WITH + typeId ) );
+        GameInfo gameInfo = getGameInfo( gameInfoId );
+        if ( gameInfo != null ) {
+            this.clear( GAME_INFO_KEY + gameInfoId );
+            this.clear( GAME_INFO_LIST_KEY + gameInfo.getTypeId() );
+        }
     }
 }

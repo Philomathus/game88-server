@@ -2,6 +2,7 @@ package tv.game88.game.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
@@ -37,5 +38,6 @@ public class MemberGameDataFix {
     @Excel( name = "0:未处理1已处理" )
     private Integer       status;
 
+    @TableField( exist = false )
     private String platformName;
 }
