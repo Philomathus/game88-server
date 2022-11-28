@@ -120,6 +120,7 @@ public class GameButtBBIN extends AbstractGameButt {
                         "/GameUrlBy" + gameUrlId : "/LobbyUrl" ) )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUri().toString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
