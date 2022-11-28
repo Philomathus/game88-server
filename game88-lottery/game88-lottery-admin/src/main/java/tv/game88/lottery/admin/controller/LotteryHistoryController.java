@@ -18,7 +18,7 @@ import java.util.List;
  * 开奖历史Controller
  */
 @RestController
-@RequestMapping( "/admin/lotteryHistory" )
+@RequestMapping( "/lottery/lotteryHistory" )
 public class LotteryHistoryController extends BaseController {
 
     @Resource
@@ -27,7 +27,7 @@ public class LotteryHistoryController extends BaseController {
     /**
      * 查询开奖历史列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:lotteryHistory:list')" )
+    @PreAuthorize( "@ss.hasPermi('lottery:history:list')" )
     @GetMapping( "/list" )
     public RspBase<List<LotteryHistory>> list( LotteryHistory lotteryHistory ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
