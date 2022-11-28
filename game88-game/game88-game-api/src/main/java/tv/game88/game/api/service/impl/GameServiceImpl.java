@@ -77,14 +77,18 @@ public class GameServiceImpl implements GameService {
     public RspGameTypes getGameTypes() {
         List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
         for ( RspGameType rspGameType : gameTypeList ) {
-            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
+            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType
+                    .getIcon()
+                    .startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
             }
         }
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
-            Long typeId = gameTypeList.get( 0 ).getId();
+            Long typeId = gameTypeList
+                    .get( 0 )
+                    .getId();
             rspGameTypes.setRspGameInfos( gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
@@ -220,12 +224,17 @@ public class GameServiceImpl implements GameService {
     public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
         Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
                 .eq( "member_id", memberId )
-                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .ge( "create_time", LocalDateTime
+                        .now()
+                        .minusMonths( 1 ) )
                 .select( "platform_id", "order_id" )
                 .list()
                 .stream()
                 .map( MemberGameMoney::getPlatformId )
                 .collect( Collectors.toSet() );
+        if ( CollectionUtils.isEmpty( platformIds ) ) {
+            return RspBase.ok( new ArrayList<>() );
+        }
         List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
         for ( GamePlatform gamePlatform : gamePlatforms ) {
@@ -251,13 +260,17 @@ public class GameServiceImpl implements GameService {
             } );
         }
         List<Future<RspGameMoney>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
-        List<RspGameMoney> resultList = futureList.stream().map( t -> {
-            try {
-                return t.get();
-            } catch ( InterruptedException | ExecutionException e ) {
-                throw new IllegalStateException( e );
-            }
-        } ).filter( Objects::nonNull ).collect( Collectors.toList() );
+        List<RspGameMoney> resultList = futureList
+                .stream()
+                .map( t -> {
+                    try {
+                        return t.get();
+                    } catch ( InterruptedException | ExecutionException e ) {
+                        throw new IllegalStateException( e );
+                    }
+                } )
+                .filter( Objects::nonNull )
+                .collect( Collectors.toList() );
         return RspBase.ok( resultList );
     }
 
