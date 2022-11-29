@@ -97,6 +97,9 @@ public class GameInfoController extends BaseController {
         gameInfo.setEffect( null );
         gameInfo.setRecommend( null );
         gameInfo.setMaintain( null );
+        if ( gameInfo.getTypeId() == null ) {
+            gameInfo.setTypeId( -1L );
+        }
         boolean isSave = gameInfoService.updateById( gameInfo );
         if ( isSave ) {
             gameCacheUtils.clearByInfoId( gameInfo.getId() );

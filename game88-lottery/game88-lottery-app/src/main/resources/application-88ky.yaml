@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://pc-j6ct6o187g7dis32y.rwlb.rds.aliyuncs.com:3306/88ky?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+    username: qp88xy
+    password: mx8kJUaQiSvb@X3(
+  redis:
+    host: r-j6crwayvx3knxgmy58.redis.rds.aliyuncs.com
+    port: 6379
+    password: qatrJElKsmZxy25j
+
+## 彩票奖池代理
+lotteryCenter : 88ky
