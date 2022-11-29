@@ -215,7 +215,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
-        return RspBase.ok( rspMember );
+        return RspBase.ok( "登录成功", rspMember );
     }
 
     @Override
@@ -277,7 +277,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
-        return RspBase.ok( rspMember );
+        return RspBase.ok( "登录成功", rspMember );
     }
 
     @Override
@@ -342,7 +342,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
-        return RspBase.ok( rspMember );
+        return RspBase.ok( "注册成功", rspMember );
     }
 
     private void setMemberLoginParam( MobileLogin mobileLogin, Integer dev, String version, String loginUrl,
@@ -517,7 +517,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public List<MemberInfo> selectMemberInfoList( MemberInfo memberInfo ) {
-        return this.baseMapper.selectMemberInfoList( memberInfo );
+        List<MemberInfo> memberInfoList = this.baseMapper.selectMemberInfoList( memberInfo );
+        for ( MemberInfo info : memberInfoList ) {
+            if ( StringUtils.isNotBlank( info.getPhone() ) ) {
+                info.setPhone( info.getPhone().substring( 0, 3 ) + "****" + info.getPhone().substring( 7, 11 ) );
+            }
+        }
+        return memberInfoList;
     }
 
     @Override
