@@ -10,6 +10,8 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 资金日志对象 log_money
@@ -62,4 +64,17 @@ public class LogMoney {
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @TableField( exist = false )
     private String   searchValue;
+
+    /**
+     * 请求参数
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 }

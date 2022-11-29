@@ -223,8 +223,11 @@
 				#{id}
 			</foreach>
 		</if>
-		<if test="startTime != null">
-			and create_time <![CDATA[ >= ]]>  #{startTime} and create_time <![CDATA[ <= ]]> #{endTime}
+		<if test="params.beginTime != null and params.beginTime != ''">
+			AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''">
+			AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
 		</if>
 		<if test="mark != null  and mark != ''">
 			and mark like concat('%', #{mark}, '%')
