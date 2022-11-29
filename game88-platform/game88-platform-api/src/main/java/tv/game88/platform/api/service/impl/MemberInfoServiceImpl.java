@@ -855,11 +855,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( memberVipGift == null ) {
             rsp.setLevelBonusStatus( 1 );
             rsp.setWeekBonusStatus( 1 );
-            rsp.setMonthBonusStatus( 1 );
+            //rsp.setMonthBonusStatus( 1 );
         } else {
             rsp.setLevelBonusStatus( 2 );
             rsp.setWeekBonusStatus( 2 );
-            rsp.setMonthBonusStatus( 2 );
+            //rsp.setMonthBonusStatus( 2 );
             if ( vip > memberVipGift.getLevelBonusVip() ) {
                 rsp.setLevelBonusStatus( 1 );
             }
@@ -868,10 +868,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                     || !LocalDateTimeUtils.isSameWeek( memberVipGift.getWeekBonusTime(), now ) ) {
                 rsp.setWeekBonusStatus( 1 );
             }
-            if ( memberVipGift.getMonthBonusTime() == null
+           /* if ( memberVipGift.getMonthBonusTime() == null
                     || !LocalDateTimeUtils.isSameMonth( memberVipGift.getMonthBonusTime(), now ) ) {
                 rsp.setMonthBonusStatus( 1 );
-            }
+            }*/
         }
         if ( vipSet.getLevelBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
             rsp.setLevelBonusStatus( 0 );
@@ -879,9 +879,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( vipSet.getWeekBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
             rsp.setWeekBonusStatus( 0 );
         }
-        if ( vipSet.getMonthBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
+        /*if ( vipSet.getMonthBonus().compareTo( BigDecimal.ZERO ) == 0 ) {
             rsp.setMonthBonusStatus( 0 );
-        }
+        }*/
         return rsp;
     }
 
@@ -936,17 +936,17 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         }
         String     name = "vip:" + vip;
-        BigDecimal addMoney;
+        BigDecimal addMoney = BigDecimal.ZERO;
         if ( type == 1 ) {
             name     = name + "晋级彩金";
             addMoney = configVip.getLevelBonus();
         } else if ( type == 2 ) {
             name     = name + "周俸禄";
             addMoney = configVip.getWeekBonus();
-        } else {
+        }/* else {
             name     = name + "月俸禄";
             addMoney = configVip.getMonthBonus();
-        }
+        }*/
         SpringUtils.getBean( MemberInfoService.class ).receiveVipGift( memberId, isInsert, saveOrUpdate, name, addMoney );
 
         redisUtils.unLock( "receiveVipGift" + memberId );

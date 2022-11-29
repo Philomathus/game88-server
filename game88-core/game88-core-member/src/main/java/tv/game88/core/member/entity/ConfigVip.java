@@ -32,7 +32,7 @@ public class ConfigVip {
     /**
     * 月俸禄
     */
-    private BigDecimal monthBonus;
+    //private BigDecimal monthBonus;
 
     /**
     * 通道加速(1是0否)

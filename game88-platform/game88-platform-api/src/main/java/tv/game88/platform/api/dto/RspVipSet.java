@@ -13,8 +13,8 @@ public class RspVipSet {
     private BigDecimal levelBonus;
     @Schema( title = "周俸禄)" )
     private BigDecimal weekBonus;
-    @Schema( title = "月俸禄" )
-    private BigDecimal monthBonus;
+    /*@Schema( title = "月俸禄" )
+    private BigDecimal monthBonus;*/
     @Schema( title = "打码量" )
     private BigDecimal bcode;
 }

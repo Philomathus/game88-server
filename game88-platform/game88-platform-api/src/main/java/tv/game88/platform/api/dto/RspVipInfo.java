@@ -14,6 +14,6 @@ public class RspVipInfo {
     private Integer levelBonusStatus = 0;
     @Schema( title = "周俸禄状态(0不可领取1未领取2已领取)" )
     private Integer weekBonusStatus  = 0;
-    @Schema( title = "月俸禄状态(0不可领取1未领取2已领取)" )
-    private Integer monthBonusStatus = 0;
+    /*@Schema( title = "月俸禄状态(0不可领取1未领取2已领取)" )
+    private Integer monthBonusStatus = 0;*/
 }
