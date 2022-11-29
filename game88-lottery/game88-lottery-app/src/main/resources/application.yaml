@@ -79,9 +79,9 @@ token:
 
 im:
   # 群聊
-  sendGroupMsg: http://alb-c8bpqf3la2md9yeih2.cn-hongkong.alb.aliyuncs.com/chat/sendGroupMsg/
+  sendGroupMsg: http://alb-109m8hnlbeww3591nz.cn-shenzhen.alb.aliyuncs.com/chat/sendGroupMsg/
   # 单聊
-  sendMsg: http://alb-c8bpqf3la2md9yeih2.cn-hongkong.alb.aliyuncs.com/chat/sendMsg/
+  sendMsg: http://alb-109m8hnlbeww3591nz.cn-shenzhen.alb.aliyuncs.com/chat/sendMsg/
 
 swagger:
   title: Game88 Lottery App Swagger 3 Api Documentation
