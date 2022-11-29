@@ -7,7 +7,9 @@ package tv.game88.pay.api.constants;
  */
 public abstract class ConstantsPay {
     // LB支付
-    public static final String LB_PAY      = "LBPay";
-    public static final String HUOJIAN_PAY = "huoJianPay";
-    public static final String TONGDA_PAY  = "tongDaPay";
+    public static final String LB_PAY        = "LBPay";
+    public static final String HUOJIAN_PAY   = "huoJianPay";
+    public static final String TONGDA_PAY    = "tongDaPay";
+    public static final String YONGXIN_PAY   = "yongXinPay";
+    public static final String ZHONGYING_PAY = "zhongYingPay";
 }
