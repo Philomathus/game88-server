@@ -10,14 +10,14 @@ import javax.validation.constraints.NotBlank;
 public class ReqMemberCard {
     @Schema( title = "姓名" )
     @NotBlank( message = "姓名为空" )
-    private String realName;
+    private String  realName;
     @Schema( title = "银行账号" )
     @NotBlank( message = "银行卡号为空" )
     @Length( max = 100, message = "请输入正确的银行卡号" )
-    private String bankAccount;
+    private String  bankAccount;
     @Schema( title = "开户地址" )
-    private String bankAddress;
+    private String  bankAddress;
     @Schema( title = "银行卡ID" )
     @NotBlank( message = "请选择银行类型" )
-    private Long   bankId;
+    private Integer bankId;
 }
