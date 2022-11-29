@@ -43,7 +43,7 @@
             and op_name = #{req.opName}
         </if>
         <if test="req.rechargeUserName != null  and req.rechargeUserName != ''">
-            and recharge_user_name = #{req.rechargeUserName}
+            and recharge_real_name = #{req.rechargeUserName}
         </if>
         <if test="req.bankName != null  and req.bankName != ''">
             and bank_name = #{req.bankName}

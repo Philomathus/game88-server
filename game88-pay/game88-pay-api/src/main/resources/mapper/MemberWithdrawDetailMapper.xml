@@ -51,7 +51,7 @@
             <include refid="selectMember">
             </include>
             <if test="searchValue != null and searchValue != ''">
-                and order_no = #{searchValue}
+                and withdraw_order_no = #{searchValue}
             </if>
             <if test="downLoadDate[ 0 ] != null">
                 and create_time <![CDATA[ >= ]]> '${downLoadDate[0]}'
@@ -67,7 +67,7 @@
                 <include refid="selectMember">
                 </include>
                 <if test="searchValue != null and searchValue != ''">
-                    and member_id = #{searchValue}
+                    and withdraw_id = #{searchValue}
                 </if>
             </where>
             UNION
@@ -183,7 +183,7 @@
             and `status` = #{status}
         </if>
         <if test="searchValue != null and searchValue != ''">
-            and (order_no = #{searchValue} or member_id = #{searchValue} or bank_user_name = #{searchValue})
+            and (withdraw_order_no = #{searchValue} or withdraw_id = #{searchValue} or bank_user_name = #{searchValue})
         </if>
         <if test="priceMin != null and priceMax != null  and priceMin != ''  and priceMax != ''">
             and withdraw_money <![CDATA[ >= ]]> #{priceMin}
@@ -199,7 +199,7 @@
     </sql>
 
     <select id="selectMemberInfoWithdrawByIda" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
-        SELECT id,phone,login_time loginTime,vip,reg_time regTime,account_now accountNow,code_total codeTotal,code_now codeNow,login_ip loginIp,register_type registerType,remark
+        SELECT id,phone,login_time loginTime,vip,register_time regTime,account_now accountNow,code_total codeTotal,code_now codeNow,login_ip loginIp,register_type registerType,remark
         from member_info where id = #{userid}
     </select>
 
@@ -208,7 +208,7 @@
     </select>
 
     <select id="selectMemberInfoWithdrawByIdc" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
-        SELECT IFNULL(SUM(platform_money),0) submoney from member_recharge_online where status='1' and member_id = #{userid} and pay_time <![CDATA[ >= ]]> DATE_SUB(NOW(),INTERVAL 30 DAY)
+        SELECT IFNULL(SUM(real_money),0) submoney from member_recharge_online where status='1' and member_id = #{userid} and pay_time <![CDATA[ >= ]]> DATE_SUB(NOW(),INTERVAL 30 DAY)
     </select>
 
     <select id="selectMemberInfoWithdrawByIde" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
@@ -224,7 +224,7 @@
         (SELECT sum(n) totalincom from (
         SELECT IFNULL(SUM(recharge_money),0) n from member_recharge_bank where status = '3' and member_id = #{userid}
         UNION ALL
-        SELECT IFNULL(SUM(platform_money),0) n from member_recharge_online where status='1' and member_id = #{userid}
+        SELECT IFNULL(SUM(real_money),0) n from member_recharge_online where status='1' and member_id = #{userid}
         UNION ALL
         select IFNULL(SUM(recharge_money),0) n from member_recharge_usdt where member_id = #{userid}
         ) as t)

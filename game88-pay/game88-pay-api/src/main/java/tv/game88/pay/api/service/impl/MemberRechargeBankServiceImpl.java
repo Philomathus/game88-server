@@ -451,7 +451,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         int timeLimit = configEnvCacheUtil.getConfInt( "bank_charge_time_limit", 10 );
         long count = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeBank>()
                 .ne( "status", 3 )
-                .eq( "recharge_user_name", req.getRechargeUserName() )
+                .eq( "recharge_real_name", req.getRechargeUserName() )
                 .eq( "recharge_money", req.getRechargeMoney() )
                 .ge( "create_time", LocalDateTime.now().minusMinutes( timeLimit ) ) );
         if ( count > 0 ) {
