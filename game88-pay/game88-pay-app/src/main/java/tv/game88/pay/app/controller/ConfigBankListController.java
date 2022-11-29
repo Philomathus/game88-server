@@ -13,6 +13,7 @@ import tv.game88.pay.api.cache.ConfigBankListCache;
 import tv.game88.pay.api.dto.RspConfigBankList;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -25,8 +26,9 @@ public class ConfigBankListController extends BaseController {
     @Operation( summary = "获取银行字典列表" )
     @PostMapping( "/bankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
-        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
-        String                  domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
+        effectList.removeIf( r -> Arrays.asList( "GOPAY", "OKPAY", "VIPPAY" ).contains( r.getBankName() ) );
+        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspConfigBankList bankList : effectList ) {
             if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
                 bankList.setBankIcon( domainValue + bankList.getBankIcon() );
