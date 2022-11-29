@@ -138,7 +138,7 @@ public class GameButtBBIN extends AbstractGameButt {
                 Map<String, Object> dataMap = dataList.get( 0 );
                 String              mobile  = dataMap.getOrDefault( "mobile", "" ).toString();
                 String              html5   = dataMap.getOrDefault( "html5", "" ).toString();
-                reqJoinGame.setGameUrl( StringUtils.isBlank( mobile ) ? mobile : html5 );
+                reqJoinGame.setGameUrl( StringUtils.isBlank( mobile ) ? html5 : mobile );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
