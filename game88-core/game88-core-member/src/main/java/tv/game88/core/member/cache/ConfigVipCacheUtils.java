@@ -46,4 +46,21 @@ public class ConfigVipCacheUtils {
     public void clear() {
         redisUtils.unlink( CONFIG_VIP_KEY );
     }
+
+    public ConfigVip getConfigVip( Integer vip ) {
+        if ( !redisUtils.exists( CONFIG_VIP_KEY ) ) {
+            Map<Integer, ConfigVip> billMap = configVipMapper
+                    .selectList( null )
+                    .stream()
+                    .collect( Collectors.toMap( ConfigVip::getLevel, Function.identity() ) );
+            Map<String, String> collect = billMap
+                    .entrySet()
+                    .stream()
+                    .collect( Collectors.toMap( e -> e.getKey().toString(), e -> JsonUtil.object2Json( e.getValue() ) ) );
+            redisUtils.hMSet( CONFIG_VIP_KEY, collect );
+            return billMap.get( vip );
+        }
+        Object o = redisUtils.hGet( CONFIG_VIP_KEY, vip + "" );
+        return o == null ? null : JsonUtil.json2Object( o.toString(), ConfigVip.class );
+    }
 }

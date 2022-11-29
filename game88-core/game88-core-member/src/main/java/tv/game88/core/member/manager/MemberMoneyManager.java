@@ -24,8 +24,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -103,11 +101,6 @@ public class MemberMoneyManager {
             code.setDes( enumMoney.getDes() );
             memberBcodeMapper.insert( code );
         }
-
-        // 充值加会员等级
-        if ( Arrays.asList( 1, 2, 3 ).contains( enumMoney.getType() ) ) {
-            this.checkAndUpdateVip( userId );
-        }
     }
 
     /**
@@ -166,15 +159,9 @@ public class MemberMoneyManager {
         return logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
     }
 
-    private void checkAndUpdateVip( String memberId ) {
+    public void checkAndUpdateVip( String memberId, List<ConfigVip> configVips ) {
         BigDecimal userCharge = memberInfoMapper.getUserCharge( memberId );
         Integer    userVip    = memberInfoMapper.getUserVip( memberId );
-        List<ConfigVip> configVips = configVipCacheUtils
-                .getConfigVipMap()
-                .values()
-                .stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
-                .toList();
         Integer vip = 1;
         for ( ConfigVip configVip : configVips ) {
             if ( userCharge.compareTo( configVip.getBcode() ) < 0 ) {

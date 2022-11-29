@@ -40,7 +40,7 @@ public class RspMember {
     private Integer    registerType;
 
     @Schema( title = "登录密码", hidden = true )
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String password;
 
     public String getHeadImg() {

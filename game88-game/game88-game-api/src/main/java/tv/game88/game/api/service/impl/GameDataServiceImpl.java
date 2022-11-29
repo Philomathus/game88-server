@@ -10,7 +10,10 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
+import tv.game88.core.member.cache.ConfigVipCacheUtils;
+import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.core.member.entity.MemberBcode;
+import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
@@ -30,10 +33,7 @@ import tv.game88.game.api.type.EnumGameCategory;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,6 +42,8 @@ import java.util.stream.Collectors;
 public class GameDataServiceImpl implements GameDataService {
     @Resource
     private GameService             gameService;
+    @Resource
+    private MemberMoneyManager      memberMoneyManager;
     @Resource
     private MemberBcodeMapper       memberBcodeMapper;
     @Resource
@@ -54,6 +56,8 @@ public class GameDataServiceImpl implements GameDataService {
     private LotteryBetMapper        lotteryBetMapper;
     @Resource
     private GameCacheUtils          gameCacheUtils;
+    @Resource
+    private ConfigVipCacheUtils     configVipCacheUtils;
     @Resource
     private SqlSessionTemplate      sqlSessionTemplate;
 
@@ -251,6 +255,16 @@ public class GameDataServiceImpl implements GameDataService {
             }
 
         }
+
+        List<ConfigVip> configVips = configVipCacheUtils
+                .getConfigVipMap()
+                .values()
+                .stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
+                .toList();
+        for ( String userId : willCodeMap.keySet() ) {
+            memberMoneyManager.checkAndUpdateVip( userId, configVips );
+        }
     }
 
     public void deQuestCheck( final List<MemberGameData> list ) {
@@ -268,7 +282,7 @@ public class GameDataServiceImpl implements GameDataService {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
-                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() )) {
+                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
                         continue;
                     }
                     MemberQuest memberQuest = memberQuestMapper.selectById( data

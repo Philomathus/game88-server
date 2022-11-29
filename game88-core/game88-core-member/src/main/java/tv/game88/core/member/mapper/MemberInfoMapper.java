@@ -47,6 +47,8 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     Integer getUserVip( @Param( "memberId" ) String memberId );
 
+    BigDecimal getUserCodeNow( @Param( "memberId" ) String userId );
+
     /**
      * @param userId   会员ID
      * @param money    增加的金额
@@ -58,7 +60,7 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     int addInviterMoney( @Param( "userId" ) String userId, @Param( "inviterMoney" ) BigDecimal inviterMoney );
 
-    int updateVipById(  @Param( "memberId" ) String memberId,@Param( "vip" ) Integer vip );
+    int updateVipById( @Param( "memberId" ) String memberId, @Param( "vip" ) Integer vip );
 
     //-------------------------app-------------------------------
 

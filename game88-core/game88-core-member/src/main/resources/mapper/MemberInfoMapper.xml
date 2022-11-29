@@ -266,6 +266,12 @@
         where id = #{memberId}
     </select>
 
+    <select id="getUserCodeNow" resultType="java.math.BigDecimal">
+        select code_now
+        from member_info
+        where id = #{memberId}
+    </select>
+
     <update id="updateSafeBox">
         update member_info
         set account_now = account_now - #{addBox},
