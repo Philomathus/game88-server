@@ -1,7 +1,7 @@
-package tv.game88.platform.api.mapper;
+package tv.game88.core.member.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tv.game88.platform.api.entity.ConfigVip;
+import tv.game88.core.member.entity.ConfigVip;
 
 import java.util.List;
 

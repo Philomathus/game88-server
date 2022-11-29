@@ -1,4 +1,4 @@
-package tv.game88.platform.api.entity;
+package tv.game88.core.member.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -45,7 +45,7 @@ public class ConfigVip {
     private Boolean client;
 
     /**
-    * 需求打码量
+    * 需充值量
     */
     private BigDecimal bcode;
 }

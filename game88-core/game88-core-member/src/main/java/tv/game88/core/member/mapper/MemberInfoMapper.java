@@ -58,7 +58,7 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     int addInviterMoney( @Param( "userId" ) String userId, @Param( "inviterMoney" ) BigDecimal inviterMoney );
 
-    int updateVipById( MemberInfo memberInfo );
+    int updateVipById(  @Param( "memberId" ) String memberId,@Param( "vip" ) Integer vip );
 
     //-------------------------app-------------------------------
 

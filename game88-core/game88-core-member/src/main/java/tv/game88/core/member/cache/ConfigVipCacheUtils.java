@@ -1,11 +1,11 @@
-package tv.game88.platform.api.cache;
+package tv.game88.core.member.cache;
 
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.platform.api.entity.ConfigVip;
-import tv.game88.platform.api.mapper.ConfigVipMapper;
+import tv.game88.core.member.entity.ConfigVip;
+import tv.game88.core.member.mapper.ConfigVipMapper;
 
 import javax.annotation.Resource;
 import java.util.Map;

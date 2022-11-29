@@ -6,29 +6,42 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.exception.NoMoneyException;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.constants.Constants;
+import tv.game88.core.member.cache.ConfigVipCacheUtils;
+import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberBcode;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.mapper.LogMoneyMapper;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
+import tv.game88.core.member.vo.PlatformUser;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Log4j2
 public class MemberMoneyManager {
-
     @Resource
-    private LogMoneyMapper    logMoneyMapper;
+    private RedisUtils          redisUtils;
     @Resource
-    private MemberBcodeMapper memberBcodeMapper;
+    private LogMoneyMapper      logMoneyMapper;
     @Resource
-    private MemberInfoMapper  memberInfoMapper;
+    private MemberBcodeMapper   memberBcodeMapper;
+    @Resource
+    private MemberInfoMapper    memberInfoMapper;
+    @Resource
+    private ConfigVipCacheUtils configVipCacheUtils;
 
     /**
      * 会员加钱
@@ -90,6 +103,11 @@ public class MemberMoneyManager {
             code.setDes( enumMoney.getDes() );
             memberBcodeMapper.insert( code );
         }
+
+        // 充值加会员等级
+        if ( Arrays.asList( 1, 2, 3 ).contains( enumMoney.getType() ) ) {
+            this.checkAndUpdateVip( userId );
+        }
     }
 
     /**
@@ -146,5 +164,39 @@ public class MemberMoneyManager {
         log.setTotal( total );
 
         return logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
+    }
+
+    private void checkAndUpdateVip( String memberId ) {
+        BigDecimal userCharge = memberInfoMapper.getUserCharge( memberId );
+        Integer    userVip    = memberInfoMapper.getUserVip( memberId );
+        List<ConfigVip> configVips = configVipCacheUtils
+                .getConfigVipMap()
+                .values()
+                .stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
+                .toList();
+        Integer vip = 1;
+        for ( ConfigVip configVip : configVips ) {
+            if ( userCharge.compareTo( configVip.getBcode() ) < 0 ) {
+                break;
+            }
+            vip = configVip.getLevel();
+        }
+        if ( userVip >= vip ) {
+            return;
+        }
+        memberInfoMapper.updateVipById( memberId, vip );
+
+        // 更新缓存
+        String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
+        if ( StringUtils.isNotBlank( token ) && redisUtils.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
+            Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
+            PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
+                    .getOrDefault( "platformUserStr", "" )
+                    .toString(), PlatformUser.class );
+            platformUser.setVip( vip );
+            loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
+            redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );
+        }
     }
 }

@@ -1,434 +1,468 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.core.member.mapper.MemberInfoMapper">
-	<resultMap type="tv.game88.core.member.entity.MemberInfo" id="MemberInfoResult">
-		<result property="id" column="id"/>
-		<result property="password" column="password"/>
-		<result property="nickName" column="nick_name"/>
-		<result property="status" column="status"/>
-		<result property="withdrawalPass" column="withdrawal_pass"/>
-		<result property="vip" column="vip"/>
-		<result property="accountNow" column="account_now"/>
-		<result property="accountCharge" column="account_charge"/>
-		<result property="codeNow" column="code_now"/>
-		<result property="codeTotal" column="code_total"/>
-		<result property="codeWill" column="code_will"/>
-		<result property="phone" column="phone"/>
-		<result property="inviterCode" column="inviter_code"/>
-		<result property="inviterMoney" column="inviter_money"/>
-		<result property="channelCode" column="channel_code"/>
-		<result property="registerTime" column="register_time"/>
-		<result property="registerIp" column="register_ip"/>
-		<result property="loginIp" column="login_ip"/>
-		<result property="loginDev" column="login_dev"/>
-		<result property="loginProvince" column="login_province"/>
-		<result property="headImg" column="head_img"/>
-		<result property="linkUrl" column="link_url"/>
-		<result property="loginTime" column="login_time"/>
-		<result property="boxAccount" column="box_account"/>
-		<result property="boxPass" column="box_pass"/>
-		<result property="loginNum" column="login_num"/>
-		<result property="version" column="version"/>
-		<result property="deviceId" column="device_id"/>
-		<result property="phoneModel" column="phone_model"/>
-		<result property="registerType" column="register_type"/>
-		<result property="remark" column="remark"/>
-		<result property="cleanTime" column="clean_time"/>
-	</resultMap>
+    <resultMap type="tv.game88.core.member.entity.MemberInfo" id="MemberInfoResult">
+        <result property="id" column="id" />
+        <result property="password" column="password" />
+        <result property="nickName" column="nick_name" />
+        <result property="status" column="status" />
+        <result property="withdrawalPass" column="withdrawal_pass" />
+        <result property="vip" column="vip" />
+        <result property="accountNow" column="account_now" />
+        <result property="accountCharge" column="account_charge" />
+        <result property="codeNow" column="code_now" />
+        <result property="codeTotal" column="code_total" />
+        <result property="codeWill" column="code_will" />
+        <result property="phone" column="phone" />
+        <result property="inviterCode" column="inviter_code" />
+        <result property="inviterMoney" column="inviter_money" />
+        <result property="channelCode" column="channel_code" />
+        <result property="registerTime" column="register_time" />
+        <result property="registerIp" column="register_ip" />
+        <result property="loginIp" column="login_ip" />
+        <result property="loginDev" column="login_dev" />
+        <result property="loginProvince" column="login_province" />
+        <result property="headImg" column="head_img" />
+        <result property="linkUrl" column="link_url" />
+        <result property="loginTime" column="login_time" />
+        <result property="boxAccount" column="box_account" />
+        <result property="boxPass" column="box_pass" />
+        <result property="loginNum" column="login_num" />
+        <result property="version" column="version" />
+        <result property="deviceId" column="device_id" />
+        <result property="phoneModel" column="phone_model" />
+        <result property="registerType" column="register_type" />
+        <result property="remark" column="remark" />
+        <result property="cleanTime" column="clean_time" />
+    </resultMap>
 
-	<sql id="selectMemberInfoVo">
-		select id,
-			   password,
-			   nick_name,
-			   status,
-			   vip,
-			   withdrawal_pass,
-			   account_now,
-			   account_charge,
-			   code_now,
-			   code_total,
-			   code_will,
-			   phone,
-			   inviter_code,
-			   inviter_money,
-			   channel_code,
-			   register_time,
-			   register_ip,
-			   login_ip,
-			   login_dev,
-			   login_province,
-			   head_img,
-			   link_url,
-			   login_time,
-			   box_account,
-			   box_pass,
-			   login_num,
-			   version,
-			   device_id,
-			   phone_model,
-			   register_type,
-			   remark,
-			   clean_time
-		from member_info
-	</sql>
+    <sql id="selectMemberInfoVo">
+        select id,
+               password,
+               nick_name,
+               status,
+               vip,
+               withdrawal_pass,
+               account_now,
+               account_charge,
+               code_now,
+               code_total,
+               code_will,
+               phone,
+               inviter_code,
+               inviter_money,
+               channel_code,
+               register_time,
+               register_ip,
+               login_ip,
+               login_dev,
+               login_province,
+               head_img,
+               link_url,
+               login_time,
+               box_account,
+               box_pass,
+               login_num,
+               version,
+               device_id,
+               phone_model,
+               register_type,
+               remark,
+               clean_time
+        from member_info
+    </sql>
 
-	<select id="selectMemberInfoList" parameterType="tv.game88.core.member.entity.MemberInfo" resultMap="MemberInfoResult">
-		<include refid="selectMemberInfoVo"/>
-		<where>
-			<if test="nickName != null  and nickName != ''">
-				and nick_name like concat('%', #{nickName}, '%')
-			</if>
-			<if test="status != null">
-				and status = #{status}
-			</if>
-			<if test="vip != null">
-				and vip = #{vip}
-			</if>
-			<if test="accountNow != null">
-				and account_now = #{accountNow}
-			</if>
-			<if test="accountCharge != null">
-				and account_charge = #{accountCharge}
-			</if>
-			<if test="codeNow != null">
-				and code_now = #{codeNow}
-			</if>
-			<if test="codeTotal != null">
-				and code_total = #{codeTotal}
-			</if>
-			<if test="codeWill != null">
-				and code_will = #{codeWill}
-			</if>
-			<if test="inviterCode != null  and inviterCode != ''">
-				and inviter_code = #{inviterCode}
-			</if>
-			<if test="channelCode != null">
-				and channel_code = #{channelCode}
-			</if>
-			<if test="registerIp != null  and registerIp != ''">
-				and register_ip = #{registerIp}
-			</if>
-			<if test="loginIp != null  and loginIp != ''">
-				and login_ip = #{loginIp}
-			</if>
-			<if test="loginDev != null">
-				and login_dev = #{loginDev}
-			</if>
-			<if test="headImg != null  and headImg != ''">
-				and head_img = #{headImg}
-			</if>
-			<if test="linkUrl != null  and linkUrl != ''">
-				and link_url = #{linkUrl}
-			</if>
-			<if test="loginTime != null">
-				and login_time = #{loginTime}
-			</if>
-			<if test="boxAccount != null">
-				and box_account = #{boxAccount}
-			</if>
-			<if test="boxPass != null  and boxPass != ''">
-				and box_pass = #{boxPass}
-			</if>
-			<if test="loginNum != null">
-				and login_num = #{loginNum}
-			</if>
-			<if test="version != null  and version != ''">
-				and version = #{version}
-			</if>
-			<if test="deviceId != null  and deviceId != ''">
-				and device_id = #{deviceId}
-			</if>
-			<if test="phoneModel != null  and phoneModel != ''">
-				and phone_model = #{phoneModel}
-			</if>
-			<if test="registerType != null">
-				and register_type = #{registerType}
-			</if>
-			<if test="searchValue != null and searchValue != ''">
-				and (id = #{searchValue} or phone = #{searchValue})
-			</if>
-<!--			<if test="downLoadDate[ 0 ] != null">-->
-<!--				and register_time <![CDATA[ >= ]]> '${downLoadDate[0]}'-->
-<!--			</if>-->
-<!--			<if test="downLoadDate[ 1 ] != null">-->
-<!--				and register_time <![CDATA[ <= ]]> '${downLoadDate[1]}'-->
-<!--			</if>-->
+    <select id="selectMemberInfoList" parameterType="tv.game88.core.member.entity.MemberInfo"
+            resultMap="MemberInfoResult">
+        <include refid="selectMemberInfoVo" />
+        <where>
+            <if test="nickName != null  and nickName != ''">
+                and nick_name like concat('%', #{nickName}, '%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="vip != null">
+                and vip = #{vip}
+            </if>
+            <if test="accountNow != null">
+                and account_now = #{accountNow}
+            </if>
+            <if test="accountCharge != null">
+                and account_charge = #{accountCharge}
+            </if>
+            <if test="codeNow != null">
+                and code_now = #{codeNow}
+            </if>
+            <if test="codeTotal != null">
+                and code_total = #{codeTotal}
+            </if>
+            <if test="codeWill != null">
+                and code_will = #{codeWill}
+            </if>
+            <if test="inviterCode != null  and inviterCode != ''">
+                and inviter_code = #{inviterCode}
+            </if>
+            <if test="channelCode != null">
+                and channel_code = #{channelCode}
+            </if>
+            <if test="registerIp != null  and registerIp != ''">
+                and register_ip = #{registerIp}
+            </if>
+            <if test="loginIp != null  and loginIp != ''">
+                and login_ip = #{loginIp}
+            </if>
+            <if test="loginDev != null">
+                and login_dev = #{loginDev}
+            </if>
+            <if test="headImg != null  and headImg != ''">
+                and head_img = #{headImg}
+            </if>
+            <if test="linkUrl != null  and linkUrl != ''">
+                and link_url = #{linkUrl}
+            </if>
+            <if test="loginTime != null">
+                and login_time = #{loginTime}
+            </if>
+            <if test="boxAccount != null">
+                and box_account = #{boxAccount}
+            </if>
+            <if test="boxPass != null  and boxPass != ''">
+                and box_pass = #{boxPass}
+            </if>
+            <if test="loginNum != null">
+                and login_num = #{loginNum}
+            </if>
+            <if test="version != null  and version != ''">
+                and version = #{version}
+            </if>
+            <if test="deviceId != null  and deviceId != ''">
+                and device_id = #{deviceId}
+            </if>
+            <if test="phoneModel != null  and phoneModel != ''">
+                and phone_model = #{phoneModel}
+            </if>
+            <if test="registerType != null">
+                and register_type = #{registerType}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                and (id = #{searchValue} or phone = #{searchValue})
+            </if>
+            <!--			<if test="downLoadDate[ 0 ] != null">-->
+            <!--				and register_time <![CDATA[ >= ]]> '${downLoadDate[0]}'-->
+            <!--			</if>-->
+            <!--			<if test="downLoadDate[ 1 ] != null">-->
+            <!--				and register_time <![CDATA[ <= ]]> '${downLoadDate[1]}'-->
+            <!--			</if>-->
 
-			<if test="params.beginTime != null and params.beginTime != ''">
-				<!-- 开始时间检索 -->
-				AND register_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
-			</if>
-			<if test="params.endTime != null and params.endTime != ''">
-				<!-- 结束时间检索 -->
-				AND register_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
-			</if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                <!-- 开始时间检索 -->
+                AND register_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                <!-- 结束时间检索 -->
+                AND register_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
 
-			<if test="searchValues != null and searchValues.size() != 0">
-				and (id in
-				<foreach item="value" collection="searchValues" open="(" separator="," close=")">
-					#{value}
-				</foreach>
-				or phone in
-				<foreach item="value" collection="searchValues" open="(" separator="," close=")">
-					#{value}
-				</foreach>
-				)
-			</if>
-		</where>
-		order by register_time desc
-	</select>
+            <if test="searchValues != null and searchValues.size( ) != 0">
+                and (id in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                or phone in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                )
+            </if>
+        </where>
+        order by register_time desc
+    </select>
 
-	<delete id="deleteByHistoryKey">
-		delete from member_info_history where id = #{userId}
-	</delete>
+    <delete id="deleteByHistoryKey">
+        delete
+        from member_info_history
+        where id = #{userId}
+    </delete>
 
-	<select id="selectMaxMemberCode" resultType="java.lang.String">
-		select IFNULL(max(id), 0) from member_info
-	</select>
+    <select id="selectMaxMemberCode" resultType="java.lang.String">
+        select IFNULL(max(id), 0)
+        from member_info
+    </select>
 
-	<select id="findMemberByDeviceId" resultType="tv.game88.core.member.entity.MemberInfo">
-		select * from member_info where device_id = #{deviceId} limit 1
-	</select>
+    <select id="findMemberByDeviceId" resultType="tv.game88.core.member.entity.MemberInfo">
+        select *
+        from member_info
+        where device_id = #{deviceId}
+        limit 1
+    </select>
 
-	<select id="findMemberHistoryByDeviceId" resultType="tv.game88.core.member.entity.MemberInfo">
-		select * from member_info_history where device_id = #{deviceId} limit 1
-	</select>
+    <select id="findMemberHistoryByDeviceId" resultType="tv.game88.core.member.entity.MemberInfo">
+        select *
+        from member_info_history
+        where device_id = #{deviceId}
+        limit 1
+    </select>
 
-	<select id="findMemberHistoryByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
-		select * from member_info_history where phone = #{phone} limit 1
-	</select>
+    <select id="findMemberHistoryByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
+        select *
+        from member_info_history
+        where phone = #{phone}
+        limit 1
+    </select>
 
-	<select id="findMemberDetail" resultType="tv.game88.core.member.dto.RspMember">
-		select * from member_info where id = #{userId}
-	</select>
+    <select id="findMemberDetail" resultType="tv.game88.core.member.dto.RspMember">
+        select *
+        from member_info
+        where id = #{userId}
+    </select>
 
-	<update id="reduceMoney">
-		update member_info set account_now = account_now - #{money}
-		where id = #{userId} and account_now - #{money} >= 0
-	</update>
+    <update id="reduceMoney">
+        update member_info
+        set account_now = account_now - #{money}
+        where id = #{userId}
+          and account_now - #{money} >= 0
+    </update>
 
-	<update id="addMoneySelect">
-		update member_info
-		<set>
-			<if test="money != null">
-				account_now = account_now + #{money},
-			</if>
-			<if test="charge != null">
-				account_charge = account_charge + #{charge},
-			</if>
-			<if test="code_mult != null">
-				code_will = code_will + #{code_mult},
-			</if>
-		</set>
-		where id = #{userId}
-	</update>
+    <update id="addMoneySelect">
+        update member_info
+        <set>
+            <if test="money != null">
+                account_now = account_now + #{money},
+            </if>
+            <if test="charge != null">
+                account_charge = account_charge + #{charge},
+            </if>
+            <if test="code_mult != null">
+                code_will = code_will + #{code_mult},
+            </if>
+        </set>
+        where id = #{userId}
+    </update>
 
-	<update id="addInviterMoney">
-		update member_info
-		<set>
-			<if test="inviterMoney != null">
-				inviter_money = inviter_money + #{inviterMoney},
-			</if>
-		</set>
-		where id = #{userId}
-	</update>
+    <update id="addInviterMoney">
+        update member_info
+        <set>
+            <if test="inviterMoney != null">
+                inviter_money = inviter_money + #{inviterMoney},
+            </if>
+        </set>
+        where id = #{userId}
+    </update>
 
-	<select id="getUserBalance" resultType="java.math.BigDecimal">
-		select account_now from member_info where id = #{memberId}
-	</select>
-	<select id="getUserCharge" resultType="java.math.BigDecimal">
-		select account_charge from member_info where id = #{memberId}
-	</select>
-	<select id="getUserVip" resultType="int">
-		select vip from member_info where id = #{memberId}
-	</select>
+    <select id="getUserBalance" resultType="java.math.BigDecimal">
+        select account_now
+        from member_info
+        where id = #{memberId}
+    </select>
+    <select id="getUserCharge" resultType="java.math.BigDecimal">
+        select account_charge
+        from member_info
+        where id = #{memberId}
+    </select>
+    <select id="getUserVip" resultType="int">
+        select vip
+        from member_info
+        where id = #{memberId}
+    </select>
 
-	<update id="updateSafeBox">
-		update member_info
-		set account_now = account_now - #{addBox},box_account = box_account + #{addBox}
-		where id = #{userId}
-		and account_now - #{addBox}>=0
-		and box_account + #{addBox} >=0
-	</update>
+    <update id="updateSafeBox">
+        update member_info
+        set account_now = account_now - #{addBox},
+            box_account = box_account + #{addBox}
+        where id = #{userId}
+          and account_now - #{addBox} >= 0
+          and box_account + #{addBox} >= 0
+    </update>
 
-	<update id="updateBeatCode">
-		update member_info
-		<set>
-			code_now = convert(code_now + #{code_now},decimal(15,2)),
-			code_total = convert(code_total + #{code_total},decimal(15,2))
-		</set>
-		where id = #{userId} and status in (1,4,6,7)
-	</update>
+    <update id="updateBeatCode">
+        update member_info
+        <set>
+            code_now   = convert(code_now + #{code_now}, decimal(15, 2)),
+            code_total = convert(code_total + #{code_total}, decimal(15, 2))
+        </set>
+        where id = #{userId}
+          and status in (1, 4, 6, 7)
+    </update>
 
-	<update id="updateVipById">
-		update member_info
-		set nick_name=#{nickName},vip=#{vip}
-		where id = #{id}
-	</update>
+    <update id="updateVipById">
+        update member_info
+        set vip = #{vip}
+        where id = #{memberId}
+    </update>
 
-	<select id="listCount" resultType="java.util.Map">
-		select count(1) peopledTotal,
-		SUM(account_now) totalMoney,
-		SUM(box_account) safeBalanceTotalMoney
-		from member_info
-		<where>
-			<if test="nickName != null  and nickName != ''">
-				and nick_name like concat('%', #{nickName}, '%')
-			</if>
-			<if test="vip != null">
-				and vip = #{vip}
-			</if>
-			<if test="accountNow != null">
-				and account_now = #{accountNow}
-			</if>
-			<if test="accountCharge != null">
-				and account_charge = #{accountCharge}
-			</if>
-			<if test="codeNow != null">
-				and code_now = #{codeNow}
-			</if>
-			<if test="codeTotal != null">
-				and code_total = #{codeTotal}
-			</if>
-			<if test="codeWill != null">
-				and code_will = #{codeWill}
-			</if>
-			<if test="inviterCode != null  and inviterCode != ''">
-				and inviter_code = #{inviterCode}
-			</if>
-			<if test="channelCode != null  and channelCode != ''">
-				and channel_code = #{channelCode}
-			</if>
-			<if test="registerIp != null  and registerIp != ''">
-				and register_ip = #{registerIp}
-			</if>
-			<if test="loginIp != null  and loginIp != ''">
-				and login_ip = #{loginIp}
-			</if>
-			<if test="loginDev != null">
-				and login_dev = #{loginDev}
-			</if>
-			<if test="headImg != null  and headImg != ''">
-				and head_img = #{headImg}
-			</if>
-			<if test="linkUrl != null  and linkUrl != ''">
-				and link_url = #{linkUrl}
-			</if>
-			<if test="loginTime != null">
-				and login_time = #{loginTime}
-			</if>
-			<if test="boxAccount != null">
-				and box_account = #{boxAccount}
-			</if>
-			<if test="boxPass != null  and boxPass != ''">
-				and box_pass = #{boxPass}
-			</if>
-			<if test="loginNum != null">
-				and login_num = #{loginNum}
-			</if>
-			<if test="version != null  and version != ''">
-				and version = #{version}
-			</if>
-			<if test="deviceId != null  and deviceId != ''">
-				and device_id = #{deviceId}
-			</if>
-			<if test="phoneModel != null  and phoneModel != ''">
-				and phone_model = #{phoneModel}
-			</if>
-			<if test="registerType != null">
-				and register_type = #{registerType}
-			</if>
-			<if test="searchValue != null and searchValue != ''">
-				and (id = #{searchValue} or phone = #{searchValue})
-			</if>
-			<if test="selectStartDate != null and selectStartDate != ''">
-				and register_time <![CDATA[ >= ]]> #{selectStartDate}
-			</if>
-			<if test="selectStartDate != null and selectEndDate != ''">
-				and register_time <![CDATA[ <= ]]> #{selectEndDate}
-			</if>
-			and `status` NOT IN ("2","5")
-		</where>
-	</select>
+    <select id="listCount" resultType="java.util.Map">
+        select count(1)         peopledTotal,
+               SUM(account_now) totalMoney,
+               SUM(box_account) safeBalanceTotalMoney
+        from member_info
+        <where>
+            <if test="nickName != null  and nickName != ''">
+                and nick_name like concat('%', #{nickName}, '%')
+            </if>
+            <if test="vip != null">
+                and vip = #{vip}
+            </if>
+            <if test="accountNow != null">
+                and account_now = #{accountNow}
+            </if>
+            <if test="accountCharge != null">
+                and account_charge = #{accountCharge}
+            </if>
+            <if test="codeNow != null">
+                and code_now = #{codeNow}
+            </if>
+            <if test="codeTotal != null">
+                and code_total = #{codeTotal}
+            </if>
+            <if test="codeWill != null">
+                and code_will = #{codeWill}
+            </if>
+            <if test="inviterCode != null  and inviterCode != ''">
+                and inviter_code = #{inviterCode}
+            </if>
+            <if test="channelCode != null  and channelCode != ''">
+                and channel_code = #{channelCode}
+            </if>
+            <if test="registerIp != null  and registerIp != ''">
+                and register_ip = #{registerIp}
+            </if>
+            <if test="loginIp != null  and loginIp != ''">
+                and login_ip = #{loginIp}
+            </if>
+            <if test="loginDev != null">
+                and login_dev = #{loginDev}
+            </if>
+            <if test="headImg != null  and headImg != ''">
+                and head_img = #{headImg}
+            </if>
+            <if test="linkUrl != null  and linkUrl != ''">
+                and link_url = #{linkUrl}
+            </if>
+            <if test="loginTime != null">
+                and login_time = #{loginTime}
+            </if>
+            <if test="boxAccount != null">
+                and box_account = #{boxAccount}
+            </if>
+            <if test="boxPass != null  and boxPass != ''">
+                and box_pass = #{boxPass}
+            </if>
+            <if test="loginNum != null">
+                and login_num = #{loginNum}
+            </if>
+            <if test="version != null  and version != ''">
+                and version = #{version}
+            </if>
+            <if test="deviceId != null  and deviceId != ''">
+                and device_id = #{deviceId}
+            </if>
+            <if test="phoneModel != null  and phoneModel != ''">
+                and phone_model = #{phoneModel}
+            </if>
+            <if test="registerType != null">
+                and register_type = #{registerType}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                and (id = #{searchValue} or phone = #{searchValue})
+            </if>
+            <if test="selectStartDate != null and selectStartDate != ''">
+                and register_time <![CDATA[ >= ]]> #{selectStartDate}
+            </if>
+            <if test="selectStartDate != null and selectEndDate != ''">
+                and register_time <![CDATA[ <= ]]> #{selectEndDate}
+            </if>
+            and `status` NOT IN ("2", "5")
+        </where>
+    </select>
 
-	<select id="findRecommendByInviterCode" resultMap="MemberInfoResult">
-		select id, nick_name, inviter_code
-		from member_info
-		where id = #{inviterCode}
-	</select>
-	<select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
-		select id,nick_name,status,vip,register_type,head_img,password from member_info where id = #{userId}
-	</select>
-	<select id="funGetaddressProvinces" resultType="java.lang.String">
-		select fun_getaddress_provinces(#{ip})
-	</select>
-	<select id="selectMemberInfoHistoryRechargeById" resultType="java.math.BigDecimal">
-		select SUM(money)
-		from member_pay_jour_history
-		where STATUS = '1'
-		  and member_id = #{userid}
-	</select>
+    <select id="findRecommendByInviterCode" resultMap="MemberInfoResult">
+        select id, nick_name, inviter_code
+        from member_info
+        where id = #{inviterCode}
+    </select>
+    <select id="selectPlatformUserByUserId" resultType="tv.game88.core.member.vo.PlatformUser">
+        select id, nick_name, status, vip, register_type, head_img, password
+        from member_info
+        where id = #{userId}
+    </select>
+    <select id="funGetaddressProvinces" resultType="java.lang.String">
+        select fun_getaddress_provinces(#{ip})
+    </select>
+    <select id="selectMemberInfoHistoryRechargeById" resultType="java.math.BigDecimal">
+        select SUM(money)
+        from member_pay_jour_history
+        where STATUS = '1'
+          and member_id = #{userid}
+    </select>
 
-	<update id="boxDish">
-		update member_info set account_now = account_now+box_account, box_account = 0 where id = #{memberId}
-	</update>
+    <update id="boxDish">
+        update member_info
+        set account_now = account_now + box_account,
+            box_account = 0
+        where id = #{memberId}
+    </update>
 
-	<select id="personalRecharge" resultType="java.math.BigDecimal">
-		select ifnull(SUM(recharge_money),0) as n from member_recharge_bank
-		where status = 3
-		  and update_time >= #{startTime}
-		  and update_time  <![CDATA[ <= ]]> #{endTime}
-		  and member_id = #{memberId};
-	</select>
+    <select id="personalRecharge" resultType="java.math.BigDecimal">
+        select ifnull(SUM(recharge_money), 0) as n
+        from member_recharge_bank
+        where status = 3
+          and update_time >= #{startTime}
+          and update_time  <![CDATA[ <= ]]> #{endTime}
+          and member_id = #{memberId};
+    </select>
 
-	<select id="personalOnlineRecharge" resultType="java.math.BigDecimal">
-		select ifnull(SUM(money),0) as n
-		from member_recharge_online
-		where
-			status = 1 and
-			update_time >= #{startTime} and
-			update_time <![CDATA[ <= ]]> #{endTime} and
-			member_id= #{memberId}
-	</select>
+    <select id="personalOnlineRecharge" resultType="java.math.BigDecimal">
+        select ifnull(SUM(money), 0) as n
+        from member_recharge_online
+        where status = 1
+          and update_time >= #{startTime}
+          and update_time <![CDATA[ <= ]]> #{endTime}
+          and member_id = #{memberId}
+    </select>
 
-<!--	<select id="personalAgentRecharge" resultType="java.math.BigDecimal">
-		select ifnull(SUM(money),0) as n from pay_agent_recharge_log
-		where create_time >= #{startTime} and
-			create_time <![CDATA[ <= ]]> #{endTime} and
-			member_id= #{memberId}
-	</select>-->
-	<select id="personalUsdtRecharge" resultType="java.math.BigDecimal">
-		select ifnull(SUM(recharge_money),0) as n from member_recharge_usdt
-		WHERE status = 3 and
-			update_time >= #{startTime} and
-			update_time <![CDATA[ <= ]]> #{endTime} and
-			member_id= #{memberId}
-	</select>
-<!--	<select id="personalWithdrawRecharge" resultType="java.math.BigDecimal">-->
-<!--		select ifnull(SUM(withdraw_money),0) as n from member_withdraw_log-->
-<!--		where member_id = #{memberId} and-->
-<!--			status in(3,6) and-->
-<!--			update_time >= #{startTime} and-->
-<!--			update_time <![CDATA[ <= ]]> #{endTime};-->
-<!--	</select>-->
+    <!--	<select id="personalAgentRecharge" resultType="java.math.BigDecimal">
+            select ifnull(SUM(money),0) as n from pay_agent_recharge_log
+            where create_time >= #{startTime} and
+                create_time <![CDATA[ <= ]]> #{endTime} and
+                member_id= #{memberId}
+        </select>-->
+    <select id="personalUsdtRecharge" resultType="java.math.BigDecimal">
+        select ifnull(SUM(recharge_money), 0) as n
+        from member_recharge_usdt
+        WHERE status = 3
+          and update_time >= #{startTime}
+          and update_time <![CDATA[ <= ]]> #{endTime}
+          and member_id = #{memberId}
+    </select>
+    <!--	<select id="personalWithdrawRecharge" resultType="java.math.BigDecimal">-->
+    <!--		select ifnull(SUM(withdraw_money),0) as n from member_withdraw_log-->
+    <!--		where member_id = #{memberId} and-->
+    <!--			status in(3,6) and-->
+    <!--			update_time >= #{startTime} and-->
+    <!--			update_time <![CDATA[ <= ]]> #{endTime};-->
+    <!--	</select>-->
 
-<!--	<select id="personalGameData" resultType="Map">-->
-<!--		select a.*,p.name platformName from(-->
-<!--		   select ifnull(SUM(cell_score),0) as cellScore,-->
-<!--				  ifnull(SUM(all_bet),0) as allBet,-->
-<!--				  ifnull(SUM(profit),0) as profit,-->
-<!--				  platform_id platformId-->
-<!--		   from member_game_data${dbNodes}-->
-<!--		   where account= #{memberId} and game_end_time >=  #{startTime}-->
-<!--			 and game_end_time <![CDATA[ <= ]]> #{endTime}-->
-<!--		   GROUP BY platform_id) a left join game_platform p on p.id = a.platformId-->
-<!--	</select>-->
-	<select id="totalAccount" resultType="hashmap">
-		select account_now,box_account from member_info
-		where id = #{memberId}
-	</select>
+    <!--	<select id="personalGameData" resultType="Map">-->
+    <!--		select a.*,p.name platformName from(-->
+    <!--		   select ifnull(SUM(cell_score),0) as cellScore,-->
+    <!--				  ifnull(SUM(all_bet),0) as allBet,-->
+    <!--				  ifnull(SUM(profit),0) as profit,-->
+    <!--				  platform_id platformId-->
+    <!--		   from member_game_data${dbNodes}-->
+    <!--		   where account= #{memberId} and game_end_time >=  #{startTime}-->
+    <!--			 and game_end_time <![CDATA[ <= ]]> #{endTime}-->
+    <!--		   GROUP BY platform_id) a left join game_platform p on p.id = a.platformId-->
+    <!--	</select>-->
+    <select id="totalAccount" resultType="hashmap">
+        select account_now, box_account
+        from member_info
+        where id = #{memberId}
+    </select>
 
-	<select id="selectMemberProvince" resultType="java.lang.String">
-		select login_province from member_info where id = #{memberId}
-	</select>
+    <select id="selectMemberProvince" resultType="java.lang.String">
+        select login_province
+        from member_info
+        where id = #{memberId}
+    </select>
 </mapper>

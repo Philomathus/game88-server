@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.platform.api.mapper.ConfigVipMapper">
-    <resultMap id="ConfigVipResult" type="tv.game88.platform.api.entity.ConfigVip">
+<mapper namespace="tv.game88.core.member.mapper.ConfigVipMapper">
+    <resultMap id="ConfigVipResult" type="tv.game88.core.member.entity.ConfigVip">
         <id column="level" property="level" />
         <result column="level_bonus" property="levelBonus" />
         <result column="week_bonus" property="weekBonus" />
@@ -21,7 +21,7 @@
         from config_vip
     </sql>
 
-    <select id="selectConfigVipList" parameterType="tv.game88.platform.api.entity.ConfigVip" resultMap="ConfigVipResult">
+    <select id="selectConfigVipList" parameterType="tv.game88.core.member.entity.ConfigVip" resultMap="ConfigVipResult">
         <include refid="selectConfigVipVo" />
         <where>
             <if test="level != null">
