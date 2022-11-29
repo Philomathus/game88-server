@@ -437,8 +437,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
      */
     private String makeMemberCode() {
         if ( !redisUtils.exists( Constants.MEMBER_CODE ) ) {
-            String maxCode      = this.baseMapper.selectMaxMemberCode();
-            long   mysqlMaxCode = Integer.parseInt( maxCode ) - Constants.MEMBER_CODE_INIT;
+            String maxCode = this.baseMapper.selectMaxMemberCode();
+            long   mysqlMaxCode;
+            if ( "0".equals( maxCode ) ) {
+                mysqlMaxCode = Constants.MEMBER_CODE_INIT;
+            } else {
+                mysqlMaxCode = Integer.parseInt( maxCode ) - Constants.MEMBER_CODE_INIT;
+            }
             redisUtils.strSet( Constants.MEMBER_CODE, String.valueOf( mysqlMaxCode + 1 ) );
         }
         RedisAtomicLong entityIdCounter = new RedisAtomicLong( Constants.MEMBER_CODE, redisUtils.getConnectionFactory() );
