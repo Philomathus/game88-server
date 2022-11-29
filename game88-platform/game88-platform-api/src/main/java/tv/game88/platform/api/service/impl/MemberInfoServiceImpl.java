@@ -1023,6 +1023,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "此手机号已经存在" );
         }
         MemberInfo m = new MemberInfo();
+        m.setPassword( bCryptPasswordEncoder.encode( password ) );
         m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
         m.setId( makeMemberCode() );
         m.setNickName( m.getId() );
