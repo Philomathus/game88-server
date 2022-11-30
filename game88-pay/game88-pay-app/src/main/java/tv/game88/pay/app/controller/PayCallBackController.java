@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.pay.api.base.BasePay;
@@ -39,7 +38,6 @@ public class PayCallBackController {
 
     @GetMapping( value = "/orderRedirect/{orderNo}", produces = MediaType.TEXT_HTML_VALUE )
     @ResponseBody
-    @Anonymous
     public ResponseEntity<String> payRedirect( @PathVariable String orderNo ) {
         HttpHeaders headers = new HttpHeaders();
         headers.add( "client_header_buffer_size", "512k" );
