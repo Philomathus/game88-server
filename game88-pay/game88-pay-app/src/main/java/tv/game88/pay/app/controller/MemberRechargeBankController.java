@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.utils.MemberSecurityUtils;
@@ -28,7 +29,9 @@ public class MemberRechargeBankController extends BaseController {
     @PostMapping( "/rechargeBankList" )
     public RspBase<List<RspPayRechargeBank>> rechargeBankList() {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        return RspBase.ok( memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() ) );
+        List<RspPayRechargeBank> data = memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
+        log.warn( JsonUtil.object2Json( data ) );
+        return RspBase.ok( data );
     }
 
     @Operation( summary = "获取绑定的银行卡" )
