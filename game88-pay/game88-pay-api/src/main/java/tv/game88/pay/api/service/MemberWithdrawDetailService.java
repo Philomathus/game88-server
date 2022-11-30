@@ -61,4 +61,6 @@ public interface MemberWithdrawDetailService extends IService<MemberWithdrawDeta
     String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard );
 
     List<RspWithdrawRechargeDetail> withdrawRechargeDetail( String memberId, WithdrawRechargeType type );
+
+    List<RspWithdrawReport> withdrawReportList( String memberId );
 }

@@ -74,6 +74,16 @@ public class MemberWithdrawDetailController extends BaseController {
         return memberWithdrawDetailService.withdrawReport( id );
     }
 
+    /**
+     * 查询资金明细列表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:query')" )
+    @GetMapping( value = "/reportList/{id}" )
+    public RspBase<List<RspWithdrawReport>> withdrawReportList( @PathVariable( "id" ) String memberId, PageDomain pageDomain ) {
+        startPage( pageDomain );
+        return getRspBasePage( memberWithdrawDetailService.withdrawReportList( memberId ), pageDomain );
+    }
+
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:list')" )
     @GetMapping( "/count" )
     public RspBase<List<MemberWithdrawDetail>> count( ReqMemberWithdrawDetail reqMemberWithdrawDetail ) {

@@ -18,6 +18,9 @@ public class MobileLogin extends MobileBind {
     @Schema( title = "手机型号" )
     private String phoneModel;
 
+    @Schema( title = "提交二次校验的验证数据，NECaptchaValidate值" )
+    private String validate;
+
     public String getIp() {
         if ( StringUtils.isBlank( ip ) ) {
             return ServletUtil.getIp();

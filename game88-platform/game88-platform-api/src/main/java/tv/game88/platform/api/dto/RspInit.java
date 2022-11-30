@@ -25,4 +25,11 @@ public class RspInit {
     private String      starPic;
     @Schema( title = "6合彩色" )
     private HeCai6Color heCai6        = new HeCai6Color();
+
+    @Schema( title = "验证码id" )
+    private String captchaId;
+    @Schema( title = "滑动验证开关  1=开启0=关闭" )
+    private String actionSwitch = "1";
+    @Schema( title = "产品编号" )
+    private String productId;
 }

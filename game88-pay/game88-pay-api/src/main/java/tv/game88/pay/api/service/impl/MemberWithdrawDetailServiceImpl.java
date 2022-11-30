@@ -296,6 +296,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         return RspBase.ok( withdrawReports );
     }
 
+    @Override
+    public List<RspWithdrawReport> withdrawReportList( String memberId ) {
+        return null;
+    }
 
     @Override
     public RspBase<?> refused( ReqMemberWithdrawDetail req, String userName ) {

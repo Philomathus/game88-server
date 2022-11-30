@@ -1,12 +1,14 @@
 package tv.game88.platform.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
@@ -58,6 +63,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -113,6 +119,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } else {
             keys.addAll( Arrays.asList( "android_version", "android_force_update", "android_down_url", "android_update_text" ) );
         }
+        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id" ) );
         List<String> valueList = configEnvCacheUtil.getConf( keys );
         res.setCustomerUrl( valueList.get( 0 ) );
         res.setCustomerUrl2( valueList.get( 1 ) );
@@ -127,6 +134,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setLatestFore( valueList.get( 5 ) );
         res.setDownUrl( valueList.get( 6 ) );
         res.setUpdateText( valueList.get( 7 ) );
+
+        res.setCaptchaId( valueList.get( 8 ) );
+        res.setActionSwitch( valueList.get( 9 ) );
+        res.setProductId( valueList.get( 10 ) );
         return res;
     }
 
@@ -161,6 +172,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
             return RspBase.businessError( "请输入登陆密码" );
+        }
+
+        if ( configEnvCacheUtil.getConfBool( "163action_switch" ) ) {
+            //行为式验证码校验
+            if ( !verification( mobileLogin.getValidate() ) ) {
+                return RspBase.businessError( "验证不通过" );
+            }
         }
 
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
@@ -231,6 +249,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 }
             }
         }
+        if ( configEnvCacheUtil.getConfBool( "163action_switch" ) ) {
+            //行为式验证码校验
+            if ( !verification( mobileLogin.getValidate() ) ) {
+                return RspBase.businessError( "验证不通过" );
+            }
+        }
         //设备号查询
         MemberInfo memberInfo = this.baseMapper.findMemberByDeviceId( mobileLogin.getDeviceId() );
         if ( memberInfo != null ) {
@@ -278,6 +302,50 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
+    }
+
+    //行为校验
+    private boolean verification( String validate ) {
+        Map<String, String> params = new TreeMap<>();
+        params.put( "captchaId", configEnvCacheUtil.getConf( "163action_captchaId" ) );
+        params.put( "validate", validate );
+        params.put( "user", "qwer" );
+        params.put( "secretId", configEnvCacheUtil.getConf( "163action_secretId" ) );
+        params.put( "version", "v2" );
+        params.put( "timestamp", String.valueOf( System.currentTimeMillis() ) );
+        params.put( "nonce", IdWorker.get32UUID() );
+        // 1. 参数名按照ASCII码表升序排序
+        String[] keys = params.keySet().toArray( new String[ 0 ] );
+        Arrays.sort( keys );
+        // 2. 按照排序拼接参数名与参数值
+        StringBuilder sb = new StringBuilder();
+        for ( String key : keys ) {
+            sb.append( key ).append( params.get( key ) );
+        }
+        // 3. 将secretKey拼接到最后
+        sb.append( configEnvCacheUtil.getConf( "163action_secretkey" ) );
+        String sign = DigestUtils.md5Hex( sb.toString().getBytes( StandardCharsets.UTF_8 ) );
+        params.put( "signature", sign );
+        log.warn( JsonUtil.object2Json( params ) );
+
+        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+        requestMap.setAll( params );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.postForObject( configEnvCacheUtil.getConf( "163action_url" ), httpEntity, Map.class );
+        } catch ( RestClientException e ) {
+            log.warn( "会员行为验证失败validate:{},msg:{}", validate, e.getMessage() );
+        }
+        log.warn( JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            return ( boolean ) resultMap.get( "result" );
+        }
+        return false;
     }
 
     @Override
@@ -935,7 +1003,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
 
         }
-        String     name = "vip:" + vip;
+        String     name     = "vip:" + vip;
         BigDecimal addMoney = BigDecimal.ZERO;
         if ( type == 1 ) {
             name     = name + "晋级彩金";
