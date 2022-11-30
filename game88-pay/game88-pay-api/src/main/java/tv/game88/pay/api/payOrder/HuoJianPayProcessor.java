@@ -37,7 +37,11 @@ public class HuoJianPayProcessor extends AbstractPay {
         params.put( "mch_id", payPlatform.getMerId() );
         params.put( "nonce", IdWorker.get32UUID() );
         params.put( "out_order_no", reqPayRecharge.getOrderNo() );
-        params.put( "amount", reqPayRecharge.getMoney().multiply( new BigDecimal( 100 ) ).setScale( 0, RoundingMode.HALF_UP ) );
+        params.put( "amount", reqPayRecharge
+                .getMoney()
+                .multiply( new BigDecimal( 100 ) )
+                .setScale( 0, RoundingMode.HALF_UP )
+                .toString() );
         params.put( "pay_type", payChannel.getChannelCode() );
         params.put( "client_ip", reqPayRecharge.getRealIp() );
         params.put( "attach", "attach" );
@@ -53,7 +57,7 @@ public class HuoJianPayProcessor extends AbstractPay {
         }
         params.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), reqPayRecharge );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
