@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class ReqMemberCard {
@@ -18,6 +19,6 @@ public class ReqMemberCard {
     @Schema( title = "开户地址" )
     private String  bankAddress;
     @Schema( title = "银行卡ID" )
-    @NotBlank( message = "请选择银行类型" )
+    @NotNull( message = "请选择银行类型" )
     private Integer bankId;
 }
