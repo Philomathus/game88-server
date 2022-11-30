@@ -8,6 +8,7 @@ import tv.game88.core.member.dto.RspLogMoney;
 import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.entity.MemberVipGift;
 
@@ -64,7 +65,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<RspAccountMoney> getAccountNow( String memberId );
 
-    RspBase<RspMemberDetail> getAccountInfo( String memberId );
+    RspBase<RspMember> getAccountInfo( String memberId );
 
     List<RspLogMoney> getFundDetails( String memberId, ReqLogMoney reqLogMoney );
 
@@ -79,4 +80,8 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<RspImToken> getImToken( String userId );
 
     RspBase<?> insertMemberInfo( String phone, String password );
+
+    RspBase<?> bindPhone( MobileBind mobileBind, PlatformUser platformUser );
+
+    RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, PlatformUser platformUser );
 }

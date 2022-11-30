@@ -351,28 +351,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) throws Exception {
-        if ( StringUtils.isBlank( mobileLogin.getMobile() ) ) {
-            return RspBase.businessError( "请输入手机号码" );
-        }
-        if ( mobileLogin.getMobile().length() != 11 ) {
-            return RspBase.businessError( "请输入正确的手机号" );
-        }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
             return RspBase.businessError( "请输入登陆密码" );
         }
-        if ( StringUtils.isBlank( mobileLogin.getCode() ) ) {
-            return RspBase.businessError( "请输入短信验证码" );
-        }
-        /*String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
-        if ( StringUtils.isBlank( fcode ) ) {
-            return RspBase.businessError( "验证码过期" );
-        }
-        if ( smsPhoneCacheUtil.setSmsNumber( mobileLogin.getMobile() ) >= 5 ) {
-            smsPhoneCacheUtil.unLink( mobileLogin.getMobile() );
-            return RspBase.businessError( "短信验证错误不能超过五次" );
-        }*/
-        if ( !mobileLogin.getCode().equals( "12345" ) ) { // TODO fcode
-            return RspBase.businessError( "验证码错误" );
+        RspBase rspBase = this.verificationPhoneCode( mobileLogin.getMobile(), mobileLogin.getCode() );
+        if ( rspBase != null ) {
+            return rspBase;
         }
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         MemberInfo oldm       = null;
@@ -1013,11 +997,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<RspMemberDetail> getAccountInfo( String memberId ) {
-        MemberInfo      memberInfo   = this.baseMapper.selectById( memberId );
-        RspMemberDetail memberDetail = new RspMemberDetail();
-        BeanUtils.copyProperties( memberInfo, memberDetail );
-        return RspBase.ok( memberDetail );
+    public RspBase<RspMember> getAccountInfo( String memberId ) {
+        MemberInfo memberInfo = this.baseMapper.selectById( memberId );
+        RspMember  rspMember  = new RspMember();
+        BeanUtils.copyProperties( memberInfo, rspMember );
+        return RspBase.ok( rspMember );
     }
 
     @Override
@@ -1245,5 +1229,73 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         m.setLoginNum( 0 );
         int insert = this.baseMapper.insert( m );
         return insert > 0 ? RspBase.ok( "新增成功" ) : RspBase.businessError( "新增失败" );
+    }
+
+    @Override
+    public RspBase<?> bindPhone( MobileBind mobileBind, PlatformUser platformUser ) {
+        if ( StringUtils.isBlank( mobileBind.getPasswd() ) ) {
+            return RspBase.businessError( "请输入登录密码" );
+        }
+        String phone = this.baseMapper.getUserPhone( platformUser.getId() );
+        if ( StringUtils.isNotBlank( phone ) ) {
+            return RspBase.businessError( "您已绑定手机号,请勿重复绑定" );
+        }
+
+        RspBase<?> rspBase = verificationPhoneCode( mobileBind.getMobile(), mobileBind.getCode() );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( platformUser.getId() );
+        update.setPassword( mobileBind.getPasswordEncrypt() );
+        update.setPhone( mobileBind.getMobile() );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok( "绑定手机成功" ) : RspBase.businessError( "绑定手机失败,请重试" );
+    }
+
+    private RspBase<?> verificationPhoneCode( String phone, String code ) {
+        if ( StringUtils.isBlank( phone ) ) {
+            return RspBase.businessError( "请输入手机号" );
+        }
+        if ( phone.length() != 11 ) {
+            return RspBase.businessError( "请输入正确的手机号" );
+        }
+        if ( StringUtils.isBlank( code ) ) {
+            return RspBase.businessError( "请输入短信验证码" );
+        }
+        /*String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
+        if ( StringUtils.isBlank( fcode ) ) {
+            return RspBase.businessError( "验证码过期" );
+        }
+        if ( smsPhoneCacheUtil.setSmsNumber( mobileLogin.getMobile() ) >= 5 ) {
+            smsPhoneCacheUtil.unLink( mobileLogin.getMobile() );
+            return RspBase.businessError( "短信验证错误不能超过五次" );
+        }*/
+        if ( !code.equals( "12345" ) ) { // TODO fcode
+            return RspBase.businessError( "验证码错误" );
+        }
+        return null;
+    }
+
+    @Override
+    public RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, PlatformUser platformUser ) {
+        if ( StringUtils.isBlank( reqResetPasswd.getOldPasswd() ) ) {
+            return RspBase.businessError( "请输入原登录密码" );
+        }
+        if ( StringUtils.isBlank( reqResetPasswd.getNewPasswd() ) ) {
+            return RspBase.businessError( "请输入新登录密码" );
+        }
+        String passwd = this.baseMapper.getUserPasswd( platformUser.getId() );
+        if ( StringUtils.isBlank( passwd ) ) {
+            return RspBase.businessError( "非手机注册用户,请绑定手机号" );
+        }
+        if ( !bCryptPasswordEncoder.matches( reqResetPasswd.getOldPasswd(), passwd ) ) {
+            return RspBase.businessError( "原登录密码错误" );
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( platformUser.getId() );
+        update.setPassword( reqResetPasswd.getPasswordEncrypt() );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok( "登录密码更新成功" ) : RspBase.businessError( "登录密码更新失败,请重试" );
     }
 }

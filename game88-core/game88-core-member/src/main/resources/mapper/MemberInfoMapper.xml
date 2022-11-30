@@ -471,4 +471,16 @@
         from member_info
         where id = #{memberId}
     </select>
+
+    <select id="getUserPasswd" resultType="java.lang.String">
+        select password
+        from member_info
+        where id = #{memberId}
+    </select>
+
+    <select id="getUserPhone" resultType="java.lang.String">
+        select phone
+        from member_info
+        where id = #{memberId}
+    </select>
 </mapper>

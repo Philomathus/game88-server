@@ -38,10 +38,19 @@ public class RspMember {
     private String     inviterCode;
     @Schema( title = "注册类型", description = "0游客 1会员" )
     private Integer    registerType;
+    @Schema( title = "手机号" )
+    private String     phone;
 
     @Schema( title = "登录密码", hidden = true )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String password;
+
+    public String getPhone() {
+        if ( StringUtils.isNotBlank( phone ) ) {
+            return phone.substring( 0, 3 ) + "****" + phone.substring( 7 );
+        }
+        return phone;
+    }
 
     public String getHeadImg() {
         if ( StringUtils.isNotBlank( headImg ) && !headImg.startsWith( "http" ) ) {

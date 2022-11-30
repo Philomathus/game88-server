@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.member.dto.ReqLogMoney;
-import tv.game88.core.member.dto.RspCodeFlow;
-import tv.game88.core.member.dto.RspConfigTradeType;
-import tv.game88.core.member.dto.RspLogMoney;
+import tv.game88.core.member.dto.*;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
@@ -61,7 +58,7 @@ public class MemberInfoController extends BaseController {
 
     @Operation( summary = "获取会员信息" )
     @PostMapping( "/getAccountInfo" )
-    public RspBase<RspMemberDetail> getAccountInfo() {
+    public RspBase<RspMember> getAccountInfo() {
         return memberInfoService.getAccountInfo( MemberSecurityUtils.getUserId() );
     }
 

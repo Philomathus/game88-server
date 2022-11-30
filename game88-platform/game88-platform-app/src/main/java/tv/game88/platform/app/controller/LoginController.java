@@ -13,10 +13,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.session.manager.MemberTokenManager;
 import tv.game88.core.session.utils.MemberSecurityUtils;
-import tv.game88.platform.api.dto.MobileLogin;
-import tv.game88.platform.api.dto.Phone;
-import tv.game88.platform.api.dto.RspInit;
-import tv.game88.platform.api.dto.RspManUpdateVersion;
+import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
 
 import javax.annotation.Resource;
@@ -90,5 +87,23 @@ public class LoginController extends BaseController {
     @PostMapping( "/sendSmsVerifyCode" )
     public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
         return memberInfoService.sendSmsVerifyCode( phone );
+    }
+
+    @Operation( summary = "游客绑定手机号", description = "必须是游客未绑定手机号的,需要登录token" )
+    @PostMapping( "/bindPhone" )
+    public RspBase<?> bindPhone( @RequestBody MobileBind mobileBind ) {
+        if ( StringUtils.isNotBlank( mobileBind.getPasswd() ) ) {
+            mobileBind.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileBind.getPasswd() ) );
+        }
+        return memberInfoService.bindPhone( mobileBind, MemberSecurityUtils.getLoginUser().getPlatformUser() );
+    }
+
+    @Operation( summary = "重置登录密码", description = "根据旧密码重置登录密码,需要登录token" )
+    @PostMapping( "/resetPasswd" )
+    public RspBase<?> resetPasswd( @RequestBody ReqResetPasswd reqResetPasswd ) {
+        if ( StringUtils.isNotBlank( reqResetPasswd.getNewPasswd() ) ) {
+            reqResetPasswd.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( reqResetPasswd.getNewPasswd() ) );
+        }
+        return memberInfoService.resetPasswd( reqResetPasswd, MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
 }

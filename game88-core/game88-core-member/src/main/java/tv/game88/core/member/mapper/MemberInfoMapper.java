@@ -49,6 +49,10 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     BigDecimal getUserCodeNow( @Param( "memberId" ) String userId );
 
+    String getUserPasswd( @Param( "memberId" ) String id );
+
+    String getUserPhone( @Param( "memberId" ) String id );
+
     /**
      * @param userId   会员ID
      * @param money    增加的金额
