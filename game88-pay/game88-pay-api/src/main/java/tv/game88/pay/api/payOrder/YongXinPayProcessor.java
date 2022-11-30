@@ -2,9 +2,9 @@ package tv.game88.pay.api.payOrder;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
@@ -117,11 +117,8 @@ public class YongXinPayProcessor extends AbstractPay {
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( memberRechargeOnline.getPlatformId() );
         PayChannel  payChannel  = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
         String      sign        = ( String ) requestMap.remove( "sign" );
-        for ( String o : requestMap.keySet() ) {
-            if ( StringUtils.isEmpty( requestMap.get( o ) ) ) {
-                requestMap.remove( o );
-            }
-        }
+        // 去除空值
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
 
         if ( this.verifyIP( requestMap, realIp, payPlatform ) ) {
             return "FAIL";
