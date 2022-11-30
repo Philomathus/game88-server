@@ -89,7 +89,7 @@ public class TongDaPayProcessor extends AbstractPay {
 
         Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
 
-        log.warn( "通达支付查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
+        log.warn( payPlatform.getName() + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( resultMap.getOrDefault( "retCode", "0" ).toString() ) ) {
             BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
             if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
