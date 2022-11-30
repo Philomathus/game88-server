@@ -47,7 +47,7 @@ public class HuoLongFuPayProcessor extends AbstractPay {
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String code = resultMap.getOrDefault( "status", "" ).toString();
+            String code = resultMap.getOrDefault( "code", "" ).toString();
             if ( "200".equals( code ) ) {
                 return ( String ) resultMap.get( "data" );
             } else {
