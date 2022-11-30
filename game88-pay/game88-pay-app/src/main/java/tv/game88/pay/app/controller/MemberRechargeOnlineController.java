@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import tv.game88.common.utils.JsonUtil;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.utils.MemberSecurityUtils;
@@ -29,7 +31,6 @@ public class MemberRechargeOnlineController {
     @PostMapping( "/payTypeList" )
     public RspBase<List<PayType>> payTypeList( @RequestHeader( "dev" ) String deviceType ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        log.info( "获取充值类型列表 - memberId:{}", platformUser.getId() );
         return RspBase.ok( payService.findPayTypeList( platformUser, deviceType ) );
     }
 
@@ -37,7 +38,6 @@ public class MemberRechargeOnlineController {
     @PostMapping( "/payChannelList" )
     public RspBase<List<RspPayChannel>> payChannelList( @RequestBody ReqPayChannel reqPayChannel ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        log.info( "获取充值通道列表 - memberId:{}", platformUser.getId() );
         if ( platformUser.getStatus() == 2 ) {
             return RspBase.ok( payService.findPayChannelList( reqPayChannel.getTypeId(), platformUser ) );
         } else {
@@ -48,9 +48,7 @@ public class MemberRechargeOnlineController {
     @Operation( summary = "支付充值请求" )
     @PostMapping( "/onlineRecharge" )
     public RspBase<?> onlineRecharge( @Validated @RequestBody ReqPayRecharge reqPayRecharge ) throws Exception {
-        log.info( "充值请求对象:{}", JsonUtil.object2Json( reqPayRecharge ) );
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        log.info( "充值请求,userId:{},realIp:{}", platformUser.getId(), reqPayRecharge.getRealIp() );
         return payService.payRecharge( reqPayRecharge, platformUser );
     }
 }
