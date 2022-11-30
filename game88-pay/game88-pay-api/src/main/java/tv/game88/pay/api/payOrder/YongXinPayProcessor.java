@@ -84,7 +84,8 @@ public class YongXinPayProcessor extends AbstractPay {
 
         Map<String, Object> response = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
 
-        log.warn( "百年支付查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( response ) );
+        log.warn( payPlatform.getName()
+                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( response ) );
         if ( !CollectionUtils.isEmpty( response ) ) {
             int status = ( int ) response.getOrDefault( "code", -1 );
             if ( status == 0 ) {
