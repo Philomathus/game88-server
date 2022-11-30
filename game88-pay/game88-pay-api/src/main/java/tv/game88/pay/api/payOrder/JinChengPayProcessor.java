@@ -43,6 +43,7 @@ public class JinChengPayProcessor extends AbstractPay {
                 .setScale( 0, RoundingMode.HALF_UP ) );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "productId", payChannel.getChannelCode() );
+        params.put( "param2", reqPayRecharge.getUserId() );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
