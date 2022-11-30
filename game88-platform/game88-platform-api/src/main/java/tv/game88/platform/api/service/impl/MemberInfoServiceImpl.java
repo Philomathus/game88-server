@@ -606,10 +606,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         headers.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( params, headers );
         try {
-            restTemplate.postForObject( noticeUrl, requestEntity, Object.class );
+            restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
         } catch ( Exception e ) {
             try {
-                restTemplate.postForObject( noticeUrl, requestEntity, Object.class );
+                restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
             } catch ( Exception ex ) {
                 log.error( ex.getMessage(), ex );
             }
