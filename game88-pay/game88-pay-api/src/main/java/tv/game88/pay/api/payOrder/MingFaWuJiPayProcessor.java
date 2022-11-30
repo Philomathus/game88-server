@@ -9,6 +9,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -41,7 +42,7 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
         params.put( "orderAmt", reqPayRecharge.getMoney().toString() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         String sign = DigestUtils.md5Hex( signStr );
         params.put( "sign", sign );
@@ -76,7 +77,7 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
         reqMap.put( "merId", payPlatform.getMerId() );
         reqMap.put( "orderId", memberRechargeOnline.getOrderNo() );
 
-        String signStr = this.assemblyUrl( reqMap ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         String sign = DigestUtils.md5Hex( signStr );
         reqMap.put( "sign", sign );
@@ -135,7 +136,7 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String rel     = DigestUtils.md5Hex( signStr );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
