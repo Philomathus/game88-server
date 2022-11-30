@@ -20,6 +20,8 @@ public class MobileLogin extends MobileBind {
 
     @Schema( title = "提交二次校验的验证数据，NECaptchaValidate值" )
     private String validate;
+    @Schema( title = "反作弊结果查询token" )
+    private String token;
 
     public String getIp() {
         if ( StringUtils.isBlank( ip ) ) {

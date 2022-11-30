@@ -77,7 +77,7 @@ public class LoginController extends BaseController {
     @PostMapping( "/register" )
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                         @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
-                                        @RequestBody MobileLogin mobileLogin ) {
+                                        @RequestBody MobileLogin mobileLogin ) throws Exception {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
             mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
         }
