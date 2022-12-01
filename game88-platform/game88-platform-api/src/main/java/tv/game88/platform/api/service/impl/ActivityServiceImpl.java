@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.member.enums.EnumMoney;
@@ -37,7 +38,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class ActivityServiceImpl implements ActivityService {
-
+    @Resource
+    private RedisUtils              redisUtils;
     @Resource
     private ActivityCacheUtil       activityCacheUtil;
     @Resource
@@ -146,7 +148,9 @@ public class ActivityServiceImpl implements ActivityService {
                 RspQuestInfo info = new RspQuestInfo();
                 info.setContent( activityQuestInfo.getContent() );
                 info.setGameTypeId( activityQuestInfo.getGameTypeId().intValue() );
-                if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo.getIcon().startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo
+                        .getIcon()
+                        .startsWith( "http" ) ) {
                     info.setIcon( domainValue + activityQuestInfo.getIcon() );
                 }
                 info.setId( activityQuestInfo.getId() );
@@ -177,12 +181,21 @@ public class ActivityServiceImpl implements ActivityService {
     @Transactional( rollbackFor = Exception.class )
     @Override
     public RspBase<?> receiveQuestReward( Long questId, String memberId ) {
+        if ( !redisUtils.lock( "receiveQuestReward" + memberId, 5 ) ) {
+            throw new BusinessException( "请勿重复提交" );
+        }
         MemberQuest memberQuest = new QueryChainWrapper<>( memberQuestMapper )
                 .eq( "member_id", memberId )
                 .eq( "quest_id", questId )
                 .one();
         if ( memberQuest == null ) {
             return RspBase.businessError( "未达条件或任务过期" );
+        }
+        if ( memberQuest.getStatus() == 0 ) {
+            throw new BusinessException( "未达领取条件" );
+        }
+        if ( memberQuest.getStatus() == 2 ) {
+            return RspBase.businessError( "请勿重复领取" );
         }
         ActivityQuestInfo questInfo = activityQuestInfoMapper.selectById( questId );
         if ( questInfo == null ) {
@@ -198,6 +211,7 @@ public class ActivityServiceImpl implements ActivityService {
                     orderId );
             return RspBase.ok( "领取成功", questInfo.getReward() );
         }
+        redisUtils.unLock( "receiveQuestReward" + memberId );
         throw new BusinessException( "领取失败,请重试" );
     }
 }
