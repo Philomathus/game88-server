@@ -175,7 +175,6 @@ public class MemberInfo implements Serializable {
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private LocalDateTime selectStartDate;
     @TableField( exist = false )
-    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String        cardRealName;
 
     /**
