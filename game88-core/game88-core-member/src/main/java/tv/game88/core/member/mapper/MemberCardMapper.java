@@ -6,6 +6,7 @@ import tv.game88.core.member.dto.RspMemberCard;
 import tv.game88.core.member.entity.MemberCard;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 会员银行卡Mapper接口
@@ -26,4 +27,6 @@ public interface MemberCardMapper extends BaseMapper<MemberCard> {
     List<MemberCard> selectMemberCard( @Param( "memberId" ) String memberId );
 
     List<RspMemberCard> selectRspList( @Param( "memberId" ) String memberId );
+
+    List<MemberCard> selectRealNameByMemberIds( @Param( "list" ) Set<String> memberIds );
 }

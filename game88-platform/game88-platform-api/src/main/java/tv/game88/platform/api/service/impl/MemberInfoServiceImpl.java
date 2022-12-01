@@ -707,9 +707,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Override
     public List<MemberInfo> selectMemberInfoList( MemberInfo memberInfo ) {
         List<MemberInfo> memberInfoList = this.baseMapper.selectMemberInfoList( memberInfo );
+        Set<String>      memberIds      = memberInfoList.stream().map( MemberInfo::getId ).collect( Collectors.toSet() );
+        List<MemberCard> memberCards    = memberCardMapper.selectRealNameByMemberIds( memberIds );
         for ( MemberInfo info : memberInfoList ) {
             if ( StringUtils.isNotBlank( info.getPhone() ) ) {
                 info.setPhone( info.getPhone().substring( 0, 3 ) + "****" + info.getPhone().substring( 7, 11 ) );
+            }
+            for ( MemberCard memberCard : memberCards ) {
+                if ( info.getId().equals( memberCard.getMemberId() ) ) {
+                    info.setCardRealName( memberCard.getRealName() );
+                }
             }
         }
         return memberInfoList;

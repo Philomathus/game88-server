@@ -64,8 +64,24 @@
     </select>
 
     <select id="selectRspList" resultType="tv.game88.core.member.dto.RspMemberCard">
-        select c.id,c.real_name,c.bank_account,c.bank_address,c.dv,l.bank_icon,l.bank_name,l.bank_code
-        from member_card c left join config_bank_list l on l.id = c.bank_id
+        select c.id,
+               c.real_name,
+               c.bank_account,
+               c.bank_address,
+               c.dv,
+               l.bank_icon,
+               l.bank_name,
+               l.bank_code
+        from member_card c
+                 left join config_bank_list l on l.id = c.bank_id
         where member_id = #{memberId}
+    </select>
+
+    <select id="selectRealNameByMemberIds" resultMap="MemberCardResult">
+        select distinct member_id, real_name
+        from member_card where member_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

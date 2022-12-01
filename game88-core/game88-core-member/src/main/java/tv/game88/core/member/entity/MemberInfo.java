@@ -165,23 +165,24 @@ public class MemberInfo implements Serializable {
     @Excel( name = "渠道号" )
     private String channelCode;
 
-    @TableField(exist = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String searchValue;
-
-    @TableField(exist = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Set<String> searchValues;
-
-    @TableField(exist = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String        searchValue;
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Set<String>   searchValues;
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private LocalDateTime selectStartDate;
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String        cardRealName;
 
     /**
      * 请求参数
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @TableField(exist = false)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
     private Map<String, Object> params;
 
     public Map<String, Object> getParams() {
