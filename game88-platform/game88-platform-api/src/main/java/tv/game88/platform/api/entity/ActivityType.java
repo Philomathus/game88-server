@@ -13,13 +13,18 @@ public class ActivityType {
     /**
      * 系统编号
      */
-    @TableId(type = IdType.AUTO)
+    @TableId( type = IdType.AUTO )
     private Long id;
 
     /**
      * 名称
      */
     private String name;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 
     /**
      * 创建人

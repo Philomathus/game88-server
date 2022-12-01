@@ -72,7 +72,7 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_TYPE_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).orderByDesc( "create_time" ).list();
+            List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).orderByDesc( "sort" ).list();
             if ( activityInfos.size() > 0 ) {
                 if ( redisUtil.lock( ACTIVITY_TYPE_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_TYPE_KEY, activityInfos
