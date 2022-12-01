@@ -41,8 +41,11 @@
             <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
             <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
             <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
-            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
-                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
         </where>
     </select>
