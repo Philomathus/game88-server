@@ -157,7 +157,7 @@
     </select>
 
     <select id="reportListCount" resultType="java.util.Map">
-        SELECT SUM(t.real_money)          AS subMoney,
+        SELECT SUM(t.real_money)          AS realMoney,
                SUM(t.real_money * c.rate) AS handlingfeeTotal,
                t.platform_id,
                t.channel_id,
