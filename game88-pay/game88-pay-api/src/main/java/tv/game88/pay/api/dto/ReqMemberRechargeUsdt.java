@@ -1,6 +1,8 @@
 package tv.game88.pay.api.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -8,6 +10,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class ReqMemberRechargeUsdt {
@@ -56,4 +60,19 @@ public class ReqMemberRechargeUsdt {
     private String   selectEndDate;
     @Schema( hidden = true )
     private Integer  googleAuthCode;
+
+    /**
+     * 请求参数
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
+
 }
