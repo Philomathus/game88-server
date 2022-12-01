@@ -79,9 +79,8 @@ public class MemberWithdrawDetailController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:query')" )
     @GetMapping( value = "/reportList" )
-    public RspBase<List<RspWithdrawReport>> withdrawReportList( PageDomain pageDomain ) {
-        startPage( pageDomain );
-        return getRspBasePage( memberWithdrawDetailService.withdrawReportList(), pageDomain );
+    public RspBase<List<RspWithdrawReport>> withdrawReportList( ) {
+        return RspBase.ok( memberWithdrawDetailService.withdrawReportList() );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:list')" )
