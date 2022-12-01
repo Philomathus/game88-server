@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.platform.api.dto.RspMessageCommonProblem;
 import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
@@ -21,13 +22,17 @@ import java.util.List;
 @Log4j2
 public class MessageController extends BaseController {
     @Resource
-    private MessageService messageService;
+    private MessageService     messageService;
+    @Resource
+    private ConfigEnvCacheUtil configEnvCacheUtil;
 
     @Operation( summary = "获取首页公告列表" )
     @PostMapping( "/getMessageHomeNotices" )
     @Anonymous
     public RspBase<List<RspMessageHomeNotice>> getHomeNotices() {
-        return RspBase.ok( messageService.getMessageHomeNotices() );
+        RspBase<List<RspMessageHomeNotice>> ok = RspBase.ok( messageService.getMessageHomeNotices() );
+        ok.setOtherData( configEnvCacheUtil.getConf( "trumpet_notice" ) );
+        return ok;
     }
 
     @Operation( summary = "常见问题列表" )
