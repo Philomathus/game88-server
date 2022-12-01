@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
 import tv.game88.pay.api.dto.RspPayChannelName;
+import tv.game88.pay.api.dto.RspRechargeOnline;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
 import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
 import tv.game88.pay.api.mapper.PayChannelMapper;
@@ -82,6 +83,24 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
     @Override
     public MemberRechargeOnline selectMemberRechargeOnlineById( String id ) {
         return this.baseMapper.selectMemberRechargeOnlineById( id );
+    }
+
+    @Override
+    public List<RspRechargeOnline> selectRspReportList( ReqMemberRechargeOnline req ) {
+        if ( req.getUpdateTime() != null ) {
+            req.setSelectStartDate( req.getUpdateTime() + " 00:00:00" );
+            req.setSelectEndDate( req.getUpdateTime() + " 23:59:59" );
+        }
+        return this.baseMapper.selectRspReportList( req );
+    }
+
+    @Override
+    public Map reportListCount( ReqMemberRechargeOnline req ) {
+        if ( req.getUpdateTime() != null ) {
+            req.setSelectStartDate( req.getUpdateTime() + " 00:00:00" );
+            req.setSelectEndDate( req.getUpdateTime() + " 23:59:59" );
+        }
+        return this.baseMapper.reportListCount( req );
     }
 }
 

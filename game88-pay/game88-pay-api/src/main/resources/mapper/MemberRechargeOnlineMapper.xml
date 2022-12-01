@@ -20,9 +20,21 @@
     </resultMap>
 
     <sql id="selectMemberRechargeOnlineVo">
-        select order_no,member_id,upper_order_no,platform_id,channel_id,
-               money,real_money,payment_address,pay_time,status,
-               patch_order,remark,update_time, `first`, rate
+        select order_no,
+               member_id,
+               upper_order_no,
+               platform_id,
+               channel_id,
+               money,
+               real_money,
+               payment_address,
+               pay_time,
+               status,
+               patch_order,
+               remark,
+               update_time,
+               `first`,
+               rate
         from member_recharge_online
     </sql>
 
@@ -30,9 +42,13 @@
             resultMap="MemberRechargeOnlineResult">
         <include refid="selectMemberRechargeOnlineVo" />
         <where>
-            <include refid="listWhere"/>
-            <if test="downLoadDate[0] != null "> and update_time <![CDATA[ >= ]]> '${downLoadDate[0]}'</if>
-            <if test="downLoadDate[1] != null "> and update_time <![CDATA[ <= ]]> '${downLoadDate[1]}'</if>
+            <include refid="listWhere" />
+            <if test="downLoadDate[ 0 ] != null">
+                and update_time <![CDATA[ >= ]]> '${downLoadDate[0]}'
+            </if>
+            <if test="downLoadDate[ 1 ] != null">
+                and update_time <![CDATA[ <= ]]> '${downLoadDate[1]}'
+            </if>
         </where>
         order by update_time desc
     </select>
@@ -54,7 +70,8 @@
             and update_time <![CDATA[ >= ]]> #{selectStartDate} and update_time <![CDATA[ <= ]]> #{selectEndDate}
         </if>
         <if test="channelName != null and channelName != ''">
-            and channel_id in (SELECT id from pay_channel where name like concat(#{channelName}, '%'))
+            and channel_id in (SELECT id from pay_channel where name like concat(#{channelName}
+                 , '%'))
         </if>
     </sql>
 
@@ -62,54 +79,102 @@
         select `status`, COUNT(1) count
         from member_recharge_online
         where member_id = #{userId}
-        and pay_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+          and pay_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)
         GROUP BY `status`
     </select>
 
     <select id="listCount" resultType="java.util.Map">
-        select *, c.successCount / a.total failRate from (<include refid="transactionsTotal"/>)a
-        left join (<include refid="replenishmentTotal"/>)b on 1 = 1
-        left join (<include refid="successCountRate"/>)c on 1 = 1
+        select *, c.successCount / a.total failRate from (<include refid="transactionsTotal" />)a
+                                                                                                   left join (<include
+            refid="replenishmentTotal" />)b on 1 = 1
+                                             left join (<include refid="successCountRate" />)c on 1 = 1
     </select>
 
     <sql id="transactionsTotal">
         select count(*) total
         from member_recharge_online
-        where 1=1
-        <include refid="listWhere"/>
+        where 1 = 1
+        <include refid="listWhere" />
     </sql>
 
     <sql id="replenishmentTotal">
         select sum(real_money) replenishmentTotalMoney
         from member_recharge_online
-        where 1=1
-        <include refid="listWhere"/>
+        where 1 = 1
+        <include refid="listWhere" />
         and patch_order = 1
     </sql>
 
     <sql id="successCountRate">
         select count(*) successCount, sum(real_money) totalMoney
         from member_recharge_online
-        where 1=1
-        <include refid="listWhere"/>
+        where 1 = 1
+        <include refid="listWhere" />
         and status = 1
     </sql>
 
     <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
-        SELECT
-        money AS money,
-        order_no AS orderNo,
-        pay_time requestTime,
-        `status`
+        SELECT money    AS money,
+               order_no AS orderNo,
+               pay_time    requestTime,
+               `status`
         FROM member_recharge_online
         WHERE member_id = #{memberId}
-        and pay_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+          and pay_time >= DATE_SUB(NOW(), INTERVAL 15 DAY)
         order by pay_time desc
     </select>
 
-    <select id="selectMemberRechargeOnlineById" parameterType="java.lang.String" resultType="tv.game88.pay.api.entity.MemberRechargeOnline">
+    <select id="selectMemberRechargeOnlineById" parameterType="java.lang.String"
+            resultType="tv.game88.pay.api.entity.MemberRechargeOnline">
         <include refid="selectMemberRechargeOnlineVo" />
-       Where order_no = #{id}
+        Where order_no = #{id}
     </select>
 
+    <select id="selectRspReportList" resultType="tv.game88.pay.api.dto.RspRechargeOnline">
+        SELECT p.name            AS platformName,
+               c.rate            as channelPayRate,
+               c.name            AS channelName,
+               t.platform_id     as platformId,
+               t.channel_id      as channelId,
+               SUM(t.money)      AS money,
+               SUM(t.real_money) AS realMoney,
+               t.update_time     as updateTime
+        FROM member_recharge_online t
+                 LEFT JOIN pay_channel c ON t.channel_id = c.id
+                 LEFT JOIN pay_platform p ON t.platform_id = p.id
+        where t.status = 1
+        <if test="platformId != null and platformId != ''">
+            and t.platform_id = #{platformId}
+        </if>
+        <if test="updateTime != null and updateTime != ''">
+            and t.update_time <![CDATA[ >= ]]> #{selectStartDate}
+            and t.update_time <![CDATA[ <= ]]> #{selectEndDate}
+        </if>
+        <if test="channelName != null and channelName != ''">
+            and t.channel_id in (SELECT id from pay_channel where name like concat(#{channelName}, '%'))
+        </if>
+        GROUP BY t.channel_id, t.platform_id
+    </select>
+
+    <select id="reportListCount" resultType="java.util.Map">
+        SELECT SUM(t.real_money)          AS subMoney,
+               SUM(t.real_money * c.rate) AS handlingfeeTotal,
+               t.platform_id,
+               t.channel_id,
+               t.update_time,
+               COUNT(*)                   AS totalcount
+        FROM member_recharge_online t
+                 LEFT JOIN pay_channel c ON t.channel_id = c.id
+        WHERE t.status = 1
+        <if test="platformId != null and platformId != ''">
+            and t.platform_id = #{platformId}
+        </if>
+        <if test="updateTime != null and updateTime != ''">
+            and t.update_time <![CDATA[ >= ]]> #{selectStartDate}
+            and t.update_time <![CDATA[ <= ]]> #{selectEndDate}
+        </if>
+        <if test="channelName != null and channelName != ''">
+            and t.channel_id in (SELECT id from pay_channel where name like concat(#{channelName}, '%'))
+        </if>
+    </select>
 </mapper>

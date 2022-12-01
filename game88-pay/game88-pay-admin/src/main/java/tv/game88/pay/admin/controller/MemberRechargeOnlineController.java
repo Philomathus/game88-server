@@ -11,6 +11,7 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
+import tv.game88.pay.api.dto.RspRechargeOnline;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
 import tv.game88.pay.api.service.MemberRechargeOnlineService;
 
@@ -80,4 +81,40 @@ public class MemberRechargeOnlineController extends BaseController {
         memberRechargeOnline.setRemark( "人工补单操作人：" + SecurityUtils.getUsername() );
         return memberRechargeOnlineService.payPatchOrder( memberRechargeOnline );
     }
+
+    // ------------- report -------------
+
+    /**
+     * 导出线上充值信息报表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:export')" )
+    @Log( title = "线上充值信息", businessType = BusinessType.EXPORT )
+    @GetMapping( "/exportReport" )
+    public void exportReport( ReqMemberRechargeOnline req, HttpServletResponse response ) {
+        List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
+        ExportExcelUtil.exportExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
+    }
+
+
+    /**
+     * 查询线上充值信息报表
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:list')" )
+    @GetMapping( "/report" )
+    public RspBase<List<RspRechargeOnline>> report( ReqMemberRechargeOnline req ) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        startPage( pageDomain );
+        List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
+        return getRspBasePage( list, pageDomain );
+    }
+
+    /**
+     * 报表统计
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:list')" )
+    @GetMapping( "/reportListCount" )
+    public Map reportListCount( ReqMemberRechargeOnline req ) {
+        return memberRechargeOnlineService.reportListCount( req );
+    }
+
 }

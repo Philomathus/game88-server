@@ -2,6 +2,7 @@ package tv.game88.pay.api.service;
 
 import tv.game88.common.vo.RspBase;
 import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
+import tv.game88.pay.api.dto.RspRechargeOnline;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -15,6 +16,10 @@ public interface MemberRechargeOnlineService extends IService<MemberRechargeOnli
 
     RspBase<?> payPatchOrder( MemberRechargeOnline memberRechargeOnline );
 
-    MemberRechargeOnline  selectMemberRechargeOnlineById( String id );
+    MemberRechargeOnline selectMemberRechargeOnlineById( String id );
+
+    List<RspRechargeOnline> selectRspReportList( ReqMemberRechargeOnline req );
+
+    Map reportListCount( ReqMemberRechargeOnline req );
 }
 
