@@ -1,10 +1,14 @@
 package tv.game88.pay.api.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class ReqMemberRechargeOnline {
@@ -41,5 +45,19 @@ public class ReqMemberRechargeOnline {
     private String   selectStartDate;
     @JsonIgnore
     private String   selectEndDate;
+
+    /**
+     * 请求参数
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 
 }
