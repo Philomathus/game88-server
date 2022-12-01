@@ -297,8 +297,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     }
 
     @Override
-    public List<RspWithdrawReport> withdrawReportList( String memberId ) {
-        return null;
+    public List<RspWithdrawReport> withdrawReportList() {
+        return this.baseMapper.withdrawReportList();
     }
 
     @Override

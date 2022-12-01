@@ -2,10 +2,7 @@ package tv.game88.pay.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-import tv.game88.pay.api.dto.ReqMemberWithdrawDetail;
-import tv.game88.pay.api.dto.RspMemberInfoWithdraw;
-import tv.game88.pay.api.dto.RspMemberWithdrawDetailShunWei;
-import tv.game88.pay.api.dto.RspWithdrawRechargeDetail;
+import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 
 import java.math.BigDecimal;
@@ -49,4 +46,6 @@ public interface MemberWithdrawDetailMapper extends BaseMapper<MemberWithdrawDet
     BigDecimal totalWithdrawMoney( String memberId );
 
     List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
+
+    List<RspWithdrawReport> withdrawReportList();
 }

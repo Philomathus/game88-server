@@ -278,4 +278,10 @@
         and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
         order by w.create_time desc
     </select>
+
+    <select id="withdrawReportList" resultType="tv.game88.pay.api.dto.RspWithdrawReport">
+        select class_twoname, t_value
+        from report_analysisuser
+        ORDER BY rep_id asc
+    </select>
 </mapper>
