@@ -1,6 +1,5 @@
 package tv.game88.platform.admin.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +17,7 @@ import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.entity.MemberInfoHistory;
 import tv.game88.platform.api.service.MemberInfoHistoryService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RequestMapping("/member/memberInfoHistory")
 public class MemberInfoHistoryController extends BaseController {
 
-    @Autowired
+    @Resource
     private MemberInfoHistoryService memberInfoHistoryService;
 
     /**

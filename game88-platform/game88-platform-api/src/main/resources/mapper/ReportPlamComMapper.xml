@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ReportPlamComMapper">
+    <resultMap type="tv.game88.platform.api.entity.ReportPlamCom" id="ReportPlamComResult">
+        <result property="repId" column="rep_id" />
+        <result property="classOne" column="class_one" />
+        <result property="classOnename" column="class_onename" />
+        <result property="classTwo" column="class_two" />
+        <result property="classTwoname" column="class_twoname" />
+        <result property="type" column="type" />
+        <result property="tValue" column="t_value" />
+        <result property="reporttime" column="reporttime" />
+        <result property="updateTime" column="updatetime" />
+    </resultMap>
+
+    <sql id="selectReportPlamComVo">
+        select rep_id,
+               class_one,
+               class_onename,
+               class_two,
+               class_twoname,
+               type,
+               t_value,
+               reporttime,
+               updatetime as updateTime
+        from report_plam_com
+    </sql>
+
+    <select id="selectReportPlamComList" parameterType="tv.game88.platform.api.entity.ReportPlamCom"
+            resultMap="ReportPlamComResult">
+        <include refid="selectReportPlamComVo" />
+        <where>
+            <if test="classTwoname != null  and classTwoname != ''">
+                and class_twoname like concat('%', #{classTwoname}, '%')
+            </if>
+            <if test="reporttime != null  and reporttime != ''">
+                and reporttime = #{reporttime}
+            </if>
+        </where>
+    </select>
+
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_plamcom(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
+                             #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+</mapper>

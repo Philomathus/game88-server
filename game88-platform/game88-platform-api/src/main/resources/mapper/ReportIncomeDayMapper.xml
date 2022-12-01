@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ReportIncomeDayMapper">
+    <resultMap type="tv.game88.platform.api.entity.ReportIncomeDay" id="ReportIncomeDayResult">
+        <result property="reppayId" column="reppay_id" />
+        <result property="money" column="money" />
+        <result property="type" column="type" />
+        <result property="payplam" column="payplam" />
+        <result property="paychancl" column="paychancl" />
+        <result property="paycard" column="paycard" />
+        <result property="paydate" column="paydate" />
+    </resultMap>
+
+    <sql id="selectReportIncomeDayVo">
+        select reppay_id, money, type, payplam, paychancl, paycard, paydate
+        from report_income_day
+    </sql>
+
+    <select id="selectReportIncomeDayList" parameterType="tv.game88.platform.api.entity.ReportIncomeDay"
+            resultMap="ReportIncomeDayResult">
+        <include refid="selectReportIncomeDayVo" />
+        <where>
+            <if test="paydate != null  and paydate != ''">
+                and paydate = #{paydate}
+            </if>
+        </where>
+    </select>
+
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_incomeday(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
+                               #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="countSuccessMoney" resultType="tv.game88.platform.api.entity.ReportIncomeDay">
+        select sum(money) as countSuccessMoney
+        from report_income_day
+        <where>
+            <if test="paydate != null  and paydate != ''">
+                and paydate = #{paydate}
+            </if>
+        </where>
+    </select>
+</mapper>

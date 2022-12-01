@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ReportPlamGamesMapper">
+    <resultMap type="tv.game88.platform.api.entity.ReportPlamGames" id="ReportPlamGamesResult">
+        <result property="gameUuid" column="game_uuid" />
+        <result property="gameagent" column="gameagent" />
+        <result property="gameplame" column="gameplame" />
+        <result property="gamepepole" column="gamepepole" />
+        <result property="gametouzhu" column="gametouzhu" />
+        <result property="gamecell" column="gamecell" />
+        <result property="gamebet" column="gamebet" />
+        <result property="gamerevenve" column="gamerevenve" />
+        <result property="gameprofit" column="gameprofit" />
+        <result property="plampfit" column="plampfit" />
+        <result property="bili" column="bili" />
+        <result property="begindate" column="begindate" />
+        <result property="updateTime" column="updatetime" />
+    </resultMap>
+
+    <sql id="selectReportPlamGamesVo">
+        select game_uuid,
+               gameagent,
+               gameplame,
+               gamepepole,
+               gametouzhu,
+               gamecell,
+               gamebet,
+               gamerevenve,
+               gameprofit,
+               plampfit,
+               bili,
+               begindate,
+               updatetime as updateTime
+        from report_plam_games
+    </sql>
+
+    <select id="selectReportPlamGamesList" parameterType="tv.game88.platform.api.entity.ReportPlamGames"
+            resultMap="ReportPlamGamesResult">
+        <include refid="selectReportPlamGamesVo" />
+        <where>
+            <if test="gameplame != null  and gameplame != ''">
+                and gameplame = #{gameplame}
+            </if>
+            <if test="begindate != null">
+                and begindate = #{begindate}
+            </if>
+        </where>
+        order by game_uuid desc
+    </select>
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_plamgame(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
+                              #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="countBetData" resultType="tv.game88.platform.api.entity.ReportPlamGames">
+        select sum(gamecell) as countBetMoney, sum(gamepepole) as countBetPeople, sum(gameprofit) as memberProfit
+        from report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">
+                and gameplame = #{gameplame}
+            </if>
+            <if test="begindate != null">
+                and begindate = #{begindate}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectReportPlamGamesListMonth" resultType="tv.game88.platform.api.dto.RspPlamGamesMonth">
+        select gameplame,
+               SUM(gamecell)                 as gamecell,
+               SUM(gamecell) - SUM(plampfit) as paicai,
+               SUM(plampfit)                 as gameprofit
+        from report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">
+                and gameplame = #{gameplame}
+            </if>
+            <if test="begindate != null and begindate != ''">
+                <!-- 开始时间检索 -->
+                AND begindate <![CDATA[ >= ]]>  STR_TO_DATE(#{begindate}, '%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                <!-- 结束时间检索 -->
+                AND begindate <![CDATA[ <= ]]> STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+            </if>
+        </where>
+        GROUP BY gameplame
+    </select>
+
+    <select id="countBetMonth" resultType="tv.game88.platform.api.dto.RspPlamGamesMonth">
+        select SUM(plampfit) as countBetMoney
+        from report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">
+                and gameplame = #{gameplame}
+            </if>
+            <if test="begindate != null and begindate != ''">
+                <!-- 开始时间检索 -->
+                AND date_format(begindate, '%y%m%d') <![CDATA[ >= ]]> date_format(#{begindate}, '%y%m%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                <!-- 结束时间检索 -->
+                AND date_format(begindate, '%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate}, '%y%m%d')
+            </if>
+        </where>
+    </select>
+</mapper>

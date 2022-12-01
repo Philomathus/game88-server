@@ -1252,6 +1252,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( rspBase != null ) {
             return rspBase;
         }
+        Long phoneCount = this.baseMapper.selectCount( new QueryWrapper<MemberInfo>().eq( "phone", mobileBind.getMobile() ) );
+        if ( phoneCount > 0 ) {
+            return RspBase.businessError( "该手机号已注册账号,请勿重复绑定" );
+        }
+
         MemberInfo update = new MemberInfo();
         update.setId( platformUser.getId() );
         update.setPassword( mobileBind.getPasswordEncrypt() );
