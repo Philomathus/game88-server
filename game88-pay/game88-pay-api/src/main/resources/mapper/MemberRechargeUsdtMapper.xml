@@ -48,6 +48,7 @@
                 AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="listCount" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt" resultType="java.util.Map">
