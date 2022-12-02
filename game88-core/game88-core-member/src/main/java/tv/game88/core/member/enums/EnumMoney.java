@@ -25,14 +25,13 @@ public enum EnumMoney {
     GAME_OUT( 101, "游戏下分", false ),
     ACTIVITY( 102, "优惠活动", true ),
     BOHUI( 103, "取款驳回", false ),
-    UP_SCORE( 105, "补分", false ),
-    WONGIVE( 113, "赠送彩金", false ),
     COMMISSION( 104, "推广佣金", true ),
     LOTTERY_BONUS( 105, "彩票中奖", false ),
     QUEST_BONUS( 106, "任务奖金", false ),
     SAFE_BOX( 107, "保险箱记录", false ),
     CODE_CLEAN( 108, "洗码", false ),
     REFUND_BET_AMOUNT( 109, "回退金额", false ),
+    WONGIVE( 110, "赠送彩金", false ),
 
     GM( 110, "人工入款", true ),
 

@@ -44,32 +44,100 @@
 
     <select id="selectLotteryBetList" parameterType="tv.game88.core.lottery.entity.LotteryBet"
             resultMap="LotteryBetResult">
-        <include refid="selectLotteryBetVo" />
+        SELECT a.* FROM (
+        SELECT *
+        FROM lottery_bet0
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet1
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet2
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet3
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet4
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet5
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet6
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet7
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet8
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        union
+        SELECT *
+        FROM lottery_bet9
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        ) a
+    </select>
+
+    <sql id="whereSelect">
+        <if test="issue != null  and issue != ''">
+            and issue = #{issue}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        <if test="lotteryName != null  and lotteryName != ''">
+            and lottery_name like concat('%',
+                #{lotteryName}, '%')
+        </if>
+        <if test="params != null">
+            and bet_time <![CDATA[ >= ]]> #{params.beginTime} and bet_time <![CDATA[ <= ]]> #{params.endTime}
+        </if>
+    </sql>
+
+    <select id="selectLotteryBetSingleList" resultMap="LotteryBetResult">
+        select * from lottery_bet${tableLast} a
         <where>
             <if test="memberId != null  and memberId != ''">
                 and member_id = #{memberId}
             </if>
-            <if test="lotteryId != null">
-                and lottery_id = #{lotteryId}
-            </if>
-            <if test="lotteryName != null and lotteryName != ''">
-                and lottery_name = #{lotteryName}
-            </if>
-            <if test="issue != null  and issue != ''">
-                and issue = #{issue}
-            </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-            <if test="betTime != null">
-                and bet_time = #{betTime}
-            </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
-            </if>
-            <if test="anchor != null">
-                and anchor = #{anchor}
-            </if>
+            <include refid="whereSelect" />
+        </where>
+    </select>
+
+    <select id="selectLotteryBetViewlList" resultMap="LotteryBetResult">
+        SELECT a.*
+        FROM lottery_bet_view a
+        <where>
+            <include refid="whereSelect" />
         </where>
     </select>
 
@@ -91,99 +159,288 @@
     </insert>
 
     <select id="selectLotteryWaiteList" resultMap="LotteryBetResult">
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet0
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet0
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet1
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet1
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet2
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet2
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet3
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet3
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet4
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet4
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet5
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet5
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet6
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet6
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet7
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet7
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet8
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet8
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
         UNION ALL
-        select id,member_id ,anchor, chip, cost, method_id, bet_select from lottery_bet9
-        where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
+        select id, member_id, anchor, chip, cost, method_id, bet_select
+        from lottery_bet9
+        where status = 0
+          and issue = #{issue}
+          and lottery_id = #{lotteryId}
     </select>
 
     <select id="selectLotteryWaiteCount" resultType="java.lang.Integer">
-        select sum(c) from (
-        select count(*) c from lottery_bet0  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet1  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet2  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet3  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet4  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet5  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet6  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet7  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet8  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        UNION ALL
-        select count(*) c from lottery_bet9  where status = 0 and issue =  #{issue} and lottery_id = #{lotteryId}
-        ) a
+        select sum(c)
+        from (select count(*) c
+              from lottery_bet0
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet1
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet2
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet3
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet4
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet5
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet6
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet7
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet8
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}
+              UNION ALL
+              select count(*) c
+              from lottery_bet9
+              where status = 0
+                and issue = #{issue}
+                and lottery_id = #{lotteryId}) a
     </select>
 
     <update id="updateStatusPrize">
         update lottery_bet${dbNodes}
         set status      = #{status}
-        , code        = #{code}
-        , prize       = #{prize}
-        , update_time = #{updateTime}
+          , code        = #{code}
+          , prize       = #{prize}
+          , update_time = #{updateTime}
         where id = #{id}
     </update>
 
     <select id="selectListByTime" resultMap="LotteryBetResult">
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet0
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet0
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet1
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet1
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet2
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet2
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet3
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet3
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet4
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet4
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet5
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet5
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet6
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet6
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet7
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet7
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet8
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet8
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
         UNION ALL
-        select id,member_id , lottery_id, issue, chip, prize, cost, anchor, bet_time,update_time from lottery_bet9
-        where update_time <![CDATA[ >= ]]>  #{start} and update_time  &lt;=  #{end} and status > 0
+        select id,
+               member_id,
+               lottery_id,
+               issue,
+               chip,
+               prize,
+               cost,
+               anchor,
+               bet_time,
+               update_time
+        from lottery_bet9
+        where update_time <![CDATA[ >= ]]>  #{start}
+          and update_time &lt;= #{end}
+          and status > 0
     </select>
 </mapper>

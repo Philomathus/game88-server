@@ -68,9 +68,10 @@ public class LogMoney {
     /**
      * 请求参数
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @TableField(exist = false)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
     private Map<String, Object> params;
+
     public Map<String, Object> getParams() {
         if ( params == null ) {
             params = new HashMap<>();

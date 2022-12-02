@@ -2,14 +2,17 @@ package tv.game88.core.lottery.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 彩票会员下注详情对象 lottery_bet
@@ -59,4 +62,11 @@ public class LotteryBet {
     // 直播间外-1
     @Excel( name = "主播ID" )
     private Integer anchor;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private Map<String, Object> params;
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String              tableLast;
 }

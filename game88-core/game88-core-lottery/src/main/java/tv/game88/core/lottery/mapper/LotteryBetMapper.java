@@ -26,7 +26,11 @@ public interface LotteryBetMapper extends BaseMapper<LotteryBet> {
      *
      * @return 彩票会员下注详情集合
      */
-    public List<LotteryBet> selectLotteryBetList( LotteryBet lotteryBet );
+    List<LotteryBet> selectLotteryBetList( LotteryBet lotteryBet );
+
+    List<LotteryBet> selectLotteryBetSingleList( LotteryBet lotteryBet );
+
+    List<LotteryBet> selectLotteryBetViewlList( LotteryBet lotteryBet );
 
     public List<LotteryBet> selectListByTime( @Param( "start" ) String start, @Param( "end" ) String end );
 

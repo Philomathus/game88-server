@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
@@ -41,7 +42,15 @@ public class LotteryBetServiceImpl extends ServiceImpl<LotteryBetMapper, Lottery
      */
     @Override
     public List<LotteryBet> selectLotteryBetList( LotteryBet lotteryBet ) {
-        return this.baseMapper.selectLotteryBetList( lotteryBet );
+        if ( StringUtils.isNotBlank( lotteryBet.getMemberId() ) ) {
+            String tableLast = lotteryBet.getMemberId().substring( lotteryBet.getMemberId().length() - 1 );
+            lotteryBet.setTableLast( tableLast );
+            return this.baseMapper.selectLotteryBetSingleList( lotteryBet );
+        } else if ( StringUtils.isNotBlank( lotteryBet.getIssue() ) ) {
+            return this.baseMapper.selectLotteryBetList( lotteryBet );
+        } else {
+            return this.baseMapper.selectLotteryBetViewlList( lotteryBet );
+        }
     }
 
     @Override
