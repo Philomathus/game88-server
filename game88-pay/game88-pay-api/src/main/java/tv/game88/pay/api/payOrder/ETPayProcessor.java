@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -40,7 +41,7 @@ public class ETPayProcessor extends AbstractPay {
         params.put( "goods_desc", "goods_desc" );
         params.put( "client_ip", reqPayRecharge.getRealIp() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr );
         params.put( "sign", sign );
 
@@ -70,23 +71,25 @@ public class ETPayProcessor extends AbstractPay {
         params.put( "out_order_sn", memberRechargeOnline.getOrderNo() );
         params.put( "time", System.currentTimeMillis() / 1000 );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr );
         params.put( "sign", sign );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
 
         log.warn( payPlatform.getName() + "查询结果:{}", JsonUtil.object2Json( resultMap ) );
-        String code = resultMap.getOrDefault( "code", -1 ).toString();
-        if ( "1".equals( code ) ) {
-            Map<String, Object> map    = ( Map<String, Object> ) resultMap.get( "data" );
-            String              status = map.getOrDefault( "status", -1 ).toString();
-            if ( "9".equals( status ) ) {
-                BigDecimal money = new BigDecimal( map.getOrDefault( "money", 0 ).toString() );
-                if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-                    memberRechargeOnline.setRealMoney( money.setScale( 2, RoundingMode.HALF_UP ) );
-                    memberRechargeOnline.setUpperOrderNo( map.getOrDefault( "order_sn", "" ).toString() );
-                    return true;
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String code = resultMap.getOrDefault( "code", -1 ).toString();
+            if ( "1".equals( code ) ) {
+                Map<String, Object> map    = ( Map<String, Object> ) resultMap.get( "data" );
+                String              status = map.getOrDefault( "status", -1 ).toString();
+                if ( "9".equals( status ) ) {
+                    BigDecimal money = new BigDecimal( map.getOrDefault( "money", 0 ).toString() );
+                    if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
+                        memberRechargeOnline.setRealMoney( money.setScale( 2, RoundingMode.HALF_UP ) );
+                        memberRechargeOnline.setUpperOrderNo( map.getOrDefault( "order_sn", "" ).toString() );
+                        return true;
+                    }
                 }
             }
         }
@@ -133,7 +136,7 @@ public class ETPayProcessor extends AbstractPay {
         bodyMap.put( "time", time );
         bodyMap.put( "status", status );
 
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         String rel = DigestUtils.md5Hex( signStr );
         log.warn( rel + ":" + sign );
