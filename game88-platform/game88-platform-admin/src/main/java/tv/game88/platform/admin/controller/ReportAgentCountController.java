@@ -31,7 +31,7 @@ import java.util.Map;
  * @date 2021-01-26
  */
 @RestController
-@RequestMapping( "/admin/reportAgentcount" )
+@RequestMapping( "/report/agentCount" )
 public class ReportAgentCountController extends BaseController {
     @Resource
     private ReportAgentcountService reportAgentcountService;
@@ -99,13 +99,13 @@ public class ReportAgentCountController extends BaseController {
     /**
      * 查询代理统计，主要用于代理渠道的统计列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:reportAgentcount:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:agentCount:list')" )
     @GetMapping( "/list" )
     public Object list( ReportAgentcount reportAgentcount ) throws Exception {
         return reportAgentcountService.selectReportAgentcountList( reportAgentcount );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:reportAgentcount:export')" )
+    @PreAuthorize( "@ss.hasPermi('report:agentCount:export')" )
     @Log( title = "推广统计报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportAgentcount reportAgentcount, HttpServletResponse response ) throws ParseException {
@@ -113,9 +113,9 @@ public class ReportAgentCountController extends BaseController {
         ExportExcelUtil.exportExcel( list, "推广统计报表", "推广统计报表", ReportAgentcount.class, response );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:reportAgentcount:generatedata')" )
-    @GetMapping( "/generatedata" )
-    public RspBase<?> generatedata( ReportAgentcount reportAgentcount ) throws ParseException {
+    @PreAuthorize( "@ss.hasPermi('report:agentCount:generateData')" )
+    @GetMapping( "/generateData" )
+    public RspBase<?> generateData( ReportAgentcount reportAgentcount ) throws ParseException {
         return reportAgentcountService.plamagent_data( reportAgentcount );
     }
 
