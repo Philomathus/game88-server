@@ -25,7 +25,7 @@ import java.util.List;
  * @date 2021-01-25
  */
 @RestController
-@RequestMapping( "/web/report-moneyinfo" )
+@RequestMapping( "/report/moneyInfo" )
 @Log4j2
 public class ReportMoneyinfoController extends BaseController {
     @Resource
