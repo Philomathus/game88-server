@@ -3,12 +3,11 @@ package tv.game88.core.config.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import tv.game88.common.vo.BaseEntity;
 
 import java.time.LocalDateTime;
 
 @Data
-public class ConfigSms extends BaseEntity {
+public class ConfigSms {
     /**
      * 主键
      */
