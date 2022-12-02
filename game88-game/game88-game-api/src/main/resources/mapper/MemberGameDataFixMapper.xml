@@ -8,10 +8,35 @@
         <result property="gameEndTime" column="game_end_time" />
         <result property="platformId" column="platform_id" />
         <result property="status" column="status" />
+
+        <result property="platformName" column="platform_name" />
     </resultMap>
 
     <sql id="selectMemberGameDataFixVo">
         select id, member_id, game_start_time, game_end_time, platform_id, status
         from member_game_data_fix
     </sql>
+
+    <select id="selectMemberGameDataFixList" resultMap="MemberGameDataFixResult">
+        select m.id, m.member_id, m.game_start_time, m.game_end_time, m.platform_id, m.status, g.name platform_name
+        from member_game_data_fix m
+                 LEFT JOIN game_platform g on m.platform_id = g.id
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and m.member_id = #{memberId}
+            </if>
+            <if test="gameStartTime != null  and gameStartTime != ''">
+                and m.game_start_time = #{gameStartTime}
+            </if>
+            <if test="gameEndTime != null  and gameEndTime != ''">
+                and m.game_end_time = #{gameEndTime}
+            </if>
+            <if test="platformId != null">
+                and m.platform_id = #{platformId}
+            </if>
+            <if test="status != null">
+                and m.status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>

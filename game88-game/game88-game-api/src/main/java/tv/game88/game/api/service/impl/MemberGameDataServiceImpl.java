@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -56,16 +58,48 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Resource
     private RedisUtils             redisUtils;
 
+    private static Pattern NUM_PATTERN = Pattern.compile( "^[-\\+]?[\\d]*$" );
+
     /**
      * 查询会员游戏注单数据列表
-     *
-     * @param memberGameData 会员游戏注单数据
      *
      * @return 会员游戏注单数据
      */
     @Override
-    public List<MemberGameData> selectMemberGameDataList( MemberGameData memberGameData ) {
-        return this.baseMapper.selectMemberGameDataList( memberGameData );
+    public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
+        pingjieReq( reqMemberGameData );
+        return this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+    }
+
+    private void pingjieReq( ReqMemberGameData reqMemberGameData ) {
+        if ( reqMemberGameData.getSelectDate() != null ) {
+            reqMemberGameData.setStartTime( reqMemberGameData.getSelectDate()[ 0 ] + " 00:00:00" );
+            reqMemberGameData.setEndTime( reqMemberGameData.getSelectDate()[ 1 ] + " 23:59:59" );
+        }
+        if ( reqMemberGameData.getPlatformId() != null && reqMemberGameData.getPlatformId() == 15 ) {
+            reqMemberGameData.setAgent( "-1" );
+            reqMemberGameData.setPlatformId( null );
+        }
+        if ( reqMemberGameData.getPlatformIds() != null && reqMemberGameData.getPlatformIds().contains( "15" ) ) {
+            reqMemberGameData.getAgents().add( "-1" );
+            reqMemberGameData.getPlatformIds().remove( "15" );
+        }
+        if ( StringUtils.isNotBlank( reqMemberGameData.getAccount() ) ) {
+            String tableLast = reqMemberGameData.getAccount().substring( reqMemberGameData.getAccount().length() - 1 );
+            if ( NUM_PATTERN.matcher( tableLast ).matches() ) {
+                reqMemberGameData.setTableLast( tableLast );
+            } else {
+                reqMemberGameData.setTableLast( "0" );
+            }
+        } else {
+            reqMemberGameData.setTableLast( "0" );
+        }
+    }
+
+    @Override
+    public MemberGameData getCount( ReqMemberGameData reqMemberGameData ) {
+        pingjieReq( reqMemberGameData );
+        return this.baseMapper.getCountMemberGameDataList( reqMemberGameData );
     }
 
     @Override
@@ -232,5 +266,15 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         reqGameData.setPlatformId( gamePlatform.getId() );
         return this.baseMapper.findByAccount( memberId.substring(
                 memberId.length() - 1 ), memberId, reqGameData, beginDay, endDay );
+    }
+
+    @Override
+    public RspBase<?> getGameBetRecordData( MemberGameData memberGameData ) {
+        return null;
+    }
+
+    @Override
+    public RspBase<?> getGameBetDetailData( MemberGameData memberGameData ) {
+        return null;
     }
 }

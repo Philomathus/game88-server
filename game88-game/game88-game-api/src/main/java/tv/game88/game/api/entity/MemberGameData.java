@@ -2,10 +2,13 @@ package tv.game88.game.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.math.BigDecimal;
 
 /**
  * 会员游戏注单数据对象 member_game_data
@@ -44,4 +47,15 @@ public class MemberGameData {
     private String  gameStartTime;
     @Excel( name = "游戏结束时间" )
     private String  gameEndTime;
+
+    @TableField( exist = false )
+    private String     platformName;
+    @TableField( exist = false )
+    private String     sonPlatformName;
+    @TableField( exist = false )
+    private BigDecimal totalSuccessBet;
+    @TableField( exist = false )
+    private BigDecimal totalBet;
+    @TableField( exist = false )
+    private BigDecimal totalIncome;
 }

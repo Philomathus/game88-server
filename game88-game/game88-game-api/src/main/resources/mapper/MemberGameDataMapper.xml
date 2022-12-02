@@ -16,6 +16,9 @@
         <result property="status" column="status" />
         <result property="gameStartTime" column="game_start_time" />
         <result property="gameEndTime" column="game_end_time" />
+
+        <result property="platformName" column="platform_name" />
+        <result property="sonPlatformName" column="son_platform_name" />
     </resultMap>
 
     <sql id="selectMemberGameDataVo">
@@ -36,36 +39,76 @@
         from member_game_data
     </sql>
 
-    <select id="selectMemberGameDataList" parameterType="tv.game88.game.api.entity.MemberGameData"
-            resultMap="MemberGameDataResult">
-        <include refid="selectMemberGameDataVo" />
+    <select id="selectMemberGameDataList" resultMap="MemberGameDataResult">
+        SELECT m.agent,
+               m.game_id,
+               m.account,
+               m.cell_score,
+               m.all_bet,
+               m.profit,
+               m.kind_id,
+               m.revenue,
+               m.platform_id,
+               m.game_start_time,
+               m.game_end_time,
+               cg.platform_name,
+               cg.son_platform_name
+        FROM member_game_data${tableLast} m
+                 LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
+            AND m.kind_id = cg.son_platform_id
         <where>
-            <if test="agent != null  and agent != ''">
-                and agent = #{agent}
-            </if>
-            <if test="account != null  and account != ''">
-                and account = #{account}
-            </if>
-            <if test="platformId != null">
-                and platform_id = #{platformId}
-            </if>
-            <if test="gameId != null  and gameId != ''">
-                and game_id = #{gameId}
-            </if>
-            <if test="kindId != null  and kindId != ''">
-                and kind_id = #{kindId}
-            </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
-            <if test="gameStartTime != null  and gameStartTime != ''">
-                and game_start_time = #{gameStartTime}
-            </if>
-            <if test="gameEndTime != null  and gameEndTime != ''">
-                and game_end_time = #{gameEndTime}
-            </if>
+            <include refid="whereSelect">
+            </include>
         </where>
     </select>
+
+    <sql id="whereSelect">
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                m.game_end_time <![CDATA[ >= ]]> #{startTime} and m.game_end_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="account != null and account != ''">
+            and m.account = #{account}
+        </if>
+        <if test="sonPlatformName != null and sonPlatformName != ''">
+            and cg.son_platform_name = #{sonPlatformName}
+        </if>
+        <if test="agent != null and agent != ''">
+            and m.agent = #{agent}
+        </if>
+        <if test="gameId != null and gameId != ''">
+            and m.game_id = #{gameId}
+        </if>
+        <if test="platformId != null and platformId != ''">
+            and m.platform_id = #{platformId}
+        </if>
+        <if test="platformIds != null and platformIds.size( ) != 0">
+            and
+            <if test="agents != null and agents.size( ) != 0">
+                (
+            </if>
+            m.platform_id in
+            <foreach item="pid" collection="platformIds" open="(" separator="," close=")">
+                #{pid}
+            </foreach>
+        </if>
+        <if test="agents != null and agents.size( ) != 0">
+            <choose>
+                <when test="platformIds != null and platformIds.size( ) != 0">
+                    or
+                </when>
+                <otherwise>
+                    and
+                </otherwise>
+            </choose>
+            m.agent in
+            <foreach item="ag" collection="agents" open="(" separator="," close=")">
+                #{ag}
+            </foreach>
+            <if test="platformIds != null and platformIds.size( ) != 0">
+                )
+            </if>
+        </if>
+    </sql>
 
     <select id="findExist" resultType="java.lang.Integer">
         SELECT status
@@ -121,16 +164,30 @@
     </update>
 
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
-        select game_id,cell_score,profit,game_end_time create_time,all_bet,agent,platform_id
+        select game_id, cell_score, profit, game_end_time create_time, all_bet, agent, platform_id
         from member_game_data${dbNodes}
-        where 1=1
+        where 1 = 1
         <if test="memberId != null and memberId != ''">
             and account = #{memberId}
         </if>
-        <if test="req != null and req.platformId != null ">
+        <if test="req != null and req.platformId != null">
             and platform_id = #{req.platformId}
         </if>
-        and game_end_time &gt;= #{beginTime} and game_end_time &lt;= #{endTime}
+        and game_end_time &gt;= #{beginTime}
+        and game_end_time &lt;= #{endTime}
         order by game_end_time desc
+    </select>
+
+    <select id="getCountMemberGameDataList" resultType="tv.game88.game.api.entity.MemberGameData">
+        SELECT
+        cast(SUM(cell_score) AS decimal(10,2)) totalSuccessBet,
+        cast(SUM(all_bet) AS decimal(10,2)) totalBet,
+        cast(SUM(profit) AS decimal(10,2)) totalIncome
+        FROM member_game_data${tableLast} m
+        LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
+        AND m.kind_id = cg.son_platform_id
+        <where>
+            <include refid="whereSelect"></include>
+        </where>
     </select>
 </mapper>

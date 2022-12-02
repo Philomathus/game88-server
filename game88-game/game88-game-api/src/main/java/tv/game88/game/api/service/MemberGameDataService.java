@@ -19,11 +19,9 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     /**
      * 查询会员游戏注单数据列表
      *
-     * @param memberGameData 会员游戏注单数据
-     *
      * @return 会员游戏注单数据集合
      */
-    public List<MemberGameData> selectMemberGameDataList( MemberGameData memberGameData );
+    public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData );
 
     RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
 
@@ -35,4 +33,10 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     List<RspCleanCodeLog> cleanCodeLogs( String memberId );
 
     List<RspGameData> getGameDataList( String memberId, ReqGameData reqGameData );
+
+    MemberGameData getCount( ReqMemberGameData reqMemberGameData );
+
+    RspBase<?> getGameBetRecordData( MemberGameData memberGameData );
+
+    RspBase<?> getGameBetDetailData( MemberGameData memberGameData );
 }

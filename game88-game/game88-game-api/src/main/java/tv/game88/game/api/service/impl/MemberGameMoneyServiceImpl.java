@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
+import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.ReqJoinGame;
+import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameMoney;
 import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.MemberGameMoneyService;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMapper, MemberGameMoney> implements MemberGameMoneyService {
     @Resource
     private MemberMoneyManager memberMoneyManager;
+    @Resource
+    private GameCacheUtils     gameCacheUtils;
 
     @Override
     public String selectMaxGameOrderCode( Long platformId ) {
@@ -43,7 +47,8 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
         gameMoney.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( gameMoney );
         //扣款
-        String mark = "上分为ID:" + reqJoinGame.getPlatformId() + "的游戏";
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( reqJoinGame.getPlatformId() );
+        String       mark         = "上分" + gamePlatform.getName() + "游戏";
         memberMoneyManager.reduceMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_IN, mark );
         log.info( "游戏上分 - 扣款成功 - 会员:{},交易号:{},平台:{},上分金额:{}", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
                 reqJoinGame.getPlatformId(), reqJoinGame.getTransferMoney() );
@@ -88,9 +93,9 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
         gameMoney.setPlatformId( reqJoinGame.getPlatformId() );
         gameMoney.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( gameMoney );
-
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( reqJoinGame.getPlatformId() );
         memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_OUT, 0,
-                "游戏下分,ID:" + reqJoinGame.getPlatformId(), null, reqJoinGame.getOrderId() );
+                "游戏下分," + gamePlatform.getName(), null, reqJoinGame.getOrderId() );
         log.info( "游戏下分成功，会员游戏下分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
     }
 
