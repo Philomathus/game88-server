@@ -21,7 +21,7 @@ import java.util.List;
  * @date 2021-02-20
  */
 @RestController
-@RequestMapping( "/admin/reportPlamGameschilds" )
+@RequestMapping( "/report/plamGamesChilds" )
 public class ReportPlamGameschildsController extends BaseController {
     @Resource
     private ReportPlamGameschildsService reportPlamGameschildsService;
@@ -29,7 +29,7 @@ public class ReportPlamGameschildsController extends BaseController {
     /**
      * 查询游戏投注报表子表列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:report-plam-games:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:plam-games:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ReportPlamGameschilds>> list( ReportPlamGameschilds reportPlamGameschilds ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
