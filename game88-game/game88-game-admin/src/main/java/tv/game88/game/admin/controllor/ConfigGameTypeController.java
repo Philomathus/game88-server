@@ -22,7 +22,7 @@ import java.util.List;
  * @date 2021-01-26
  */
 @RestController
-@RequestMapping( "/game/config-gametype" )
+@RequestMapping( "/game/configGameType" )
 public class ConfigGameTypeController extends BaseController {
     @Resource
     private ConfigGametypeService configGametypeService;
@@ -30,7 +30,7 @@ public class ConfigGameTypeController extends BaseController {
     /**
      * 查询游戏字典列表
      */
-    @PreAuthorize( "@ss.hasPermi('game:config-gametype:list')" )
+    @PreAuthorize( "@ss.hasPermi('game:configGametype:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ConfigGametype>> list( ConfigGametype configGametype ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -42,7 +42,7 @@ public class ConfigGameTypeController extends BaseController {
     /**
      * 获取游戏字典详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('game:config-gametype:query')" )
+    @PreAuthorize( "@ss.hasPermi('game:configGametype:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<ConfigGametype> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( configGametypeService.getById( id ) );
@@ -51,7 +51,7 @@ public class ConfigGameTypeController extends BaseController {
     /**
      * 新增游戏字典
      */
-    @PreAuthorize( "@ss.hasPermi('game:config-gametype:add')" )
+    @PreAuthorize( "@ss.hasPermi('game:configGametype:add')" )
     @Log( title = "游戏配置新增", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody ConfigGametype configGametype ) {
@@ -61,7 +61,7 @@ public class ConfigGameTypeController extends BaseController {
     /**
      * 修改游戏字典
      */
-    @PreAuthorize( "@ss.hasPermi('game:config-gametype:edit')" )
+    @PreAuthorize( "@ss.hasPermi('game:configGametype:edit')" )
     @Log( title = "游戏配置编辑", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ConfigGametype configGametype ) {
@@ -71,7 +71,7 @@ public class ConfigGameTypeController extends BaseController {
     /**
      * 删除游戏字典
      */
-    @PreAuthorize( "@ss.hasPermi('game:config-gametype:remove')" )
+    @PreAuthorize( "@ss.hasPermi('game:configGametype:remove')" )
     @Log( title = "游戏配置删除", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable String[] ids ) {
