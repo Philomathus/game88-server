@@ -465,16 +465,18 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( withdraw_times > 0 && times >= withdraw_times ) {
             return RspBase.businessError( "今日充值次数超过限制，请您改日申请充值" );
         }
-        MemberCard memberCard = memberCardMapper.selectOne( new QueryWrapper<MemberCard>()
+        MemberRechargeBank rechargeBank = new MemberRechargeBank();
+        List<MemberCard> memberCards = memberCardMapper.selectList( new QueryWrapper<MemberCard>()
                 .eq( "member_id", platformUser.getId() )
                 .select( "real_name", "id" ) );
-        String             realName     = memberCard != null ? memberCard.getRealName() : "";
-        MemberRechargeBank rechargeBank = new MemberRechargeBank();
+        if ( !CollectionUtils.isEmpty( memberCards ) ) {
+            String realName = memberCards.get( 0 ).getRealName();
+            rechargeBank.setRealName( realName );
+        }
         rechargeBank.setRechargeOrderNo( GenerateOrderCacheUtils.me.getOrderId( "CZB", 3 ) );
         rechargeBank.setMemberId( platformUser.getId() );
         rechargeBank.setRechargeMoney( req.getRechargeMoney() );
         rechargeBank.setStatus( 0 );
-        rechargeBank.setRealName( realName );
         rechargeBank.setRechargeRealName( req.getRechargeUserName() );
         rechargeBank.setBankUserName( payRechargeBank.getAccountName() );
         rechargeBank.setBankAccount( payRechargeBank.getBankAccount() );
