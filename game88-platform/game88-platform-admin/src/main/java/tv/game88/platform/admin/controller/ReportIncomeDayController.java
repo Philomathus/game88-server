@@ -44,18 +44,17 @@ public class ReportIncomeDayController extends BaseController {
     public RspBase<List<ReportIncomeDay>> list( ReportIncomeDay reportIncomeDay ) throws ParseException {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        Date   d        = new Date();
-        String myString = reportIncomeDay.getPaydate();
-        if ( !StringUtils.isEmpty( myString ) ) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-            Date             dd               = simpleDateFormat.parse( myString );
-            boolean          flag             = dd.before( d );
-            if ( !flag ) {
-                reportIncomeDay.setPaydate( null );
-            }
-        } else {
-            reportIncomeDay.setPaydate( LocalDateTimeUtils.format( LocalDate.now().minusDays( 1 ) ) );
-        }
+//        Date   d        = new Date();
+//        String myString = reportIncomeDay.getPaydate();
+//        if ( !StringUtils.isEmpty( myString ) ) {
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
+//            Date             dd               = simpleDateFormat.parse( myString );
+//            boolean          flag             = dd.before( d );
+//            if ( !flag ) {
+//                reportIncomeDay.setPaydate( null );
+//            }
+//        }
+//
         List<ReportIncomeDay> list = reportIncomeDayService.selectReportIncomeDayList( reportIncomeDay );
         return getRspBasePage( list, pageDomain );
     }
