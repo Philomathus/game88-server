@@ -1,5 +1,7 @@
 package tv.game88.core.config.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import tv.game88.common.vo.BaseEntity;
 
@@ -10,6 +12,7 @@ public class ConfigSms extends BaseEntity {
     /**
      * 主键
      */
+    @TableId( type = IdType.AUTO )
     private Long          id;
     /**
      * SMS名称
