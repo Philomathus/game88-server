@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping( "/admin/reportAgentcount" )
-public class ReportAgentcountController extends BaseController {
+public class ReportAgentCountController extends BaseController {
     @Resource
     private ReportAgentcountService reportAgentcountService;
 
