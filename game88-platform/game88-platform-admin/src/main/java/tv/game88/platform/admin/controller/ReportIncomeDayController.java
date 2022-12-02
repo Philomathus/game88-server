@@ -31,7 +31,7 @@ import java.util.List;
  * @date 2021-01-26
  */
 @RestController
-@RequestMapping( "/admin/reportIncomeDay" )
+@RequestMapping( "/report/incomeDay" )
 public class ReportIncomeDayController extends BaseController {
     @Resource
     private ReportIncomeDayService reportIncomeDayService;
@@ -39,7 +39,7 @@ public class ReportIncomeDayController extends BaseController {
     /**
      * 查询平台充值报表列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:reportIncomeDay:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:incomeDay:list')" )
     @GetMapping( "/list" )
     public RspBase<List<ReportIncomeDay>> list( ReportIncomeDay reportIncomeDay ) throws ParseException {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -70,7 +70,7 @@ public class ReportIncomeDayController extends BaseController {
         return RspBase.ok( reportIncomeDay1 );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:reportIncomeDay:export')" )
+    @PreAuthorize( "@ss.hasPermi('report:incomeDay:export')" )
     @Log( title = "平台充值报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportIncomeDay reportIncomeDay, HttpServletResponse response ) {
