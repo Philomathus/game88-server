@@ -466,12 +466,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             return RspBase.businessError( "今日充值次数超过限制，请您改日申请充值" );
         }
         MemberRechargeBank rechargeBank = new MemberRechargeBank();
-        List<MemberCard> memberCards = memberCardMapper.selectList( new QueryWrapper<MemberCard>()
+        MemberCard memberCard = memberCardMapper.selectOne( new QueryWrapper<MemberCard>()
                 .eq( "member_id", platformUser.getId() )
-                .select( "real_name", "id" ) );
-        if ( !CollectionUtils.isEmpty( memberCards ) ) {
-            String realName = memberCards.get( 0 ).getRealName();
-            rechargeBank.setRealName( realName );
+                .select( "real_name", "id" )
+                .last( "limit 1" ) );
+        if ( memberCard != null ) {
+            rechargeBank.setRealName( memberCard.getRealName() );
         }
         rechargeBank.setRechargeOrderNo( GenerateOrderCacheUtils.me.getOrderId( "CZB", 3 ) );
         rechargeBank.setMemberId( platformUser.getId() );
