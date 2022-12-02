@@ -34,7 +34,7 @@ public class MemberGameDataController extends BaseController {
     /**
      * 查询会员注单数据列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:memberGameData:list')" )
+    @PreAuthorize( "@ss.hasPermi('member:gameData:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MemberGameData>> list( ReqMemberGameData reqMemberGameData ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -46,7 +46,7 @@ public class MemberGameDataController extends BaseController {
     /**
      * 查询会员注单数据统计
      */
-    @PreAuthorize( "@ss.hasPermi('member:memberGameData:list')" )
+    @PreAuthorize( "@ss.hasPermi('member:gameData:list')" )
     @GetMapping( "/getCount" )
     public RspBase<MemberGameData> getCount( ReqMemberGameData reqMemberGameData ) {
         MemberGameData memberGameData = memberGameDataService.getCount( reqMemberGameData );
@@ -56,7 +56,7 @@ public class MemberGameDataController extends BaseController {
     /**
      * 导出会员注单数据列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:memberGameData:export')" )
+    @PreAuthorize( "@ss.hasPermi('member:gameData:export')" )
     @Log( title = "会员注单数据", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReqMemberGameData reqMemberGameData, HttpServletResponse response ) {
@@ -64,13 +64,13 @@ public class MemberGameDataController extends BaseController {
         ExportExcelUtil.exportExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
     }
 
-    @PreAuthorize( "@ss.hasPermi('member:memberGameData:recordList')" )
+    @PreAuthorize( "@ss.hasPermi('member:gameData:recordList')" )
     @GetMapping( value = "/recordList" )
     public RspBase<?> getGameRecordList( MemberGameData memberGameData ) {
         return memberGameDataService.getGameBetRecordData( memberGameData );
     }
 
-    @PreAuthorize( "@ss.hasPermi('member:memberGameData:detailList')" )
+    @PreAuthorize( "@ss.hasPermi('member:gameData:detailList')" )
     @GetMapping( value = "/detailList" )
     public RspBase<?> getGameDetailList( MemberGameData memberGameData ) {
         return memberGameDataService.getGameBetDetailData( memberGameData );
