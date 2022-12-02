@@ -78,16 +78,18 @@ public class ETPayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
 
         log.warn( payPlatform.getName() + "查询结果:{}", JsonUtil.object2Json( resultMap ) );
-        String code = resultMap.getOrDefault( "code", -1 ).toString();
-        if ( "1".equals( code ) ) {
-            Map<String, Object> map    = ( Map<String, Object> ) resultMap.get( "data" );
-            String              status = map.getOrDefault( "status", -1 ).toString();
-            if ( "9".equals( status ) ) {
-                BigDecimal money = new BigDecimal( map.getOrDefault( "money", 0 ).toString() );
-                if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-                    memberRechargeOnline.setRealMoney( money.setScale( 2, RoundingMode.HALF_UP ) );
-                    memberRechargeOnline.setUpperOrderNo( map.getOrDefault( "order_sn", "" ).toString() );
-                    return true;
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String code = resultMap.getOrDefault( "code", -1 ).toString();
+            if ( "1".equals( code ) ) {
+                Map<String, Object> map    = ( Map<String, Object> ) resultMap.get( "data" );
+                String              status = map.getOrDefault( "status", -1 ).toString();
+                if ( "9".equals( status ) ) {
+                    BigDecimal money = new BigDecimal( map.getOrDefault( "money", 0 ).toString() );
+                    if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
+                        memberRechargeOnline.setRealMoney( money.setScale( 2, RoundingMode.HALF_UP ) );
+                        memberRechargeOnline.setUpperOrderNo( map.getOrDefault( "order_sn", "" ).toString() );
+                        return true;
+                    }
                 }
             }
         }
