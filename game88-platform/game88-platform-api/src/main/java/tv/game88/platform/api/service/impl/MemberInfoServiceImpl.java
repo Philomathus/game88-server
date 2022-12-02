@@ -378,10 +378,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
             if ( oldm != null ) {
-                memberInfo = oldm;
-                if ( memberInfo.getStatus() == 0 ) {
-                    return RspBase.businessError( "您被限制登录,请联系客服" );
-                }
+                return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
             } else {
                 memberInfo = this.newMemberInfoReg( mobileLogin );
                 memberInfo.setRegisterType( 1 );
@@ -411,15 +408,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
             }
         } else {
-            if ( memberInfo.getStatus() == 0 ) {
-                return RspBase.businessError( "您被限制登录,请联系客服" );
-            }
-
-            MemberInfo update = new MemberInfo();
-            update.setId( memberInfo.getId() );
-
-            this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
-            this.baseMapper.updateById( update );
+            return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
         }
 
         RspMember rspMember = new RspMember();
@@ -1277,15 +1266,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( code ) ) {
             return RspBase.businessError( "请输入短信验证码" );
         }
-        /*String fcode = smsPhoneCacheUtil.getPhoneCode( mobileLogin.getMobile() );
+        String fcode = smsPhoneCacheUtil.getPhoneCode( phone );
         if ( StringUtils.isBlank( fcode ) ) {
             return RspBase.businessError( "验证码过期" );
         }
-        if ( smsPhoneCacheUtil.setSmsNumber( mobileLogin.getMobile() ) >= 5 ) {
-            smsPhoneCacheUtil.unLink( mobileLogin.getMobile() );
+        if ( smsPhoneCacheUtil.setSmsNumber( phone ) >= 5 ) {
+            smsPhoneCacheUtil.unLink( phone );
             return RspBase.businessError( "短信验证错误不能超过五次" );
-        }*/
-        if ( !code.equals( "12345" ) ) { // TODO fcode
+        }
+        if ( !code.equals( fcode ) ) {
             return RspBase.businessError( "验证码错误" );
         }
         return null;
