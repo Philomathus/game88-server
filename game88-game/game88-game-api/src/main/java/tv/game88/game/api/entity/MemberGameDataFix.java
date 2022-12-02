@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -21,11 +22,13 @@ public class MemberGameDataFix {
      * 游戏开始时间
      */
     @Excel( name = "游戏开始时间" )
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime gameStartTime;
     /**
      * 游戏结束时间
      */
     @Excel( name = "游戏结束时间" )
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime gameEndTime;
     /**
      * 本地平台id
