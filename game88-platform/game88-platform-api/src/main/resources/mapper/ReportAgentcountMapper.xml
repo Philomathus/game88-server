@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ReportAgentcountMapper">
+    <resultMap type="tv.game88.platform.api.entity.ReportAgentcount" id="ReportAgentcountResult">
+        <result property="repId" column="rep_id" />
+        <result property="agentcode" column="agentcode" />
+        <result property="agentname" column="agentname" />
+        <result property="agenttime" column="agenttime" />
+        <result property="newmember" column="newmember" />
+        <result property="totalmember" column="totalmember" />
+        <result property="gsRukuanjine" column="gs_rukuanjine" />
+        <result property="xsRukuanjine" column="xs_rukuanjine" />
+        <result property="sgRukuanjine" column="sg_rukuanjine" />
+        <result property="totalfristRukuanjine" column="totalfrist_rukuanjine" />
+        <result property="chukuanjine" column="chukuanjine" />
+        <result property="totalRukuanjine" column="total_rukuanjine" />
+        <result property="totalChukuanjine" column="total_chukuanjine" />
+        <result property="totalEnterlivetimes" column="total_enterlivetimes" />
+        <result property="totalActiveandroid" column="total_activeandroid" />
+        <result property="totalActiveios" column="total_activeios" />
+        <result property="totalGiveprop" column="total_giveprop" />
+        <result property="totalRukuanrenshu" jdbcType="VARCHAR" column="total_rukuanrenshu" />
+        <result property="totalRukuanbishu" jdbcType="VARCHAR" column="total_rukuanbishu" />
+    </resultMap>
+
+    <sql id="selectReportAgentcountVo">
+        select rep_id,
+               agentcode,
+               agentname,
+               agenttime,
+               newmember,
+               totalmember,
+               gs_rukuanjine,
+               xs_rukuanjine,
+               sg_rukuanjine,
+               totalfrist_rukuanjine,
+               chukuanjine,
+               total_rukuanjine,
+               total_chukuanjine,
+               total_enterlivetimes,
+               total_activeandroid,
+               total_activeios,
+               total_giveprop,
+               total_rukuanrenshu,
+               total_rukuanbishu
+        from report_agentcount
+    </sql>
+
+    <select id="selectReportAgentcountList" parameterType="tv.game88.platform.api.entity.ReportAgentcount"
+            resultMap="ReportAgentcountResult">
+        <include refid="selectReportAgentcountVo" />
+        <where>
+            <if test="agentcode != null  and agentcode != ''">
+                and agentcode = #{agentcode}
+            </if>
+            <if test="agentname != null  and agentname != ''">
+                and agentname like concat('%', #{agentname}, '%')
+            </if>
+            <if test="agenttime != null and agenttime != ''">
+                <!-- 开始时间检索 -->
+                and agenttime = #{agenttime}
+            </if>
+        </where>
+    </select>
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_plamagent(#{beginTime,mode=IN,jdbcType=VARCHAR}, #{endTime,mode=IN,jdbcType=VARCHAR},
+                               #{agentcode,mode=IN,jdbcType=VARCHAR}, #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+    <select id="findChartsOne" resultType="tv.game88.platform.api.dto.ReportPlamHome">
+        select *
+        from report_plam_home
+        where class_two = #{classTwo,jdbcType=VARCHAR}
+          and reporttime = #{time,jdbcType=VARCHAR}
+        order by reporhour asc
+    </select>
+
+    <select id="callplamagentData" resultType="java.lang.String" statementType="CALLABLE">
+        {call prorep_plamagent_data(#{p_begintime,mode=IN,jdbcType=VARCHAR}, #{kj_result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="memberInfoCounts" resultType="java.lang.Integer">
+        select COUNT(1)
+        from member_info
+        where register_time >= #{startTime}
+          and register_time &lt;= #{endTime}
+          and inviter_code > 0
+    </select>
+
+    <select id="rmemberInfoCounts" resultType="java.lang.Integer">
+        select COUNT(1)
+        from r_member_info
+        where reg_time >= #{startTime}
+          and reg_time &lt;= #{endTime}
+          and inviter_code > 0
+    </select>
+
+    <select id="rmemberInfoLately" resultType="java.lang.String">
+        select max(reg_time)
+        from r_member_info
+    </select>
+
+</mapper>
