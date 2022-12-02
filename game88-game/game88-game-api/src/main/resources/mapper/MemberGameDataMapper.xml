@@ -14,6 +14,7 @@
         <result property="profit" column="profit" />
         <result property="revenue" column="revenue" />
         <result property="status" column="status" />
+        <result property="gameRound" column="game_round" />
         <result property="gameStartTime" column="game_start_time" />
         <result property="gameEndTime" column="game_end_time" />
 
@@ -51,6 +52,7 @@
                m.platform_id,
                m.game_start_time,
                m.game_end_time,
+               m.game_round,
                cg.platform_name,
                cg.son_platform_name
         FROM member_game_data${tableLast} m
@@ -179,15 +181,15 @@
     </select>
 
     <select id="getCountMemberGameDataList" resultType="tv.game88.game.api.entity.MemberGameData">
-        SELECT
-        cast(SUM(cell_score) AS decimal(10,2)) totalSuccessBet,
-        cast(SUM(all_bet) AS decimal(10,2)) totalBet,
-        cast(SUM(profit) AS decimal(10,2)) totalIncome
+        SELECT cast(SUM(cell_score) AS decimal(10, 2)) totalSuccessBet,
+               cast(SUM(all_bet) AS decimal(10, 2))    totalBet,
+               cast(SUM(profit) AS decimal(10, 2))     totalIncome
         FROM member_game_data${tableLast} m
-        LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
-        AND m.kind_id = cg.son_platform_id
+                 LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
+            AND m.kind_id = cg.son_platform_id
         <where>
-            <include refid="whereSelect"></include>
+            <include refid="whereSelect">
+            </include>
         </where>
     </select>
 </mapper>

@@ -100,6 +100,7 @@ public class GameDataServiceImpl implements GameDataService {
             gameDataLog.setAgent( dataLog.getAgent() );
             gameDataLog.setStatus( 0 );
             gameDataLog.setRevenue( dataLog.getRevenue() );
+            gameDataLog.setGameRound( dataLog.getGame_round() );
 
             gameDataLog.setPlatformId( gamePlatform.getId().intValue() );
 

@@ -47,6 +47,8 @@ public class MemberGameData {
     private String  gameStartTime;
     @Excel( name = "游戏结束时间" )
     private String  gameEndTime;
+    @Excel( name = "游戏局号" )
+    private String  gameRound;
 
     @TableField( exist = false )
     private String     platformName;
@@ -58,4 +60,5 @@ public class MemberGameData {
     private BigDecimal totalBet;
     @TableField( exist = false )
     private BigDecimal totalIncome;
+
 }
