@@ -189,9 +189,8 @@
             and withdraw_money <![CDATA[ >= ]]> #{priceMin}
                 and withdraw_money <![CDATA[ <= ]]> #{priceMax}
         </if>
-        <if test="startTime != null and startTime != ''">
-            and create_time <![CDATA[ >= ]]> #{startTime}
-                and create_time <![CDATA[ <= ]]> #{endTime}
+        <if test="selectStartDate != null and selectEndDate != ''">
+            and create_time between #{selectStartDate} and #{selectEndDate}
         </if>
         <if test="remark != null and remark != ''">
             and remark like concat('%', #{remark}, '%')

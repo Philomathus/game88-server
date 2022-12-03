@@ -804,8 +804,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         forkJoinTasks.add( () -> ImmutableMap.of( "personalUsdtRecharge", this.baseMapper.personalUsdtRecharge( startTime,
                 endTime, memberId ) ) );
         // 提款 withdrawal
-        //        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
-        //                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
+        forkJoinTasks.add( () -> ImmutableMap.of( "personalWithdrawRecharge",
+                this.baseMapper.personalWithdrawRecharge( startTime, endTime, memberId ) ) );
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
@@ -825,10 +825,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 .flatMap( Set::stream )
                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
-        //        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
-        //                memberId.length() - 1 ) );
+        List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
+                memberId.length() - 1 ) );
 
-        //        resultMap.put( "bCodeList", mapList );
+        resultMap.put( "bCodeList", mapList );
 
         return RspBase.ok( resultMap );
     }

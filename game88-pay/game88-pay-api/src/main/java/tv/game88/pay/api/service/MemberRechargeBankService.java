@@ -24,6 +24,8 @@ public interface MemberRechargeBankService extends IService<MemberRechargeBank> 
 
     List<MemberRechargeBank> selectMemberRechargeBankList( ReqMemberRechargeBank req );
 
+    Map listCount( ReqMemberRechargeBank req );
+
     RspBase<?> firstAudit( ReqMemberRechargeBank req, String userName );
 
     RspBase<?> finalAudit( ReqMemberRechargeBank req, String userName );

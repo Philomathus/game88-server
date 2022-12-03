@@ -28,4 +28,6 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
     BigDecimal totalRechargeAll( @Param( "memberId" ) String memberId );
 
     List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
+
+    Map listCount( @Param( "req" ) ReqMemberRechargeBank req );
 }

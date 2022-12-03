@@ -22,16 +22,30 @@
     </resultMap>
 
     <sql id="selectMemberRechargeBankVo">
-        select recharge_order_no,member_id,recharge_money,status,real_name,
-               recharge_real_name,bank_user_name,bank_id,bank_account,
-               bank_address,op_name,remark, `first`, create_time, update_time, ip, discount_bill
+        select recharge_order_no,
+               member_id,
+               recharge_money,
+               status,
+               real_name,
+               recharge_real_name,
+               bank_user_name,
+               bank_id,
+               bank_account,
+               bank_address,
+               op_name,
+               remark,
+               `first`,
+               create_time,
+               update_time,
+               ip,
+               discount_bill
         from member_recharge_bank
     </sql>
 
     <select id="selectMemberRechargeBankList" parameterType="tv.game88.pay.api.entity.MemberRechargeBank"
             resultMap="MemberRechargeBankResult">
         <include refid="selectMemberRechargeBankVo" />
-        <include refid="listWhere"/>
+        <include refid="listWhere" />
     </select>
 
     <sql id="listWhere">
@@ -62,21 +76,26 @@
             and member_id = #{req.memberId}
         </if>
         <if test="req.selectStartDate != null and req.selectStartDate != ''">
-            and update_time <![CDATA[ >= ]]> #{req.selectStartDate} and update_time <![CDATA[ <= ]]> #{req.selectEndDate}
+            and update_time <![CDATA[ >= ]]> #{req.selectStartDate}
+            and update_time <![CDATA[ <= ]]> #{req.selectEndDate}
         </if>
-        <if test="req.downLoadDate[0] != null "> and update_time <![CDATA[ >= ]]> '${req.downLoadDate[0]}'</if>
-        <if test="req.downLoadDate[1] != null "> and update_time <![CDATA[ <= ]]> '${req.downLoadDate[1]}'</if>
+        <if test="req.downLoadDate[ 0 ] != null">
+            and update_time <![CDATA[ >= ]]> '${req.downLoadDate[0]}'
+        </if>
+        <if test="req.downLoadDate[ 1 ] != null">
+            and update_time <![CDATA[ <= ]]> '${req.downLoadDate[1]}'
+        </if>
     </sql>
 
     <select id="selectReportList" resultType="tv.game88.pay.api.dto.RspRechargeBankReport">
         SELECT w.bank_user_name as bankUserName,
-            l.bank_name as bankName,
-            w.bank_account as bankAccount,
-            w.recharge_money as rechargeMoney,
-            COUNT(1) as time,
-            w.update_time as updateTime
+               l.bank_name      as bankName,
+               w.bank_account   as bankAccount,
+               w.recharge_money as rechargeMoney,
+               COUNT(1)         as time,
+               w.update_time    as updateTime
         FROM member_recharge_bank w
-        left join config_bank_list l on l.id = w.bank_id
+                 left join config_bank_list l on l.id = w.bank_id
         WHERE w.`STATUS` = '3'
         <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != '' and req.priceMax != ''">
             and w.recharge_money <![CDATA[ >= ]]> #{req.priceMin}
@@ -88,16 +107,16 @@
         <if test="req.updateTime != null and req.updateTime != ''">
             and w.update_time like '${req.updateTime}%'
         </if>
-        GROUP BY w.bank_user_name,l.bank_name,w.recharge_money,w.bank_account
-        ORDER BY w.bank_user_name,w.recharge_money
+        GROUP BY w.bank_user_name, l.bank_name, w.recharge_money, w.bank_account
+        ORDER BY w.bank_user_name, w.recharge_money
     </select>
 
     <select id="selectReportListCount" resultType="java.util.Map">
         SELECT *,
-        sum(recharge_money) as rechargeMoney,
-        count(*) as totalcount
+               sum(recharge_money) as rechargeMoney,
+               count(*)            as totalcount
         FROM member_recharge_bank
-        WHERE  STATUS = '3'
+        WHERE STATUS = '3'
         <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != ''  and req.priceMax != ''">
             and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
             and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
@@ -111,31 +130,60 @@
     </select>
 
     <select id="countRechargeDaySucess" resultType="int">
-        select COUNT(1) from member_recharge_bank where  date(update_time) = curdate() and  member_id = #{memberId} and status = 3;
+        select COUNT(1)
+        from member_recharge_bank
+        where date(update_time) = curdate()
+          and member_id = #{memberId}
+          and status = 3;
     </select>
 
     <select id="totalRechargeAll" resultType="java.math.BigDecimal">
-        select sum(a.money) from(
-            select IFNULL(SUM(recharge_money),0) money from member_recharge_bank where `status` = 3 and member_id = #{memberId}
-            union all
-            select IFNULL(SUM(money),0) money from member_recharge_online  where `status` = 1 and member_id = #{memberId}
-            union all
-            select IFNULL(SUM(recharge_money),0) money from member_recharge_usdt where `status` = 3 and member_id = #{memberId}
-        ) a
+        select sum(a.money)
+        from (select IFNULL(SUM(recharge_money), 0) money
+              from member_recharge_bank
+              where `status` = 3
+                and member_id = #{memberId}
+              union all
+              select IFNULL(SUM(money), 0) money
+              from member_recharge_online
+              where `status` = 1
+                and member_id = #{memberId}
+              union all
+              select IFNULL(SUM(recharge_money), 0) money
+              from member_recharge_usdt
+              where `status` = 3
+                and member_id = #{memberId}) a
     </select>
 
     <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
-        select
-        w.recharge_money money,
-        w.recharge_order_no orderNo,
-        w.create_time requestTime,
-        l.bank_name bankName,
-        w.`status`,
-        w.remark
+        select w.recharge_money    money,
+               w.recharge_order_no orderNo,
+               w.create_time       requestTime,
+               l.bank_name         bankName,
+               w.`status`,
+               w.remark
         from member_recharge_bank w
-        left join config_bank_list l on l.id = w.bank_id
+                 left join config_bank_list l on l.id = w.bank_id
         where w.member_id = #{memberId}
-        and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+          and w.create_time >= DATE_SUB(NOW(), INTERVAL 15 DAY)
         order by w.create_time desc
     </select>
+
+    <select id="listCount" resultType="java.util.Map">
+        select a.total, b.successMoney, totalSuccess / total successRate from (<include refid="totalCount" />)a
+                                                                                                                 left join (
+        <include refid="successMoney" />)b on 1 = 1
+    </select>
+
+    <sql id="totalCount">
+        SELECT COUNT(*) total, SUM(recharge_money) totalMoney
+        FROM member_recharge_bank
+        <include refid="listWhere" />
+    </sql>
+    <sql id="successMoney">
+        SELECT COUNT(*) totalSuccess, SUM(recharge_money) successMoney
+        FROM member_recharge_bank
+        <include refid="listWhere" />
+        and status = 3
+    </sql>
 </mapper>

@@ -97,14 +97,14 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     BigDecimal personalUsdtRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
             "memberId" ) String memberId );
 
-    //    BigDecimal personalWithdrawRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
-    //            "memberId" ) String memberId );
+    BigDecimal personalWithdrawRecharge( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime, @Param(
+            "memberId" ) String memberId );
 
     HashMap totalAccount( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
                           @Param( "memberId" ) String memberId );
 
-    //    List<Map> personalGameData( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
-    //                                @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
+    List<Map> personalGameData( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime,
+                                @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
 
     String selectMemberProvince( String memberId );
 }

@@ -151,6 +151,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public Map<String, Object> getTotal( ReqMemberWithdrawDetail req ) {
+        String[] selectDate = req.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            req.setSelectStartDate( selectDate[ 0 ] );
+            req.setSelectEndDate( selectDate[ 1 ] );
+        }
         return this.baseMapper.getTotal( req );
     }
 

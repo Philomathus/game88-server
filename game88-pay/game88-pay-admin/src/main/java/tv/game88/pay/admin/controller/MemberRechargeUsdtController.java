@@ -37,10 +37,10 @@ public class MemberRechargeUsdtController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<MemberRechargeUsdt>> list( ReqMemberRechargeUsdt reqMemberRechargeUsdt ) {
+    public RspBase<List<MemberRechargeUsdt>> list( ReqMemberRechargeUsdt req ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( reqMemberRechargeUsdt );
+        List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( req );
         return getRspBasePage( list, pageDomain );
     }
 

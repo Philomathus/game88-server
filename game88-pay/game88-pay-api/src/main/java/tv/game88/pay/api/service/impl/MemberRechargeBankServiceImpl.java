@@ -255,6 +255,16 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     }
 
     @Override
+    public Map listCount( ReqMemberRechargeBank req ) {
+        String[] selectDate = req.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            req.setSelectStartDate( selectDate[ 0 ] );
+            req.setSelectEndDate( selectDate[ 1 ] );
+        }
+        return this.baseMapper.listCount( req );
+    }
+
+    @Override
     public RspBase<?> firstAudit( ReqMemberRechargeBank req, String userName ) {
         MemberRechargeBank memberRechargeBank = this.baseMapper.selectById( req.getId() );
         if ( memberRechargeBank == null ) {

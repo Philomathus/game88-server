@@ -48,7 +48,7 @@ public class MemberRechargeBankController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBank:list')" )
     @GetMapping( "/listCount" )
     public Map listCount( ReqMemberRechargeBank req ) {
-        return memberRechargeBankService.selectReportListCount( req );
+        return memberRechargeBankService.listCount( req );
     }
 
     /**

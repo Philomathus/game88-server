@@ -30,26 +30,26 @@
     <select id="selectMemberRechargeUsdtList" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt"
             resultMap="MemberRechargeUsdtResult">
         <include refid="selectMemberRechargeUsdtVo" />
-        <where>
-            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
-            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
-            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
-            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
-            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
-            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
-            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
-            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
-            <if test="params.beginTime != null and params.beginTime != ''">
-                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
-            </if>
-            <if test="params.endTime != null and params.endTime != ''">
-                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
-            </if>
-        </where>
+        <include refid="listWhere" />
         order by create_time desc
     </select>
+
+    <sql id="listWhere">
+        where 1=1
+        <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
+        <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
+        <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
+        <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
+        <if test="status != null "> and status = #{status}</if>
+        <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
+        <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
+        <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
+        <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
+        <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
+        <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
+            and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
+        </if>
+    </sql>
 
     <select id="listCount" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt" resultType="java.util.Map">
         select a.total, b.successMoney, totalSuccess / total successRate from (<include refid="totalCount"/>)a
@@ -58,40 +58,12 @@
 
     <sql id="totalCount">
         SELECT COUNT(*) total,SUM(recharge_money) totalMoney FROM `member_recharge_usdt`
-        <where>
-            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
-            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
-            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
-            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
-            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
-            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
-            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
-            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
-            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
-                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
-            </if>
-        </where>
+        <include refid="listWhere" />
     </sql>
 
     <sql id="successMoney">
         SELECT COUNT(*) totalSuccess,SUM(recharge_money) successMoney FROM `member_recharge_usdt`
-        <where>
-            <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
-            <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
-            <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
-            <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
-            <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
-            <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
-            <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
-            <if test="transactionId != null  and transactionId != ''"> and transaction_id = #{transactionId}</if>
-            <if test="opName != null  and opName != ''"> and op_name like concat('%', #{opName}, '%')</if>
-            <if test="selectDate != null and selectDate != ''"><!-- 开始时间检索 -->
-                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
-            </if>
-            and status = 3
-        </where>
+        <include refid="listWhere" />
     </sql>
 
     <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
