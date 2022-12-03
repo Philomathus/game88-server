@@ -369,11 +369,13 @@
             <if test="searchValue != null and searchValue != ''">
                 and (id = #{searchValue} or phone = #{searchValue})
             </if>
-            <if test="selectStartDate != null and selectStartDate != ''">
-                and register_time <![CDATA[ >= ]]> #{selectStartDate}
+            <if test="params.beginTime != null and params.beginTime != ''">
+                <!-- 开始时间检索 -->
+                AND register_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>
-            <if test="selectStartDate != null and selectEndDate != ''">
-                and register_time <![CDATA[ <= ]]> #{selectEndDate}
+            <if test="params.endTime != null and params.endTime != ''">
+                <!-- 结束时间检索 -->
+                AND register_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             and `status` NOT IN ("2", "5")
         </where>
