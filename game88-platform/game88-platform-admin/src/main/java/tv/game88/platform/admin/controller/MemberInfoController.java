@@ -275,12 +275,14 @@ public class MemberInfoController extends BaseController {
         return memberInfoService.updateVip( memberId, vip, nickName );
     }
 
+    @PreAuthorize( "@ss.hasPermi('member:memberInfo:unbindCard')" )
     @Log( title = "解绑银行卡", businessType = BusinessType.UPDATE )
     @PutMapping( "/unbindCard" )
     public RspBase<?> unbindCard( @RequestBody MemberCard memberCard ) {
         return memberInfoService.unbindCard( memberCard );
     }
 
+    @PreAuthorize(  "@ss.hasPermi('member:memberInfo:changeBank')")
     @Log( title = "修改用户银行卡信息", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeBank" )
     public RspBase<?> changeBank( @RequestBody MemberCard memberCard ) {
