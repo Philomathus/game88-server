@@ -245,7 +245,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         }
         List<MemberRechargeBank> memberRechargeBanks = this.baseMapper.selectMemberRechargeBankList( req );
         for ( MemberRechargeBank me : memberRechargeBanks ) {
-            if ( Strings.isNotBlank( me.getRechargeRealName() ) && !me.getRealName().equals( me.getRechargeRealName() ) ) {
+            if ( Strings.isNotBlank( me.getRechargeRealName() ) && !me.getRechargeRealName().equals( me.getRealName() ) ) {
                 me.setNameStatus( 0 );
             } else {
                 me.setNameStatus( 1 );
