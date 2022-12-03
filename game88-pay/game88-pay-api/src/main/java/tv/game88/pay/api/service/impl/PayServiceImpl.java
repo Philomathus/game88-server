@@ -280,7 +280,10 @@ public class PayServiceImpl implements PayService {
             this.payNewLogicRecharge( reqPayRecharge, platformUser );
         }
 
-        PayChannel  payChannel  = payCacheUtil.getPayChannel( reqPayRecharge.getChannelId() );
+        PayChannel payChannel = payCacheUtil.getPayChannel( reqPayRecharge.getChannelId() );
+        if ( payChannel == null ) {
+            return RspBase.businessError( "充值调整,请退出并重新进入充值界面" );
+        }
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( payChannel.getPlatformId() );
         PayType     payType     = payCacheUtil.getPayType( payChannel.getTypeId() );
 
