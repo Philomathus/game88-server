@@ -103,8 +103,8 @@
         <if test="opName != null and opName != ''">
             and op_name = #{opName}
         </if>
-        <if test="startTime != null and startTime != ''">
-            and create_time between #{startTime} and #{endTime}
+        <if test="selectStartDate != null and selectEndDate != ''">
+            and create_time between #{selectStartDate} and #{selectEndDate}
         </if>
         <if test="remark != null and remark != ''">
             and remark like concat('%', #{remark}, '%')

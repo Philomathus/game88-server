@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,6 +33,7 @@ public class LotteryHistory {
     @Excel( name = "开奖号码" )
     private String        code;
     @Excel( name = "开奖时间" )
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime ktime;
     @Excel( name = "开奖状态" )
     private Integer       status;

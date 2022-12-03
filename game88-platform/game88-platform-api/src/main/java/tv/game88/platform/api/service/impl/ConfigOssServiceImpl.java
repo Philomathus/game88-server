@@ -106,12 +106,12 @@ public class ConfigOssServiceImpl implements ConfigOssService {
         for ( ConfigOss configOss : configOssList ) {
             ConfigOss update = new ConfigOss();
             update.setId( configOss.getId() );
-            update.setIsEffect( 0 );
+            update.setEffect( false );
             configOssMapper.updateById( update );
         }
         ConfigOss update = new ConfigOss();
         update.setId( id );
-        update.setIsEffect( 1 );
+        update.setEffect( true );
         int i = configOssMapper.updateById( update );
         if ( i > 0 ) {
             configOssCacheUtil.clear();

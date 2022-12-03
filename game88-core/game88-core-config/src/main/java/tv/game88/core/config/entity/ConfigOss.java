@@ -59,7 +59,7 @@ public class ConfigOss extends BaseEntity {
     /**
      * 状态
      */
-    private Integer isEffect;
+    private Boolean effect;
 
     /**
      * 0 阿里 1亚马逊 2快快云

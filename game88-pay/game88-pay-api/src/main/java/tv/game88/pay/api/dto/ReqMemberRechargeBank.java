@@ -19,8 +19,8 @@ public class ReqMemberRechargeBank {
 
     private String[] selectDate;
     private String   selectStartDate;
+    private String   selectEndDate;
 
-    private String selectEndDate;
     private String updateTime;
 
     @JsonIgnore

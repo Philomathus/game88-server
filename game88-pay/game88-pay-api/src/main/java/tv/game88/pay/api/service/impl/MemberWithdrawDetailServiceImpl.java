@@ -93,6 +93,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public List<MemberWithdrawDetail> selectMemberWithdrawDetailList( ReqMemberWithdrawDetail reqMemberWithdrawDetail ) {
+        String[] selectDate = reqMemberWithdrawDetail.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            reqMemberWithdrawDetail.setSelectStartDate( selectDate[ 0 ] );
+            reqMemberWithdrawDetail.setSelectEndDate( selectDate[ 1 ] );
+        }
         List<MemberWithdrawDetail> withdrawDetails = this.baseMapper.selectMemberWithdrawDetailList( reqMemberWithdrawDetail );
         //查出会员状态是否为套利号
         if ( !CollectionUtils.isEmpty( withdrawDetails ) ) {

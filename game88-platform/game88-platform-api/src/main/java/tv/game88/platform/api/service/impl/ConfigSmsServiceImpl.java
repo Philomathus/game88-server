@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service.impl;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.utils.ValidatorUtil;
@@ -53,7 +54,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
      */
     @Override
     public int insertConfigSms( ConfigSms configSms ) {
-        configSms.setIsEffect( 0 );
+        configSms.setEffect( false );
         configSms.setUpdateTime( LocalDateTime.now() );
         return configSmsMapper.insert( configSms );
     }
@@ -72,7 +73,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
         int i = configSmsMapper.updateById( configSms );
         if ( i > 0 ) {
             ConfigSms newServerSms = configSmsMapper.selectById( configSms.getId() );
-            if ( newServerSms.getIsEffect() == 1 ) {
+            if ( BooleanUtils.isTrue( newServerSms.getEffect() ) ) {
                 configSmsCacheUtil.setConfigSmsCache( newServerSms );
             }
         }
@@ -93,7 +94,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
         List<Long>      idList    = Arrays.asList( ids );
         List<ConfigSms> configSms = configSmsMapper.selectBatchIds( idList );
         for ( ConfigSms configSm : configSms ) {
-            if ( configSm.getIsEffect() == 1 ) {
+            if ( BooleanUtils.isTrue(configSm.getEffect()) ) {
                 configSmsCacheUtil.clearCache( configSm.getId() );
             }
         }
@@ -117,7 +118,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
     public boolean effect( Long id, String opName ) {
         ConfigSms update = new ConfigSms();
         update.setId( id );
-        update.setIsEffect( 1 );
+        update.setEffect( true );
         update.setUpdateTime( LocalDateTime.now() );
         update.setUpdateBy( opName );
         int i = configSmsMapper.updateById( update );
@@ -132,7 +133,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
     public boolean noEffect( Long id, String opName ) {
         ConfigSms update = new ConfigSms();
         update.setId( id );
-        update.setIsEffect( 0 );
+        update.setEffect( false );
         update.setUpdateTime( LocalDateTime.now() );
         update.setUpdateBy( opName );
         int i = configSmsMapper.updateById( update );

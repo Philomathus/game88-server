@@ -14,7 +14,7 @@
 		<result property="template" column="template"/>
 		<result property="smsSdkAppid" column="sms_sdk_appid"/>
 		<result property="identify" column="identify"/>
-		<result property="isEffect" column="is_effect"/>
+		<result property="effect" column="effect"/>
 		<result property="endpoint" column="endpoint"/>
 		<result property="updateTime" column="update_time"/>
 		<result property="createTime" column="create_time"/>
@@ -33,7 +33,7 @@
 			   template,
 			   sms_sdk_appid,
 			   identify,
-			   is_effect,
+			   effect,
 			   endpoint,
 		       update_time,
 			   create_time,
@@ -50,16 +50,16 @@
 			<if test="provider != null">
 				and provider = #{provider}
 			</if>
-			<if test="isEffect != null">
-				and is_effect = #{isEffect}
+			<if test="effect != null">
+				and effect = #{effect}
 			</if>
 		</where>
-		order by is_effect desc, update_time asc
+		order by effect desc, update_time asc
 	</select>
 
 	<select id="selectConfigSmsByEffect" resultMap="ConfigSmsResult">
 		<include refid="selectConfigSmsVo"/>
-		where is_effect = 1 order by RAND()
+		where effect = 1 order by RAND()
 	</select>
 
 </mapper>

@@ -12,7 +12,7 @@
 		<result property="region" column="region"/>
 		<result property="bucket" column="bucket"/>
 		<result property="vhost" column="vhost"/>
-		<result property="isEffect" column="is_effect"/>
+		<result property="effect" column="effect"/>
 		<result property="provider" column="provider"/>
 		<result property="doMain" column="do_main"/>
 		<result property="createBy" column="create_by"/>
@@ -23,7 +23,7 @@
 	</resultMap>
 
 	<sql id="selectConfigOssVo">
-		select id,name,access_key,access_secret,endpoint,region,bucket,vhost,is_effect,provider,do_main,create_by,
+		select id,name,access_key,access_secret,endpoint,region,bucket,vhost,effect,provider,do_main,create_by,
 			   create_time,update_by,update_time,remark from config_oss
 	</sql>
 
@@ -33,15 +33,15 @@
 			<if test="name != null  and name != ''">
 				and name like concat('%', #{name}, '%')
 			</if>
-			<if test="isEffect != null">
-				is_effect = #{isEffect},
+			<if test="effect != null">
+				and effect = #{effect}
 			</if>
 		</where>
 	</select>
 
 	<select id="selectConfigOssByEffect" resultMap="ConfigOssResult">
 		<include refid="selectConfigOssVo"/>
-		where is_effect = 1
+		where effect = 1
 	</select>
 
 
