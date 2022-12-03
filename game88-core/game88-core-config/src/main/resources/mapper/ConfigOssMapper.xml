@@ -41,7 +41,7 @@
 
 	<select id="selectConfigOssByEffect" resultMap="ConfigOssResult">
 		<include refid="selectConfigOssVo"/>
-		where is_effect = 1
+		where effect = 1
 	</select>
 
 
