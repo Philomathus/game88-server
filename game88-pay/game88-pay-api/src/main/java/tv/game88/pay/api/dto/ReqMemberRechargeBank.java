@@ -10,7 +10,7 @@ public class ReqMemberRechargeBank {
     private String   remark;
 
     private Integer status;
-    private String  searchValue;
+    private String  memberId;
 
     private String bankUserName;
     private String rechargeUserName;

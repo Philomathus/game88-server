@@ -58,8 +58,8 @@
             and recharge_money <![CDATA[ >= ]]> #{req.priceMin}
             and recharge_money <![CDATA[ <= ]]> #{req.priceMax}
         </if>
-        <if test="req.searchValue != null and req.searchValue != ''">
-            and member_id = #{req.searchValue}
+        <if test="req.memberId != null and req.memberId != ''">
+            and member_id = #{req.memberId}
         </if>
         <if test="req.selectStartDate != null and req.selectStartDate != ''">
             and update_time <![CDATA[ >= ]]> #{req.selectStartDate} and update_time <![CDATA[ <= ]]> #{req.selectEndDate}
