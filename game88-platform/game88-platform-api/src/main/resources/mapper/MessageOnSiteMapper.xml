@@ -24,12 +24,20 @@
             <if test="content != null  and content != ''">
                 and content = #{content}
             </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
+
+            <if test="params.beginTime != null and params.beginTime != ''">
+                <!-- 开始时间检索 -->
+                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                <!-- 结束时间检索 -->
+                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+
             <if test="createBy != null  and createBy != ''">
                 and create_by = #{createBy}
             </if>
+
         </where>
     </select>
 </mapper>

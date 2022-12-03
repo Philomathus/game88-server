@@ -2,11 +2,15 @@ package tv.game88.platform.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class MessageOnSite {
@@ -21,4 +25,15 @@ public class MessageOnSite {
     private LocalDateTime createTime;
     @Excel( name = "发布人" )
     private String        createBy;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+
+    public Map<String,Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
 }
