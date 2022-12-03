@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2021-01-25
  */
 @RestController
-@RequestMapping( "/admin/report-plam-com" )
+@RequestMapping( "/report/report-plam-com" )
 @Log4j2
 public class ReportPlamComController extends BaseController {
     @Resource
@@ -33,7 +33,7 @@ public class ReportPlamComController extends BaseController {
     /**
      * 查询综合数据报会每天进行前一天数据的生成，如果需要查当天的数据则需手动调用prorep_plamcom报存储过程，传入当天时间列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:report-plam-com:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:plam-com:list')" )
     @GetMapping( "/list" )
     public Object list( ReportPlamCom reportPlamCom ) throws ParseException {
         return reportPlamComService.selectReportPlamComList( reportPlamCom );
@@ -42,7 +42,7 @@ public class ReportPlamComController extends BaseController {
     /**
      * 导出综合数据报会每天进行前一天数据的生成，如果需要查当天的数据则需手动调用prorep_plamcom报存储过程，传入当天时间列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:report-plam-com:export')" )
+    @PreAuthorize( "@ss.hasPermi('report:plam-com:export')" )
     @Log( title = "综合数据", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {

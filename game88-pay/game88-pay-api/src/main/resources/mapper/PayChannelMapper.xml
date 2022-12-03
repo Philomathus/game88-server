@@ -71,6 +71,7 @@
         <if test="updateTime != null">
             and update_time = #{updateTime}
         </if>
+        order by rate asc
     </select>
 
     <select id="selectRspListByTypeId" resultType="tv.game88.pay.api.dto.RspPayChannel">
