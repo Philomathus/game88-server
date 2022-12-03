@@ -145,9 +145,6 @@
             <if test="registerType != null">
                 and register_type = #{registerType}
             </if>
-            <if test="searchValue != null and searchValue != ''">
-                and (id = #{searchValue} or phone = #{searchValue})
-            </if>
             <!--			<if test="downLoadDate[ 0 ] != null">-->
             <!--				and register_time <![CDATA[ >= ]]> '${downLoadDate[0]}'-->
             <!--			</if>-->
