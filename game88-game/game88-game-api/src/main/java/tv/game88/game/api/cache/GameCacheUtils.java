@@ -127,7 +127,10 @@ public class GameCacheUtils {
         GameInfo gameInfo = getGameInfo( gameInfoId );
         if ( gameInfo != null ) {
             this.clear( GAME_INFO_KEY + gameInfoId );
-            this.clear( GAME_INFO_LIST_KEY + gameInfo.getTypeId() );
+        }
+        List<RspGameType> effectTypeList = getEffectTypeList();
+        for ( RspGameType rspGameType : effectTypeList ) {
+            this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
         }
     }
 }
