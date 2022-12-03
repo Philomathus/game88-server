@@ -52,7 +52,7 @@ public class ConfigSms {
     /**
      * 状态
      */
-    private Integer       isEffect;
+    private Boolean       effect;
     /**
      * 节点
      */
