@@ -54,4 +54,11 @@ public class PayAgentLog {
     @TableField( exist = false )
     private Map<String, Object> params = new HashMap<>();
 
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
+
 }
