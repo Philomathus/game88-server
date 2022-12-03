@@ -89,7 +89,8 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
     }
 
     private void sendNewLotteryIssueMsg( Integer lotteryId, LocalDateTime ktimes, String issue ) {
-        long cutDown = ktimes.until( LocalDateTime.now(), ChronoUnit.SECONDS );
+        LocalDateTime now     = LocalDateTime.now();
+        long          cutDown = now.until( ktimes, ChronoUnit.SECONDS );
         if ( cutDown < 0 ) {
             return;
         }
