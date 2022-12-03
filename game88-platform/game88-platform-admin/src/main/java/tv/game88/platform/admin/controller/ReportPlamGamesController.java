@@ -31,7 +31,7 @@ import java.util.List;
  * @date 2021-01-26
  */
 @RestController
-@RequestMapping( "/admin/report-plam-games" )
+@RequestMapping( "/report/reportPlamGames" )
 public class ReportPlamGamesController extends BaseController {
     @Resource
     private ReportPlamGamesService reportPlamGamesService;
@@ -47,7 +47,7 @@ public class ReportPlamGamesController extends BaseController {
     /**
      * 查询游戏投注报表列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:report-plam-games:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:plam-games:list')" )
     @GetMapping( "/list" )
     public Object list( ReportPlamGames reportPlamGames ) throws ParseException {
         return reportPlamGamesService.selectReportPlamGamesList( reportPlamGames );
@@ -64,7 +64,7 @@ public class ReportPlamGamesController extends BaseController {
         return RspBase.ok( reportPlamGames1 );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:reportPlamGames:export')" )
+    @PreAuthorize( "@ss.hasPermi('report:plamGames:export')" )
     @Log( title = "游戏投注报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportPlamGames reportPlamGames, HttpServletResponse response ) {
@@ -72,7 +72,7 @@ public class ReportPlamGamesController extends BaseController {
         ExportExcelUtil.exportExcel( list, "游戏投注报表", "游戏投注报表", ReportPlamGames.class, response );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:report-plam-games:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:plam-games:list')" )
     @GetMapping( "/listMonth" )
     public RspBase<List<RspPlamGamesMonth>> listMonth( ReportPlamGames reportPlamGames ) throws ParseException {
         PageDomain pageDomain = TableSupport.buildPageRequest();
