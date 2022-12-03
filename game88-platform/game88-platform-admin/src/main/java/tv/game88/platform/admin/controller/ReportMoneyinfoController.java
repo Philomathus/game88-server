@@ -34,7 +34,7 @@ public class ReportMoneyinfoController extends BaseController {
     /**
      * 查询平台资金报，记录平台每日收入及支出总额，预估当前会员的积分余额列表
      */
-    @PreAuthorize( "@ss.hasPermi('web:report-moneyinfo:list')" )
+    @PreAuthorize( "@ss.hasPermi('report:moneyinfo:list')" )
     @GetMapping( "/list" )
     public Object list( ReportMoneyinfo reportMoneyinfo ) throws ParseException {
         return reportMoneyinfoService.selectReportMoneyinfoList( reportMoneyinfo );
@@ -46,7 +46,7 @@ public class ReportMoneyinfoController extends BaseController {
         return RspBase.ok( reportMoneyinfo1 );
     }
 
-    @PreAuthorize( "@ss.hasPermi('web:report-moneyinfo:export')" )
+    @PreAuthorize( "@ss.hasPermi('report:moneyinfo:export')" )
     @Log( title = "平台资金报表导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) throws ParseException {
