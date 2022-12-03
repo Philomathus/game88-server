@@ -47,8 +47,8 @@
             <if test="failReason != null  and failReason != ''">
                 and fail_reason = #{failReason}
             </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
+            <if test="selectDate != null and selectDate != ''">
+                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
             </if>
         </where>
     </select>

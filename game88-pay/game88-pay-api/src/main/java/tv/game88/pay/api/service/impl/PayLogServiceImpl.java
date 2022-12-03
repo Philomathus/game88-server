@@ -12,6 +12,11 @@ import java.util.List;
 public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> implements PayLogService {
     @Override
     public List<PayLog> selectPayLogList( PayLog payLog ) {
+        String[] selectDate = payLog.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            payLog.setSelectStartDate( selectDate[ 0 ] );
+            payLog.setSelectEndDate( selectDate[ 1 ] );
+        }
         return this.baseMapper.selectPayLogList( payLog );
     }
 }
