@@ -74,7 +74,7 @@ token:
   expireTime: 6
 
 im:
-  tokenUrl: http://alb-109m8hnlbeww3591nz.cn-shenzhen.alb.aliyuncs.com/token/auth
+  tokenUrl: http://8.218.39.243:43000/token/auth
 
 swagger:
   title: Game88 Platform App Swagger 3 Api Documentation
