@@ -54,8 +54,11 @@
     </select>
 
     <sql id="listWhere">
-        <if test="status != null and status != ''">
+        <if test="status != null and status != '' and status lt 2">
             and status = #{status}
+        </if>
+        <if test="status == 2">
+            and status = '1' and patch_order = 1
         </if>
         <if test="platformId != null and platformId != ''">
             and platform_id = #{platformId}
