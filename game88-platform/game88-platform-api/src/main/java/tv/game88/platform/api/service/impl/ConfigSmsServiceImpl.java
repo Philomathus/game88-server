@@ -118,7 +118,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
     public boolean effect( Long id, String opName ) {
         ConfigSms update = new ConfigSms();
         update.setId( id );
-        update.setEffect( false );
+        update.setEffect( true );
         update.setUpdateTime( LocalDateTime.now() );
         update.setUpdateBy( opName );
         int i = configSmsMapper.updateById( update );
