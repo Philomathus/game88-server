@@ -3,9 +3,9 @@ package tv.game88.platform.api.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.stereotype.Service;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberCard;
-import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.entity.MemberInfoHistory;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoHistoryMapper;
@@ -32,6 +32,16 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
 
     @Override
     public List<MemberInfoHistory> memberInfoHistoryList( MemberInfoHistory memberInfoHistory ) {
+        //有其他搜索条件的时候，忽略时间
+        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() ) || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
+                || StringUtils.isNotBlank( memberInfoHistory.getInviterCode() ) ) {
+            memberInfoHistory.setSelectDate( null );
+        }
+        String[] selectDate = memberInfoHistory.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            memberInfoHistory.setSelectStartDate( selectDate[ 0 ] );
+            memberInfoHistory.setSelectEndDate( selectDate[ 1 ] );
+        }
         return this.baseMapper.selectMemberInfoHistoryList(memberInfoHistory);
     }
 
@@ -94,6 +104,16 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
 
     @Override
     public Map listCount( MemberInfoHistory memberInfoHistory ) {
+        //有其他搜索条件的时候，忽略时间
+        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() ) || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
+                || StringUtils.isNotBlank( memberInfoHistory.getInviterCode() ) ) {
+            memberInfoHistory.setSelectDate( null );
+        }
+        String[] selectDate = memberInfoHistory.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            memberInfoHistory.setSelectStartDate( selectDate[ 0 ] );
+            memberInfoHistory.setSelectEndDate( selectDate[ 1 ] );
+        }
         return this.baseMapper.listCountMemberHistory( memberInfoHistory );
     }
 }

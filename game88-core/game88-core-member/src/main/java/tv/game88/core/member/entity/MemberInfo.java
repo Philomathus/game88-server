@@ -9,15 +9,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -166,43 +161,18 @@ public class MemberInfo implements Serializable {
     private String channelCode;
 
     @TableField( exist = false )
-    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
-    private String        searchValue;
+    private String cardRealName;
+
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
-    private Set<String>   searchValues;
+    private String   searchValue;
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
-    private LocalDateTime selectStartDate;
+    private String[] selectDate;
     @TableField( exist = false )
-    private String        cardRealName;
-
-    /**
-     * 请求参数
-     */
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String   selectStartDate;
     @TableField( exist = false )
-    private Map<String, Object> params;
-
-    public Map<String, Object> getParams() {
-        if ( params == null ) {
-            params = new HashMap<>();
-        }
-        return params;
-    }
-
-    public Set<String> getSearchValues() {
-        if ( StringUtils.isNotBlank( searchValue ) ) {
-            String[]    strings        = searchValue.split( "," );
-            Set<String> searchValueSet = new HashSet<>();
-            for ( String s : strings ) {
-                if ( StringUtils.isNotBlank( s ) ) {
-                    searchValueSet.add( s.trim() );
-                }
-            }
-            return searchValueSet;
-        }
-        return searchValues;
-    }
-
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String   selectEndDate;
 }

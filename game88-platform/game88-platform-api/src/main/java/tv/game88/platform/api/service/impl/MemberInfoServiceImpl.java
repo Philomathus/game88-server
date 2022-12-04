@@ -695,6 +695,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public List<MemberInfo> selectMemberInfoList( MemberInfo memberInfo ) {
+        //有其他搜索条件的时候，忽略时间
+        if ( StringUtils.isNotBlank( memberInfo.getSearchValue() ) || StringUtils.isNotBlank( memberInfo.getLoginIp() )
+                || StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
+            memberInfo.setSelectDate( null );
+        }
+        String[] selectDate = memberInfo.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            memberInfo.setSelectStartDate( selectDate[ 0 ] );
+            memberInfo.setSelectEndDate( selectDate[ 1 ] );
+        }
         List<MemberInfo> memberInfoList = this.baseMapper.selectMemberInfoList( memberInfo );
         Set<String>      memberIds      = memberInfoList.stream().map( MemberInfo::getId ).collect( Collectors.toSet() );
         if ( !CollectionUtils.isEmpty( memberIds ) ) {
@@ -715,6 +725,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public Map listCount( MemberInfo memberInfo ) {
+        //有其他搜索条件的时候，忽略时间
+        if ( StringUtils.isNotBlank( memberInfo.getSearchValue() ) || StringUtils.isNotBlank( memberInfo.getLoginIp() )
+                || StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
+            memberInfo.setSelectDate( null );
+        }
+        String[] selectDate = memberInfo.getSelectDate();
+        if ( selectDate != null && selectDate.length > 0 ) {
+            memberInfo.setSelectStartDate( selectDate[ 0 ] );
+            memberInfo.setSelectEndDate( selectDate[ 1 ] );
+        }
         return this.baseMapper.listCount( memberInfo );
     }
 
