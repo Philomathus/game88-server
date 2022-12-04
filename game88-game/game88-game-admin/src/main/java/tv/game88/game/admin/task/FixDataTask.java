@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.game.api.cache.GameCacheUtils;
@@ -38,6 +39,7 @@ public class FixDataTask {
         }
         List<GamePlatform>      gamePlatformList    = gameCacheUtils.getGamePlatformList();
         List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 ).list();
+        log.warn( JsonUtil.object2Json( memberGameDataFixes ) );
         for ( MemberGameDataFix memberGameDataFix : memberGameDataFixes ) {
             for ( GamePlatform gamePlatform : gamePlatformList ) {
                 if ( memberGameDataFix.getPlatformId() == gamePlatform.getId().intValue() ) {
