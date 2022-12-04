@@ -1,6 +1,5 @@
 package tv.game88.core.member.manager;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.member.cache.ConfigRecommendCacheUtils;
@@ -46,7 +45,6 @@ public class MemberRecommendManager {
             , MemberInfo rd ) {
         MemberRecommend memberRecommend = new MemberRecommend();
         BigDecimal      commission      = rechargeMoney.multiply( billMap.get( key ).getBill() );
-        memberRecommend.setId( IdWorker.get32UUID() );
         memberRecommend.setCreateTime( LocalDateTime.now() );
         memberRecommend.setMemberId( memberInfo.getId() );
         memberRecommend.setCommission( commission );
