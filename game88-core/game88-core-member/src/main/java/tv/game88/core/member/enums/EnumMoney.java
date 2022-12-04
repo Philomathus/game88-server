@@ -20,6 +20,7 @@ public enum EnumMoney {
     DEPOSIT( 1, "银行卡充值", true ),
     USDT( 2, "USDT充值", true ),
     PAY( 3, "支付充值", true ),
+    PAY_AGENT( 4, "代充入款", true ),
 
     GAME_FAIL( 100, "游戏上分失败", false ),
     GAME_OUT( 101, "游戏下分", false ),
@@ -34,6 +35,8 @@ public enum EnumMoney {
     WONGIVE( 110, "赠送彩金", false ),
 
     GM( 111, "人工入款", true ),
+
+    DEPOSIT_BONUS( 120, "充值彩金", true ),
 
     /****************type>0 入款type<0  消费  *************************/
     GAME_IN( -101, "游戏上分", false ),

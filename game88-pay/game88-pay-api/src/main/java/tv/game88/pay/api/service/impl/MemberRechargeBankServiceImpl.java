@@ -344,7 +344,8 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
 
         String mark = "审核人：" + userName;
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark, null, req.getId() );
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, 1, mark, null,
+                    req.getId() );
         }
 
         memberMoneyManager.addMemberMoney( memberRechargeBank.getMemberId(), memberRechargeBank.getRechargeMoney(),

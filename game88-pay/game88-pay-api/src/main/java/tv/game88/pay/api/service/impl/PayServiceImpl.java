@@ -209,7 +209,7 @@ public class PayServiceImpl implements PayService {
 
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
             //充值彩金日志
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.ACTIVITY, 1, mark, null,
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, 1, mark, null,
                     memberRechargeOnline.getOrderNo() );
         }
 
