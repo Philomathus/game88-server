@@ -33,7 +33,7 @@ public enum EnumMoney {
     REFUND_BET_AMOUNT( 109, "回退金额", false ),
     WONGIVE( 110, "赠送彩金", false ),
 
-    GM( 110, "人工入款", true ),
+    GM( 111, "人工入款", true ),
 
     /****************type>0 入款type<0  消费  *************************/
     GAME_IN( -101, "游戏上分", false ),
