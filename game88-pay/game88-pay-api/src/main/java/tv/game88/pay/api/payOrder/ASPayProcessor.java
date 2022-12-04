@@ -65,7 +65,7 @@ public class ASPayProcessor extends AbstractPay {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "pay_memberid", payPlatform.getMerId() );
         bodyMap.put( "pay_orderid", orderNo );
-        String sign = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "pay_md5sign", DigestUtils.md5Hex( sign ).toUpperCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( bodyMap ), null );
@@ -109,7 +109,9 @@ public class ASPayProcessor extends AbstractPay {
         String                    sign    = ( String ) treeMap.remove( "sign" );
         treeMap.remove( "attach" );
         treeMap.remove( "attcah" );
-        String mySign = DigestUtils.md5Hex( this.assemblyUrl( treeMap ) + "&key=" + payPlatform.getSignMd5() ).toUpperCase();
+        String mySign = DigestUtils
+                .md5Hex( this.assemblyUrl( treeMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                .toUpperCase();
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + mySign );
         if ( StringUtils.equals( sign, mySign ) ) {

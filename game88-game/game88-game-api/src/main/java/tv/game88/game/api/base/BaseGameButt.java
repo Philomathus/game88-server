@@ -6,6 +6,8 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.game.api.dto.ReqJoinGame;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 public interface BaseGameButt {
     /**
@@ -69,4 +71,6 @@ public interface BaseGameButt {
      */
     @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
     boolean queryTransfer( ReqJoinGame reqJoinGame );
+
+    List<Map<String, Object>> queryBetRecord();
 }
