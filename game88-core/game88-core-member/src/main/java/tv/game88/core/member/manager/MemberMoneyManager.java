@@ -165,11 +165,11 @@ public class MemberMoneyManager {
     }
 
     public void checkAndUpdateVip( String memberId, List<ConfigVip> configVips ) {
-        BigDecimal userCharge = memberInfoMapper.getUserCharge( memberId );
+        BigDecimal codeTotal = memberInfoMapper.getUserCodeTotal( memberId );
         Integer    userVip    = memberInfoMapper.getUserVip( memberId );
         Integer    vip        = 1;
         for ( ConfigVip configVip : configVips ) {
-            if ( userCharge.compareTo( configVip.getBcode() ) < 0 ) {
+            if ( codeTotal.compareTo( configVip.getBcode() ) < 0 ) {
                 break;
             }
             vip = configVip.getLevel();

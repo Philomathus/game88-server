@@ -49,6 +49,8 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     BigDecimal getUserCodeNow( @Param( "memberId" ) String userId );
 
+    BigDecimal getUserCodeTotal( @Param( "memberId" ) String memberId );
+
     String getUserPasswd( @Param( "memberId" ) String id );
 
     String getUserPhone( @Param( "memberId" ) String id );

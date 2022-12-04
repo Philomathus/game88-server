@@ -999,6 +999,38 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberInfo memberInfo = this.baseMapper.selectById( memberId );
         RspMember  rspMember  = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
+
+        List<ConfigVip> configVips = configVipCacheUtils
+                .getConfigVipMap()
+                .values()
+                .stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
+                .toList();
+        Integer vip = 1;
+        for ( ConfigVip configVip : configVips ) {
+            if ( memberInfo.getCodeTotal().compareTo( configVip.getBcode() ) < 0 ) {
+                rspMember.setNextLevelIntegral( configVip.getBcode().subtract( rspMember.getCodeTotal() ) );
+                break;
+            }
+            vip = configVip.getLevel();
+        }
+        if ( vip > memberInfo.getVip() ) {
+            int updateVip = this.baseMapper.updateVipById( memberId, vip );
+            rspMember.setVip( vip );
+            if ( updateVip > 0 ) {
+                // 更新缓存
+                String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
+                if ( StringUtils.isNotBlank( token ) && redisUtils.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
+                    Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
+                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
+                            .getOrDefault( "platformUserStr", "" )
+                            .toString(), PlatformUser.class );
+                    platformUser.setVip( vip );
+                    loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
+                    redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );
+                }
+            }
+        }
         return RspBase.ok( rspMember );
     }
 
