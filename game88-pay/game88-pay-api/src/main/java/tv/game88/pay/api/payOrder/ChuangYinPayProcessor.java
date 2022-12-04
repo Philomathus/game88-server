@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -31,12 +32,12 @@ public class ChuangYinPayProcessor extends AbstractPay {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "currency", "CNY" );
-        params.put( "amount", reqPayRecharge.getMoney().setScale( 2, BigDecimal.ROUND_HALF_UP ).toString() );
+        params.put( "amount", reqPayRecharge.getMoney().setScale( 2, RoundingMode.HALF_UP ).toString() );
         params.put( "orderId", reqPayRecharge.getOrderNo() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "channel", payChannel.getChannelCode() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr );
         sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
@@ -64,7 +65,7 @@ public class ChuangYinPayProcessor extends AbstractPay {
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "orderId", memberRechargeOnline.getOrderNo() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr );
         sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
@@ -112,7 +113,7 @@ public class ChuangYinPayProcessor extends AbstractPay {
         String     sign      = requestMap.remove( "sign" ).toString();
 
         SortedMap<String, Object> params  = new TreeMap<>( requestMap );
-        String                    signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String                    signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String                    rel     = DigestUtils.md5Hex( signStr );
         rel = DigestUtils.md5Hex( rel );
         rel = DigestUtils.md5Hex( rel ).toUpperCase();
