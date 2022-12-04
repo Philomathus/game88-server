@@ -37,7 +37,7 @@ public enum EnumMoney {
 
     /****************type>0 入款type<0  消费  *************************/
     GAME_IN( -101, "游戏上分", false ),
-    WITHDRAW( -103, "人工取款", false ),
+    WITHDRAW( -103, "会员提现", false ),
     LOTTERY_BET( -104, "彩票投注", false ),
     PLATFORM( -1, "平台资金切换", false );
 
