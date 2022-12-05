@@ -52,7 +52,7 @@ public class MemberWithdrawDetailController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:query')" )
     @GetMapping( value = "/{id}" )
-    public RspBase<MemberWithdrawDetail> getInfo( @PathVariable( "id" ) Long id ) {
+    public RspBase<MemberWithdrawDetail> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( memberWithdrawDetailService.getById( id ) );
     }
 
