@@ -57,7 +57,7 @@
 
     <select id="selectConfigRecommendPic" parameterType="tv.game88.core.config.entity.ConfigEnvironment" resultType="tv.game88.core.config.entity.ConfigEnvironment">
         <include refid="selectConfigEnvironmentVo"/>
-        where env_code in ("163action_check_url", "app_domain")
+        where env_code in ("share_background", "share_icon")
     </select>
 
 </mapper>
