@@ -1,7 +1,15 @@
 package tv.game88.platform.api.service.impl;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.config.mapper.ConfigEnvironmentMapper;
@@ -22,6 +30,9 @@ public class ConfigEnvironmentServiceImpl implements ConfigEnvironmentService {
     private ConfigEnvironmentMapper configEnvironmentMapper;
     @Resource
     private ConfigEnvCacheUtil      configEnvCacheUtil;
+
+    @Resource
+    private ConfigDomainCacheUtil configDomainCacheUtil;
 
     /**
      * 查询环境参数配置
@@ -132,4 +143,24 @@ public class ConfigEnvironmentServiceImpl implements ConfigEnvironmentService {
     public void refreshCache() {
         configEnvCacheUtil.refreshConfCache();
     }
+
+    /**
+     * 查询环境参数配置列表
+     *
+     * @param configEnvironment 环境参数配置
+     *
+     * @return 环境参数配置
+     */
+    @Override
+    public List<ConfigEnvironment> selectConfigRecommendPic( ConfigEnvironment configEnvironment ) {
+        List<ConfigEnvironment> configEnvironments = configEnvironmentMapper.selectConfigRecommendPic( configEnvironment );
+        String domainValue = configDomainCacheUtil.getDomainOssValue();
+        for ( ConfigEnvironment co : configEnvironments ) {
+            if ( StringUtils.isNotBlank( co.getEnvValue() ) && co.getEnvValue().startsWith( "${domain.oss}" ) && !co.getEnvValue().startsWith( "http" ) ) {
+                co.setEnvValue(co.getEnvValue().replace("${domain.oss}",domainValue));
+            }
+        }
+        return configEnvironments;
+    }
+
 }

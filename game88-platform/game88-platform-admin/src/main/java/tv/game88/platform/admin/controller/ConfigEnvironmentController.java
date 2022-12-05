@@ -5,6 +5,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.page.PageDomain;
+import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -172,4 +174,16 @@ public class ConfigEnvironmentController extends BaseController {
         configEnvironmentService.refreshCache();
         return RspBase.ok();
     }
+
+
+    @PreAuthorize( "@ss.hasPermi('config:env:list')" )
+    @GetMapping("/listRecommendPic")
+    public RspBase<List<ConfigEnvironment>> listRecommendPic(ConfigEnvironment configEnvironment){
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        startPage( pageDomain );
+        List<ConfigEnvironment> configEnvironments = configEnvironmentService.selectConfigRecommendPic( configEnvironment );
+        return getRspBasePage( configEnvironments, pageDomain );
+    }
+
+
 }

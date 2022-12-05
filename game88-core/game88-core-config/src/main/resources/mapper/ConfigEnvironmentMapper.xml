@@ -55,4 +55,9 @@
         select dict_value from sys_dict_data where dict_type= 'config_environment_group' ORDER BY dict_value desc LIMIT 1
     </select>
 
+    <select id="selectConfigRecommendPic" parameterType="tv.game88.core.config.entity.ConfigEnvironment" resultType="tv.game88.core.config.entity.ConfigEnvironment">
+        <include refid="selectConfigEnvironmentVo"/>
+        where env_code in ("163action_check_url", "app_domain")
+    </select>
+
 </mapper>

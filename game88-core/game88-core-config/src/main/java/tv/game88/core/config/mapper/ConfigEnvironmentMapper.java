@@ -31,4 +31,7 @@ public interface ConfigEnvironmentMapper extends BaseMapper<ConfigEnvironment> {
 
     public String getValue();
 
+
+	public List<ConfigEnvironment> selectConfigRecommendPic( ConfigEnvironment configEnvironment );
+
 }

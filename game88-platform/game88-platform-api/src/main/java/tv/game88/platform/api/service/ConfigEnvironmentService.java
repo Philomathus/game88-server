@@ -56,4 +56,10 @@ public interface ConfigEnvironmentService {
     public int getTitleIndex(String title, String code);
 
 	void refreshCache();
+
+	/**
+	 * @param configEnvironment ConfigRecommendPic
+	 * @return 环境参数配置集合
+	 */
+	public List<ConfigEnvironment> selectConfigRecommendPic(ConfigEnvironment configEnvironment);
 }
