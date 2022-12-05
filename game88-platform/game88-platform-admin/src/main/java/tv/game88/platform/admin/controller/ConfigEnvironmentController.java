@@ -185,5 +185,15 @@ public class ConfigEnvironmentController extends BaseController {
         return getRspBasePage( configEnvironments, pageDomain );
     }
 
+    /**
+     * 修改推广图
+     */
+    @PreAuthorize( "@ss.hasPermi('config:recommonPic:edit')" )
+    @Log( title = "修改环境参数配置", businessType = BusinessType.UPDATE )
+    @PutMapping( value = "/updateRecommendPic" )
+    public int updateRecommendPic( @RequestBody ConfigEnvironment configEnvironment ) {
+        configEnvironment.setEnvValue("${domain.oss}" + configEnvironment.getEnvValue());
+        return configEnvironmentService.updateConfigEnvironment( configEnvironment );
+    }
 
 }
