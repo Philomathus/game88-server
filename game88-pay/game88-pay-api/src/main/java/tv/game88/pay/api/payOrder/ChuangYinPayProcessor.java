@@ -43,6 +43,12 @@ public class ChuangYinPayProcessor extends AbstractPay {
         sign = DigestUtils.md5Hex( sign );
         params.put( "sign", sign.toUpperCase() );
 
+        if ( "757".equals( payChannel.getChannelCode() ) ) {
+            Map<String, Object> extMap = CollectionUtils.newHashMap( 1 );
+            extMap.put( "user_id", reqPayRecharge.getUserId() );
+            params.put( "ext", extMap );
+        }
+
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
@@ -111,6 +117,7 @@ public class ChuangYinPayProcessor extends AbstractPay {
         BigDecimal money     = new BigDecimal( requestMap.getOrDefault( "amount", "" ).toString() );
         String     payStatus = requestMap.getOrDefault( "payStatus", "" ).toString();
         String     sign      = requestMap.remove( "sign" ).toString();
+        requestMap.remove( "ext" );
 
         SortedMap<String, Object> params  = new TreeMap<>( requestMap );
         String                    signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
