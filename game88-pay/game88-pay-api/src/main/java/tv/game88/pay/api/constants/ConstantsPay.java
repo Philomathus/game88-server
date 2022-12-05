@@ -26,4 +26,5 @@ public abstract class ConstantsPay {
     public static final String ET_PAY         = "etPay";
     public static final String CHUANGYIN_PAY  = "chuangYinPay";
     public static final String AS_PAY         = "asPay";
+    public static final String JINXIN_PAY     = "jinXinPay";
 }
