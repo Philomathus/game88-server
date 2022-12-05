@@ -718,6 +718,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                         info.setCardRealName( memberCard.getRealName() );
                     }
                 }
+                info.setPassword( null );
+                info.setBoxPass( null );
+                info.setWithdrawalPass( null );
             }
         }
         return memberInfoList;
