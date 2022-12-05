@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.ActivityCashBackMapper">
+    <resultMap type="tv.game88.pay.api.entity.ActivityCashBack" id="ActivityCashBackResult">
+        <result property="id" column="id" />
+        <result property="depositTotalMin" column="deposit_total_min" />
+        <result property="depositTotalMax" column="deposit_total_max" />
+        <result property="rebate" column="rebate" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <sql id="selectActivityCashBackVo">
+        select id, deposit_total_min, deposit_total_max, rebate, status
+        from activity_cash_back
+    </sql>
+
+    <select id="selectActivityCashBackList" parameterType="tv.game88.pay.api.entity.ActivityCashBack"
+            resultMap="ActivityCashBackResult">
+        <include refid="selectActivityCashBackVo" />
+        <where>
+            <if test="depositTotalMin != null">
+                and deposit_total_min = #{depositTotalMin}
+            </if>
+            <if test="depositTotalMax != null">
+                and deposit_total_max = #{depositTotalMax}
+            </if>
+            <if test="rebate != null">
+                and rebate = #{rebate}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectActivityCashBackBycash" parameterType="java.math.BigDecimal" resultType="java.lang.Integer">
+        select rebate
+        from activity_cash_back
+        where status = 1
+          and deposit_total_min <![CDATA[ <= ]]> #{cash}
+          and deposit_total_max > #{cash}
+    </select>
+</mapper>

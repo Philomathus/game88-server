@@ -56,4 +56,6 @@ public interface LogMoneyMapper extends BaseMapper<LogMoney> {
     Map listCount( LogMoney logMoney );
 
     Integer findExist( @Param( "dbNodes" ) String dbNodes, @Param( "keyId" ) String id );
+
+    int findExistActivityCashBack( @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
 }

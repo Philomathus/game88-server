@@ -30,4 +30,6 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
     List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
 
     Map listCount( @Param( "req" ) ReqMemberRechargeBank req );
+
+    List<MemberRechargeBank> yesterdaySuccessOrder();
 }

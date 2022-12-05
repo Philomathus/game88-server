@@ -1,242 +1,407 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.core.member.mapper.LogMoneyMapper">
+    <resultMap type="tv.game88.core.member.entity.LogMoney" id="LogMoneyResult">
+        <result property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="type" column="type" />
+        <result property="des" column="des" />
+        <result property="income" column="income" />
+        <result property="pay" column="pay" />
+        <result property="totalBefore" column="total_before" />
+        <result property="total" column="total" />
+        <result property="createTime" column="create_time" />
+        <result property="mark" column="mark" />
+        <result property="markorder" column="markorder" />
+    </resultMap>
 
-	<resultMap type="tv.game88.core.member.entity.LogMoney" id="LogMoneyResult">
-		<result property="id"	column="id"	/>
-		<result property="userId"	column="user_id"	/>
-		<result property="type"	column="type"	/>
-		<result property="des"	column="des"	/>
-		<result property="income"	column="income"	/>
-		<result property="pay"	column="pay"	/>
-		<result property="totalBefore"	column="total_before"	/>
-		<result property="total"	column="total"	/>
-		<result property="createTime"	column="create_time"	/>
-		<result property="mark"	column="mark"	/>
-		<result property="markorder"	column="markorder"	/>
-	</resultMap>
+    <sql id="selectLogMoneyVo">
+        select id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        from log_money${dbNodes}
+    </sql>
 
-	<sql id="selectLogMoneyVo">
-		select id, user_id, type, des, income, pay, total_before, total, create_time, mark, markorder
-		from log_money${dbNodes}
-	</sql>
+    <select id="selectLogMoneyList" parameterType="tv.game88.core.member.entity.LogMoney" resultMap="LogMoneyResult">
+        select * from (
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money0
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money1
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money2
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money3
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money4
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money5
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money6
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money7
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money8
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        UNION ALL
+        SELECT id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        FROM log_money9
+        <where>
+            <include refid="whereSelect" />
+        </where>
+        ) a
+    </select>
 
-	<select id="selectLogMoneyList" parameterType="tv.game88.core.member.entity.LogMoney" resultMap="LogMoneyResult">
-		select * from (
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money0
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money1
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money2
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money3
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money4
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money5
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money6
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money7
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money8
-		<where><include refid="whereSelect" /></where>
-		UNION ALL
-		SELECT id,user_id,type,des,income,pay,total_before,total,create_time,mark,markorder FROM log_money9
-		<where><include refid="whereSelect" /></where>
-		) a
-	</select>
+    <select id="selectLogMoneySingleList" parameterType="tv.game88.core.member.entity.LogMoney"
+            resultMap="LogMoneyResult">
+        select id,
+               user_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        from log_money${tableLast} a
+        <where>
+            <if test="searchValue != null  and searchValue != ''">
+                and user_id = #{searchValue}
+            </if>
+            <include refid="whereSelect" />
+        </where>
+    </select>
 
-	<select id="selectLogMoneySingleList" parameterType="tv.game88.core.member.entity.LogMoney" resultMap="LogMoneyResult">
-		select id,
-		user_id,
-		type,
-		des,
-		income,
-		pay,
-		total_before,
-		total,
-		create_time,
-		mark,
-		markorder
-		from log_money${tableLast} a
-		<where>
-			<if test="searchValue != null  and searchValue != ''">
-				and user_id = #{searchValue}
-			</if>
-			<include refid="whereSelect" />
-		</where>
-	</select>
+    <select id="findMark" resultMap="LogMoneyResult">
+        <include refid="selectLogMoneyVo" />
+        where 1 = 1
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="mark != null">
+            and markorder = #{mark}
+        </if>
+        <if test="money != null and money > 0">
+            and income = #{money}
+        </if>
+        <if test="pay != null">
+            and pay = #{pay}
+        </if>
+    </select>
 
-	<select id="findMark" resultMap="LogMoneyResult">
-		<include refid="selectLogMoneyVo"/>
-		where 1 = 1
-		<if test="userId != null">
-			and user_id = #{userId}
-		</if>
-		<if test="mark != null">
-			and markorder = #{mark}
-		</if>
-		<if test="money != null and money > 0">
-			and income = #{money}
-		</if>
-		<if test="pay != null">
-			and pay = #{pay}
-		</if>
-	</select>
+    <select id="selectLogMoneyFirstList" parameterType="tv.game88.core.member.entity.LogMoney"
+            resultMap="LogMoneyResult">
+        select id,
+               user_id,
+               `type`,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        from log_money0 a
+        <where>
+            <include refid="whereSelect" />
+        </where>
+    </select>
 
-	<select id="selectLogMoneyFirstList" parameterType="tv.game88.core.member.entity.LogMoney" resultMap="LogMoneyResult">
-		select id,user_id,`type`,des,income,pay,total_before,total,create_time,
-		mark,markorder from log_money0 a
-		<where>
-			<include refid="whereSelect" />
-		</where>
-	</select>
+    <select id="findLogMoneyList" resultType="tv.game88.core.member.dto.RspLogMoney">
+        select user_id,
+               type,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time
+        from log_money${dbNodes}
+        where user_id = #{userId}
+        <if test="req.enumMoney != null">
+            and type = #{req.enumMoney.type}
+        </if>
+        <if test="req.enumReqTime != null">
+            and create_time &gt;= #{beginDay}
+            and create_time &lt;= #{endDay}
+        </if>
+        order by create_time desc
+    </select>
 
-	<select id="findLogMoneyList" resultType="tv.game88.core.member.dto.RspLogMoney">
-		select
-		user_id,
-		type,
-		income,
-		pay,
-		total_before,
-		total,
-		create_time
-		from log_money${dbNodes}
-		where user_id =  #{userId}
-		<if test="req.enumMoney != null ">
-			and type = #{req.enumMoney.type}
-		</if>
-		<if test="req.enumReqTime != null ">
-			and create_time &gt;=  #{beginDay} and create_time &lt;=  #{endDay}
-		</if>
-		order by create_time desc
-	</select>
+    <select id="selectById" resultMap="LogMoneyResult" resultType="tv.game88.core.member.entity.LogMoney">
+        select *
+        from log_money${dbNodes}
+        where id = #{id}
+    </select>
 
-	<select id="selectById" resultMap="LogMoneyResult" resultType="tv.game88.core.member.entity.LogMoney">
-		select * from log_money${dbNodes} where id = #{id}
-	</select>
+    <insert id="insert">
+        insert into log_money${dbNodes} (id, user_id, type, des, income,
+                                         pay, total_before, total, create_time, mark, markorder)
+        values (#{req.id}, #{req.userId}, #{req.type}, #{req.des}, #{req.income},
+                #{req.pay}, #{req.totalBefore}, #{req.total}, #{req.createTime}, #{req.mark}, #{req.markorder})
+    </insert>
 
-	<insert id="insert">
-		insert into log_money${dbNodes} (id, user_id,type, des, income,
-		pay, total_before, total, create_time, mark,markorder)
-		values (#{req.id},#{req.userId},#{req.type},#{req.des},#{req.income},
-		#{req.pay}, #{req.totalBefore}, #{req.total},#{req.createTime},#{req.mark},#{req.markorder})
-	</insert>
+    <insert id="insertDefault">
+        insert into log_money(id, user_id, type, des, income,
+                              pay, total_before, total, create_time, mark, markorder)
+        values (#{req.id}, #{req.userId}, #{req.type}, #{req.des}, #{req.income},
+                #{req.pay}, #{req.totalBefore}, #{req.total}, #{req.createTime}, #{req.mark}, #{req.markorder})
+    </insert>
 
-	<insert id="insertDefault">
-		insert into log_money(id, user_id,type, des, income,
-		pay, total_before, total, agent,create_time, mark,markorder)
-		values (#{req.id},#{req.userId},#{req.type},#{req.des},#{req.income},
-				#{req.pay}, #{req.totalBefore}, #{req.total},#{req.createTime},#{req.mark},#{req.markorder})
-	</insert>
+    <update id="updateByIdSelective">
+        update log_money${dbNodes}
+        <set>
+            <if test="req.userId != null">
+                user_id = #{req.userId},
+            </if>
+            <if test="req.type != null">
+                type = #{req.type},
+            </if>
+            <if test="req.des != null">
+                des = #{req.des},
+            </if>
+            <if test="req.income != null">
+                income = #{req.income},
+            </if>
+            <if test="req.pay != null">
+                pay = #{req.pay},
+            </if>
+            <if test="req.total != null">
+                total = #{req.total},
+            </if>
+            <if test="req.createTime != null">
+                create_time = #{req.createTime},
+            </if>
+            <if test="req.totalBefore != null">
+                total_before = #{req.totalBefore},
+            </if>
+            <if test="req.mark != null">
+                mark = #{req.mark},
+            </if>
+            <if test="req.markorder != null">
+                markorder = #{req.markorder},
+            </if>
+        </set>
+        where id = #{req.id}
+    </update>
 
-	<update id="updateByIdSelective">
-		update log_money${dbNodes}
-		<set>
-			<if test="req.userId != null">
-				user_id = #{req.userId},
-			</if>
-			<if test="req.type != null">
-				type = #{req.type},
-			</if>
-			<if test="req.des != null">
-				des = #{req.des},
-			</if>
-			<if test="req.income != null">
-				income = #{req.income},
-			</if>
-			<if test="req.pay != null">
-				pay = #{req.pay},
-			</if>
-			<if test="req.total != null">
-				total = #{req.total},
-			</if>
-			<if test="req.createTime != null">
-				create_time = #{req.createTime},
-			</if>
-			<if test="req.totalBefore != null">
-				total_before = #{req.totalBefore},
-			</if>
-			<if test="req.mark != null">
-				mark = #{req.mark},
-			</if>
-			<if test="req.markorder != null">
-				markorder = #{req.markorder},
-			</if>
-		</set>
-		where id = #{req.id}
-	</update>
+    <select id="totalCount" parameterType="tv.game88.core.member.entity.LogMoney" resultType="java.util.Map">
+        select ifnull(sum(income), 0) as totalIncome,
+               ifnull(sum(pay), 0)    as totalPay
+        from log_money
+        <where>
+            <include refid="whereCount" />
+        </where>
+    </select>
 
-	<select id="totalCount" parameterType="tv.game88.core.member.entity.LogMoney" resultType="java.util.Map">
-		select ifnull(sum(income),0) as totalIncome,
-		ifnull(sum(pay),0) as totalPay
-		from log_money
-		<where>
-			<include refid="whereCount"/>
-		</where>
-	</select>
+    <sql id="whereCount">
+        <if test="userId != null  and userId != ''">
+            and user_id = #{userId}
+        </if>
+        <if test="userName != null  and userName != ''">
+            and user_name = #{userName}
+        </if>
+        <if test="types != null and types.length != 0">
+            and type in
+            <foreach item="id" collection="types" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="startTime != null">
+            and create_time <![CDATA[ >= ]]>  #{startTime} and create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="mark != null  and mark != ''">
+            and mark like concat('%', #{mark}, '%')
+        </if>
+    </sql>
 
-	<sql id="whereCount">
-		<if test="userId != null  and userId != ''">
-			and user_id = #{userId}
-		</if>
-		<if test="userName != null  and userName != ''">
-			and user_name = #{userName}
-		</if>
-		<if test="types != null and types.length != 0">
-			and type in
-			<foreach item="id" collection="types" open="(" separator="," close=")">
-				#{id}
-			</foreach>
-		</if>
-		<if test="startTime != null">
-			and create_time <![CDATA[ >= ]]>  #{startTime} and create_time <![CDATA[ <= ]]> #{endTime}
-		</if>
-		<if test="mark != null  and mark != ''">
-			and mark like concat('%', #{mark}, '%')
-		</if>
-	</sql>
+    <select id="listCount" parameterType="tv.game88.core.member.entity.LogMoney" resultType="java.util.Map">
+        select SUM(income) - SUM(pay) as totalIncome
+        from log_money${tableLast}
+        <where>
+            <if test="searchValue != null  and searchValue != ''">
+                and user_id = #{searchValue}
+            </if>
+            <include refid="whereSelect" />
+        </where>
+    </select>
 
-	<select id="listCount" parameterType="tv.game88.core.member.entity.LogMoney" resultType="java.util.Map">
-		select SUM(income)-SUM(pay) as totalIncome from log_money${tableLast}
-		<where>
-			<if test="searchValue != null  and searchValue != ''">
-				and user_id = #{searchValue}
-			</if>
-			<include refid="whereSelect" />
-		</where>
-	</select>
+    <sql id="whereSelect">
+        <if test="types != null and types.length != 0">
+            and type in
+            <foreach item="id" collection="types" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND create_time <![CDATA[ <= ]]> STR_TO_DATE(
+                #{params.endTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="mark != null  and mark != ''">
+            and mark like concat('%',
+                #{mark}, '%')
+        </if>
+    </sql>
 
-	<sql id="whereSelect">
-		<if test="types != null and types.length != 0">
-			and type in
-			<foreach item="id" collection="types" open="(" separator="," close=")">
-				#{id}
-			</foreach>
-		</if>
-		<if test="params.beginTime != null and params.beginTime != ''">
-			AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
-		</if>
-		<if test="params.endTime != null and params.endTime != ''">
-			AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
-		</if>
-		<if test="mark != null  and mark != ''">
-			and mark like concat('%', #{mark}, '%')
-		</if>
-	</sql>
+    <select id="findExist" resultType="java.lang.Integer">
+        SELECT type
+        FROM log_money${dbNodes}
+        WHERE id = #{keyId}
+    </select>
 
-	<select id="findExist" resultType="java.lang.Integer">
-		SELECT type FROM log_money${dbNodes}
-		WHERE id = #{keyId}
-	</select>
-
+    <select id="findExistActivityCashBack" resultType="int">
+        select count(0)
+        from log_money${dbNodes}
+        where type = 121
+          and user_id = #{memberId}
+          and mark = '充值返现活动'
+          and date_format(create_time, '%y%m%d') = DATE_ADD(CURDATE(), INTERVAL -0 DAY)
+    </select>
 </mapper>

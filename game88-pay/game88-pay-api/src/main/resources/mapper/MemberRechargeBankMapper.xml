@@ -189,4 +189,15 @@
         <include refid="listWhere" />
         and status = 3
     </sql>
+
+    <select id="yesterdaySuccessOrder" resultMap="MemberRechargeBankResult">
+        select l.member_id,
+               ifnull(sum(l.recharge_money), 0) as recharge_money
+        from member_recharge_bank l
+                 left join member_info m ON l.member_id = m.id
+        where l.status = 3
+          and m.status in (1, 7)
+          and date_format(l.create_time, '%y%m%d') = DATE_ADD(CURDATE(), INTERVAL -1 DAY)
+        GROUP BY l.member_id
+    </select>
 </mapper>
