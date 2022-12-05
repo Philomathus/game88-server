@@ -42,6 +42,12 @@ public class PayRechargeBankController extends BaseController {
         return getRspBasePage( list, pageDomain );
     }
 
+    @PreAuthorize( "@ss.hasPermi('pay:payRechargeBank:list')" )
+    @GetMapping( "/listAll" )
+    public RspBase<List<PayRechargeBank>> listAll() {
+        return RspBase.ok( payRechargeBankService.list() );
+    }
+
     /**
      * 导出列表
      */

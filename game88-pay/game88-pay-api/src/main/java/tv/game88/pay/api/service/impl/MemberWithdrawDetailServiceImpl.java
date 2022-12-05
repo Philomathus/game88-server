@@ -856,6 +856,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         memberWithdrawDetail.setBankUserName( memberCard.getRealName() );
         memberWithdrawDetail.setRealBankAddress( memberCard.getRealBankAddress() );
         memberWithdrawDetail.setStatus( 0 );
+        memberWithdrawDetail.setCreateTime( LocalDateTime.now() );
+        memberWithdrawDetail.setUpdateTime( memberWithdrawDetail.getCreateTime() );
         memberWithdrawDetail.setFirst( this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
                 .eq( "withdraw_id", memberInfo.getId() )
                 .in( "status", 3, 6 ) ) <= 0 );

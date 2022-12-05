@@ -13,6 +13,7 @@ public class ReqMemberRechargeBank {
     private String  memberId;
 
     private String bankUserName;
+    private String bankAccount;
     private String rechargeUserName;
     private String opName;
     private String bankName;

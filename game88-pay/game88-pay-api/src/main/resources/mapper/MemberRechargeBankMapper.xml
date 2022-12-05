@@ -62,6 +62,9 @@
         <if test="req.bankName != null  and req.bankName != ''">
             and bank_name = #{req.bankName}
         </if>
+        <if test="req.bankAccount != null  and req.bankAccount != ''">
+            and bank_account = #{req.bankAccount}
+        </if>
         <if test="req.id != null  and req.id != ''">
             and recharge_order_no = #{req.id}
         </if>
