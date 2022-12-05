@@ -24,6 +24,8 @@
         <result property="totalLast" column="total_last" />
         <result property="updateTime" column="updatetime" />
         <result property="totalActiveprop" column="total_activeprop" />
+        <result property="usdtRenshu" column="usdt_renshu" />
+        <result property="usetJine" column="uset_jine" />
     </resultMap>
 
     <sql id="selectReportMoneyinfoVo">
@@ -46,6 +48,8 @@
                total_giveprop,
                total_last,
                total_activeprop,
+               usdt_renshu,
+               uset_jine,
                updatetime as updateTime
         from report_moneyinfo
     </sql>

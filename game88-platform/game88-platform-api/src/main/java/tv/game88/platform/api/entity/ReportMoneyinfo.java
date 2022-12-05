@@ -126,8 +126,12 @@ public class ReportMoneyinfo implements Serializable {
     @Excel( name = "合计剩余偏差" )
     private BigDecimal totalLast;
 
-    @Excel( name = "主播提现" )
     private BigDecimal totalActiveprop;
+
+    @Excel( name = "usdt人数" )
+    private Long       usdtRenshu;
+    @Excel( name = "usdt金额" )
+    private BigDecimal usetJine;
 
     private BigDecimal paymentAmount;//入款总额
     private BigDecimal outMoney;//出款总额
