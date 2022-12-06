@@ -35,7 +35,7 @@ public class MemberWithdrawDetail {
     private String     bankAddress;
     @Excel( name = "开户银行真实姓名", orderNum = "7" )
     private String     bankUserName;
-    //0申请中 1锁定 2审核不通过 3人工入款成功 4代付中 5代付失败 6代付成功
+    //0申请中 1锁定 2审核不通过 3人工出款成功 4代付中 5代付失败 6代付成功
     private Integer    status;
     @Excel( name = "操作人", orderNum = "10" )
     private String     opName;

@@ -161,7 +161,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         this.toCleanCode( memberId );
 
         redisUtils.unLock( "cleanCode" + memberId );
-        return this.cleanCodeDetail( memberId );
+        RspBase<RspCleanCodeInfo> rspBase = this.cleanCodeDetail( memberId );
+        rspBase.getData().setMoney( memberInfoMapper.getUserBalance( memberId ) );
+        return rspBase;
     }
 
     private void toCleanCode( String memberId ) {

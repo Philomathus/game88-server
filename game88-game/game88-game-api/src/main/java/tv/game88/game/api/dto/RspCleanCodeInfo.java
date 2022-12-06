@@ -15,6 +15,8 @@ public class RspCleanCodeInfo {
     private BigDecimal cleanAmountTotal;
     @Schema( title = "上次结算时间" )
     private String     cleanTime;
+    @Schema( title = "当前余额" )
+    private BigDecimal money;
 
     @Schema( title = "游戏类型列表" )
     private List<RspGameCategory> rspGameCategoryList;
