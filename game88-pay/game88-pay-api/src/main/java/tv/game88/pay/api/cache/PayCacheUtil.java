@@ -1,5 +1,6 @@
 package tv.game88.pay.api.cache;
 
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -176,7 +177,7 @@ public class PayCacheUtil {
 
     public void existsPayAgentPlatform( String code ) {
         if ( !redisUtil.exists( AGENT_PLATFORM + code ) ) {
-            PayAgentPlatform payAgentPlatform = payAgentPlatformMapper.selectById( code );
+            PayAgentPlatform payAgentPlatform = new QueryChainWrapper<>( payAgentPlatformMapper ).eq( "code", code ).one();
             if ( payAgentPlatform != null ) {
                 this.setPayAgentPlatform( payAgentPlatform );
             }
