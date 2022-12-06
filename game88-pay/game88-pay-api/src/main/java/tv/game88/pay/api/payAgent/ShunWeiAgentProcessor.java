@@ -188,7 +188,8 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             log.error( "已有代付记录 - merOrderNo:{}", order_num );
             return "success";
         }
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( withdrawDetail.getPayAgentChannelId() );
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( order_num );
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
         String data           = requestMap.getOrDefault( "data", "" ).toString();
@@ -211,7 +212,7 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             String remit_result = ( String ) signMap.get( "remit_result" );
 
             if ( "SUCCESS".equals( remit_result ) || "FAILED".equals( remit_result ) ) {
-                PayAgentLog payAgentLog = payAgentLogMapper.selectById( order_num );
+
                 payAgentService.processOrderPay( withdrawDetail, payAgentLog, "", payAgentChannel,
                         "SUCCESS".equals( remit_result ) );
                 log.info( payAgentPlatform.getName()
@@ -244,7 +245,12 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             resultMap.put( "msg", "订单不存在" );
             return resultMap;
         }
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( memberWithdrawDetail.getPayAgentChannelId() );
+        PayAgentLog payAgentLog = payAgentLogMapper.selectById( clientOrderNo );
+        if ( payAgentLog == null ) {
+            resultMap.put( "msg", "代付记录不存在" );
+            return resultMap;
+        }
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String reSign = requestMap.remove( "sign" ).toString();
 

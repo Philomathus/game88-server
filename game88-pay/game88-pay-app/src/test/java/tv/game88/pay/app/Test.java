@@ -17,6 +17,6 @@ public class Test {
         Long aLong = this.memberWithdrawDetailMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
                 .eq( "withdraw_id", "1001" )
                 .in( "status", 3, 6 ) );
-        System.out.println(aLong);
+        System.out.println(aLong <= 0);
     }
 }

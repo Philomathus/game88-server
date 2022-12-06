@@ -128,7 +128,8 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
             log.error( "已有代付记录 - merOrderNo:{}", merOrderNo );
             return "success";
         }
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( withdrawDetail.getPayAgentChannelId() );
+        PayAgentLog payAgentLog = payAgentLogMapper.selectById( merOrderNo );
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
         String data           = RSACoder.decryptByPrivateKey( dataStr, signPrivateKey );
@@ -154,7 +155,7 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
         log.warn( sign + " : " + resultMap.get( "sign" ).toString() );
         if ( sign.equalsIgnoreCase( resultMap.get( "sign" ).toString() ) ) {
             if ( orderState > 0 ) {
-                PayAgentLog payAgentLog = payAgentLogMapper.selectById( merOrderNo );
+
                 payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderNo, payAgentChannel, orderState == 1 );
             }
             return "success";
@@ -177,7 +178,13 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
             signMap.put( "message", "订单不存在" );
             return signMap;
         }
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( memberWithdrawDetail.getPayAgentChannelId() );
+        PayAgentLog payAgentLog = payAgentLogMapper.selectById( merOrderNo );
+        if ( payAgentLog == null ) {
+            signMap.put( "code", "1002" );
+            signMap.put( "message", "代付记录不存在" );
+            return signMap;
+        }
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         SortedMap<String, Object> requestSignMap = new TreeMap<>( requestMap );
 

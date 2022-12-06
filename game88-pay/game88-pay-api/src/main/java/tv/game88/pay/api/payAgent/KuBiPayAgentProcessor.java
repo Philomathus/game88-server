@@ -110,8 +110,8 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
             log.error( "已有代付记录 - merOrderNo:{}", orderid );
             return "success";
         }
-
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( withdrawDetail.getPayAgentChannelId() );
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( orderid );
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         Map<String, String> dataMap = new LinkedHashMap<>();
         dataMap.put( "cmd", requestMap.getOrDefault( "cmd", "" ).toString() );
@@ -130,7 +130,7 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
         String mySign = DigestUtils.md5Hex( this.assemblyUrl( dataMap ) );
 
         if ( mySign.equalsIgnoreCase( sign ) ) {
-            PayAgentLog payAgentLog = payAgentLogMapper.selectById( orderid );
+
             payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderid, payAgentChannel, "1".equals( bankstate ) );
             return "SUCCESS";
         }
@@ -154,7 +154,14 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
             resultMap.put( "orderNo", orderNo );
             return resultMap;
         }
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( memberWithdrawDetail.getPayAgentChannelId() );
+        PayAgentLog payAgentLog = payAgentLogMapper.selectById( orderNo );
+        if ( payAgentLog == null ) {
+            resultMap.put( "code", "ERROR" );
+            resultMap.put( "message", "代付记录不存在" );
+            resultMap.put( "orderNo", orderNo );
+            return resultMap;
+        }
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
         if ( !merchantNo.equals( payAgentChannel.getMerId() ) ) {
             resultMap.put( "code", "ERROR" );
             resultMap.put( "message", "商户号错误" );
