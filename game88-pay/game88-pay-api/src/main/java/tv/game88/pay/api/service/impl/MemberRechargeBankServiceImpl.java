@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.dto.RspMemberCard;
@@ -148,6 +149,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         } else {
             memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        }
+        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( RspMemberCard memberCard : memberCardList ) {
+            if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {
+                memberCard.setBankIcon( domainValue + memberCard.getBankIcon() );
+            }
         }
         return RspBase.ok( rspWithdrawBank );
     }
