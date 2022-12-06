@@ -21,7 +21,15 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<RspMessageHomeNotice> getMessageHomeNotices() {
-        return messageCacheUtil.getMessageHomeNotices();
+        List<RspMessageHomeNotice> messageHomeNotices = messageCacheUtil.getMessageHomeNotices();
+        String                     domainValue        = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( RspMessageHomeNotice messageHomeNotice : messageHomeNotices ) {
+            // 替换动态域名
+            if ( StringUtils.isNotBlank( messageHomeNotice.getContent() ) ) {
+                messageHomeNotice.setContent( messageHomeNotice.getContent().replaceAll( "\\$\\{domain\\.oss\\}", domainValue ) );
+            }
+        }
+        return messageHomeNotices;
     }
 
     @Override
