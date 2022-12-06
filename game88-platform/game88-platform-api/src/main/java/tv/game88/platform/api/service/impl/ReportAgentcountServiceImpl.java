@@ -59,7 +59,7 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
 
             LocalDateTime time    = LocalDateTimeUtils.parseLocalDateTime( s );
             Duration      between = Duration.between( LocalDateTime.now(), time );
-            if ( between.toSeconds() > 3600 ) {
+            if ( between.toSeconds() > 1200 ) {
                 return RspBase.businessError( "请重新生成" + agenttime + "数据" );
             }
         } else {
