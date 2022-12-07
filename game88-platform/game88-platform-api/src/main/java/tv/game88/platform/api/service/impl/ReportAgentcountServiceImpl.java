@@ -38,7 +38,7 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
      */
     @Override
     public Object selectReportAgentcountList( ReportAgentcount reportAgentcount ) throws Exception {
-        String                 agenttime;
+        String agenttime;
         if ( reportAgentcount.getAgenttime() == null ) {
             agenttime = LocalDateTimeUtils.format( LocalDate.now().minusDays( 1 ) );
             reportAgentcount.setAgentname( agenttime );
@@ -58,7 +58,8 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
             String s = reportAgentcountMapper.rmemberInfoLately();
 
             LocalDateTime time    = LocalDateTimeUtils.parseLocalDateTime( s );
-            Duration      between = Duration.between( LocalDateTime.now(), time );
+            Duration      between = Duration.between( time, LocalDateTime.now() );
+
             if ( between.toSeconds() > 1200 ) {
                 return RspBase.businessError( "请重新生成" + agenttime + "数据" );
             }
