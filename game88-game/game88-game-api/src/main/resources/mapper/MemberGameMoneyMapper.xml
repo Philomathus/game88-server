@@ -34,8 +34,11 @@
             <if test="status != null">
                 and status = #{status}
             </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
+            <if test="params.beginTime != null">
+                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="params.endTime != null">
+                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             <if test="orderId != null  and orderId != ''">
                 and order_id = #{orderId}

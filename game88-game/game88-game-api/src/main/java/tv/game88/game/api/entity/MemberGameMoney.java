@@ -1,11 +1,14 @@
 package tv.game88.game.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class MemberGameMoney {
@@ -39,4 +42,15 @@ public class MemberGameMoney {
      * 创建时间
      */
     private LocalDateTime updateTime;
+
+
+    @TableField(exist = false)
+    private Map<String,Object> params = new HashMap<>();
+
+    public Map<String, Object> getParams(){
+        if(params ==null){
+            return new HashMap<>();
+        }
+        return params;
+    }
 }
