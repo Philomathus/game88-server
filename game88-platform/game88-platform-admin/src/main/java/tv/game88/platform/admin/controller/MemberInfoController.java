@@ -233,7 +233,8 @@ public class MemberInfoController extends BaseController {
      * @param memberId
      */
     @PostMapping( "/resetBoxPasswd/{memberId}" )
-    public Object resetPassword( @PathVariable String memberId ) {
+    public Object resetPassword( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
         update.setBoxPass( "" );
