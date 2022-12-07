@@ -20,7 +20,7 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/admin/memberGameMoney" )
+@RequestMapping( "/game/memberGameMoney" )
 public class MemberGameMoneyController extends BaseController {
     @Resource
     private MemberGameMoneyService memberGameMoneyService;
@@ -28,7 +28,7 @@ public class MemberGameMoneyController extends BaseController {
     /**
      * 查询列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:memberGameMoney:list')" )
+    @PreAuthorize( "@ss.hasPermi('game:memberGameMoney:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MemberGameMoney>> list( MemberGameMoney memberGameMoney ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
