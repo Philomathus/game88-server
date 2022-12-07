@@ -102,7 +102,7 @@ public class MemberInfoController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:query')" )
     @GetMapping( value = "/getHistoryRecharge/{memberId}" )
-    public RspBase<BigDecimal> getHistoryRecharge( @PathVariable( "id" ) String id ) {
+    public RspBase<BigDecimal> getHistoryRecharge( @PathVariable( "memberId" ) String id ) {
         return RspBase.ok( memberInfoService.getHistoryRecharge( id ) );
     }
 
