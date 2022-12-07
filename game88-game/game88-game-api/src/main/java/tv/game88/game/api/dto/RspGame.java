@@ -14,6 +14,8 @@ public class RspGame {
     @Schema( title = "图标" )
     private String icon;
 
+    private String agent;
+
     public String getIcon() {
         if ( StringUtils.isNotBlank( icon ) && !icon.startsWith( "http" ) ) {
             return ConfigDomainCacheUtil.me.getDomainOssValue() + icon;

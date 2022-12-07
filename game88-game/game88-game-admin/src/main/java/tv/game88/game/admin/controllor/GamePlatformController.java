@@ -58,7 +58,7 @@ public class GamePlatformController extends BaseController {
     @GetMapping( "/listAll" )
     public RspBase<List<RspGame>> listAll() {
         List<RspGame> list = gamePlatformService
-                .list( new QueryWrapper<GamePlatform>().select( "id", "name" ) )
+                .list( new QueryWrapper<GamePlatform>().select( "id", "name", "agent" ) )
                 .stream()
                 .map( p -> {
                     RspGame rspGame = new RspGame();
