@@ -16,6 +16,7 @@ import tv.game88.game.api.service.MemberGameMoneyService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -24,6 +25,16 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
     private MemberMoneyManager memberMoneyManager;
     @Resource
     private GameCacheUtils     gameCacheUtils;
+
+    /**
+     * 查询列表
+     *
+     * @param memberGameMoney
+     */
+    @Override
+    public List<MemberGameMoney> selectMemberGameMoneyList( MemberGameMoney memberGameMoney ) {
+        return this.baseMapper.selectMemberGameMoneyList( memberGameMoney );
+    }
 
     @Override
     public String selectMaxGameOrderCode( Long platformId ) {

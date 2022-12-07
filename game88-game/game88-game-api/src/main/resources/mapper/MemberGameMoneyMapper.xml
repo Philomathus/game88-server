@@ -22,6 +22,27 @@
         from member_game_money
     </sql>
 
+    <select id="selectMemberGameMoneyList" parameterType="tv.game88.game.api.entity.MemberGameMoney" resultMap="MemberGameMoneyResult">
+        <include refid="selectMemberGameMoneyVo" />
+        <where>
+            <if test="memberId != null  and memberId != ''">
+                and member_id = #{memberId}
+            </if>
+            <if test="platformId != null">
+                and platform_id = #{platformId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="orderId != null  and orderId != ''">
+                and order_id = #{orderId}
+            </if>
+        </where>
+    </select>
+
     <select id="selectMaxGameOrderCode" resultType="java.lang.String">
         select IFNULL(max(order_id), 0)
         from member_game_money
