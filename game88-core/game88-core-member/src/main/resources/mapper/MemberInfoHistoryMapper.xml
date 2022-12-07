@@ -350,7 +350,7 @@
 	</select>
 	<select id="selectMemberInfoHistoryRechargeById" resultType="java.math.BigDecimal">
 		select SUM(money)
-		from member_pay_jour_history
+		from member_recharge_online
 		where STATUS = '1'
 		  and member_id = #{userid}
 	</select>
