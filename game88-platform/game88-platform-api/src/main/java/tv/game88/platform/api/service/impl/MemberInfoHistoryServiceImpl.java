@@ -33,7 +33,8 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
     @Override
     public List<MemberInfoHistory> memberInfoHistoryList( MemberInfoHistory memberInfoHistory ) {
         //有其他搜索条件的时候，忽略时间
-        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() ) || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
+        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() )
+                || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
                 || StringUtils.isNotBlank( memberInfoHistory.getInviterCode() ) ) {
             memberInfoHistory.setSelectDate( null );
         }
@@ -42,12 +43,13 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
             memberInfoHistory.setSelectStartDate( selectDate[ 0 ] );
             memberInfoHistory.setSelectEndDate( selectDate[ 1 ] );
         }
-        return this.baseMapper.selectMemberInfoHistoryList(memberInfoHistory);
+        return this.baseMapper.selectMemberInfoHistoryList( memberInfoHistory );
     }
 
     @Override
     public BigDecimal getHistoryRecharge( String memberId ) {
-        return this.baseMapper.selectMemberInfoHistoryRechargeById( memberId );
+        BigDecimal money = this.baseMapper.selectMemberInfoHistoryRechargeById( memberId );
+        return money == null ? BigDecimal.ZERO : money;
     }
 
     @Override
@@ -105,7 +107,8 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
     @Override
     public Map listCount( MemberInfoHistory memberInfoHistory ) {
         //有其他搜索条件的时候，忽略时间
-        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() ) || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
+        if ( StringUtils.isNotBlank( memberInfoHistory.getSearchValue() )
+                || StringUtils.isNotBlank( memberInfoHistory.getLoginIp() )
                 || StringUtils.isNotBlank( memberInfoHistory.getInviterCode() ) ) {
             memberInfoHistory.setSelectDate( null );
         }

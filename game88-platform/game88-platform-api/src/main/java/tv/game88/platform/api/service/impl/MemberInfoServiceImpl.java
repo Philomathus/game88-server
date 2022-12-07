@@ -760,7 +760,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public BigDecimal getHistoryRecharge( String memberId ) {
-        return this.baseMapper.selectMemberInfoHistoryRechargeById( memberId );
+        BigDecimal money = this.baseMapper.selectMemberInfoHistoryRechargeById( memberId );
+        return money == null ? BigDecimal.ZERO : money;
     }
 
     @Override
