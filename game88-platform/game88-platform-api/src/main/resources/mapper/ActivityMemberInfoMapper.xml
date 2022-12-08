@@ -24,7 +24,7 @@
         vip,
         login_time,
         CASE
-        WHEN ${isTwoPw} THEN
+        WHEN #{isTwoPw} THEN
         phone
         ELSE
         CONCAT(left(phone, 5), '**', RIGHT(phone, 4))
@@ -39,12 +39,13 @@
             <if test="loginIp != null  and loginIp != ''">
                 and login_ip = #{loginIp}
             </if>
-            <if test="selectDate != null">
-                and register_time <![CDATA[ >= ]]> '${selectDate[0]}'
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND register_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>
-            <if test="selectDate != null">
-                and register_time <![CDATA[ <= ]]> '${selectDate[1]}'
+            <if test="params.endTime != null and params.endTime != ''">
+                AND register_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
+
         </where>
     </select>
 
