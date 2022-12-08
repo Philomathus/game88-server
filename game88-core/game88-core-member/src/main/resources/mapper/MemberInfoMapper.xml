@@ -477,4 +477,10 @@
         from member_info
         where id = #{memberId}
     </select>
+
+    <select id="selectMemberInfoAddressById" resultType="java.lang.String">
+        SELECT fun_getaddress(login_ip) ipaddress
+        from member_info
+        where id = #{memberId}
+    </select>
 </mapper>

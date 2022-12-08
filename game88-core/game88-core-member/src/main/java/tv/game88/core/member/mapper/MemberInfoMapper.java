@@ -109,4 +109,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
                                 @Param( "memberId" ) String memberId, @Param( "dbNodes" ) String dbNodes );
 
     String selectMemberProvince( String memberId );
+
+    String selectMemberInfoAddressById( String memberId );
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.ibatis.type.JdbcType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ public class MemberRechargeUsdt {
     @Excel( name = "优惠比例" )
     private BigDecimal    discountBill;
     @Excel( name = "是否首次" )
+    @TableField( jdbcType = JdbcType.TINYINT )
     private Boolean       first;
     @Excel( name = "操作人" )
     private String        opName;

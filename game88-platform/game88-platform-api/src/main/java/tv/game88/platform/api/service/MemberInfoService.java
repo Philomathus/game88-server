@@ -84,4 +84,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<?> bindPhone( MobileBind mobileBind, PlatformUser platformUser );
 
     RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, PlatformUser platformUser );
+
+    String getMemberLoginAddress( String memberId );
 }

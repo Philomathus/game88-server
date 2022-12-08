@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.ibatis.type.JdbcType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,6 +52,7 @@ public class MemberRechargeOnline {
     @Excel( name = "更新时间", databaseFormat = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
     @Excel( name = "是否首次" )
+    @TableField( jdbcType = JdbcType.TINYINT )
     private Boolean       first;
     @Excel( name = "通道费率" )
     private BigDecimal    rate;
@@ -71,7 +73,10 @@ public class MemberRechargeOnline {
 
     public String getCurrentSuccessRateStr() {
         if ( currentSuccessRate != null ) {
-            return currentSuccessRate.multiply( new BigDecimal( 100 ) ).setScale( 0, RoundingMode.HALF_UP ).toString()
+            return currentSuccessRate
+                    .multiply( new BigDecimal( 100 ) )
+                    .setScale( 0, RoundingMode.HALF_UP )
+                    .toString()
                     .concat( "%" );
         }
         return "";

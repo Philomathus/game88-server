@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.ibatis.type.JdbcType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,7 +43,8 @@ public class MemberWithdrawDetail {
     @Excel( name = "备注", orderNum = "11" )
     private String     remark;
     @Excel( name = "是否首次", orderNum = "12" )
-    private Boolean    first = false;
+    @TableField( jdbcType = JdbcType.TINYINT )
+    private Boolean    first;
     @Excel( name = "入款出款比", orderNum = "13" )
     private BigDecimal rechargeWithdrawRate;
     @Excel( name = "公司入款成功次数", orderNum = "14" )
