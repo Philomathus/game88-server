@@ -1,9 +1,10 @@
 server:
-  tomcat:
-    max-connections: 30000
+  undertow:
     threads:
-      min-spare: 100
-      max: 1000
+      io: 16
+      worker: 256
+    buffer-size: 1024
+    direct-buffers: true
   shutdown: graceful
   port: 18802
   max-http-header-size: 65536
