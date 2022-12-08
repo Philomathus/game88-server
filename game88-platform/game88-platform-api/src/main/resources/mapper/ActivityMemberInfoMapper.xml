@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ActivityMemberInfoMapper">
+    <resultMap type="tv.game88.platform.api.entity.ActivityMemberInfo" id="ActivityMemberInfoResult">
+        <result property="id" column="id" />
+        <result property="vip" column="vip" />
+        <result property="phone" column="phone" />
+        <result property="registerTime" column="register_time" />
+        <result property="loginTime" column="login_time" />
+        <result property="loginIp" column="login_ip" />
+        <result property="inviterCode" column="inviter_code" />
+    </resultMap>
+
+    <sql id="selectActivityMemberInfoVo">
+        select id, vip, phone, register_time, login_ip, login_time, inviter_code
+        from member_info
+    </sql>
+
+    <select id="selectActivityMemberInfoList" parameterType="tv.game88.platform.api.entity.ActivityMemberInfo" resultMap="ActivityMemberInfoResult">
+        select id,
+        register_time,
+        login_ip,
+        inviter_code,
+        vip,
+        login_time,
+        CASE
+        WHEN ${isTwoPw} THEN
+        phone
+        ELSE
+        CONCAT(left(phone, 5), '**', RIGHT(phone, 4))
+        end phone
+        from member_info
+        <where>
+            and (inviter_code is not null and inviter_code != '')
+            and (phone is not null and phone != '')
+            <if test="inviterCode != null  and inviterCode != ''">
+                and inviter_code = #{inviterCode}
+            </if>
+            <if test="loginIp != null  and loginIp != ''">
+                and login_ip = #{loginIp}
+            </if>
+            <if test="selectDate != null">
+                and register_time <![CDATA[ >= ]]> '${selectDate[0]}'
+            </if>
+            <if test="selectDate != null">
+                and register_time <![CDATA[ <= ]]> '${selectDate[1]}'
+            </if>
+        </where>
+    </select>
+
+    <select id="selectActivityMemberInfoById" parameterType="String" resultMap="ActivityMemberInfoResult">
+        <include refid="selectActivityMemberInfoVo" />
+        where id = #{id}
+    </select>
+
+    <select id="selectIpList" resultType="java.util.Map">
+        select inviter_code inviterCode, login_ip loginIp, COUNT(1) count
+        from member_info
+        <where>
+            and (inviter_code is not null and inviter_code != '')
+                  and (phone is not null and phone != '')
+            <if test="inviterCode != null  and inviterCode != ''">
+                and inviter_code = #{inviterCode}
+            </if>
+            <if test="loginIp != null  and loginIp != ''">
+                and login_ip = #{loginIp}
+            </if>
+            <if test="selectDate != null">
+                and register_time <![CDATA[ >= ]]> '${selectDate[0]}'
+            </if>
+            <if test="selectDate != null">
+                and register_time <![CDATA[ <= ]]> '${selectDate[1]}'
+            </if>
+        </where>
+        GROUP BY login_ip
+        HAVING COUNT(1) <![CDATA[ >= ]]> 2
+    </select>
+</mapper>
