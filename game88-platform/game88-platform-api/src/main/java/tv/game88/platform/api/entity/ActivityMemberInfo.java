@@ -1,10 +1,13 @@
 package tv.game88.platform.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 会员推广管理对象 member_info
@@ -37,4 +40,14 @@ public class ActivityMemberInfo {
 
     private String[] selectDate;
     private Boolean  isTwoPw;
+
+    @TableField(exist = false)
+    private Map<String , Object> params = new HashMap<>();
+
+    public Map<String,Object> getParams(){
+        if(params ==null){
+            return new HashMap<>();
+        }
+        return params;
+    }
 }
