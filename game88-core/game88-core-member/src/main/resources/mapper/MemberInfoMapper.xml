@@ -479,7 +479,7 @@
     </select>
 
     <select id="selectMemberInfoAddressById" resultType="java.lang.String">
-        SELECT login_ip ipaddress
+        SELECT fun_getaddress(login_ip) ipaddress
         from member_info
         where id = #{memberId}
     </select>
