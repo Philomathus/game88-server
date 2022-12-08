@@ -78,12 +78,14 @@ public class ConfigEnvironmentController extends BaseController {
             if ( "M".equals( configEnvironment.getMenuType() ) ) {
                 //判断名称是否存在
                 QueryWrapper<SysDictData> queryLabel = new QueryWrapper<SysDictData>()
-                        .eq( "dict_type", "config_environment_group" ).eq( "dict_label", configEnvironment.getEnvTitle() );
+                        .eq( "dict_type", "config_environment_group" )
+                        .eq( "dict_label", configEnvironment.getEnvTitle() );
                 if ( sysDictDataMapper.exists( queryLabel ) ) {
                     throw new BusinessException( "名称已存在" );
                 }
                 QueryWrapper<SysDictData> queryValue = new QueryWrapper<SysDictData>()
-                        .eq( "dict_type", "config_environment_group" ).eq( "dict_value", configEnvironment.getEnvSort() );
+                        .eq( "dict_type", "config_environment_group" )
+                        .eq( "dict_value", configEnvironment.getEnvSort() );
                 //判断编码是否存在
                 if ( sysDictDataMapper.exists( queryValue ) ) {
                     throw new BusinessException( "排序和值已存在" );
@@ -177,8 +179,8 @@ public class ConfigEnvironmentController extends BaseController {
 
 
     @PreAuthorize( "@ss.hasPermi('config:env:list')" )
-    @GetMapping("/listRecommendPic")
-    public RspBase<List<ConfigEnvironment>> listRecommendPic(ConfigEnvironment configEnvironment){
+    @GetMapping( "/listRecommendPic" )
+    public RspBase<List<ConfigEnvironment>> listRecommendPic( ConfigEnvironment configEnvironment ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<ConfigEnvironment> configEnvironments = configEnvironmentService.selectConfigRecommendPic( configEnvironment );
@@ -192,8 +194,8 @@ public class ConfigEnvironmentController extends BaseController {
     @Log( title = "修改环境参数配置", businessType = BusinessType.UPDATE )
     @PutMapping( value = "/updateRecommendPic" )
     public RspBase<?> updateRecommendPic( @RequestBody ConfigEnvironment configEnvironment ) {
-        configEnvironment.setEnvValue("${domain.oss}" + configEnvironment.getEnvValue());
-        return toResult(configEnvironmentService.updateConfigEnvironment( configEnvironment ));
+        configEnvironment.setEnvValue( "${domain.oss}" + configEnvironment.getEnvValue() );
+        return toResult( configEnvironmentService.updateConfigEnvironment( configEnvironment ) );
     }
 
 }
