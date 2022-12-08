@@ -268,7 +268,7 @@ public class LotteryServiceImpl implements LotteryService {
 
     @Override
     public void computeResult( Integer lotteryId ) {
-        for ( String historyId : lotteryHistoryMapper.selectIssueWaite( LocalDateTime.now().plusSeconds( 5 ), lotteryId ) ) {
+        for ( String historyId : lotteryHistoryMapper.selectIssueWaite( LocalDateTime.now().plusSeconds( 30 ), lotteryId ) ) {
             HistoryResult historyResult = null;
             try {
                 historyResult = this.countLotteryResult( historyId, Integer.parseInt( historyId.split( "-" )[ 2 ] ),

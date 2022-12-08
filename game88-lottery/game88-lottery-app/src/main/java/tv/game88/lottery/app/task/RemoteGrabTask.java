@@ -24,7 +24,6 @@ public class RemoteGrabTask {
 
     @Scheduled( cron = "2 * * * * *" )
     public void runTask() {
-
         if ( lotteryService.isLotteryCenter() ) {
             return;
         }
