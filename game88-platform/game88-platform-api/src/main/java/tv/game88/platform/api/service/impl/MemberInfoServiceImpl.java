@@ -18,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,10 +33,12 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.core.member.cache.ConfigVipCacheUtils;
 import tv.game88.core.member.dto.ReqLogMoney;
 import tv.game88.core.member.dto.RspCodeFlow;
 import tv.game88.core.member.dto.RspLogMoney;
 import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
@@ -49,9 +50,7 @@ import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.core.member.cache.ConfigVipCacheUtils;
 import tv.game88.platform.api.dto.*;
-import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.platform.api.entity.MemberVipGift;
 import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.service.MemberInfoService;
@@ -204,11 +203,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
-            if ( e instanceof BadCredentialsException ) {
-                return RspBase.businessError( "手机号不存在/密码错误" );
-            } else {
-                return RspBase.businessError( "登录异常,请联系客服" );
-            }
+            return RspBase.businessError( "手机号不存在/密码错误" );
         } finally {
             AuthContextHolderUtils.clearContext();
         }
@@ -545,7 +540,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         m.setId( makeMemberCode() );
         if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) ) {
             try {
-                Long.parseLong( mobileLogin.getInviterCode() );
                 m.setInviterCode( mobileLogin.getInviterCode() );
             } catch ( Exception e ) {
                 log.error( "推广码异常，inviter_code:{}", mobileLogin.getInviterCode() );

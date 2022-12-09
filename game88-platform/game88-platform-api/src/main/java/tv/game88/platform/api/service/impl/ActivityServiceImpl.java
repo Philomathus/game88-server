@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -111,7 +110,6 @@ public class ActivityServiceImpl implements ActivityService {
                 collect.add( rspActivityInfo );
             }
         }
-        log.warn( JsonUtil.object2Json( collect ) );
         return collect;
     }
 

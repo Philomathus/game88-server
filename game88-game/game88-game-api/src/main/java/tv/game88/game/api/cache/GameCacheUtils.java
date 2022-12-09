@@ -116,11 +116,15 @@ public class GameCacheUtils {
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
+    public void clear() {
+
+    }
+
     public void clear( String key ) {
-        redisUtils.unlink( key );
         if ( key.startsWith( GAME_PLATFORM_KEY ) ) {
             redisUtils.unlink( GAME_PLATFORM_LIST_KEY );
         }
+        redisUtils.unlink( key );
     }
 
     public void clearByInfoId( Long gameInfoId ) {

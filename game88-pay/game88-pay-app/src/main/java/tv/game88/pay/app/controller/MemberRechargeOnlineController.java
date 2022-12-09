@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.utils.MemberSecurityUtils;
@@ -33,7 +32,6 @@ public class MemberRechargeOnlineController {
     public RspBase<List<PayType>> payTypeList( @RequestHeader( "dev" ) String deviceType ) {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         List<PayType> payTypeList = payService.findPayTypeList( platformUser, deviceType );
-        log.warn( JsonUtil.object2Json( payTypeList ) );
         return RspBase.ok( payTypeList );
     }
 
