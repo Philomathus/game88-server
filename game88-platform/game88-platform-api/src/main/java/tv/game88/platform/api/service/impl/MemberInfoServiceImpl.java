@@ -1356,4 +1356,23 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     public String getMemberLoginAddress( String memberId ) {
         return this.baseMapper.selectMemberInfoAddressById( memberId );
     }
+
+    @Override
+    public RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String memberId ) {
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", memberId )
+                .select( "id", "inviter_code" )
+                .one();
+        if ( memberInfo == null ) {
+            return RspBase.businessError( "会员不存在" );
+        }
+        if ( StringUtils.isNotBlank( memberInfo.getInviterCode() ) ) {
+            return RspBase.businessError( "已存在邀请码" );
+        }
+        MemberInfo update = new MemberInfo();
+        update.setId( memberId );
+        update.setInviterCode( reqMemberRecommend.getCode() );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok( "邀请码更新成功" ) : RspBase.businessError( "邀请码更新失败,请重试" );
+    }
 }

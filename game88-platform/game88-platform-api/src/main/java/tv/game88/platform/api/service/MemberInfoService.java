@@ -86,4 +86,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, PlatformUser platformUser );
 
     String getMemberLoginAddress( String memberId );
+
+    RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String userId );
 }
