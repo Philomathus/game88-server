@@ -46,12 +46,12 @@ public class CaiHongPayProcessor extends AbstractPay {
                 .toString() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
-        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
-        params.put( "sign", sign );
         if ( "8025".equals( payChannel.getChannelCode() ) ) {
             params.put( "param2", reqPayRecharge.getUserId() );
         }
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
+        params.put( "sign", sign );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
