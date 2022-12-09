@@ -30,10 +30,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -265,6 +262,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 .stream()
                 .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
         GamePlatform gamePlatform = gamePlatformMap.get( reqGameData.getGameCategory() );
+        if ( gamePlatform == null ) {
+            return new ArrayList<>();
+        }
         reqGameData.setPlatformId( gamePlatform.getId() );
         return this.baseMapper.findByAccount( memberId.substring(
                 memberId.length() - 1 ), memberId, reqGameData, beginDay, endDay );
