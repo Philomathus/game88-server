@@ -20,7 +20,6 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -90,7 +89,8 @@ public class FengYePayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
 
 
-        log.warn("鸿运支付查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
+        log.warn(payPlatform.getName()
+                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
             String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
             if (!CollectionUtils.isEmpty(resultMap) && "SUCCESS".equals(retCode)) {
                 BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
