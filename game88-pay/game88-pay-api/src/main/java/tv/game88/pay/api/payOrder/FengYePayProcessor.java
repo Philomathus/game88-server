@@ -2,8 +2,13 @@ package tv.game88.pay.api.payOrder;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
@@ -35,24 +40,28 @@ public class FengYePayProcessor extends AbstractPay {
         params.put("mchId", payPlatform.getMerId());
         params.put("productId", Integer.parseInt(payChannel.getChannelCode()));
         params.put("mchOrderNo", reqPayRecharge.getOrderNo());
-        params.put("amount", reqPayRecharge.getMoney().setScale(0, RoundingMode.HALF_UP));
+        params.put("amount", reqPayRecharge.getMoney()
+              .multiply( BigDecimal.valueOf( 100 ) )
+              .setScale( 0, RoundingMode.HALF_UP )
+              .toString());
         params.put("notifyUrl", configEnvCacheUtil.getConf("payCallbackUrl") + payPlatform.getCode());
         params.put("returnUrl", configEnvCacheUtil.getConf("payReturnUrl"));
-        createSignParam(params, payPlatform.getSignMd5());
 
-        Map<String, Object> resultMap = this.sendPostMap(payPlatform.getPayUrl(), packageForm(params), reqPayRecharge);
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String sign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        params.put( "sign", sign );
+
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn(payPlatform.getName()
                         + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json(resultMap), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo());
         if (!CollectionUtils.isEmpty(resultMap)) {
-            if ("SUCCESS".equals(resultMap.get("retCode")) && !resultMap.containsKey("errDes")) {
+            if ("SUCCESS".equals(resultMap.get("retCode"))) {
                 Map urlsMap = (Map) resultMap.get("payParams");
                 return urlsMap.get("payUrl").toString();
             } else {
-                reqPayRecharge.setFailReason(resultMap.getOrDefault("errDes", "").toString() + "," + resultMap
-                        .getOrDefault("retMsg", "")
-                        .toString());
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
         }
         return null;
@@ -60,31 +69,47 @@ public class FengYePayProcessor extends AbstractPay {
 
     @Override
     public boolean queryPay(MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel) {
-        Map<String, Object> params = new TreeMap<>();
+        SortedMap<String, String> params = new TreeMap<>();
         params.put("mchId", payPlatform.getMerId());
         params.put("mchOrderNo", memberRechargeOnline.getOrderNo());
-        createSignParam(params, payPlatform.getSignMd5());
 
-        Map<String, Object> resultMap = this.sendPostMap(payPlatform.getQueryUrl(), packageJson(params), null);
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
+        params.put( "sign", sign );
+
+        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+        requestMap.setAll( params );
+
+        log.warn( JsonUtil.object2Json( requestMap ) );
+
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( payPlatform.getQueryUrl() )
+                .queryParams( requestMap )
+                .build();
+
+        Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
+
 
         log.warn("鸿运支付查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            if ("SUCCESS".equals(resultMap.getOrDefault("retCode", "FAIL").toString())) {
-                int status = Integer.parseInt(resultMap.getOrDefault("status", "0").toString());
-                return status == 2;
+            String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
+            if (!CollectionUtils.isEmpty(resultMap) && "SUCCESS".equals(retCode)) {
+                BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
+                if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
+                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
+                    return true;
+                }
             }
-        }
         return false;
     }
 
     @Override
     public String callbackPay(Map<String, Object> requestMap, String realIp) {
-        String mchOrderNo = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
-        String transactionId = requestMap.getOrDefault( "payOrderId", "" ).toString();
 
+        String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
+        String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
 
-        if ( memberRechargeOnline.getStatus() == 2 ) {
+        if ( memberRechargeOnline.getStatus() == 1 ) {
             log.warn( "订单已成功，无需继续回调 - orderNo:{}", mchOrderNo );
             return "success";
         }
@@ -102,54 +127,27 @@ public class FengYePayProcessor extends AbstractPay {
             log.warn( "平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), mchOrderNo );
             return "fail";
         }
+        String sign = requestMap.remove( "sign" ).toString();
+        // 去除空值
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
 
-        int    amount      = Integer.parseInt( requestMap.getOrDefault( "amount", "" ).toString() );
-        int    status      = Integer.parseInt( requestMap.getOrDefault( "status", "" ).toString() );
-        String mchId       = requestMap.getOrDefault( "mchId", "" ).toString();
-        String sign        = requestMap.getOrDefault( "sign", "" ).toString();
-        long   paySuccTime = Long.parseLong( requestMap.getOrDefault( "paySuccTime", "" ).toString() );
-        int    productId   = Integer.parseInt( requestMap.getOrDefault( "productId", "" ).toString() );
+        SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        SortedMap<String, Object> signMap = new TreeMap<>();
-        signMap.put( "mchId", mchId );
-        signMap.put( "mchOrderNo", mchOrderNo );
-        signMap.put( "amount", amount );
-        signMap.put( "payOrderId", transactionId );
-        signMap.put( "status", status );
-        signMap.put( "paySuccTime", paySuccTime );
-        signMap.put( "productId", productId );
-
-        //对参数名按照ASCII升序排序
-        Object[] key = signMap.keySet().toArray();
-        Arrays.sort( key );
-        //生成加密原串
-        StringBuilder res = new StringBuilder();
-        for ( Object o : key ) {
-            res.append( o ).append( "=" ).append( signMap.get( o ) ).append( "&" );
-        }
-        //再拼接秘钥
-        String src = res.append( "key=" ).append( AESCoder.decrypt( payPlatform.getSignMd5() ) ).toString();
-        //MD5加密并转为大写
-        String rel = DigestUtils.md5Hex( src ).toUpperCase();
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( signStr );
+        String rel = DigestUtils.md5Hex( signStr ).toUpperCase();
+        log.warn( rel + ":" + sign );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
-        if ( sign.equals( rel ) ) {
-            if ( ( status == 2 || status == 3 ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
-                memberRechargeOnline.setRealMoney( new BigDecimal( amount ));
-                memberRechargeOnline.setUpperOrderNo( transactionId );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
-                        payChannel.getName() );
+        if ( rel.equalsIgnoreCase( sign ) ) {
+            String status = requestMap.getOrDefault( "status", 0 ).toString();
+            if ( ( "2".equals( status ) || "3".equals( status ) )
+                    && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
+                memberRechargeOnline.setUpperOrderNo( payOrderId );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
         return "fail";
-    }
-
-    private void createSignParam(Map<String, Object> params, String md5) {
-        String signStr = this.assemblyUrl(params) + "&key=" + AESCoder.decrypt(md5);
-        log.warn(signStr);
-
-        String sign = DigestUtils.md5Hex(signStr).toUpperCase();
-        params.put("sign", sign);
     }
 }
