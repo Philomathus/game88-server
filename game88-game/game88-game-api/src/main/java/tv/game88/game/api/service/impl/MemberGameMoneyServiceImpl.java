@@ -45,7 +45,7 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
     @Transactional( rollbackFor = Exception.class )
     public void beginGameEnter( ReqJoinGame reqJoinGame ) {
         if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
-            log.error( "游戏上分 - 无需扣款 - 会员:{},交易号:{},平台:{},上分金额小于等于0", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
+            log.info( "游戏上分 - 无需扣款 - 会员:{},交易号:{},平台:{},上分金额小于等于0", reqJoinGame.getMemberId(), reqJoinGame.getOrderId(),
                     reqJoinGame.getPlatformId() );
             return;
         }
