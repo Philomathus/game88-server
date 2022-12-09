@@ -3,6 +3,7 @@ package tv.game88.platform.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -111,5 +112,11 @@ public class LoginController extends BaseController {
             reqResetPasswd.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( reqResetPasswd.getNewPasswd() ) );
         }
         return memberInfoService.resetPasswd( reqResetPasswd, MemberSecurityUtils.getLoginUser().getPlatformUser() );
+    }
+
+    @Operation( summary = "绑定邀请码" )
+    @PostMapping( "/bindInviterCode" )
+    public RspBase<?> bindInviterCode( @Validated @RequestBody ReqMemberRecommend reqMemberRecommend ) {
+        return memberInfoService.bindInviterCode( reqMemberRecommend, MemberSecurityUtils.getUserId() );
     }
 }
