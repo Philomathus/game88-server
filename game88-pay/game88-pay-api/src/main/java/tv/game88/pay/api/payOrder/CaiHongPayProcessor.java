@@ -39,23 +39,31 @@ public class CaiHongPayProcessor extends AbstractPay {
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "productId", payChannel.getChannelCode() );
         params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
-        params.put( "amount", reqPayRecharge.getMoney().setScale( 0,RoundingMode.HALF_UP).toString() );
+        params.put( "amount", reqPayRecharge
+                .getMoney()
+                .multiply( BigDecimal.valueOf( 100 ) )
+                .setScale( 0, RoundingMode.HALF_UP )
+                .toString() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
+        if ( "8025".equals( payChannel.getChannelCode() ) ) {
+            params.put( "param2", reqPayRecharge.getUserId() );
+        }
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        String sign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
         params.put( "sign", sign );
+
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
-                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
+                + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            if ( "SUCCESS".equals( resultMap.get( "retCode" ))) {
+            if ( "SUCCESS".equals( resultMap.get( "retCode" ) ) ) {
                 Map urlsMap = ( Map ) resultMap.get( "payParams" );
                 return urlsMap.get( "payUrl" ).toString();
             } else {
-                reqPayRecharge.setFailReason(  resultMap.getOrDefault( "retMsg", "" ).toString()  );
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
         }
         return null;
@@ -76,16 +84,20 @@ public class CaiHongPayProcessor extends AbstractPay {
 
         log.warn( JsonUtil.object2Json( requestMap ) );
 
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString( payPlatform.getQueryUrl() ).queryParams( requestMap ).build();
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( payPlatform.getQueryUrl() )
+                .queryParams( requestMap )
+                .build();
 
         Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
 
-        log.warn( payPlatform.getName() + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
+        log.warn( payPlatform.getName()
+                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
         String retCode = resultMap.getOrDefault( "retCode", "0" ).toString();
-        if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals(retCode) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( retCode ) ) {
             BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
             if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
-                memberRechargeOnline.setRealMoney(amount.setScale( 0, RoundingMode.HALF_UP ) );
+                memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
                 return true;
             }
         }
@@ -95,8 +107,8 @@ public class CaiHongPayProcessor extends AbstractPay {
     @Override
     public String callbackPay( Map<String, Object> requestMap, String realIp ) {
 
-        String mchOrderNo = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
-        String payOrderId = requestMap.getOrDefault( "payOrderId", "" ).toString();
+        String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
+        String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
 
         if ( memberRechargeOnline.getStatus() == 1 ) {
@@ -131,10 +143,10 @@ public class CaiHongPayProcessor extends AbstractPay {
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
         if ( rel.equalsIgnoreCase( sign ) ) {
             String status = requestMap.getOrDefault( "status", 0 ).toString();
-            if ( ( "2".equals( status ) || "3".equals( status ) ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
+            if ( ( "2".equals( status ) || "3".equals( status ) )
+                    && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( payOrderId );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
-                        payChannel.getName() );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
