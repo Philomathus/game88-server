@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.utils.MemberSecurityUtils;
@@ -30,8 +31,8 @@ public class MemberRechargeOnlineController {
     @Operation( summary = "获取充值类型列表" )
     @PostMapping( "/payTypeList" )
     public RspBase<List<PayType>> payTypeList( @RequestHeader( "dev" ) String deviceType ) {
-        PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        List<PayType> payTypeList = payService.findPayTypeList( platformUser, deviceType );
+        PlatformUser  platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
+        List<PayType> payTypeList  = payService.findPayTypeList( platformUser, deviceType );
         return RspBase.ok( payTypeList );
     }
 
@@ -50,6 +51,7 @@ public class MemberRechargeOnlineController {
     @PostMapping( "/onlineRecharge" )
     public RspBase<?> onlineRecharge( @Validated @RequestBody ReqPayRecharge reqPayRecharge ) throws Exception {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
+        reqPayRecharge.setRealIp( ServletUtil.getIp() );
         return payService.payRecharge( reqPayRecharge, platformUser );
     }
 }
