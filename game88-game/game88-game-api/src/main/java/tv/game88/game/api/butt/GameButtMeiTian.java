@@ -18,6 +18,7 @@ import tv.game88.game.api.exception.GameTransferException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -78,7 +79,12 @@ public class GameButtMeiTian extends AbstractGameButt {
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
 
         Map<String, String> rawData = new HashMap<>();
-        rawData.put( "gameHall", reqJoinGame.getKindId() );
+        if ( Arrays.asList( "0", "1", "2", "3", "4" ).contains( reqJoinGame.getKindId() ) ) {
+            rawData.put( "gameHall", reqJoinGame.getKindId() );
+        } else {
+            rawData.put( "gameCode", reqJoinGame.getKindId() );
+            rawData.put( "roomID", "" );
+        }
         rawData.put( "lang ", "ZH-CN" );
         String rawDataStr = JsonUtil.object2Json( rawData );
 
