@@ -104,7 +104,8 @@ public class GameButtMeiTian extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "meitian 获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( "meitian 获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ),
+                    reqJoinGame.getGameMemberId(), url );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
