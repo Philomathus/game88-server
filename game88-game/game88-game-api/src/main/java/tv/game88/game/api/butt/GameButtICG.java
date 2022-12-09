@@ -100,8 +100,9 @@ public class GameButtICG extends AbstractGameButt {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
         HttpEntity<?> httpEntity = new HttpEntity<>( httpHeaders );
-        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId()
-                + "&lang=zh", HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
+        String url = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
+        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
+                restTemplate.httpEntityCallback( httpEntity ), response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -118,7 +119,8 @@ public class GameButtICG extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "ICG获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( "ICG获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(),
+                    url );
             throw new BusinessException( "获取游戏链接失败" );
         }
         reqJoinGame.setGameUrl( reqJoinGame.getGameUrl() + "&token=ICG".concat( reqJoinGame.getGameMemberId() ) );
