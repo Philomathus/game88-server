@@ -545,7 +545,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         m.setId( makeMemberCode() );
         if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) ) {
             try {
-                Long.parseLong( mobileLogin.getInviterCode() );
                 m.setInviterCode( mobileLogin.getInviterCode() );
             } catch ( Exception e ) {
                 log.error( "推广码异常，inviter_code:{}", mobileLogin.getInviterCode() );
