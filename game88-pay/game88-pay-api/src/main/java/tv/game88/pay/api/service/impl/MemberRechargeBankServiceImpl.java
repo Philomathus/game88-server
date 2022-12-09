@@ -100,6 +100,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         }
         if ( !CollectionUtils.isEmpty( configBankList ) ) {
             String bankChargeLimit = configEnvCacheUtil.getConf( "bank_charge_limit", "" );
+            String domainValue     = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( RspPayRechargeBank rspPayRechargeBank : configBankList ) {
                 if ( StringUtils.isNotBlank( bankChargeLimit ) ) {
                     if ( StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMin() )
@@ -120,6 +121,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                 }
                 if ( rspPayRechargeBank.getBankAddress() == null ) {
                     rspPayRechargeBank.setBankAddress( "" );
+                }
+                if ( StringUtils.isNotBlank( rspPayRechargeBank.getBankIcon() ) && !rspPayRechargeBank
+                        .getBankIcon()
+                        .startsWith( "http" ) ) {
+                    rspPayRechargeBank.setBankIcon( domainValue + rspPayRechargeBank.getBankIcon() );
                 }
             }
         }

@@ -12,4 +12,5 @@ public class ConstantsGame {
     public static final String MEITIAN  = "meiTian";
     public static final String KAIXUAN  = "kaiXuan";
     public static final String NEWWORLD = "newWorld";
+    public static final String LE_YOU   = "leYou";
 }
