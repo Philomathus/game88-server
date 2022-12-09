@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 @Repository( value = ConstantsPay.CAI_HONG_PAY + "Processor" )
 @Log4j2
-public class CaiHongPay extends AbstractPay {
+public class CaiHongPayProcessor extends AbstractPay {
 
     @Override
     public String getName() {
