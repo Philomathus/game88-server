@@ -67,7 +67,7 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
             //昨天的数据，判断数量是否相等
             int i = reportAgentcountMapper.memberInfoCounts( agenttime + " 00:00:00", agenttime + " 23:59:59" );
             int r = reportAgentcountMapper.rmemberInfoCounts( agenttime + " 00:00:00", agenttime + " 23:59:59" );
-            if ( i != r ) {
+            if ( i > r ) {
                 return RspBase.businessError( "请重新生成" + agenttime + "数据" );
             }
         }

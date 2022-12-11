@@ -2,6 +2,7 @@ package tv.game88.core.config.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -60,10 +61,12 @@ public class ConfigSms {
     /**
      * 更新时间
      */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
     /**
      * 更新时间
      */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createTime;
     /**
      * 更新者
