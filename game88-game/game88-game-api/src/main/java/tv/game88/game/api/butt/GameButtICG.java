@@ -57,7 +57,7 @@ public class GameButtICG extends AbstractGameButt {
             Map<String, Object> resultMap = restTemplate.postForObject( reqJoinGame.getApiUrl() + LOGIN, httpEntity, Map.class );
             String              token     = resultMap.get( "token" ) == null ? null : resultMap.get( "token" ).toString();
             if ( StringUtils.isBlank( token ) ) {
-                throw new BusinessException( "ICG - 获取token失败" );
+                throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 获取token失败" );
             }
             reqJoinGame.setToken( token );
             redisUtils.strSet( Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId(), token, Duration.ofDays( 80 ) );
@@ -84,13 +84,13 @@ public class GameButtICG extends AbstractGameButt {
             resultMap = restTemplate.postForObject( reqJoinGame.getApiUrl() + COMMON_URL, httpEntity, Map.class );
         } catch ( Exception e ) {
             if ( !e.getMessage().contains( "username already exists" ) ) {
-                log.error( "ICG - 创建玩家失败 - 失败原因:" + e.getMessage(), e );
-                throw new BusinessException( "ICG - 创建玩家失败" );
+                log.error( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败 - 失败原因:" + e.getMessage(), e );
+                throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
             }
         }
         if ( resultMap.get( "data" ) == null ) {
-            log.error( "ICG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
-            throw new BusinessException( "ICG - 创建玩家失败" );
+            log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+            throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
         }
         redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
     }
@@ -100,7 +100,7 @@ public class GameButtICG extends AbstractGameButt {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
         HttpEntity<?> httpEntity = new HttpEntity<>( httpHeaders );
-        String url = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
+        String        url        = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
                 restTemplate.httpEntityCallback( httpEntity ), response -> {
             InputStream bodyStream = response.getBody();
@@ -119,8 +119,8 @@ public class GameButtICG extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "ICG获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(),
-                    url );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), url );
             throw new BusinessException( "获取游戏链接失败" );
         }
         reqJoinGame.setGameUrl( reqJoinGame.getGameUrl() + "&token=ICG".concat( reqJoinGame.getGameMemberId() ) );
@@ -143,9 +143,10 @@ public class GameButtICG extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "ICG上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !resultMap.containsKey( "data" ) ) {
-            throw new GameTransferException( "ICG上分异常 - 上分失败或数据为空" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
         }
     }
 
@@ -167,9 +168,10 @@ public class GameButtICG extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "ICG下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !resultMap.containsKey( "data" ) ) {
-            throw new GameTransferException( "ICG下分异常 - 下分失败或数据为空" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分异常 - 下分失败或数据为空" );
         }
     }
 
@@ -196,7 +198,8 @@ public class GameButtICG extends AbstractGameButt {
                 return coin.divide( new BigDecimal( 100 ), 2, RoundingMode.HALF_UP );
             }
         }
-        log.error( "ICG查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 

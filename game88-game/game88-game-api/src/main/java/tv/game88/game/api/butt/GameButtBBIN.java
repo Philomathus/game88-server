@@ -79,7 +79,7 @@ public class GameButtBBIN extends AbstractGameButt {
             reqJoinGame.setToken( dataMap.getOrDefault( "sessionid", "" ).toString() );
         }
         if ( StringUtils.isBlank( reqJoinGame.getToken() ) ) {
-            throw new BusinessException( "BBIN - 获取sessionId失败" );
+            throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 获取sessionId失败" );
         }
     }
 
@@ -142,7 +142,8 @@ public class GameButtBBIN extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "BBIN获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -179,7 +180,7 @@ public class GameButtBBIN extends AbstractGameButt {
             } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
-            throw new GameTransferException( "BBIN上分失败" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
         }
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
@@ -189,7 +190,7 @@ public class GameButtBBIN extends AbstractGameButt {
                 return;
             }
         }
-        throw new BusinessException( "BBIN上分失败" );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
     }
 
     @Override
@@ -224,7 +225,7 @@ public class GameButtBBIN extends AbstractGameButt {
             } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
-            throw new GameTransferException( "BBIN下分失败" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
         }
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
@@ -234,7 +235,7 @@ public class GameButtBBIN extends AbstractGameButt {
                 return;
             }
         }
-        throw new BusinessException( "BBIN下分失败" );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
     }
 
     @Override

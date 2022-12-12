@@ -68,8 +68,8 @@ public class GameButtShaBa extends AbstractGameButt {
             }
         }
 
-        log.error( "shaba 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
-        throw new BusinessException( "shaba - 创建玩家失败" );
+        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
     @Override
@@ -93,7 +93,8 @@ public class GameButtShaBa extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "shaba获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -125,8 +126,9 @@ public class GameButtShaBa extends AbstractGameButt {
                 return;
             }
         }
-        log.info( "shaba上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        throw new GameTransferException( "shaba 上分异常 - 上分失败或数据为空" );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 上分异常 - 上分失败或数据为空" );
     }
 
     @Override
@@ -156,8 +158,9 @@ public class GameButtShaBa extends AbstractGameButt {
                 return;
             }
         }
-        log.info( "shaba下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        throw new GameTransferException( "shaba 下分异常 - 下分失败或数据为空" );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 下分异常 - 下分失败或数据为空" );
     }
 
     @Override
@@ -182,7 +185,8 @@ public class GameButtShaBa extends AbstractGameButt {
                 return new BigDecimal( dataMap.get( "balance" ).toString() );
             }
         }
-        log.error( "shaba查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 

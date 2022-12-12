@@ -29,7 +29,7 @@ public class PayType {
     private Boolean       recommend;
     @Excel( name = "激活状态" )
     private Boolean       effect;
-    // 支付类型 1线上支付 2线下支付 3 代充支付 4 USDT
+    // 支付类型 1线上支付 2线下支付 3 代充支付 4 USDT 5 vipPay
     @Excel( name = "支付类型" )
     private Integer       type;
     // 设备类型 1 ios 2 android 以英文逗号分隔

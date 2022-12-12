@@ -60,7 +60,7 @@ public class GameButtOG extends AbstractGameButt {
         }
 
         if ( StringUtils.isBlank( reqJoinGame.getToken() ) ) {
-            throw new BusinessException( "OG - 获取token失败" );
+            throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 获取token失败" );
         }
     }
 
@@ -98,8 +98,8 @@ public class GameButtOG extends AbstractGameButt {
                 return;
             }
         }
-        log.error( "OG 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
-        throw new BusinessException( "OG - 创建玩家失败" );
+        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
     @Override
@@ -138,14 +138,16 @@ public class GameButtOG extends AbstractGameButt {
                     }
                 }
                 if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-                    log.error( "MG获取游戏链接失败 resultMap:{}; joinGameMap:{}; userId:{}", JsonUtil.object2Json( resultMap ),
+                    log.error( reqJoinGame.getGameCategory().getDes()
+                            + "获取游戏链接失败 resultMap:{}; joinGameMap:{}; userId:{}", JsonUtil.object2Json( resultMap ),
                             JsonUtil.object2Json( joinGameMap ), reqJoinGame.getGameMemberId() );
                     throw new BusinessException( "获取游戏链接失败" );
                 }
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "MG获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -185,7 +187,7 @@ public class GameButtOG extends AbstractGameButt {
                 return;
             }
         }
-        throw new GameTransferException( "OG上分异常 - 上分失败或数据为空" );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
     }
 
     @Override
@@ -223,7 +225,7 @@ public class GameButtOG extends AbstractGameButt {
                 return;
             }
         }
-        throw new GameTransferException( "OG下分异常 - 下分失败或数据为空" );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分异常 - 下分失败或数据为空" );
     }
 
     @Override

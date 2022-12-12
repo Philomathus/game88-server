@@ -82,7 +82,8 @@ public class GameButtNewWorld extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "NewWorld获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -127,7 +128,8 @@ public class GameButtNewWorld extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "NewWorld上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -137,7 +139,7 @@ public class GameButtNewWorld extends AbstractGameButt {
                 }
             }
         }
-        throw new GameTransferException( "NewWorld上分异常 - 上分失败或数据为空" );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
     }
 
     @Override
@@ -180,7 +182,8 @@ public class GameButtNewWorld extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "NewWorld下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -190,12 +193,12 @@ public class GameButtNewWorld extends AbstractGameButt {
                 }
             }
         }
-        throw new GameTransferException( "NewWorld下分异常 - 下分失败或数据为空" );
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分异常 - 下分失败或数据为空" );
     }
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        String time = System.currentTimeMillis() + "";
+        String time   = System.currentTimeMillis() + "";
         String params = String.format( "s=%s&account=%s", 1, reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
@@ -236,13 +239,14 @@ public class GameButtNewWorld extends AbstractGameButt {
                 }
             }
         }
-        log.error( "NewWorld查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
-        String time = System.currentTimeMillis() + "";
+        String time   = System.currentTimeMillis() + "";
         String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
         String param  = null;
         try {

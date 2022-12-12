@@ -134,44 +134,41 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<RspQuestInfo> getActivityQuestInfos( Long typeId, String memberId ) {
         List<ActivityQuestInfo> questInfos = activityCacheUtil.getQuestInfos();
-        List<ActivityQuestInfo> lists      = new ArrayList<>();
         List<RspQuestInfo>      qlist      = new ArrayList<>();
         if ( !CollectionUtils.isEmpty( questInfos ) ) {
-            lists = questInfos
+            List<ActivityQuestInfo> lists = questInfos
                     .stream()
                     .filter( activityQuestInfo -> Objects.equals( activityQuestInfo.getTypeId(), typeId ) )
                     .collect( Collectors.toList() );
-        }
-        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
-        if ( !CollectionUtils.isEmpty( lists ) ) {
-            for ( ActivityQuestInfo activityQuestInfo : lists ) {
-                RspQuestInfo info = new RspQuestInfo();
-                info.setContent( activityQuestInfo.getContent() );
-                info.setGameTypeId( activityQuestInfo.getGameTypeId().intValue() );
-                if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo
-                        .getIcon()
-                        .startsWith( "http" ) ) {
-                    info.setIcon( domainValue + activityQuestInfo.getIcon() );
+            String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+            if ( !CollectionUtils.isEmpty( lists ) ) {
+                for ( ActivityQuestInfo activityQuestInfo : lists ) {
+                    RspQuestInfo info = new RspQuestInfo();
+                    info.setContent( activityQuestInfo.getContent() );
+                    info.setGameTypeId( activityQuestInfo.getGameTypeId().intValue() );
+                    if ( StringUtils.isNotBlank( activityQuestInfo.getIcon() ) && !activityQuestInfo
+                            .getIcon()
+                            .startsWith( "http" ) ) {
+                        info.setIcon( domainValue + activityQuestInfo.getIcon() );
+                    }
+                    info.setId( activityQuestInfo.getId() );
+                    info.setReward( activityQuestInfo.getReward() );
+                    info.setTarget( activityQuestInfo.getTarget() );
+                    info.setTitle( activityQuestInfo.getTitle() );
+                    qlist.add( info );
                 }
-                info.setId( activityQuestInfo.getId() );
-                info.setReward( activityQuestInfo.getReward() );
-                info.setTarget( activityQuestInfo.getTarget() );
-                info.setTitle( activityQuestInfo.getTitle() );
-                qlist.add( info );
             }
         }
         //登录
-        if ( !StringUtils.isEmpty( memberId ) ) {
-            List<MemberQuest> memberQuest = new QueryChainWrapper<>( memberQuestMapper ).eq( "member_id", memberId ).list();
-            if ( memberQuest.size() > 0 ) {
-                Map<Long, MemberQuest> questMap = memberQuest
-                        .stream()
-                        .collect( Collectors.toMap( MemberQuest::getQuestId, Function.identity() ) );
-                for ( RspQuestInfo q : qlist ) {
-                    if ( questMap.containsKey( q.getId() ) ) {
-                        q.setCurNum( questMap.get( q.getId() ).getCurNum() );
-                        q.setStatus( questMap.get( q.getId() ).getStatus() );
-                    }
+        List<MemberQuest> memberQuest = new QueryChainWrapper<>( memberQuestMapper ).eq( "member_id", memberId ).list();
+        if ( memberQuest.size() > 0 ) {
+            Map<Long, MemberQuest> questMap = memberQuest
+                    .stream()
+                    .collect( Collectors.toMap( MemberQuest::getQuestId, Function.identity() ) );
+            for ( RspQuestInfo q : qlist ) {
+                if ( questMap.containsKey( q.getId() ) ) {
+                    q.setCurNum( questMap.get( q.getId() ).getCurNum() );
+                    q.setStatus( questMap.get( q.getId() ).getStatus() );
                 }
             }
         }

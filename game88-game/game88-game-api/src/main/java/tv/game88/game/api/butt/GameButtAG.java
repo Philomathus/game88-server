@@ -53,7 +53,7 @@ public class GameButtAG extends AbstractGameButt {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
             return;
         }
-        throw new BusinessException( "AG - 创建玩家失败" );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
     @Override
@@ -141,7 +141,7 @@ public class GameButtAG extends AbstractGameButt {
                 throw new BusinessException( e.getMessage() );
             }
         }
-        log.error( "AG 获取数据失败 ->{}", resultXml );
+        log.error( reqJoinGame.getGameCategory().getDes() + " 获取数据失败 ->{}", resultXml );
         throw new BusinessException( "获取数据失败" );
     }
 

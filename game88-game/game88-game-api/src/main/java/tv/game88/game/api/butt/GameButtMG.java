@@ -36,7 +36,7 @@ public class GameButtMG extends AbstractGameButt {
             Object              obj       = resultMap.get( "access_token" );
             String              token     = obj == null ? null : obj.toString();
             if ( StringUtils.isBlank( token ) ) {
-                throw new BusinessException( "MG - 获取token失败" );
+                throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 获取token失败" );
             }
             reqJoinGame.setToken( token );
             redisUtils.strSet( Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId(), token, Duration.ofMinutes( 50 ) );
@@ -68,8 +68,8 @@ public class GameButtMG extends AbstractGameButt {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
             return;
         }
-        log.error( "MG 创建玩家失败 ->{}", JsonUtil.object2Json( result ) );
-        throw new BusinessException( "MG - 创建玩家失败" );
+        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( result ) );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
     @Override
@@ -93,7 +93,8 @@ public class GameButtMG extends AbstractGameButt {
             reqJoinGame.setGameUrl( result.get( "gameURL" ).toString() );
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "MG获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -118,16 +119,17 @@ public class GameButtMG extends AbstractGameButt {
             responseGameResult = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
-            throw new GameTransferException( "MG上分失败" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
         }
         Map result = responseGameResult.getBody();
-        log.info( "MG上分信息:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
         if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
             if ( result.get( "status" ).equals( "Succeeded" ) ) {
                 return;
             }
         }
-        throw new BusinessException( "MG上分失败" );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
     }
 
     @Override
@@ -150,16 +152,17 @@ public class GameButtMG extends AbstractGameButt {
             responseGameResult = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
-            throw new GameTransferException( "MG下分失败" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
         }
         Map result = responseGameResult.getBody();
-        log.info( "MG下分信息:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( result ), reqJoinGame.getGameMemberId() );
         if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
             if ( result.get( "status" ).equals( "Succeeded" ) ) {
                 return;
             }
         }
-        throw new BusinessException( "MG下分失败" );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
     }
 
     @Override
@@ -199,7 +202,8 @@ public class GameButtMG extends AbstractGameButt {
 
         ResponseEntity<Map> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, Map.class );
         Map                 resultMap          = responseGameResult.getBody();
-        log.info( "MG用户:{}获交易明细返回结果:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "用户:{}获交易明细返回结果:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
             return "Succeeded".equals( resultMap.get( "status" ) );
         }

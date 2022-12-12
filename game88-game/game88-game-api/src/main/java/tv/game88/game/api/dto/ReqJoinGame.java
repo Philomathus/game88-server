@@ -2,6 +2,7 @@ package tv.game88.game.api.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import tv.game88.game.api.type.EnumGameCategory;
 
 import java.math.BigDecimal;
 
@@ -15,6 +16,8 @@ public class ReqJoinGame {
     private String apiUrl;
     private String recordUrl;
     private String kindId;
+
+    private EnumGameCategory gameCategory;
 
     private String     memberId;
     private String     gameMemberId;

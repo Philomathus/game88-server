@@ -71,8 +71,8 @@ public class GameButtMeiTian extends AbstractGameButt {
                 return;
             }
         }
-        log.error( "meitian 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
-        throw new BusinessException( "meitian - 创建玩家失败" );
+        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
     @Override
@@ -110,7 +110,7 @@ public class GameButtMeiTian extends AbstractGameButt {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( "meitian 获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ),
+            log.error( reqJoinGame.getGameCategory().getDes() + " 获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ),
                     reqJoinGame.getGameMemberId(), url );
             throw new BusinessException( "获取游戏链接失败" );
         }
@@ -148,9 +148,9 @@ public class GameButtMeiTian extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "meitian上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes() + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !"1".equals( resultMap.getOrDefault( "resultCode", -1 ).toString() ) ) {
-            throw new GameTransferException( "meitian 上分异常 - 上分失败或数据为空" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 上分异常 - 上分失败或数据为空" );
         }
     }
 
@@ -186,9 +186,9 @@ public class GameButtMeiTian extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( "meitian下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes() + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !"1".equals( resultMap.getOrDefault( "resultCode", -1 ).toString() ) ) {
-            throw new GameTransferException( "meitian 下分异常 - 下分失败或数据为空" );
+            throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 下分异常 - 下分失败或数据为空" );
         }
     }
 
@@ -205,7 +205,7 @@ public class GameButtMeiTian extends AbstractGameButt {
                 return new BigDecimal( resultMap.get( "coinBalance" ) ).setScale( 2, RoundingMode.FLOOR );
             }
         }
-        log.error( "meitian查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( reqJoinGame.getGameCategory().getDes() + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 

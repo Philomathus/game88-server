@@ -138,9 +138,9 @@ public class GameServiceImpl implements GameService {
             baseGameButt.createAccount( reqJoinGame );
             // 获取游戏链接
             baseGameButt.getJoinGameUrl( reqJoinGame );
-            // 扣除会员金额
-            memberGameMoneyService.beginGameEnter( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
+                // 扣除会员金额
+                memberGameMoneyService.beginGameEnter( reqJoinGame );
                 // 上分
                 baseGameButt.transferMoney( reqJoinGame );
             }
@@ -321,6 +321,7 @@ public class GameServiceImpl implements GameService {
                 .platformId( gamePlatform.getId() )
                 .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
                 .ip( ServletUtil.getIp() )
+                .gameCategory( gamePlatform.getGameCategory() )
                 .build();
     }
 
