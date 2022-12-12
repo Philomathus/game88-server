@@ -18,9 +18,9 @@ import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
+import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.ConfigBankList;
@@ -514,6 +514,15 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         rechargeBank.setIp( req.getIp() );
         int i = this.baseMapper.insert( rechargeBank );
         return i > 0 ? RspBase.ok( "充值请求成功" ) : RspBase.businessError( "充值请求失败" );
+    }
+
+    @Override
+    public RspBase<?> updateRemark( ReqMemberWithdrawDetail req ) {
+        MemberRechargeBank update = new MemberRechargeBank();
+        update.setRechargeOrderNo( req.getId() );
+        update.setRemark( req.getRemark() );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "更改备注失败" );
     }
 }
 

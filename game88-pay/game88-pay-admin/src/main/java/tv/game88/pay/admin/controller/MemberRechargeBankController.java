@@ -11,6 +11,7 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.pay.api.dto.ReqMemberRechargeBank;
+import tv.game88.pay.api.dto.ReqMemberWithdrawDetail;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
@@ -71,6 +72,12 @@ public class MemberRechargeBankController extends BaseController {
     @GetMapping( value = "/{id}" )
     public RspBase<?> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( memberRechargeBankService.getById( id ) );
+    }
+
+    @Log( title = "修改备注", businessType = BusinessType.AUDIT )
+    @PutMapping( "/updateRemark" )
+    public RspBase<?> updateRemark( @RequestBody ReqMemberWithdrawDetail req ) {
+        return memberRechargeBankService.updateRemark( req );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBank:firstAudit')" )
