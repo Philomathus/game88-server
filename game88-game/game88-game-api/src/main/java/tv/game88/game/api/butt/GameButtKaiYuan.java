@@ -83,7 +83,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+                    + "获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(),
+                    uriComponents
+                    .toUri()
+                    .toString() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
