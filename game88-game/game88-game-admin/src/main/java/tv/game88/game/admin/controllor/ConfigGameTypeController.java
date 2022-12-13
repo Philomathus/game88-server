@@ -65,6 +65,7 @@ public class ConfigGameTypeController extends BaseController {
     @Log( title = "游戏配置编辑", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody ConfigGametype configGametype ) {
+
         return toResult( configGametypeService.updateById( configGametype ) );
     }
 
