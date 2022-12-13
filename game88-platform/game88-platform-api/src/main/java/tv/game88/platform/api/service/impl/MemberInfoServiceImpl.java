@@ -52,6 +52,8 @@ import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.entity.MemberVipGift;
+import tv.game88.platform.api.entity.MobileLimit;
+import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
@@ -101,6 +103,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MemberMoneyManager    memberMoneyManager;
     @Resource
     private LogMoneyMapper        logMoneyMapper;
+    @Resource
+    private MobileLimitMapper     mobileLimitMapper;
 
     @Value( "${im.tokenUrl:null}" )
     private String getImTokenUrl;
@@ -1312,6 +1316,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         if ( phone.length() != 11 ) {
             return RspBase.businessError( "请输入正确的手机号" );
+        }
+        MobileLimit mobileLimit = mobileLimitMapper.selectById( phone );
+        if ( mobileLimit != null ) {
+            return RspBase.businessError( "该手机号被限制登录,请联系客服" );
         }
         if ( StringUtils.isBlank( code ) ) {
             return RspBase.businessError( "请输入短信验证码" );

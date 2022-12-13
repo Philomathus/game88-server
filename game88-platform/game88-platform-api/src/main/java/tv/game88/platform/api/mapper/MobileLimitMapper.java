@@ -1,6 +1,7 @@
-package tv.game88.platform.api.entity;
+package tv.game88.platform.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tv.game88.platform.api.entity.MobileLimit;
 
 import java.util.List;
 
