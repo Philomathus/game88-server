@@ -87,9 +87,7 @@ public class Ju8PayProcessor extends AbstractPay {
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        String sign    = DigestUtils
-                .md5Hex( signStr )
-                .toUpperCase();
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
         params.put( "sign", sign );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
@@ -109,9 +107,7 @@ public class Ju8PayProcessor extends AbstractPay {
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
         String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
         if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( retCode ) ) {
-            BigDecimal amount = new BigDecimal( resultMap
-                    .getOrDefault( "amount", 0 )
-                    .toString() );
+            BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
             if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
                 memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
                 return true;
@@ -123,9 +119,7 @@ public class Ju8PayProcessor extends AbstractPay {
     @Override
     public String callbackPay( Map<String, Object> requestMap, String realIp ) {
         String  mchOrderNo  = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
-        String               payOrderId           = requestMap
-                .getOrDefault( "payOrderId", "" )
-                .toString();
+        String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
 
         if ( memberRechargeOnline.getStatus() == 1 ) {
