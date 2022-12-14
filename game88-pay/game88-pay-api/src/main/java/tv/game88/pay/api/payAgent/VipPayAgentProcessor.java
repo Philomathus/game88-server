@@ -2,8 +2,10 @@ package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPayAgent;
@@ -14,8 +16,10 @@ import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 @Repository( value = ConstantsPayAgent.VIPPAY + ConstantsPayAgent.PROCESSOR )
@@ -29,12 +33,76 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
     @Override
     public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
                              PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
+        if ( withdrawDetail.getBankId() != 68 ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "此代付无法支持的银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "此代付无法支持的银行类型：" + withdrawDetail.getBankId() );
+        }
+        SortedMap<String, Object> bodyMap = new TreeMap<>();
+        bodyMap.put( "merchantNo", payAgentChannel.getMerId() );
+        bodyMap.put( "withdrawNo", withdrawDetail.getWithdrawOrderNo() );
+        bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
+        bodyMap.put( "walletAddress", withdrawDetail.getBankAccount().trim() );
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
+        bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
+        bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
+
+        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
+
+        log.info( payAgentPlatform.getName()
+                + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+                if ( !CollectionUtils.isEmpty( dataMap ) ) {
+                    log.info( payAgentPlatform.getName() + "订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
+                    int status = Integer.parseInt( dataMap.getOrDefault( "status", "0" ).toString() );
+                    return status == 1 || status == 2;
+                }
+            } else {
+                reqPayAgent.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
+
+                payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            }
+        }
+        log.warn( payAgentPlatform.getName() + "订单提交失败 - orderNo:{}", withdrawDetail.getWithdrawOrderNo() );
         return false;
     }
 
     @Override
     public String callbackPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp ) throws Exception {
-        return null;
+        if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {
+            log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );
+            return "fail";
+        }
+        String sign      = requestMap.remove( "sign" ).toString();
+        String depositNo = requestMap.getOrDefault( "depositNo", "" ).toString();
+        String status    = requestMap.getOrDefault( "status", "" ).toString();
+
+        MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( depositNo );
+        if ( withdrawDetail == null ) {
+            log.error( "提现相关记录丢失 - merOrderNo:{}", depositNo );
+            return "fail";
+        }
+        if ( withdrawDetail.getStatus() == 6 ) {
+            log.error( "已有代付记录 - merOrderNo:{}", depositNo );
+            return "success";
+        }
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( depositNo );
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
+
+        // 去除空值
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
+
+        SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
+
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
+        String mySign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        if ( mySign.equalsIgnoreCase( sign ) ) {
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, "1".equals( status ) );
+            return "success";
+        }
+        return "fail";
     }
 
     @Override

@@ -40,7 +40,8 @@ public class VipPayProcessor extends AbstractPay {
         String sign     = DigestUtils.md5Hex( signTemp ).toUpperCase();
         reqMap.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( reqMap ), reqPayRecharge );
+        Map<String, Object> resultMap = this.sendPostMap(
+                payPlatform.getPayUrl() + "/Api/Common/PayOrder", packageJson( reqMap ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
@@ -70,7 +71,8 @@ public class VipPayProcessor extends AbstractPay {
         String sign    = DigestUtils.md5Hex( tempStr ).toUpperCase();
         params.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
+        Map<String, Object> resultMap = this.sendPostMap(
+                payPlatform.getPayUrl() + "/Api/Common/PayOrder/query", packageJson( params ), null );
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );

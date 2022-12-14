@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
@@ -776,7 +777,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( Objects.isNull( memberCard ) ) {
             return RspBase.businessError( "卡号不存在" );
         }
-        if ( memberCardList.size() > 1 && memberCard.isDv() ) {
+        if ( memberCardList.size() > 1 && BooleanUtils.isTrue( memberCard.getDv() ) ) {
             return RspBase.businessError( "请先解绑副卡" );
         }
         memberCardMapper.deleteById( id );

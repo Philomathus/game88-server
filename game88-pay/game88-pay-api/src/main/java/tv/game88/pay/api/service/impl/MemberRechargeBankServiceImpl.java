@@ -3,6 +3,7 @@ package tv.game88.pay.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,12 +151,9 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             memberCardList.removeIf( rspMemberCard -> "OKPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "OKPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         }
-        if ( configEnvCacheUtil.getConfBool( "is_display_vippay" ) ) {
-            rspWithdrawBank.getSpecialBankInfoMap().put( "VIPPAY", configBankListMapper.findBankIdByNameOrCode( "VIPPAY" ) );
-        } else {
-            memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
-                    || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
-        }
+        // VIPPAY 内嵌,故剔除
+        memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
+                || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspMemberCard memberCard : memberCardList ) {
             if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {
@@ -170,7 +168,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         MemberCard       update     = new MemberCard();
         List<MemberCard> resultList = memberCardMapper.selectMemberCard( memberId );
         for ( MemberCard card : resultList ) {
-            if ( card.isDv() && !Objects.equals( cardId, card.getId() ) ) {
+            if ( BooleanUtils.isTrue( card.getDv() ) && !Objects.equals( cardId, card.getId() ) ) {
                 update.setId( card.getId() );
                 update.setDv( false );
                 memberCardMapper.updateById( update );
@@ -492,6 +490,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         MemberRechargeBank rechargeBank = new MemberRechargeBank();
         MemberCard memberCard = memberCardMapper.selectOne( new QueryWrapper<MemberCard>()
                 .eq( "member_id", platformUser.getId() )
+                .ne( "bank_id", 68 )
                 .select( "real_name", "id" )
                 .last( "limit 1" ) );
         if ( memberCard != null ) {

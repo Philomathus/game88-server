@@ -2,9 +2,11 @@ package tv.game88.core.member.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.apache.ibatis.type.JdbcType;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +30,8 @@ public class MemberCard {
     @Excel( name = "开户地址(选填)" )
     private String  bankAddress;
     @Excel( name = "是否默认" )
-    private boolean dv;
+    @TableField( jdbcType = JdbcType.TINYINT )
+    private Boolean dv;
     @Excel( name = "银行卡归属地" )
     private String  realBankAddress;
 
