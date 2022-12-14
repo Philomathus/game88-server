@@ -18,12 +18,16 @@ import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqVipPayDeposit;
 import tv.game88.pay.api.dto.RspVipPayLogin;
+import tv.game88.pay.api.entity.MemberRechargeOnline;
 import tv.game88.pay.api.entity.PayPlatform;
+import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
 import tv.game88.pay.api.service.VipPayService;
 
 import javax.annotation.Resource;
@@ -40,11 +44,15 @@ import java.util.TreeMap;
 @Log4j2
 public class VipPayServiceImpl implements VipPayService {
     @Resource
-    private MemberCardMapper memberCardMapper;
+    private MemberCardMapper           memberCardMapper;
     @Resource
-    private RestTemplate     restTemplate;
+    private MemberRechargeOnlineMapper memberRechargeOnlineMapper;
     @Resource
-    private PayCacheUtil     payCacheUtil;
+    private RestTemplate               restTemplate;
+    @Resource
+    private ConfigEnvCacheUtil         configEnvCacheUtil;
+    @Resource
+    private PayCacheUtil               payCacheUtil;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
@@ -135,6 +143,26 @@ public class VipPayServiceImpl implements VipPayService {
 
     @Override
     public RspBase<?> vipPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) {
+        if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
+            return RspBase.businessError( "充值金额最低10" );
+        }
+        String orderId = GenerateOrderCacheUtils.me.getOrderId( "P", 2 );
+        // 先保存 MemberRechargeOnline
+        MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
+        memberRechargeOnline.setOrderNo( orderId );
+        memberRechargeOnline.setMemberId( memberId );
+        memberRechargeOnline.setPlatformId( VIPPAY_PAY_PLATFORM_ID );
+        memberRechargeOnline.setMoney( reqVipPayDeposit.getAmount() );
+        memberRechargeOnline.setFirst( false );
+        memberRechargeOnline.setPayTime( LocalDateTime.now() );
+        memberRechargeOnline.setStatus( -1 );
+        memberRechargeOnline.setRate( configEnvCacheUtil.getConfBd( "vippay_rate" ) );
+        memberRechargeOnline.setUpdateTime( memberRechargeOnline.getPayTime() );
+        int i = memberRechargeOnlineMapper.insert( memberRechargeOnline );
+        if ( i <= 0 ) {
+            return RspBase.businessError( "新建充值订单失败,请重试" );
+        }
+
         return null;
     }
 }
