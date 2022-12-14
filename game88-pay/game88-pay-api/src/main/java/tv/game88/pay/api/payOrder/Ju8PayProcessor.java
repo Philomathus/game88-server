@@ -64,8 +64,7 @@ public class Ju8PayProcessor extends AbstractPay {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String code = resultMap.getOrDefault( "retCode", "" ).toString();
             if ( "0".equals( code ) ) {
-                Map urlsMap = ( Map ) resultMap.get( "payParams" );
-                return urlsMap.get( "payUrl" ).toString();
+                return resultMap.get( "payUrl" ).toString();
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
