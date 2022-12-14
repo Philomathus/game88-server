@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.game.api.service.GameDataService;
+import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -16,10 +17,10 @@ public class beatTest {
     @Test
     public void beatGameCodeAgent() {
         LocalDateTime endDay  = LocalDateTime.now();
-        LocalDateTime starDay = endDay.minusMinutes( 2 );
+        LocalDateTime starDay = endDay.minusHours( 4 );
         String        begin   = LocalDateTimeUtils.format( starDay );
         String        end     = LocalDateTimeUtils.format( endDay );
-        gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
+        gameDataService.beatGameCodeAgent( begin, begin, end, null, EnumGameCategory.KAIXUAN );
     }
 
     @Test

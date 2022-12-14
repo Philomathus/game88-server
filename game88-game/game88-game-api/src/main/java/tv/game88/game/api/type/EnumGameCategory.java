@@ -61,10 +61,10 @@ public enum EnumGameCategory {
             case SHABA -> List.of( 12 );
             case ICG -> List.of( 13 );
             case MEITIAN -> List.of( 14 );
+            case KAIXUAN -> List.of( 15 );
             case NEWWORLD -> List.of( 17 );
             case BBIN -> List.of( 8, 9, 10, 11 );
             case KAIYUAN -> List.of( 50 );
-            case KAIXUAN -> List.of( 51 );
             case LEYOU -> List.of( 52 );
         };
     }
@@ -78,10 +78,10 @@ public enum EnumGameCategory {
             case 12 -> SHABA;
             case 13 -> ICG;
             case 14 -> MEITIAN;
+            case 15 -> KAIXUAN;
             case 17 -> NEWWORLD;
             case 8, 9, 10, 11 -> BBIN;
             case 50 -> KAIYUAN;
-            case 51 -> KAIXUAN;
             case 52 -> LEYOU;
             default -> null;
         };
