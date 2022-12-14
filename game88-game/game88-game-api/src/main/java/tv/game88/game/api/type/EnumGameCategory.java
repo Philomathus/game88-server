@@ -20,6 +20,7 @@ public enum EnumGameCategory {
     ICG( ConstantsGame.ICG, "ICG电子" ),
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
     KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
+    KAIXUAN_X( ConstantsGame.KAIXUAN_X, "凯旋棋牌X" ),
     NEWWORLD( ConstantsGame.NEWWORLD, "新世界棋牌" ),
     BBIN( ConstantsGame.BBIN, "BBIN电子" ),
     LEYOU( ConstantsGame.LE_YOU, "乐游棋牌" ),
@@ -65,6 +66,7 @@ public enum EnumGameCategory {
             case NEWWORLD -> List.of( 17 );
             case BBIN -> List.of( 8, 9, 10, 11 );
             case KAIYUAN -> List.of( 50 );
+            case KAIXUAN_X -> List.of( 51 );
             case LEYOU -> List.of( 52 );
         };
     }
@@ -82,6 +84,7 @@ public enum EnumGameCategory {
             case 17 -> NEWWORLD;
             case 8, 9, 10, 11 -> BBIN;
             case 50 -> KAIYUAN;
+            case 51 -> KAIXUAN_X;
             case 52 -> LEYOU;
             default -> null;
         };
