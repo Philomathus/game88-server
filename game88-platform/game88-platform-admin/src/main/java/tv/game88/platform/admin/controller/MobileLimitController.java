@@ -31,7 +31,7 @@ public class MobileLimitController extends BaseController {
     /**
      * 查询列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:mobileLimit:list')" )
+    @PreAuthorize( "@ss.hasPermi('member:limit:list')" )
     @GetMapping( "/list" )
     public RspBase<List<MobileLimit>> list( MobileLimit mobileLimit ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -43,7 +43,7 @@ public class MobileLimitController extends BaseController {
     /**
      * 导出列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:mobileLimit:export')" )
+    @PreAuthorize( "@ss.hasPermi('member:limit:export')" )
     @Log( title = "限制手机号注册", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( MobileLimit mobileLimit, HttpServletResponse response ) {
@@ -54,7 +54,7 @@ public class MobileLimitController extends BaseController {
     /**
      * 新增
      */
-    @PreAuthorize( "@ss.hasPermi('member:mobileLimit:add')" )
+    @PreAuthorize( "@ss.hasPermi('member:limit:add')" )
     @Log( title = "限制手机号注册", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody MobileLimit mobileLimit ) {
@@ -64,7 +64,7 @@ public class MobileLimitController extends BaseController {
     /**
      * 删除
      */
-    @PreAuthorize( "@ss.hasPermi('member:mobileLimit:remove')" )
+    @PreAuthorize( "@ss.hasPermi('member:limit:remove')" )
     @Log( title = "限制手机号注册", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{mobiles}" )
     public RspBase<?> remove( @PathVariable String[] mobiles ) {
