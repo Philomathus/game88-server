@@ -5,10 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
@@ -36,11 +32,9 @@ public class Ju8PayProcessor extends AbstractPay {
     }
 
     @Override
-    @SuppressWarnings( "rawtypes" )
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
-        params.put( "appId", payPlatform.getAppId() );
         params.put( "productId", Integer.parseInt( payChannel.getChannelCode() ) );
         params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
         params.put( "amount", reqPayRecharge
@@ -51,7 +45,6 @@ public class Ju8PayProcessor extends AbstractPay {
         params.put( "currency", "CNY" );
         params.put( "clientIp", reqPayRecharge.getRealIp() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
-        params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
         params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "subject", "subject" );
         params.put( "body", "body" );
@@ -59,7 +52,7 @@ public class Ju8PayProcessor extends AbstractPay {
 
         String tempStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( tempStr );
-        String sign    = DigestUtils.md5Hex( tempStr ).toUpperCase();
+        String sign = DigestUtils.md5Hex( tempStr ).toUpperCase();
         params.put( "sign", sign );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
@@ -82,35 +75,28 @@ public class Ju8PayProcessor extends AbstractPay {
 
     @Override
     public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
-        SortedMap<String, String> params = new TreeMap<>();
+        SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
+        params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "version", "1.0" );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
-        params.put( "sign", sign );
+        params.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.setAll( params );
-
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( payPlatform.getQueryUrl() )
-                .queryParams( requestMap )
-                .build();
-
-        Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
 
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
-        String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
-        if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( retCode ) ) {
-            BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
-            if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
-                memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
-                return true;
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "0".equals( resultMap.getOrDefault( "retCode", "" ).toString() ) ) {
+                int status = Integer.parseInt( resultMap.getOrDefault( "status", -1 ).toString() );
+                if ( status == 2 || status == 3 ) {
+                    BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
+                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
+                    return true;
+                }
             }
         }
         return false;
@@ -118,7 +104,7 @@ public class Ju8PayProcessor extends AbstractPay {
 
     @Override
     public String callbackPay( Map<String, Object> requestMap, String realIp ) {
-        String  mchOrderNo  = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
+        String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
         String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
 
@@ -141,34 +127,23 @@ public class Ju8PayProcessor extends AbstractPay {
             return "fail";
         }
 
-        String sign = requestMap
-                .remove( "sign" )
-                .toString();
+        String sign = requestMap.remove( "sign" ).toString();
         // 去除空值
-        requestMap
-                .entrySet()
-                .removeIf( me -> me.getValue() == null || StringUtils.isBlank( me
-                        .getValue()
-                        .toString() ) );
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        log.warn( signStr );
-        String rel = DigestUtils
-                .md5Hex( signStr )
-                .toUpperCase();
-        log.warn( rel + ":" + sign );
+        String rel     = DigestUtils.md5Hex( signStr ).toUpperCase();
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
         if ( rel.equalsIgnoreCase( sign ) ) {
-            String status = requestMap
-                    .getOrDefault( "status", 0 )
-                    .toString();
+            String status = requestMap.getOrDefault( "status", 0 ).toString();
             if ( ( "2".equals( status ) || "3".equals( status ) )
                     && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( payOrderId );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
+                        payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
