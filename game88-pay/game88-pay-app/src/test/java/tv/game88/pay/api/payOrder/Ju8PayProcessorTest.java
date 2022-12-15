@@ -67,8 +67,7 @@ class Ju8PayProcessorTest {
     @Test
     void orderPaySuccess() {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
-                .thenReturn(Map.of("retCode", "0", "payParams",
-                        Map.of("payUrl", "http://localhost:8080/success")));
+                .thenReturn(Map.of("retCode", "0", "payUrl", "http://localhost:8080/success"));
         String result = mockJu8PayProcessor.orderPay(createPayChannel(), createPayPlatform(), createReqPayRecharge());
         //return success pay url
         assertEquals("http://localhost:8080/success", result);
@@ -87,7 +86,7 @@ class Ju8PayProcessorTest {
     @Test
     void queryPaySuccess() {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
-                .thenReturn(Map.of("retCode", "0", "amount", "12345.98"));
+                .thenReturn(Map.of("retCode", "0", "amount", "12345.98", "status", "2"));
         MemberRechargeOnline memberRechargeOnline = createMemberRechargeOnline(1);
         mockJu8PayProcessor.queryPay(memberRechargeOnline, createPayPlatform(), createPayChannel());
         //set real money
@@ -118,7 +117,7 @@ class Ju8PayProcessorTest {
         when(payCacheUtil.getPayPlatform(anyLong())).thenReturn(platform);
         when(payCacheUtil.getPayChannel(anyLong())).thenReturn(payChannel);
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
-                .thenReturn(Map.of("retCode", "0", "amount", "12345.98"));
+                .thenReturn(Map.of("retCode", "0", "amount", "12345.98", "status", "2"));
         when(payService.updatePayJourStatus(any(), any(), any())).thenReturn("success");
 
         String result = mockJu8PayProcessor.callbackPay(requestMap, "127.0.0.1");
