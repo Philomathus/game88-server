@@ -179,7 +179,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public RspBase<?> receiveQuestReward( Long questId, String memberId ) {
         if ( !redisUtils.lock( "receiveQuestReward" + memberId, 5 ) ) {
-            throw new BusinessException( "请勿重复提交" );
+            return RspBase.businessError( "请勿重复提交" );
         }
         MemberQuest memberQuest = new QueryChainWrapper<>( memberQuestMapper )
                 .eq( "member_id", memberId )
@@ -209,6 +209,6 @@ public class ActivityServiceImpl implements ActivityService {
             return RspBase.ok( "领取成功", questInfo.getReward() );
         }
         redisUtils.unLock( "receiveQuestReward" + memberId );
-        throw new BusinessException( "领取失败,请重试" );
+        return RspBase.businessError( "领取失败,请重试" );
     }
 }
