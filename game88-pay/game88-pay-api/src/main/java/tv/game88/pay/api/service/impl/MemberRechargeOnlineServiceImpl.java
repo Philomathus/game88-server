@@ -9,8 +9,10 @@ import tv.game88.pay.api.dto.ReqMemberRechargeOnline;
 import tv.game88.pay.api.dto.RspPayChannelName;
 import tv.game88.pay.api.dto.RspRechargeOnline;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
+import tv.game88.pay.api.entity.PayPlatform;
 import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
 import tv.game88.pay.api.mapper.PayChannelMapper;
+import tv.game88.pay.api.mapper.PayPlatformMapper;
 import tv.game88.pay.api.service.MemberRechargeOnlineService;
 import tv.game88.pay.api.service.PayService;
 
@@ -23,9 +25,11 @@ import java.util.stream.Collectors;
 @Service
 public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeOnlineMapper, MemberRechargeOnline> implements MemberRechargeOnlineService {
     @Resource
-    private PayService       payService;
+    private PayService        payService;
     @Resource
-    private PayChannelMapper payChannelMapper;
+    private PayChannelMapper  payChannelMapper;
+    @Resource
+    private PayPlatformMapper payPlatformMapper;
 
     @Override
     public List<MemberRechargeOnline> selectMemberRechargeOnlineList( ReqMemberRechargeOnline req ) {
@@ -40,6 +44,10 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
                     .stream()
                     .map( MemberRechargeOnline::getChannelId )
                     .collect( Collectors.toSet() ) );
+            List<PayPlatform> payPlatforms = payPlatformMapper.selectBatchIds( memberRechargeOnlines
+                    .stream()
+                    .map( MemberRechargeOnline::getPlatformId )
+                    .collect( Collectors.toSet() ) );
             for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlines ) {
                 if ( BooleanUtils.isTrue( memberRechargeOnline.getPatchOrder() ) && memberRechargeOnline.getStatus() == 1 ) {
                     memberRechargeOnline.setStatus( 2 );
@@ -49,6 +57,11 @@ public class MemberRechargeOnlineServiceImpl extends ServiceImpl<MemberRechargeO
                         memberRechargeOnline.setChannelName( payChannelName.getChannelName() );
                         memberRechargeOnline.setPlatformName( payChannelName.getPlatformName() );
                         memberRechargeOnline.setRate( payChannelName.getPayRate() );
+                    }
+                }
+                for ( PayPlatform payPlatform : payPlatforms ) {
+                    if ( Objects.equals( memberRechargeOnline.getPlatformId(), payPlatform.getId() ) ) {
+                        memberRechargeOnline.setPlatformName( payPlatform.getName() );
                     }
                 }
             }
