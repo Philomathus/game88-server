@@ -37,9 +37,9 @@ public class LeDuoPayProcessor extends AbstractPay {
                 .setScale( 0, RoundingMode.HALF_UP )
                 .intValue() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
-        if ( "8016".equals( payChannel.getChannelCode() ) ) {
+        /*if ( "1025".equals( payChannel.getChannelCode() ) ) {
             params.put( "param2", reqPayRecharge.getUserId() );
-        }
+        }*/
 
         Object[] key = params.keySet().toArray();
         Arrays.sort( key );
@@ -150,9 +150,9 @@ public class LeDuoPayProcessor extends AbstractPay {
         signMap.put( "paySuccTime", paySuccTime );
         signMap.put( "productId", productId );
 
-        if ( "8016".equals( payChannel.getChannelCode() ) ) {
+        /*if ( "1025".equals( payChannel.getChannelCode() ) ) {
             signMap.put( "param2", requestMap.get( "param2" ) );
-        }
+        }*/
 
         //对参数名按照ASCII升序排序
         Object[] key = signMap.keySet().toArray();
