@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.member.enums.EnumMoney;
@@ -38,8 +37,6 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class ActivityServiceImpl implements ActivityService {
-    @Resource
-    private RedisUtils              redisUtils;
     @Resource
     private ActivityCacheUtil       activityCacheUtil;
     @Resource
@@ -178,9 +175,6 @@ public class ActivityServiceImpl implements ActivityService {
     @Transactional( rollbackFor = Exception.class )
     @Override
     public RspBase<?> receiveQuestReward( Long questId, String memberId ) {
-        if ( !redisUtils.lock( "receiveQuestReward" + memberId, 5 ) ) {
-            return RspBase.businessError( "请勿重复提交" );
-        }
         MemberQuest memberQuest = new QueryChainWrapper<>( memberQuestMapper )
                 .eq( "member_id", memberId )
                 .eq( "quest_id", questId )
@@ -208,7 +202,6 @@ public class ActivityServiceImpl implements ActivityService {
                     orderId );
             return RspBase.ok( "领取成功", questInfo.getReward() );
         }
-        redisUtils.unLock( "receiveQuestReward" + memberId );
         return RspBase.businessError( "领取失败,请重试" );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
@@ -24,6 +25,8 @@ import java.util.List;
 public class ActivityController extends BaseController {
     @Resource
     private ActivityService activityService;
+    @Resource
+    private RedisUtils      redisUtils;
 
     @Operation( summary = "获取活动分类列表" )
     @PostMapping( "/getActivityTypes" )
@@ -55,6 +58,10 @@ public class ActivityController extends BaseController {
     @Operation( summary = "领取任务奖励" )
     @PostMapping( "/receiveQuestReward" )
     public RspBase<?> receiveQuestReward( @Validated @RequestBody ReqActivityType req ) {
-        return activityService.receiveQuestReward( req.getId(), MemberSecurityUtils.getUserId() );
+        String memberId = MemberSecurityUtils.getUserId();
+        if ( !redisUtils.lock( "receiveQuestReward" + memberId + "-" + req.getId(), 3 ) ) {
+            return RspBase.businessError( "请勿重复提交" );
+        }
+        return activityService.receiveQuestReward( req.getId(), memberId );
     }
 }
