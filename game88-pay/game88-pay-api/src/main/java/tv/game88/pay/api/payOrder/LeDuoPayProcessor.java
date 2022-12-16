@@ -94,7 +94,7 @@ public class LeDuoPayProcessor extends AbstractPay {
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( reqMap ), null );
 
-        log.warn( "金鑫支付查询结果:{}", JsonUtil.object2Json( resultMap ) );
+        log.warn( payPlatform.getName() + "查询结果:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             int status = Integer.parseInt( resultMap.get( "status" ).toString() );
             if ( status == 2 || status == 3 ) {
