@@ -105,6 +105,9 @@ public class VipPayProcessor extends AbstractPay {
             return "FAIL";
         }
 
+        // 去除空值
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
+
         SortedMap<String, Object> treeMap = new TreeMap<>( requestMap );
 
         String sign    = ( String ) treeMap.remove( "sign" );
