@@ -15,8 +15,8 @@ import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
-import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.manager.MemberRecommendManager;
+import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
@@ -184,7 +184,9 @@ public class PayServiceImpl implements PayService {
         //支付通道优惠比例
         BigDecimal chargeGive = null;
         PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
-        if ( StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
+        if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
+            chargeGive = memberRechargeOnline.getRate().multiply( payJourMoney ).setScale( 2, RoundingMode.HALF_UP );
+        } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
             chargeGive = new BigDecimal( payChannel.getDiscountBill() )
                     .multiply( payJourMoney )
                     .setScale( 2, RoundingMode.HALF_UP );
