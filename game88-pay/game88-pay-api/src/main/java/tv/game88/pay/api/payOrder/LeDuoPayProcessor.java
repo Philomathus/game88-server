@@ -41,18 +41,8 @@ public class LeDuoPayProcessor extends AbstractPay {
             params.put( "param2", reqPayRecharge.getUserId() );
         }*/
 
-        Object[] key = params.keySet().toArray();
-        Arrays.sort( key );
-        //生成加密原串
-        StringBuilder res = new StringBuilder();
-        for ( Object o : key ) {
-            res.append( o ).append( "=" ).append( params.get( o ) ).append( "&" );
-        }
-        //再拼接秘钥
-        String src = res.append( "key=" ).append( AESCoder.decrypt( payPlatform.getSignMd5() ) ).toString();
-        //MD5加密并转为大写
-        String sign = DigestUtils.md5Hex( src ).toUpperCase();
-        params.put( "sign", sign );
+        String src = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        params.put( "sign", DigestUtils.md5Hex( src ).toUpperCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
@@ -78,19 +68,8 @@ public class LeDuoPayProcessor extends AbstractPay {
         reqMap.put( "mchId", payPlatform.getMerId() );
         reqMap.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
 
-        //对参数名按照ASCII升序排序
-        Object[] key = reqMap.keySet().toArray();
-        Arrays.sort( key );
-        //生成加密原串
-        StringBuilder res = new StringBuilder();
-        for ( Object o : key ) {
-            res.append( o ).append( "=" ).append( reqMap.get( o ) ).append( "&" );
-        }
-        //再拼接秘钥
-        String src = res.append( "key=" ).append( AESCoder.decrypt( payPlatform.getSignMd5() ) ).toString();
-        //MD5加密并转为大写
-        String sign = DigestUtils.md5Hex( src ).toUpperCase();
-        reqMap.put( "sign", sign );
+        String src = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        reqMap.put( "sign", DigestUtils.md5Hex( src ).toUpperCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( reqMap ), null );
 
@@ -154,16 +133,7 @@ public class LeDuoPayProcessor extends AbstractPay {
             signMap.put( "param2", requestMap.get( "param2" ) );
         }*/
 
-        //对参数名按照ASCII升序排序
-        Object[] key = signMap.keySet().toArray();
-        Arrays.sort( key );
-        //生成加密原串
-        StringBuilder res = new StringBuilder();
-        for ( Object o : key ) {
-            res.append( o ).append( "=" ).append( signMap.get( o ) ).append( "&" );
-        }
-        //再拼接秘钥
-        String src = res.append( "key=" ).append( AESCoder.decrypt( payPlatform.getSignMd5() ) ).toString();
+        String src = this.assemblyUrl( signMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         //MD5加密并转为大写
         String rel = DigestUtils.md5Hex( src ).toUpperCase();
 
