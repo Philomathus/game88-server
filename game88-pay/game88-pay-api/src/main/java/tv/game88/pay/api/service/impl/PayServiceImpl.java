@@ -185,7 +185,10 @@ public class PayServiceImpl implements PayService {
         BigDecimal chargeGive = null;
         PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
         if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
-            chargeGive = memberRechargeOnline.getRate().multiply( payJourMoney ).setScale( 2, RoundingMode.HALF_UP );
+            chargeGive = configEnvCacheUtil
+                    .getConfBd( "vippay_rate" )
+                    .multiply( payJourMoney )
+                    .setScale( 2, RoundingMode.HALF_UP );
         } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
             chargeGive = new BigDecimal( payChannel.getDiscountBill() )
                     .multiply( payJourMoney )
