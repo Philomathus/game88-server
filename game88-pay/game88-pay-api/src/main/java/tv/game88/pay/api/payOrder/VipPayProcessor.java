@@ -98,15 +98,10 @@ public class VipPayProcessor extends AbstractPay {
             return "success";
         }
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( memberRechargeOnline.getPlatformId() );
-        PayChannel  payChannel  = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
         if ( this.verifyIP( requestMap, realIp, payPlatform ) ) {
             return "FAIL";
         }
         if ( this.diffPayTime12Hour( memberRechargeOnline.getPayTime(), merOrderNo ) ) {
-            return "FAIL";
-        }
-        if ( !payChannel.getCanCallback() ) {
-            log.warn( "平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), merOrderNo );
             return "FAIL";
         }
 
@@ -119,13 +114,13 @@ public class VipPayProcessor extends AbstractPay {
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + mySign );
         if ( StringUtils.equals( sign, mySign ) ) {
             String status = requestMap.getOrDefault( "status", "-1" ).toString();
-            if ( StringUtils.equals( "1", status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
+            if ( StringUtils.equals( "1", status ) && this.queryPay( memberRechargeOnline, payPlatform, null ) ) {
                 BigDecimal pay_amount = new BigDecimal( requestMap.getOrDefault( "amount", 0 ).toString() );
                 memberRechargeOnline.setRealMoney( pay_amount.setScale( 2, RoundingMode.HALF_UP ) );
                 String trade_no = requestMap.getOrDefault( "platformOrderId", "" ).toString();
                 memberRechargeOnline.setUpperOrderNo( trade_no );
                 return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "FAIL" },
-                        payPlatform.getName() + "-" + payChannel.getName() );
+                        payPlatform.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
