@@ -32,8 +32,9 @@ public class MemberQuestManager {
             memberQuestMapper.insert( newMemberQuest );
         } else if ( memberQuest.getStatus() == 0 ) {
             MemberQuest update = new MemberQuest();
+            update.setId( memberQuestId );
             update.setCurNum( memberQuest.getCurNum() + add );
-            if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
+            if ( update.getCurNum() >= confQuest.getTarget() ) {
                 update.setCurNum( confQuest.getTarget() );
                 update.setStatus( 1 );
             }

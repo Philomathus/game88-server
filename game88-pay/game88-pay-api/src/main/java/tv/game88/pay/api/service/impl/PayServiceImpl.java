@@ -234,7 +234,7 @@ public class PayServiceImpl implements PayService {
             //vipPay充值活动任务
             List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                     .eq( "effect", 1 )
-                    .gt( "game_type_id", -2 ) );
+                    .eq( "game_type_id", -2 ) );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney.intValue(), confQuest );
             }

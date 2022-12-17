@@ -379,7 +379,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         //公司入款充值活动任务
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                 .eq( "effect", 1 )
-                .gt( "game_type_id", -1 ) );
+                .eq( "game_type_id", -1 ) );
         for ( ActivityQuestInfo confQuest : listConfQuest ) {
             memberQuestManager.memberQuestProcess( memberInfo.getId(), memberRechargeBank
                     .getRechargeMoney()
