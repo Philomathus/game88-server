@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.member.enums.EnumMoney;
@@ -27,6 +28,7 @@ import tv.game88.platform.api.entity.ActivityType;
 import tv.game88.platform.api.service.ActivityService;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -196,8 +198,9 @@ public class ActivityServiceImpl implements ActivityService {
         update.setId( memberQuest.getId() );
         update.setStatus( 2 );
         if ( memberQuestMapper.updateById( update ) > 0 ) {
-            String name    = questInfo.getContent() + "奖金:" + questInfo.getReward().toString();
-            String orderId = "memberQuest-" + memberQuest.getId() + "-" + memberId;
+            String name = questInfo.getContent() + "奖金:" + questInfo.getReward().toString();
+            String orderId = "memberQuest-" + memberQuest.getId() + "-" + memberId + "-"
+                    + LocalDateTimeUtils.format( LocalDate.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER );
             memberMoneyManager.addMemberMoney( memberId, questInfo.getReward(), EnumMoney.QUEST_BONUS, 1, name, orderId,
                     orderId );
             return RspBase.ok( "领取成功", questInfo.getReward() );
