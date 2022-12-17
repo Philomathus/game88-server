@@ -18,6 +18,9 @@ import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.quest.entity.ActivityQuestInfo;
+import tv.game88.core.quest.manager.MemberQuestManager;
+import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
 import tv.game88.pay.api.cache.PayCacheUtil;
@@ -56,6 +59,10 @@ public class PayServiceImpl implements PayService {
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
     @Resource
     private MemberRecommendManager              memberRecommendManager;
+    @Resource
+    private MemberQuestManager                  memberQuestManager;
+    @Resource
+    private ActivityQuestInfoMapper             questInfoMapper;
 
     @Resource
     private PayProcessorFactoryUtil payProcessorFactoryUtil;
@@ -222,6 +229,17 @@ public class PayServiceImpl implements PayService {
                 mark + "-充值:" + payJourMoney, memberRechargeOnline.getOrderNo(), memberRechargeOnline.getOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
+
+        if ( memberRechargeOnline.getPlatformId() == 24L ) {
+            //vipPay充值活动任务
+            List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
+                    .eq( "effect", 1 )
+                    .gt( "game_type_id", -2 ) );
+            for ( ActivityQuestInfo confQuest : listConfQuest ) {
+                memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney.intValue(), confQuest );
+            }
+        }
+
         memberRechargeOnlineMapper.updateById( updatePayJour );
 
         log.warn( "会员线上充值上分成功 - orderNo:{}", memberRechargeOnline.getOrderNo() );

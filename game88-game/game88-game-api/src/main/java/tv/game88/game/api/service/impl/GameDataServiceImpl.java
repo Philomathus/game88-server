@@ -17,9 +17,8 @@ import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
-import tv.game88.core.quest.entity.MemberQuest;
+import tv.game88.core.quest.manager.MemberQuestManager;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
-import tv.game88.core.quest.mapper.MemberQuestMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.RspGameDataLog;
 import tv.game88.game.api.dto.RspGameInfo;
@@ -45,13 +44,13 @@ public class GameDataServiceImpl implements GameDataService {
     @Resource
     private MemberMoneyManager      memberMoneyManager;
     @Resource
+    private MemberQuestManager      memberQuestManager;
+    @Resource
     private MemberBcodeMapper       memberBcodeMapper;
     @Resource
     private MemberInfoMapper        memberInfoMapper;
     @Resource
     private ActivityQuestInfoMapper questInfoMapper;
-    @Resource
-    private MemberQuestMapper       memberQuestMapper;
     @Resource
     private LotteryBetMapper        lotteryBetMapper;
     @Resource
@@ -270,8 +269,9 @@ public class GameDataServiceImpl implements GameDataService {
 
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
-        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>().eq( "effect",
-                1 ) );
+        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
+                .eq( "effect", 1 )
+                .gt( "game_type_id", 0 ) );
 
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
@@ -282,35 +282,20 @@ public class GameDataServiceImpl implements GameDataService {
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
+                if ( gameTypeId == 4 ) {// 4 是电子游戏
+                    // MG UPG 记入电子游戏任务
+                    RspGameInfo rspGameInfoMG = new RspGameInfo();
+                    rspGameInfoMG.setPlatformId( 9 );
+                    effectInfoList.add( rspGameInfoMG );
+                    RspGameInfo rspGameInfoUPG = new RspGameInfo();
+                    rspGameInfoUPG.setPlatformId( 11 );
+                    effectInfoList.add( rspGameInfoUPG );
+                }
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
                     if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
                         continue;
                     }
-                    MemberQuest memberQuest = memberQuestMapper.selectById( data
-                            .getAccount()
-                            .concat( "_" )
-                            .concat( confQuest.getId().toString() ) );
-                    if ( memberQuest == null ) {
-                        memberQuest = new MemberQuest();
-                        memberQuest.setMemberId( data.getAccount() );
-                        memberQuest.setQuestId( confQuest.getId() );
-                        memberQuest.setId( data.getAccount().concat( "_" ).concat( confQuest.getId().toString() ) );
-                        memberQuest.setStatus( 0 );
-                        memberQuest.setCurNum( add );
-                        if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
-                            memberQuest.setCurNum( confQuest.getTarget() );
-                            memberQuest.setStatus( 1 );
-                        }
-                        memberQuest.setTaskMode( confQuest.getTaskMode() );
-                        memberQuestMapper.insert( memberQuest );
-                    } else if ( memberQuest.getStatus() == 0 ) {
-                        memberQuest.setCurNum( memberQuest.getCurNum() + add );
-                        if ( memberQuest.getCurNum() >= confQuest.getTarget() ) {
-                            memberQuest.setCurNum( confQuest.getTarget() );
-                            memberQuest.setStatus( 1 );
-                        }
-                        memberQuestMapper.updateById( memberQuest );
-                    }
+                    memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
         }
