@@ -45,7 +45,6 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "walletAddress", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        log.warn( signStr );
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
         log.warn( JsonUtil.object2Json( bodyMap ) );
