@@ -106,7 +106,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             String multipleCode = configEnvCacheUtil.getConf( "multiple_code" );
             for ( MemberWithdrawDetail me : withdrawDetails ) {
                 //入款人姓名不为空，并且入款人不包含提现人，整条数据标红警告
-                if ( Strings.isNotBlank( me.getRechargeUserName() ) && !me
+                if ( StringUtils.isNotBlank( me.getBankUserName() ) && Strings.isNotBlank( me.getRechargeUserName() ) && !me
                         .getRechargeUserName()
                         .contains( me.getBankUserName() ) ) {
                     me.setRechargeUserNameStatus( 1 );//等于1,数据警告
