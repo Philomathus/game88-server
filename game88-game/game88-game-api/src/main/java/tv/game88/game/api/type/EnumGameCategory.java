@@ -24,6 +24,8 @@ public enum EnumGameCategory {
     NEWWORLD( ConstantsGame.NEWWORLD, "新世界棋牌" ),
     BBIN( ConstantsGame.BBIN, "BBIN电子" ),
     LEYOU( ConstantsGame.LE_YOU, "乐游棋牌" ),
+    GAMING_365( ConstantsGame.GAMING_365, "365棋牌" ),
+    BOLE( ConstantsGame.BOLE, "博乐棋牌" ),
     ;
 
     private final String type;
@@ -68,6 +70,8 @@ public enum EnumGameCategory {
             case KAIYUAN -> List.of( 50 );
             case KAIXUAN_X -> List.of( 51 );
             case LEYOU -> List.of( 52 );
+            case GAMING_365 -> List.of( 53 );
+            case BOLE -> List.of( 54 );
         };
     }
 
@@ -86,6 +90,8 @@ public enum EnumGameCategory {
             case 50 -> KAIYUAN;
             case 51 -> KAIXUAN_X;
             case 52 -> LEYOU;
+            case 53 -> GAMING_365;
+            case 54 -> BOLE;
             default -> null;
         };
     }
