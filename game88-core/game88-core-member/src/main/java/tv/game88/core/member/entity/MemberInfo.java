@@ -9,10 +9,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tv.game88.common.utils.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -163,6 +166,18 @@ public class MemberInfo implements Serializable {
     @TableField( exist = false )
     private String cardRealName;
 
+    /**
+     * 会员编号
+     */
+    @Excel( name = "银行卡号" )
+    private String bankAccount;
+
+    /**
+     * 账号
+     */
+    @Excel( name = "账号" )
+    private String userName;
+
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   searchValue;
@@ -175,4 +190,23 @@ public class MemberInfo implements Serializable {
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   selectEndDate;
+
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Set<String> searchValues;
+
+    public Set<String> getSearchValues() {
+        if ( StringUtils.isNotBlank( searchValue ) ) {
+            String[]    strings        = searchValue.split( "," );
+            Set<String> searchValueSet = new HashSet<>();
+            for ( String s : strings ) {
+                if ( StringUtils.isNotBlank( s ) ) {
+                    searchValueSet.add( s.trim() );
+                }
+            }
+            return searchValueSet;
+        }
+        return searchValues;
+    }
+
 }

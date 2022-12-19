@@ -141,6 +141,31 @@ public class PayTypeController extends BaseController {
         return toResult( isUpdate );
     }
 
+    @PreAuthorize( "@ss.hasPermi('pay:payType:edit')" )
+    @Log( title = "支付类型", businessType = BusinessType.UPDATE )
+    @PutMapping("/editText")
+    public RspBase<?> editText( @RequestBody PayType payType ) {
+        payType.setType( null );
+        payType.setUpdateBy( SecurityUtils.getUsername() );
+        payType.setUpdateTime( LocalDateTime.now() );
+        payType.setEffect( null );
+        payType.setRecommend( null );
+        payType.setIconUrl(null);
+        if ( payType.getOpenLevelMin() == null ) {
+            payType.setOpenLevelMin( 0 );
+        }
+        if ( payType.getOpenLevelMax() == null ) {
+            payType.setOpenLevelMax( 50 );
+        }
+        boolean isUpdate = payTypeService.updateById( payType );
+        if ( isUpdate ) {
+            payCacheUtil.clearPayType( payType.getId() );
+        }
+        return toResult( isUpdate );
+    }
+
+
+
     /**
      * 删除支付类型
      */
