@@ -77,18 +77,14 @@ public class GameServiceImpl implements GameService {
     public RspGameTypes getGameTypes() {
         List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
         for ( RspGameType rspGameType : gameTypeList ) {
-            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType
-                    .getIcon()
-                    .startsWith( "http" ) ) {
+            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
             }
         }
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
-            Long typeId = gameTypeList
-                    .get( 0 )
-                    .getId();
+            Long typeId = gameTypeList.get( 0 ).getId();
             rspGameTypes.setRspGameInfos( gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
@@ -224,9 +220,7 @@ public class GameServiceImpl implements GameService {
     public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
         Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
                 .eq( "member_id", memberId )
-                .ge( "create_time", LocalDateTime
-                        .now()
-                        .minusMonths( 1 ) )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
                 .select( "platform_id", "order_id" )
                 .list()
                 .stream()
@@ -260,17 +254,13 @@ public class GameServiceImpl implements GameService {
             } );
         }
         List<Future<RspGameMoney>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
-        List<RspGameMoney> resultList = futureList
-                .stream()
-                .map( t -> {
-                    try {
-                        return t.get();
-                    } catch ( InterruptedException | ExecutionException e ) {
-                        throw new IllegalStateException( e );
-                    }
-                } )
-                .filter( Objects::nonNull )
-                .collect( Collectors.toList() );
+        List<RspGameMoney> resultList = futureList.stream().map( t -> {
+            try {
+                return t.get();
+            } catch ( InterruptedException | ExecutionException e ) {
+                throw new IllegalStateException( e );
+            }
+        } ).filter( Objects::nonNull ).collect( Collectors.toList() );
         return RspBase.ok( resultList );
     }
 
@@ -306,6 +296,9 @@ public class GameServiceImpl implements GameService {
         // BBIN会员ID只能是英文加数字
         String gameMemberId =
                 gamePlatform.getGameCategory() == EnumGameCategory.BBIN ? profile + "BBIN" + memberId : profile + "_" + memberId;
+        if ( gamePlatform.getGameCategory() == EnumGameCategory.GAMING_365 ) {
+            gameMemberId = gameMemberId.toLowerCase();
+        }
         return ReqJoinGame
                 .builder()
                 .des( AESCoder.decrypt( gamePlatform.getDes() ) )

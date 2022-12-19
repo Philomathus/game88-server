@@ -91,7 +91,7 @@ public class MemberMoneyManager {
         int insertBcode = 1;
         if ( enumMoney.getBcode() ) {
             MemberBcode code = new MemberBcode();
-            code.setIncome( addCount );
+            code.setIncome( codeMult );
             code.setCharge( addCount );
             code.setCreateTime( log.getCreateTime() );
             code.setCur( BigDecimal.ZERO );
