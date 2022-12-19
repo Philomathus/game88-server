@@ -168,6 +168,11 @@
             <if test="selectStartDate != null and selectEndDate != ''">
                 and register_time <![CDATA[ <= ]]> #{selectEndDate}
             </if>
+            <if test="bankAccount != null  and bankAccount != ''">
+                and id in (select member_id
+                from member_card
+                where bank_account = #{bankAccount} or real_name = #{bankAccount})
+            </if>
         </where>
         order by register_time desc
     </select>
