@@ -27,7 +27,7 @@ public class ConfigBankListController extends BaseController {
     @PostMapping( "/bankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
         List<RspConfigBankList> effectList = configBankListCache.getEffectList();
-        effectList.removeIf( r -> Arrays.asList( "GOPAY", "OKPAY", "VIPPAY" ).contains( r.getBankName() ) );
+        effectList.removeIf( r -> Arrays.asList( "GOPAY", "OKPAY", "VIPPAY" ).contains( r.getBankName().toUpperCase() ) );
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspConfigBankList bankList : effectList ) {
             if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
