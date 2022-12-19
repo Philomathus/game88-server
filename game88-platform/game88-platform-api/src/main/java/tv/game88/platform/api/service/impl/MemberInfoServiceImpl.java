@@ -690,7 +690,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( beatNum == null || beatNum.compareTo( BigDecimal.ZERO ) < 1 ) {
                 beatNum = new BigDecimal( 0 );
             }
-            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.intValue(), Mk, null, markorder );
+            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.doubleValue(), Mk, null, markorder );
         } else {
             return RspBase.businessError( "该成员未初始化金额，或者您输入的金额有误" );
         }
