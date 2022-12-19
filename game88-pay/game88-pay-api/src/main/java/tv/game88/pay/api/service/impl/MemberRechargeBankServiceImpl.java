@@ -23,6 +23,9 @@ import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.quest.entity.ActivityQuestInfo;
+import tv.game88.core.quest.manager.MemberQuestManager;
+import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.entity.MemberRechargeBank;
@@ -64,7 +67,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     @Resource
     private MemberMoneyManager                  memberMoneyManager;
     @Resource
+    private MemberQuestManager                  memberQuestManager;
+    @Resource
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
+    @Resource
+    private ActivityQuestInfoMapper             questInfoMapper;
 
     @Resource
     private ConfigEnvCacheUtil configEnvCacheUtil;
@@ -151,9 +158,10 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             memberCardList.removeIf( rspMemberCard -> "OKPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "OKPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         }
-        // VIPPAY 内嵌,故剔除
-        memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
-                || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        if ( !configEnvCacheUtil.getConfBool( "is_display_vippay" ) ) {
+            memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
+                    || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        }
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspMemberCard memberCard : memberCardList ) {
             if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {
@@ -371,6 +379,16 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
 
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeBank.getRechargeMoney() );
+
+        //公司入款充值活动任务
+        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
+                .eq( "effect", 1 )
+                .eq( "game_type_id", -1 ) );
+        for ( ActivityQuestInfo confQuest : listConfQuest ) {
+            memberQuestManager.memberQuestProcess( memberInfo.getId(), memberRechargeBank
+                    .getRechargeMoney()
+                    .intValue(), confQuest );
+        }
 
         redisUtils.unLock( "RechargeBankFinalAudit" + req.getId() );
         int i = this.baseMapper.updateById( update );

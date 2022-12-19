@@ -146,6 +146,13 @@ public class VipPayServiceImpl implements VipPayService {
         if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
             return RspBase.businessError( "充值金额最低10" );
         }
+        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
+                .eq( "member_id", memberId )
+                .eq( "bank_id", VIPPAY_BANK_ID )
+                .one();
+        if ( memberCard == null ) {
+            return RspBase.businessError( "未注册vipPay,请登录后重试" );
+        }
         String orderId = GenerateOrderCacheUtils.me.getOrderId( "P", 2 );
         // 先保存 MemberRechargeOnline
         MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
@@ -156,13 +163,48 @@ public class VipPayServiceImpl implements VipPayService {
         memberRechargeOnline.setFirst( false );
         memberRechargeOnline.setPayTime( LocalDateTime.now() );
         memberRechargeOnline.setStatus( -1 );
-        memberRechargeOnline.setRate( configEnvCacheUtil.getConfBd( "vippay_rate" ) );
+        memberRechargeOnline.setRate( BigDecimal.ZERO );
         memberRechargeOnline.setUpdateTime( memberRechargeOnline.getPayTime() );
         int i = memberRechargeOnlineMapper.insert( memberRechargeOnline );
         if ( i <= 0 ) {
             return RspBase.businessError( "新建充值订单失败,请重试" );
         }
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( VIPPAY_PAY_PLATFORM_ID );
 
-        return null;
+        Map<String, Object> reqMap = new TreeMap<>();
+        reqMap.put( "merchantNo", payPlatform.getMerId() );
+        reqMap.put( "depositNo", orderId );
+        reqMap.put( "account", profile + "_" + memberId );
+        reqMap.put( "amount", reqVipPayDeposit.getAmount() );
+        reqMap.put( "walletAddress", memberCard.getBankAccount().trim() );
+        reqMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
+        String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        requestMap.setAll( reqMap );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
+
+        Map<String, Object> resultMap = restTemplate.execute( payPlatform.getPayUrl()
+                + "/Api/Covert/WalletDeposit", HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+
+        log.warn( JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( result ) ) {
+                return RspBase.ok( "请求成功,请前往vipPay支付中心确认", result.getOrDefault( "redirectUrl", "" ).toString() );
+            }
+        }
+        return RspBase.businessError( "访问vipPay支付中心失败,请重试或者联系客服" );
     }
 }

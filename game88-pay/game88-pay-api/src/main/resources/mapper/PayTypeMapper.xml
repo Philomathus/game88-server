@@ -77,7 +77,7 @@
     <select id="selectCachePayTypeList" resultMap="PayTypeResult">
         <include refid="selectPayTypeVo"/>
         where ((id in (select DISTINCT type_id from pay_channel where effect = 1))
-        or type in (2, 3, 4)) and effect = 1
+        or type in (2, 3, 4, 5)) and effect = 1
         order by sort
     </select>
 

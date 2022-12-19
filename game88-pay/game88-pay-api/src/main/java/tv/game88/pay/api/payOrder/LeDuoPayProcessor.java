@@ -17,19 +17,19 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-@Repository( value = ConstantsPay.JINXIN_PAY + "Processor" )
+@Repository( value = ConstantsPay.LEDUO_PAY + "Processor" )
 @Log4j2
-public class JinXinPayProcessor extends AbstractPay {
+public class LeDuoPayProcessor extends AbstractPay {
     @Override
     public String getName() {
-        return "金鑫支付";
+        return "乐多支付";
     }
 
     @Override
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new HashMap<>();
-        params.put( "mchId", Long.parseLong( payPlatform.getMerId() ) );
-        params.put( "productId", Integer.parseInt( payChannel.getChannelCode() ) );
+        params.put( "mchId", payPlatform.getMerId() );
+        params.put( "productId", payChannel.getChannelCode() );
         params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
         params.put( "amount", reqPayRecharge
                 .getMoney()
@@ -37,9 +37,9 @@ public class JinXinPayProcessor extends AbstractPay {
                 .setScale( 0, RoundingMode.HALF_UP )
                 .intValue() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
-        if ( "8016".equals( payChannel.getChannelCode() ) ) {
+        /*if ( "1025".equals( payChannel.getChannelCode() ) ) {
             params.put( "param2", reqPayRecharge.getUserId() );
-        }
+        }*/
 
         Object[] key = params.keySet().toArray();
         Arrays.sort( key );
@@ -150,9 +150,9 @@ public class JinXinPayProcessor extends AbstractPay {
         signMap.put( "paySuccTime", paySuccTime );
         signMap.put( "productId", productId );
 
-        if ( "8016".equals( payChannel.getChannelCode() ) ) {
+        /*if ( "1025".equals( payChannel.getChannelCode() ) ) {
             signMap.put( "param2", requestMap.get( "param2" ) );
-        }
+        }*/
 
         //对参数名按照ASCII升序排序
         Object[] key = signMap.keySet().toArray();

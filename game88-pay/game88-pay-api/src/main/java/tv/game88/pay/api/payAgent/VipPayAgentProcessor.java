@@ -43,10 +43,11 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "withdrawNo", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
         bodyMap.put( "walletAddress", withdrawDetail.getBankAccount().trim() );
+        bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
-        bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
 
+        log.warn( JsonUtil.object2Json( bodyMap ) );
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
 
         log.info( payAgentPlatform.getName()
@@ -76,7 +77,7 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
             return "fail";
         }
         String sign      = requestMap.remove( "sign" ).toString();
-        String depositNo = requestMap.getOrDefault( "depositNo", "" ).toString();
+        String depositNo = requestMap.getOrDefault( "withdrawNo", "" ).toString();
         String status    = requestMap.getOrDefault( "status", "" ).toString();
 
         MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( depositNo );

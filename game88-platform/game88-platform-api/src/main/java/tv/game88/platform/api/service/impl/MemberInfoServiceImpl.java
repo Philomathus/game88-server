@@ -18,6 +18,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -79,33 +80,35 @@ import java.util.stream.Collectors;
 @Service( "memberInfoService" )
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo> implements MemberInfoService {
     @Resource
-    private RedisUtils            redisUtils;
+    private RedisUtils             redisUtils;
     @Resource
-    private ConfigEnvCacheUtil    configEnvCacheUtil;
+    private ConfigEnvCacheUtil     configEnvCacheUtil;
     @Resource
-    private RestTemplate          restTemplate;
+    private RestTemplate           restTemplate;
     @Resource
-    private AuthenticationManager authenticationManager;
+    private AuthenticationManager  authenticationManager;
     @Resource
-    private SmsPhoneCacheUtil     smsPhoneCacheUtil;
+    private SmsPhoneCacheUtil      smsPhoneCacheUtil;
     @Resource
-    private ConfigVipCacheUtils   configVipCacheUtils;
+    private ConfigVipCacheUtils    configVipCacheUtils;
     @Resource
-    private SmsApi                smsApi;
+    private SmsApi                 smsApi;
     @Resource
-    private ForkJoinPool          forkJoinPool;
+    private ForkJoinPool           forkJoinPool;
     @Resource
-    private MemberCardMapper      memberCardMapper;
+    private MemberCardMapper       memberCardMapper;
     @Resource
-    private MemberBcodeMapper     memberBcodeMapper;
+    private MemberBcodeMapper      memberBcodeMapper;
     @Resource
-    private MemberVipGiftMapper   memberVipGiftMapper;
+    private MemberVipGiftMapper    memberVipGiftMapper;
     @Resource
-    private MemberMoneyManager    memberMoneyManager;
+    private MemberMoneyManager     memberMoneyManager;
     @Resource
-    private LogMoneyMapper        logMoneyMapper;
+    private LogMoneyMapper         logMoneyMapper;
     @Resource
-    private MobileLimitMapper     mobileLimitMapper;
+    private MobileLimitMapper      mobileLimitMapper;
+    @Resource
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Value( "${im.tokenUrl:null}" )
     private String getImTokenUrl;
@@ -583,25 +586,27 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );
             return;
         }
-        Map<String, Object> params = new HashMap<>();
-        params.put( "channel_id", mobileLogin.getChannelCode() );
-        params.put( "invitation_code", mobileLogin.getInviterCode() );
-        params.put( "account", userId );
-        params.put( "device_type", dev == 2 ? "android" : "ios" );
-        params.put( "ip", mobileLogin.getIp() );
+        threadPoolTaskExecutor.execute( () -> {
+            Map<String, Object> params = new HashMap<>();
+            params.put( "channel_id", mobileLogin.getChannelCode() );
+            params.put( "invitation_code", mobileLogin.getInviterCode() );
+            params.put( "account", userId );
+            params.put( "device_type", dev == 2 ? "android" : "ios" );
+            params.put( "ip", mobileLogin.getIp() );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( params, headers );
-        try {
-            restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
-        } catch ( Exception e ) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType( MediaType.APPLICATION_JSON );
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( params, headers );
             try {
                 restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
-            } catch ( Exception ex ) {
-                log.error( ex.getMessage(), ex );
+            } catch ( Exception e ) {
+                try {
+                    restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
+                } catch ( Exception ex ) {
+                    log.error( ex.getMessage(), ex );
+                }
             }
-        }
+        } );
     }
 
     /**
