@@ -183,7 +183,7 @@ public class MemberInfoController extends BaseController {
         if ( !redisUtil.lock( "memberAddScore" + req.getId(), 15 ) ) {
             return RspBase.businessError( "请勿重复提交" );
         }
-        return RspBase.ok( memberInfoService.addMemberMoneyOnly( ServletUtil.getIp(), SecurityUtils.getUsername(), req ) );
+        return memberInfoService.addMemberMoneyOnly( ServletUtil.getIp(), SecurityUtils.getUsername(), req );
     }
 
     /**
@@ -292,7 +292,7 @@ public class MemberInfoController extends BaseController {
         return memberInfoService.unbindCard( memberCard );
     }
 
-    @PreAuthorize(  "@ss.hasPermi('member:memberInfo:changeBank')")
+    @PreAuthorize( "@ss.hasPermi('member:memberInfo:changeBank')" )
     @Log( title = "修改用户银行卡信息", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeBank" )
     public RspBase<?> changeBank( @RequestBody MemberCard memberCard ) {
