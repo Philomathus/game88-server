@@ -235,7 +235,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
         RspWithdrawReport withdrawReporth = new RspWithdrawReport();
         withdrawReporth.setClass_twoname( "会员打码" );
-        withdrawReporth.setT_value( rspMemberInfo1.getCodeTotal() );
+        withdrawReporth.setT_value( rspMemberInfo1.getCodeNow() );
         withdrawReports.add( withdrawReporth );
 
         RspWithdrawReport withdrawReporti = new RspWithdrawReport();
