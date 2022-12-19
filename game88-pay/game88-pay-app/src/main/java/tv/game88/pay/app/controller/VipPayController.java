@@ -17,7 +17,7 @@ import tv.game88.pay.api.service.VipPayService;
 import javax.annotation.Resource;
 
 @RestController
-@Tag( name = "vipPay登录注册以及充值提现" )
+@Tag( name = "vipPay登录注册以及充值" )
 @Log4j2
 public class VipPayController extends BaseController {
     @Resource
