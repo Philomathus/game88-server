@@ -151,8 +151,16 @@
             <!--			<if test="downLoadDate[ 1 ] != null">-->
             <!--				and register_time <![CDATA[ <= ]]> '${downLoadDate[1]}'-->
             <!--			</if>-->
-            <if test="searchValue != null and searchValue != ''">
-                and (id = #{searchValue} or phone = #{searchValue})
+            <if test="searchValues != null and searchValues.size() != 0">
+                and (id in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                or phone in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                )
             </if>
             <if test="selectStartDate != null and selectStartDate != ''">
                 and register_time <![CDATA[ >= ]]> #{selectStartDate}
