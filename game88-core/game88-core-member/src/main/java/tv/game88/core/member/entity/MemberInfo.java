@@ -170,12 +170,16 @@ public class MemberInfo implements Serializable {
      * 会员编号
      */
     @Excel( name = "银行卡号" )
+    @TableField(exist = false)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String bankAccount;
 
     /**
      * 账号
      */
     @Excel( name = "账号" )
+    @TableField(exist = false)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String userName;
 
     @TableField( exist = false )
