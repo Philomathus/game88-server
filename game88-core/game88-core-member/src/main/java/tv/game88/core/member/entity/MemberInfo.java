@@ -166,6 +166,18 @@ public class MemberInfo implements Serializable {
     @TableField( exist = false )
     private String cardRealName;
 
+    /**
+     * 会员编号
+     */
+    @Excel( name = "银行卡号" )
+    private String bankAccount;
+
+    /**
+     * 账号
+     */
+    @Excel( name = "账号" )
+    private String userName;
+
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   searchValue;
