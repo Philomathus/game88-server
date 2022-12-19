@@ -179,6 +179,8 @@ public class MemberInfo implements Serializable {
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String   selectEndDate;
 
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private Set<String> searchValues;
 
     public Set<String> getSearchValues() {
