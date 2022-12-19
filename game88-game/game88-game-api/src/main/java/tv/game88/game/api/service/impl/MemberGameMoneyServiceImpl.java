@@ -74,8 +74,8 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
         update.setUpdateTime( LocalDateTime.now() );
         this.baseMapper.updateById( update );
 
-        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_FAIL, 0,
-                "游戏上分回退", null, reqJoinGame.getOrderId() );
+        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_FAIL,
+                BigDecimal.ZERO, "游戏上分回退", null, reqJoinGame.getOrderId() );
         log.error( "进入游戏失败，回滚会员上分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
     }
 
@@ -105,7 +105,8 @@ public class MemberGameMoneyServiceImpl extends ServiceImpl<MemberGameMoneyMappe
         gameMoney.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( gameMoney );
         GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( reqJoinGame.getPlatformId() );
-        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_OUT, 0,
+        memberMoneyManager.addMemberMoney( reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), EnumMoney.GAME_OUT,
+                BigDecimal.ZERO,
                 "游戏下分," + gamePlatform.getName(), null, reqJoinGame.getOrderId() );
         log.info( "游戏下分成功，会员游戏下分金额：userId:{},returnMoney:{}", reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney() );
     }

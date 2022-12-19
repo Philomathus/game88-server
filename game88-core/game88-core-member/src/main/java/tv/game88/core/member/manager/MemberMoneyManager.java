@@ -47,7 +47,7 @@ public class MemberMoneyManager {
      * @param mult      打码倍数
      */
     @Transactional( rollbackFor = Exception.class )
-    public void addMemberMoney( String userId, BigDecimal addCount, EnumMoney enumMoney, double mult, String mark,
+    public void addMemberMoney( String userId, BigDecimal addCount, EnumMoney enumMoney, BigDecimal mult, String mark,
                                 String businessId, String markorder ) {
         if ( enumMoney.getType() < 0 ) {
             throw new BusinessException( "服务器异常" );
@@ -57,7 +57,7 @@ public class MemberMoneyManager {
         //会员充值
         if ( enumMoney.getBcode() ) {
             charge   = addCount;
-            codeMult = addCount.multiply( new BigDecimal( mult ) ).setScale( 2, RoundingMode.DOWN );
+            codeMult = addCount.multiply( mult ).setScale( 2, RoundingMode.DOWN );
         }
 
         BigDecimal memberMoney = memberInfoMapper.getUserBalance( userId );

@@ -73,7 +73,7 @@ public class ActivityCashBackTask {
                 //会员返现
                 try {
                     memberMoneyManager.addMemberMoney( memberRechargeBank.getMemberId(), new BigDecimal( bycash ),
-                            EnumMoney.DEPOSIT_CASHBACK, 1, "充值返现活动", null, null );
+                            EnumMoney.DEPOSIT_CASHBACK, BigDecimal.ONE, "充值返现活动", null, null );
                 } catch ( Exception e ) {
                     log.error( memberRechargeBank.getMemberId() + "数据插入失败" + e.getMessage(), e );
                     log.error( "执行充值返现活动任务 - 充值失败的会员:{}, 金额:{}", memberRechargeBank.getMemberId(),

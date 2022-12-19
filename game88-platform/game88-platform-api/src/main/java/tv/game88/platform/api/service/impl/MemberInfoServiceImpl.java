@@ -670,7 +670,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( lat.compareTo( BigDecimal.ZERO ) < 0 ) {
                 return RspBase.businessError( "余额" + money + "不足扣除" );
             }
-            beatNum = new BigDecimal( 0 );
+            beatNum = BigDecimal.ZERO;
         }
 
         if ( !"0".equals( markorder ) ) {
@@ -688,9 +688,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         if ( total != null ) {
             if ( beatNum == null || beatNum.compareTo( BigDecimal.ZERO ) < 1 ) {
-                beatNum = new BigDecimal( 0 );
+                beatNum = BigDecimal.ZERO;
             }
-            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum.doubleValue(), Mk, null, markorder );
+            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum, Mk, null, markorder );
         } else {
             return RspBase.businessError( "该成员未初始化金额，或者您输入的金额有误" );
         }
@@ -1208,7 +1208,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             throw new BusinessException( "领取异常,请重试" );
         }
         //会员加钱，日志
-        memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, 1,
+        memberMoneyManager.addMemberMoney( memberId, addMoney, EnumMoney.WONGIVE, BigDecimal.ONE,
                 name + "奖励:" + addMoney.toString(), null, null );
     }
 

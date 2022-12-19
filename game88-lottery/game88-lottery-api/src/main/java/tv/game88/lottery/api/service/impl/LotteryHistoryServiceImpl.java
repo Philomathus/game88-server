@@ -132,7 +132,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
         session.close();
 
         for ( String memberId : prizeMap.keySet() ) {
-            memberMoneyManager.addMemberMoney( memberId, prizeMap.get( memberId ), EnumMoney.LOTTERY_BONUS, 0,
+            memberMoneyManager.addMemberMoney( memberId, prizeMap.get( memberId ), EnumMoney.LOTTERY_BONUS, BigDecimal.ZERO,
                     lotteryName + "派奖", historyId.concat( "-" ).concat( memberId ), historyId );
         }
         log.info( "awardPrize更新投注状态条数：{},执行时间:{}ms", updateList.size(), System.currentTimeMillis() - now );

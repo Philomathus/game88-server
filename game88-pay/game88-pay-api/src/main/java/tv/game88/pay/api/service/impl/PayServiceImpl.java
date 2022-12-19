@@ -221,11 +221,11 @@ public class PayServiceImpl implements PayService {
 
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
             //充值彩金日志
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, 1, mark, null,
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE, mark, null,
                     memberRechargeOnline.getOrderNo() );
         }
 
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), payJourMoney, EnumMoney.PAY, 1,
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), payJourMoney, EnumMoney.PAY, BigDecimal.ONE,
                 mark + "-充值:" + payJourMoney, memberRechargeOnline.getOrderNo(), memberRechargeOnline.getOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );

@@ -244,8 +244,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         String name = "洗码金额:" + restlt.getAddCodeAmount().toString() + "存入:" + restlt
                 .getAddCleanAmount()
                 .setScale( 2, RoundingMode.HALF_UP );
-        memberMoneyManager.addMemberMoney( memberId, restlt.getAddCleanAmount(), EnumMoney.CODE_CLEAN, 0, name, cleanId,
-                cleanId );
+        memberMoneyManager.addMemberMoney( memberId, restlt.getAddCleanAmount(), EnumMoney.CODE_CLEAN, BigDecimal.ZERO, name,
+                cleanId, cleanId );
     }
 
     @Override

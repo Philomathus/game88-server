@@ -198,11 +198,11 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         }
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
             //充值彩金日志
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, 1, update.getRemark(),
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE, update.getRemark(),
                     null, update.getRechargeOrderNo() );
         }
         //usdt充值日志
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, 1, update.getRemark(),
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, BigDecimal.ONE, update.getRemark(),
                 update.getRechargeOrderNo(), update.getRechargeOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, rechargeMoney );

@@ -28,6 +28,7 @@ import tv.game88.platform.api.entity.ActivityType;
 import tv.game88.platform.api.service.ActivityService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -201,8 +202,8 @@ public class ActivityServiceImpl implements ActivityService {
             String name = questInfo.getContent() + "奖金:" + questInfo.getReward().toString();
             String orderId = "memberQuest-" + memberQuest.getId() + "-" + memberId + "-"
                     + LocalDateTimeUtils.format( LocalDate.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER );
-            memberMoneyManager.addMemberMoney( memberId, questInfo.getReward(), EnumMoney.QUEST_BONUS, 1, name, orderId,
-                    orderId );
+            memberMoneyManager.addMemberMoney( memberId, questInfo.getReward(), EnumMoney.QUEST_BONUS, BigDecimal.ONE, name,
+                    orderId, orderId );
             return RspBase.ok( "领取成功", questInfo.getReward() );
         }
         return RspBase.businessError( "领取失败,请重试" );
