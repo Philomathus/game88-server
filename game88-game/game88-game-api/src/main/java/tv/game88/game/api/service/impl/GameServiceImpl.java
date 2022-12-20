@@ -295,11 +295,12 @@ public class GameServiceImpl implements GameService {
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
                                            BigDecimal changeMoney ) {
         // BBIN会员ID只能是英文加数字
-        String gameMemberId =
-                gamePlatform.getGameCategory() == EnumGameCategory.BBIN ? profile + "BBIN" + memberId : profile + "_" + memberId;
-        if ( gamePlatform.getGameCategory() == EnumGameCategory.GAMING_365 ) {
-            gameMemberId = gameMemberId.toLowerCase();
-        }
+        String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
+            case BBIN -> profile + "BBIN" + memberId;
+            case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
+            case BOLE -> ( profile + memberId ).toLowerCase();
+            default -> profile + "_" + memberId;
+        };
         return ReqJoinGame
                 .builder()
                 .des( AESCoder.decrypt( gamePlatform.getDes() ) )

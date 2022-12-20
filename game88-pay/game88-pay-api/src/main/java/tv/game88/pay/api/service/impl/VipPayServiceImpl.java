@@ -163,7 +163,7 @@ public class VipPayServiceImpl implements VipPayService {
         memberRechargeOnline.setFirst( false );
         memberRechargeOnline.setPayTime( LocalDateTime.now() );
         memberRechargeOnline.setStatus( -1 );
-        memberRechargeOnline.setRate( BigDecimal.ZERO );
+        memberRechargeOnline.setRate( new BigDecimal( "0.0163" ) );
         memberRechargeOnline.setUpdateTime( memberRechargeOnline.getPayTime() );
         int i = memberRechargeOnlineMapper.insert( memberRechargeOnline );
         if ( i <= 0 ) {
