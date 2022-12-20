@@ -167,6 +167,9 @@ public class GameButt365 extends AbstractGameButt {
         String url = reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/getBalance";
 
         Map<String, Object> resultMap = restTemplate.postForObject( url, requestEntity, Map.class );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals( resultMap.getOrDefault( "status", 0 ).toString() ) ) {
             List<Map<String, Object>> results = ( List<Map<String, Object>> ) resultMap.getOrDefault( "results",
                     new ArrayList<>() );
