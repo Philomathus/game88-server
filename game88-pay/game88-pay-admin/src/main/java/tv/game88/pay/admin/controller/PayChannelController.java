@@ -129,6 +129,7 @@ public class PayChannelController extends BaseController {
             for ( Long id : ids ) {
                 payCacheUtil.clearPayChannel( id );
             }
+            payCacheUtil.clearPayTypeList();
         }
         return toResult( isSave );
     }
@@ -143,6 +144,7 @@ public class PayChannelController extends BaseController {
         RspBase<?> rspBase = payChannelService.updateEffect( id, effect );
         if ( rspBase.getCode() == HttpStatus.SUCCESS ) {
             payCacheUtil.clearPayChannel( id );
+            payCacheUtil.clearPayTypeList();
         }
         return rspBase;
     }
