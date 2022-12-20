@@ -238,7 +238,8 @@ public class GameServiceImpl implements GameService {
                 BigDecimal balance = null;
                 try {
                     // 获取token
-                    if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+                    if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                            && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
                         baseGameButt.getToken( reqJoinGame );
                     }
                     balance = baseGameButt.queryBalance( reqJoinGame );
