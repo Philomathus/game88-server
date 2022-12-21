@@ -33,6 +33,7 @@ public class NanBeiPayProcessor extends AbstractPay {
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
+        params.put( "productId", Integer.parseInt( payChannel.getChannelCode() ) );
         params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
         params.put( "amount", reqPayRecharge
                 .getMoney()
