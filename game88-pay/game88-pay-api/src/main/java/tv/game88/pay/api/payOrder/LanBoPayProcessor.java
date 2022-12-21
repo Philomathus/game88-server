@@ -109,12 +109,11 @@ public class LanBoPayProcessor extends AbstractPay {
 
     @Override
     public String callbackPay(Map<String, Object> requestMap, String realIp) {
-        String mchOrderNo = requestMap.getOrDefault("merId", "").toString();
         String payOrderId = requestMap.getOrDefault("orderId", "").toString();
-        MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById(mchOrderNo);
+        MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById(payOrderId);
 
         if (memberRechargeOnline.getStatus() == 1) {
-            log.warn("订单已成功，无需继续回调 - orderNo:{}", mchOrderNo);
+            log.warn("订单已成功，无需继续回调 - orderNo:{}", payOrderId);
             return "success";
         }
 
@@ -141,17 +140,17 @@ public class LanBoPayProcessor extends AbstractPay {
         if (this.verifyIP(requestMap, realIp, payPlatform)) {
             return "fail";
         }
-        if (this.diffPayTime12Hour(memberRechargeOnline.getPayTime(), mchOrderNo)) {
+        if (this.diffPayTime12Hour(memberRechargeOnline.getPayTime(), payOrderId)) {
             return "fail";
         }
         if (!payChannel.getCanCallback()) {
-            log.warn("平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), mchOrderNo);
+            log.warn("平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), payOrderId);
             return "fail";
         }
 
         String status = requestMap.getOrDefault("status", 0).toString();
         if (("1".equals(status)) && this.queryPay(memberRechargeOnline, payPlatform, payChannel)) {
-            memberRechargeOnline.setUpperOrderNo(payOrderId);
+            memberRechargeOnline.setUpperOrderNo(requestMap.getOrDefault("sysOrderId", "").toString());
             return payService.updatePayJourStatus(memberRechargeOnline, new String[]{"success", "fail"},
                     payChannel.getName());
         }
