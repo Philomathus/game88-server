@@ -9,10 +9,14 @@
     </resultMap>
 
     <sql id="selectLotteryMethodVo">
-        select id,
-               lottery_type,
-               name,
-               sort
-        from lottery_method
+        select id,lottery_type,name,sort from lottery_method
     </sql>
+    <select id="selectLotteryMethodList" parameterType="tv.game88.lottery.api.entity.LotteryMethod" resultMap="LotteryMethodResult">
+        <include refid="selectLotteryMethodVo"/>
+        <where>
+            <if test="lotteryType != null  and lotteryType != ''"> and lottery_type = #{lotteryType}</if>
+            <if test="sort != null "> and sort = #{sort}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
 </mapper>
