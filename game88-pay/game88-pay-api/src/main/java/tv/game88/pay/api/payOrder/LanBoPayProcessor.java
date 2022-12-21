@@ -93,7 +93,7 @@ public class LanBoPayProcessor extends AbstractPay {
 
         log.warn(payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
-        if (!CollectionUtils.isEmpty(resultMap) && "1".equals(resultMap.getOrDefault("status", -1).toString())) {
+        if (!CollectionUtils.isEmpty(resultMap) && "1".equals(resultMap.getOrDefault("code", -1).toString())) {
             Map<String, Object> dataMap = (Map<String, Object>) resultMap.getOrDefault("data", new HashMap<>());
             int status = Integer.parseInt(dataMap.getOrDefault("status", -1).toString());
             if (status == 1) {
