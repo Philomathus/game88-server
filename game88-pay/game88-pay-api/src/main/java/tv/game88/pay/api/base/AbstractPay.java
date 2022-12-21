@@ -30,9 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static tv.game88.common.utils.RSACoder.signSha256Rsa;
-import static tv.game88.common.utils.RSACoder.verifySha256Rsa;
-
 @Log4j2
 public abstract class AbstractPay implements BasePay {
 
@@ -154,23 +151,6 @@ public abstract class AbstractPay implements BasePay {
         sb.append( "</form><script>var form = document.getElementById('Form1');form.submit();</script>" );
         reqPayRecharge.setUrlType( 1 );
         return sb.toString();
-    }
-
-    @NotNull
-    protected static String buildRSASignByPrivateKey(String data, String key) {
-        try {
-            return signSha256Rsa(data, key);
-        } catch (Exception e) {
-            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
-        }
-    }
-
-    protected static boolean buildRSAVerifyByPublicKey(String data, String key, String sign) {
-        try {
-            return verifySha256Rsa(data, key, sign);
-        } catch (Exception e) {
-            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
-        }
     }
 
     protected Map<String, Object> sendPostMap( String url, HttpEntity<?> httpEntity, ReqPayRecharge reqPayRecharge ) {
