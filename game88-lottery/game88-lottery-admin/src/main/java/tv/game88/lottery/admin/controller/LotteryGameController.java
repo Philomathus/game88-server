@@ -9,7 +9,6 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.lottery.api.entity.LotteryGame;
-import tv.game88.lottery.api.entity.LotteryInfo;
 import tv.game88.lottery.api.service.LotteryGameService;
 
 import javax.annotation.Resource;
@@ -18,7 +17,7 @@ import java.util.List;
 /**
  * 下注Controller
  *
- * @author rajesh
+ * @author mengJun
  * @date 2022-12-21
  */
 @RestController

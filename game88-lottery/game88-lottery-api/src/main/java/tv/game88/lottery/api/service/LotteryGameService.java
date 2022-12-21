@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 下注Service接口
  *
- * @author rajesh
+ * @author mengJun
  * @date 2022-12021
  */
 public interface LotteryGameService extends IService<LotteryGame> {
