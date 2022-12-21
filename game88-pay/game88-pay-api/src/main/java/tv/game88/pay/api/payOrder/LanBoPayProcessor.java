@@ -17,10 +17,7 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 @Repository(value = ConstantsPay.LAN_BO_PAY + "Processor")
 @Log4j2
@@ -96,10 +93,11 @@ public class LanBoPayProcessor extends AbstractPay {
 
         log.warn(payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            int status = Integer.parseInt(resultMap.getOrDefault("status", -1).toString());
+        if (!CollectionUtils.isEmpty(resultMap) && "1".equals(resultMap.getOrDefault("status", -1).toString())) {
+            Map<String, Object> dataMap = (Map<String, Object>) resultMap.getOrDefault("data", new HashMap<>());
+            int status = Integer.parseInt(dataMap.getOrDefault("status", -1).toString());
             if (status == 1) {
-                BigDecimal amount = new BigDecimal(resultMap.getOrDefault("amount", 0).toString());
+                BigDecimal amount = new BigDecimal(dataMap.getOrDefault("orderAmt", 0).toString());
                 memberRechargeOnline.setRealMoney(amount.setScale(2, RoundingMode.HALF_UP));
                 return true;
             }
