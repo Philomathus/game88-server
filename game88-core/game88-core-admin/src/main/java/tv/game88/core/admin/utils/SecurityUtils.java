@@ -74,14 +74,9 @@ public class SecurityUtils {
         if ( StringUtils.isBlank( otpSecret ) ) {
             throw new BusinessException( "请联系管理员绑定MFA验证秘钥" );
         }
-        try {
-            String otpSecretKey = RSACoder.decryptByPrivateKey( otpSecret, KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
-            if ( !GoogleAuthUtil.verifyCode( otpSecretKey, MFACode ) ) {
-                throw new BusinessException( "MFA验证码不正确，请检查" );
-            }
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw e;
+        String otpSecretKey = RSACoder.decryptByPrivateKey( otpSecret, KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
+        if ( !GoogleAuthUtil.verifyCode( otpSecretKey, MFACode ) ) {
+            throw new BusinessException( "MFA验证码不正确，请检查" );
         }
     }
 
