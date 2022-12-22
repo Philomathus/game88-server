@@ -30,17 +30,18 @@
     <select id="selectMemberRechargeUsdtList" parameterType="tv.game88.pay.api.dto.ReqMemberRechargeUsdt"
             resultMap="MemberRechargeUsdtResult">
         <include refid="selectMemberRechargeUsdtVo" />
+        <where>
         <include refid="listWhere" />
+        <if test="status != null "> and status = #{status}</if>
+        </where>
         order by create_time desc
     </select>
 
     <sql id="listWhere">
-        where 1=1
         <if test="memberId != null  and memberId != ''"> and member_id = #{memberId}</if>
         <if test="channelName != null  and channelName != ''"> and channel_name like concat('%', #{channelName}, '%')</if>
         <if test="rechargeNumber != null "> and recharge_number = #{rechargeNumber}</if>
         <if test="rechargeMoney != null "> and recharge_money = #{rechargeMoney}</if>
-        <if test="status != null "> and status = #{status}</if>
         <if test="discountBill != null "> and discount_bill = #{discountBill}</if>
         <if test="chainName != null  and chainName != ''"> and chain_name like concat('%', #{chainName}, '%')</if>
         <if test="rechargeAddress != null  and rechargeAddress != ''"> and recharge_address = #{rechargeAddress}</if>
@@ -58,12 +59,19 @@
 
     <sql id="totalCount">
         SELECT COUNT(*) total,SUM(recharge_money) totalMoney FROM `member_recharge_usdt`
-        <include refid="listWhere" />
+        <where>
+            <if test="status != null "> and status = #{status}</if>
+            <include refid="listWhere" />
+        </where>
+
     </sql>
 
     <sql id="successMoney">
         SELECT COUNT(*) totalSuccess,SUM(recharge_money) successMoney FROM `member_recharge_usdt`
+        <where>
         <include refid="listWhere" />
+          and status = 3
+        </where>
     </sql>
 
     <select id="selectRspDetail" resultType="tv.game88.pay.api.dto.RspWithdrawRechargeDetail">
