@@ -27,7 +27,7 @@
         WHEN #{isTwoPw} THEN
         phone
         ELSE
-        CONCAT(left(phone, 5), '**', RIGHT(phone, 4))
+        CONCAT(left(phone, 3), '****', RIGHT(phone, 4))
         end phone
         from member_info
         <where>
