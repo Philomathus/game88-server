@@ -280,6 +280,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
