@@ -322,7 +322,7 @@ public class GameServiceImpl implements GameService {
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
         return switch ( gamePlatform.getGameCategory() ) {
-            case AG, BBIN -> this.getGameAtomicId( gamePlatform.getId() );
+            case AG, BBIN, BG -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
