@@ -25,10 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Repository( value = ConstantsGame.BG + "GameProcessor" )
@@ -108,9 +105,15 @@ public class GameButtBG extends AbstractGameButt {
         params.put( "isMobileUrl", 1 );
         params.put( "fromIp", reqJoinGame.getIp() );
         params.put( "locale", "zh_CN" );
-        params.put( "gameType", 443 );
-        if ( StringUtils.isNotBlank( reqJoinGame.getKindId() ) ) {
-            params.put( "gameId", reqJoinGame.getKindId() );
+        if ( StringUtils.isNotBlank( reqJoinGame.getKindId() ) && Arrays
+                .asList( "105", "411", "484" )// 105:BG捕鱼大师; 411:西游捕鱼; 484:大仙捕鱼
+                .contains( reqJoinGame.getKindId() ) ) {
+            params.put( "gameType", reqJoinGame.getKindId() );
+        } else {
+            params.put( "gameType", 443 );
+            if ( StringUtils.isNotBlank( reqJoinGame.getKindId() ) ) {
+                params.put( "gameId", reqJoinGame.getKindId() );
+            }
         }
         params.put( "sign", DigestUtils.md5Hex( id + sn + reqJoinGame.getMd5() ) );
 

@@ -5,6 +5,7 @@ import org.springframework.util.Base64Utils;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -120,6 +121,15 @@ public class AESCoder {
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
         String base64    = Base64Utils.encodeToString( encrypted );// 此处使用BASE64做转码
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
+    }
+
+    public static String encryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( AESKey.getBytes( StandardCharsets.US_ASCII ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( AESIV.getBytes() );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
+        cipher.init( Cipher.ENCRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( content.getBytes( StandardCharsets.UTF_8 ) );
+        return Base64Utils.encodeToString( encrypted ); // 加密
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
