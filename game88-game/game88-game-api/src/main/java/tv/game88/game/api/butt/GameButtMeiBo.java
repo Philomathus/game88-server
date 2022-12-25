@@ -42,7 +42,7 @@ public class GameButtMeiBo extends AbstractGameButt {
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s&lineCode=%s&KindID=%s&language=chinese_zh&loginHall=false&backHall"
+        String params = String.format( "s=%s&account=%s&lineCode=%s&KindID=%s&language=chinese_zh&loginHall=true&backHall"
                 + "=false", 0, reqJoinGame.getGameMemberId(), reqJoinGame.getLinecode(), reqJoinGame.getKindId() );
         log.warn( params );
         String param = null;
@@ -57,8 +57,6 @@ public class GameButtMeiBo extends AbstractGameButt {
         keyMap.put( "timestamp", time );
         keyMap.put( "MD5Key", MD5 );
         String key = DigestUtils.md5Hex( JsonUtil.object2Json( keyMap ) );
-
-        log.warn( key );
 
         Map<String, String> requestMap = new HashMap<>();
         requestMap.put( "agent", reqJoinGame.getAgent() );

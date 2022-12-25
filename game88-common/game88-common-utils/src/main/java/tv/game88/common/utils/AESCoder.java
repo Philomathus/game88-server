@@ -123,6 +123,16 @@ public class AESCoder {
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
+    public static String decryptByKey( String content, String key ) throws Exception {
+        byte[]        encrypted1 = Base64Utils.decodeFromString( content );
+        byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
+        SecretKeySpec skeySpec   = new SecretKeySpec( raw, AES );
+        Cipher        cipher     = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec );
+        byte[] original = cipher.doFinal( encrypted1 );
+        return new String( original, StandardCharsets.UTF_8 );
+    }
+
     public static String encryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
         Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
         SecretKeySpec   skeySpec = new SecretKeySpec( AESKey.getBytes( StandardCharsets.US_ASCII ), AES );
@@ -132,13 +142,13 @@ public class AESCoder {
         return Base64Utils.encodeToString( encrypted ); // 加密
     }
 
-    public static String decryptByKey( String content, String key ) throws Exception {
-        byte[]        encrypted1 = Base64Utils.decodeFromString( content );
-        byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
-        SecretKeySpec skeySpec   = new SecretKeySpec( raw, AES );
-        Cipher        cipher     = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
-        cipher.init( Cipher.DECRYPT_MODE, skeySpec );
-        byte[] original = cipher.doFinal( encrypted1 );
-        return new String( original, StandardCharsets.UTF_8 );
+    public static String decryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( AESKey.getBytes( StandardCharsets.US_ASCII ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( AESIV.getBytes() );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec, iv );
+        byte[] buffer    = Base64Utils.decodeFromString( content );
+        byte[] encrypted = cipher.doFinal( buffer );
+        return new String( encrypted, StandardCharsets.UTF_8 );//此处使用BASE64做转码。
     }
 }

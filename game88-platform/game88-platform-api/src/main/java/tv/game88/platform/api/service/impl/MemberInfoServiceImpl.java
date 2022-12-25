@@ -40,10 +40,7 @@ import tv.game88.core.member.dto.ReqLogMoney;
 import tv.game88.core.member.dto.RspCodeFlow;
 import tv.game88.core.member.dto.RspLogMoney;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.member.entity.ConfigVip;
-import tv.game88.core.member.entity.LogMoney;
-import tv.game88.core.member.entity.MemberCard;
-import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.entity.*;
 import tv.game88.core.member.enums.EnumDev;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
@@ -558,7 +555,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         m.setVip( 1 );//默认vip1
         m.setRegisterTime( LocalDateTime.now() );
         m.setRegisterIp( mobileLogin.getIp() );
-        m.setAccountNow( BigDecimal.ZERO );
+        BigDecimal registerMemberMoney = configEnvCacheUtil.getConfBd( "register_member_money" );
+        if ( registerMemberMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
+            registerMemberMoney = BigDecimal.ZERO;
+        }
+        m.setAccountNow( registerMemberMoney );
         m.setAccountCharge( BigDecimal.ZERO );
         m.setBoxAccount( BigDecimal.ZERO );
         m.setCodeNow( BigDecimal.ZERO );
@@ -572,6 +573,22 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         m.setNickName( m.getId() );
         m.setLoginNum( 0 );
+        BigDecimal registerMemberBcodeMultiple = configEnvCacheUtil.getConfBd( "register_member_bcode_multiple" );
+        if ( registerMemberBcodeMultiple.compareTo( BigDecimal.ZERO ) < 0 ) {
+            registerMemberBcodeMultiple = BigDecimal.ZERO;
+        }
+        if ( registerMemberBcodeMultiple.compareTo( BigDecimal.ZERO ) > 0
+                && registerMemberMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
+            MemberBcode code = new MemberBcode();
+            code.setIncome( registerMemberMoney.multiply( registerMemberBcodeMultiple ).setScale( 2, RoundingMode.DOWN ) );
+            code.setCharge( registerMemberMoney );
+            code.setCreateTime( LocalDateTime.now() );
+            code.setCur( BigDecimal.ZERO );
+            code.setStatus( 0 );
+            code.setUserId( m.getId() );
+            code.setDes( EnumMoney.ACTIVITY.getDes() );
+            memberBcodeMapper.insert( code );
+        }
         return m;
     }
 
