@@ -225,7 +225,7 @@
         UNION ALL
         SELECT IFNULL(SUM(real_money),0) n from member_recharge_online where status='1' and member_id = #{userid}
         UNION ALL
-        select IFNULL(SUM(recharge_money),0) n from member_recharge_usdt where member_id = #{userid}
+        select IFNULL(SUM(recharge_money),0) n from member_recharge_usdt where status = '3' and member_id = #{userid}
         ) as t)
     </select>
 
