@@ -285,9 +285,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
+
+            int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
+            int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
+            if ( status != 3 ) {
                 return code == 0 && status == 0;
             }
         }
