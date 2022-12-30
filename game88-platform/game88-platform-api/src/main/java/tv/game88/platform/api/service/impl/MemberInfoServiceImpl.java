@@ -35,6 +35,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
 import tv.game88.core.member.dto.ReqLogMoney;
 import tv.game88.core.member.dto.RspCodeFlow;
@@ -54,6 +55,7 @@ import tv.game88.platform.api.entity.MemberVipGift;
 import tv.game88.platform.api.entity.MobileLimit;
 import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.mapper.MemberVipGiftMapper;
+import tv.game88.platform.api.service.ConfigEnvironmentService;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
 
@@ -106,6 +108,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MobileLimitMapper      mobileLimitMapper;
     @Resource
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    @Resource
+    private ConfigEnvironmentService configEnvironmentService;
 
     @Value( "${im.tokenUrl:null}" )
     private String getImTokenUrl;
@@ -679,8 +684,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         BigDecimal total         = oldmemberInfo.getAccountNow();
 
         if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-            if ( money.compareTo( new BigDecimal( 1000000 ) ) > 0 ) {
-                return RspBase.businessError( "最大金额为1000000" );
+            String addMoney;
+            ConfigEnvironment configEnvMoney = configEnvironmentService.selectConfigEnvironmentById( "addMoney" );
+            if(configEnvMoney == null){
+                addMoney = "1000000";
+            }else{
+                addMoney = configEnvMoney.getEnvValue();
+            }
+            if ( money.compareTo( new BigDecimal(Integer.parseInt(addMoney)  ) ) > 0 ) {
+                return RspBase.businessError( "最大金额为"+Integer.parseInt(addMoney));
             }
         } else if ( money.compareTo( BigDecimal.ZERO ) < 0 ) {
             BigDecimal lat = total.add( money );
