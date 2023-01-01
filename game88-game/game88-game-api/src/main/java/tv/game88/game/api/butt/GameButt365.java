@@ -76,10 +76,8 @@ public class GameButt365 extends AbstractGameButt {
 
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                 reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/loginV2", requestEntity, String.class );
-        if ( responseEntity.getStatusCode() == HttpStatus.FOUND ) {
-            URI location = responseEntity.getHeaders().getLocation();
-            reqJoinGame.setGameUrl( location == null ? null : location.toString() );
-        }
+        URI location = responseEntity.getHeaders().getLocation();
+        reqJoinGame.setGameUrl( location == null ? null : location.toString() );
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
                     + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( responseEntity ), reqJoinGame.getGameMemberId() );
