@@ -148,7 +148,7 @@ public class GameButt365 extends AbstractGameButt {
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals( resultMap.getOrDefault( "status", 0 ).toString() ) ) {
             BigDecimal withdrawBalance = new BigDecimal( resultMap.getOrDefault( "withdrawBalance", "-1" ).toString() );
-            if ( withdrawBalance.compareTo( reqJoinGame.getTransferMoney() ) == 0 ) {
+            if ( withdrawBalance.compareTo( reqJoinGame.getTransferMoney().negate() ) == 0 ) {
                 return;
             }
         }
