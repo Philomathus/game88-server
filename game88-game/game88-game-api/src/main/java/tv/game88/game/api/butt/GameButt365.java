@@ -69,6 +69,7 @@ public class GameButt365 extends AbstractGameButt {
         params.add( "userName", reqJoinGame.getGameMemberId().split( "_" )[ 1 ] );
         params.add( "extension1", reqJoinGame.getAgent() );
         params.add( "gameId", reqJoinGame.getKindId() );
+        params.add( "fullscreen", 0 );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
