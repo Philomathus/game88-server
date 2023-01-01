@@ -74,8 +74,11 @@ public class GameButt365 extends AbstractGameButt {
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(
-                reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/loginV2", requestEntity, String.class );
+        String url = reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/loginV2";
+
+        log.warn( url + "         " + JsonUtil.object2Json( params ) );
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity( url, requestEntity, String.class );
         URI location = responseEntity.getHeaders().getLocation();
         reqJoinGame.setGameUrl( location == null ? null : location.toString() );
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
