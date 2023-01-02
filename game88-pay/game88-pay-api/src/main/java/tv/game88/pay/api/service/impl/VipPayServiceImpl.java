@@ -118,7 +118,6 @@ public class VipPayServiceImpl implements VipPayService {
                             newInsert.setMemberId( memberId );
                             newInsert.setBankAccount( walletAddress );
                             newInsert.setCreateTime( LocalDateTime.now() );
-                            newInsert.setDv( false );
                             memberCardMapper.insert( newInsert );
                         }
                         RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();

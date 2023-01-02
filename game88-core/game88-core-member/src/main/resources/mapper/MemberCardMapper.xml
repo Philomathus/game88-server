@@ -60,7 +60,7 @@
 
     <select id="selectMemberCard" resultMap="MemberCardResult">
         <include refid="selectMemberCardVo" />
-        where member_id = #{memberId} and real_name is not null
+        where member_id = #{memberId}
     </select>
 
     <select id="selectRspList" resultType="tv.game88.core.member.dto.RspMemberCard">
