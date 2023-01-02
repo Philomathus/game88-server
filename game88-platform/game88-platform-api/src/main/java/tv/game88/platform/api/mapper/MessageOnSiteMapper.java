@@ -20,4 +20,12 @@ public interface MessageOnSiteMapper extends BaseMapper<MessageOnSite> {
      * @return 站内信集合
      */
     public List<MessageOnSite> selectMessageOnSiteList( MessageOnSite messageOnSite );
+
+    /**
+     * 新增站内信息
+     *
+     * @param messageOnSite 站内信息
+     * @return 结果
+     */
+    int insertMessageOnSite( MessageOnSite messageOnSite );
 }

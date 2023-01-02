@@ -30,6 +30,9 @@ public class MessageOnSite {
     @TableField(exist = false)
     private Map<String, Object> params;
 
+    @Excel(name = "会员id")
+    private String receiverUserId;
+
     public Map<String,Object> getParams() {
         if ( params == null ) {
             params = new HashMap<>();

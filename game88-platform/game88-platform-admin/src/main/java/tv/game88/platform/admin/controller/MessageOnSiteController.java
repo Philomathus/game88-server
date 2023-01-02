@@ -10,15 +10,16 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.platform.api.cache.MessageCacheUtil;
 import tv.game88.platform.api.entity.MessageOnSite;
+import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.service.MessageOnSiteService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 站内信Controller
@@ -32,6 +33,9 @@ public class MessageOnSiteController extends BaseController {
     private MessageOnSiteService messageOnSiteService;
     @Resource
     private MessageCacheUtil     messageCacheUtil;
+
+    @Resource
+    private MemberInfoService memberInfoService;
 
     /**
      * 查询站内信列表
@@ -107,5 +111,17 @@ public class MessageOnSiteController extends BaseController {
             messageCacheUtil.clear( MessageCacheUtil.ON_SITE );
         }
         return toResult( isRemove );
+    }
+
+    @PreAuthorize( "@ss.hasPermi('message:onSite:add')" )
+    @Log( title = "会员站内信息", businessType = BusinessType.INSERT )
+    @PostMapping("/sendUserMessage")
+    public RspBase<?> sendUserMessage( @RequestBody MessageOnSite messageOnSite ) {
+        MemberInfo memberInfo = memberInfoService.getById(messageOnSite.getReceiverUserId());
+        if ( Objects.isNull(memberInfo)) {
+            return RspBase.businessError("发送失败,会员id错误");
+        }
+        messageOnSite.setCreateTime(LocalDateTime.now());
+        return RspBase.ok( messageOnSiteService.insertMessageOnSite( messageOnSite ) );
     }
 }

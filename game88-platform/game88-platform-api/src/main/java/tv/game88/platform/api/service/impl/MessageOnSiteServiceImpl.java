@@ -26,4 +26,15 @@ public class MessageOnSiteServiceImpl extends ServiceImpl<MessageOnSiteMapper, M
     public List<MessageOnSite> selectMessageOnSiteList( MessageOnSite messageOnSite ) {
         return this.baseMapper.selectMessageOnSiteList( messageOnSite );
     }
+
+    /**
+     * 新增站内信息
+     *
+     * @param messageOnSite 站内信息
+     * @return 结果
+     */
+    @Override
+    public int insertMessageOnSite( MessageOnSite messageOnSite ) {
+        return this.baseMapper.insertMessageOnSite(messageOnSite);
+    }
 }
