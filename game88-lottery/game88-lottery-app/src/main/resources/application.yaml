@@ -79,9 +79,9 @@ token:
 
 im:
   # 群聊
-  sendGroupMsg: http://8.218.39.243:43000/chat/sendGroupMsg/
+  sendGroupMsg: http://154.23.182.40:43000/chat/sendGroupMsg/
   # 单聊
-  sendMsg: http://8.218.39.243:43000/chat/sendMsg/
+  sendMsg: http://154.23.182.40:43000/chat/sendMsg/
 
 swagger:
   title: Game88 Lottery App Swagger 3 Api Documentation

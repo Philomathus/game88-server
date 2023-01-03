@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.core.member.mapper.MemberMoneyMapper">
+
+    <resultMap type="tv.game88.core.member.entity.MemberMoney" id="MemberMoneyResult">
+        <result property="id"    column="id"    />
+        <result property="money"    column="money"    />
+        <result property="beat"    column="beat"    />
+    </resultMap>
+
+    <sql id="selectMemberMoneyVo">
+        select id, money, beat from member_money
+    </sql>
+
+    <select id="selectMemberMoneyList" parameterType="tv.game88.core.member.entity.MemberMoney" resultMap="MemberMoneyResult">
+        <include refid="selectMemberMoneyVo"/>
+        <where>
+            <if test="id != null and memberId != ''"> and id = #{id}</if>
+            <if test="money != null "> and money = #{money}</if>
+            <if test="beat != null "> and beat = #{beat}</if>
+        </where>
+    </select>
+
+    <delete id="deleteMemberMoneyByIds" parameterType="String">
+        delete from member_money where id in
+        <foreach item="memberId" collection="array" open="(" separator="," close=")">
+            #{memberId}
+        </foreach>
+    </delete>
+
+    <delete id="handleClean">
+       delete from member_money where 1=1
+    </delete>
+
+    <select id="countMoney" resultType="java.math.BigDecimal">
+        select sum(money) from member_money;
+    </select>
+
+</mapper>

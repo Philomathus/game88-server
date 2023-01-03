@@ -14,4 +14,13 @@
         select id, method_id, type, info, odds, sort
         from lottery_game
     </sql>
+    <select id="selectLotteryGameList" resultType="tv.game88.lottery.api.entity.LotteryGame">
+        <include refid="selectLotteryGameVo"/>
+        <where>
+            <if test="methodId != null  and methodId != ''"> and method_id = #{methodId}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="info != null  and info != ''"> and info = #{info}</if>
+            <if test="odds != null "> and odds = #{odds}</if>
+        </where>
+    </select>
 </mapper>
