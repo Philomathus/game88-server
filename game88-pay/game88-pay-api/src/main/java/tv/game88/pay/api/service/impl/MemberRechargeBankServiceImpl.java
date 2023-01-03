@@ -1,6 +1,7 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
@@ -204,8 +205,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( countCard > 0 ) {
             return RspBase.businessError( "该银行卡已经绑定,请输入其它银行卡号" );
         }
-        boolean          dfault     = true;
-        List<MemberCard> resultList = memberCardMapper.selectMemberCard( memberId );
+        boolean dfault = true;
+        List<MemberCard> resultList = new QueryChainWrapper<>( memberCardMapper )
+                .eq( "member_id", memberId )
+                .isNotNull( "real_name" )
+                .list();
         if ( resultList.size() > 0 ) {
             dfault = false;
             if ( !resultList.get( 0 ).getRealName().equals( reqMemberCard.getRealName() ) ) {

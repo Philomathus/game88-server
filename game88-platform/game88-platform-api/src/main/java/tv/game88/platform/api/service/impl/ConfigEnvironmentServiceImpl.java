@@ -38,12 +38,14 @@ public class ConfigEnvironmentServiceImpl implements ConfigEnvironmentService {
     @Override
     public ConfigEnvironment selectConfigEnvironmentById( String envCode ) {
         ConfigEnvironment configEnvironment = configEnvironmentMapper.selectById( envCode );
-        if ( StringUtils.isNotBlank( configEnvironment.getEnvValue() ) && configEnvironment
-                .getEnvValue()
-                .startsWith( "${domain.oss}" ) ) {
-            configEnvironment.setEnvValue( configEnvironment
+        if(configEnvironment !=null){
+            if ( StringUtils.isNotBlank( configEnvironment.getEnvValue() ) && configEnvironment
                     .getEnvValue()
-                    .replaceFirst( "\\$\\{domain\\.oss\\}", ConfigDomainCacheUtil.me.getDomainOssValue() ) );
+                    .startsWith( "${domain.oss}" ) ) {
+                configEnvironment.setEnvValue( configEnvironment
+                        .getEnvValue()
+                        .replaceFirst( "\\$\\{domain\\.oss\\}", ConfigDomainCacheUtil.me.getDomainOssValue() ) );
+            }
         }
         return configEnvironment;
     }

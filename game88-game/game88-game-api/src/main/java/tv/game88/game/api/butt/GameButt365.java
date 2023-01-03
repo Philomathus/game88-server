@@ -69,17 +69,19 @@ public class GameButt365 extends AbstractGameButt {
         params.add( "userName", reqJoinGame.getGameMemberId().split( "_" )[ 1 ] );
         params.add( "extension1", reqJoinGame.getAgent() );
         params.add( "gameId", reqJoinGame.getKindId() );
+        params.add( "fullscreen", 0 );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(
-                reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/loginV2", requestEntity, String.class );
-        if ( responseEntity.getStatusCode() == HttpStatus.FOUND ) {
-            URI location = responseEntity.getHeaders().getLocation();
-            reqJoinGame.setGameUrl( location == null ? null : location.toString() );
-        }
+        String url = reqJoinGame.getApiUrl() + "/api/" + reqJoinGame.getDes() + "/loginV2";
+
+        log.warn( url + "         " + JsonUtil.object2Json( params ) );
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity( url, requestEntity, String.class );
+        URI location = responseEntity.getHeaders().getLocation();
+        reqJoinGame.setGameUrl( location == null ? null : location.toString() );
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
                     + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( responseEntity ), reqJoinGame.getGameMemberId() );
@@ -146,7 +148,7 @@ public class GameButt365 extends AbstractGameButt {
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals( resultMap.getOrDefault( "status", 0 ).toString() ) ) {
             BigDecimal withdrawBalance = new BigDecimal( resultMap.getOrDefault( "withdrawBalance", "-1" ).toString() );
-            if ( withdrawBalance.compareTo( reqJoinGame.getTransferMoney() ) == 0 ) {
+            if ( withdrawBalance.compareTo( reqJoinGame.getTransferMoney().negate() ) == 0 ) {
                 return;
             }
         }

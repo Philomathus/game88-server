@@ -81,7 +81,11 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
             GamePlatform gamePlatform = gamePlatformMap.get( enumGameCategory );
-            String       memberId     = dataLog.getAccount().toUpperCase().split( "_" )[ 1 ];
+            if ( gamePlatform == null ) {
+                log.error( dataLog.getPlatform_id() + ":" + enumGameCategory.name() );
+                continue;
+            }
+            String memberId = dataLog.getAccount().toUpperCase().split( "_" )[ 1 ];
             if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), dataLog.getId() ) != null ) {
                 continue;
             }

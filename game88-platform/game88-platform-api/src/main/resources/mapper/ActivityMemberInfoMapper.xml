@@ -27,7 +27,7 @@
         WHEN #{isTwoPw} THEN
         phone
         ELSE
-        CONCAT(left(phone, 5), '**', RIGHT(phone, 4))
+        CONCAT(left(phone, 3), '****', RIGHT(phone, 4))
         end phone
         from member_info
         <where>
@@ -45,7 +45,7 @@
             <if test="params.endTime != null and params.endTime != ''">
                 AND register_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
-
+             order by register_time desc
         </where>
     </select>
 

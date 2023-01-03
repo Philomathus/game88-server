@@ -75,5 +75,6 @@
                 and update_time = #{updateTime}
             </if>
         </where>
+        order by sort asc
     </select>
 </mapper>

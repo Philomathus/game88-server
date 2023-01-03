@@ -45,17 +45,13 @@ public class JinDunPayProcessor extends AbstractPay {
         requestMap.put("pay_md5sign", sign);
         requestMap.put("pay_productname", "product");
 
-        Map<String, Object> resultMap = this.sendPostMap(payPlatform.getPayUrl(), packageForm(requestMap), reqPayRecharge);
+        String resultStr = this.sendPostString(payPlatform.getPayUrl(), packageForm(requestMap), reqPayRecharge);
 
         log.warn(payPlatform.getName()
-                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json(resultMap), payChannel.getChannelCode(),
+                        + "下单结果:{},支付通道:{},订单号:{}", resultStr, payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo());
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            if ("00".equals(resultMap.getOrDefault("returncode", "").toString())) {
-                return "OK";
-            } else {
-                reqPayRecharge.setFailReason("FAIL");
-            }
+        if (StringUtils.isNoneBlank(resultStr)) {
+            return filterSpecialStr(resultStr);
         }
         return null;
     }

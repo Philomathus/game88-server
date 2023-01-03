@@ -20,16 +20,16 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPay.JING_CAI_PAY + "Processor" )
+@Repository( value = ConstantsPay.BAI_SHI_PAY + "Processor" )
 @Log4j2
-public class JingCaiPayProcessor extends AbstractPay {
+public class BaiShiPayProcessor extends AbstractPay {
+
     @Override
     public String getName() {
-        return "精彩支付";
+        return "百事支付";
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
@@ -74,7 +74,7 @@ public class JingCaiPayProcessor extends AbstractPay {
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        log.warn( "Query: {}", signStr );
+        log.warn( "Query: {}, ", signStr );
         params.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
@@ -135,11 +135,11 @@ public class JingCaiPayProcessor extends AbstractPay {
             if ( ( "2".equals( status ) || "3".equals( status ) )
                     && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( requestMap.getOrDefault( "payOrderId", "" ).toString() );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
+                        payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
         return "fail";
     }
 }
-

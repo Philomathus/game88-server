@@ -27,23 +27,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.KAI_YUAN + "GameProcessor" )
-public class GameButtKaiYuan extends AbstractGameButt {
+@Repository( value = ConstantsGame.BAISHENG + "GameProcessor" )
+public class GameButtBaiSheng extends AbstractGameButt {
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
-        // 开元没有token,忽略
+
     }
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        // 开元无需创建账号,进入游戏附带创建账号,忽略
+
     }
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s&money=0&orderid=%s&ip=%s&lineCode=%s&KindID=%s", 0,
-                reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(), reqJoinGame.getIp(), reqJoinGame.getLinecode(),
+        String params = String.format( "action=1&account=%s&money=0&nickname=%s&sub_channel_id=%s&server_type=%s&lang=cn"
+                + "&switch_lang=1", reqJoinGame.getGameMemberId(), reqJoinGame.getGameMemberId(), reqJoinGame.getLinecode(),
                 reqJoinGame.getKindId() );
         String param = null;
         try {
@@ -55,7 +55,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
+        requestMap.set( "channel_id", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
         requestMap.set( "param", param );
         requestMap.set( "key", key );
@@ -64,6 +64,8 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 .fromUriString( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
                 .build( true );
+
+        log.error( reqJoinGame.getGameCategory().getDes() + "访问游戏链接:{}", uriComponents.toUri().toString() );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -74,12 +76,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                String url = d.getOrDefault( "url", "" ).toString();
-                reqJoinGame.setGameUrl( url );
-            }
+        if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            String              url    = result.getOrDefault( "url", "" ).toString();
+            reqJoinGame.setGameUrl( url );
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
@@ -94,8 +94,8 @@ public class GameButtKaiYuan extends AbstractGameButt {
     @Override
     public void transferMoney( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 2, reqJoinGame.getGameMemberId(),
-                reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
+        String params = String.format( "action=2&account=%s&money=%s&money_type=RMB&order_id=%s", reqJoinGame.getGameMemberId()
+                , reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
             param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
@@ -106,7 +106,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
+        requestMap.set( "channel_id", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
         requestMap.set( "param", param );
         requestMap.set( "key", key );
@@ -134,12 +134,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                if ( code == 0 ) {
-                    return;
-                }
+            int code = Integer.parseInt( resultMap.getOrDefault( "code", "-1" ).toString() );
+            if ( code == 0 ) {
+                return;
             }
         }
         throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
@@ -148,8 +145,8 @@ public class GameButtKaiYuan extends AbstractGameButt {
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
         String time = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 3, reqJoinGame.getGameMemberId(),
-                reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
+        String params = String.format( "action=20&money_type=RMB&account=%s&order_id=%s&money=%s",
+                reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(), reqJoinGame.getTransferMoney() );
         String param = null;
         try {
             param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
@@ -160,7 +157,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
+        requestMap.set( "channel_id", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
         requestMap.set( "param", param );
         requestMap.set( "key", key );
@@ -188,12 +185,9 @@ public class GameButtKaiYuan extends AbstractGameButt {
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                if ( code == 0 ) {
-                    return;
-                }
+            int code = Integer.parseInt( resultMap.getOrDefault( "code", "-1" ).toString() );
+            if ( code == 0 ) {
+                return;
             }
         }
         throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分异常 - 下分失败或数据为空" );
@@ -202,7 +196,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         String time   = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s", 1, reqJoinGame.getGameMemberId() );
+        String params = String.format( "action=6&account=%s&money_type=RMB", reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
             param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
@@ -213,7 +207,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
+        requestMap.set( "channel_id", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
         requestMap.set( "param", param );
         requestMap.set( "key", key );
@@ -233,10 +227,10 @@ public class GameButtKaiYuan extends AbstractGameButt {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int        code  = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                BigDecimal money = new BigDecimal( d.getOrDefault( "money", "0" ).toString() );
+            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( result ) ) {
+                int        code  = Integer.parseInt( resultMap.getOrDefault( "code", "-1" ).toString() );
+                BigDecimal money = new BigDecimal( result.getOrDefault( "totalMoney", "0" ).toString() );
                 if ( code == 0 ) {
                     return money;
                 }
@@ -250,7 +244,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         String time   = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
+        String params = String.format( "action=5&order_id=%s", reqJoinGame.getOrderId() );
         String param  = null;
         try {
             param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
@@ -261,7 +255,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agent", reqJoinGame.getAgent() );
+        requestMap.set( "channel_id", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
         requestMap.set( "param", param );
         requestMap.set( "key", key );
@@ -284,12 +278,11 @@ public class GameButtKaiYuan extends AbstractGameButt {
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-
-            int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-            int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
-            if ( status != 3 ) {
-                return code == 0 && status == 0;
+            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( result ) ) {
+                int code   = Integer.parseInt( resultMap.getOrDefault( "code", "-1" ).toString() );
+                int status = Integer.parseInt( result.getOrDefault( "status", "-1" ).toString() );
+                return code == 0 && status == 2;
             }
         }
         throw new RuntimeException( "查询结果为空,需要重试" );
