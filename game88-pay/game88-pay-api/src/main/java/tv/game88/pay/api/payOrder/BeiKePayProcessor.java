@@ -87,7 +87,7 @@ public class BeiKePayProcessor extends AbstractPay {
 
             if ( "200".equals( code ) ) {
                 Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
-                if ( !CollectionUtils.isEmpty( dataMap ) && "1".equals( dataMap.getOrDefault( "status", "-1" ) ) ) {
+                if ( !CollectionUtils.isEmpty( dataMap ) && "1".equals( dataMap.getOrDefault( "status", "-1" ).toString() ) ) {
                     memberRechargeOnline.setUpperOrderNo( dataMap.getOrDefault( "trade_no", "" ).toString() );
                     return true;
                 }
@@ -132,7 +132,7 @@ public class BeiKePayProcessor extends AbstractPay {
             String status = requestMap.getOrDefault( "status", "" ).toString();
             if ( "success".equals( status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 BigDecimal amount = new BigDecimal( requestMap.getOrDefault( "amount", 0 ).toString() );
-                memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
+                memberRechargeOnline.setRealMoney( amount );
                 return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
                         payChannel.getName() );
             }
