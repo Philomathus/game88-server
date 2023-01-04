@@ -16,10 +16,7 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 @Repository( value = ConstantsPay.BEIKE_PAY + "Processor" )
 @Log4j2
@@ -32,7 +29,7 @@ public class BeiKePayProcessor extends AbstractPay {
     @Override
     @SuppressWarnings( "unchecked" )
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
-        Map<String, Object> params = new TreeMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put( "account_id", payPlatform.getMerId() );
         params.put( "thoroughfare", payChannel.getChannelCode() );
         params.put( "out_trade_no", reqPayRecharge.getOrderNo() );
@@ -44,12 +41,11 @@ public class BeiKePayProcessor extends AbstractPay {
         params.put( "success_url", "xx" );
         params.put( "error_url", "xx" );
 
-        String tempStr = DigestUtils.md5Hex( params.get( "amount" ).toString() + params.get( "out_trade_no" ) )
-                + AESCoder.decrypt( payPlatform.getSignMd5() );
-        log.warn( "Order: {}", tempStr );
+        String s       = params.get( "amount" ).toString() + params.get( "out_trade_no" ).toString();
+        String tempStr = AESCoder.decrypt( payPlatform.getSignMd5() ).toLowerCase() + DigestUtils.md5Hex( s );
         params.put( "sign", DigestUtils.md5Hex( tempStr ) );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
@@ -77,8 +73,8 @@ public class BeiKePayProcessor extends AbstractPay {
         params.put( "nonce_str", IdWorker.get32UUID() );
         params.put( "amount", memberRechargeOnline.getMoney() );
 
-        String tempStr = DigestUtils.md5Hex( params.get( "amount" ).toString() + params.get( "out_trade_no" ) )
-                + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String tempStr = AESCoder.decrypt( payPlatform.getSignMd5() ).toLowerCase() + DigestUtils.md5Hex(
+                params.get( "amount" ).toString() + params.get( "out_trade_no" ) );
         log.warn( "Query: {}", tempStr );
         params.put( "sign", DigestUtils.md5Hex( tempStr ) );
 
@@ -125,8 +121,8 @@ public class BeiKePayProcessor extends AbstractPay {
 
         String sign = requestMap.remove( "sign" ).toString();
 
-        String signStr = DigestUtils.md5Hex( requestMap.get( "amount" ).toString() + requestMap.get( "out_trade_no" ) )
-                + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signStr = AESCoder.decrypt( payPlatform.getSignMd5() ).toLowerCase() + DigestUtils.md5Hex(
+                requestMap.get( "amount" ).toString() + requestMap.get( "out_trade_no" ) );
         log.warn( "Callback: {}", signStr );
         String rel = DigestUtils.md5Hex( signStr );
 
