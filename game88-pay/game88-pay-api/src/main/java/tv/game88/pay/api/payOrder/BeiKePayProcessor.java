@@ -3,7 +3,6 @@ package tv.game88.pay.api.payOrder;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
@@ -17,6 +16,7 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -41,13 +41,13 @@ public class BeiKePayProcessor extends AbstractPay {
         params.put( "nonce_str", IdWorker.get32UUID() );
         params.put( "content_type", "json_new" );
         params.put( "robin", "1" );
+        params.put( "success_url", "xx" );
+        params.put( "error_url", "xx" );
 
-        String tempStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String tempStr = DigestUtils.md5Hex( params.get( "amount" ).toString() + params.get( "out_trade_no" ) )
+                + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Order: {}", tempStr );
-        String sign = DigestUtils.md5Hex( tempStr ).toLowerCase();
-        params.put( "sign", sign );
-        params.put( "success_url", "" );
-        params.put( "error_url", "" );
+        params.put( "sign", DigestUtils.md5Hex( tempStr ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
@@ -56,10 +56,11 @@ public class BeiKePayProcessor extends AbstractPay {
                 reqPayRecharge.getOrderNo() );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String              code    = resultMap.getOrDefault( "code", "" ).toString();
-            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
-            if ( "200".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
-                return resultMap.get( "jump_url" ).toString();
+            String                    code        = resultMap.getOrDefault( "code", "" ).toString();
+            List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.get( "data" );
+            if ( "200".equals( code ) && !CollectionUtils.isEmpty( dataMapList ) ) {
+                Map<String, Object> dataMap = dataMapList.get( 0 );
+                return dataMap.get( "jump_url" ).toString();
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
             }
@@ -76,9 +77,10 @@ public class BeiKePayProcessor extends AbstractPay {
         params.put( "nonce_str", IdWorker.get32UUID() );
         params.put( "amount", memberRechargeOnline.getMoney() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        log.warn( "Query: {}", signStr );
-        params.put( "sign", DigestUtils.md5Hex( signStr ).toLowerCase() );
+        String tempStr = DigestUtils.md5Hex( params.get( "amount" ).toString() + params.get( "out_trade_no" ) )
+                + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( "Query: {}", tempStr );
+        params.put( "sign", DigestUtils.md5Hex( tempStr ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
 
@@ -122,14 +124,11 @@ public class BeiKePayProcessor extends AbstractPay {
         }
 
         String sign = requestMap.remove( "sign" ).toString();
-        // 去除空值
-        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
 
-        SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
-
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signStr = DigestUtils.md5Hex( requestMap.get( "amount" ).toString() + requestMap.get( "out_trade_no" ) )
+                + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Callback: {}", signStr );
-        String rel = DigestUtils.md5Hex( signStr ).toLowerCase();
+        String rel = DigestUtils.md5Hex( signStr );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
         if ( rel.equalsIgnoreCase( sign ) ) {
