@@ -52,10 +52,9 @@ public class BeiKePayProcessor extends AbstractPay {
                 reqPayRecharge.getOrderNo() );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String                    code        = resultMap.getOrDefault( "code", "" ).toString();
-            List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.get( "data" );
-            if ( "200".equals( code ) && !CollectionUtils.isEmpty( dataMapList ) ) {
-                Map<String, Object> dataMap = dataMapList.get( 0 );
+            String code = resultMap.getOrDefault( "code", "" ).toString();
+            if ( "200".equals( code ) ) {
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
                 return dataMap.get( "jump_url" ).toString();
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
@@ -84,12 +83,14 @@ public class BeiKePayProcessor extends AbstractPay {
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String              code    = resultMap.getOrDefault( "code", "" ).toString();
-            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
-            if ( "200".equals( code ) && !CollectionUtils.isEmpty( dataMap )
-                    && "1".equals( dataMap.getOrDefault( "status", "-1" ) ) ) {
-                memberRechargeOnline.setUpperOrderNo( dataMap.getOrDefault( "trade_no", "" ).toString() );
-                return true;
+            String code = resultMap.getOrDefault( "code", "" ).toString();
+
+            if ( "200".equals( code ) ) {
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+                if ( !CollectionUtils.isEmpty( dataMap ) && "1".equals( dataMap.getOrDefault( "status", "-1" ) ) ) {
+                    memberRechargeOnline.setUpperOrderNo( dataMap.getOrDefault( "trade_no", "" ).toString() );
+                    return true;
+                }
             }
         }
         return false;
