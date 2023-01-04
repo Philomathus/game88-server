@@ -70,14 +70,14 @@ public class BeiKePayProcessor extends AbstractPay {
         params.put( "acc_id", payPlatform.getMerId() );
         params.put( "out_trade_no", memberRechargeOnline.getOrderNo() );
         params.put( "nonce_str", IdWorker.get32UUID() );
-        params.put( "amount", memberRechargeOnline.getMoney() );
+        params.put( "amount", memberRechargeOnline.getMoney().setScale( 2, RoundingMode.HALF_UP ) );
 
         String tempStr = AESCoder.decrypt( payPlatform.getSignMd5() ).toLowerCase() + DigestUtils.md5Hex(
                 params.get( "amount" ).toString() + params.get( "out_trade_no" ) );
         log.warn( "Query: {}", tempStr );
         params.put( "sign", DigestUtils.md5Hex( tempStr ) );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
