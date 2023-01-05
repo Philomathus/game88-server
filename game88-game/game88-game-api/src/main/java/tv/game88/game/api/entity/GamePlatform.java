@@ -51,6 +51,19 @@ public class GamePlatform {
      */
     @Excel( name = "查询注单" )
     private String           recordUrl;
+
+    /**
+     * 小图标
+     */
+    @Excel( name = "小图标" )
+    private String icon;
+
+    /**
+     * 卡片图标
+     */
+    @Excel( name = "卡片图标" )
+    private String cardIcon;
+
     /**
      * DES密钥
      */

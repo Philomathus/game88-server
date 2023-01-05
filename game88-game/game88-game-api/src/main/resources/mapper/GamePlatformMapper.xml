@@ -9,6 +9,8 @@
         <result property="apiUrl" column="api_url" />
         <result property="recordUrl" column="record_url" />
         <result property="des" column="des" />
+        <result property="icon" column="icon" />
+        <result property="cardIcon" column="card_icon" />
         <result property="md5" column="md5" />
         <result property="linecode" column="linecode" />
         <result property="rateClean" column="rate_clean" />
@@ -29,6 +31,8 @@
                api_url,
                record_url,
                des,
+               icon,
+               card_icon,
                md5,
                linecode,
                rate_clean,

@@ -1,7 +1,9 @@
 package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.service.GamePlatformService;
@@ -28,6 +30,17 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
         for ( GamePlatform platform : gamePlatforms ) {
             platform.setDes( null );
             platform.setMd5( null );
+        }
+
+        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+
+        for ( GamePlatform gamePlatform1 : gamePlatforms ) {
+            if ( StringUtils.isNotBlank( gamePlatform1.getIcon() ) && !gamePlatform1.getIcon().startsWith( "http" ) ) {
+                gamePlatform1.setIcon( domainValue + gamePlatform1.getIcon() );
+            }
+            if ( StringUtils.isNotBlank( gamePlatform1.getCardIcon() ) && !gamePlatform1.getCardIcon().startsWith( "http" ) ) {
+                gamePlatform1.setCardIcon( domainValue + gamePlatform1.getCardIcon() );
+            }
         }
         return gamePlatforms;
     }
