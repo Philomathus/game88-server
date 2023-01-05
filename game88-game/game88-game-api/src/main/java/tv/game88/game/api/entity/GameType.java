@@ -45,4 +45,10 @@ public class GameType {
      */
     @Excel( name = "排序号" )
     private Long sort;
+
+    /**
+     * 显示类型
+     */
+    @Excel( name = "显示类型")
+    private Integer type;
 }

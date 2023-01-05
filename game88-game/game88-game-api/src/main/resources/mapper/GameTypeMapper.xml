@@ -7,10 +7,11 @@
         <result property="effect" column="effect" />
         <result property="icon" column="icon" />
         <result property="sort" column="sort" />
+        <result property="type" column="type" />
     </resultMap>
 
     <sql id="selectGameTypeVo">
-        select id, name, effect, icon, sort
+        select id, name, effect, icon, sort,type
         from game_type
     </sql>
 
