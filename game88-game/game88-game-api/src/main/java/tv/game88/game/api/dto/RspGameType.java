@@ -6,9 +6,11 @@ import lombok.Data;
 @Data
 public class RspGameType {
     @Schema( title = "类型ID" )
-    private Long   id;
+    private Long    id;
     @Schema( title = "名称" )
-    private String name;
+    private String  name;
     @Schema( title = "图标" )
-    private String icon;
+    private String  icon;
+    @Schema( title = "显示类型" )
+    private Integer type;
 }
