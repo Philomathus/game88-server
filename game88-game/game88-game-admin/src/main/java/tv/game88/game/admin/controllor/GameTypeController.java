@@ -51,11 +51,15 @@ public class GameTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:type:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<RspGame>> listAll() {
-        List<RspGame> list = gameTypeService.list( new QueryWrapper<GameType>().select( "id", "name", "icon" ) ).stream().map( p -> {
-            RspGame rspGame = new RspGame();
-            BeanUtils.copyProperties( p, rspGame );
-            return rspGame;
-        } ).collect( Collectors.toList() );
+        List<RspGame> list = gameTypeService
+                .list( new QueryWrapper<GameType>().ne( "id", 1 ).select( "id", "name", "icon" ) )
+                .stream()
+                .map( p -> {
+                    RspGame rspGame = new RspGame();
+                    BeanUtils.copyProperties( p, rspGame );
+                    return rspGame;
+                } )
+                .collect( Collectors.toList() );
         return RspBase.ok( list );
     }
 
