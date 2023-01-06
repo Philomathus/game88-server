@@ -16,6 +16,7 @@
         <result property="rateClean" column="rate_clean" />
         <result property="rateBeat" column="rate_beat" />
         <result property="effect" column="effect" />
+        <result property="sort" column="sort" />
         <result property="maintain" column="maintain" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
@@ -38,6 +39,7 @@
                rate_clean,
                rate_beat,
                effect,
+               sort,
                maintain,
                create_by,
                create_time,

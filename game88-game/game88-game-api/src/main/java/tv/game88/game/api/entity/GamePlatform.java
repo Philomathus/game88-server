@@ -92,6 +92,13 @@ public class GamePlatform {
      */
     @Excel( name = "激活状态(1启用0停用)" )
     private Boolean          effect;
+
+    /**
+     * 排序号
+     */
+    @Excel( name = "排序号" )
+    private int sort;
+
     /**
      * 是否维护(1是0否)
      */
