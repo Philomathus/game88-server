@@ -25,6 +25,7 @@ import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameMoney;
 import tv.game88.game.api.exception.GameTransferException;
+import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
@@ -61,6 +62,8 @@ public class GameServiceImpl implements GameService {
     @Resource
     private GamePlatformMapper     gamePlatformMapper;
     @Resource
+    private GameInfoMapper         gameInfoMapper;
+    @Resource
     private MemberGameMoneyMapper  memberGameMoneyMapper;
     @Resource
     private MemberGameMoneyService memberGameMoneyService;
@@ -91,8 +94,57 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<RspGameInfo> getGameInfoList( Long typeId ) {
-        return gameCacheUtils.getEffectInfoList( typeId );
+    public List<RspGameInfo> getGameInfoList( Long typeId, Long platformId ) {
+        if ( platformId == null ) {
+            return gameCacheUtils.getEffectInfoList( typeId );
+        } else {
+            return gameInfoMapper.selectRspListByPlatform( typeId, platformId );
+        }
+    }
+
+    @Override
+    public RspBase<List<RspGamePlatform>> getGameInfoGroup( Long infoTypeId ) {
+        List<RspGameType> gameTypeList   = gameCacheUtils.getEffectTypeList();
+        RspGameType       rspGameType_   = null;
+        RspGameType       rspGameTypeHot = null;
+        for ( RspGameType rspGameType : gameTypeList ) {
+            if ( Objects.equals( rspGameType.getId(), infoTypeId ) ) {
+                rspGameType_ = rspGameType;
+            }
+            if ( Objects.equals( rspGameType.getId(), 1L ) ) {
+                rspGameTypeHot = rspGameType;
+            }
+        }
+        if ( rspGameType_ == null || rspGameTypeHot == null ) {
+            return RspBase.businessError( "未知的游戏分类" );
+        }
+        if ( !Arrays.asList( 3, 4 ).contains( rspGameType_.getType() ) ) {
+            return RspBase.businessError( "游戏显示类型错误" );
+        }
+
+        List<RspGamePlatform> rspGamePlatformList = new ArrayList<>();
+        if ( rspGameType_.getType() == 4 ) {
+            RspGamePlatform hotRsp = new RspGamePlatform();
+            hotRsp.setId( -1L );
+            hotRsp.setName( rspGameTypeHot.getName() );
+            hotRsp.setCardIcon( rspGameTypeHot.getIcon() );
+            hotRsp.setRspGameInfos( gameInfoMapper.selectHotRspList( infoTypeId ) );
+            rspGamePlatformList.add( hotRsp );
+        }
+        rspGamePlatformList.addAll( gamePlatformMapper.selectRspList( infoTypeId ) );
+        if ( !CollectionUtils.isEmpty( rspGamePlatformList ) ) {
+            for ( RspGamePlatform rspGamePlatform : rspGamePlatformList ) {
+                if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon().startsWith( "http" ) ) {
+                    rspGamePlatform.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getIcon() );
+                }
+                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform
+                        .getCardIcon()
+                        .startsWith( "http" ) ) {
+                    rspGamePlatform.setCardIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getCardIcon() );
+                }
+            }
+        }
+        return RspBase.ok( rspGamePlatformList );
     }
 
     @Override

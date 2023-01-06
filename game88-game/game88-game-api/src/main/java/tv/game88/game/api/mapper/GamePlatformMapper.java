@@ -1,6 +1,7 @@
 package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tv.game88.game.api.dto.RspGamePlatform;
 import tv.game88.game.api.entity.GamePlatform;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface GamePlatformMapper extends BaseMapper<GamePlatform> {
      * @return 游戏平台集合
      */
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform );
+
+    List<RspGamePlatform> selectRspList( Long infoTypeId );
 }

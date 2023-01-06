@@ -90,4 +90,14 @@
             </if>
         </where>
     </select>
+
+    <select id="selectRspList" resultType="tv.game88.game.api.dto.RspGamePlatform">
+        select DISTINCT p.id, p.name, p.icon, p.card_icon
+        from game_platform p
+                 INNER JOIN game_info i on i.platform_id = p.id
+        where i.type_id = #{infoTypeId}
+          and i.effect = 1
+          and p.effect = 1
+        order by p.sort
+    </select>
 </mapper>

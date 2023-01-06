@@ -13,10 +13,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
-import tv.game88.game.api.dto.ReqGame;
-import tv.game88.game.api.dto.RspGameInfo;
-import tv.game88.game.api.dto.RspGameMoney;
-import tv.game88.game.api.dto.RspGameTypes;
+import tv.game88.game.api.dto.*;
 import tv.game88.game.api.service.GameService;
 
 import javax.annotation.Resource;
@@ -39,8 +36,15 @@ public class GameController extends BaseController {
     @Operation( summary = "根据类型获取游戏列表" )
     @PostMapping( "/getGameInfoList" )
     @Anonymous
-    public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
-        return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
+    public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGameInfo req ) {
+        return RspBase.ok( gameService.getGameInfoList( req.getId(), req.getPlatformId() ) );
+    }
+
+    @Operation( summary = "根据类型获取游戏分组" )
+    @PostMapping( "/getGameInfoGroup" )
+    @Anonymous
+    public RspBase<List<RspGamePlatform>> getGameInfoGroup( @Validated @RequestBody ReqGame req ) {
+        return gameService.getGameInfoGroup( req.getId() );
     }
 
     // 获取游戏token,内部接口

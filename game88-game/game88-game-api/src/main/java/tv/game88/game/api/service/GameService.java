@@ -4,17 +4,16 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.game.api.dto.RspGameDataLog;
-import tv.game88.game.api.dto.RspGameInfo;
-import tv.game88.game.api.dto.RspGameMoney;
-import tv.game88.game.api.dto.RspGameTypes;
+import tv.game88.game.api.dto.*;
 
 import java.util.List;
 
 public interface GameService {
     RspGameTypes getGameTypes();
 
-    List<RspGameInfo> getGameInfoList( Long typeId );
+    List<RspGameInfo> getGameInfoList( Long typeId, Long platformId );
+
+    RspBase<List<RspGamePlatform>> getGameInfoGroup( Long typeId );
 
     RspBase<?> joinGame( Long infoId, PlatformUser platformUser );
 
