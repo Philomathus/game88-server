@@ -77,29 +77,38 @@ public class GameServiceImpl implements GameService {
     private ForkJoinPool forkJoinPool;
 
     @Override
-    public RspGameTypes getGameTypes() {
-        List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
+    public RspGameTypes getGameTypes( String version ) {
+        List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
+        boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.5.0", version );
+        gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L ).contains( rspGameType.getId() ) : Arrays
+                .asList( 8L, 9L )
+                .contains( rspGameType.getId() ) );
         for ( RspGameType rspGameType : gameTypeList ) {
             if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
+            }
+            if ( StringUtils.isNotBlank( rspGameType.getName() ) && rspGameType.getName().contains( "-" ) ) {
+                rspGameType.setName( rspGameType.getName().replaceAll( "-", "" ) );
             }
         }
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
             Long typeId = gameTypeList.get( 0 ).getId();
-            rspGameTypes.setRspGameInfos( gameCacheUtils.getEffectInfoList( typeId ) );
+            rspGameTypes.setRspGameInfos( hasNewVersion ? gameCacheUtils.getEffectInfoList( typeId, null ) :
+                    gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
     }
 
     @Override
-    public List<RspGameInfo> getGameInfoList( Long typeId, Long platformId ) {
-        if ( platformId == null ) {
-            return gameCacheUtils.getEffectInfoList( typeId );
-        } else {
-            return gameInfoMapper.selectRspListByPlatform( typeId, platformId );
-        }
+    public List<RspGameInfo> getGameInfoList( Long typeId ) {
+        return gameCacheUtils.getEffectInfoList( typeId );
+    }
+
+    @Override
+    public List<RspGameInfo> getGameInfos( Long typeId, Long platformId ) {
+        return gameCacheUtils.getEffectInfoList( typeId, platformId );
     }
 
     @Override

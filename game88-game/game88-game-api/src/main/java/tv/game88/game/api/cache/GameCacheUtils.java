@@ -30,6 +30,7 @@ public class GameCacheUtils {
     public static final String GAME_PLATFORM_LIST_KEY = Constants.GAME_PREX + "platformList";
     public static final String GAME_INFO_KEY          = Constants.GAME_PREX + "info:";
     public static final String GAME_INFO_LIST_KEY     = Constants.GAME_PREX + "infoList:";
+    public static final String GAME_INFO_S_KEY        = Constants.GAME_PREX + "infos:";
 
     @Resource
     private RedisUtils         redisUtils;
@@ -100,12 +101,7 @@ public class GameCacheUtils {
 
     public List<RspGameInfo> getEffectInfoList( Long typeId ) {
         if ( !redisUtils.exists( GAME_INFO_LIST_KEY + typeId ) ) {
-            List<RspGameInfo> rspGameInfoList;
-            if ( typeId == 1 ) {
-                rspGameInfoList = gameInfoMapper.selectRspListByRecommend();
-            } else {
-                rspGameInfoList = gameInfoMapper.selectRspList( typeId );
-            }
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( typeId );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
                 for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
                     if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
@@ -119,6 +115,33 @@ public class GameCacheUtils {
         }
         String s = redisUtils.strGet( GAME_INFO_LIST_KEY + typeId );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
+    }
+
+    public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
+        List<RspGameInfo> rspGameInfoList;
+        if ( !redisUtils.exists( GAME_INFO_S_KEY + typeId ) ) {
+            if ( typeId == 1 ) {
+                rspGameInfoList = gameInfoMapper.selectRspListByRecommend();
+            } else {
+                rspGameInfoList = gameInfoMapper.selectRspList( typeId );
+            }
+            if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
+                for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
+                    if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
+                            && StringUtils.isNotBlank( rspGameInfo.getKindId() ) ) {
+                        rspGameInfo.setLotteryId( Long.parseLong( rspGameInfo.getKindId() ) );
+                    }
+                }
+                redisUtils.strSet( GAME_INFO_S_KEY + typeId, JsonUtil.object2Json( rspGameInfoList ) );
+            }
+        } else {
+            String s = redisUtils.strGet( GAME_INFO_S_KEY + typeId );
+            rspGameInfoList = StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
+        }
+        if ( platformId != null && !CollectionUtils.isEmpty( rspGameInfoList ) ) {
+            rspGameInfoList.removeIf( rspGameInfo -> rspGameInfo.getPlatformId() != platformId.intValue() );
+        }
+        return rspGameInfoList;
     }
 
     public void clear( String key ) {
@@ -136,6 +159,7 @@ public class GameCacheUtils {
         List<RspGameType> effectTypeList = getEffectTypeList();
         for ( RspGameType rspGameType : effectTypeList ) {
             this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
+            this.clear( GAME_INFO_S_KEY + rspGameType.getId() );
         }
     }
 }

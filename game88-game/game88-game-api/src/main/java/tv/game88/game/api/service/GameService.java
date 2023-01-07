@@ -9,9 +9,11 @@ import tv.game88.game.api.dto.*;
 import java.util.List;
 
 public interface GameService {
-    RspGameTypes getGameTypes();
+    RspGameTypes getGameTypes( String version );
 
-    List<RspGameInfo> getGameInfoList( Long typeId, Long platformId );
+    List<RspGameInfo> getGameInfoList( Long typeId );
+
+    List<RspGameInfo> getGameInfos( Long typeId, Long platformId );
 
     RspBase<List<RspGamePlatform>> getGameInfoGroup( Long typeId );
 

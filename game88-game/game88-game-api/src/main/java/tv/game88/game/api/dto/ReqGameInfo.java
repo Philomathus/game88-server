@@ -11,5 +11,5 @@ public class ReqGameInfo {
     @NotNull( message = "游戏类型ID不能为空" )
     private Long id;
     @Schema( title = "游戏平台ID" )
-    private Long platformId;
+    private Long pid;
 }
