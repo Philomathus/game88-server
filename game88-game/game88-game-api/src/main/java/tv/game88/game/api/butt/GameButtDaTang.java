@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Log4j2
 @Repository( value = ConstantsGame.DATANG + "GameProcessor" )
@@ -44,7 +45,7 @@ public class GameButtDaTang extends AbstractGameButt {
         String time = System.currentTimeMillis() + "";
         String params = String.format( "account=%s&headindex=0&linecode=%s&lastloginip=%s&logintype=%s&gameid=%s",
                 reqJoinGame.getGameMemberId(), reqJoinGame.getLinecode(), reqJoinGame.getIp(),
-                reqJoinGame.getDev() == 1 ? 4 : 2, reqJoinGame.getKindId() );
+                Objects.equals( reqJoinGame.getDev(), 1 ) ? 4 : 2, reqJoinGame.getKindId() );
         String param = null;
         try {
             param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
