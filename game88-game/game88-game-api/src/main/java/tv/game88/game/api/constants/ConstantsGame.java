@@ -19,4 +19,5 @@ public class ConstantsGame {
     public static final String BAISHENG   = "baiSheng";
     public static final String BG         = "bg";
     public static final String MEIBO      = "meiBo";
+    public static final String DATANG     = "daTang";
 }

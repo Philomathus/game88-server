@@ -23,10 +23,11 @@ public class ReqJoinGame {
     private String     gameMemberId;
     private BigDecimal transferMoney;
 
-    private String orderId;
-    private Long   platformId;
-    private String token;
-    private String ip;
+    private String  orderId;
+    private Long    platformId;
+    private String  token;
+    private String  ip;
+    private Integer dev;
 
     private String gameUrl;
 }

@@ -60,8 +60,9 @@ public class GameController extends BaseController {
 
     @Operation( summary = "进入游戏" )
     @PostMapping( "/joinGame" )
-    public RspBase<?> joinGame( @Validated @RequestBody ReqGame req ) {
-        return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser() );
+    public RspBase<?> joinGame( @RequestHeader( value = "dev", required = false ) Integer dev,
+                                @Validated @RequestBody ReqGame req ) {
+        return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser(), dev );
     }
 
     @Operation( summary = "会员游戏下分" )

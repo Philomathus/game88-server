@@ -113,18 +113,14 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<List<RspGamePlatform>> getGameInfoGroup( Long infoTypeId ) {
-        List<RspGameType> gameTypeList   = gameCacheUtils.getEffectTypeList();
-        RspGameType       rspGameType_   = null;
-        RspGameType       rspGameTypeHot = null;
+        List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
+        RspGameType       rspGameType_ = null;
         for ( RspGameType rspGameType : gameTypeList ) {
             if ( Objects.equals( rspGameType.getId(), infoTypeId ) ) {
                 rspGameType_ = rspGameType;
             }
-            if ( Objects.equals( rspGameType.getId(), 1L ) ) {
-                rspGameTypeHot = rspGameType;
-            }
         }
-        if ( rspGameType_ == null || rspGameTypeHot == null ) {
+        if ( rspGameType_ == null ) {
             return RspBase.businessError( "未知的游戏分类" );
         }
         if ( !Arrays.asList( 3, 4 ).contains( rspGameType_.getType() ) ) {
@@ -135,8 +131,8 @@ public class GameServiceImpl implements GameService {
         if ( rspGameType_.getType() == 4 ) {
             RspGamePlatform hotRsp = new RspGamePlatform();
             hotRsp.setId( -1L );
-            hotRsp.setName( rspGameTypeHot.getName() );
-            hotRsp.setCardIcon( rspGameTypeHot.getIcon() );
+            hotRsp.setName( "热门电子" );
+            hotRsp.setCardIcon( "/8800/default/c88c2b13b480ff521d78ac3ca81a2908.png" );
             hotRsp.setRspGameInfos( gameInfoMapper.selectHotRspList( infoTypeId ) );
             rspGamePlatformList.add( hotRsp );
         }
@@ -157,7 +153,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<?> joinGame( Long infoId, PlatformUser platformUser ) {
+    public RspBase<?> joinGame( Long infoId, PlatformUser platformUser, Integer dev ) {
         GameInfo gameInfo = gameCacheUtils.getGameInfo( infoId );
         if ( gameInfo == null || !gameInfo.getEffect() ) {
             return RspBase.businessError( "该游戏不存在或已关闭" );
@@ -186,7 +182,7 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney );
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
@@ -210,6 +206,7 @@ public class GameServiceImpl implements GameService {
                 // 查询转账记录
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.enterGameSuccess( reqJoinGame );
+                    redisUtils.unLock( "joinGame" + platformUser.getId() );
                     return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
                 } else {
                     // 如果转账记录不存在则回退会员上分金额
@@ -245,11 +242,12 @@ public class GameServiceImpl implements GameService {
         if ( !redisUtils.lock( "escGame" + memberId, 10 ) ) {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null );
+        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
-            if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+            if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                    && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
                 baseGameButt.getToken( reqJoinGame );
             }
             BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
@@ -293,7 +291,7 @@ public class GameServiceImpl implements GameService {
         List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
         for ( GamePlatform gamePlatform : gamePlatforms ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
             BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
@@ -345,7 +343,7 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "游戏平台不存在" );
         }
         if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null );
             BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
             baseGameButt.getToken( reqJoinGame );
             return RspBase.ok( "", reqJoinGame.getToken() );
@@ -354,7 +352,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
-                                           BigDecimal changeMoney ) {
+                                           BigDecimal changeMoney, Integer dev ) {
         // BBIN会员ID只能是英文加数字
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
@@ -378,6 +376,7 @@ public class GameServiceImpl implements GameService {
                 .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
                 .ip( ServletUtil.getIp() )
                 .gameCategory( gamePlatform.getGameCategory() )
+                .dev( dev )
                 .build();
     }
 

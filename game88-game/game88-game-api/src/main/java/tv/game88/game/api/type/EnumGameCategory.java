@@ -29,6 +29,7 @@ public enum EnumGameCategory {
     BAISHENG( ConstantsGame.BAISHENG, "百胜棋牌" ),
     BG( ConstantsGame.BG, "BG棋牌" ),
     MEIBO( ConstantsGame.MEIBO, "美博棋牌" ),
+    DATANG( ConstantsGame.DATANG, "大唐棋牌" ),
     ;
 
     private final String type;
@@ -78,6 +79,7 @@ public enum EnumGameCategory {
             case BAISHENG -> List.of( 55 );
             case BG -> List.of( 56 );
             case MEIBO -> List.of( 57 );
+            case DATANG -> List.of( 58 );
         };
     }
 
@@ -101,6 +103,7 @@ public enum EnumGameCategory {
             case 55 -> BAISHENG;
             case 56 -> BG;
             case 57 -> MEIBO;
+            case 58 -> DATANG;
             default -> null;
         };
     }
