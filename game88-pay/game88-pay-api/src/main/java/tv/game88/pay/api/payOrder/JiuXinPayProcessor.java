@@ -61,7 +61,7 @@ public class JiuXinPayProcessor extends AbstractPay {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String code = resultMap.getOrDefault( "retCode", "" ).toString();
             if ( "0".equals( code ) ) {
-                return resultMap.get( "payUrl" ).toString();
+                return filterSpecialStr( resultMap.get( "payUrl" ).toString() );
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
