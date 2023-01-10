@@ -29,6 +29,8 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.HG + "GameProcessor" )
 public class GameButtHG extends AbstractGameButt {
+    private static final String MODE = "1";
+
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
 
@@ -47,6 +49,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "password", reqJoinGame.getGameMemberId() + "1234" );
         params.put( "ip", reqJoinGame.getIp() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
@@ -90,6 +93,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "password", reqJoinGame.getGameMemberId() + "1234" );
         params.put( "gameCode", reqJoinGame.getLinecode() );
         params.put( "ip", reqJoinGame.getIp() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
@@ -135,6 +139,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
         params.put( "money", reqJoinGame.getTransferMoney().toString() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
@@ -180,6 +185,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
         params.put( "money", reqJoinGame.getTransferMoney().toString() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
@@ -223,6 +229,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "merchant", reqJoinGame.getDes() );
         params.put( "agent", reqJoinGame.getAgent() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
@@ -265,6 +272,7 @@ public class GameButtHG extends AbstractGameButt {
         params.put( "agent", reqJoinGame.getAgent() );
         params.put( "type", reqJoinGame.getMoneyType() + "" );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
+        params.put( "mode", MODE );
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
