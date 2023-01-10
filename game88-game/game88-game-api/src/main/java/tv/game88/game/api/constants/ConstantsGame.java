@@ -22,4 +22,9 @@ public class ConstantsGame {
     public static final String DATANG     = "daTang";
     public static final String HG         = "hg";
     public static final String XINGYUN    = "xingYun";
+    public static final String WALI       = "wali";
+    public static final String SGWIN      = "sgWin";
+    public static final String FG         = "fg";
+    public static final String JDB        = "jdb";
+    public static final String CQ9        = "cq9";
 }

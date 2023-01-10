@@ -30,4 +30,7 @@ public class ReqJoinGame {
     private Integer dev;
 
     private String gameUrl;
+
+    // 1 转入 2 转出
+    private Integer moneyType;
 }

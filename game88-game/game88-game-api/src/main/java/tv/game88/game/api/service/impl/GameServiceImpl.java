@@ -203,6 +203,7 @@ public class GameServiceImpl implements GameService {
         } catch ( Exception e ) {
             // 如果发生转账异常
             if ( e instanceof GameTransferException ) {
+                reqJoinGame.setMoneyType( 1 );
                 // 查询转账记录
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.enterGameSuccess( reqJoinGame );
@@ -262,6 +263,7 @@ public class GameServiceImpl implements GameService {
         } catch ( Exception e ) {
             // 如果发生提现异常
             if ( e instanceof GameTransferException ) {
+                reqJoinGame.setMoneyType( 2 );
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.outGameSuccess( reqJoinGame );
                     return RspBase.ok( "下分成功" );
@@ -358,6 +360,7 @@ public class GameServiceImpl implements GameService {
             case BBIN -> profile + "BBIN" + memberId;
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
             case BOLE -> ( profile + memberId ).toLowerCase();
+            case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
         return ReqJoinGame
@@ -386,6 +389,9 @@ public class GameServiceImpl implements GameService {
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
+            case HG -> AESCoder.decrypt( gamePlatform.getDes() )
+                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                    .concat( gameMemberId );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );

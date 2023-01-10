@@ -16,7 +16,7 @@ public enum EnumGameCategory {
     AG( ConstantsGame.AG, "AG电子" ),
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
-    SHABA( ConstantsGame.SHABA, "沙巴电子" ),
+    SHABA( ConstantsGame.SHABA, "沙巴体育" ),
     ICG( ConstantsGame.ICG, "ICG电子" ),
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
     KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
@@ -32,6 +32,11 @@ public enum EnumGameCategory {
     DATANG( ConstantsGame.DATANG, "大唐棋牌" ),
     HG( ConstantsGame.HG, "欢乐棋牌" ),
     XINGYUN( ConstantsGame.XINGYUN, "幸运棋牌" ),
+    WALI( ConstantsGame.WALI, "瓦力棋牌" ),
+    SGWIN( ConstantsGame.SGWIN, "双赢棋牌" ),
+    FG( ConstantsGame.FG, "FG棋牌" ),
+    JDB( ConstantsGame.JDB, "JDB电子" ),
+    CQ9( ConstantsGame.CQ9, "CQ9电子" ),
     ;
 
     private final String type;
@@ -84,6 +89,11 @@ public enum EnumGameCategory {
             case DATANG -> List.of( 58 );
             case HG -> List.of( 59 );
             case XINGYUN -> List.of( 60 );
+            case WALI -> List.of( 61 );
+            case SGWIN -> List.of( 62 );
+            case FG -> List.of( 63 );
+            case JDB -> List.of( 64 );
+            case CQ9 -> List.of( 65 );
         };
     }
 
@@ -110,6 +120,11 @@ public enum EnumGameCategory {
             case 58 -> DATANG;
             case 59 -> HG;
             case 60 -> XINGYUN;
+            case 61 -> WALI;
+            case 62 -> SGWIN;
+            case 63 -> FG;
+            case 64 -> JDB;
+            case 65 -> CQ9;
             default -> null;
         };
     }

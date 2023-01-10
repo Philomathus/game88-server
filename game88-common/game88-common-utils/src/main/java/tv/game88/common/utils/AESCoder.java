@@ -9,6 +9,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 
 /**
@@ -170,5 +171,25 @@ public class AESCoder {
             bytes[ i ] = ( byte ) Integer.parseInt( subStr, 16 );
         }
         return bytes;
+    }
+
+    public static String encryptDES3( String str, String saltTxt ) throws Exception {
+        byte[]    md5Key  = getMd5( saltTxt ); //16bytes
+        SecretKey key     = new SecretKeySpec( md5Key, "DESede" );
+        Cipher    ecipher = Cipher.getInstance( "DESede/ECB/PKCS5Padding" );
+        ecipher.init( Cipher.ENCRYPT_MODE, key );
+        byte[] data           = str.getBytes( StandardCharsets.UTF_8 );
+        byte[] encryptedArray = ecipher.doFinal( data );
+        return Base64Utils.encodeToString( encryptedArray );
+    }
+
+    private static byte[] getMd5( String keyString ) throws Exception {
+        byte[]        rawKey        = new byte[ 24 ];
+        MessageDigest messageDigest = MessageDigest.getInstance( "MD5" );
+        messageDigest.update( keyString.getBytes( StandardCharsets.UTF_8 ), 0, keyString.length() );
+        byte[] md5 = messageDigest.digest();
+        System.arraycopy( md5, 0, rawKey, 0, 16 );
+        System.arraycopy( md5, 0, rawKey, 16, 8 );
+        return rawKey;
     }
 }

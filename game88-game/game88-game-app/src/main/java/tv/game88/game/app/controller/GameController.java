@@ -82,4 +82,6 @@ public class GameController extends BaseController {
     public RspBase<?> gameWithdrawal( @Validated @RequestBody ReqGame req ) {
         return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
     }
+
+    // pgVerifysession
 }
