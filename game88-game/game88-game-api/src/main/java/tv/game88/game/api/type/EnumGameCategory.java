@@ -16,7 +16,6 @@ public enum EnumGameCategory {
     AG( ConstantsGame.AG, "AG电子" ),
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
-    SHABA( ConstantsGame.SHABA, "沙巴体育" ),
     ICG( ConstantsGame.ICG, "ICG电子" ),
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
     KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
@@ -74,7 +73,6 @@ public enum EnumGameCategory {
             case AG -> List.of( 5 );
             case MG -> List.of( 6 );
             case UPG -> List.of( 7 );
-            case SHABA -> List.of( 12 );
             case ICG -> List.of( 13 );
             case MEITIAN -> List.of( 14 );
             case KAIXUAN -> List.of( 15 );
@@ -107,7 +105,6 @@ public enum EnumGameCategory {
             case 5 -> AG;
             case 6 -> MG;
             case 7 -> UPG;
-            case 12 -> SHABA;
             case 13 -> ICG;
             case 14 -> MEITIAN;
             case 15 -> KAIXUAN;

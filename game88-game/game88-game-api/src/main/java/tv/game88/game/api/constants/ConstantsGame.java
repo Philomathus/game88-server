@@ -7,7 +7,6 @@ public class ConstantsGame {
     public static final String MG         = "mg";
     public static final String UPG        = "upg";
     public static final String BBIN       = "bbin";
-    public static final String SHABA      = "shaba";
     public static final String ICG        = "icg";
     public static final String MEITIAN    = "meiTian";
     public static final String KAIXUAN    = "kaiXuan";

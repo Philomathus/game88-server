@@ -71,7 +71,7 @@ public class QiDianPayProcessor extends AbstractPay {
         params.put( "app_id", payPlatform.getMerId() );
         params.put( "out_trade_no", memberRechargeOnline.getOrderNo() );
 
-        String signStr = this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         params.put( "sign", DigestUtils.md5Hex( signStr ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
