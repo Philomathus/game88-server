@@ -38,6 +38,7 @@ public enum EnumGameCategory {
     CQ9( ConstantsGame.CQ9, "CQ9电子" ),
     AT( ConstantsGame.AT, "AT电子" ),
     RICH88( ConstantsGame.RICH88, "Rich88电子" ),
+    PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
     ;
 
     private final String type;
@@ -96,6 +97,7 @@ public enum EnumGameCategory {
             case CQ9 -> List.of( 65 );
             case AT -> List.of( 66 );
             case RICH88 -> List.of( 67 );
+            case PG_SOFT -> List.of( 68 );
         };
     }
 
@@ -128,6 +130,7 @@ public enum EnumGameCategory {
             case 65 -> CQ9;
             case 66 -> AT;
             case 67 -> RICH88;
+            case 68 -> PG_SOFT;
             default -> null;
         };
     }
