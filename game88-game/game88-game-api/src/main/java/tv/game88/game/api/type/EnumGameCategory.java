@@ -37,6 +37,8 @@ public enum EnumGameCategory {
     FG( ConstantsGame.FG, "FG棋牌" ),
     JDB( ConstantsGame.JDB, "JDB电子" ),
     CQ9( ConstantsGame.CQ9, "CQ9电子" ),
+    AT( ConstantsGame.AT, "AT电子" ),
+    RICH88( ConstantsGame.RICH88, "Rich88电子" ),
     ;
 
     private final String type;
@@ -94,6 +96,8 @@ public enum EnumGameCategory {
             case FG -> List.of( 63 );
             case JDB -> List.of( 64 );
             case CQ9 -> List.of( 65 );
+            case AT -> List.of( 66 );
+            case RICH88 -> List.of( 67 );
         };
     }
 
@@ -125,6 +129,8 @@ public enum EnumGameCategory {
             case 63 -> FG;
             case 64 -> JDB;
             case 65 -> CQ9;
+            case 66 -> AT;
+            case 67 -> RICH88;
             default -> null;
         };
     }

@@ -27,4 +27,6 @@ public class ConstantsGame {
     public static final String FG         = "fg";
     public static final String JDB        = "jdb";
     public static final String CQ9        = "cq9";
+    public static final String AT         = "at";
+    public static final String RICH88     = "rich88";
 }

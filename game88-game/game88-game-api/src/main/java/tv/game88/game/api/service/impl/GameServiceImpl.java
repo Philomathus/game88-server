@@ -2,6 +2,7 @@ package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
@@ -391,7 +392,7 @@ public class GameServiceImpl implements GameService {
                     .concat( gameMemberId.replaceAll( "_", "" ) );
             case HG -> AESCoder.decrypt( gamePlatform.getDes() )
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
-                    .concat( gameMemberId );
+                    .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
