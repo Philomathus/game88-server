@@ -61,7 +61,7 @@ public class QiDianPayProcessor extends AbstractPay {
                         + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json(resultMap), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo());
 
-        //TODO: process result
+
         return null;
     }
 
