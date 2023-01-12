@@ -65,7 +65,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
                 .queryParams( requestMap )
                 .build( true );
 
-        log.error( reqJoinGame.getGameCategory().getDes() + "访问游戏链接:{}", uriComponents.toUri().toString() );
+        log.warn( reqJoinGame.getGameCategory().getDes() + "访问游戏链接:{}", uriComponents.toUri().toString() );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {

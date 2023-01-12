@@ -27,10 +27,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Repository( value = ConstantsGame.ICG + "GameProcessor" )
@@ -100,7 +97,14 @@ public class GameButtICG extends AbstractGameButt {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
         HttpEntity<?> httpEntity = new HttpEntity<>( httpHeaders );
-        String        url        = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
+        String        url;
+        if ( Arrays.asList( "all", "fish", "slot", "coc" ).contains( reqJoinGame.getKindId() ) ) {
+            url = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
+        } else {
+            url = reqJoinGame.getApiUrl() + "/api/v1/games/gamelink?productId=" + reqJoinGame.getKindId() + "&player="
+                    + reqJoinGame.getGameMemberId() + "&lang=zh";
+        }
+
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
                 restTemplate.httpEntityCallback( httpEntity ), response -> {
             InputStream bodyStream = response.getBody();
@@ -112,10 +116,15 @@ public class GameButtICG extends AbstractGameButt {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Map<String, Object>> list = ( List<Map<String, Object>> ) resultMap.get( "data" );
-            if ( !CollectionUtils.isEmpty( list ) ) {
-                Map<String, Object> dataMap = list.get( 0 );
-                reqJoinGame.setGameUrl( dataMap.getOrDefault( "href", "" ).toString() );
+            if ( resultMap.get( "data" ) instanceof List ) {
+                List<Map<String, Object>> list = ( List<Map<String, Object>> ) resultMap.get( "data" );
+                if ( !CollectionUtils.isEmpty( list ) ) {
+                    Map<String, Object> dataMap = list.get( 0 );
+                    reqJoinGame.setGameUrl( dataMap.getOrDefault( "href", "" ).toString() );
+                }
+            } else {
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+                reqJoinGame.setGameUrl( dataMap.getOrDefault( "url", "" ).toString() );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
@@ -213,10 +222,8 @@ public class GameButtICG extends AbstractGameButt {
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
         HttpEntity<?> httpEntity = new HttpEntity<>( httpHeaders );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() + TRANSACTION_RECORD )
-                .queryParams( requestMap )
-                .build();
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() + TRANSACTION_RECORD )
+                                                          .queryParams( requestMap ).build();
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( httpEntity ), response -> {
