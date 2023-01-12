@@ -47,7 +47,7 @@ public class GameButtNewWorld extends AbstractGameButt {
                 reqJoinGame.getKindId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -60,10 +60,8 @@ public class GameButtNewWorld extends AbstractGameButt {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -95,7 +93,7 @@ public class GameButtNewWorld extends AbstractGameButt {
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -108,10 +106,8 @@ public class GameButtNewWorld extends AbstractGameButt {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -149,7 +145,7 @@ public class GameButtNewWorld extends AbstractGameButt {
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -162,10 +158,8 @@ public class GameButtNewWorld extends AbstractGameButt {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -202,7 +196,7 @@ public class GameButtNewWorld extends AbstractGameButt {
         String params = String.format( "s=%s&account=%s", 1, reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -215,10 +209,8 @@ public class GameButtNewWorld extends AbstractGameButt {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -250,7 +242,7 @@ public class GameButtNewWorld extends AbstractGameButt {
         String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -263,10 +255,8 @@ public class GameButtNewWorld extends AbstractGameButt {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {

@@ -47,7 +47,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
                 reqJoinGame.getKindId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -98,7 +98,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
                 , reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -149,7 +149,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
                 reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(), reqJoinGame.getTransferMoney() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -199,7 +199,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
         String params = String.format( "action=6&account=%s&money_type=RMB", reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -247,7 +247,7 @@ public class GameButtBaiSheng extends AbstractGameButt {
         String params = String.format( "action=5&order_id=%s", reqJoinGame.getOrderId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );

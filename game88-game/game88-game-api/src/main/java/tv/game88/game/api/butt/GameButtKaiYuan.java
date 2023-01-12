@@ -47,7 +47,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 reqJoinGame.getKindId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -98,7 +98,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -152,7 +152,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
         String param = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -205,7 +205,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String params = String.format( "s=%s&account=%s", 1, reqJoinGame.getGameMemberId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -253,7 +253,7 @@ public class GameButtKaiYuan extends AbstractGameButt {
         String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, reqJoinGame.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
