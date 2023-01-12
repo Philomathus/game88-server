@@ -120,8 +120,7 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        String base64    = Base64Utils.encodeToString( encrypted );// 此处使用BASE64做转码
-        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
+        return Base64Utils.encodeToString( encrypted );// 此处使用BASE64做转码
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
