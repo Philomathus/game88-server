@@ -80,7 +80,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public RspGameTypes getGameTypes( String version ) {
         List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
-        boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.5.0", version );
+        boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.12.0", version );
         gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L ).contains( rspGameType.getId() ) : Arrays
                 .asList( 8L, 9L )
                 .contains( rspGameType.getId() ) );
