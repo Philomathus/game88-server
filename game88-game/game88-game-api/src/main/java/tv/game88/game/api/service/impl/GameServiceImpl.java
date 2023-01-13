@@ -82,8 +82,7 @@ public class GameServiceImpl implements GameService {
         List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
         boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.13.0", version );
         gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L ).contains( rspGameType.getId() ) : Arrays
-                .asList( 8L, 9L )
-                .contains( rspGameType.getId() ) );
+                .asList( 8L, 9L ).contains( rspGameType.getId() ) );
         for ( RspGameType rspGameType : gameTypeList ) {
             if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
@@ -109,6 +108,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<RspGameInfo> getGameInfos( Long typeId, Long platformId ) {
+        if ( platformId == -1 ) {
+            return gameInfoMapper.selectHotRspList( typeId );
+        }
         return gameCacheUtils.getEffectInfoList( typeId, platformId );
     }
 
@@ -134,7 +136,6 @@ public class GameServiceImpl implements GameService {
             hotRsp.setId( -1L );
             hotRsp.setName( "热门电子" );
             hotRsp.setCardIcon( "/8800/default/c88c2b13b480ff521d78ac3ca81a2908.png" );
-            hotRsp.setRspGameInfos( gameInfoMapper.selectHotRspList( infoTypeId ) );
             rspGamePlatformList.add( hotRsp );
         }
         rspGamePlatformList.addAll( gamePlatformMapper.selectRspList( infoTypeId ) );
@@ -143,9 +144,8 @@ public class GameServiceImpl implements GameService {
                 if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon().startsWith( "http" ) ) {
                     rspGamePlatform.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getIcon() );
                 }
-                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform
-                        .getCardIcon()
-                        .startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform.getCardIcon()
+                                                                                                .startsWith( "http" ) ) {
                     rspGamePlatform.setCardIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getCardIcon() );
                 }
             }
@@ -280,14 +280,12 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
-        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
-                .eq( "member_id", memberId )
-                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
-                .select( "platform_id", "order_id" )
-                .list()
-                .stream()
-                .map( MemberGameMoney::getPlatformId )
-                .collect( Collectors.toSet() );
+        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper ).eq( "member_id", memberId )
+                                                                                .ge( "create_time", LocalDateTime.now()
+                                                                                                                 .minusMonths( 1 ) )
+                                                                                .select( "platform_id", "order_id" ).list()
+                                                                                .stream().map( MemberGameMoney::getPlatformId )
+                                                                                .collect( Collectors.toSet() );
         if ( CollectionUtils.isEmpty( platformIds ) ) {
             return RspBase.ok( new ArrayList<>() );
         }
@@ -338,10 +336,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) {
-        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
-                .eq( "agent", agent )
-                .eq( "game_category", gameCategory )
-                .one();
+        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper ).eq( "agent", agent )
+                                                                                 .eq( "game_category", gameCategory ).one();
         if ( gamePlatform == null ) {
             return RspBase.businessError( "游戏平台不存在" );
         }
@@ -364,24 +360,14 @@ public class GameServiceImpl implements GameService {
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
-        return ReqJoinGame
-                .builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .recordUrl( gamePlatform.getRecordUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo == null ? null : gameInfo.getKindId() )
-                .gameMemberId( gameMemberId )
-                .memberId( memberId )
-                .transferMoney( changeMoney )
-                .platformId( gamePlatform.getId() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .ip( ServletUtil.getIp() )
-                .gameCategory( gamePlatform.getGameCategory() )
-                .dev( dev )
-                .build();
+        return ReqJoinGame.builder().des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                          .md5( AESCoder.decrypt( gamePlatform.getMd5() ) ).agent( gamePlatform.getAgent() )
+                          .apiUrl( gamePlatform.getApiUrl() ).recordUrl( gamePlatform.getRecordUrl() )
+                          .linecode( gamePlatform.getLinecode() ).kindId( gameInfo == null ? null : gameInfo.getKindId() )
+                          .gameMemberId( gameMemberId ).memberId( memberId ).transferMoney( changeMoney )
+                          .platformId( gamePlatform.getId() )
+                          .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                          .ip( ServletUtil.getIp() ).gameCategory( gamePlatform.getGameCategory() ).dev( dev ).build();
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
@@ -391,8 +377,9 @@ public class GameServiceImpl implements GameService {
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
             case HG -> AESCoder.decrypt( gamePlatform.getDes() )
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
-                    .concat( RandomStringUtils.randomAlphabetic( 5 ) );
+                               .concat( LocalDateTimeUtils.format( LocalDateTime.now(),
+                                       LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                               .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
@@ -403,7 +390,7 @@ public class GameServiceImpl implements GameService {
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
-                + entityIdCounter.getAndIncrement() );
+                                                                                                      + entityIdCounter.getAndIncrement() );
     }
 
     public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
