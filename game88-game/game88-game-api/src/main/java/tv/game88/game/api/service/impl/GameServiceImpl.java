@@ -135,6 +135,7 @@ public class GameServiceImpl implements GameService {
             hotRsp.setId( -1L );
             hotRsp.setName( "热门电子" );
             hotRsp.setCardIcon( "/8800/default/c88c2b13b480ff521d78ac3ca81a2908.png" );
+            hotRsp.setIcon( "/8800/default/c88c2b13b480ff521d78ac3ca81a2908.png" );
             rspGamePlatformList.add( hotRsp );
         }
         rspGamePlatformList.addAll( gamePlatformMapper.selectRspList( infoTypeId ) );
