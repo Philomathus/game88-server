@@ -115,6 +115,8 @@ public class GameButtICG extends AbstractGameButt {
 
             return JsonUtil.json2Map( text );
         } );
+        log.warn( reqJoinGame.getGameCategory().getDes()
+                + "获取游戏链接:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), url );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( resultMap.get( "data" ) instanceof List ) {
                 List<Map<String, Object>> list = ( List<Map<String, Object>> ) resultMap.get( "data" );
