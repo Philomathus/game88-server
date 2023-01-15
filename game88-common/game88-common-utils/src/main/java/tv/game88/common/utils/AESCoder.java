@@ -133,6 +133,24 @@ public class AESCoder {
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
+    public static String encryptByKeyUrlIv(String data, String key, String iv, String transformation) throws Exception {
+        Cipher cipher = Cipher.getInstance(transformation);
+        int blockSize = cipher.getBlockSize();
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        int plainTextLength = dataBytes.length;
+        if (plainTextLength % blockSize != 0) {
+            plainTextLength = plainTextLength + (blockSize - plainTextLength % blockSize);
+        }
+        byte[] plaintext = new byte[plainTextLength];
+        System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
+        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+        byte[] encrypted = cipher.doFinal(plaintext);
+        String base64    = Base64Utils.encodeToString( encrypted );
+        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );
+    }
+
     public static String decryptByKey( String content, String key ) throws Exception {
         byte[]        encrypted1 = Base64Utils.decodeFromString( content );
         byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
@@ -201,4 +219,5 @@ public class AESCoder {
         System.arraycopy( md5, 0, rawKey, 16, 8 );
         return rawKey;
     }
+
 }
