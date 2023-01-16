@@ -143,7 +143,7 @@ public class AESCoder {
         }
         byte[] plaintext = new byte[plainTextLength];
         System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), AES);
         IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
         byte[] encrypted = cipher.doFinal(plaintext);
