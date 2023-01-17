@@ -51,8 +51,10 @@ public class MemberGameData {
     private String  gameRound;
 
     @TableField( exist = false )
+    @Excel( name = "平台名称" )
     private String     platformName;
     @TableField( exist = false )
+    @Excel( name = "子平台名称" )
     private String     sonPlatformName;
     @TableField( exist = false )
     private BigDecimal totalSuccessBet;
