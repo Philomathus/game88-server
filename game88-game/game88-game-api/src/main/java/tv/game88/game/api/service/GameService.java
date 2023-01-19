@@ -27,6 +27,8 @@ public interface GameService {
 
     RspBase<?> gameWithdrawal( Long platformId, String memberId );
 
+    RspBase<?> verify( String traceId, ReqPGSoftGameData data );
+
     @Retryable( value = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
     List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds );
 }

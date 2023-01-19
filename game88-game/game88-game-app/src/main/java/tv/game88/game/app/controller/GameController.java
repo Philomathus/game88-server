@@ -83,5 +83,10 @@ public class GameController extends BaseController {
         return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
     }
 
-    // pgVerifysession
+    @Operation( summary = "PG Verify Session" )
+    @PostMapping( "/VerifySession" )
+    public RspBase<?> verifySession( @RequestHeader( value = "trace_id") String traceId,
+                                @Validated @RequestBody ReqPGSoftGameData data ) {
+        return gameService.verify( traceId, data );
+    }
 }

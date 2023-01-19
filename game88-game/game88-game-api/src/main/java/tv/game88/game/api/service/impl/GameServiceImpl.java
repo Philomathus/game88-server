@@ -44,6 +44,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 @Log4j2
 @Service
 public class GameServiceImpl implements GameService {
@@ -417,4 +419,40 @@ public class GameServiceImpl implements GameService {
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public RspBase<?> verify(String traceId, ReqPGSoftGameData data) {
+        String ot = redisUtils.strGet(Constants.GAME_PGSOFT_OT + data.getCustom_parameter());
+        String key = redisUtils.strGet(Constants.GAME_PGSOFT_KEY + data.getCustom_parameter());
+        String ops = redisUtils.strGet(Constants.GAME_PGSOFT_OPS + data.getCustom_parameter());
+        log.info("PGSoft Verify: trace_id - {}, data - {}, system - {}",
+                traceId, data.toString(), String.format("Ot: %s, Key: %s, Ops: %s", ot, key, ops));
+        if(StringUtils.isEmpty(ot) || StringUtils.isEmpty(key) || StringUtils.isEmpty(ops)) {
+            return createResponse(1200, null,
+                    Map.of("code", "500", "message", "Required field missing"));
+        } else {
+            boolean isOt = ot.equals(data.getOperator_token());
+            boolean isKey = key.equals(data.getSecret_key());
+            boolean isOps = ops.equals(data.getOperator_player_session());
+            if(isOt && isKey && isOps) {
+                Map<String, String> successMap = Map.of("player_name", data.getCustom_parameter(), "currency", "CNY");
+                return createResponse(SC_OK, successMap, null);
+            } else {
+                return createResponse(1034, null,
+                        Map.of("code", "400", "message", "One of required fields not equal"));
+            }
+        }
+    }
+
+    private static RspBase<RspPGSoftGameData> createResponse(int rspCode, Map<String, String> data, Map<String, String> error) {
+        RspPGSoftGameData rspData = RspPGSoftGameData.builder()
+                .data(data)
+                .error(error)
+                .build();
+        RspBase<RspPGSoftGameData> response = new RspBase<>();
+        response.setCode(rspCode);
+        response.setData(rspData);
+        return response;
+    }
+
 }
