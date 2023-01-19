@@ -29,6 +29,7 @@ public class LunarAnimalUtils {
 
     //生肖
     final static String[] animals = new String[] { "鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪" };
+    final static String[] animal_6hecai = new String[] { "虎", "牛", "鼠", "猪", "狗", "鸡", "猴", "羊", "马", "蛇", "龙", "兔" };
 
     /**
      * 返回农历y年的总天数
@@ -105,16 +106,16 @@ public class LunarAnimalUtils {
     public static String[] getLeftOverAnimals( String animal ) {
         String[] result   = new String[ 12 ];
         int      position = 0;
-        for ( int i = 0; i < animals.length; i++ ) {
-            if ( animals[ i ].equals( animal ) ) {
+        for ( int i = 0; i < animal_6hecai.length; i++ ) {
+            if ( animal_6hecai[ i ].equals( animal ) ) {
                 position = i;
             }
         }
-        for ( int i = position; i < animals.length; i++ ) {
-            result[ i - position ] = animals[ i ];
+        for ( int i = position; i < animal_6hecai.length; i++ ) {
+            result[ i - position ] = animal_6hecai[ i ];
         }
         for ( int i = 0; i < position; i++ ) {
-            result[ animals.length - position + i ] = animals[ i ];
+            result[ animal_6hecai.length - position + i ] = animal_6hecai[ i ];
         }
         return result;
     }
