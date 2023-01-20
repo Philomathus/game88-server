@@ -3,14 +3,12 @@ package tv.game88.lottery.api.service.impl;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.lottery.dto.RspBetRecord;
 import tv.game88.core.lottery.dto.RspLotteryHistory;
@@ -69,20 +67,15 @@ public class LotteryServiceImpl implements LotteryService {
     private LotteryHistoryService lotteryHistoryService;
 
     @Resource
-    private SqlSessionTemplate sqlSessionTemplate;
-
-    @Resource
     private RedisUtils           redisUtils;
     @Resource
     private ImServerUtils        imServerUtils;
-    @Resource
-    private ConfigEnvCacheUtil   configEnvCacheUtil;
     @Resource
     private ExLotteryFactoryUtil exLotteryFactoryUtil;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
-    @Value( "${lotteryCenter:7701}" )
+    @Value( "${lotteryCenter:8800}" )
     private String lotteryAgent;
 
     /**
