@@ -204,11 +204,9 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( countCard > 0 ) {
             return RspBase.businessError( "该银行卡已经绑定,请输入其它银行卡号" );
         }
-        boolean dfault = true;
         List<MemberCard> resultList = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
                                                                                  .isNotNull( "real_name" ).list();
         if ( resultList.size() > 0 ) {
-            dfault = false;
             if ( !resultList.get( 0 ).getRealName().equals( reqMemberCard.getRealName() ) ) {
                 return RspBase.businessError( "姓名必须与首次绑定的一致" );
             }
@@ -226,7 +224,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         memberCard.setCreateTime( LocalDateTime.now() );
         memberCard.setMemberId( memberId );
         memberCard.setRealName( reqMemberCard.getRealName() );
-        memberCard.setDv( dfault && ( new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId ).count() == 0 ) );
+        memberCard.setDv( new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId ).count() == 0 );
         memberCard.setBankId( configBankList.getId() );
         String bankAccount = reqMemberCard.getBankAccount();
         try {
