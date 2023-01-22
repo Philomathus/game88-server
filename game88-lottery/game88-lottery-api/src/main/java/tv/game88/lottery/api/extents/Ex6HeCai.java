@@ -6,8 +6,11 @@ import tv.game88.common.utils.RandomUtils;
 import tv.game88.lottery.api.base.AbstractExLottery;
 import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.LocalMethod;
+import tv.game88.lottery.api.utils.LunarAnimalUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,19 +104,22 @@ public class Ex6HeCai extends AbstractExLottery {
     }
 
     public static String getShengXiao( String code ) {
+        String   localDate = LocalDate.now().format( DateTimeFormatter.ofPattern( "yyyy-MM-dd" ) );
+        String   animal    = LunarAnimalUtils.getAnimal( localDate );
+        String[] animals   = LunarAnimalUtils.getLeftOverAnimals( animal );
         return switch ( Integer.parseInt( code ) ) {
-            case 1, 13, 25, 37, 49 -> "虎";
-            case 2, 14, 26, 38 -> "牛";
-            case 3, 15, 27, 39 -> "鼠";
-            case 4, 16, 28, 40 -> "猪";
-            case 5, 17, 29, 41 -> "狗";
-            case 6, 18, 30, 42 -> "鸡";
-            case 7, 19, 31, 43 -> "猴";
-            case 8, 20, 32, 44 -> "羊";
-            case 9, 21, 33, 45 -> "马";
-            case 10, 22, 34, 46 -> "蛇";
-            case 11, 23, 35, 47 -> "龙";
-            case 12, 24, 36, 48 -> "兔";
+            case 1, 13, 25, 37, 49 -> animals[ 0 ];
+            case 2, 14, 26, 38 -> animals[ 1 ];
+            case 3, 15, 27, 39 -> animals[ 2 ];
+            case 4, 16, 28, 40 -> animals[ 3 ];
+            case 5, 17, 29, 41 -> animals[ 4 ];
+            case 6, 18, 30, 42 -> animals[ 5 ];
+            case 7, 19, 31, 43 -> animals[ 6 ];
+            case 8, 20, 32, 44 -> animals[ 7 ];
+            case 9, 21, 33, 45 -> animals[ 8 ];
+            case 10, 22, 34, 46 -> animals[ 9 ];
+            case 11, 23, 35, 47 -> animals[ 10 ];
+            case 12, 24, 36, 48 -> animals[ 11 ];
             default -> "";
         };
 
@@ -177,7 +183,7 @@ public class Ex6HeCai extends AbstractExLottery {
         return paijiangTotal;
     }
 
-    public List<String> randomResult(){
+    public List<String> randomResult() {
         return RandomUtils.randomWeight( 7, new HashMap<>( weightableMap ), true );
     }
 }
