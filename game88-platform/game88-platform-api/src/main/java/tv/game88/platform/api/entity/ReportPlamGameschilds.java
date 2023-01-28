@@ -100,7 +100,7 @@ public class ReportPlamGameschilds {
      */
     @JsonFormat( pattern = "yyyy-MM-dd" )
     @Excel( name = "日期", width = 30, databaseFormat = "yyyy-MM-dd" )
-    private Date begindate;
+    private String begindate;
 
     @Override
     public String toString() {
