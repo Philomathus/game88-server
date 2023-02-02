@@ -22,7 +22,7 @@ import java.util.TreeMap;
 
 @Repository( value = ConstantsPay.LAICAI_PAY + "Processor" )
 @Log4j2
-public class laiCaiPayProcessor extends AbstractPay {
+public class LaiCaiPayProcessor extends AbstractPay {
 
     @Override
     public String getName() {
