@@ -228,7 +228,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         MemberInfo update = new MemberInfo();
         update.setId( memberInfo.getId() );
-
+        update.setDeviceId( mobileLogin.getDeviceId() );
         this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
 
         if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
