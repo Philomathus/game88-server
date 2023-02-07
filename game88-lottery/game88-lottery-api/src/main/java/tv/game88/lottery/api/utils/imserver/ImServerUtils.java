@@ -59,13 +59,13 @@ public class ImServerUtils {
         ext.put( "uuid", IdWorker.get32UUID() );
         RspBase<?> rspBase = this.sendGroupMessage( groupId, ext, 3 );
         if ( rspBase != null && rspBase.getCode() == 200 ) {
-            // log.info( "新IM - 群组{}im消息发送成功", groupId );
+            log.info( "新IM - 群组{}im消息发送成功", groupId );
         }
     }
 
     private RspBase<?> sendGroupMessage( String groupId, Map<String, Object> messageMap, int retryNum ) {
         if ( StringUtils.isBlank( this.imSendGroupMsgUrl ) || !this.imSendGroupMsgUrl.startsWith( "http" ) ) {
-            //log.error( "新IM - 未初始化参数, IM消息无法发送" );
+            log.error( "新IM - 未初始化参数, IM消息无法发送" );
             return null;
         }
         if ( retryNum <= 0 ) {
