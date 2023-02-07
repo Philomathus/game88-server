@@ -188,10 +188,16 @@ public class GameServiceImpl implements GameService {
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
+            if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
+                // 创建账号
+                baseGameButt.createAccount( reqJoinGame );
+            }
             // 获取token
             baseGameButt.getToken( reqJoinGame );
-            // 创建账号
-            baseGameButt.createAccount( reqJoinGame );
+            if ( gamePlatform.getGameCategory() != EnumGameCategory.CQ9 ) {
+                // 创建账号
+                baseGameButt.createAccount( reqJoinGame );
+            }
             // 获取游戏链接
             baseGameButt.getJoinGameUrl( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
