@@ -36,11 +36,10 @@ public class XiongMaoPayProcessor extends AbstractPay {
         params.put( "orderId", reqPayRecharge.getOrderNo() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "channel", payChannel.getChannelCode() );
-        params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( signStr );
         String sign    = DigestUtils.md5Hex( signStr );
-        sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
         params.put( "sign", sign.toUpperCase() );
@@ -69,7 +68,6 @@ public class XiongMaoPayProcessor extends AbstractPay {
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr );
-        sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
         params.put( "sign", sign.toUpperCase() );
