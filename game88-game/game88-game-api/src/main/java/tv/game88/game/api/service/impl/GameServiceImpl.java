@@ -188,10 +188,16 @@ public class GameServiceImpl implements GameService {
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
+            if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
+                // 创建账号
+                baseGameButt.createAccount( reqJoinGame );
+            }
             // 获取token
             baseGameButt.getToken( reqJoinGame );
-            // 创建账号
-            baseGameButt.createAccount( reqJoinGame );
+            if ( gamePlatform.getGameCategory() != EnumGameCategory.CQ9 ) {
+                // 创建账号
+                baseGameButt.createAccount( reqJoinGame );
+            }
             // 获取游戏链接
             baseGameButt.getJoinGameUrl( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
@@ -358,7 +364,7 @@ public class GameServiceImpl implements GameService {
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
-            case BOLE -> ( profile + memberId ).toLowerCase();
+            case BOLE, JDB -> ( profile + memberId ).toLowerCase();
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
@@ -374,7 +380,7 @@ public class GameServiceImpl implements GameService {
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
         return switch ( gamePlatform.getGameCategory() ) {
-            case AG, BBIN, BG, XINGYUN -> this.getGameAtomicId( gamePlatform.getId() );
+            case AG, BBIN, BG, XINGYUN, JDB -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
@@ -421,37 +427,32 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<?> verify(String traceId, ReqPGSoftGameData data) {
-        String ot = redisUtils.strGet(Constants.GAME_PGSOFT_OT + data.getCustom_parameter());
-        String key = redisUtils.strGet(Constants.GAME_PGSOFT_KEY + data.getCustom_parameter());
-        String ops = redisUtils.strGet(Constants.GAME_PGSOFT_OPS + data.getCustom_parameter());
-        log.info("PGSoft Verify: trace_id - {}, data - {}, system - {}",
-                traceId, data.toString(), String.format("Ot: %s, Key: %s, Ops: %s", ot, key, ops));
-        if(StringUtils.isEmpty(ot) || StringUtils.isEmpty(key) || StringUtils.isEmpty(ops)) {
-            return createResponse(1200, null,
-                    Map.of("code", "500", "message", "Required field missing"));
+    public RspBase<?> verify( String traceId, ReqPGSoftGameData data ) {
+        String ot  = redisUtils.strGet( Constants.GAME_PGSOFT_OT + data.getCustom_parameter() );
+        String key = redisUtils.strGet( Constants.GAME_PGSOFT_KEY + data.getCustom_parameter() );
+        String ops = redisUtils.strGet( Constants.GAME_PGSOFT_OPS + data.getCustom_parameter() );
+        log.info( "PGSoft Verify: trace_id - {}, data - {}, system - {}", traceId, data.toString(), String.format(
+                "Ot: %s, " + "Key: %s, Ops: %s", ot, key, ops ) );
+        if ( StringUtils.isEmpty( ot ) || StringUtils.isEmpty( key ) || StringUtils.isEmpty( ops ) ) {
+            return createResponse( 1200, null, Map.of( "code", "500", "message", "Required field missing" ) );
         } else {
-            boolean isOt = ot.equals(data.getOperator_token());
-            boolean isKey = key.equals(data.getSecret_key());
-            boolean isOps = ops.equals(data.getOperator_player_session());
-            if(isOt && isKey && isOps) {
-                Map<String, String> successMap = Map.of("player_name", data.getCustom_parameter(), "currency", "CNY");
-                return createResponse(SC_OK, successMap, null);
+            boolean isOt  = ot.equals( data.getOperator_token() );
+            boolean isKey = key.equals( data.getSecret_key() );
+            boolean isOps = ops.equals( data.getOperator_player_session() );
+            if ( isOt && isKey && isOps ) {
+                Map<String, String> successMap = Map.of( "player_name", data.getCustom_parameter(), "currency", "CNY" );
+                return createResponse( SC_OK, successMap, null );
             } else {
-                return createResponse(1034, null,
-                        Map.of("code", "400", "message", "One of required fields not equal"));
+                return createResponse( 1034, null, Map.of( "code", "400", "message", "One of required fields not equal" ) );
             }
         }
     }
 
-    private static RspBase<RspPGSoftGameData> createResponse(int rspCode, Map<String, String> data, Map<String, String> error) {
-        RspPGSoftGameData rspData = RspPGSoftGameData.builder()
-                .data(data)
-                .error(error)
-                .build();
+    private static RspBase<RspPGSoftGameData> createResponse( int rspCode, Map<String, String> data, Map<String, String> error ) {
+        RspPGSoftGameData          rspData  = RspPGSoftGameData.builder().data( data ).error( error ).build();
         RspBase<RspPGSoftGameData> response = new RspBase<>();
-        response.setCode(rspCode);
-        response.setData(rspData);
+        response.setCode( rspCode );
+        response.setData( rspData );
         return response;
     }
 

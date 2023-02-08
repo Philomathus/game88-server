@@ -20,6 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,8 +54,8 @@ import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.entity.MemberVipGift;
 import tv.game88.platform.api.entity.MobileLimit;
-import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.mapper.MemberVipGiftMapper;
+import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.service.ConfigEnvironmentService;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.sms.SmsApi;
@@ -212,7 +213,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
+            if ( e instanceof BadCredentialsException ) {
+                log.error( e.getMessage() );
+            } else {
+                log.error( e.getMessage(), e );
+            }
             return RspBase.businessError( "手机号不存在/密码错误" );
         } finally {
             AuthContextHolderUtils.clearContext();
@@ -223,7 +228,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         MemberInfo update = new MemberInfo();
         update.setId( memberInfo.getId() );
-
+        update.setDeviceId( mobileLogin.getDeviceId() );
         this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
 
         if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
@@ -684,15 +689,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         BigDecimal total         = oldmemberInfo.getAccountNow();
 
         if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-            String addMoney;
+            String            addMoney;
             ConfigEnvironment configEnvMoney = configEnvironmentService.selectConfigEnvironmentById( "addMoney" );
-            if(configEnvMoney == null){
+            if ( configEnvMoney == null ) {
                 addMoney = "1000000";
-            }else{
+            } else {
                 addMoney = configEnvMoney.getEnvValue();
             }
-            if ( money.compareTo( new BigDecimal(Integer.parseInt(addMoney)  ) ) > 0 ) {
-                return RspBase.businessError( "最大金额为"+Integer.parseInt(addMoney));
+            if ( money.compareTo( new BigDecimal( Integer.parseInt( addMoney ) ) ) > 0 ) {
+                return RspBase.businessError( "最大金额为" + Integer.parseInt( addMoney ) );
             }
         } else if ( money.compareTo( BigDecimal.ZERO ) < 0 ) {
             BigDecimal lat = total.add( money );
@@ -876,11 +881,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } ).filter( Objects::nonNull ).collect( Collectors.toSet() );
         resultSet.add( ImmutableMap.of( "memberId", memberId ) );
 
-        Map<String, Object> resultMap = resultSet
-                .stream()
-                .map( Map::entrySet )
-                .flatMap( Set::stream )
-                .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
+        Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
+                                                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
         List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
                 memberId.length() - 1 ) );
@@ -933,9 +935,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( StringUtils.isNotBlank( token ) ) {
                 Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
                 if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
-                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
-                            .getOrDefault( "platformUserStr", "" )
-                            .toString(), PlatformUser.class );
+                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
+                                                                                  .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     platformUser.setNickName( nickName );
                     loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
@@ -974,10 +975,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<RspMoney> boxAccount( String memberId, ReqBoxPass boxPass ) {
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
-                .eq( "id", memberId )
-                .select( "id", "box_account", "account_now", "box_pass" )
-                .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
+                                                                          .select( "id", "box_account", "account_now",
+                                                                                  "box_pass" )
+                                                                          .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }
@@ -1000,10 +1001,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( !redisUtils.lock( "boxTransfer" + memberId, 5 ) ) {
             return RspBase.businessError( "处理中请稍后" );
         }
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
-                .eq( "id", memberId )
-                .select( "id", "box_account", "account_now" )
-                .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
+                                                                          .select( "id", "box_account", "account_now" ).one();
         BigDecimal boxAccount = memberInfo.getBoxAccount();
         BigDecimal accountNow = memberInfo.getAccountNow();
         boolean    flag       = false;
@@ -1018,10 +1017,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
         SpringUtils.getBean( MemberInfoService.class ).updateSafeBox( memberInfo, addAccount, flag );
-        MemberInfo newInfo = new QueryChainWrapper<>( this.baseMapper )
-                .eq( "id", memberId )
-                .select( "id", "box_account", "account_now" )
-                .one();
+        MemberInfo newInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
+                                                                       .select( "id", "box_account", "account_now" ).one();
         RspMoney money = new RspMoney();
         money.setBoxAccount( newInfo.getBoxAccount() );
         money.setAccountNow( newInfo.getAccountNow() );
@@ -1057,12 +1054,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         RspMember  rspMember  = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
 
-        List<ConfigVip> configVips = configVipCacheUtils
-                .getConfigVipMap()
-                .values()
-                .stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
-                .toList();
+        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
+                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         Integer vip = 1;
         for ( ConfigVip configVip : configVips ) {
             if ( memberInfo.getCodeTotal().compareTo( configVip.getBcode() ) < 0 ) {
@@ -1079,9 +1072,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
                 if ( StringUtils.isNotBlank( token ) && redisUtils.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
                     Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
-                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
-                            .getOrDefault( "platformUserStr", "" )
-                            .toString(), PlatformUser.class );
+                    PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
+                                                                                  .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
                     redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );
@@ -1402,10 +1394,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String memberId ) {
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper )
-                .eq( "id", memberId )
-                .select( "id", "inviter_code" )
-                .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId ).select( "id", "inviter_code" )
+                                                                          .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }

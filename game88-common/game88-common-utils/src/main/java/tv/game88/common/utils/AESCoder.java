@@ -133,8 +133,8 @@ public class AESCoder {
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
-    public static String encryptByKeyUrlIv(String data, String key, String iv, String transformation) throws Exception {
-        Cipher cipher = Cipher.getInstance(transformation);
+    public static String encryptByKeyIvNoPadding(String data, String key, String iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
         int blockSize = cipher.getBlockSize();
         byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
         int plainTextLength = dataBytes.length;
@@ -147,8 +147,7 @@ public class AESCoder {
         IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
         byte[] encrypted = cipher.doFinal(plaintext);
-        String base64    = Base64Utils.encodeToString( encrypted );
-        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );
+        return Base64Utils.encodeToUrlSafeString( encrypted );
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {

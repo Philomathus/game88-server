@@ -302,6 +302,6 @@ public class GameButtHG extends AbstractGameButt {
                 return reqJoinGame.getOrderId().equals( result.get( "transactionNo" ) );
             }
         }
-        throw new RuntimeException( "查询结果为空,需要重试" );
+        throw new BusinessException( "查询结果为空,需要重试" );
     }
 }

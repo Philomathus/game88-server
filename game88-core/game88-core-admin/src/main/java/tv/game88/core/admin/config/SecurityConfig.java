@@ -1,5 +1,8 @@
 package tv.game88.core.admin.config;
 
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import tv.game88.core.admin.security.filter.JwtAuthenticationTokenFilter;
 import tv.game88.core.admin.security.handle.AuthenticationEntryPointImpl;
 import tv.game88.core.admin.security.handle.LogoutSuccessHandlerImpl;
@@ -121,7 +124,16 @@ public class SecurityConfig implements WebSecurityCustomizer {
     @Bean
     public AuthenticationManager authManager( HttpSecurity httpSecurity ) throws Exception {
         return httpSecurity.getSharedObject( AuthenticationManagerBuilder.class ).userDetailsService( userDetailsService )
-                           .passwordEncoder( new BCryptPasswordEncoder() ).and().build();
+                           .passwordEncoder( getPasswordEncoder() ).and().build();
+    }
+
+    @Bean( name = "myPasswordEncoder" )
+    public PasswordEncoder getPasswordEncoder() {
+        DelegatingPasswordEncoder delPasswordEncoder    =
+                ( DelegatingPasswordEncoder ) PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        BCryptPasswordEncoder     bcryptPasswordEncoder = new BCryptPasswordEncoder();
+        delPasswordEncoder.setDefaultPasswordEncoderForMatches( bcryptPasswordEncoder );
+        return delPasswordEncoder;
     }
 
     @Bean
