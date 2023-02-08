@@ -65,4 +65,7 @@ public class PayRechargeBank {
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private Integer googleAuthCode;
+
+    @Excel( name = "排序" )
+    private Integer       sort;
 }
