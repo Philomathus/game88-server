@@ -43,7 +43,7 @@
                 and account_name like concat('%', #{accountName}, '%')
             </if>
             <if test="effect != null">
-                and effect = #{effect}
+                and b.effect = #{effect}
             </if>
         </where>
        order by b.sort asc
