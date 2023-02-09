@@ -82,8 +82,12 @@
             <if test="status != null">
                 and status = #{status}
             </if>
-            <if test="vip != null">
-                and vip = #{vip}
+<!--            <if test="vip != null">-->
+<!--                and vip = #{vip}-->
+<!--            </if>-->
+            <if test="vipMin != null and vipMax != null  and vipMin != ''  and vipMax != ''">
+                and vip <![CDATA[ >= ]]> #{vipMin}
+                and vip <![CDATA[ <= ]]> #{vipMax}
             </if>
             <if test="accountNow != null">
                 and account_now = #{accountNow}

@@ -51,6 +51,12 @@ public class MemberInfo implements Serializable {
     @Excel( name = "会员vip" )
     private Integer vip;
 
+    @TableField(exist = false)
+    private String vipMin;
+
+    @TableField(exist = false)
+    private String vipMax;
+
     @Schema( title = "提现密码" )
     private String withdrawalPass;
 
