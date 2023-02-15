@@ -8,7 +8,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.service.GameService;
@@ -34,14 +36,26 @@ public class GameController extends BaseController {
     @PostMapping( "/getGameInfoList" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
-        return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
+        List<RspGameInfo> gameInfos = gameService.getGameInfoList( req.getId() );
+        for ( RspGameInfo gameInfo : gameInfos ) {
+            if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+            }
+        }
+        return RspBase.ok( gameInfos );
     }
 
     @Operation( summary = "根据类型获取游戏列表-新" )
     @PostMapping( "/getGameInfos" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfos( @Validated @RequestBody ReqGameInfo req ) {
-        return RspBase.ok( gameService.getGameInfos( req.getId(), req.getPid() ) );
+        List<RspGameInfo> gameInfos = gameService.getGameInfos( req.getId(), req.getPid() );
+        for ( RspGameInfo gameInfo : gameInfos ) {
+            if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+            }
+        }
+        return RspBase.ok( gameInfos );
     }
 
     @Operation( summary = "根据类型获取游戏分组" )
@@ -85,8 +99,8 @@ public class GameController extends BaseController {
 
     @Operation( summary = "PG Verify Session" )
     @PostMapping( "/VerifySession" )
-    public RspBase<?> verifySession( @RequestHeader( value = "trace_id") String traceId,
-                                @Validated @RequestBody ReqPGSoftGameData data ) {
+    public RspBase<?> verifySession( @RequestHeader( value = "trace_id" ) String traceId,
+                                     @Validated @RequestBody ReqPGSoftGameData data ) {
         return gameService.verify( traceId, data );
     }
 }

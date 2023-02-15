@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
-import tv.game88.common.utils.StringUtils;
-import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.game.api.type.EnumGameCategory;
 
 @Data
@@ -42,12 +40,5 @@ public class RspGameInfo {
 
     public Boolean getMaintain() {
         return BooleanUtils.isTrue( maintain ) || BooleanUtils.isTrue( platformMaintain );
-    }
-
-    public String getIcon() {
-        if ( StringUtils.isNotBlank( icon ) && !icon.startsWith( "http" ) ) {
-            return ConfigDomainCacheUtil.me.getDomainOssValue() + icon;
-        }
-        return icon;
     }
 }
