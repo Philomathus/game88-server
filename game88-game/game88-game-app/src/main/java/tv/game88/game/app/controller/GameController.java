@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -29,7 +30,15 @@ public class GameController extends BaseController {
     @PostMapping( "/getGameTypes" )
     @Anonymous
     public RspBase<RspGameTypes> getGameTypes( @RequestHeader( value = "version", required = false ) String version ) {
-        return RspBase.ok( gameService.getGameTypes( version ) );
+        RspGameTypes gameTypes = gameService.getGameTypes( version );
+        if ( !CollectionUtils.isEmpty( gameTypes.getRspGameInfos() ) ) {
+            for ( RspGameInfo gameInfo : gameTypes.getRspGameInfos() ) {
+                if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                    gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+                }
+            }
+        }
+        return RspBase.ok( gameTypes );
     }
 
     @Operation( summary = "根据类型获取游戏列表" )
@@ -62,7 +71,19 @@ public class GameController extends BaseController {
     @PostMapping( "/getGameInfoGroup" )
     @Anonymous
     public RspBase<List<RspGamePlatform>> getGameInfoGroup( @Validated @RequestBody ReqGame req ) {
-        return gameService.getGameInfoGroup( req.getId() );
+        RspBase<List<RspGamePlatform>> gameInfoGroup = gameService.getGameInfoGroup( req.getId() );
+        if ( !CollectionUtils.isEmpty( gameInfoGroup.getData() ) ) {
+            for ( RspGamePlatform gamePlatform : gameInfoGroup.getData() ) {
+                if ( !CollectionUtils.isEmpty( gamePlatform.getRspGameInfos() ) ) {
+                    for ( RspGameInfo gameInfo : gamePlatform.getRspGameInfos() ) {
+                        if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                            gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+                        }
+                    }
+                }
+            }
+        }
+        return gameInfoGroup;
     }
 
     // 获取游戏token,内部接口
