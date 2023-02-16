@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Log4j2
@@ -41,9 +40,9 @@ public class GameButtCQ9 extends AbstractGameButt {
             redisUtils.expire( key, Duration.ofDays( 1 ) );
         } else {
             String              url    = reqJoinGame.getApiUrl() + "/gameboy/player/login";
-            Map<String, String> params = new LinkedHashMap<>();
-            params.put( "account", reqJoinGame.getGameMemberId() );
-            params.put( "password", reqJoinGame.getGameMemberId() + "XX123" );
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add( "account", reqJoinGame.getGameMemberId() );
+            params.add( "password", reqJoinGame.getGameMemberId() + "XX123" );
             Map<String, Object> resultMap = execute( HttpMethod.POST, url, params, reqJoinGame.getMd5() );
 
             if ( isValid( resultMap ) ) {
@@ -66,9 +65,9 @@ public class GameButtCQ9 extends AbstractGameButt {
             return;
         }
         String              url    = reqJoinGame.getApiUrl() + "/gameboy/player";
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "account", reqJoinGame.getGameMemberId() );
-        params.put( "password", reqJoinGame.getGameMemberId() + "XX123" );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "account", reqJoinGame.getGameMemberId() );
+        params.add( "password", reqJoinGame.getGameMemberId() + "XX123" );
         Map<String, Object> resultMap = execute( HttpMethod.POST, url, params, reqJoinGame.getMd5() );
         if ( isValid( resultMap ) ) {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
@@ -81,12 +80,12 @@ public class GameButtCQ9 extends AbstractGameButt {
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String              url    = reqJoinGame.getApiUrl() + "/gameboy/player/gamelink";
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "usertoken", reqJoinGame.getToken() );
-        params.put( "gamehall", "cq9" );
-        params.put( "gamecode", reqJoinGame.getKindId() );
-        params.put( "gameplat", "mobile" );
-        params.put( "lang", "zh-cn" );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "usertoken", reqJoinGame.getToken() );
+        params.add( "gamehall", "cq9" );
+        params.add( "gamecode", reqJoinGame.getKindId() );
+        params.add( "gameplat", "mobile" );
+        params.add( "lang", "zh-cn" );
         Map<String, Object> resultMap = execute( HttpMethod.POST, url, params, reqJoinGame.getMd5() );
         if ( isValid( resultMap ) ) {
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
@@ -140,17 +139,13 @@ public class GameButtCQ9 extends AbstractGameButt {
         throw new BusinessException( "查询结果为空,需要重试" );
     }
 
-    private Map<String, Object> execute( HttpMethod method, String url, Map<String, String> params, String token ) {
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        if ( params != null ) {
-            requestMap.setAll( params );
-        }
+    private Map<String, Object> execute( HttpMethod method, String url, MultiValueMap<String, String> params, String token ) {
         HttpHeaders httpHeaders = new HttpHeaders();
         if ( method != HttpMethod.GET ) {
             httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         }
         httpHeaders.set( "Authorization", token );
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
         return restTemplate.execute( url, method, restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
@@ -176,10 +171,10 @@ public class GameButtCQ9 extends AbstractGameButt {
     }
 
     private void transact( ReqJoinGame reqJoinGame, String url, String type ) {
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "account", reqJoinGame.getGameMemberId() );
-        params.put( "mtcode", reqJoinGame.getOrderId() );
-        params.put( "amount", reqJoinGame.getTransferMoney().toString() );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "account", reqJoinGame.getGameMemberId() );
+        params.add( "mtcode", reqJoinGame.getOrderId() );
+        params.add( "amount", reqJoinGame.getTransferMoney().toString() );
         Map<String, Object> resultMap = null;
         try {
             resultMap = execute( HttpMethod.POST, url, params, reqJoinGame.getMd5() );
