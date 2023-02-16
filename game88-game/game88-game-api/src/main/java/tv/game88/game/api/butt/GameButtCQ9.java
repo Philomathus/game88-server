@@ -158,6 +158,7 @@ public class GameButtCQ9 extends AbstractGameButt {
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
                 text = IOUtils.toString( reader );
             }
+            log.warn( text );
             return JsonUtil.json2Map( text );
         } );
     }
