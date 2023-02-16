@@ -69,6 +69,7 @@ public class GameButtCQ9 extends AbstractGameButt {
         params.add( "account", reqJoinGame.getGameMemberId() );
         params.add( "password", reqJoinGame.getGameMemberId() + "XX123" );
         Map<String, Object> resultMap = execute( HttpMethod.POST, url, params, reqJoinGame.getMd5() );
+        log.warn( "CQ9创建玩家:" + JsonUtil.object2Json( resultMap ) );
         if ( isValid( resultMap ) ) {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
             return;
