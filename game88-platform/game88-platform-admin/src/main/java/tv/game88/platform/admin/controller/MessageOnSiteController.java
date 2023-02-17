@@ -121,6 +121,7 @@ public class MessageOnSiteController extends BaseController {
         if ( Objects.isNull(memberInfo)) {
             return RspBase.businessError("发送失败,会员id错误");
         }
+        messageOnSite.setCreateBy( SecurityUtils.getUsername() );
         messageOnSite.setCreateTime(LocalDateTime.now());
         return RspBase.ok( messageOnSiteService.insertMessageOnSite( messageOnSite ) );
     }
