@@ -49,7 +49,7 @@ public class YaiTaiPayProcessor extends AbstractPay {
                 reqPayRecharge.getOrderNo() );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( resultMap.getOrDefault( "retCode", "" ).toString() ) ) {
-            Map<String, Object> payParams = ( Map<String, Object> ) resultMap.get( "PayParams" );
+            Map<String, Object> payParams = ( Map<String, Object> ) resultMap.get( "payParams" );
             if ( !CollectionUtils.isEmpty( payParams ) ) {
                 return ( String ) payParams.get( "payUrl" );
             } else {
@@ -87,7 +87,7 @@ public class YaiTaiPayProcessor extends AbstractPay {
 
     @Override
     public String callbackPay( Map<String, Object> requestMap, String realIp ) {
-        String               PayOrderId           = requestMap.getOrDefault( "PayOrderId", "" ).toString();
+        String               PayOrderId           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( PayOrderId );
 
         if ( memberRechargeOnline.getStatus() == 1 ) {
