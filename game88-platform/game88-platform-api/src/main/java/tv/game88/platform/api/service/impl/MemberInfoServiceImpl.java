@@ -598,6 +598,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             code.setUserId( m.getId() );
             code.setDes( EnumMoney.ACTIVITY.getDes() );
             memberBcodeMapper.insert( code );
+
+            m.setCodeWill( code.getIncome() );
+            m.setAccountCharge( registerMemberMoney );
         }
         return m;
     }
