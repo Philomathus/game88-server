@@ -71,7 +71,7 @@ public class ShanDianPayProcessor extends AbstractPay {
         log.warn( "Query: {}", signStr );
         params.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( params ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
