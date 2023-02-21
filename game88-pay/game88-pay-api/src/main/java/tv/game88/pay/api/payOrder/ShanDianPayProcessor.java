@@ -65,7 +65,6 @@ public class ShanDianPayProcessor extends AbstractPay {
     public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
-        params.put( "payOrderId", payChannel.getChannelCode() );
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
 
         String signStr = this.assemblyUrl( params ) + "&secretKey=" + AESCoder.decrypt( payPlatform.getSignMd5() );
@@ -120,7 +119,7 @@ public class ShanDianPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signStr = this.assemblyUrl( bodyMap ) + "&secretKey=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Callback: {}", signStr );
         String rel = DigestUtils.md5Hex( signStr ).toUpperCase();
 
