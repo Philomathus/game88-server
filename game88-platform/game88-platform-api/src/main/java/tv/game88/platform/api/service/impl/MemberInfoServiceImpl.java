@@ -600,7 +600,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             memberBcodeMapper.insert( code );
 
             m.setCodeWill( code.getIncome() );
-            m.setAccountCharge( registerMemberMoney );
+            // m.setAccountCharge( registerMemberMoney );
         }
         return m;
     }
