@@ -500,4 +500,15 @@
         from member_info
         where id = #{memberId}
     </select>
+
+    <delete id="clearMemberMoney">
+        delete
+        from member_money
+        where 1 = 1
+    </delete>
+
+    <insert id="insertBatchMemberMoney" parameterType="String">
+        insert into member_money(id, money, beat)
+        values (${userIds})
+    </insert>
 </mapper>

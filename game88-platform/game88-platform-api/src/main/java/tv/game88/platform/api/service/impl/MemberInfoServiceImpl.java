@@ -1411,4 +1411,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         int i = this.baseMapper.updateById( update );
         return i > 0 ? RspBase.ok( "邀请码更新成功" ) : RspBase.businessError( "邀请码更新失败,请重试" );
     }
+
+    @Override
+    public RspBase<?> insertBatchExcelMoney(String userIds) {
+        this.baseMapper.clearMemberMoney();
+        this.baseMapper.insertBatchMemberMoney(userIds);
+        return RspBase.ok( "member_money updated" );
+    }
+
 }

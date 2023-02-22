@@ -88,4 +88,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
     String getMemberLoginAddress( String memberId );
 
     RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String userId );
+
+    RspBase<?> insertBatchExcelMoney( String userIds );
 }
