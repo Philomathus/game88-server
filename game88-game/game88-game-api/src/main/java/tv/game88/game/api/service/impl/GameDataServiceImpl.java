@@ -1,6 +1,7 @@
 package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -24,6 +25,7 @@ import tv.game88.game.api.dto.RspGameDataLog;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
 import tv.game88.game.api.service.GameDataService;
 import tv.game88.game.api.service.GameService;
@@ -54,6 +56,8 @@ public class GameDataServiceImpl implements GameDataService {
     @Resource
     private LotteryBetMapper        lotteryBetMapper;
     @Resource
+    private GamePlatformMapper      gamePlatformMapper;
+    @Resource
     private GameCacheUtils          gameCacheUtils;
     @Resource
     private ConfigVipCacheUtils     configVipCacheUtils;
@@ -67,10 +71,9 @@ public class GameDataServiceImpl implements GameDataService {
         if ( CollectionUtils.isEmpty( rspGameDataLogs ) ) {
             return;
         }
-        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gameCacheUtils
-                .getGamePlatformList()
-                .stream()
-                .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
+                                                                           .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
         SqlSession              session      = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
@@ -107,9 +110,8 @@ public class GameDataServiceImpl implements GameDataService {
 
             gameDataLog.setPlatformId( gamePlatform.getId().intValue() );
 
-            BigDecimal beatAdd = new BigDecimal( dataLog.getCell_score() )
-                    .multiply( gamePlatform.getRateBeat() )
-                    .setScale( 4, RoundingMode.HALF_UP );
+            BigDecimal beatAdd = new BigDecimal( dataLog.getCell_score() ).multiply( gamePlatform.getRateBeat() )
+                                                                          .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
 
@@ -128,12 +130,9 @@ public class GameDataServiceImpl implements GameDataService {
             return;
         }
         log.warn( "彩票拉取注单数量" + list.size() );
-        GamePlatform gamePlatform = gameCacheUtils
-                .getGamePlatformList()
-                .stream()
-                .filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
-                .findFirst()
-                .get();
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+        GamePlatform gamePlatform = gamePlatforms.stream().filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
+                                                 .findFirst().get();
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -260,12 +259,8 @@ public class GameDataServiceImpl implements GameDataService {
 
         }
 
-        List<ConfigVip> configVips = configVipCacheUtils
-                .getConfigVipMap()
-                .values()
-                .stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
-                .toList();
+        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
+                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         for ( String userId : willCodeMap.keySet() ) {
             memberMoneyManager.checkAndUpdateVip( userId, configVips );
         }
@@ -274,8 +269,7 @@ public class GameDataServiceImpl implements GameDataService {
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                .eq( "effect", 1 )
-                .gt( "game_type_id", 0 ) );
+                .eq( "effect", 1 ).gt( "game_type_id", 0 ) );
 
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
