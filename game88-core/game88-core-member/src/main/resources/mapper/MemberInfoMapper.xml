@@ -511,4 +511,9 @@
         insert into member_money(id, money, beat)
         values (${userIds})
     </insert>
+
+    <select id="selectMemberInfoById" parameterType="String" resultMap="MemberInfoResult">
+        <include refid="selectMemberInfoVo"/>
+        where id = #{id}
+    </select>
 </mapper>

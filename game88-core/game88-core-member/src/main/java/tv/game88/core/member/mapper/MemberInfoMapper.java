@@ -114,4 +114,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     Integer clearMemberMoney();
     Integer insertBatchMemberMoney(String userIds);
+
+    MemberInfo selectMemberInfoById(String id);
 }
