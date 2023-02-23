@@ -69,7 +69,10 @@ public class SecurityUtils {
      *
      * @return 是否校验成功
      */
-    public static void verifyMFACode( int MFACode ) throws Exception {
+    public static void verifyMFACode( Integer MFACode ) throws Exception {
+        if(MFACode == null) {
+            throw new BusinessException( "MFA验证码不正确，请检查" );
+        }
         String otpSecret = getLoginUser().getUser().getOtpSecret();
         if ( StringUtils.isBlank( otpSecret ) ) {
             throw new BusinessException( "请联系管理员绑定MFA验证秘钥" );

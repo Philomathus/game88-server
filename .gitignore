@@ -4,6 +4,7 @@ logs/
 */*.iml
 out/
 *.iml
+*.log
 target/
 .factorypath
 .classpath
