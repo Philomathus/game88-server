@@ -361,6 +361,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) throws Exception {
+        String login_restrict_ip = configEnvCacheUtil.getConf( "login_restrict_ip", null );
+        if ( StringUtils.isNotBlank( mobileLogin.getIp() ) && StringUtils.isNotBlank( login_restrict_ip ) ) {
+            for ( String dip : login_restrict_ip.split( "," ) ) {
+                if ( mobileLogin.getIp().equals( dip ) ) {
+                    return RspBase.businessError( "您已被限制登录,请联系客服" );
+                }
+            }
+        }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
             return RspBase.businessError( "请输入登陆密码" );
         }
@@ -600,7 +608,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             memberBcodeMapper.insert( code );
 
             m.setCodeWill( code.getIncome() );
-            m.setAccountCharge( registerMemberMoney );
+            // m.setAccountCharge( registerMemberMoney );
         }
         return m;
     }
