@@ -133,7 +133,7 @@ public class MemberMoneyManager {
         logMoney.setTotalBefore(totalOld);
         logMoney.setTotal(totalNow);
         logMoney.setMarkorder(markOrder);
-        int insertLogMoney = logMoneyMapper.insert(logMoney, logMoney.getUserId().substring(logMoney.getUserId().length() - 1));
+        int insertLogMoney = logMoneyMapper.insert(logMoney, userId.substring(userId.length() - 1));
 
         MemberBcode code = new MemberBcode();
         code.setCharge(trade);

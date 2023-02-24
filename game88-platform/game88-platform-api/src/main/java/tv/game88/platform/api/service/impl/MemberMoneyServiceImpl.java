@@ -90,8 +90,8 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
                             memberData.getId(), memberData.getMoney()));
                 }
                 MemberInfo memberInfo = getMemberInfo(memberData.getId(), key);
-                log.info("STARSEND: Processing memberMoney: {}, memberInfo: {}",
-                        memberData.toString(), memberInfo.toString());
+                log.info("STARSEND: Processing memberMoney ID: {}, memberInfo nickName: {}",
+                        memberData.getId(), memberInfo.getNickName());
                 processMoney(memberData, memberInfo, adminName, key);
             });
         } else {
@@ -103,7 +103,6 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
         return RspBase.ok("success");
     }
 
-    @Transactional(rollbackFor = Exception.class)
     void processMoney(MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String key) {
         processLogMoney(memberMoney, memberInfo, adminName, key);
         processMemberInfo(memberMoney, memberInfo);
@@ -134,6 +133,7 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
         memberMoneyManager.addMemberMoneyStarSend(memberMoney, memberInfo, markOrder, adminName, moneyDes);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     void processMemberInfo(MemberMoney memberMoney, MemberInfo memberInfo) {
         int addMemberInfo = memberInfoMapper.addMoneySelect(memberMoney.getId(), memberMoney.getMoney(),
                 null, memberInfo.getCodeWill());
