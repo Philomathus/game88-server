@@ -98,10 +98,12 @@ public class MessageCacheUtil {
         return list.stream().map( a -> JsonUtil.json2Object( a, RspMessageCommonProblem.class ) ).collect( Collectors.toList() );
     }
 
-    public List<RspMessageOnSite> getMessageOnSites() {
+    public List<RspMessageOnSite> getMessageOnSites(String userId) {
         Boolean exists = redisUtils.exists( ON_SITE );
         if ( exists == null || !exists ) {
             List<RspMessageOnSite> result = new QueryChainWrapper<>( messageOnSiteMapper )
+                    .eq("receiver_user_id", userId)
+                    .or().isNull("receiver_user_id")
                     .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
                     .orderByDesc( "create_time" )
                     .list()

@@ -9,6 +9,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.RspMessageCommonProblem;
 import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
@@ -46,6 +47,7 @@ public class MessageController extends BaseController {
     @PostMapping( "/getMessageOnSites" )
     @Anonymous
     public RspBase<List<RspMessageOnSite>> getOnSiteMessages() {
-        return RspBase.ok( messageService.getMessageOnSites() );
+        String userId = MemberSecurityUtils.getUserId();
+        return RspBase.ok( messageService.getMessageOnSites(userId) );
     }
 }
