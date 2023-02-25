@@ -137,6 +137,9 @@ public class ServletUtil {
         if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "wl-proxy-client-ip" );
         }
+        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+            ip = request.getHeader( "X-NoProxy-IP" );
+        }
         if ( ip != null && ip.contains( "," ) ) {
             ip = ip.split( "," )[ 0 ];
         }
