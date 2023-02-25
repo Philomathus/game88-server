@@ -123,6 +123,10 @@ public class MessageOnSiteController extends BaseController {
         }
         messageOnSite.setCreateBy( SecurityUtils.getUsername() );
         messageOnSite.setCreateTime(LocalDateTime.now());
-        return RspBase.ok( messageOnSiteService.insertMessageOnSite( messageOnSite ) );
+        int result = messageOnSiteService.insertMessageOnSite( messageOnSite );
+        if(result > 0) {
+            messageCacheUtil.clear( MessageCacheUtil.ON_SITE );
+        }
+        return RspBase.ok( result );
     }
 }
