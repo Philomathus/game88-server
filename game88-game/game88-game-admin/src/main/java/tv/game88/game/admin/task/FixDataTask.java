@@ -6,9 +6,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
-import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameDataFix;
+import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameDataFixMapper;
 import tv.game88.game.api.service.GameDataService;
 import tv.game88.game.api.type.EnumGameCategory;
@@ -25,7 +25,7 @@ public class FixDataTask {
     @Resource
     private RedisUtils              redisUtils;
     @Resource
-    private GameCacheUtils          gameCacheUtils;
+    private GamePlatformMapper      gamePlatformMapper;
     @Resource
     private GameDataService         gameDataService;
     @Resource
@@ -36,10 +36,10 @@ public class FixDataTask {
         if ( !redisUtils.lock( "FixDataTask", 150 ) ) {
             return;
         }
-        List<GamePlatform>      gamePlatformList    = gameCacheUtils.getGamePlatformList();
+        List<GamePlatform>      gamePlatforms       = new QueryChainWrapper<>( gamePlatformMapper ).list();
         List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 ).list();
         for ( MemberGameDataFix memberGameDataFix : memberGameDataFixes ) {
-            for ( GamePlatform gamePlatform : gamePlatformList ) {
+            for ( GamePlatform gamePlatform : gamePlatforms ) {
                 if ( memberGameDataFix.getPlatformId() == gamePlatform.getId().intValue() ) {
                     String begin = LocalDateTimeUtils.format( memberGameDataFix.getGameStartTime() );
                     String end   = LocalDateTimeUtils.format( memberGameDataFix.getGameEndTime() );
