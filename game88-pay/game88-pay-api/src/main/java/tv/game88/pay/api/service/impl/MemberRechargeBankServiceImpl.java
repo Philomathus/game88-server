@@ -46,6 +46,7 @@ import java.math.RoundingMode;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -136,6 +137,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                     rspPayRechargeBank.setBankIcon( domainValue + rspPayRechargeBank.getBankIcon() );
                 }
             }
+            Collections.shuffle( configBankList );
         }
         return configBankList;
     }
