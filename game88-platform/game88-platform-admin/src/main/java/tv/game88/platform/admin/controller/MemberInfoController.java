@@ -16,6 +16,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
@@ -25,6 +26,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
@@ -150,10 +152,16 @@ public class MemberInfoController extends BaseController {
         }
 
         boolean b = memberInfoService.updateById( update );
-        if ( status == 0 && b ) {
+        if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
-            if ( StringUtils.isNotBlank( token ) ) {
+            if ( StringUtils.isNotBlank( token ) && status == 0 ) {
                 redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+            } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
+                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
+                                                        .toString();
+                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                platformUser.setStatus( status );
+                redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
         }
         return toResult( b );
@@ -337,9 +345,9 @@ public class MemberInfoController extends BaseController {
         return memberInfoService.boxDish( memberId );
     }
 
-    @PostMapping("/batchUploadExcel")
-    @Transactional(rollbackFor = Exception.class)
-    public RspBase<?> batchUploadExcel( @RequestParam("excelFile") MultipartFile excelFile ) throws Exception {
+    @PostMapping( "/batchUploadExcel" )
+    @Transactional( rollbackFor = Exception.class )
+    public RspBase<?> batchUploadExcel( @RequestParam( "excelFile" ) MultipartFile excelFile ) throws Exception {
         Workbook      workbook = null;
         StringBuilder userId   = new StringBuilder();
         try {
@@ -381,7 +389,7 @@ public class MemberInfoController extends BaseController {
                     cell3 = "1";
                 }
                 userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
-                        .append( cell3 ).append( "),(" );
+                               .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
             e.getMessage();
@@ -390,6 +398,6 @@ public class MemberInfoController extends BaseController {
         String userIds = String.valueOf( userId );
 
 
-        return memberInfoService.insertBatchExcelMoney(userIds);
+        return memberInfoService.insertBatchExcelMoney( userIds );
     }
 }
