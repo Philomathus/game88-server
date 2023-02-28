@@ -103,12 +103,8 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
         return RspBase.ok("success");
     }
 
-    void processMoney(MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String key) {
-        processLogMoney(memberMoney, memberInfo, adminName, key);
-        processMemberInfo(memberMoney, memberInfo);
-    }
-
-    void processLogMoney(MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes) {
+    @Transactional(rollbackFor = Exception.class)
+    void processMoney(MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes) {
         String startOfToday = LocalDateTimeUtils.format(LocalDateTimeUtils.getStartOfToday());
         String today = LocalDateTimeUtils.format(LocalDate.now());
         String userId = memberMoney.getId();
@@ -131,15 +127,6 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
                             + "入款备注" + moneyDes);
         }
         memberMoneyManager.addMemberMoneyStarSend(memberMoney, memberInfo, markOrder, adminName, moneyDes);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    void processMemberInfo(MemberMoney memberMoney, MemberInfo memberInfo) {
-        int addMemberInfo = memberInfoMapper.addMoneySelect(memberMoney.getId(), memberMoney.getMoney(),
-                null, memberInfo.getCodeWill());
-        if (addMemberInfo <= 0) {
-            throw new BusinessException("资金记入失败,请重试");
-        }
     }
 
     private MemberInfo getMemberInfo(String id, String key) {
