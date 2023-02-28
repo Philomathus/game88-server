@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberInfo;
@@ -84,6 +85,8 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
         log.info("STARSEND: List size - {}", memberMoneyList.size());
         if (memberMoneyList.size() > 0) {
             BigDecimal deliveryLimit = new BigDecimal(10000);
+
+            MemberMoneyService memberMoneyService = SpringUtils.getBean( MemberMoneyService.class );
             memberMoneyList.forEach(memberData -> {
                 if (memberData.getMoney().compareTo(deliveryLimit) >= 0) {
                     throw new BusinessException(String.format("会员%s派送金额超过一万, 派送金额:%s",
@@ -92,7 +95,7 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
                 MemberInfo memberInfo = getMemberInfo(memberData.getId(), key);
                 log.info("STARSEND: Processing memberMoney ID: {}, memberInfo nickName: {}",
                         memberData.getId(), memberInfo.getNickName());
-                processMoney(memberData, memberInfo, adminName, key);
+                memberMoneyService.processMoney(memberData, memberInfo, adminName, key);
             });
         } else {
             lockUnlock(key, false);
@@ -103,8 +106,9 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
         return RspBase.ok("success");
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    void processMoney(MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes) {
+    public void processMoney( MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes ) {
         String startOfToday = LocalDateTimeUtils.format(LocalDateTimeUtils.getStartOfToday());
         String today = LocalDateTimeUtils.format(LocalDate.now());
         String userId = memberMoney.getId();
