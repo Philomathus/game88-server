@@ -14,12 +14,12 @@ import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.LogCleanCode;
 import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.LogCleanCodeInfoMapper;
 import tv.game88.game.api.mapper.LogCleanCodeMapper;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
@@ -51,7 +51,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Resource
     private MemberMoneyManager     memberMoneyManager;
     @Resource
-    private GameCacheUtils         gameCacheUtils;
+    private GamePlatformMapper     gamePlatformMapper;
     @Resource
     private RedisUtils             redisUtils;
 
@@ -106,21 +106,19 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         info.setCodeAmountTotal( BigDecimal.ZERO );
         List<RspGameCategory> gameCategorys = EnumGameCategory.getGameCategorys();
         info.setRspGameCategoryList( gameCategorys );
-        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
-                .eq( "id", memberId )
-                .select( "id", "clean_time" )
-                .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId ).select( "id", "clean_time" )
+                                                                           .one();
         if ( memberInfo.getCleanTime() != null ) {
             info.setCleanTime( LocalDateTimeUtils.format( memberInfo.getCleanTime() ) );
         }
         Map<Long, RspCleanPlatform> map = this.baseMapper
-                .findMemCleanPlatformLists( memberId.substring( memberId.length() - 1 ), memberId )
-                .stream()
+                .findMemCleanPlatformLists( memberId.substring( memberId.length() - 1 ), memberId ).stream()
                 .collect( Collectors.toMap( RspCleanPlatform::getId, Function.identity() ) );
-        Map<String, RspGameCategory> gameCategoryMap = gameCategorys
-                .stream()
-                .collect( Collectors.toMap( RspGameCategory::getName, Function.identity() ) );
-        for ( GamePlatform pl : gameCacheUtils.getGamePlatformList() ) {
+        Map<String, RspGameCategory> gameCategoryMap = gameCategorys.stream()
+                                                                    .collect( Collectors.toMap( RspGameCategory::getName,
+                                                                            Function.identity() ) );
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+        for ( GamePlatform pl : gamePlatforms ) {
             if ( map.containsKey( pl.getId() ) ) {
                 map.get( pl.getId() ).setRateClean( pl.getRateClean() );
                 map.get( pl.getId() ).setName( pl.getName() );
@@ -165,8 +163,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     private void toCleanCode( String memberId ) {
         Map<Long, RspCleanPlatform> willCleanPlatforms = this.baseMapper
-                .findMemCleanPlatformLists( memberId.substring( memberId.length() - 1 ), memberId )
-                .stream()
+                .findMemCleanPlatformLists( memberId.substring( memberId.length() - 1 ), memberId ).stream()
                 .collect( Collectors.toMap( RspCleanPlatform::getId, Function.identity() ) );
         // 无可洗码注单 返回
         if ( willCleanPlatforms.size() == 0 ) {
@@ -174,11 +171,11 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         }
         // 本次洗码日志容器
         Map<Long, LogCleanCodeInfo> logsMap = new HashMap<>();
+
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         // 查询可洗码游戏平台
-        Map<Long, GamePlatform> map = gameCacheUtils
-                .getGamePlatformList()
-                .stream()
-                .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
+        Map<Long, GamePlatform> map = gamePlatforms.stream()
+                                                   .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
 
         String             cleanId = IdWorker.get32UUID();
         LocalDateTime      ntime   = LocalDateTime.now();
@@ -241,9 +238,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         for ( LogCleanCodeInfo t : logCleanCodeInfos ) {
             logCleanCodeInfoMapper.insert( t );
         }
-        String name = "洗码金额:" + restlt.getAddCodeAmount().toString() + "存入:" + restlt
-                .getAddCleanAmount()
-                .setScale( 2, RoundingMode.HALF_UP );
+        String name = "洗码金额:" + restlt.getAddCodeAmount().toString() + "存入:" + restlt.getAddCleanAmount()
+                                                                                           .setScale( 2, RoundingMode.HALF_UP );
         memberMoneyManager.addMemberMoney( memberId, restlt.getAddCleanAmount(), EnumMoney.CODE_CLEAN, BigDecimal.ZERO, name,
                 cleanId, cleanId );
     }
@@ -257,10 +253,10 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     public List<RspGameData> getGameDataList( String memberId, ReqGameData reqGameData ) {
         String beginDay = reqGameData.getEnumReqTime().getBeginDayTime();
         String endDay   = reqGameData.getEnumReqTime().getEndDayTime();
-        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gameCacheUtils
-                .getGamePlatformList()
-                .stream()
-                .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
+
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
+                                                                           .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
         GamePlatform gamePlatform = gamePlatformMap.get( reqGameData.getGameCategory() );
         if ( gamePlatform == null ) {
             return new ArrayList<>();
