@@ -3,7 +3,6 @@ package tv.game88.game.api.service.impl;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.http.HttpEntity;
@@ -239,7 +238,6 @@ public class GameServiceImpl implements GameService {
         return this.gameWithdrawal( memberId, gameInfo.getPlatformId() );
     }
 
-    @NotNull
     private RspBase<Object> gameWithdrawal( String memberId, Long platformId ) {
         GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( platformId );
         if ( gamePlatform == null ) {
