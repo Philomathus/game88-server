@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class GameCacheUtils {
 
     public static final String GAME_TYPE_KEY          = Constants.GAME_PREX + "type:effect";
+    public static final String GAME_TYPE_LIST_KEY     = Constants.GAME_PREX + "typeList";
     public static final String GAME_PLATFORM_KEY      = Constants.GAME_PREX + "platform:";
     public static final String GAME_PLATFORM_LIST_KEY = Constants.GAME_PREX + "platformList";
     public static final String GAME_INFO_KEY          = Constants.GAME_PREX + "info:";
@@ -75,7 +76,7 @@ public class GameCacheUtils {
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, GamePlatform.class );
     }
 
-    public List<GamePlatform> getGamePlatformList() {
+    public List<GamePlatform>  getGamePlatformList() {
         if ( !redisUtils.exists( GAME_PLATFORM_LIST_KEY ) ) {
             List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
             if ( !CollectionUtils.isEmpty( gamePlatforms ) ) {

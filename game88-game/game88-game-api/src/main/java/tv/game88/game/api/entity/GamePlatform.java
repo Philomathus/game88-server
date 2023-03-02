@@ -81,7 +81,7 @@ public class GamePlatform {
      * 洗码比例
      */
     @Excel( name = "洗码比例" )
-    private BigDecimal       rateClean;
+    private BigDecimal      rateClean;
     /**
      * 打码比例
      */
