@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.http.HttpEntity;
@@ -244,7 +243,6 @@ public class GameServiceImpl extends ServiceImpl<MemberGameDataMapper, MemberGam
         return this.gameWithdrawal( memberId, gameInfo.getPlatformId() );
     }
 
-    @NotNull
     private RspBase<Object> gameWithdrawal( String memberId, Long platformId ) {
         GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( platformId );
         if ( gamePlatform == null ) {

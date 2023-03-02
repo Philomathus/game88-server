@@ -114,13 +114,17 @@ public class MemberMoneyManager {
         String userName = memberInfo.getUserName();
         String mark     = moneyDes + ",操作人:" + adminName;
 
-        BigDecimal trade     = memberMoney.getMoney();
-        BigDecimal totalOld  = memberInfo.getAccountNow();
-        BigDecimal totalNow  = totalOld.add( trade );
+        BigDecimal trade    = memberMoney.getMoney();
+        BigDecimal totalOld = memberInfo.getAccountNow();
+        BigDecimal totalNow = totalOld.add( trade );
+
+        BigDecimal codeMult  = trade.multiply( memberMoney.getBeat() ).setScale( 2, RoundingMode.DOWN );
         int        hasIncome = trade.compareTo( BigDecimal.ZERO );
         if ( hasIncome == 0 ) {
             return;
         }
+
+        int addMemberInfo = memberInfoMapper.addMoneySelect( userId, trade, null, codeMult );
 
         LogMoney logMoney = new LogMoney();
         logMoney.setId( markOrder );
@@ -139,14 +143,14 @@ public class MemberMoneyManager {
 
         MemberBcode code = new MemberBcode();
         code.setCharge( trade );
-        code.setIncome( trade.multiply( memberMoney.getBeat() ).setScale( 2, RoundingMode.HALF_UP ) );
+        code.setIncome( codeMult );
         code.setCreateTime( logMoney.getCreateTime() );
         code.setCur( BigDecimal.ZERO );
         code.setStatus( 0 );
         code.setUserId( userId );
         code.setDes( moneyDes );
         int insertBCode = memberBcodeMapper.insert( code );
-        if ( insertLogMoney <= 0 || insertBCode <= 0 ) {
+        if ( addMemberInfo <= 0 || insertLogMoney <= 0 || insertBCode <= 0 ) {
             throw new BusinessException( "资金记入失败,请重试" );
         }
     }
