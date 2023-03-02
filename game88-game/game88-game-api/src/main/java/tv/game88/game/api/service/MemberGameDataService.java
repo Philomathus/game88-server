@@ -37,4 +37,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     RspBase<?> getGameBetDetailData( MemberGameData memberGameData );
     RspBase<RspCleanCodeInfo> cleanCode( String memberId );
 
+    RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
+
 }
