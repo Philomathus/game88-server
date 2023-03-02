@@ -77,11 +77,13 @@ public class GamePlatform {
      */
     @Excel( name = "站点标识" )
     private String           linecode;
+
     /**
      * 洗码比例
      */
     @Excel( name = "洗码比例" )
-    private BigDecimal      rateClean;
+    private BigDecimal       rateClean;
+
     /**
      * 打码比例
      */

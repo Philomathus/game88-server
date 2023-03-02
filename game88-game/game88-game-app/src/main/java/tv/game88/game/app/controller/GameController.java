@@ -124,4 +124,10 @@ public class GameController extends BaseController {
                                      @Validated @RequestBody ReqPGSoftGameData data ) {
         return gameService.verify( traceId, data );
     }
+
+    @Operation( summary = "会员洗码详情" )
+    @PostMapping( "/cleanCodeDetail" )
+    public RspBase<RspCleanCodeInfo> cleanCodeDetail() {
+        return gameService.cleanCodeDetail( MemberSecurityUtils.getUserId() );
+    }
 }
