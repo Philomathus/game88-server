@@ -7,3 +7,5 @@ spring:
     host: r-j6crwayvx3knxgmy58.redis.rds.aliyuncs.com
     port: 6379
     password: qatrJElKsmZxy25j
+
+payAgentLimitLianFuBao: 20000
