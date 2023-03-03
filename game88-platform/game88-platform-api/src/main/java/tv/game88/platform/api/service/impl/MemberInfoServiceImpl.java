@@ -130,7 +130,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } else {
             keys.addAll( Arrays.asList( "android_version", "android_force_update", "android_down_url", "android_update_text" ) );
         }
-        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id" ) );
+        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id", "first_recharge_url" ) );
         List<String> valueList = configEnvCacheUtil.getConf( keys );
         res.setCustomerUrl( valueList.get( 0 ) );
         res.setCustomerUrl2( valueList.get( 1 ) );
@@ -149,6 +149,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setCaptchaId( valueList.get( 8 ) );
         res.setActionSwitch( valueList.get( 9 ) );
         res.setProductId( valueList.get( 10 ) );
+        res.setFirstRechargeUrl( valueList.get( 11 ) );
         return res;
     }
 
