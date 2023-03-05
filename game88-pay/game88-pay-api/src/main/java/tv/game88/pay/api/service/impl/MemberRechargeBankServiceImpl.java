@@ -46,6 +46,7 @@ import java.math.RoundingMode;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -136,6 +137,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                     rspPayRechargeBank.setBankIcon( domainValue + rspPayRechargeBank.getBankIcon() );
                 }
             }
+            Collections.shuffle( configBankList );
         }
         return configBankList;
     }
@@ -438,7 +440,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
 
     @Override
     public RspBase<?> bankCardRecharge( PlatformUser platformUser, ReqMemberCardRecharge req ) {
-        if ( !ValidatorUtil.isChinese( req.getRechargeUserName() ) ) {
+        if ( StringUtils.isBlank( req.getRechargeUserName() ) ) {
             return RspBase.businessError( "请输入真实的绑定银行卡姓名" );
         }
         if ( platformUser.getStatus() == 0 ) {

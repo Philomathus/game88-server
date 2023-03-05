@@ -130,7 +130,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } else {
             keys.addAll( Arrays.asList( "android_version", "android_force_update", "android_down_url", "android_update_text" ) );
         }
-        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id" ) );
+        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id", "first_recharge_url" ) );
         List<String> valueList = configEnvCacheUtil.getConf( keys );
         res.setCustomerUrl( valueList.get( 0 ) );
         res.setCustomerUrl2( valueList.get( 1 ) );
@@ -149,6 +149,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setCaptchaId( valueList.get( 8 ) );
         res.setActionSwitch( valueList.get( 9 ) );
         res.setProductId( valueList.get( 10 ) );
+        res.setFirstRechargeUrl( valueList.get( 11 ) );
         return res;
     }
 
@@ -361,6 +362,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) throws Exception {
+        String login_restrict_ip = configEnvCacheUtil.getConf( "login_restrict_ip", null );
+        if ( StringUtils.isNotBlank( mobileLogin.getIp() ) && StringUtils.isNotBlank( login_restrict_ip ) ) {
+            for ( String dip : login_restrict_ip.split( "," ) ) {
+                if ( mobileLogin.getIp().equals( dip ) ) {
+                    return RspBase.businessError( "您已被限制登录,请联系客服" );
+                }
+            }
+        }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
             return RspBase.businessError( "请输入登陆密码" );
         }
@@ -598,6 +607,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             code.setUserId( m.getId() );
             code.setDes( EnumMoney.ACTIVITY.getDes() );
             memberBcodeMapper.insert( code );
+
+            m.setCodeWill( code.getIncome() );
+            // m.setAccountCharge( registerMemberMoney );
         }
         return m;
     }
@@ -710,10 +722,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( !"0".equals( markorder ) ) {
             List<LogMoney> markList = null;
             if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-                markList = logMoneyMapper.findMark( userId, markorder, money, null, userId.substring( userId.length() - 1 ) );
+                markList = logMoneyMapper.findMark( userId, markorder, money, null, userId.substring( userId.length() - 1 ), null );
             } else {
                 BigDecimal negate = money.negate();
-                markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring( userId.length() - 1 ) );
+                markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring( userId.length() - 1 ), null );
             }
             if ( markList.size() > 0 ) {
                 return RspBase.businessError( "请查看此笔金额是否已经入款过，如否请输入其他订单备注" );
@@ -1408,4 +1420,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         int i = this.baseMapper.updateById( update );
         return i > 0 ? RspBase.ok( "邀请码更新成功" ) : RspBase.businessError( "邀请码更新失败,请重试" );
     }
+
+    @Override
+    public RspBase<?> insertBatchExcelMoney(String userIds) {
+        this.baseMapper.clearMemberMoney();
+        this.baseMapper.insertBatchMemberMoney(userIds);
+        return RspBase.ok( "member_money updated" );
+    }
+
 }

@@ -2,7 +2,6 @@ package tv.game88.pay.api.base;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -120,7 +119,6 @@ public abstract class AbstractPay implements BasePay {
         return sb.toString();
     }
 
-    @NotNull
     protected static HttpEntity<MultiValueMap<String, Object>> packageForm( Map<String, Object> params ) {
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
         requestMap.setAll( params );
@@ -130,14 +128,12 @@ public abstract class AbstractPay implements BasePay {
         return new HttpEntity<>( requestMap, httpHeaders );
     }
 
-    @NotNull
     protected static HttpEntity<Map<String, Object>> packageJson( Map<String, Object> params ) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         return new HttpEntity<>( params, httpHeaders );
     }
 
-    @NotNull
     protected static String packageFormHtml( String url, ReqPayRecharge reqPayRecharge, Map<String, String> bodyMap ) {
         StringBuilder sb = new StringBuilder( "<form id='Form1' name='Form1' method='post' action='" + url + "'>" );
 

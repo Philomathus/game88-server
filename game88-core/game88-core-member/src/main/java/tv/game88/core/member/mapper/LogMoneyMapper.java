@@ -31,7 +31,8 @@ public interface LogMoneyMapper extends BaseMapper<LogMoney> {
     List<LogMoney> selectLogMoneySingleList( LogMoney logMoney );
 
     List<LogMoney> findMark( @Param( "userId" ) String userId, @Param( "mark" ) String mark, @Param( "money" ) BigDecimal money
-            , @Param( "pay" ) BigDecimal pay, @Param( "dbNodes" ) String dbNodes );
+            , @Param( "pay" ) BigDecimal pay, @Param( "dbNodes" ) String dbNodes, @Param( "startTime" ) String startTime );
+
 
     /**
      * 插入数据

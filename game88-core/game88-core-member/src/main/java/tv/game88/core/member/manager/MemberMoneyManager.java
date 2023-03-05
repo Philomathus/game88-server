@@ -13,6 +13,8 @@ import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.entity.MemberBcode;
+import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.entity.MemberMoney;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.mapper.LogMoneyMapper;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
@@ -89,7 +91,7 @@ public class MemberMoneyManager {
         int insertLogMoney = logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
         //打码
         int insertBcode = 1;
-        if ( enumMoney.getBcode() ) {
+        if ( enumMoney.getBcode() && codeMult.compareTo( BigDecimal.ZERO ) > 0 ) {
             MemberBcode code = new MemberBcode();
             code.setIncome( codeMult );
             code.setCharge( addCount );
@@ -104,6 +106,55 @@ public class MemberMoneyManager {
             throw new BusinessException( "资金记入失败,请重试" );
         }
     }
+
+    @Transactional( rollbackFor = Exception.class )
+    public void addMemberMoneyStarSend( MemberMoney memberMoney, MemberInfo memberInfo, String markOrder, String adminName,
+                                        String moneyDes ) {
+        String userId   = memberMoney.getId();
+        String userName = memberInfo.getUserName();
+        String mark     = moneyDes + ",操作人:" + adminName;
+
+        BigDecimal trade    = memberMoney.getMoney();
+        BigDecimal totalOld = memberInfo.getAccountNow();
+        BigDecimal totalNow = totalOld.add( trade );
+
+        BigDecimal codeMult  = trade.multiply( memberMoney.getBeat() ).setScale( 2, RoundingMode.DOWN );
+        int        hasIncome = trade.compareTo( BigDecimal.ZERO );
+        if ( hasIncome == 0 ) {
+            return;
+        }
+
+        int addMemberInfo = memberInfoMapper.addMoneySelect( userId, trade, null, codeMult );
+
+        LogMoney logMoney = new LogMoney();
+        logMoney.setId( markOrder );
+        logMoney.setUserId( userId );
+        logMoney.setUserName( userName );
+        logMoney.setCreateTime( LocalDateTime.now() );
+        logMoney.setIncome( hasIncome > 0 ? trade : BigDecimal.ZERO );
+        logMoney.setPay( hasIncome < 0 ? trade.negate() : BigDecimal.ZERO );
+        logMoney.setType( EnumMoney.WONGIVE.getType() );
+        logMoney.setDes( EnumMoney.WONGIVE.getDes() );
+        logMoney.setMark( mark );
+        logMoney.setTotalBefore( totalOld );
+        logMoney.setTotal( totalNow );
+        logMoney.setMarkorder( markOrder );
+        int insertLogMoney = logMoneyMapper.insert( logMoney, userId.substring( userId.length() - 1 ) );
+
+        MemberBcode code = new MemberBcode();
+        code.setCharge( trade );
+        code.setIncome( codeMult );
+        code.setCreateTime( logMoney.getCreateTime() );
+        code.setCur( BigDecimal.ZERO );
+        code.setStatus( 0 );
+        code.setUserId( userId );
+        code.setDes( moneyDes );
+        int insertBCode = memberBcodeMapper.insert( code );
+        if ( addMemberInfo <= 0 || insertLogMoney <= 0 || insertBCode <= 0 ) {
+            throw new BusinessException( "资金记入失败,请重试" );
+        }
+    }
+
 
     /**
      * 会员资金扣减
@@ -166,8 +217,8 @@ public class MemberMoneyManager {
 
     public void checkAndUpdateVip( String memberId, List<ConfigVip> configVips ) {
         BigDecimal codeTotal = memberInfoMapper.getUserCodeTotal( memberId );
-        Integer    userVip    = memberInfoMapper.getUserVip( memberId );
-        Integer    vip        = 1;
+        Integer    userVip   = memberInfoMapper.getUserVip( memberId );
+        Integer    vip       = 1;
         for ( ConfigVip configVip : configVips ) {
             if ( codeTotal.compareTo( configVip.getBcode() ) < 0 ) {
                 break;
@@ -183,9 +234,8 @@ public class MemberMoneyManager {
             String token = redisUtils.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) && redisUtils.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
                 Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
-                PlatformUser platformUser = JsonUtil.json2Object( loginUserMap
-                        .getOrDefault( "platformUserStr", "" )
-                        .toString(), PlatformUser.class );
+                PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
+                                                                              .toString(), PlatformUser.class );
                 platformUser.setVip( vip );
                 loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
                 redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );

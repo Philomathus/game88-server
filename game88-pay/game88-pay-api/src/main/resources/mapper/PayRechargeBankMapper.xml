@@ -21,6 +21,7 @@
         <result property="updateTime" column="update_time" />
         <result property="bankName" column="bank_name" />
         <result property="bankIcon" column="bank_icon" />
+        <result property="sort" column="sort" />
     </resultMap>
 
     <sql id="selectPayRechargeBankVo">
@@ -28,7 +29,7 @@
                b.discount_bill,b.open_level_min,b.open_level_max,
                b.recharge_limit_min,b.recharge_limit_max,b.effect,rest_province,
                b.remark,b.create_by,b.create_time,b.update_by,b.update_time,
-               l.bank_icon,l.bank_name
+               l.bank_icon,l.bank_name,b.sort
         from pay_recharge_bank b left join config_bank_list l on l.id = b.bank_id
     </sql>
 
@@ -42,9 +43,10 @@
                 and account_name like concat('%', #{accountName}, '%')
             </if>
             <if test="effect != null">
-                and effect = #{effect}
+                and b.effect = #{effect}
             </if>
         </where>
+       order by b.sort asc
     </select>
 
     <select id="selectRspList" resultType="tv.game88.pay.api.dto.RspPayRechargeBank">

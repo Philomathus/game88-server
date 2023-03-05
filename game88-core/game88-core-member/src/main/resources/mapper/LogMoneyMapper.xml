@@ -231,6 +231,9 @@
         <if test="pay != null">
             and pay = #{pay}
         </if>
+        <if test="startTime != null">
+            and create_time  >= #{startTime}
+        </if>
     </select>
 
     <select id="selectLogMoneyFirstList" parameterType="tv.game88.core.member.entity.LogMoney"

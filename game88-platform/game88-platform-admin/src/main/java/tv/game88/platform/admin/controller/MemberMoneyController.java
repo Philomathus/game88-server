@@ -10,9 +10,9 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
-import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.entity.MemberMoney;
 import tv.game88.platform.api.service.MemberMoneyService;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
@@ -112,12 +112,18 @@ public class MemberMoneyController extends BaseController{
     /**
      * 查询派送彩金暂存表列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:money:remove')" )
+    @PreAuthorize( "@ss.hasPermi(' member:money:remove')" )
     @GetMapping("/handleClean")
     @Log( title = "派送彩金暂存表", businessType = BusinessType.DELETE )
     public RspBase<?> handleCleanData(){
         return RspBase.ok(memberMoneyService.handleClean());
     }
 
-
+    @PreAuthorize( "@ss.hasPermi('member:money:edit')" )
+    @Log( title = "开始派送彩金", businessType = BusinessType.INSERT )
+    @PostMapping("/starSend")
+    public RspBase<?> starSend( @RequestBody MemberMoney memberMoney ) throws Exception {
+        SecurityUtils.verifyMFACode( memberMoney.getGoogleAuthCode() );
+        return memberMoneyService.starSend(memberMoney, SecurityUtils.getUsername());
+    }
 }

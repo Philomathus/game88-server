@@ -1,6 +1,9 @@
 package tv.game88.platform.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.entity.MemberMoney;
 
 import java.math.BigDecimal;
@@ -31,4 +34,9 @@ public interface MemberMoneyService extends IService<MemberMoney> {
      * 查询派送彩金暂存表列表 remove all data service
      */
     Integer handleClean();
+
+    RspBase<?> starSend(MemberMoney memberMoney, String adminName);
+
+    @Transactional(rollbackFor = Exception.class)
+    void processMoney( MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes );
 }

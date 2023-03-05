@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.service.GameService;
@@ -27,28 +30,60 @@ public class GameController extends BaseController {
     @PostMapping( "/getGameTypes" )
     @Anonymous
     public RspBase<RspGameTypes> getGameTypes( @RequestHeader( value = "version", required = false ) String version ) {
-        return RspBase.ok( gameService.getGameTypes( version ) );
+        RspGameTypes gameTypes = gameService.getGameTypes( version );
+        if ( !CollectionUtils.isEmpty( gameTypes.getRspGameInfos() ) ) {
+            for ( RspGameInfo gameInfo : gameTypes.getRspGameInfos() ) {
+                if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                    gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+                }
+            }
+        }
+        return RspBase.ok( gameTypes );
     }
 
     @Operation( summary = "根据类型获取游戏列表" )
     @PostMapping( "/getGameInfoList" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
-        return RspBase.ok( gameService.getGameInfoList( req.getId() ) );
+        List<RspGameInfo> gameInfos = gameService.getGameInfoList( req.getId() );
+        for ( RspGameInfo gameInfo : gameInfos ) {
+            if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+            }
+        }
+        return RspBase.ok( gameInfos );
     }
 
     @Operation( summary = "根据类型获取游戏列表-新" )
     @PostMapping( "/getGameInfos" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfos( @Validated @RequestBody ReqGameInfo req ) {
-        return RspBase.ok( gameService.getGameInfos( req.getId(), req.getPid() ) );
+        List<RspGameInfo> gameInfos = gameService.getGameInfos( req.getId(), req.getPid() );
+        for ( RspGameInfo gameInfo : gameInfos ) {
+            if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+            }
+        }
+        return RspBase.ok( gameInfos );
     }
 
     @Operation( summary = "根据类型获取游戏分组" )
     @PostMapping( "/getGameInfoGroup" )
     @Anonymous
     public RspBase<List<RspGamePlatform>> getGameInfoGroup( @Validated @RequestBody ReqGame req ) {
-        return gameService.getGameInfoGroup( req.getId() );
+        RspBase<List<RspGamePlatform>> gameInfoGroup = gameService.getGameInfoGroup( req.getId() );
+        if ( !CollectionUtils.isEmpty( gameInfoGroup.getData() ) ) {
+            for ( RspGamePlatform gamePlatform : gameInfoGroup.getData() ) {
+                if ( !CollectionUtils.isEmpty( gamePlatform.getRspGameInfos() ) ) {
+                    for ( RspGameInfo gameInfo : gamePlatform.getRspGameInfos() ) {
+                        if ( StringUtils.isNotBlank( gameInfo.getIcon() ) && !gameInfo.getIcon().startsWith( "http" ) ) {
+                            gameInfo.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + gameInfo.getIcon() );
+                        }
+                    }
+                }
+            }
+        }
+        return gameInfoGroup;
     }
 
     // 获取游戏token,内部接口
@@ -85,8 +120,8 @@ public class GameController extends BaseController {
 
     @Operation( summary = "PG Verify Session" )
     @PostMapping( "/VerifySession" )
-    public RspBase<?> verifySession( @RequestHeader( value = "trace_id") String traceId,
-                                @Validated @RequestBody ReqPGSoftGameData data ) {
+    public RspBase<?> verifySession( @RequestHeader( value = "trace_id" ) String traceId,
+                                     @Validated @RequestBody ReqPGSoftGameData data ) {
         return gameService.verify( traceId, data );
     }
 }

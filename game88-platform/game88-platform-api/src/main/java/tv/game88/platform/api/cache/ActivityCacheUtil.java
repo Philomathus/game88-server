@@ -48,7 +48,7 @@ public class ActivityCacheUtil {
         if ( exists == null || !exists ) {
             List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper )
                     .eq( "effect", 1 )
-                    .orderByDesc( "create_time" )
+                    .orderByAsc( "sort" )
                     .list();
             if ( activityInfos.size() > 0 ) {
                 if ( redisUtil.lock( ACTIVITY_INFO_KEY, 3 ) ) {

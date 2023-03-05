@@ -2,12 +2,21 @@ package tv.game88.platform.admin.controller;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
@@ -17,6 +26,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
@@ -142,10 +152,16 @@ public class MemberInfoController extends BaseController {
         }
 
         boolean b = memberInfoService.updateById( update );
-        if ( status == 0 && b ) {
+        if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
-            if ( StringUtils.isNotBlank( token ) ) {
+            if ( StringUtils.isNotBlank( token ) && status == 0 ) {
                 redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+            } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
+                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
+                                                        .toString();
+                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                platformUser.setStatus( status );
+                redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
         }
         return toResult( b );
@@ -327,5 +343,61 @@ public class MemberInfoController extends BaseController {
     public RspBase<?> boxDish( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
         SecurityUtils.verifyMFACode( googleAuthCode );
         return memberInfoService.boxDish( memberId );
+    }
+
+    @PostMapping( "/batchUploadExcel" )
+    @Transactional( rollbackFor = Exception.class )
+    public RspBase<?> batchUploadExcel( @RequestParam( "excelFile" ) MultipartFile excelFile ) throws Exception {
+        Workbook      workbook = null;
+        StringBuilder userId   = new StringBuilder();
+        try {
+            workbook = WorkbookFactory.create( excelFile.getInputStream() );
+            excelFile.getInputStream().close();
+            //工作表对象
+            Sheet sheet = workbook.getSheetAt( 0 );
+            //总行数
+            int rowLength = sheet.getLastRowNum() + 1;
+            //工作表的列
+            Row row = sheet.getRow( 0 );
+            //总列数
+            //            int colLength = row.getLastCellNum();
+            //得到指定的单元格
+            for ( int i = 0; i < rowLength; i++ ) {
+                Cell cell = row.getCell( i );
+                row = sheet.getRow( i );
+                String cell1 = null;
+                String cell2 = null;
+                String cell3 = null;
+                for ( int j = 0; j < 3; j++ ) {
+                    cell = row.getCell( j );
+                    if ( cell != null ) {
+                        cell.setCellType( CellType.STRING );
+                        String data = cell.getStringCellValue();
+                        if ( j == 0 ) {
+                            cell1 = data.trim();
+                        } else if ( j == 1 ) {
+                            cell2 = data.trim();
+                        } else {
+                            cell3 = data.trim();
+                        }
+                    }
+                }
+                if ( StringUtils.isBlank( cell1 ) || StringUtils.isBlank( cell2 ) ) {
+                    break;
+                }
+                if ( StringUtils.isBlank( cell3 ) ) {
+                    cell3 = "1";
+                }
+                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
+                               .append( cell3 ).append( "),(" );
+            }
+        } catch ( Exception e ) {
+            e.getMessage();
+        }
+        userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
+        String userIds = String.valueOf( userId );
+
+
+        return memberInfoService.insertBatchExcelMoney( userIds );
     }
 }

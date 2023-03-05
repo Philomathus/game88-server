@@ -11,7 +11,7 @@
     </resultMap>
 
     <sql id="selectMessageOnSiteVo">
-        select id, title, content, create_time, create_by
+        select id, title, content, create_time, create_by,receiver_user_id
         from message_on_site
     </sql>
     <insert id="insertMessageOnSite"  parameterType="tv.game88.platform.api.entity.MessageOnSite">
@@ -20,6 +20,7 @@
             <if test="id != null">id,</if>
             <if test="title != null and title != ''">title,</if>
             <if test="content != null and content != ''">content,</if>
+            <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="receiverUserId != null">receiver_user_id,</if>
         </trim>
@@ -27,6 +28,7 @@
             <if test="id != null">#{id},</if>
             <if test="title != null and title != ''">#{title},</if>
             <if test="content != null and content != ''">#{content},</if>
+            <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="receiverUserId != null">#{receiverUserId},</if>
         </trim>
