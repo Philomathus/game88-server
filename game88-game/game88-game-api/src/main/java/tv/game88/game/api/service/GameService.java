@@ -31,8 +31,4 @@ public interface GameService {
 
     @Retryable( value = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
     List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds );
-
-    RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
-
-    RspBase<RspCleanCodeInfo> cleanCode( String memberId );
 }

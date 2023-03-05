@@ -23,6 +23,10 @@ public interface MemberGameDataService extends IService<MemberGameData> {
      */
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData );
 
+    RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
+
+    RspBase<RspCleanCodeInfo> cleanCode( String memberId );
+
     public void opCleanCode( String memberId, RspCleanCodeResult restlt, Collection<LogCleanCodeInfo> logCleanCodeInfos,
                              String cleanId, LocalDateTime ntime );
 
@@ -35,8 +39,4 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     RspBase<?> getGameBetRecordData( MemberGameData memberGameData );
 
     RspBase<?> getGameBetDetailData( MemberGameData memberGameData );
-    RspBase<RspCleanCodeInfo> cleanCode( String memberId );
-
-    RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
-
 }

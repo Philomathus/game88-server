@@ -25,6 +25,12 @@ public class WashCodeController extends BaseController {
     @Resource
     private MemberGameDataService memberGameDataService;
 
+    @Operation( summary = "会员洗码详情" )
+    @PostMapping( "/cleanCodeDetail" )
+    public RspBase<RspCleanCodeInfo> cleanCodeDetail() {
+        return memberGameDataService.cleanCodeDetail( MemberSecurityUtils.getUserId() );
+    }
+
     @Operation( summary = "会员手动洗码" )
     @PostMapping( "/cleanCode" )
     public RspBase<RspCleanCodeInfo> cleanCode() {
