@@ -43,7 +43,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
     public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
                              PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
 
-        SortedMap<String, Object> bodyMap      = new TreeMap<>();
+        SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "Amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
         bodyMap.put( "BankCardBankName", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "BankCardNumber", withdrawDetail.getBankAccount().trim() );
@@ -53,7 +53,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "NotifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         bodyMap.put( "Timestamp", LocalDateTimeUtils.format( reqPayAgent.getCurrentTime(),
                 LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        bodyMap.put( "WithdrawTypeId", 0);
+        bodyMap.put( "WithdrawTypeId", 0 );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + signMd5;
@@ -70,12 +70,12 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String return_code = resultMap.getOrDefault("Code", "").toString();
-            if ("0".equals(return_code)) {
-                log.info(payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json(resultMap));
+            String return_code = resultMap.getOrDefault( "Code", "" ).toString();
+            if ( "0".equals( return_code ) ) {
+                log.info( payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
-                reqPayAgent.setFailReason(resultMap.getOrDefault("Message", "").toString());
+                reqPayAgent.setFailReason( resultMap.getOrDefault( "Message", "" ).toString() );
                 payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             }
         }
@@ -89,19 +89,20 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
             log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );
             return "fail";
         }
-        String sign      = requestMap.remove( "sign" ).toString();
+        String sign            = requestMap.remove( "sign" ).toString();
         String withdrawOrderId = requestMap.getOrDefault( "MerchantUniqueOrderId", "" ).toString();
-        String status    = requestMap.getOrDefault( "Status", "" ).toString();
+        String status          = requestMap.getOrDefault( "Status", "" ).toString();
 
         PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( withdrawOrderId );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         // 去除空值
-        requestMap.entrySet().removeIf( me -> me.getValue() == null || org.apache.commons.lang3.StringUtils.isBlank( me.getValue().toString() ) );
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || org.apache.commons.lang3.StringUtils.isBlank( me.getValue()
+                                                                                                                       .toString() ) );
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String mySign = DigestUtils.md5Hex( signStr ).toLowerCase();
+        String mySign  = DigestUtils.md5Hex( signStr ).toLowerCase();
         if ( mySign.equalsIgnoreCase( sign ) ) {
 
             MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( withdrawOrderId );
@@ -114,10 +115,11 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
                 return "SUCCESS";
             }
 
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap.getOrDefault("WithdrawOrderId", "").toString(), payAgentChannel,
-                        "SUCCESS".equals( status ) );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap.getOrDefault( "WithdrawOrderId", "" )
+                                                                                    .toString(), payAgentChannel,
+                    "SUCCESS".equals( status ) );
             log.info( payAgentPlatform.getName()
-                        + "订单号:{},回调状态:{},", withdrawOrderId, "SUCCESS".equals( status ) ? "成功" : "失败" );
+                    + "订单号:{},回调状态:{},", withdrawOrderId, "SUCCESS".equals( status ) ? "成功" : "失败" );
             return "SUCCESS";
         }
 
@@ -127,7 +129,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
     @Override
     public Map<String, Object> reverseCheckOrderPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap,
                                                      String realIp ) {
-       return null;
+        return null;
     }
 
     @Override
@@ -137,10 +139,9 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> dataMap = new TreeMap<>();
-        dataMap.put("MerchantId", payAgentPlatform.getId());
-        dataMap.put("Timestamp", LocalDateTimeUtils.format(LocalDateTime.now(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        dataMap.put("MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo());
+        dataMap.put( "MerchantId", payAgentPlatform.getId() );
+        dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        dataMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
@@ -150,47 +151,48 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         dataMap.put( "Sign", sign );
 
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
-        requestMap.setAll(dataMap);
+        requestMap.setAll( dataMap );
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(requestMap, httpHeaders);
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
 
         Map<String, Object> resultMap;
         try {
-            resultMap = restTemplate.execute(payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
-                    restTemplate.httpEntityCallback(httpEntity), response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    });
-            log.warn(payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json(resultMap));
+            resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
+                    restTemplate.httpEntityCallback( httpEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+            log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
-            if (!CollectionUtils.isEmpty(resultMap)) {
-                String return_code = resultMap.getOrDefault("Code", "").toString();
-                if ("0".equals(return_code)) {
-                    String trade_state = resultMap.getOrDefault("WithdrawOrderStatus", "").toString();
-                    if ("100".equals(trade_state) || "0".equals(trade_state) || "-90".equals(trade_state)) {
+            if ( !CollectionUtils.isEmpty( resultMap ) ) {
+                String return_code = resultMap.getOrDefault( "Code", "" ).toString();
+                if ( "0".equals( return_code ) ) {
+                    String trade_state = resultMap.getOrDefault( "WithdrawOrderStatus", "" ).toString();
+                    if ( "100".equals( trade_state ) || "0".equals( trade_state ) || "-90".equals( trade_state ) ) {
                         // status 4代付中 5代付失败 6代付成功
                         // trade_state  100成功 -90失败 0 處理中,需繼續查詢
-                        int status = 4;
+                        int status      = 4;
                         int orderStatus = 0;
-                        if ("100".equals(trade_state)) {
-                            status = 6;
+                        if ( "100".equals( trade_state ) ) {
+                            status      = 6;
                             orderStatus = 1;
-                        } else if ("-90".equals(trade_state)) {
-                            status = 5;
+                        } else if ( "-90".equals( trade_state ) ) {
+                            status      = 5;
                             orderStatus = 2;
                         }
-                        payAgentService.processOrder(payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status, orderStatus);
+                        payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
+                                orderStatus );
                     }
                 }
             }
             return resultMap.getOrDefault( "Message", "" ).toString();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
         }
         return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawDetail.getWithdrawOrderNo();
     }

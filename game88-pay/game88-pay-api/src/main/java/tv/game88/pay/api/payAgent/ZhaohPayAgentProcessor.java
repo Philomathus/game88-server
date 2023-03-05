@@ -15,12 +15,14 @@ import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 @Repository( value = ConstantsPayAgent.ZHAOH + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class ZhaohPayAgentProcessor extends AbstractPayAgent {
@@ -30,20 +32,20 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public boolean orderPay(MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
-                            PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent) throws Exception {
+    public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                             PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
-        bodyMap.put("merchantNo",reqPayAgent.getWithdrawOrderNo());
-        bodyMap.put("merchantCode",payAgentChannel.getMerId());
-        bodyMap.put("userId",AESCoder.decrypt( payAgentChannel.getHeaderValue() ) );
-        bodyMap.put("channelGroup",payAgentChannel.getId());
-        bodyMap.put("amount",withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ));
-        bodyMap.put("coinUnit","CNY");
-        bodyMap.put("callbackUrl",configEnvCacheUtil.getConf( "payCallbackUrl" ) + payAgentPlatform.getCode());
-        bodyMap.put("issueBankCode", withdrawDetail.getBankId());
-        bodyMap.put("name",withdrawDetail.getBankUserName());
-        bodyMap.put("bankNo",withdrawDetail.getBankAccount().trim());
-        bodyMap.put("callbackDataFormat","JSON");
+        bodyMap.put( "merchantNo", reqPayAgent.getWithdrawOrderNo() );
+        bodyMap.put( "merchantCode", payAgentChannel.getMerId() );
+        bodyMap.put( "userId", AESCoder.decrypt( payAgentChannel.getHeaderValue() ) );
+        bodyMap.put( "channelGroup", payAgentChannel.getId() );
+        bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
+        bodyMap.put( "coinUnit", "CNY" );
+        bodyMap.put( "callbackUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payAgentPlatform.getCode() );
+        bodyMap.put( "issueBankCode", withdrawDetail.getBankId() );
+        bodyMap.put( "name", withdrawDetail.getBankUserName() );
+        bodyMap.put( "bankNo", withdrawDetail.getBankAccount().trim() );
+        bodyMap.put( "callbackDataFormat", "JSON" );
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
@@ -56,12 +58,12 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String return_code = resultMap.getOrDefault("code", "").toString();
-            if ("0".equals(return_code)) {
-                log.info(payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json(resultMap));
+            String return_code = resultMap.getOrDefault( "code", "" ).toString();
+            if ( "0".equals( return_code ) ) {
+                log.info( payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
-                reqPayAgent.setFailReason(resultMap.getOrDefault("message", "").toString());
+                reqPayAgent.setFailReason( resultMap.getOrDefault( "message", "" ).toString() );
                 payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             }
         }
@@ -70,14 +72,14 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String callbackPay(PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp) throws Exception {
+    public String callbackPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp ) throws Exception {
         if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {
             log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );
             return "fail";
         }
 
-        String dataStr                      = requestMap.getOrDefault( "data", "" ).toString();
-        String merchNo                      = requestMap.getOrDefault( "merchNo", "" ).toString();
+        String               dataStr        = requestMap.getOrDefault( "data", "" ).toString();
+        String               merchNo        = requestMap.getOrDefault( "merchNo", "" ).toString();
         MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( merchNo );
         if ( withdrawDetail == null ) {
             log.error( "提现相关记录丢失 - merOrderNo:{}", merchNo );
@@ -87,7 +89,7 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
             log.error( "已有代付记录 - merOrderNo:{}", merchNo );
             return "success";
         }
-        PayAgentLog payAgentLog = payAgentLogMapper.selectById( merchNo );
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( merchNo );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
@@ -96,23 +98,23 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         Map<String, Object> resultMap = JsonUtil.json2Map( data );
 
         String orderNo    = resultMap.getOrDefault( "orderNo", "" ).toString();
-        int orderState    = Integer.parseInt( resultMap.getOrDefault( "status", 1 ).toString() );
+        int    orderState = Integer.parseInt( resultMap.getOrDefault( "status", 1 ).toString() );
 
         // 解密后对签名验证
         SortedMap<String, Object> signMap = new TreeMap<>();
         signMap.put( "merchantNo", orderNo );
         signMap.put( "merchantCode", merchNo );
         signMap.put( "status", orderState );
-        signMap.put( "amount", resultMap.get( "amount" ));
+        signMap.put( "amount", resultMap.get( "amount" ) );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String signStr = this.assemblyUrl( signMap ) + "&key=" + signMd5;
         log.info( signStr );
         String sign = DigestUtils.md5Hex( signStr );
         log.warn( sign + " : " + resultMap.get( "sign" ).toString() );
-        if ( sign.equalsIgnoreCase( resultMap.get( "sign" ).toString())) {
+        if ( sign.equalsIgnoreCase( resultMap.get( "sign" ).toString() ) ) {
             if ( orderState == 2 ) {
-                payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderNo, payAgentChannel, true);
+                payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderNo, payAgentChannel, true );
             }
             return "success";
         }
@@ -120,7 +122,8 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public Map<String, Object> reverseCheckOrderPay(PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp) throws Exception {
+    public Map<String, Object> reverseCheckOrderPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap,
+                                                     String realIp ) throws Exception {
         if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {
             log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );
             return null;
@@ -144,7 +147,7 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> requestSignMap = new TreeMap<>( requestMap );
 
         String sign    = requestSignMap.remove( "sign" ).toString();
-        String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5());
+        String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String signStr = this.assemblyUrl( requestSignMap ) + "&key=" + signMd5;
         String mySign  = DigestUtils.md5Hex( signStr );
 
@@ -152,8 +155,8 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         BigDecimal amount        = new BigDecimal( requestSignMap.getOrDefault( "amount", "0" ).toString() );
         String     bankAccountNo = requestSignMap.getOrDefault( "bankAccountNo", "" ).toString();
 
-        signMap.put("merId",merId);
-        signMap.put("merOrderNo",merOrderNo);
+        signMap.put( "merId", merId );
+        signMap.put( "merOrderNo", merOrderNo );
         signMap.put( "code", "1001" );
         signMap.put( "message", "签名错误" );
 
@@ -181,14 +184,14 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay(PayAgentLog payAgentLog) throws Exception {
+    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
         MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
         PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
         PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> params = new TreeMap<>();
-        params.put("merchantNo", payAgentLog.getWithdrawOrderNo());
-        params.put("merchantCode", payAgentLog.getChannelId());
+        params.put( "merchantNo", payAgentLog.getWithdrawOrderNo() );
+        params.put( "merchantCode", payAgentLog.getChannelId() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         // 生成签名信息
