@@ -32,4 +32,6 @@ public class RspInit {
     private String actionSwitch = "1";
     @Schema( title = "产品编号" )
     private String productId;
+    @Schema( title = "首存活动URL" )
+    private String firstRechargeUrl;
 }
