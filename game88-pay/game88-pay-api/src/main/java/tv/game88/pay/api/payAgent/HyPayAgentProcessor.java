@@ -50,7 +50,7 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "submitIp", "192.168.0.1" );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + signMd5;
+        String signStr = this.assemblyUrl( bodyMap ) + signMd5;
 
         String sign = DigestUtils.md5Hex( signStr ).toLowerCase();
         bodyMap.put( "sign", sign );
