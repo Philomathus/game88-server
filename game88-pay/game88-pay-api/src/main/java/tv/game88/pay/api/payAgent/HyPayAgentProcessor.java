@@ -37,7 +37,7 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
             log.warn( payAgentPlatform.getName() + "代付无法支持的银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
             throw new BusinessException( payAgentPlatform.getName() + "代付无法支持的银行类型：" + withdrawDetail.getBankId() );
         }
-        SortedMap<String, Object> bodyMap = new TreeMap<>();
+        Map<String, Object> bodyMap = new LinkedHashMap<>();
         bodyMap.put( "merchantId", payAgentChannel.getMerId() );
         bodyMap.put( "merchantOrderId", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "orderAmount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
