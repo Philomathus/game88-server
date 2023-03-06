@@ -210,9 +210,12 @@ public class GameButtBoLe extends AbstractGameButt {
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> resp_msg = ( Map<String, Object> ) resultMap.getOrDefault( "resp_msg", new HashMap<>() );
-            if ( "200".equals( resp_msg.getOrDefault( "code", "0" ).toString() ) ) {
+            String              code     = resp_msg.getOrDefault( "code", "0" ).toString();
+            if ( "200".equals( code ) ) {
                 Map<String, Object> resp_data = ( Map<String, Object> ) resultMap.getOrDefault( "resp_data", new HashMap<>() );
                 return "2".equals( resp_data.getOrDefault( "status", "" ).toString() );
+            } else if ( "43303".equals( code ) ) { // 订单不存在,上分不成功,需要回滚
+                return false;
             }
         }
         throw new RuntimeException( "查询结果为空,需要重试" );
