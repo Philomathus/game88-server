@@ -51,7 +51,7 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String signStr = this.assemblyUrl( bodyMap ) + signMd5;
-
+        log.warn( signStr );
         String sign = DigestUtils.md5Hex( signStr ).toLowerCase();
         bodyMap.put( "sign", sign );
 
