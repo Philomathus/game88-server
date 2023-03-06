@@ -103,7 +103,7 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
 
         String tempStr = this.assemblyUrl( bodyMap ) + signMd5;
         String signStr = DigestUtils.md5Hex( tempStr );
-
+        log.warn( sign + " : " + signStr );
         if ( signStr.equalsIgnoreCase( sign ) ) {
             MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( merchantOrderId );
             if ( withdrawLog == null ) {

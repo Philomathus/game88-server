@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.StringUtils;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -86,12 +85,13 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( withdrawOrderId );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
-        // 去除空值
-        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String mySign  = DigestUtils.md5Hex( signStr ).toLowerCase();
+        log.warn( signStr );
+        String mySign = DigestUtils.md5Hex( signStr ).toLowerCase();
+
+        log.warn( sign + " : " + mySign );
         if ( mySign.equalsIgnoreCase( sign ) ) {
             MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( withdrawOrderId );
             if ( withdrawDetail == null ) {

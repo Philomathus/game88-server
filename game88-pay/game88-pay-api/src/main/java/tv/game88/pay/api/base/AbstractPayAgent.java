@@ -54,7 +54,7 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     protected boolean checkWhiteIp( String platWhiteIpList, String realIp ) {
         if ( StringUtils.hasText( platWhiteIpList ) ) {
             Set<String> whiteIpSet = Sets.newHashSet( platWhiteIpList.split( "," ) );
-            return !whiteIpSet.contains( realIp ) && !"0:0:0:0:0:0:0:1".equals( realIp );
+            return !whiteIpSet.contains( realIp ) && !"0:0:0:0:0:0:0:1".equals( realIp ) && !"127.0.0.1".equals( realIp );
         }
         return false;
     }
