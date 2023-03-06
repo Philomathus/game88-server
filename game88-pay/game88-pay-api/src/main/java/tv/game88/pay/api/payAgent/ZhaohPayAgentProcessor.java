@@ -110,6 +110,8 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
 
         Map<String, Object> dataMap = JsonUtil.json2Map( RSACoder.decryptByPrivateKey( dataStr, privateKey ) );
 
+        log.warn( "解密数据:" + JsonUtil.object2Json( dataMap ) );
+
         // 解密后对签名验证
         SortedMap<String, Object> signMap = new TreeMap<>( dataMap );
 
