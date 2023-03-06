@@ -47,7 +47,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "WithdrawTypeId", 0 );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + signMd5;
+        String signStr = this.assemblyUrl( bodyMap ) + signMd5;
 
         String sign = DigestUtils.md5Hex( signStr ).toLowerCase();
         bodyMap.put( "Sign", sign );
@@ -90,7 +90,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String mySign  = DigestUtils.md5Hex( signStr ).toLowerCase();
         if ( mySign.equalsIgnoreCase( sign ) ) {
             MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( withdrawOrderId );
