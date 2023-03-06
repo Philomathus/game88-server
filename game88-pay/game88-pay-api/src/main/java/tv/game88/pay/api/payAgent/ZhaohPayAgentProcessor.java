@@ -22,6 +22,7 @@ import tv.game88.pay.api.type.BankCodeZhaoHType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -55,15 +56,17 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
                 + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
-        String orderJson = JsonUtil.object2Json( bodyMap );
-        log.info( "非对称加密加密前:" + orderJson );
-
         log.warn( JsonUtil.object2Json( bodyMap ) );
+
+        String publicKey = AESCoder.decrypt( payAgentChannel.getSignPublicKey() );
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put( "data", RSACoder.encryptByPublicKey( this.assemblyUrl( bodyMap ), publicKey ) );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         httpHeaders.set( "token", headerValue );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( bodyMap, httpHeaders );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), httpEntity, reqPayAgent );
 
@@ -71,8 +74,7 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String dataStr = resultMap.getOrDefault( "data", "" ).toString();
-            Map<String, Object> resDataMap = JsonUtil.json2Map( RSACoder.decryptByPublicKey( dataStr,
-                    AESCoder.decrypt( payAgentChannel.getSignPublicKey() ) ) );
+            Map<String, Object> resDataMap = JsonUtil.json2Map( RSACoder.decryptByPublicKey( dataStr, publicKey ) );
             log.warn( "解密数据:" + JsonUtil.object2Json( resDataMap ) );
             if ( "0".equals( resDataMap.getOrDefault( "code", "" ).toString() ) ) {
                 Map<String, Object> data = JsonUtil.json2Map( resDataMap.getOrDefault( "data", "" ).toString() );
@@ -220,10 +222,13 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         String sign    = DigestUtils.md5Hex( signStr );
         params.put( "sign", sign );
 
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put( "data", RSACoder.encryptByPublicKey( this.assemblyUrl( params ), publicKey ) );
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         httpHeaders.set( "token", headerValue );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( params, httpHeaders );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), httpEntity, null );
 
