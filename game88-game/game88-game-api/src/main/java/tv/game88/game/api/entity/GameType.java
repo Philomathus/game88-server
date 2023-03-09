@@ -1,11 +1,11 @@
 package tv.game88.game.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.math.BigDecimal;
 
 /**
  * 游戏类型对象 game_type
@@ -39,13 +39,6 @@ public class GameType {
      */
     @Excel( name = "图标" )
     private String icon;
-
-    /**
-     * 洗码比例
-     */
-    @Excel( name = "洗码比例" )
-    @TableField( updateStrategy = FieldStrategy.IGNORED, insertStrategy = FieldStrategy.IGNORED )
-    private BigDecimal rateClean;
 
     /**
      * 排序号
