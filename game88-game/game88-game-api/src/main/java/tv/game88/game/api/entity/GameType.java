@@ -1,9 +1,7 @@
 package tv.game88.game.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -46,7 +44,8 @@ public class GameType {
      * 洗码比例
      */
     @Excel( name = "洗码比例" )
-    private BigDecimal      rateClean;
+    @TableField( updateStrategy = FieldStrategy.IGNORED, insertStrategy = FieldStrategy.IGNORED )
+    private BigDecimal rateClean;
 
     /**
      * 排序号
@@ -57,6 +56,6 @@ public class GameType {
     /**
      * 显示类型
      */
-    @Excel( name = "显示类型")
+    @Excel( name = "显示类型" )
     private Integer type;
 }
