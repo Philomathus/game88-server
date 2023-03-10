@@ -14,6 +14,7 @@ public class ReqJoinGame {
     private String agent;
     private String linecode;
     private String apiUrl;
+    private String apiAccount;
     private String recordUrl;
     private String kindId;
 
