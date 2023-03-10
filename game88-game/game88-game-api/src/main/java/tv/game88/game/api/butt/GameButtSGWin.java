@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -37,15 +38,21 @@ public class GameButtSGWin extends AbstractGameButt {
 
     @Override
     public void createAccount(ReqJoinGame reqJoinGame) {
-
+        //Ignore
     }
 
     @Override
     public void getJoinGameUrl(ReqJoinGame reqJoinGame) {
         String time = System.currentTimeMillis() + "";
-        String params = String.format( "ac=1&userCode=111111&nickName=张三" +
-                        "&money=8.88&orderId=1000120170306143036949111111&ip=127.0.0.1&gameId=1001" +
-                        "&lang=zh-CN&homeUrl=http://www.homeurl.com");
+        String params = String.format( "ac=%s&userCode=%s&ip=%s&gameId=%s&money=0",
+                        //ac
+                        reqJoinGame.getGameMemberId(),
+                        //userCode
+                        reqJoinGame.getMemberId(),
+                        //ip
+                        reqJoinGame.getIp(),
+                        //gameID
+                        Objects.equals( reqJoinGame.getDev(), 1 ) ? 4 : 2, reqJoinGame.getKindId());
         String param = null;
         try {
             param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
@@ -56,14 +63,15 @@ public class GameButtSGWin extends AbstractGameButt {
         String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agentid", reqJoinGame.getAgent() );
+        requestMap.set( "agentId", reqJoinGame.getAgent() );
         requestMap.set( "timestamp", time );
-        requestMap.set( "type", "0" );
-        requestMap.set( "paraValue", param );
+        requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() + "/GameHandle" )
-                .queryParams( requestMap ).build( true );
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( reqJoinGame.getApiUrl() )
+                .queryParams( requestMap )
+                .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -102,11 +110,58 @@ public class GameButtSGWin extends AbstractGameButt {
 
     @Override
     public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
-        return null;
+
+        String time   = System.currentTimeMillis() + "";
+        String params = String.format( "ac=%s&userCode=%s",
+                reqJoinGame.getGameMemberId(),
+                reqJoinGame.getLinecode() );
+        String param  = null;
+        try {
+            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            throw new BusinessException( e.getMessage() );
+        }
+        String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
+
+        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+        requestMap.set( "agentId", reqJoinGame.getAgent() );
+        requestMap.set( "timestamp", time );
+        requestMap.set( "param", param );
+        requestMap.set( "key", key );
+
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( reqJoinGame.getApiUrl() )
+                .queryParams( requestMap )
+                .build( true );
+
+        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( d ) ) {
+                int        code  = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
+                BigDecimal money = new BigDecimal( d.getOrDefault( "money", "0" ).toString() );
+                if ( code == 0 ) {
+                    return money;
+                }
+            }
+        }
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        return BigDecimal.ZERO;
     }
 
     @Override
     public boolean queryTransfer(ReqJoinGame reqJoinGame) {
+        //3.2.5
         return false;
     }
 }
