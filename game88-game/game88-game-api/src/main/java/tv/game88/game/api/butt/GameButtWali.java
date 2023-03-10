@@ -31,6 +31,11 @@ import java.util.Map;
 @SuppressWarnings( "unchecked" )
 public class GameButtWali extends AbstractGameButt {
 
+    enum TransactionType {
+        TRANSFER,
+        WITHDRAW
+    }
+
     /*
     * apiUrl = reqJoinGame.getApiUrl
     * ${apiUrl}/${action}?a=${apiAccount}&t=${unixTime}&p=${params}&k=${sign}
@@ -61,16 +66,18 @@ public class GameButtWali extends AbstractGameButt {
 
     @Override
     public void transferMoney(ReqJoinGame reqJoinGame) {
-        transact( reqJoinGame, "上分" );
+        transact( reqJoinGame, TransactionType.TRANSFER );
     }
 
     @Override
     public void withdrawal(ReqJoinGame reqJoinGame) {
-        transact( reqJoinGame, "下分" );
+        transact( reqJoinGame, TransactionType.WITHDRAW );
     }
 
     @Override
     public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
+
+
 
         return BigDecimal.ZERO;
     }
@@ -80,16 +87,21 @@ public class GameButtWali extends AbstractGameButt {
         return false;
     }
 
-    private void transact(ReqJoinGame reqJoinGame, String type) {
-        String time = String.valueOf( System.currentTimeMillis() );
+    private void transact(ReqJoinGame reqJoinGame, TransactionType type) {
+        String time    = String.valueOf( System.currentTimeMillis() );
         String agentId = reqJoinGame.getAgent();
-        String userId = reqJoinGame.getGameMemberId();
-        String credit = String.valueOf( reqJoinGame.getTransferMoney() );
+        String userId  = reqJoinGame.getGameMemberId();
+        String credit  = String.valueOf(
+            switch(type) {
+                case TRANSFER -> reqJoinGame.getTransferMoney();
+                case WITHDRAW -> reqJoinGame.getTransferMoney().negate();
+            }
+        );
 
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "orderId",  String.format( "%s_%s_%s", agentId, time, userId ) );
-        paramMap.set( "uid", userId );
-        paramMap.set( "credit", credit );
+        paramMap.set( "uid",      userId );
+        paramMap.set( "credit",   credit );
 
         Map<String, Object> resultMap = executeGetRequest( "transferV3", reqJoinGame, paramMap );
 
@@ -102,17 +114,15 @@ public class GameButtWali extends AbstractGameButt {
         }
 
         log.info( reqJoinGame.getGameCategory().getDes()
-                + type + ":{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+                + type + "_response:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
         throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
     }
 
     private Map<String, Object> executeGetRequest(String action, ReqJoinGame reqJoinGame, MultiValueMap<String, String> paramMap) {
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( generateRequestUrl( reqJoinGame, action, paramMap ) )
-                .build();
-
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+        Map<String, Object> resultMap = restTemplate.execute(
+            generateRequestUrl( reqJoinGame, action, paramMap ),
+            HttpMethod.GET,
             restTemplate.httpEntityCallback( null ),
             response -> {
                 InputStream bodyStream = response.getBody();
@@ -134,10 +144,10 @@ public class GameButtWali extends AbstractGameButt {
     }
 
     private static String generateRequestUrl(ReqJoinGame reqJoinGame, String action, Map<String, ?> paramMap) {
-        String time = String.valueOf( System.currentTimeMillis() / 1000 );
-        String apiUrl = reqJoinGame.getApiUrl();
+        String unixTime       = String.valueOf( System.currentTimeMillis() / 1000 );
+        String apiUrl     = reqJoinGame.getApiUrl();
         String apiAccount = reqJoinGame.getApiAccount();
-        String aesKey = reqJoinGame.getDes();
+        String aesKey     = reqJoinGame.getDes();
         String params;
         try {
             params = AESCoder.encryptByKey( assembleUrlParameters( paramMap ), aesKey);
@@ -146,17 +156,21 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
-        String sign = DigestUtils.md5Hex( params + time + reqJoinGame.getMd5() );
+        String sign = DigestUtils.md5Hex( params + unixTime + reqJoinGame.getMd5() );
         params = URLEncoder.encode( params, StandardCharsets.UTF_8 );
 
-        return String.format(
-                "%s/%s?a=%s&t=%s&p=%s&k=%s",
-                apiUrl,
-                action,
-                apiAccount,
-                time,
-                params,
-                sign
+        String url = String.format(
+            "%s/%s?a=%s&t=%s&p=%s&k=%s",
+            apiUrl,
+            action,
+            apiAccount,
+            unixTime,
+            params,
+            sign
         );
+
+        log.info( reqJoinGame.getGameCategory().getDes() + "URL: {}", url );
+
+        return url;
     }
 }
