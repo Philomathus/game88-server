@@ -46,8 +46,6 @@ public class GameButtWali extends AbstractGameButt {
         WITHDRAW
     }
 
-    private final static String API_ACCOUNT = ""; //TODO: get the API account
-
     /**
      * Ignore. <br>
      * 文件中几乎没有关于代币的信息。<br>
@@ -223,7 +221,7 @@ public class GameButtWali extends AbstractGameButt {
         String url = UriComponentsBuilder
             .fromHttpUrl( reqJoinGame.getApiUrl() )
             .path( action )
-            .queryParam( "a", API_ACCOUNT )
+            .queryParam( "a", reqJoinGame.getLinecode() )
             .queryParam( "t", unixTimeSeconds )
             .queryParam( "p", params )
             .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
