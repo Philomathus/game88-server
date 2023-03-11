@@ -137,6 +137,8 @@ public class GameButtSGWin extends AbstractGameButt {
             }
         }
 
+        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
+
     }
 
     //http://<server>/agentHandle?agentId=XX&timestamp=xx&param=XX&sign=XX
