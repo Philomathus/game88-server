@@ -77,7 +77,8 @@ public class GameButtHG extends AbstractGameButt {
                 return;
             }
         }
-        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        log.error(
+                reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}; url:{}", JsonUtil.object2Json( resultMap ), url );
         throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
