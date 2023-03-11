@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -67,7 +69,7 @@ public class GameButtWali extends AbstractGameButt {
         paramMap.set( "uid", reqJoinGame.getGameMemberId() );
         paramMap.set( "ip", reqJoinGame.getIp() );
 
-        Map<String, Object> resultMap = executeGetRequest( "register", reqJoinGame, paramMap );
+        Map<String, Object> resultMap = executeGetRequest( "/register", reqJoinGame, paramMap );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
@@ -94,7 +96,7 @@ public class GameButtWali extends AbstractGameButt {
         paramMap.set( "ip", reqJoinGame.getIp() );
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
 
-        Map<String, Object> resultMap = executeGetRequest( "enterGame", reqJoinGame, paramMap );
+        Map<String, Object> resultMap = executeGetRequest( "/enterGame", reqJoinGame, paramMap );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
@@ -123,11 +125,11 @@ public class GameButtWali extends AbstractGameButt {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "uid", reqJoinGame.getGameMemberId() );
 
-        Map<String, Object> resultMap = executeGetRequest( "getBalance", reqJoinGame, paramMap );
+        Map<String, Object> resultMap = executeGetRequest( "/getBalance", reqJoinGame, paramMap );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-            String status = String.valueOf( data.getOrDefault( "status", "-1" ) );
+            Map<String, Object> data   = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            String              status = String.valueOf( data.getOrDefault( "status", "-1" ) );
             if ( "0".equals( status ) || "2".equals( status ) ) {
                 return new BigDecimal( String.valueOf( data.getOrDefault( "transferable", 0 ) ) ).setScale( 2,
                         RoundingMode.HALF_UP );
@@ -143,13 +145,13 @@ public class GameButtWali extends AbstractGameButt {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
 
-        Map<String, Object> resultMap = executeGetRequest( "queryOrderV3", reqJoinGame, paramMap );
+        Map<String, Object> resultMap = executeGetRequest( "/queryOrderV3", reqJoinGame, paramMap );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-            String status = String.valueOf( data.getOrDefault( "status", "-1" ) );
+            Map<String, Object> data   = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            String              status = String.valueOf( data.getOrDefault( "status", "-1" ) );
             if ( "1".equals( status ) ) {
                 return true;
             } else if ( "-1".equals( status ) || "2".equals( status ) ) {
@@ -170,7 +172,7 @@ public class GameButtWali extends AbstractGameButt {
 
         Map<String, Object> resultMap = null;
         try {
-            resultMap = executeGetRequest( "transferV3", reqJoinGame, paramMap );
+            resultMap = executeGetRequest( "/transferV3", reqJoinGame, paramMap );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
@@ -215,7 +217,7 @@ public class GameButtWali extends AbstractGameButt {
         // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
         String url = UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).path( action )
                                          .queryParam( "a", reqJoinGame.getLinecode() ).queryParam( "t", unixTimeSeconds )
-                                         .queryParam( "p", params )
+                                         .queryParam( "p", URLEncoder.encode( params, StandardCharsets.UTF_8 ) )
                                          .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
                                          .build( true ).toUriString();
 
