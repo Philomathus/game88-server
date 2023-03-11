@@ -3,12 +3,15 @@ package tv.game88.game.api.butt;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
@@ -24,10 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.RoundingMode;
+import java.util.*;
 
 @Log4j2
 @Repository(value = ConstantsGame.SGWIN + "GameProcessor")
@@ -45,208 +46,51 @@ public class GameButtSGWin extends AbstractGameButt {
 
     @Override
     public void getJoinGameUrl(ReqJoinGame reqJoinGame) {
-        String time = System.currentTimeMillis() + "";
-        String params = String.format( "ac=%s&userCode=%s&ip=%s&gameId=%s&money=0",
-                        //ac
-                        reqJoinGame.getGameMemberId(),
-                        //userCode
-                        reqJoinGame.getMemberId(),
-                        //ip
-                        reqJoinGame.getIp(),
-                        //gameID
-                        reqJoinGame.getKindId());
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.set("ac", "1");
+        param.set( "userCode", reqJoinGame.getGameMemberId());
+        param.set( "ip", reqJoinGame.getIp());
+        param.set( "gameId", reqJoinGame.getKindId());
 
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agentId", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
-        requestMap.set( "key", key );
+        Map<String, Object> resultMap = executeGet( reqJoinGame, param );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
-
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
-                restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = (Map<String, Object>) resultMap.getOrDefault("data", new HashMap<>());
-            if (!CollectionUtils.isEmpty(d)) {
-                String url = d.getOrDefault("url", "").toString();
-                reqJoinGame.setGameUrl(url);
+        if(!CollectionUtils.isEmpty( resultMap )){
+            Map<String,Object> data = (Map<String, Object>)
+                    resultMap.getOrDefault("data", Collections.emptyMap());
+            if(!data.isEmpty()){
+                reqJoinGame.setGameUrl(String.valueOf(data.getOrDefault("fullUrl","")));
             }
+        }
+        if( StringUtils.isBlank( reqJoinGame.getGameUrl() )){
+            throw new BusinessException("获取游戏链接失败");
         }
     }
 
     @Override
     public void transferMoney(ReqJoinGame reqJoinGame) {
-        String time = System.currentTimeMillis() + "";
-        String params = String.format( "ac=%s&userCode=%s&money=%s&orderid=%s",
-                reqJoinGame.getGameMemberId(), reqJoinGame.getMemberId(),
-                reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
-
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agentId", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
-        requestMap.set( "key", key );
-
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
-
-        Map<String, Object> resultMap = null;
-        try {
-            resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
-                    response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    } );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new GameTransferException( e.getMessage() );
-        }
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                if ( code == 0 ) {
-                    return;
-                }
-            }
-        }
-        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
+        transact(reqJoinGame,"3");
     }
 
     @Override
     public void withdrawal(ReqJoinGame reqJoinGame) {
-        String time = System.currentTimeMillis() + "";
-        String params = String.format( "ac=%s&userCode=%s&money=%s&orderid=%s",
-                reqJoinGame.getGameMemberId(), reqJoinGame.getMemberId(),
-                reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
-
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agentId", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
-        requestMap.set( "key", key );
-
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
-
-        Map<String, Object> resultMap = null;
-        try {
-            resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
-                    response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    } );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new GameTransferException( e.getMessage() );
-        }
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int code = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                if ( code == 0 ) {
-                    return;
-                }
-            }
-        }
-        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分异常 - 下分失败或数据为空" );
+        transact(reqJoinGame,"4");
     }
 
     @Override
     public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.set("ac", "2");
+        param.set("userCode",reqJoinGame.getGameMemberId());
 
-        String time   = System.currentTimeMillis() + "";
-        String params = String.format( "ac=%s&userCode=%s",
-                reqJoinGame.getGameMemberId(),
-                reqJoinGame.getLinecode() );
-        String param  = null;
-        try {
-            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String key = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
+        Map<String,Object> resultMap = executeGet( reqJoinGame, param);
 
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "agentId", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
-        requestMap.set( "param", param );
-        requestMap.set( "key", key );
-
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
-
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
-                restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) ) {
-                int        code  = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-                BigDecimal money = new BigDecimal( d.getOrDefault( "money", "0" ).toString() );
-                if ( code == 0 ) {
-                    return money;
-                }
+        if(!CollectionUtils.isEmpty(resultMap)){
+            Map<String, Object> data = ( Map<String, Object> )
+                    resultMap.getOrDefault("data", Collections.emptyMap());
+            if(!data.isEmpty()){
+                return new BigDecimal( String.valueOf(
+                        data.getOrDefault("money",0)))
+                        .setScale(2, RoundingMode.HALF_UP);
             }
         }
         return BigDecimal.ZERO;
@@ -254,65 +98,100 @@ public class GameButtSGWin extends AbstractGameButt {
 
     @Override
     public boolean queryTransfer(ReqJoinGame reqJoinGame) {
-        String time   = System.currentTimeMillis() + "";
-        String params = String.format( "ac=%s&userCode=%s&orderid=%s",
-                reqJoinGame.getGameMemberId(), reqJoinGame.getMemberId(), reqJoinGame.getOrderId() );
-        String param  = null;
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+        param.set("ac", "5");
+        param.set("userCode", reqJoinGame.getGameMemberId());
+        param.set("orderId", reqJoinGame.getOrderId());
+
+        Map<String, Object> resultMap = executeGet(reqJoinGame,param);
+
+        if(!CollectionUtils.isEmpty(resultMap)){
+            Map<String,Object> data = (Map<String, Object>)
+                    resultMap.getOrDefault("data", Collections.emptyMap());
+            if(!data.isEmpty()){
+                int status = Integer.parseInt(String.valueOf(
+                        data.getOrDefault("status","-1")));
+                return status == 2;
+            }
+        }
+        return false;
+    }
+
+    public void transact(ReqJoinGame reqJoinGame, String actionType){
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.set("ac", actionType);
+        params.set("userCode", reqJoinGame.getMemberId());
+        params.set("money", String.valueOf(reqJoinGame.getTransferMoney()));
+        params.set("orderId",reqJoinGame.getOrderId());
+
+        Map<String, Object> requestMap = executeGet (reqJoinGame,params);
+
+        if( !CollectionUtils.isEmpty( requestMap )){
+            Map<String,Object> data = (Map<String,Object>)
+                    requestMap.getOrDefault( "data", Collections.emptyMap());
+            if(!data.isEmpty()){
+                int status = Integer.parseInt(String.valueOf( data.getOrDefault("status", "-1")));
+                if(status == 0){
+                    return;
+                }
+            }
+        }
+
+    }
+
+    //http://<server>/agentHandle?agentId=XX&timestamp=xx&param=XX&sign=XX
+    private Map<String, Object> executeGet(ReqJoinGame reqJoinGame, MultiValueMap<String,String> params){
         try {
-            param = AESCoder.encryptByKeyUrl( params, reqJoinGame.getDes() );
-        } catch ( Exception e ) {
+            return restTemplate.execute(
+                    generateReqUrl(reqJoinGame, params),
+                    HttpMethod.GET,
+                    restTemplate.httpEntityCallback(null),
+                    response -> {
+                        InputStream bodyStream = response.getBody();
+                        String text;
+                        try (Reader reader = new InputStreamReader(bodyStream)) {
+                            text = IOUtils.toString(reader);
+                        }
+                        return JsonUtil.json2Map(text);
+                    }
+            );
+        } catch(RestClientException ignored){
+            return null;
+        }
+    }
+
+    private static String generateReqUrl(ReqJoinGame reqJoinGame, Map<String,?> paramMap){
+        long unixTimeStamp = System.currentTimeMillis();
+        String param;
+        try{
+            param = AESCoder.encryptByKeyUrl( assembleParameters( paramMap ), reqJoinGame.getDes());
+        } catch (Exception e) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String sign = DigestUtils.md5Hex( reqJoinGame.getAgent() + time + reqJoinGame.getMd5() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "agentId", reqJoinGame.getAgent() );
-        requestMap.set( "timestamp", time );
+        requestMap.set( "timestamp", String.valueOf(unixTimeStamp) );
         requestMap.set( "param", param );
-        requestMap.set( "sign", sign );
+        requestMap.set( "sign", DigestUtils.md5Hex(reqJoinGame.getGameMemberId()
+                + unixTimeStamp + reqJoinGame.getMd5()));
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
+        // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
+        String url = UriComponentsBuilder
+                .fromHttpUrl( reqJoinGame.getApiUrl() )
                 .queryParams( requestMap )
-                .build( true );
+                .build( true )
+                .toUriString();
 
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
-                restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+        log.info( reqJoinGame.getGameCategory().getDes() + "URL: {}", url);
 
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-
-            int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
-            int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
-            if ( status != 3 ) {
-                return code == 0 && status == 0;
-            }
-        }
-        throw new RuntimeException( "查询结果为空,需要重试" );
+        return url;
     }
 
-    public void transact(ReqJoinGame reqJoinGame, String url){
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("ac", reqJoinGame.getGameMemberId());
-        params.put("userCode", reqJoinGame.getMemberId());
-        params.put("money", reqJoinGame.getTransferMoney().toString());
-        params.put("orderId",reqJoinGame.getOrderId());
-
-        Map<String, ?> requestMap = execute (HttpMethod.GET,url,params);
-
-    }
-
-    public Map<String, Object> execute(HttpMethod method, String url, Map<String,String> params){
-        String param = JsonUtil.object2Json(params);
+    private static String assembleParameters(Map<String, ?> paramMap) {
+        StringBuilder sb = new StringBuilder();
+        paramMap.forEach( (k, v) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
+        return sb.substring( 0, sb.length() - 1 );
     }
 }
