@@ -3,6 +3,7 @@ package tv.game88.game.api.butt;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -24,7 +25,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Repository(value = ConstantsGame.SGWIN + "GameProcessor")
@@ -299,6 +302,17 @@ public class GameButtSGWin extends AbstractGameButt {
     }
 
     public void transact(ReqJoinGame reqJoinGame, String url){
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("ac", reqJoinGame.getGameMemberId());
+        params.put("userCode", reqJoinGame.getMemberId());
+        params.put("money", reqJoinGame.getTransferMoney().toString());
+        params.put("orderId",reqJoinGame.getOrderId());
 
+        Map<String, ?> requestMap = execute (HttpMethod.GET,url,params);
+
+    }
+
+    public Map<String, Object> execute(HttpMethod method, String url, Map<String,String> params){
+        String param = JsonUtil.object2Json(params);
     }
 }
