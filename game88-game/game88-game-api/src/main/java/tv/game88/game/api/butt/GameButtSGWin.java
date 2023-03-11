@@ -130,8 +130,8 @@ public class GameButtSGWin extends AbstractGameButt {
             Map<String,Object> data = (Map<String,Object>)
                     requestMap.getOrDefault( "data", Collections.emptyMap());
             if(!data.isEmpty()){
-                int status = Integer.parseInt(String.valueOf( data.getOrDefault("status", "-1")));
-                if(status == 0){
+                int code = Integer.parseInt(String.valueOf( data.getOrDefault("code", "-1")));
+                if(code == 0){
                     return;
                 }
             }
