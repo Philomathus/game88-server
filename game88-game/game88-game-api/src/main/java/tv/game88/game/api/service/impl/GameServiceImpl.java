@@ -185,6 +185,7 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
+
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {

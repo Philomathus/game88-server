@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum EnumGameCategory {
+    //
     LOTTERY( "lottery", "彩票游戏" ),
     KAIYUAN( ConstantsGame.KAI_YUAN, "开元棋牌" ),
     OG( ConstantsGame.OG, "OG电子" ),
