@@ -14,4 +14,7 @@
 
     <name>Game88 Server General Parent</name>
     <description>88棋牌服务-总代以及三方游戏拉取等服务</description>
+    <modules>
+        <module>game88-general-api</module>
+    </modules>
 </project>

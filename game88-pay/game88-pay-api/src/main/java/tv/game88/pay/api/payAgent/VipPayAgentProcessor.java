@@ -8,6 +8,8 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.core.member.enums.EnumMoney;
+import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -16,6 +18,8 @@ import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 
+import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +29,10 @@ import java.util.TreeMap;
 @Repository( value = ConstantsPayAgent.VIPPAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class VipPayAgentProcessor extends AbstractPayAgent {
+
+    @Resource
+    private MemberMoneyManager memberMoneyManager;
+
     @Override
     public String getName() {
         return "vipPay";
@@ -98,9 +106,18 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String mySign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        String mySign  = DigestUtils.md5Hex( signStr ).toUpperCase();
         if ( mySign.equalsIgnoreCase( sign ) ) {
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, "1".equals( status ) );
+            boolean isSuccess = "1".equals( status );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, isSuccess );
+
+            BigDecimal vippayWithdrawRate = configEnvCacheUtil.getConfBd( "vippay_withdraw_rate" );
+            if ( isSuccess && vippayWithdrawRate.compareTo( BigDecimal.ZERO ) > 0 ) {
+                BigDecimal withdrawGive = withdrawDetail.getWithdrawMoney().multiply( vippayWithdrawRate )
+                                                        .setScale( 2, RoundingMode.HALF_UP );
+                memberMoneyManager.addMemberMoney( withdrawDetail.getWithdrawId(), withdrawGive, EnumMoney.ACTIVITY,
+                        BigDecimal.ONE, "vipPay提现赠送彩金", null, withdrawDetail.getWithdrawOrderNo() );
+            }
             return "success";
         }
         return "fail";
