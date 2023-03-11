@@ -219,17 +219,14 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
-        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "a", API_ACCOUNT );
-        requestMap.set( "t", unixTimeSeconds );
-        requestMap.set( "p", params );
-        requestMap.set( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) );
-
         // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
         String url = UriComponentsBuilder
             .fromHttpUrl( reqJoinGame.getApiUrl() )
             .path( action )
-            .queryParams( requestMap )
+            .queryParam( "a", API_ACCOUNT )
+            .queryParam( "t", unixTimeSeconds )
+            .queryParam( "p", params )
+            .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
             .build( true )
             .toUriString();
 
