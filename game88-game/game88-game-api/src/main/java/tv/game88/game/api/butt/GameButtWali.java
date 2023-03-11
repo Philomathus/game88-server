@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -217,13 +219,14 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
+
         // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
         String url = UriComponentsBuilder
             .fromHttpUrl( reqJoinGame.getApiUrl() )
             .path( action )
             .queryParam( "a", reqJoinGame.getLinecode() )
             .queryParam( "t", unixTimeSeconds )
-            .queryParam( "p", params )
+            .queryParam( "p", URLEncoder.encode( params, StandardCharsets.UTF_8 ) )
             .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
             .build( true )
             .toUriString();
