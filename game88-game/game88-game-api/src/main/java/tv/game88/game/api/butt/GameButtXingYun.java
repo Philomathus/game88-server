@@ -119,16 +119,21 @@ public class GameButtXingYun extends AbstractGameButt {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
 
-        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl()
-                + "/Transfer/platformTransferToGame", HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
-                response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( reqJoinGame.getApiUrl()
+                    + "/Transfer/platformTransferToGame", HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
+                    response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
@@ -171,16 +176,21 @@ public class GameButtXingYun extends AbstractGameButt {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
 
-        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl()
-                + "/Transfer/platformTransferToGame", HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
-                response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( reqJoinGame.getApiUrl()
+                    + "/Transfer/platformTransferToGame", HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
+                    response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );

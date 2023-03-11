@@ -128,7 +128,7 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "key", signMd5 );
 
         String mySign = DigestUtils.md5Hex( this.assemblyUrl( dataMap ) );
-
+        log.warn( sign + " : " + mySign );
         if ( mySign.equalsIgnoreCase( sign ) ) {
 
             payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderid, payAgentChannel, "1".equals( bankstate ) );

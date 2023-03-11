@@ -8,10 +8,13 @@
         <version>1.0</version>
     </parent>
 
-    <groupId>tv.game88.data</groupId>
-    <artifactId>game88-data</artifactId>
+    <groupId>tv.game88.general</groupId>
+    <artifactId>game88-general</artifactId>
     <packaging>pom</packaging>
 
-    <name>Game88 Server Data Parent</name>
+    <name>Game88 Server General Parent</name>
     <description>88棋牌服务-总代以及三方游戏拉取等服务</description>
+    <modules>
+        <module>game88-general-api</module>
+    </modules>
 </project>
