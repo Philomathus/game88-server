@@ -3,8 +3,12 @@ package tv.game88.game.api.butt;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpMethod;
+<<<<<<<HEAD import org.apache.commons.lang3.StringUtils;
+=======
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+>>>>>>>main import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,12 +32,16 @@ import java.math.RoundingMode;
 import java.util.*;
 
 @Log4j2
-@Repository(value = ConstantsGame.SGWIN + "GameProcessor")
+@Repository( value = ConstantsGame.SGWIN + "GameProcessor" )
 @SuppressWarnings( "unchecked" )
 public class GameButtSGWin extends AbstractGameButt {
 
     private enum ActionType {
-        JOIN_GAME, QUERY_BALANCE, TRANSFER, WITHDRAW, QUERY_TRANSFER;
+        JOIN_GAME,
+        QUERY_BALANCE,
+        TRANSFER,
+        WITHDRAW,
+        QUERY_TRANSFER;
 
         public String getActionCode() {
             return String.valueOf( ordinal() + 1 );
@@ -41,12 +49,12 @@ public class GameButtSGWin extends AbstractGameButt {
     }
 
     @Override
-    public void getToken(ReqJoinGame reqJoinGame) {
+    public void getToken( ReqJoinGame reqJoinGame ) {
         //Ignore
     }
 
     @Override
-    public void createAccount(ReqJoinGame reqJoinGame) {
+    public void createAccount( ReqJoinGame reqJoinGame ) {
         //Ignore
     }
 
@@ -57,27 +65,27 @@ public class GameButtSGWin extends AbstractGameButt {
      * If the account does not exist, it will be created automatically.
      */
     @Override
-    public void getJoinGameUrl(ReqJoinGame reqJoinGame) {
+    public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "ac",       ActionType.JOIN_GAME.getActionCode() );
+        paramMap.set( "ac", ActionType.JOIN_GAME.getActionCode() );
         paramMap.set( "userCode", reqJoinGame.getGameMemberId() );
-        paramMap.set( "ip",       reqJoinGame.getIp() );
-        paramMap.set( "gameId",   reqJoinGame.getKindId() );
+        paramMap.set( "ip", reqJoinGame.getIp() );
+        paramMap.set( "gameId", reqJoinGame.getKindId() );
 
         Map<String, Object> resultMap = executeGetRequest( reqJoinGame, paramMap );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "getJoinGameUrl:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
 
-            if( !data.isEmpty() ) {
+            if ( !data.isEmpty() ) {
                 reqJoinGame.setGameUrl( String.valueOf( data.getOrDefault( "fullUrl", "" ) ) );
             }
         }
 
-        if( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+        if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -87,7 +95,7 @@ public class GameButtSGWin extends AbstractGameButt {
      * If the account does not exist, it will be created automatically
      */
     @Override
-    public void transferMoney(ReqJoinGame reqJoinGame) {
+    public void transferMoney( ReqJoinGame reqJoinGame ) {
         transact( reqJoinGame, ActionType.TRANSFER );
     }
 
@@ -95,7 +103,7 @@ public class GameButtSGWin extends AbstractGameButt {
      * 3.2.4 Lower division
      */
     @Override
-    public void withdrawal(ReqJoinGame reqJoinGame) {
+    public void withdrawal( ReqJoinGame reqJoinGame ) {
         transact( reqJoinGame, ActionType.WITHDRAW );
     }
 
@@ -104,9 +112,9 @@ public class GameButtSGWin extends AbstractGameButt {
      * returns the balance of the user
      */
     @Override
-    public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
+    public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "ac",       ActionType.QUERY_BALANCE.getActionCode() );
+        paramMap.set( "ac", ActionType.QUERY_BALANCE.getActionCode() );
         paramMap.set( "userCode", reqJoinGame.getGameMemberId() );
 
         Map<String, Object> resultMap = executeGetRequest( reqJoinGame, paramMap );
@@ -114,12 +122,11 @@ public class GameButtSGWin extends AbstractGameButt {
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "queryBalance:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
 
-            if( !data.isEmpty() ) {
-                return new BigDecimal( String.valueOf( data.getOrDefault( "money", 0 ) ) )
-                        .setScale( 2, RoundingMode.HALF_UP );
+            if ( !data.isEmpty() ) {
+                return new BigDecimal( String.valueOf( data.getOrDefault( "money", 0 ) ) ).setScale( 2, RoundingMode.HALF_UP );
             }
         }
 
@@ -130,21 +137,21 @@ public class GameButtSGWin extends AbstractGameButt {
      * 3.2.5 Check the status of up and down orders
      */
     @Override
-    public boolean queryTransfer(ReqJoinGame reqJoinGame) {
+    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "ac",       ActionType.QUERY_TRANSFER.getActionCode() );
+        paramMap.set( "ac", ActionType.QUERY_TRANSFER.getActionCode() );
         paramMap.set( "userCode", reqJoinGame.getGameMemberId() );
-        paramMap.set( "orderId",  reqJoinGame.getOrderId() );
+        paramMap.set( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( reqJoinGame, paramMap );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "queryTransfer:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
 
-            if( !data.isEmpty() ) {
+            if ( !data.isEmpty() ) {
                 int status = Integer.parseInt( String.valueOf( data.getOrDefault( "status", "-1" ) ) );
 
                 return status == 2;
@@ -154,33 +161,32 @@ public class GameButtSGWin extends AbstractGameButt {
         return false;
     }
 
-    private void transact(ReqJoinGame reqJoinGame, ActionType actionType) {
-        switch(actionType) {
-            case TRANSFER:
-            case WITHDRAW:
-                break;
-            default:
-                throw new IllegalArgumentException( "Action type must be transfer or withdraw!" );
+    private void transact( ReqJoinGame reqJoinGame, ActionType actionType ) {
+        switch ( actionType ) {
+        case TRANSFER:
+        case WITHDRAW:
+            break;
+        default:
+            throw new IllegalArgumentException( "Action type must be transfer or withdraw!" );
         }
 
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "ac",       actionType.getActionCode() );
+        paramMap.set( "ac", actionType.getActionCode() );
         paramMap.set( "userCode", reqJoinGame.getGameMemberId() );
-        paramMap.set( "money",    String.valueOf( reqJoinGame.getTransferMoney() ) );
-        paramMap.set( "orderId",  reqJoinGame.getOrderId() );
+        paramMap.set( "money", String.valueOf( reqJoinGame.getTransferMoney() ) );
+        paramMap.set( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( reqJoinGame, paramMap );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "transferMoney:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
 
-            if( !data.isEmpty() ) {
+            if ( !data.isEmpty() ) {
                 int code = Integer.parseInt( String.valueOf( data.getOrDefault( "code", "-1" ) ) );
-
-                if( code == 0 ) {
+                if ( code == 0 ) {
                     return;
                 }
             }
@@ -189,28 +195,20 @@ public class GameButtSGWin extends AbstractGameButt {
         throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
     }
 
-    private Map<String, Object> executeGetRequest(ReqJoinGame reqJoinGame, MultiValueMap<String, String> paramMap) {
-        try {
-            return restTemplate.execute(
-                    generateRequestUrl( reqJoinGame, paramMap ),
-                    HttpMethod.GET,
-                    restTemplate.httpEntityCallback( null ),
-                    response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    }
-            );
-        } catch( RestClientException ignored ) {
-            return null;
-        }
+    private Map<String, Object> executeGetRequest( ReqJoinGame reqJoinGame, MultiValueMap<String, String> paramMap ) {
+        return restTemplate.execute( generateRequestUrl( reqJoinGame, paramMap ), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
     }
 
-    private static String generateRequestUrl(ReqJoinGame reqJoinGame, Map<String, ?> paramMap) {
-        long unixTime = System.currentTimeMillis();
+    private static String generateRequestUrl( ReqJoinGame reqJoinGame, Map<String, ?> paramMap ) {
+        long   unixTime = System.currentTimeMillis();
         String params;
         try {
             params = AESCoder.encryptByKeyUrl( assembleParameters( paramMap ), reqJoinGame.getDes() );
@@ -220,23 +218,20 @@ public class GameButtSGWin extends AbstractGameButt {
         }
 
         // ${apiUrl}?agentId=${agent}timestamp=${unixTime}&param=${params}&sign=${md5Hex}
-        String url = UriComponentsBuilder
-                .fromHttpUrl( reqJoinGame.getApiUrl() )
-                .queryParam( "agentId", reqJoinGame.getAgent() )
-                .queryParam( "timestamp", unixTime )
-                .queryParam( "param", params )
-                .queryParam( "sign", DigestUtils.md5Hex( reqJoinGame.getAgent() + unixTime + reqJoinGame.getMd5() ) )
-                .build( true )
-                .toUriString();
+        String url = UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).queryParam( "agentId", reqJoinGame.getAgent() )
+                                         .queryParam( "timestamp", unixTime ).queryParam( "param", params )
+                                         .queryParam( "sign", DigestUtils.md5Hex(
+                                                 reqJoinGame.getAgent() + unixTime + reqJoinGame.getMd5() ) ).build( true )
+                                         .toUriString();
 
         log.info( reqJoinGame.getGameCategory().getDes() + "URL: {}", url );
 
         return url;
     }
 
-    private static String assembleParameters(Map<String, ?> paramMap) {
+    private static String assembleParameters( Map<String, ?> paramMap ) {
         StringBuilder sb = new StringBuilder();
-        paramMap.forEach( (k, v) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
+        paramMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
         return sb.substring( 0, sb.length() - 1 );
     }
 }

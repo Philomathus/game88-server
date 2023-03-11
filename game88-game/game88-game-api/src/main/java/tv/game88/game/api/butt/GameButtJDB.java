@@ -215,8 +215,12 @@ public class GameButtJDB extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        Map<String, Object> resultMap = execute( evaluateUrl( reqJoinGame.getApiUrl() ), encodedParam,
-                reqJoinGame.getLinecode() );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = execute( evaluateUrl( reqJoinGame.getApiUrl() ), encodedParam, reqJoinGame.getLinecode() );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
         String des = isDeposit ? "上" : "下";
         log.info( reqJoinGame.getGameCategory().getDes() + des
                 + "分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );

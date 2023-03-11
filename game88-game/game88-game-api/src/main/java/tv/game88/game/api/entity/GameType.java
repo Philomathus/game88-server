@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
-
 /**
  * 游戏类型对象 game_type
  *
@@ -43,12 +41,6 @@ public class GameType {
     private String icon;
 
     /**
-     * 洗码比例
-     */
-    @Excel( name = "洗码比例" )
-    private BigDecimal      rateClean;
-
-    /**
      * 排序号
      */
     @Excel( name = "排序号" )
@@ -57,6 +49,6 @@ public class GameType {
     /**
      * 显示类型
      */
-    @Excel( name = "显示类型")
+    @Excel( name = "显示类型" )
     private Integer type;
 }

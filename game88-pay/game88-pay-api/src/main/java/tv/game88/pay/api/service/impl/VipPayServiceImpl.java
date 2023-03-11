@@ -63,10 +63,8 @@ public class VipPayServiceImpl implements VipPayService {
     @Override
     public RspBase<RspVipPayLogin> vipPayLogin( String memberId ) {
         // 68是vipPay的银行ID
-        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
-                .eq( "member_id", memberId )
-                .eq( "bank_id", VIPPAY_BANK_ID )
-                .one();
+        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
+                                                                           .eq( "bank_id", VIPPAY_BANK_ID ).one();
         // 24是vipPay支付平台ID
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( VIPPAY_PAY_PLATFORM_ID );
 
@@ -99,33 +97,31 @@ public class VipPayServiceImpl implements VipPayService {
             return JsonUtil.json2Map( text );
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String code = resultMap.getOrDefault( "code", "" ).toString();
-            if ( "200".equals( code ) ) {
-                Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
-                if ( !CollectionUtils.isEmpty( result ) ) {
-                    String              token    = result.getOrDefault( "token", "" ).toString();
-                    Map<String, Object> userInfo = ( Map<String, Object> ) result.getOrDefault( "userInfo", new HashMap<>() );
-                    Map<String, Object> data     = ( Map<String, Object> ) result.getOrDefault( "data", new HashMap<>() );
-                    if ( StringUtils.isNotBlank( token ) && !CollectionUtils.isEmpty( userInfo )
-                            && !CollectionUtils.isEmpty( data ) ) {
-                        String     h5WebAddress  = data.getOrDefault( "h5WebAddress", "" ).toString();
-                        String     walletAddress = userInfo.getOrDefault( "walletAddress", "" ).toString();
-                        BigDecimal balance       = new BigDecimal( userInfo.getOrDefault( "balance", "0" ).toString() );
+            String              code   = resultMap.getOrDefault( "code", "" ).toString();
+            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            if ( "200".equals( code ) && !CollectionUtils.isEmpty( result ) ) {
+                String              token    = result.getOrDefault( "token", "" ).toString();
+                Map<String, Object> userInfo = ( Map<String, Object> ) result.getOrDefault( "userInfo", new HashMap<>() );
+                Map<String, Object> data     = ( Map<String, Object> ) result.getOrDefault( "data", new HashMap<>() );
+                if ( StringUtils.isNotBlank( token ) && !CollectionUtils.isEmpty( userInfo )
+                        && !CollectionUtils.isEmpty( data ) ) {
+                    String     h5WebAddress  = data.getOrDefault( "h5WebAddress", "" ).toString();
+                    String     walletAddress = userInfo.getOrDefault( "walletAddress", "" ).toString();
+                    BigDecimal balance       = new BigDecimal( userInfo.getOrDefault( "balance", "0" ).toString() );
 
-                        if ( memberCard == null && StringUtils.isNotBlank( walletAddress ) ) {
-                            MemberCard newInsert = new MemberCard();
-                            newInsert.setBankId( VIPPAY_BANK_ID );
-                            newInsert.setMemberId( memberId );
-                            newInsert.setBankAccount( walletAddress );
-                            newInsert.setCreateTime( LocalDateTime.now() );
-                            memberCardMapper.insert( newInsert );
-                        }
-                        RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();
-                        rspVipPayLogin.setBalance( balance );
-                        rspVipPayLogin.setWalletAddress( walletAddress );
-                        rspVipPayLogin.setUrl( h5WebAddress + "?t=" + token );
-                        return RspBase.ok( rspVipPayLogin );
+                    if ( memberCard == null && StringUtils.isNotBlank( walletAddress ) ) {
+                        MemberCard newInsert = new MemberCard();
+                        newInsert.setBankId( VIPPAY_BANK_ID );
+                        newInsert.setMemberId( memberId );
+                        newInsert.setBankAccount( walletAddress );
+                        newInsert.setCreateTime( LocalDateTime.now() );
+                        memberCardMapper.insert( newInsert );
                     }
+                    RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();
+                    rspVipPayLogin.setBalance( balance );
+                    rspVipPayLogin.setWalletAddress( walletAddress );
+                    rspVipPayLogin.setUrl( h5WebAddress + "?t=" + token );
+                    return RspBase.ok( rspVipPayLogin );
                 }
             }
         }
@@ -145,10 +141,8 @@ public class VipPayServiceImpl implements VipPayService {
         if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
             return RspBase.businessError( "充值金额最低10" );
         }
-        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
-                .eq( "member_id", memberId )
-                .eq( "bank_id", VIPPAY_BANK_ID )
-                .one();
+        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
+                                                                           .eq( "bank_id", VIPPAY_BANK_ID ).one();
         if ( memberCard == null ) {
             return RspBase.businessError( "未注册vipPay,请登录后重试" );
         }
