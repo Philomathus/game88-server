@@ -4,6 +4,7 @@
     <resultMap type="tv.game88.platform.api.entity.ActivityQuestType" id="ActivityQuestTypeResult">
         <result property="id" column="id" />
         <result property="name" column="name" />
+        <result property="sort" column="sort" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="gameId" column="game_id" />
@@ -12,6 +13,7 @@
     <sql id="selectActivityQuestTypeVo">
         select id,
                name,
+               sort,
                create_by,
                create_time,
                game_id
@@ -24,6 +26,9 @@
         <where>
             <if test="name != null  and name != ''">
                 and name like concat('%', #{name}, '%')
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
             </if>
             <if test="createBy != null  and createBy != ''">
                 and create_by = #{createBy}

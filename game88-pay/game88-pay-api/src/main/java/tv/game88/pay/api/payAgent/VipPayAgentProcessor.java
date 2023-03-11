@@ -98,9 +98,10 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String mySign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        String mySign  = DigestUtils.md5Hex( signStr ).toUpperCase();
         if ( mySign.equalsIgnoreCase( sign ) ) {
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, "1".equals( status ) );
+            boolean isSuccess = "1".equals( status );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, isSuccess );
             return "success";
         }
         return "fail";

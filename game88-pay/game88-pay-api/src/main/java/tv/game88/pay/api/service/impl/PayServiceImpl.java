@@ -80,7 +80,7 @@ public class PayServiceImpl implements PayService {
             //移除 类型层级比会员vip层级大 的类型
             payTypeList.removeIf( payType -> payType.getOpenLevelMin() != null && payType.getOpenLevelMax() != null
                     && platformUser.getVip() != null && ( platformUser.getVip() < payType.getOpenLevelMin()
-                    || platformUser.getVip() > payType.getOpenLevelMax() ) );
+                                                                  || platformUser.getVip() > payType.getOpenLevelMax() ) );
             payTypeList.removeIf( payType -> payType.getType() == 2 && platformUser.getStatus() == 6 );
             payTypeList.removeIf( payType -> "1".equals( deviceType ) && StringUtils.isNotBlank( payType.getDeviceType() )
                     && !payType.getDeviceType().contains( "1" ) ); //移除ios外的支付类型
@@ -141,10 +141,8 @@ public class PayServiceImpl implements PayService {
                 && memberRechargeOnline.getRealMoney().compareTo( memberRechargeOnline.getMoney() ) != 0 ) {
             // 35是新火箭支付平台ID，0.85是扣除15%费率后的值，判断下单金额扣除15%费率后是否与实际金额相等，不相等拒绝回调
             if ( memberRechargeOnline.getPlatformId() == -1 ) {
-                if ( memberRechargeOnline
-                        .getMoney()
-                        .multiply( new BigDecimal( "0.85" ) )
-                        .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
+                if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) )
+                                         .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
                     log.warn( "下单金额与实际金额不符拒绝回调 - orderNo:{};money:{};subMoney:{}", memberRechargeOnline.getOrderNo(),
                             memberRechargeOnline.getMoney(), memberRechargeOnline.getRealMoney() );
                     return notifyResultWays[ 1 ];
@@ -192,14 +190,11 @@ public class PayServiceImpl implements PayService {
         BigDecimal chargeGive = null;
         PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
         if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
-            chargeGive = configEnvCacheUtil
-                    .getConfBd( "vippay_rate" )
-                    .multiply( payJourMoney )
-                    .setScale( 2, RoundingMode.HALF_UP );
+            chargeGive = configEnvCacheUtil.getConfBd( "vippay_rate" ).multiply( payJourMoney )
+                                           .setScale( 2, RoundingMode.HALF_UP );
         } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
-            chargeGive = new BigDecimal( payChannel.getDiscountBill() )
-                    .multiply( payJourMoney )
-                    .setScale( 2, RoundingMode.HALF_UP );
+            chargeGive = new BigDecimal( payChannel.getDiscountBill() ).multiply( payJourMoney )
+                                                                       .setScale( 2, RoundingMode.HALF_UP );
         } else {
             chargeGive = new BigDecimal( 0 );
         }
@@ -221,8 +216,8 @@ public class PayServiceImpl implements PayService {
 
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
             //充值彩金日志
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE, mark, null,
-                    memberRechargeOnline.getOrderNo() );
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE, mark,
+                    null, memberRechargeOnline.getOrderNo() );
         }
 
         memberMoneyManager.addMemberMoney( memberInfo.getId(), payJourMoney, EnumMoney.PAY, BigDecimal.ONE,
@@ -233,8 +228,7 @@ public class PayServiceImpl implements PayService {
         if ( memberRechargeOnline.getPlatformId() == 24L ) {
             //vipPay充值活动任务
             List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                    .eq( "effect", 1 )
-                    .eq( "game_type_id", -2 ) );
+                    .eq( "effect", 1 ).eq( "game_type_id", -2 ) );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney.intValue(), confQuest );
             }
@@ -260,9 +254,11 @@ public class PayServiceImpl implements PayService {
     @Override
     @Transactional( rollbackFor = Exception.class )
     public void payQuery10Min() throws Exception {
-        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>()
-                .eq( "status", -1 )
-                .le( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) );
+        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>().eq( "status", -1 )
+                                                                                                  .le( "pay_time",
+                                                                                                          LocalDateTimeUtils.format( LocalDateTime
+                                                                                                          .now()
+                                                                                                          .minusMinutes( 10 ) ) );
         List<MemberRechargeOnline> memberRechargeOnlineList = memberRechargeOnlineMapper.selectList( queryWrapper );
         for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlineList ) {
             MemberRechargeOnline update = new MemberRechargeOnline();
@@ -290,8 +286,7 @@ public class PayServiceImpl implements PayService {
             return RspBase.businessError( String.format( "请求订单过于频繁哦，请%s秒后再试", payIntervalExpire ) );
         }
         long payOrderNum = memberRechargeOnlineMapper.selectCount( new QueryWrapper<MemberRechargeOnline>()
-                .eq( "member_id", platformUser.getId() )
-                .le( "status", 0 )
+                .eq( "member_id", platformUser.getId() ).le( "status", 0 )
                 .ge( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) ) );
         if ( payOrderNum >= configEnvCacheUtil.getConfInt( "pay_order_num_5min", 10 ) ) {
             log.warn( "您请求订单次数过多{}", platformUser.getId() );

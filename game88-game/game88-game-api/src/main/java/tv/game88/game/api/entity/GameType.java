@@ -49,6 +49,6 @@ public class GameType {
     /**
      * 显示类型
      */
-    @Excel( name = "显示类型")
+    @Excel( name = "显示类型" )
     private Integer type;
 }

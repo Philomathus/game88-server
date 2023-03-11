@@ -21,7 +21,7 @@ import java.util.TreeMap;
 
 @Repository( value = ConstantsPay.YATAI_PAY + "Processor" )
 @Log4j2
-public class YaiTaiPayProcessor extends AbstractPay {
+public class YaTaiPayProcessor extends AbstractPay {
     @Override
     public String getName() {
         return "亚太支付";
@@ -45,7 +45,7 @@ public class YaiTaiPayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
-                + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
+                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( resultMap.getOrDefault( "retCode", "" ).toString() ) ) {

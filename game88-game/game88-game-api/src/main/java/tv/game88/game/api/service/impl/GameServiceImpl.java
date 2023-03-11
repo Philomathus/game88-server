@@ -70,6 +70,7 @@ public class GameServiceImpl implements GameService {
     @Resource
     private MemberGameMoneyService memberGameMoneyService;
 
+
     @Value( "${spring.profiles.active}" )
     private String profile;
     @Value( "${gameOrderPrefix:0}" )
@@ -184,6 +185,7 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
+
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
@@ -386,6 +388,8 @@ public class GameServiceImpl implements GameService {
                                .concat( LocalDateTimeUtils.format( LocalDateTime.now(),
                                        LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                                .concat( RandomStringUtils.randomAlphabetic( 5 ) );
+            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
+                    LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
@@ -453,5 +457,4 @@ public class GameServiceImpl implements GameService {
         response.setData( rspData );
         return response;
     }
-
 }

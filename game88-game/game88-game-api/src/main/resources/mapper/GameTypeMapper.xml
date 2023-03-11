@@ -11,7 +11,7 @@
     </resultMap>
 
     <sql id="selectGameTypeVo">
-        select id, name, effect, icon, sort,type
+        select id, name, effect, icon, sort, type
         from game_type
     </sql>
 

@@ -77,7 +77,8 @@ public class GameButtHG extends AbstractGameButt {
                 return;
             }
         }
-        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        log.error(
+                reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}; url:{}", JsonUtil.object2Json( resultMap ), url );
         throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
     }
 
@@ -151,15 +152,19 @@ public class GameButtHG extends AbstractGameButt {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
-                restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( url, HttpMethod.PUT, restTemplate.httpEntityCallback( requestEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
@@ -197,15 +202,19 @@ public class GameButtHG extends AbstractGameButt {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
-                restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( url, HttpMethod.PUT, restTemplate.httpEntityCallback( requestEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );

@@ -803,8 +803,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         LocalDateTime endTime = now.withHour( 23 ).withMinute( 59 ).withSecond( 59 ).withNano( 999999999 );
 
         BigDecimal withdrawLimitMoney = configEnvCacheUtil.getConfBd( "withdraw_limit_money" );
-        if ( req.getWithdrawMoney().compareTo( withdrawLimitMoney ) < 0 && startTime.compareTo( now ) <= 0
-                && endTime.compareTo( now ) >= 0 ) {
+        if ( req.getWithdrawMoney().compareTo( withdrawLimitMoney ) < 0 && !startTime.isAfter( now )
+                && !endTime.isBefore( now ) ) {
             return RspBase.businessError( configEnvCacheUtil.getConf( "withdraw_limit_msg" ) );
         }
         //每日提现次数

@@ -66,9 +66,8 @@ public class GameButtBG extends AbstractGameButt {
         } );
         if ( !CollectionUtils.isEmpty( resultMap ) && resultMap.get( "error" ) == null ) {
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( result ) && BooleanUtils.toBoolean( result
-                    .getOrDefault( "success", "false" )
-                    .toString() ) ) {
+            if ( !CollectionUtils.isEmpty( result ) && BooleanUtils.toBoolean( result.getOrDefault( "success", "false" )
+                                                                                     .toString() ) ) {
                 redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
                 return;
             }
@@ -105,9 +104,9 @@ public class GameButtBG extends AbstractGameButt {
         params.put( "isMobileUrl", 1 );
         params.put( "fromIp", reqJoinGame.getIp() );
         params.put( "locale", "zh_CN" );
-        if ( StringUtils.isNotBlank( reqJoinGame.getKindId() ) && Arrays
-                .asList( "105", "411", "484" )// 105:BG捕鱼大师; 411:西游捕鱼; 484:大仙捕鱼
-                .contains( reqJoinGame.getKindId() ) ) {
+        if ( StringUtils.isNotBlank( reqJoinGame.getKindId() )
+                && Arrays.asList( "105", "411", "484" )// 105:BG捕鱼大师; 411:西游捕鱼; 484:大仙捕鱼
+                         .contains( reqJoinGame.getKindId() ) ) {
             params.put( "gameType", reqJoinGame.getKindId() );
         } else {
             params.put( "gameType", 443 );
@@ -159,15 +158,20 @@ public class GameButtBG extends AbstractGameButt {
 
         HttpEntity<Map<String, Object>> httpEntity = getRequestHttpEntity( id, method, params );
 
-        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + "/"
-                + method, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + "/"
+                    + method, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
@@ -197,15 +201,20 @@ public class GameButtBG extends AbstractGameButt {
 
         HttpEntity<Map<String, Object>> httpEntity = getRequestHttpEntity( id, method, params );
 
-        Map<String, Object> resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + "/"
-                + method, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( reqJoinGame.getApiUrl() + "/"
+                    + method, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
