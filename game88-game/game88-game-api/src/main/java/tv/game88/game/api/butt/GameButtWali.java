@@ -48,7 +48,6 @@ public class GameButtWali extends AbstractGameButt {
 
     private final static String API_ACCOUNT = ""; //TODO: get the API account
 
-
     /**
      * Ignore. <br>
      * 文件中几乎没有关于代币的信息。<br>
@@ -83,7 +82,7 @@ public class GameButtWali extends AbstractGameButt {
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
         paramMap.set( "credit",  String.valueOf( reqJoinGame.getTransferMoney() ) );
 
-        paramMap.values().removeIf( v -> v.isEmpty() || StringUtils.isBlank( v.get(0) ) );
+        paramMap.values().removeIf( v -> StringUtils.isBlank( v.get(0) ) );
 
         Map<String, Object> resultMap = executeGetRequest( "enterGame", reqJoinGame, paramMap );
 
