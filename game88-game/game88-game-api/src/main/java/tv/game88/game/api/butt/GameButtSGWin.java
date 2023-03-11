@@ -213,7 +213,7 @@ public class GameButtSGWin extends AbstractGameButt {
         long unixTime = System.currentTimeMillis();
         String params;
         try {
-            params = AESCoder.encryptByKey( assembleParameters( paramMap ), reqJoinGame.getDes() );
+            params = AESCoder.encryptByKeyUrl( assembleParameters( paramMap ), reqJoinGame.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
