@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
@@ -24,8 +23,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -37,24 +34,25 @@ import java.util.Map;
  * * signKey = reqJoinGame.getMd5() <br>
  * * agentId = reqJoinGame.getAgent() <br>
  * * userId = reqJoinGame.getGameMemberId()
- * */
+ */
 @Log4j2
 @Repository( value = ConstantsGame.WALI + "GameProcessor" )
-@SuppressWarnings( "unchecked" )
 public class GameButtWali extends AbstractGameButt {
 
     private enum TransactionType {
+        //
         TRANSFER,
         WITHDRAW
     }
 
     /**
      * Ignore. <br>
-     * 文件中几乎没有关于代币的信息。<br>
+     * 文件中几乎没有关于token的信息。<br>
      * There is no information about tokens in the document.
      */
     @Override
-    public void getToken(ReqJoinGame reqJoinGame) { }
+    public void getToken( ReqJoinGame reqJoinGame ) {
+    }
 
     /**
      * Ignore. <br>
@@ -64,7 +62,22 @@ public class GameButtWali extends AbstractGameButt {
      * ...You can also use enterGame to automatically register with the operation.
      */
     @Override
-    public void createAccount(ReqJoinGame reqJoinGame) { }
+    public void createAccount( ReqJoinGame reqJoinGame ) {
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.set( "ip", reqJoinGame.getIp() );
+
+        Map<String, Object> resultMap = executeGetRequest( "register", reqJoinGame, paramMap );
+
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            if ( "1".equals( String.valueOf( data.getOrDefault( "status", "2" ) ) ) ) {
+                return;
+            }
+        }
+        log.error( reqJoinGame.getGameCategory().getDes() + " 创建玩家失败 ->{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 创建玩家失败" );
+    }
 
     /**
      * Optional: <br>
@@ -74,142 +87,122 @@ public class GameButtWali extends AbstractGameButt {
      * * credit <br>
      */
     @Override
-    public void getJoinGameUrl(ReqJoinGame reqJoinGame) {
+    public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "uid",     reqJoinGame.getGameMemberId() );
-        paramMap.set( "game",    reqJoinGame.getKindId() );
-        paramMap.set( "ip",      reqJoinGame.getIp() );
+        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.set( "game", reqJoinGame.getKindId() );
+        paramMap.set( "ip", reqJoinGame.getIp() );
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
-        paramMap.set( "credit",  String.valueOf( reqJoinGame.getTransferMoney() ) );
-
-        paramMap.values().removeIf( v -> StringUtils.isBlank( v.get(0) ) );
 
         Map<String, Object> resultMap = executeGetRequest( "enterGame", reqJoinGame, paramMap );
 
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + "getJoinGameUrl:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-
-            if( !data.isEmpty() ) {
-                reqJoinGame.setGameUrl( String.valueOf( data.getOrDefault( "gameUrl", "" ) ) );
-            }
+            reqJoinGame.setGameUrl( String.valueOf( data.getOrDefault( "gameUrl", "" ) ) );
         }
 
-        if( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+        if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
 
     @Override
-    public void transferMoney(ReqJoinGame reqJoinGame) {
+    public void transferMoney( ReqJoinGame reqJoinGame ) {
         transact( reqJoinGame, TransactionType.TRANSFER );
     }
 
     @Override
-    public void withdrawal(ReqJoinGame reqJoinGame) {
+    public void withdrawal( ReqJoinGame reqJoinGame ) {
         transact( reqJoinGame, TransactionType.WITHDRAW );
     }
 
     @Override
-    public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
+    public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "uid", reqJoinGame.getGameMemberId() );
 
         Map<String, Object> resultMap = executeGetRequest( "getBalance", reqJoinGame, paramMap );
 
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + "queryBalance:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-
-            if( !data.isEmpty() ) {
-                return new BigDecimal( String.valueOf( data.getOrDefault( "balance", 0 ) ) )
-                    .setScale( 2, RoundingMode.HALF_UP );
+            String status = String.valueOf( data.getOrDefault( "status", "-1" ) );
+            if ( "0".equals( status ) || "2".equals( status ) ) {
+                return new BigDecimal( String.valueOf( data.getOrDefault( "transferable", 0 ) ) ).setScale( 2,
+                        RoundingMode.HALF_UP );
             }
         }
-
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 
     @Override
-    public boolean queryTransfer(ReqJoinGame reqJoinGame) {
+    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( "queryOrderV3", reqJoinGame, paramMap );
 
         log.info( reqJoinGame.getGameCategory().getDes()
-                + "queryTransfer:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-
-            if( !data.isEmpty() ) {
-                int status = Integer.parseInt( String.valueOf( data.getOrDefault( "status", "-3" ) ) );
-
-                return status == 1;
+            String status = String.valueOf( data.getOrDefault( "status", "-1" ) );
+            if ( "1".equals( status ) ) {
+                return true;
+            } else if ( "-1".equals( status ) || "2".equals( status ) ) {
+                return false;
             }
         }
-
-        return false;
+        throw new RuntimeException( "查询结果为空,需要重试" );
     }
 
-    private void transact(ReqJoinGame reqJoinGame, TransactionType type) {
+    private void transact( ReqJoinGame reqJoinGame, TransactionType type ) {
         MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
         paramMap.set( "orderId", reqJoinGame.getOrderId() );
-        paramMap.set( "uid",     reqJoinGame.getGameMemberId() );
-        paramMap.set( "credit",  String.valueOf(
-                switch(type) {
-                    case TRANSFER -> reqJoinGame.getTransferMoney();
-                    case WITHDRAW -> reqJoinGame.getTransferMoney().negate();
-                }
-            )
-        );
+        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.set( "credit", String.valueOf( switch ( type ) {
+            case TRANSFER -> reqJoinGame.getTransferMoney();
+            case WITHDRAW -> reqJoinGame.getTransferMoney().negate();
+        } ) );
 
-        Map<String, Object> resultMap = executeGetRequest( "transferV3", reqJoinGame, paramMap );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = executeGetRequest( "transferV3", reqJoinGame, paramMap );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            throw new GameTransferException( e.getMessage() );
+        }
 
-        log.info( reqJoinGame.getGameCategory().getDes()
-                + type + ":{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-
-        if( !CollectionUtils.isEmpty( resultMap ) ) {
+        String action = type == TransactionType.TRANSFER ? "上" : "下";
+        log.info( reqJoinGame.getGameCategory().getDes() + action
+                + "分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-
-            if( !data.isEmpty() ) {
-                int status = Integer.parseInt( String.valueOf( data.getOrDefault( "status", "-3" ) ) );
-
-                if( status == 0 || status == 1 ) {
-                    return;
-                }
+            if ( "1".equals( String.valueOf( data.getOrDefault( "status", "2" ) ) ) ) {
+                return;
             }
         }
-
-        throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空" );
+        throw new GameTransferException(
+                reqJoinGame.getGameCategory().getDes() + action + "分异常 - " + action + "分失败或数据为空" );
     }
 
-    private Map<String, Object> executeGetRequest(String action, ReqJoinGame reqJoinGame, MultiValueMap<String, String> paramMap) {
-        try {
-            return restTemplate.execute(
-                generateRequestUrl( reqJoinGame, action, paramMap ),
-                HttpMethod.GET,
-                restTemplate.httpEntityCallback( null ),
-                response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                }
-            );
-        } catch(RestClientException ignored) {
-            return null;
-        }
+    private Map<String, Object> executeGetRequest( String action, ReqJoinGame reqJoinGame,
+                                                   MultiValueMap<String, String> paramMap ) {
+        return restTemplate.execute( generateRequestUrl( reqJoinGame, action, paramMap ), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
     }
 
-    private static String generateRequestUrl(ReqJoinGame reqJoinGame, String action, Map<String, ?> paramMap) {
+    private static String generateRequestUrl( ReqJoinGame reqJoinGame, String action, Map<String, ?> paramMap ) {
         String unixTimeSeconds = String.valueOf( System.currentTimeMillis() / 1000 );
         String params;
         try {
@@ -219,26 +212,20 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
-
         // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
-        String url = UriComponentsBuilder
-            .fromHttpUrl( reqJoinGame.getApiUrl() )
-            .path( action )
-            .queryParam( "a", reqJoinGame.getLinecode() )
-            .queryParam( "t", unixTimeSeconds )
-            .queryParam( "p", URLEncoder.encode( params, StandardCharsets.UTF_8 ) )
-            .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
-            .build( true )
-            .toUriString();
+        String url = UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).path( action )
+                                         .queryParam( "a", reqJoinGame.getLinecode() ).queryParam( "t", unixTimeSeconds )
+                                         .queryParam( "p", params )
+                                         .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
+                                         .build( true ).toUriString();
 
-        log.info( reqJoinGame.getGameCategory().getDes() + "URL: {}", url );
-
+        log.info( reqJoinGame.getGameCategory().getDes() + "的访问URL: {}", url );
         return url;
     }
 
-    private static String assembleParameters(Map<String, ?> paramMap) {
+    private static String assembleParameters( Map<String, ?> paramMap ) {
         StringBuilder sb = new StringBuilder();
-        paramMap.forEach( (k, v) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
+        paramMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
         return sb.substring( 0, sb.length() - 1 );
     }
 }
