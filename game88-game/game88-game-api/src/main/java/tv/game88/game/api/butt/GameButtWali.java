@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 import tv.game88.common.exception.BusinessException;
@@ -73,6 +74,7 @@ public class GameButtWali extends AbstractGameButt {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
             if ( "1".equals( String.valueOf( data.getOrDefault( "status", "2" ) ) ) ) {
+                log.info( reqJoinGame.getGameCategory().getDes() + " 创建玩家成功 ->{}", JsonUtil.object2Json( resultMap ) );
                 return;
             }
         }
@@ -93,7 +95,6 @@ public class GameButtWali extends AbstractGameButt {
         paramMap.put( "uid", reqJoinGame.getGameMemberId() );
         paramMap.put( "game", reqJoinGame.getKindId() );
         paramMap.put( "ip", reqJoinGame.getIp() );
-        paramMap.put( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( "/enterGame", reqJoinGame, paramMap );
 
@@ -127,9 +128,9 @@ public class GameButtWali extends AbstractGameButt {
         Map<String, Object> resultMap = executeGetRequest( "/getBalance", reqJoinGame, paramMap );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> data   = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-            String              status = String.valueOf( data.getOrDefault( "status", "-1" ) );
-            if ( "0".equals( status ) || "2".equals( status ) ) {
+            Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            String              code = String.valueOf( resultMap.getOrDefault( "code", "-1" ) );
+            if ( "0".equals( code ) ) {
                 return new BigDecimal( String.valueOf( data.getOrDefault( "transferable", 0 ) ) ).setScale( 2,
                         RoundingMode.HALF_UP );
             }
@@ -191,8 +192,9 @@ public class GameButtWali extends AbstractGameButt {
     }
 
     private Map<String, Object> executeGetRequest( String action, ReqJoinGame reqJoinGame, Map<String, String> paramMap ) {
-        return restTemplate.execute( generateRequestUrl( reqJoinGame, action, paramMap ), HttpMethod.GET,
-                restTemplate.httpEntityCallback( null ), response -> {
+        UriComponents uriComponents = generateRequestUrl( reqJoinGame, action, paramMap );
+        // log.info( reqJoinGame.getGameCategory().getDes() + "的访问URL: {}", uriComponents.toUriString() );
+        return restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -202,7 +204,7 @@ public class GameButtWali extends AbstractGameButt {
         } );
     }
 
-    private static String generateRequestUrl( ReqJoinGame reqJoinGame, String action, Map<String, ?> paramMap ) {
+    private static UriComponents generateRequestUrl( ReqJoinGame reqJoinGame, String action, Map<String, ?> paramMap ) {
         String unixTimeSeconds = String.valueOf( System.currentTimeMillis() / 1000 );
         String params;
         try {
@@ -212,14 +214,11 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
-        String url = UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).path( action )
-                                         .queryParam( "a", reqJoinGame.getLinecode() ).queryParam( "t", unixTimeSeconds )
-                                         .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
-                                         .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
-                                         .build( false ).toUriString();
-
-        log.info( reqJoinGame.getGameCategory().getDes() + "的访问URL: {}", url );
-        return url;
+        return UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).path( action )
+                                   .queryParam( "a", reqJoinGame.getLinecode() ).queryParam( "t", unixTimeSeconds )
+                                   .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
+                                   .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
+                                   .build( true );
     }
 
     private static String assembleParameters( Map<String, ?> paramMap ) {
