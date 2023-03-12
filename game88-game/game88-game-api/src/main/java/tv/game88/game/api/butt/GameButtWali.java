@@ -7,9 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
@@ -23,9 +22,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -65,9 +64,9 @@ public class GameButtWali extends AbstractGameButt {
      */
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
-        paramMap.set( "ip", reqJoinGame.getIp() );
+        Map<String, String> paramMap = new LinkedHashMap<>();
+        paramMap.put( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.put( "ip", reqJoinGame.getIp() );
 
         Map<String, Object> resultMap = executeGetRequest( "/register", reqJoinGame, paramMap );
 
@@ -90,11 +89,11 @@ public class GameButtWali extends AbstractGameButt {
      */
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
-        paramMap.set( "game", reqJoinGame.getKindId() );
-        paramMap.set( "ip", reqJoinGame.getIp() );
-        paramMap.set( "orderId", reqJoinGame.getOrderId() );
+        Map<String, String> paramMap = new LinkedHashMap<>();
+        paramMap.put( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.put( "game", reqJoinGame.getKindId() );
+        paramMap.put( "ip", reqJoinGame.getIp() );
+        paramMap.put( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( "/enterGame", reqJoinGame, paramMap );
 
@@ -122,8 +121,8 @@ public class GameButtWali extends AbstractGameButt {
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
+        Map<String, String> paramMap = new LinkedHashMap<>();
+        paramMap.put( "uid", reqJoinGame.getGameMemberId() );
 
         Map<String, Object> resultMap = executeGetRequest( "/getBalance", reqJoinGame, paramMap );
 
@@ -142,8 +141,8 @@ public class GameButtWali extends AbstractGameButt {
 
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "orderId", reqJoinGame.getOrderId() );
+        Map<String, String> paramMap = new LinkedHashMap<>();
+        paramMap.put( "orderId", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = executeGetRequest( "/queryOrderV3", reqJoinGame, paramMap );
 
@@ -162,10 +161,10 @@ public class GameButtWali extends AbstractGameButt {
     }
 
     private void transact( ReqJoinGame reqJoinGame, TransactionType type ) {
-        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.set( "orderId", reqJoinGame.getOrderId() );
-        paramMap.set( "uid", reqJoinGame.getGameMemberId() );
-        paramMap.set( "credit", String.valueOf( switch ( type ) {
+        Map<String, String> paramMap = new LinkedHashMap<>();
+        paramMap.put( "orderId", reqJoinGame.getOrderId() );
+        paramMap.put( "uid", reqJoinGame.getGameMemberId() );
+        paramMap.put( "credit", String.valueOf( switch ( type ) {
             case TRANSFER -> reqJoinGame.getTransferMoney();
             case WITHDRAW -> reqJoinGame.getTransferMoney().negate();
         } ) );
@@ -191,8 +190,7 @@ public class GameButtWali extends AbstractGameButt {
                 reqJoinGame.getGameCategory().getDes() + action + "分异常 - " + action + "分失败或数据为空" );
     }
 
-    private Map<String, Object> executeGetRequest( String action, ReqJoinGame reqJoinGame,
-                                                   MultiValueMap<String, String> paramMap ) {
+    private Map<String, Object> executeGetRequest( String action, ReqJoinGame reqJoinGame, Map<String, String> paramMap ) {
         return restTemplate.execute( generateRequestUrl( reqJoinGame, action, paramMap ), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
@@ -214,12 +212,11 @@ public class GameButtWali extends AbstractGameButt {
             throw new BusinessException( e.getMessage() );
         }
 
-        // ${apiUrl}/${action}?a=${apiAccount}&t=${unixTimeSeconds}&p=${params}&k=${sign}
         String url = UriComponentsBuilder.fromHttpUrl( reqJoinGame.getApiUrl() ).path( action )
                                          .queryParam( "a", reqJoinGame.getLinecode() ).queryParam( "t", unixTimeSeconds )
-                                         .queryParam( "p", URLEncoder.encode( params, StandardCharsets.UTF_8 ) )
+                                         .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
                                          .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + reqJoinGame.getMd5() ) )
-                                         .build( true ).toUriString();
+                                         .build( false ).toUriString();
 
         log.info( reqJoinGame.getGameCategory().getDes() + "的访问URL: {}", url );
         return url;

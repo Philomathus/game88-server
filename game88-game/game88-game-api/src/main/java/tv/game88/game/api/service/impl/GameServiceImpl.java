@@ -364,7 +364,7 @@ public class GameServiceImpl implements GameService {
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
-            case BOLE, JDB, WALI -> ( profile + memberId ).toLowerCase();
+            case BOLE, JDB -> ( profile + memberId ).toLowerCase();
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
