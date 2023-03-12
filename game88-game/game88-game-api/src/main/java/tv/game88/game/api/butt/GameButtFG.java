@@ -8,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
@@ -21,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Log4j2
@@ -44,15 +47,15 @@ public class GameButtFG extends AbstractGameButt {
         }
 
         String              url       = reqJoinGame.getApiUrl() + "/v3/player_names/" + reqJoinGame.getGameMemberId();
-        Map<String, Object> resultMap = execute( url, Map.of(), reqJoinGame );
+        Map<String, Object> resultMap = execute( url, new LinkedMultiValueMap<>(), reqJoinGame );
         if ( isValid( resultMap ) ) {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
         } else {
             url = reqJoinGame.getApiUrl() + "/v3/players";
 
-            Map<String, Object> params = new HashMap<>();
-            params.put( "member_code", reqJoinGame.getGameMemberId() );
-            params.put( "password", reqJoinGame.getGameMemberId() + "!@#$1234" );
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add( "member_code", reqJoinGame.getGameMemberId() );
+            params.add( "password", reqJoinGame.getGameMemberId() + "88771234" );
 
             resultMap = execute( url, params, reqJoinGame );
 
@@ -70,19 +73,23 @@ public class GameButtFG extends AbstractGameButt {
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
         String url = reqJoinGame.getApiUrl() + "/v3/launch_game";
 
-        Map<String, Object> params = new LinkedHashMap<>();
-        params.put( "member_code", reqJoinGame.getGameMemberId() );
-        params.put( "game_code", reqJoinGame.getKindId() );
-        params.put( "game_type", "h5" );
-        params.put( "language", "zh-cn" );
-        params.put( "ip", reqJoinGame.getIp() );
-        params.put( "return_url", "" );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "member_code", reqJoinGame.getGameMemberId() );
+        params.add( "game_id", reqJoinGame.getKindId() );
+        params.add( "game_type", "h5" );
+        params.add( "language", "zh-cn" );
+        params.add( "ip", reqJoinGame.getIp() );
+        params.add( "return_url", "" );
+
+        log.warn( JsonUtil.object2Json( params ) );
 
         Map<String, Object> resultMap = execute( url, params, reqJoinGame );
 
         if ( isValid( resultMap ) ) {
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-            reqJoinGame.setGameUrl( dataMap.getOrDefault( "game_url", "" ).toString() );
+            String              gameUrl = dataMap.getOrDefault( "game_url", "" ).toString();
+            String              token   = dataMap.getOrDefault( "token", "" ).toString();
+            reqJoinGame.setGameUrl( gameUrl.concat( "&token=" ).concat( token ) );
         }
 
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
@@ -105,13 +112,13 @@ public class GameButtFG extends AbstractGameButt {
     private void TransferOrWithrdawMoney( ReqJoinGame reqJoinGame, TransactionType type ) {
         String URL = reqJoinGame.getApiUrl() + "/v3/player_uchips/member_code/" + reqJoinGame.getGameMemberId();
 
-        Map<String, Object> params = new LinkedHashMap<>();
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         BigDecimal transferMoney = switch ( type ) {
             case TRANSFER -> reqJoinGame.getTransferMoney();
             case WITHDRAW -> reqJoinGame.getTransferMoney().negate();
         };
-        params.put( "amount", transferMoney.multiply( new BigDecimal( 100 ) ).intValue() );
-        params.put( "externaltransactionid", reqJoinGame.getOrderId() );
+        params.add( "amount", transferMoney.multiply( new BigDecimal( 100 ) ).setScale( 0, RoundingMode.DOWN ).toString() );
+        params.add( "externaltransactionid", reqJoinGame.getOrderId() );
 
         Map<String, Object> resultMap = null;
         try {
@@ -135,11 +142,12 @@ public class GameButtFG extends AbstractGameButt {
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         String url = reqJoinGame.getApiUrl() + "/v3/player_chips/member_code/" + reqJoinGame.getGameMemberId();
 
-        Map<String, Object> resultMap = execute( url, Map.of(), reqJoinGame );
+        Map<String, Object> resultMap = execute( url, new LinkedMultiValueMap<>(), reqJoinGame );
 
         if ( isValid( resultMap ) ) {
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
-            return new BigDecimal( dataMap.getOrDefault( "balance", "0" ).toString() );
+            return new BigDecimal( dataMap.getOrDefault( "balance", "0" )
+                                          .toString() ).divide( new BigDecimal( 100 ), 2, RoundingMode.DOWN );
         }
 
         log.error( reqJoinGame.getGameCategory().getDes()
@@ -151,7 +159,7 @@ public class GameButtFG extends AbstractGameButt {
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         String URL = reqJoinGame.getApiUrl() + "/v3/player_uchips_check/" + reqJoinGame.getOrderId();
 
-        Map<String, Object> resultMap = execute( URL, Map.of(), reqJoinGame );
+        Map<String, Object> resultMap = execute( URL, new LinkedMultiValueMap<>(), reqJoinGame );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
@@ -175,20 +183,22 @@ public class GameButtFG extends AbstractGameButt {
 
     private boolean isValid( Map<String, Object> resultMap ) {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            return "0".equals( resultMap.getOrDefault( "code", "" ) );
+            return "0".equals( resultMap.getOrDefault( "code", "" ).toString() );
         }
         return false;
     }
 
-    private Map<String, Object> execute( String url, Map<String, Object> params, ReqJoinGame reqJoinGame ) {
+    private Map<String, Object> execute( String url, MultiValueMap<String, String> params, ReqJoinGame reqJoinGame ) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         httpHeaders.setAccept( List.of( MediaType.APPLICATION_JSON ) );
         httpHeaders.set( "merchantname", reqJoinGame.getDes() );
         httpHeaders.set( "merchantcode", reqJoinGame.getMd5() );
 
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( params, httpHeaders );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
+        log.warn( url );
+        log.warn( JsonUtil.object2Json( params ) );
         return restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
             String      text;
