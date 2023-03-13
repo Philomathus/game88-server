@@ -31,6 +31,7 @@ import java.util.*;
 
 @Log4j2
 @Repository( value = ConstantsGame.AT + "GameProcessor" )
+@SuppressWarnings( "unchecked" )
 public class GameButtAT extends AbstractGameButt {
 
     private static final String LOGIN              = "/login";
@@ -119,7 +120,7 @@ public class GameButtAT extends AbstractGameButt {
                     reqJoinGame.setGameUrl( dataMap.getOrDefault( "href", "" ).toString() );
                 }
             } else {
-                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
                 reqJoinGame.setGameUrl( dataMap.getOrDefault( "url", "" ).toString() );
             }
         }
