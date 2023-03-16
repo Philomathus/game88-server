@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.game.api.mapper.ConfigCleanCodeMapper">
+    <resultMap type="tv.game88.game.api.entity.ConfigCleanCode" id="ConfigCleanCodeResult">
+        <result property="id" column="id" />
+        <result property="typeId" column="game_type_id" />
+        <result property="codeMin" column="code_min" />
+        <result property="codeMax" column="code_max" />
+        <result property="cleanCodeRate" column="clean_code_rate" />
+        <result property="effect" column="effect" />
+    </resultMap>
+
+    <sql id="selectConfigCleanCodeVo">
+        select id, game_type_id, code_min, code_max, clean_code_rate, effect
+        from config_clean_code
+    </sql>
+
+    <select id="selectConfigCleanCodeList" parameterType="tv.game88.game.api.entity.ConfigCleanCode" resultMap="ConfigCleanCodeResult">
+        <include refid="selectConfigCleanCodeVo" />
+        <where>
+            <if test="typeId != null">
+                and game_type_id = #{typeId}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+        </where>
+    </select>
+</mapper>
