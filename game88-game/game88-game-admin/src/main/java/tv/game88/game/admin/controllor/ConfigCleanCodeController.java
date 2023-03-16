@@ -63,7 +63,7 @@ public class ConfigCleanCodeController extends BaseController {
     }
 
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:effect')" )
-    @Log( title = "游戏类型激活状态修改", businessType = BusinessType.EFFECT )
+    @Log( title = "洗码配置激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeEffect/{id}/{effect}" )
     public RspBase<?> changeStatus( @PathVariable Integer id, @PathVariable Boolean effect ) {
         ConfigCleanCode update = new ConfigCleanCode();
