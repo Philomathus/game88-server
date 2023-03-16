@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.type.JdbcType;
+import tv.game88.common.utils.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,7 +38,7 @@ public class MemberRechargeOnline {
     private BigDecimal realMoney;
     private String paymentAddress;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "商户下单时间", databaseFormat = "yyyy-MM-dd HH:mm:ss" , orderNum = "7")
+    @Excel(name = "商户下单时间", databaseFormat = "yyyy-MM-dd HH:mm:ss", orderNum = "7")
     private LocalDateTime payTime;
     private Integer status;
     @Excel(name = "是否是人工补单", orderNum = "9")
@@ -96,12 +97,15 @@ public class MemberRechargeOnline {
     }
 
     public String getStatusStr() {
-        if (status == 1)
-            return "成功";
-        else if (status == 0)
-            return "失败";
-        else
-            return "待确认";
-
+        switch (status) {
+            case 1:
+                return "成功";
+            case 0:
+                return "失败";
+            case -1:
+                return "待确认";
+            default:
+                return StringUtils.EMPTY;
+        }
     }
 }
