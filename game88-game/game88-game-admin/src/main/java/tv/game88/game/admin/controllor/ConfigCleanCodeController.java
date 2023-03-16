@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
+import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -12,6 +13,7 @@ import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.ConfigCleanCode;
 import tv.game88.game.api.service.ConfigCleanCodeService;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,5 +73,13 @@ public class ConfigCleanCodeController extends BaseController {
         update.setEffect( effect );
         boolean isSave = configCleanCodeService.updateById( update );
         return toResult( isSave );
+    }
+
+    @Log( title = "洗码配置", businessType = BusinessType.EXPORT )
+    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:export')" )
+    @GetMapping( "/export" )
+    public void export( ConfigCleanCode configCleanCode, HttpServletResponse response ) {
+        List<ConfigCleanCode> list = configCleanCodeService.selectConfigCleanCodeList( configCleanCode );
+        ExportExcelUtil.exportExcel( list, "洗码配置信息", "洗码配置信息表", ConfigCleanCode.class, response );
     }
 }
