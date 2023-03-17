@@ -2,7 +2,9 @@ package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
@@ -16,6 +18,9 @@ import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +53,28 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
         log.warn( JsonUtil.object2Json( bodyMap ) );
-        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( payAgentPlatform.getOrderUrl(), HttpMethod.POST,
+                    restTemplate.httpEntityCallback( packageJson( bodyMap ) ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+
+            if ( e.getMessage().contains( "No route to host (Host unreachable)" ) ) {
+                reqPayAgent.setFailReason( "代付IP需加白:" + e.getMessage() );
+                payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+                return false;
+            }
+            reqPayAgent.setFailReason( e.getMessage() );
+        }
 
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
