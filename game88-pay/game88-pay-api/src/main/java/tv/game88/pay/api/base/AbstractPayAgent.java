@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.pay.api.cache.ConfigBankListCache;
 import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqPayAgent;
 import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
@@ -44,6 +45,8 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     protected PayAgentService            payAgentService;
     @Resource
     protected ConfigEnvCacheUtil         configEnvCacheUtil;
+    @Resource
+    protected ConfigBankListCache        configBankListCache;
 
     protected String assemblyUrl( Map<String, ?> bodyMap ) {
         StringBuilder sb = new StringBuilder();

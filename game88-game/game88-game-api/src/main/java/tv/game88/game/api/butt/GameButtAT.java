@@ -30,14 +30,14 @@ import java.time.Duration;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.ICG + "GameProcessor" )
-public class GameButtICG extends AbstractGameButt {
+@Repository( value = ConstantsGame.AT + "GameProcessor" )
+@SuppressWarnings( "unchecked" )
+public class GameButtAT extends AbstractGameButt {
 
     private static final String LOGIN              = "/login";
     private static final String COMMON_URL         = "/api/v1/players";
     private static final String DEPOSIT            = "deposit";
     private static final String WITHDRAW           = "withdraw";
-    private static final String GAME               = "/api/v1/games";
     private static final String TRANSACTION_RECORD = "/api/v1/profile/transactions";
 
     @Override
@@ -97,13 +97,8 @@ public class GameButtICG extends AbstractGameButt {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add( "Authorization", "Bearer " + reqJoinGame.getToken() );
         HttpEntity<?> httpEntity = new HttpEntity<>( httpHeaders );
-        String        url;
-        if ( Arrays.asList( "all", "fish", "slot", "coc" ).contains( reqJoinGame.getKindId() ) ) {
-            url = reqJoinGame.getApiUrl() + GAME + "?type=" + reqJoinGame.getKindId() + "&lang=zh";
-        } else {
-            url = reqJoinGame.getApiUrl() + "/api/v1/games/gamelink?productId=" + reqJoinGame.getKindId() + "&player="
-                    + reqJoinGame.getGameMemberId() + "&lang=zh";
-        }
+        String url = reqJoinGame.getApiUrl() + "/api/v1/games/gamelink?productId=" + reqJoinGame.getKindId() + "&player="
+                + reqJoinGame.getGameMemberId() + "&lang=zh";
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
                 restTemplate.httpEntityCallback( httpEntity ), response -> {
@@ -125,7 +120,7 @@ public class GameButtICG extends AbstractGameButt {
                     reqJoinGame.setGameUrl( dataMap.getOrDefault( "href", "" ).toString() );
                 }
             } else {
-                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
                 reqJoinGame.setGameUrl( dataMap.getOrDefault( "url", "" ).toString() );
             }
         }
@@ -134,7 +129,6 @@ public class GameButtICG extends AbstractGameButt {
                     + "获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), url );
             throw new BusinessException( "获取游戏链接失败" );
         }
-        reqJoinGame.setGameUrl( reqJoinGame.getGameUrl() + "&token=ICG".concat( reqJoinGame.getGameMemberId() ) );
     }
 
     @Override
@@ -236,6 +230,9 @@ public class GameButtICG extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             List<Map<String, Object>> dataList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data",
                     new ArrayList<>() );
@@ -243,9 +240,7 @@ public class GameButtICG extends AbstractGameButt {
                 Map<String, Object> recordMap = dataList.get( 0 );
                 String              id        = recordMap.getOrDefault( "id", "" ).toString();
                 BigDecimal          amount    = new BigDecimal( recordMap.getOrDefault( "amount", 0 ).toString() );
-                if ( id.equals( reqJoinGame.getOrderId() ) && amount.compareTo( reqJoinGame.getTransferMoney() ) == 0 ) {
-                    return true;
-                }
+                return id.equals( reqJoinGame.getOrderId() ) && amount.compareTo( reqJoinGame.getTransferMoney() ) == 0;
             }
         }
         throw new RuntimeException( "查询结果为空,需要重试" );
