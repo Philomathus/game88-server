@@ -9,7 +9,6 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.ConfigCleanCode;
 import tv.game88.game.api.service.ConfigCleanCodeService;
 import javax.annotation.Resource;
@@ -67,7 +66,7 @@ public class ConfigCleanCodeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:effect')" )
     @Log( title = "洗码配置激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeEffect/{id}/{effect}" )
-    public RspBase<?> changeStatus( @PathVariable Integer id, @PathVariable Boolean effect ) {
+    public RspBase<?> changeEffect(@PathVariable Integer id, @PathVariable Boolean effect ) {
         ConfigCleanCode update = new ConfigCleanCode();
         update.setId( id );
         update.setEffect( effect );

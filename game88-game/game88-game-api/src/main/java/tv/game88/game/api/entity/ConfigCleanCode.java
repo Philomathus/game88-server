@@ -29,7 +29,7 @@ public class ConfigCleanCode {
      * 游戏类型ID
      */
     @Excel( name = "游戏类型ID" )
-    private Long typeId;
+    private Long gameTypeId;
 
     /**
      * 最小打码

@@ -23,7 +23,7 @@ public class ConfigCleanCodeServiceImpl extends ServiceImpl<ConfigCleanCodeMappe
      * @return 洗码配置集合
      */
     @Override
-    public List<ConfigCleanCode> selectConfigCleanCodeList(ConfigCleanCode configCleanCode) {
+    public List<ConfigCleanCode> selectConfigCleanCodeList( ConfigCleanCode configCleanCode ) {
         return this.baseMapper.selectConfigCleanCodeList( configCleanCode );
     }
 }

@@ -18,5 +18,5 @@ public interface ConfigCleanCodeMapper extends BaseMapper<ConfigCleanCode> {
      *
      * @return 洗码配置集合
      */
-    List<ConfigCleanCode> selectConfigCleanCodeList(ConfigCleanCode configCleanCode);
+    List<ConfigCleanCode> selectConfigCleanCodeList( ConfigCleanCode configCleanCode );
 }

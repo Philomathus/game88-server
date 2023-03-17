@@ -3,7 +3,7 @@
 <mapper namespace="tv.game88.game.api.mapper.ConfigCleanCodeMapper">
     <resultMap type="tv.game88.game.api.entity.ConfigCleanCode" id="ConfigCleanCodeResult">
         <result property="id" column="id" />
-        <result property="typeId" column="game_type_id" />
+        <result property="gameTypeId" column="game_type_id" />
         <result property="codeMin" column="code_min" />
         <result property="codeMax" column="code_max" />
         <result property="cleanCodeRate" column="clean_code_rate" />
@@ -18,8 +18,8 @@
     <select id="selectConfigCleanCodeList" parameterType="tv.game88.game.api.entity.ConfigCleanCode" resultMap="ConfigCleanCodeResult">
         <include refid="selectConfigCleanCodeVo" />
         <where>
-            <if test="typeId != null">
-                and game_type_id = #{typeId}
+            <if test="gameTypeId != null">
+                and game_type_id = #{gameTypeId}
             </if>
             <if test="effect != null">
                 and effect = #{effect}
