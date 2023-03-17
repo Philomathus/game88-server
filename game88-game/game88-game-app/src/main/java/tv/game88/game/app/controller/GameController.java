@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -119,9 +120,8 @@ public class GameController extends BaseController {
     }
 
     @Operation( summary = "PG Verify Session" )
-    @PostMapping( "/VerifySession" )
-    public RspBase<?> verifySession( @RequestHeader( value = "trace_id" ) String traceId,
-                                     @Validated @RequestBody ReqPGSoftGameData data ) {
+    @PostMapping( value = "/VerifySession", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE } )
+    public RspBase<?> verifySession( @RequestParam( value = "trace_id" ) String traceId, @Validated ReqPGSoftGameData data ) {
         return gameService.verify( traceId, data );
     }
 }
