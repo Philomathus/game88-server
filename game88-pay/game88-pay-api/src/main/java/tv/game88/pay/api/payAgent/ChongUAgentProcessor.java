@@ -10,6 +10,7 @@ import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
+import tv.game88.pay.api.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -17,9 +18,7 @@ import tv.game88.pay.api.entity.PayAgentPlatform;
 
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 @Repository( value = ConstantsPayAgent.CHONG_U + ConstantsPayAgent.PROCESSOR )
 @Log4j2
@@ -36,7 +35,14 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "MerchantId", payAgentChannel.getMerId() );
         bodyMap.put( "Amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
-        bodyMap.put( "BankCardBankName", withdrawDetail.getBankUserName().trim() );
+
+        bodyMap.put( "BankCardBankName", withdrawDetail.getBankAddress() );
+        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
+        for ( RspConfigBankList rspConfigBank : effectList ) {
+            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
+                bodyMap.put( "BankCardBankName", rspConfigBank.getBankName() );
+            }
+        }
         bodyMap.put( "BankCardNumber", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "BankCardRealName", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
