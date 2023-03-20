@@ -25,5 +25,6 @@
                 and effect = #{effect}
             </if>
         </where>
+        order by game_type_id, code_min
     </select>
 </mapper>
