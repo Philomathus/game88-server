@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.game.api.mapper.ConfigCleanCodeMapper">
-    <resultMap type="tv.game88.game.api.entity.ConfigCleanCode" id="ConfigCleanCodeResult">
+<mapper namespace="tv.game88.game.api.mapper.ConfigWashCodeMapper">
+    <resultMap type="tv.game88.game.api.entity.ConfigWashCode" id="ConfigWashCodeResult">
         <result property="id" column="id" />
         <result property="gameTypeId" column="game_type_id" />
         <result property="codeMin" column="code_min" />
         <result property="codeMax" column="code_max" />
-        <result property="cleanCodeRate" column="clean_code_rate" />
+        <result property="washCodeRate" column="wash_code_rate" />
         <result property="effect" column="effect" />
     </resultMap>
 
-    <sql id="selectConfigCleanCodeVo">
-        select id, game_type_id, code_min, code_max, clean_code_rate, effect
-        from config_clean_code
+    <sql id="selectConfigWashCodeVo">
+        select id, game_type_id, code_min, code_max, wash_code_rate, effect
+        from config_wash_code
     </sql>
 
-    <select id="selectConfigCleanCodeList" parameterType="tv.game88.game.api.entity.ConfigCleanCode" resultMap="ConfigCleanCodeResult">
-        <include refid="selectConfigCleanCodeVo" />
+    <select id="selectConfigWashCodeList" parameterType="tv.game88.game.api.entity.ConfigWashCode" resultMap="ConfigWashCodeResult">
+        <include refid="selectConfigWashCodeVo" />
         <where>
             <if test="gameTypeId != null">
                 and game_type_id = #{gameTypeId}

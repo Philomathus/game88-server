@@ -60,4 +60,12 @@ public class WashCodeController extends BaseController {
         return getRspBasePage( memberGameDataService.getGameDataList( MemberSecurityUtils.getUserId(), reqGameData ),
                 reqGameData );
     }
+
+    // ========== 新洗码接口 ============
+
+    @Operation( summary = "洗码比例 - 新" )
+    @PostMapping( "/getWashCodeRateList" )
+    public RspBase<List<RspWashCodeRate>> getWashCodeRateList() {
+        return RspBase.ok( memberGameDataService.getWashCodeRateList() );
+    }
 }

@@ -14,6 +14,7 @@ import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
+import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.LogCleanCode;
@@ -54,6 +55,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     private GamePlatformMapper     gamePlatformMapper;
     @Resource
     private RedisUtils             redisUtils;
+    @Resource
+    private GameCacheUtils         gameCacheUtils;
 
     private static Pattern NUM_PATTERN = Pattern.compile( "^[-\\+]?[\\d]*$" );
 
@@ -273,6 +276,13 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     @Override
     public RspBase<?> getGameBetDetailData( MemberGameData memberGameData ) {
+        return null;
+    }
+
+    @Override
+    public List<RspWashCodeRate> getWashCodeRateList() {
+        List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
+
         return null;
     }
 }

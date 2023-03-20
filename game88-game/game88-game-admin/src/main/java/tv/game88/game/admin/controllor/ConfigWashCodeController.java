@@ -9,39 +9,39 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.game.api.entity.ConfigCleanCode;
-import tv.game88.game.api.service.ConfigCleanCodeService;
+import tv.game88.game.api.entity.ConfigWashCode;
+import tv.game88.game.api.service.ConfigWashCodeService;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/game/configCleanCode" )
-public class ConfigCleanCodeController extends BaseController {
+@RequestMapping( "/game/configWashCode" )
+public class ConfigWashCodeController extends BaseController {
 
     @Resource
-    private ConfigCleanCodeService configCleanCodeService;
+    private ConfigWashCodeService configCleanCodeService;
 
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<ConfigCleanCode>> list(ConfigCleanCode configCleanCode ) {
+    public RspBase<List<ConfigWashCode>> list(ConfigWashCode configCleanCode ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        List<ConfigCleanCode> list = configCleanCodeService.selectConfigCleanCodeList( configCleanCode );
+        List<ConfigWashCode> list = configCleanCodeService.selectConfigWashCodeList( configCleanCode );
         return getRspBasePage( list, pageDomain );
     }
 
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:query')" )
     @GetMapping( value = "/{id}" )
-    public RspBase<ConfigCleanCode> getInfo( @PathVariable( "id" ) Integer id ) {
+    public RspBase<ConfigWashCode> getInfo( @PathVariable( "id" ) Integer id ) {
         return RspBase.ok( configCleanCodeService.getById( id ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:add')" )
     @Log( title = "洗码配置", businessType = BusinessType.INSERT )
     @PostMapping
-    public RspBase<?> add( @RequestBody ConfigCleanCode configCleanCode ) {
+    public RspBase<?> add( @RequestBody ConfigWashCode configCleanCode ) {
         configCleanCode.setEffect( false );
         return toResult( configCleanCodeService.save( configCleanCode ) );
     }
@@ -49,7 +49,7 @@ public class ConfigCleanCodeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:edit')" )
     @Log( title = "洗码配置", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> edit( @RequestBody ConfigCleanCode configCleanCode ) {
+    public RspBase<?> edit( @RequestBody ConfigWashCode configCleanCode ) {
         configCleanCode.setEffect( null );
         boolean isSave = configCleanCodeService.updateById( configCleanCode );
         return toResult( isSave );
@@ -67,7 +67,7 @@ public class ConfigCleanCodeController extends BaseController {
     @Log( title = "洗码配置激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeEffect/{id}/{effect}" )
     public RspBase<?> changeEffect(@PathVariable Integer id, @PathVariable Boolean effect ) {
-        ConfigCleanCode update = new ConfigCleanCode();
+        ConfigWashCode update = new ConfigWashCode();
         update.setId( id );
         update.setEffect( effect );
         boolean isSave = configCleanCodeService.updateById( update );
@@ -77,8 +77,8 @@ public class ConfigCleanCodeController extends BaseController {
     @Log( title = "洗码配置", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('game:configCleanCode:export')" )
     @GetMapping( "/export" )
-    public void export( ConfigCleanCode configCleanCode, HttpServletResponse response ) {
-        List<ConfigCleanCode> list = configCleanCodeService.selectConfigCleanCodeList( configCleanCode );
-        ExportExcelUtil.exportExcel( list, "洗码配置信息", "洗码配置信息表", ConfigCleanCode.class, response );
+    public void export( ConfigWashCode configCleanCode, HttpServletResponse response ) {
+        List<ConfigWashCode> list = configCleanCodeService.selectConfigWashCodeList( configCleanCode );
+        ExportExcelUtil.exportExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
     }
 }

@@ -1,7 +1,7 @@
 package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tv.game88.game.api.entity.ConfigCleanCode;
+import tv.game88.game.api.entity.ConfigWashCode;
 import java.util.List;
 
 /**
@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author krzystof
  */
-public interface ConfigCleanCodeMapper extends BaseMapper<ConfigCleanCode> {
+public interface ConfigWashCodeMapper extends BaseMapper<ConfigWashCode> {
 
     /**
      * 查询洗码配置列表
@@ -18,5 +18,5 @@ public interface ConfigCleanCodeMapper extends BaseMapper<ConfigCleanCode> {
      *
      * @return 洗码配置集合
      */
-    List<ConfigCleanCode> selectConfigCleanCodeList( ConfigCleanCode configCleanCode );
+    List<ConfigWashCode> selectConfigWashCodeList( ConfigWashCode configCleanCode );
 }

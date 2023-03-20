@@ -1,7 +1,7 @@
 package tv.game88.game.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import tv.game88.game.api.entity.ConfigCleanCode;
+import tv.game88.game.api.entity.ConfigWashCode;
 import java.util.List;
 
 /**
@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author krzystof
  */
-public interface ConfigCleanCodeService extends IService<ConfigCleanCode> {
+public interface ConfigWashCodeService extends IService<ConfigWashCode> {
 
     /**
      * 查询洗码配置列表
@@ -18,5 +18,5 @@ public interface ConfigCleanCodeService extends IService<ConfigCleanCode> {
      *
      * @return 洗码配置集合
      */
-    List<ConfigCleanCode> selectConfigCleanCodeList(ConfigCleanCode configCleanCode);
+    List<ConfigWashCode> selectConfigWashCodeList(ConfigWashCode configCleanCode);
 }

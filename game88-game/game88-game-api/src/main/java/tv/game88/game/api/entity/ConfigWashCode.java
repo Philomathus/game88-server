@@ -10,14 +10,14 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 
 /**
- * 洗码配置对象 config_clean_code
+ * 洗码配置对象 config_wash_code
  *
  * @author krzystof
  */
-@TableName( "config_clean_code" )
+@TableName( "config_wash_code" )
 @Data
 @EqualsAndHashCode( callSuper = false )
-public class ConfigCleanCode {
+public class ConfigWashCode {
 
     /**
      * 系统编号
@@ -47,7 +47,7 @@ public class ConfigCleanCode {
      * 洗码比例
      */
     @Excel( name = "洗码比例" )
-    private BigDecimal cleanCodeRate;
+    private BigDecimal washCodeRate;
 
     /**
      * 激活状态
