@@ -14,9 +14,9 @@ public interface ConfigWashCodeService extends IService<ConfigWashCode> {
     /**
      * 查询洗码配置列表
      *
-     * @param configCleanCode 洗码配置
+     * @param configWashCode 洗码配置
      *
      * @return 洗码配置集合
      */
-    List<ConfigWashCode> selectConfigWashCodeList(ConfigWashCode configCleanCode);
+    List<ConfigWashCode> selectConfigWashCodeList(ConfigWashCode configWashCode);
 }

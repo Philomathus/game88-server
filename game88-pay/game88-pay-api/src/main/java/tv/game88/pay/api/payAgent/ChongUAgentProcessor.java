@@ -112,7 +112,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
             String orderId = requestMap.getOrDefault( "WithdrawOrderId", "" ).toString();
             payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderId, payAgentChannel, "100".equals( status ) );
             log.info( payAgentPlatform.getName()
-                    + "订单号:{},回调状态:{},", withdrawOrderId, "SUCCESS".equals( status ) ? "成功" : "失败" );
+                    + "订单号:{},回调状态:{},", withdrawOrderId, "100".equals( status ) ? "成功" : "失败" );
             return "SUCCESS";
         }
 

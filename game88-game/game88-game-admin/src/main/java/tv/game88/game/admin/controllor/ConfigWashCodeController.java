@@ -21,64 +21,64 @@ import java.util.List;
 public class ConfigWashCodeController extends BaseController {
 
     @Resource
-    private ConfigWashCodeService configCleanCodeService;
+    private ConfigWashCodeService configWashCodeService;
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:list')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<ConfigWashCode>> list(ConfigWashCode configCleanCode ) {
+    public RspBase<List<ConfigWashCode>> list(ConfigWashCode configWashCode ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        List<ConfigWashCode> list = configCleanCodeService.selectConfigWashCodeList( configCleanCode );
+        List<ConfigWashCode> list = configWashCodeService.selectConfigWashCodeList( configWashCode );
         return getRspBasePage( list, pageDomain );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:query')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<ConfigWashCode> getInfo( @PathVariable( "id" ) Integer id ) {
-        return RspBase.ok( configCleanCodeService.getById( id ) );
+        return RspBase.ok( configWashCodeService.getById( id ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:add')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:add')" )
     @Log( title = "洗码配置", businessType = BusinessType.INSERT )
     @PostMapping
-    public RspBase<?> add( @RequestBody ConfigWashCode configCleanCode ) {
-        configCleanCode.setEffect( false );
-        return toResult( configCleanCodeService.save( configCleanCode ) );
+    public RspBase<?> add( @RequestBody ConfigWashCode configWashCode ) {
+        configWashCode.setEffect( false );
+        return toResult( configWashCodeService.save( configWashCode ) );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:edit')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:edit')" )
     @Log( title = "洗码配置", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> edit( @RequestBody ConfigWashCode configCleanCode ) {
-        configCleanCode.setEffect( null );
-        boolean isSave = configCleanCodeService.updateById( configCleanCode );
+    public RspBase<?> edit( @RequestBody ConfigWashCode configWashCode ) {
+        configWashCode.setEffect( null );
+        boolean isSave = configWashCodeService.updateById( configWashCode );
         return toResult( isSave );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:remove')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:remove')" )
     @Log( title = "洗码配置", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Integer[] ids ) {
-        boolean isSave = configCleanCodeService.removeByIds( Arrays.asList( ids ) );
+        boolean isSave = configWashCodeService.removeByIds( Arrays.asList( ids ) );
         return toResult( isSave );
     }
 
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:effect')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:effect')" )
     @Log( title = "洗码配置激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeEffect/{id}/{effect}" )
     public RspBase<?> changeEffect(@PathVariable Integer id, @PathVariable Boolean effect ) {
         ConfigWashCode update = new ConfigWashCode();
         update.setId( id );
         update.setEffect( effect );
-        boolean isSave = configCleanCodeService.updateById( update );
+        boolean isSave = configWashCodeService.updateById( update );
         return toResult( isSave );
     }
 
     @Log( title = "洗码配置", businessType = BusinessType.EXPORT )
-    @PreAuthorize( "@ss.hasPermi('game:configCleanCode:export')" )
+    @PreAuthorize( "@ss.hasPermi('game:configWashCode:export')" )
     @GetMapping( "/export" )
-    public void export( ConfigWashCode configCleanCode, HttpServletResponse response ) {
-        List<ConfigWashCode> list = configCleanCodeService.selectConfigWashCodeList( configCleanCode );
+    public void export( ConfigWashCode configWashCode, HttpServletResponse response ) {
+        List<ConfigWashCode> list = configWashCodeService.selectConfigWashCodeList( configWashCode );
         ExportExcelUtil.exportExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
     }
 }

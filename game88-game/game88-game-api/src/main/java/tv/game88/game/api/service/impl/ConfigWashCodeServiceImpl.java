@@ -18,12 +18,12 @@ public class ConfigWashCodeServiceImpl extends ServiceImpl<ConfigWashCodeMapper,
     /**
      * 查询洗码配置列表
      *
-     * @param configCleanCode 洗码配置
+     * @param configWashCode 洗码配置
      *
      * @return 洗码配置集合
      */
     @Override
-    public List<ConfigWashCode> selectConfigWashCodeList( ConfigWashCode configCleanCode ) {
-        return this.baseMapper.selectConfigWashCodeList( configCleanCode );
+    public List<ConfigWashCode> selectConfigWashCodeList( ConfigWashCode configWashCode ) {
+        return this.baseMapper.selectConfigWashCodeList( configWashCode );
     }
 }
