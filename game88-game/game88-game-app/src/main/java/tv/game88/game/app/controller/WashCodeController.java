@@ -71,8 +71,21 @@ public class WashCodeController extends BaseController {
     }
 
     @Operation( summary = "会员洗码详情 - 新" )
-    @PostMapping( "/washCodeDetail" )
-    public RspBase<RspWashCodeInfo> washCodeDetail() {
-        return memberGameDataService.washCodeDetail( MemberSecurityUtils.getUserId() );
+    @PostMapping( "/getWashCodeDetail" )
+    public RspBase<RspWashCodeInfo> getWashCodeDetail() {
+        return memberGameDataService.getWashCodeDetail( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "会员洗码记录 - 新" )
+    @PostMapping( "/getWashCodeLogs" )
+    public RspBase<List<RspGameWashCodeLog>> getWashCodeLogs( @RequestBody PageDomain pageDomain ) {
+        startPage( pageDomain );
+        return getRspBasePage( memberGameDataService.getWashCodeLogs( MemberSecurityUtils.getUserId() ), pageDomain );
+    }
+
+    @Operation( summary = "会员手动洗码 - 新" )
+    @PostMapping( "/toWashCode" )
+    public RspBase<RspWashCodeInfo> toWashCode() {
+        return memberGameDataService.toWashCode( MemberSecurityUtils.getUserId() );
     }
 }

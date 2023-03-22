@@ -1,8 +1,10 @@
 package tv.game88.game.api.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.*;
@@ -14,10 +16,7 @@ import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.*;
-import tv.game88.game.api.mapper.GamePlatformMapper;
-import tv.game88.game.api.mapper.LogCleanCodeInfoMapper;
-import tv.game88.game.api.mapper.LogCleanCodeMapper;
-import tv.game88.game.api.mapper.MemberGameDataMapper;
+import tv.game88.game.api.mapper.*;
 import tv.game88.game.api.service.ConfigWashCodeService;
 import tv.game88.game.api.service.MemberGameDataService;
 import tv.game88.game.api.type.EnumGameCategory;
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
  *
  * @author mengJun
  */
+@Log4j2
 @Service
 public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper, MemberGameData> implements MemberGameDataService {
     @Resource
@@ -48,6 +48,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     private MemberMoneyManager     memberMoneyManager;
     @Resource
     private GamePlatformMapper     gamePlatformMapper;
+    @Resource
+    private GameInfoMapper         gameInfoMapper;
     @Resource
     private RedisUtils             redisUtils;
     @Resource
@@ -279,11 +281,39 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     @Override
     public List<RspWashCodeRate> getWashCodeRateList() {
-        return gameCacheUtils.getEffectWashCodeRateList();
+        List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
+        List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
+
+        Map<Long, String> gameTypeMap = new LinkedHashMap<>();
+        for ( ConfigWashCode washCode : configWashCodes ) {
+            for ( RspGameType rspGameType : gameTypeList ) {
+                if ( Objects.equals( washCode.getGameTypeId(), rspGameType.getId() ) ) {
+                    gameTypeMap.put( rspGameType.getId(), rspGameType.getName() );
+                }
+            }
+        }
+        List<RspWashCodeRate> rspWashCodeRates = new ArrayList<>();
+        for ( Map.Entry<Long, String> gameTypeEntry : gameTypeMap.entrySet() ) {
+            RspWashCodeRate rspWashCodeRate = new RspWashCodeRate();
+            rspWashCodeRate.setId( gameTypeEntry.getKey() );
+            rspWashCodeRate.setName( gameTypeEntry.getValue().replace( "-", "" ) );
+            List<RspWashCodeDesc> rspWashCodeDescList = new ArrayList<>();
+            for ( ConfigWashCode washCode : configWashCodes ) {
+                if ( Objects.equals( gameTypeEntry.getKey(), washCode.getGameTypeId() ) ) {
+                    RspWashCodeDesc rspWashCodeDesc = new RspWashCodeDesc();
+                    rspWashCodeDesc.setWashRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                    rspWashCodeDesc.setCodeInterval( Convert.amountConversion( washCode.getCodeMin() ) + "+" );
+                    rspWashCodeDescList.add( rspWashCodeDesc );
+                }
+            }
+            rspWashCodeRate.setWashCodeDescList( rspWashCodeDescList );
+            rspWashCodeRates.add( rspWashCodeRate );
+        }
+        return rspWashCodeRates;
     }
 
     @Override
-    public RspBase<RspWashCodeInfo> washCodeDetail( String memberId ) {
+    public RspBase<RspWashCodeInfo> getWashCodeDetail( String memberId ) {
         RspWashCodeInfo info = new RspWashCodeInfo();
         info.setWashCodeAmount( BigDecimal.ZERO );
         MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId ).select( "id", "clean_time" )
@@ -291,9 +321,119 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         if ( memberInfo.getCleanTime() != null ) {
             info.setWashCodeTime( LocalDateTimeUtils.format( memberInfo.getCleanTime() ) );
         }
+
+        List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
+        List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
+
+        Map<Long, String> gameTypeMap = new LinkedHashMap<>();
+        for ( ConfigWashCode washCode : configWashCodes ) {
+            for ( RspGameType rspGameType : gameTypeList ) {
+                if ( Objects.equals( washCode.getGameTypeId(), rspGameType.getId() ) ) {
+                    gameTypeMap.put( rspGameType.getId(), rspGameType.getName() );
+                }
+            }
+        }
+
+        Map<Long, BigDecimal> sumGameTypeCodeMap = new HashMap<>();
+
         List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
                 memberId.length() - 1 ), memberId );
+        if ( CollectionUtils.isNotEmpty( sumProfitKinds ) ) {
+            Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
+            Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
 
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
+                                                                                .in( "kind_id", kindIds )
+                                                                                .notIn( "type_id", 1, 2, 4 ).list();
+
+            for ( MemberGameData memberGameData : sumProfitKinds ) {
+                Long       gameTypeId = null;
+                BigDecimal profit     = null;
+                for ( GameInfo gameInfo : gameInfos ) {
+                    if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
+                            memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
+                                    "-" + memberGameData.getKindId() ) ) ) {
+                        gameTypeId = gameInfo.getTypeId();
+                        profit     = new BigDecimal( memberGameData.getProfit() );
+                    }
+                }
+                if ( gameTypeId != null ) {
+                    BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                    sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
+                } else {
+                    GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
+                    if ( gamePlatform.getName().contains( "棋牌" ) ) {
+                        gameTypeId = 8L;
+                    } else if ( gamePlatform.getName().contains( "电子" ) ) {
+                        gameTypeId = 9L;
+                    } else if ( gamePlatform.getName().contains( "视讯" ) ) {
+                        gameTypeId = 7L;
+                    } else {
+                        log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
+                                memberGameData.getKindId() );
+                    }
+                    if ( gameTypeId != null ) {
+                        BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                        sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
+                    }
+                }
+            }
+        }
+
+        List<RspGameTypeWashCode> rspGameTypeWashCodes = new ArrayList<>();
+        for ( Map.Entry<Long, String> gameTypeEntry : gameTypeMap.entrySet() ) {
+            RspGameTypeWashCode rspGameTypeWashCode = new RspGameTypeWashCode();
+            rspGameTypeWashCode.setGameTypeId( gameTypeEntry.getKey() );
+            rspGameTypeWashCode.setGameTypeName( gameTypeEntry.getValue().replace( "-", "" ) );
+            rspGameTypeWashCode.setWashCodeAmount( BigDecimal.ZERO );
+            rspGameTypeWashCode.setCodeAmountTotal( BigDecimal.ZERO );
+
+            for ( Map.Entry<Long, BigDecimal> sumGameTypeCodeEntry : sumGameTypeCodeMap.entrySet() ) {
+                if ( Objects.equals( gameTypeEntry.getKey(), sumGameTypeCodeEntry.getKey() ) ) {
+                    rspGameTypeWashCode.setCodeAmountTotal( sumGameTypeCodeEntry.getValue() );
+                }
+            }
+            for ( ConfigWashCode washCode : configWashCodes ) {
+                if ( Objects.equals( gameTypeEntry.getKey(), washCode.getGameTypeId() ) ) {
+                    // 如果打码为0 则取第一条洗码配置
+                    if ( Objects.equals( rspGameTypeWashCode.getCodeAmountTotal(), BigDecimal.ZERO )
+                            && washCode.getCodeMin().compareTo( BigDecimal.ONE ) <= 0 ) {
+                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                    }
+                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) > 0
+                            && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
+                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                        rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
+                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() ) );
+                    }
+                }
+            }
+            rspGameTypeWashCodes.add( rspGameTypeWashCode );
+        }
+        info.setRspGameTypeWashCodes( rspGameTypeWashCodes );
+        return RspBase.ok( info );
+    }
+
+    @Override
+    public List<RspGameWashCodeLog> getWashCodeLogs( String memberId ) {
         return null;
+    }
+
+    @Override
+    public RspBase<RspWashCodeInfo> toWashCode( String memberId ) {
+        if ( !redisUtils.lock( "cleanCode" + memberId, 5 ) ) {
+            return RspBase.businessError( "请勿重复请求" );
+        }
+
+        this.toWashCodeProcess( memberId );
+
+        redisUtils.unLock( "cleanCode" + memberId );
+        RspBase<RspWashCodeInfo> rspBase = this.getWashCodeDetail( memberId );
+        rspBase.getData().setMoney( memberInfoMapper.getUserBalance( memberId ) );
+        return rspBase;
+    }
+
+    private void toWashCodeProcess( String memberId ) {
+        
     }
 }
