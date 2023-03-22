@@ -5,40 +5,48 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.Convert;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.dto.RspGameType;
+import tv.game88.game.api.dto.RspWashCodeDesc;
+import tv.game88.game.api.dto.RspWashCodeRate;
+import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.mapper.ConfigWashCodeMapper;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
 import tv.game88.game.api.type.EnumGameCategory;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class GameCacheUtils {
 
-    public static final String GAME_TYPE_KEY      = Constants.GAME_PREX + "type:effect";
-    public static final String GAME_PLATFORM_KEY  = Constants.GAME_PREX + "platform:";
-    public static final String GAME_INFO_KEY      = Constants.GAME_PREX + "info:";
-    public static final String GAME_INFO_LIST_KEY = Constants.GAME_PREX + "infoList:";
-    public static final String GAME_INFO_S_KEY    = Constants.GAME_PREX + "infos:";
+    public static final String GAME_TYPE_KEY             = Constants.GAME_PREX + "type:effect";
+    public static final String GAME_PLATFORM_KEY         = Constants.GAME_PREX + "platform:";
+    public static final String GAME_INFO_KEY             = Constants.GAME_PREX + "info:";
+    public static final String GAME_INFO_LIST_KEY        = Constants.GAME_PREX + "infoList:";
+    public static final String GAME_INFO_S_KEY           = Constants.GAME_PREX + "infos:";
+    public static final String GAME_WASH_CODE_RATE_S_KEY = Constants.GAME_PREX + "washCodeRateList";
 
     @Resource
-    private RedisUtils         redisUtils;
+    private RedisUtils           redisUtils;
     @Resource
-    private GameTypeMapper     gameTypeMapper;
+    private GameTypeMapper       gameTypeMapper;
     @Resource
-    private GamePlatformMapper gamePlatformMapper;
+    private GamePlatformMapper   gamePlatformMapper;
     @Resource
-    private GameInfoMapper     gameInfoMapper;
+    private GameInfoMapper       gameInfoMapper;
+    @Resource
+    private ConfigWashCodeMapper configWashCodeMapper;
 
     public List<RspGameType> getEffectTypeList() {
         if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
@@ -140,5 +148,45 @@ public class GameCacheUtils {
             this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
             this.clear( GAME_INFO_S_KEY + rspGameType.getId() );
         }
+    }
+
+    public List<RspWashCodeRate> getEffectWashCodeRateList() {
+        if ( !redisUtils.exists( GAME_WASH_CODE_RATE_S_KEY ) ) {
+            List<RspGameType> gameTypeList   = this.getEffectTypeList();
+            ConfigWashCode    configWashCode = new ConfigWashCode();
+            configWashCode.setEffect( true );
+            List<ConfigWashCode> configWashCodes = configWashCodeMapper.selectConfigWashCodeList( configWashCode );
+
+            List<RspWashCodeRate> rspWashCodeRates = new ArrayList<>();
+
+            Map<Long, String> gameTypeMap = new LinkedHashMap<>();
+            for ( ConfigWashCode washCode : configWashCodes ) {
+                for ( RspGameType rspGameType : gameTypeList ) {
+                    if ( Objects.equals( washCode.getGameTypeId(), rspGameType.getId() ) ) {
+                        gameTypeMap.put( rspGameType.getId(), rspGameType.getName() );
+                    }
+                }
+            }
+            for ( Map.Entry<Long, String> gameTypeEntry : gameTypeMap.entrySet() ) {
+                RspWashCodeRate rspWashCodeRate = new RspWashCodeRate();
+                rspWashCodeRate.setId( gameTypeEntry.getKey() );
+                rspWashCodeRate.setName( gameTypeEntry.getValue().replace( "-", "" ) );
+                List<RspWashCodeDesc> rspWashCodeDescList = new ArrayList<>();
+                for ( ConfigWashCode washCode : configWashCodes ) {
+                    if ( Objects.equals( gameTypeEntry.getKey(), washCode.getGameTypeId() ) ) {
+                        RspWashCodeDesc rspWashCodeDesc = new RspWashCodeDesc();
+                        rspWashCodeDesc.setWashRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                        rspWashCodeDesc.setCodeInterval( Convert.amountConversion( washCode.getCodeMin() ) + "+" );
+                        rspWashCodeDescList.add( rspWashCodeDesc );
+                    }
+                }
+                rspWashCodeRate.setWashCodeDescList( rspWashCodeDescList );
+                rspWashCodeRates.add( rspWashCodeRate );
+            }
+            redisUtils.strSet( GAME_WASH_CODE_RATE_S_KEY, JsonUtil.object2Json( rspWashCodeRates ) );
+            return rspWashCodeRates;
+        }
+        String s = redisUtils.strGet( GAME_WASH_CODE_RATE_S_KEY );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 }

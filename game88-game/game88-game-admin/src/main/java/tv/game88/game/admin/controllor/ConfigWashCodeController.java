@@ -9,8 +9,10 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.service.ConfigWashCodeService;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -23,9 +25,12 @@ public class ConfigWashCodeController extends BaseController {
     @Resource
     private ConfigWashCodeService configWashCodeService;
 
+    @Resource
+    private GameCacheUtils gameCacheUtils;
+
     @PreAuthorize( "@ss.hasPermi('game:configWashCode:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<ConfigWashCode>> list(ConfigWashCode configWashCode ) {
+    public RspBase<List<ConfigWashCode>> list( ConfigWashCode configWashCode ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<ConfigWashCode> list = configWashCodeService.selectConfigWashCodeList( configWashCode );
@@ -43,7 +48,11 @@ public class ConfigWashCodeController extends BaseController {
     @PostMapping
     public RspBase<?> add( @RequestBody ConfigWashCode configWashCode ) {
         configWashCode.setEffect( false );
-        return toResult( configWashCodeService.save( configWashCode ) );
+        boolean save = configWashCodeService.save( configWashCode );
+        if ( save ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+        }
+        return toResult( save );
     }
 
     @PreAuthorize( "@ss.hasPermi('game:configWashCode:edit')" )
@@ -52,6 +61,9 @@ public class ConfigWashCodeController extends BaseController {
     public RspBase<?> edit( @RequestBody ConfigWashCode configWashCode ) {
         configWashCode.setEffect( null );
         boolean isSave = configWashCodeService.updateById( configWashCode );
+        if ( isSave ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+        }
         return toResult( isSave );
     }
 
@@ -60,17 +72,23 @@ public class ConfigWashCodeController extends BaseController {
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Integer[] ids ) {
         boolean isSave = configWashCodeService.removeByIds( Arrays.asList( ids ) );
+        if ( isSave ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+        }
         return toResult( isSave );
     }
 
     @PreAuthorize( "@ss.hasPermi('game:configWashCode:effect')" )
     @Log( title = "洗码配置激活状态修改", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeEffect/{id}/{effect}" )
-    public RspBase<?> changeEffect(@PathVariable Integer id, @PathVariable Boolean effect ) {
+    public RspBase<?> changeEffect( @PathVariable Integer id, @PathVariable Boolean effect ) {
         ConfigWashCode update = new ConfigWashCode();
         update.setId( id );
         update.setEffect( effect );
         boolean isSave = configWashCodeService.updateById( update );
+        if ( isSave ) {
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+        }
         return toResult( isSave );
     }
 

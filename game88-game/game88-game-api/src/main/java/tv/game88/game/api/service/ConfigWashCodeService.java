@@ -2,6 +2,7 @@ package tv.game88.game.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.game.api.entity.ConfigWashCode;
+
 import java.util.List;
 
 /**
@@ -18,5 +19,5 @@ public interface ConfigWashCodeService extends IService<ConfigWashCode> {
      *
      * @return 洗码配置集合
      */
-    List<ConfigWashCode> selectConfigWashCodeList(ConfigWashCode configWashCode);
+    List<ConfigWashCode> selectConfigWashCodeList( ConfigWashCode configWashCode );
 }

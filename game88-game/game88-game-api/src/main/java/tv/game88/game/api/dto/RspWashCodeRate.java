@@ -13,6 +13,6 @@ public class RspWashCodeRate {
     @Schema( title = "游戏类型名称" )
     private String name;
 
-    @Schema( title = "游戏列表" )
-    private List<RspWashCodeDesc> platforms = new ArrayList<>();
+    @Schema( title = "洗码列表" )
+    private List<RspWashCodeDesc> washCodeDescList = new ArrayList<>();
 }

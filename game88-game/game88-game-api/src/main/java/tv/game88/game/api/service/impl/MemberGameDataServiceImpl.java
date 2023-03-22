@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.SpringUtils;
-import tv.game88.common.utils.StringUtils;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
@@ -16,14 +13,12 @@ import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.*;
-import tv.game88.game.api.entity.GamePlatform;
-import tv.game88.game.api.entity.LogCleanCode;
-import tv.game88.game.api.entity.LogCleanCodeInfo;
-import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.entity.*;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.LogCleanCodeInfoMapper;
 import tv.game88.game.api.mapper.LogCleanCodeMapper;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
+import tv.game88.game.api.service.ConfigWashCodeService;
 import tv.game88.game.api.service.MemberGameDataService;
 import tv.game88.game.api.type.EnumGameCategory;
 
@@ -57,6 +52,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     private RedisUtils             redisUtils;
     @Resource
     private GameCacheUtils         gameCacheUtils;
+
+    @Resource
+    private ConfigWashCodeService configWashCodeService;
 
     private static Pattern NUM_PATTERN = Pattern.compile( "^[-\\+]?[\\d]*$" );
 
@@ -281,7 +279,20 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     @Override
     public List<RspWashCodeRate> getWashCodeRateList() {
-        List<RspGameType> gameTypeList = gameCacheUtils.getEffectTypeList();
+        return gameCacheUtils.getEffectWashCodeRateList();
+    }
+
+    @Override
+    public RspBase<RspWashCodeInfo> washCodeDetail( String memberId ) {
+        RspWashCodeInfo info = new RspWashCodeInfo();
+        info.setWashCodeAmount( BigDecimal.ZERO );
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId ).select( "id", "clean_time" )
+                                                                           .one();
+        if ( memberInfo.getCleanTime() != null ) {
+            info.setWashCodeTime( LocalDateTimeUtils.format( memberInfo.getCleanTime() ) );
+        }
+        List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
+                memberId.length() - 1 ), memberId );
 
         return null;
     }

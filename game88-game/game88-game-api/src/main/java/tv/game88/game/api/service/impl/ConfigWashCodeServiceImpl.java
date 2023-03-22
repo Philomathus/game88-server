@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.mapper.ConfigWashCodeMapper;
 import tv.game88.game.api.service.ConfigWashCodeService;
+
 import java.util.List;
 
 /**

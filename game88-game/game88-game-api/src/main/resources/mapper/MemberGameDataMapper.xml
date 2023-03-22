@@ -184,10 +184,18 @@
                cast(SUM(all_bet) AS decimal(10, 2))    totalBet,
                cast(SUM(profit) AS decimal(10, 2))     totalIncome
         FROM member_game_data${tableLast} m
-                LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
+                 LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
         <where>
             <include refid="whereSelect">
             </include>
         </where>
+    </select>
+
+    <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
+        select platform_id, kind_id, sum(ABS(profit)) profit
+        from member_game_data${dbNodes}
+        where status = 0
+          and account = #{memberId}
+        GROUP BY platform_id, kind_id
     </select>
 </mapper>

@@ -5,6 +5,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.dto.RspWashCodeInfo;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -41,4 +42,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     RspBase<?> getGameBetDetailData( MemberGameData memberGameData );
 
     List<RspWashCodeRate> getWashCodeRateList();
+
+    RspBase<RspWashCodeInfo> washCodeDetail( String memberId );
 }
