@@ -9,4 +9,6 @@ public class RspWashCodeDesc {
     private String codeInterval;
     @Schema( title = "洗码比例" )
     private String washRate;
+    @Schema( title = "打码比例" )
+    private String beat;
 }

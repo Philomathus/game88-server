@@ -303,6 +303,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     RspWashCodeDesc rspWashCodeDesc = new RspWashCodeDesc();
                     rspWashCodeDesc.setWashRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                     rspWashCodeDesc.setCodeInterval( Convert.amountConversion( washCode.getCodeMin() ) + "+" );
+                    rspWashCodeDesc.setBeat( washCode.getBeat().stripTrailingZeros().toPlainString() );
                     rspWashCodeDescList.add( rspWashCodeDesc );
                 }
             }
