@@ -50,6 +50,12 @@ public class ConfigWashCode {
     private BigDecimal washCodeRate;
 
     /**
+     * 打码倍数
+     */
+    @Excel( name = "打码倍数" )
+    private BigDecimal beat;
+
+    /**
      * 激活状态
      */
     @Excel( name = "激活状态" )

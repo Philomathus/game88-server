@@ -7,11 +7,12 @@
         <result property="codeMin" column="code_min" />
         <result property="codeMax" column="code_max" />
         <result property="washCodeRate" column="wash_code_rate" />
+        <result property="beat" column="beat" />
         <result property="effect" column="effect" />
     </resultMap>
 
     <sql id="selectConfigWashCodeVo">
-        select id, game_type_id, code_min, code_max, wash_code_rate, effect
+        select id, game_type_id, code_min, code_max, wash_code_rate, beat, effect
         from config_wash_code
     </sql>
 
