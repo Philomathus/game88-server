@@ -30,7 +30,7 @@ public enum EnumMoney {
     LOTTERY_BONUS( 105, "彩票中奖", false ),
     QUEST_BONUS( 106, "任务奖金", false ),
     SAFE_BOX( 107, "保险箱记录", false ),
-    CODE_CLEAN( 108, "洗码", false ),
+    CODE_CLEAN( 108, "洗码", true ),
     REFUND_BET_AMOUNT( 109, "回退金额", false ),
     WONGIVE( 110, "赠送彩金", false ),
 

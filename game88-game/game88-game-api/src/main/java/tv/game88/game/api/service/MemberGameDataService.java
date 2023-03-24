@@ -3,6 +3,7 @@ package tv.game88.game.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.game.api.dto.*;
+import tv.game88.game.api.entity.GameWashCodeLog;
 import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
 import tv.game88.game.api.dto.RspWashCodeInfo;
@@ -48,4 +49,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     List<RspGameWashCodeLog> getWashCodeLogs( String memberId );
 
     RspBase<RspWashCodeInfo> toWashCode( String memberId );
+
+    void opWashCode( String memberId, List<GameWashCodeLog> gameWashCodeLogs, LocalDateTime time, String washId );
 }

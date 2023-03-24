@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class GameWashCodeLog {
-    @TableId( type = IdType.AUTO )
-    private Long          id;
+    @TableId( type = IdType.INPUT )
+    private String        washId;
     @Schema( title = "会员id" )
     private String        memberId;
     @Schema( title = "打码量" )
