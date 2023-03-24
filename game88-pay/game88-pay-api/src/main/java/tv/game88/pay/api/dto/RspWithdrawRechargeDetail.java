@@ -2,6 +2,7 @@ package tv.game88.pay.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import tv.game88.common.utils.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -21,4 +22,14 @@ public class RspWithdrawRechargeDetail {
     private String     remark;
     @Schema( title = "颜色" )
     private String     color;
+
+    @Schema( title = "银行账户" )
+    private String bankAccount;
+
+    public String getBankAccount() {
+        if ( StringUtils.isNotBlank( bankAccount ) ) {
+            return bankAccount.substring( bankAccount.length() - 4 );
+        }
+        return "";
+    }
 }
