@@ -50,7 +50,7 @@ public class ConfigWashCodeController extends BaseController {
         configWashCode.setEffect( false );
         boolean save = configWashCodeService.save( configWashCode );
         if ( save ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_CONFIG_LIST_KEY );
         }
         return toResult( save );
     }
@@ -62,7 +62,7 @@ public class ConfigWashCodeController extends BaseController {
         configWashCode.setEffect( null );
         boolean isSave = configWashCodeService.updateById( configWashCode );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_CONFIG_LIST_KEY );
         }
         return toResult( isSave );
     }
@@ -73,7 +73,7 @@ public class ConfigWashCodeController extends BaseController {
     public RspBase<?> remove( @PathVariable Integer[] ids ) {
         boolean isSave = configWashCodeService.removeByIds( Arrays.asList( ids ) );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_CONFIG_LIST_KEY );
         }
         return toResult( isSave );
     }
@@ -87,7 +87,7 @@ public class ConfigWashCodeController extends BaseController {
         update.setEffect( effect );
         boolean isSave = configWashCodeService.updateById( update );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_RATE_S_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_WASH_CODE_CONFIG_LIST_KEY );
         }
         return toResult( isSave );
     }
