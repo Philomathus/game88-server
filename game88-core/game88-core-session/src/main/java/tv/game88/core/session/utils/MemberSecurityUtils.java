@@ -25,6 +25,7 @@ public class MemberSecurityUtils {
         try {
             return getLoginUser().getUserId();
         } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
             throw new BusinessException( "获取用户账户异常", HttpStatus.UNAUTHORIZED );
         }
     }
