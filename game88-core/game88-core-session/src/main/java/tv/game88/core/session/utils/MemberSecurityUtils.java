@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.core.session.vo.MemberLoginUser;
 
 /**
@@ -37,6 +38,7 @@ public class MemberSecurityUtils {
         try {
             return ( MemberLoginUser ) getAuthentication().getPrincipal();
         } catch ( Exception e ) {
+            log.warn( JsonUtil.object2Json( getAuthentication().getPrincipal() ) );
             log.error( e.getMessage(), e );
             throw new BusinessException( "获取用户信息异常", HttpStatus.UNAUTHORIZED );
         }
