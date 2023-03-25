@@ -37,6 +37,7 @@ public class MemberSecurityUtils {
         try {
             return ( MemberLoginUser ) getAuthentication().getPrincipal();
         } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
             throw new BusinessException( "获取用户信息异常", HttpStatus.UNAUTHORIZED );
         }
     }
