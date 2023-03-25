@@ -12,7 +12,4 @@ public class ReqGameData extends PageDomain {
     private EnumGameCategory gameCategory;
     @Schema( title = "时间设置" )
     private EnumReqTime      enumReqTime;
-
-    @Schema( hidden = true )
-    private Long platformId;
 }

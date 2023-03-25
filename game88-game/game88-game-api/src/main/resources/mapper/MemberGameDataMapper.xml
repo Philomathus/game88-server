@@ -165,18 +165,18 @@
     </update>
 
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
-        select game_id, cell_score, profit, game_end_time create_time, all_bet, agent, platform_id
-        from member_game_data${dbNodes}
-        where 1 = 1
+        select d.game_id, d.cell_score, d.profit, d.game_end_time create_time, d.all_bet, d.agent, d.platform_id
+        from member_game_data${dbNodes} d
+                 left join game_platform p on d.platform_id = p.id
+        where d.game_end_time &gt;= #{beginTime}
+          and d.game_end_time &lt;= #{endTime}
         <if test="memberId != null and memberId != ''">
-            and account = #{memberId}
+            and d.account = #{memberId}
         </if>
-        <if test="req != null and req.platformId != null">
-            and platform_id = #{req.platformId}
+        <if test="req != null and req.gameCategory != null">
+            and p.game_category = #{req.gameCategory}
         </if>
-        and game_end_time &gt;= #{beginTime}
-        and game_end_time &lt;= #{endTime}
-        order by game_end_time desc
+        order by d.game_end_time desc
     </select>
 
     <select id="getCountMemberGameDataList" resultType="tv.game88.game.api.entity.MemberGameData">
