@@ -215,7 +215,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             if ( e instanceof BadCredentialsException ) {
-                log.error( e.getMessage() );
+                log.error( "密码错误:{} ", JsonUtil.object2Json( mobileLogin ) );
             } else {
                 log.error( e.getMessage(), e );
             }
