@@ -91,7 +91,7 @@ public class MemberMoneyManager {
         int insertLogMoney = logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
         //打码
         int insertBcode = 1;
-        if ( enumMoney.getBcode() && codeMult.compareTo( BigDecimal.ZERO ) > 0 ) {
+        if ( enumMoney.getBcode() && codeMult != null && codeMult.compareTo( BigDecimal.ZERO ) > 0 ) {
             MemberBcode code = new MemberBcode();
             code.setIncome( codeMult );
             code.setCharge( addCount );
