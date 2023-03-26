@@ -36,12 +36,12 @@ public class YongXinPayProcessor extends AbstractPay {
         params.put("wayCode",payChannel.getChannelCode());
         params.put("subject","subject");
         params.put("outTradeNo",reqPayRecharge.getOrderNo());
-        params.put("amount", reqPayRecharge.getMoney().divide(BigDecimal.valueOf(100),2,RoundingMode.HALF_UP));
+        params.put("amount", reqPayRecharge.getMoney().multiply(BigDecimal.valueOf(100)).setScale(0,RoundingMode.HALF_UP).toString());
         params.put("clientIp",reqPayRecharge.getRealIp());
         params.put("notifyUrl",configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode());
-        params.put("reqTime",LocalDateTimeUtils.format( LocalDateTime.now() ));
+        params.put("reqTime", System.currentTimeMillis());
         String sign = DigestUtils
-                .md5Hex( this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                .md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
                 .toLowerCase();
         params.put( "sign", sign );
         log.warn( JsonUtil.object2Json( params ) );
@@ -56,7 +56,7 @@ public class YongXinPayProcessor extends AbstractPay {
             if ( code == 0 ) {
                 resultMap = ( Map<String, Object> ) resultMap.get( "data" );
                 if ( !CollectionUtils.isEmpty( resultMap ) ) {
-                    return ( String ) resultMap.get( "pay_url" );
+                    return ( String ) resultMap.get( "payUrl" );
                 }
             } else {
                 // 存档失败原因
@@ -71,9 +71,9 @@ public class YongXinPayProcessor extends AbstractPay {
         Map<String, Object> params = new TreeMap<>();
         params.put("mchId",payPlatform.getMerId());
         params.put("outTradeNo",memberRechargeOnline.getOrderNo());
-        params.put("reqTime",LocalDateTimeUtils.format( LocalDateTime.now() ));
+        params.put("reqTime", System.currentTimeMillis());
         String sign = DigestUtils
-                .md5Hex( this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                .md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
                 .toLowerCase();
         params.put( "sign", sign );
         log.warn( JsonUtil.object2Json( params ) );
@@ -130,7 +130,7 @@ public class YongXinPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
         String signTemp = DigestUtils
-                .md5Hex( this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                .md5Hex( this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
                 .toLowerCase();
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + signTemp );
