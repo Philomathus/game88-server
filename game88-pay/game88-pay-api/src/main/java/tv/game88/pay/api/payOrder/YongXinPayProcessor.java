@@ -94,7 +94,7 @@ public class YongXinPayProcessor extends AbstractPay {
                     if ( notify == 0 && status == 2 ) {
                         BigDecimal amount = new BigDecimal( money );
                         memberRechargeOnline.setUpperOrderNo( trade_no );
-                        memberRechargeOnline.setRealMoney( amount.setScale( 2, RoundingMode.HALF_UP ) );
+                        memberRechargeOnline.setRealMoney( amount.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP ) );
                         return true;
                     }
                 }
@@ -138,7 +138,7 @@ public class YongXinPayProcessor extends AbstractPay {
             String status = requestMap.getOrDefault( "state", "" ).toString();
             if ( "1".equals( status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 String userPayAmount = requestMap.getOrDefault( "amount", "" ).toString();
-                memberRechargeOnline.setRealMoney( new BigDecimal( userPayAmount ).setScale( 2, BigDecimal.ROUND_HALF_UP ) );
+                memberRechargeOnline.setRealMoney( new BigDecimal( userPayAmount ).divide(BigDecimal.valueOf(100)).setScale( 2, BigDecimal.ROUND_HALF_UP ) );
                 String orderNo = requestMap.getOrDefault( "tradeNo", "" ).toString();
                 memberRechargeOnline.setUpperOrderNo( orderNo );
                 return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "SUCCESS", "FAIL" },
