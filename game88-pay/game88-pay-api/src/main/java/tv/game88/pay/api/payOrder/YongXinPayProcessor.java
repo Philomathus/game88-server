@@ -3,12 +3,10 @@ package tv.game88.pay.api.payOrder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.time.Instant;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.ReqPayRecharge;
@@ -18,8 +16,10 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @Repository( value = ConstantsPay.YONGXIN_PAY + "Processor" )
 @Log4j2
@@ -32,17 +32,17 @@ public class YongXinPayProcessor extends AbstractPay {
     @Override
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         SortedMap<String, Object> params = new TreeMap<>();
-        params.put("mchId",payPlatform.getMerId());
-        params.put("wayCode",payChannel.getChannelCode());
-        params.put("subject","subject");
-        params.put("outTradeNo",reqPayRecharge.getOrderNo());
-        params.put("amount", reqPayRecharge.getMoney().multiply(BigDecimal.valueOf(100)).setScale(0,RoundingMode.HALF_UP).toString());
-        params.put("clientIp",reqPayRecharge.getRealIp());
-        params.put("notifyUrl",configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode());
-        params.put("reqTime", System.currentTimeMillis());
-        String sign = DigestUtils
-                .md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
-                .toLowerCase();
+        params.put( "mchId", payPlatform.getMerId() );
+        params.put( "wayCode", payChannel.getChannelCode() );
+        params.put( "subject", "subject" );
+        params.put( "outTradeNo", reqPayRecharge.getOrderNo() );
+        params.put( "amount", reqPayRecharge.getMoney().multiply( BigDecimal.valueOf( 100 ) ).setScale( 0, RoundingMode.HALF_UP )
+                                            .toString() );
+        params.put( "clientIp", reqPayRecharge.getRealIp() );
+        params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
+        params.put( "reqTime", System.currentTimeMillis() );
+        String sign = DigestUtils.md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                                 .toLowerCase();
         params.put( "sign", sign );
         log.warn( JsonUtil.object2Json( params ) );
 
@@ -69,12 +69,11 @@ public class YongXinPayProcessor extends AbstractPay {
     @Override
     public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
         Map<String, Object> params = new TreeMap<>();
-        params.put("mchId",payPlatform.getMerId());
-        params.put("outTradeNo",memberRechargeOnline.getOrderNo());
-        params.put("reqTime", System.currentTimeMillis());
-        String sign = DigestUtils
-                .md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
-                .toLowerCase();
+        params.put( "mchId", payPlatform.getMerId() );
+        params.put( "outTradeNo", memberRechargeOnline.getOrderNo() );
+        params.put( "reqTime", System.currentTimeMillis() );
+        String sign = DigestUtils.md5Hex( this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
+                                 .toLowerCase();
         params.put( "sign", sign );
         log.warn( JsonUtil.object2Json( params ) );
 
@@ -94,7 +93,7 @@ public class YongXinPayProcessor extends AbstractPay {
                     if ( notify == 0 && status == 2 ) {
                         BigDecimal amount = new BigDecimal( money );
                         memberRechargeOnline.setUpperOrderNo( trade_no );
-                        memberRechargeOnline.setRealMoney( amount.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP ) );
+                        memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
                         return true;
                     }
                 }
@@ -130,15 +129,15 @@ public class YongXinPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
         String signTemp = DigestUtils
-                .md5Hex( this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) )
-                .toLowerCase();
+                .md5Hex( this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) ).toLowerCase();
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + signTemp );
         if ( sign.equalsIgnoreCase( signTemp ) ) {
             String status = requestMap.getOrDefault( "state", "" ).toString();
             if ( "1".equals( status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 String userPayAmount = requestMap.getOrDefault( "amount", "" ).toString();
-                memberRechargeOnline.setRealMoney( new BigDecimal( userPayAmount ).divide(BigDecimal.valueOf(100)).setScale( 2, BigDecimal.ROUND_HALF_UP ) );
+                memberRechargeOnline.setRealMoney( new BigDecimal( userPayAmount ).divide( BigDecimal.valueOf( 100 ), 2,
+                        RoundingMode.HALF_UP ) );
                 String orderNo = requestMap.getOrDefault( "tradeNo", "" ).toString();
                 memberRechargeOnline.setUpperOrderNo( orderNo );
                 return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "SUCCESS", "FAIL" },
