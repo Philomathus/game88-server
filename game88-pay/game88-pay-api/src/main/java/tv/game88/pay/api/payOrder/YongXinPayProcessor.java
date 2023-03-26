@@ -82,15 +82,14 @@ public class YongXinPayProcessor extends AbstractPay {
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( response ) );
         if ( !CollectionUtils.isEmpty( response ) ) {
-            int status = ( int ) response.getOrDefault( "code", -1 );
-            if ( status == 0 ) {
+            int code = ( int ) response.getOrDefault( "code", -1 );
+            if ( code == 0 ) {
                 Map<String, Object> dataMap = ( Map<String, Object> ) response.getOrDefault( "data", new HashMap<>() );
                 if ( !CollectionUtils.isEmpty( response ) ) {
                     String trade_no = dataMap.getOrDefault( "tradeNo", "" ).toString();
                     String money    = dataMap.getOrDefault( "amount", "" ).toString();
-                    status = ( int ) dataMap.getOrDefault( "state", 0 );
-                    int notify = ( int ) dataMap.getOrDefault( "notifyState", -1 );
-                    if ( notify == 0 && status == 2 ) {
+                    int    status   = ( int ) dataMap.getOrDefault( "state", 0 );
+                    if ( status == 1 ) {
                         BigDecimal amount = new BigDecimal( money );
                         memberRechargeOnline.setUpperOrderNo( trade_no );
                         memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
