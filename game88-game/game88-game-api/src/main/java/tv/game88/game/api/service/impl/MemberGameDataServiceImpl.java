@@ -363,6 +363,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
         List<RspGameTypeWashCode> rspGameTypeWashCodes = new ArrayList<>();
         for ( RspGameType rspGameType : gameTypeList ) {
+            if ( Arrays.asList( 1L, 2L, 4L ).contains( rspGameType.getId() ) ) {
+                continue;
+            }
             RspGameTypeWashCode rspGameTypeWashCode = new RspGameTypeWashCode();
             rspGameTypeWashCode.setGameTypeId( rspGameType.getId() );
             rspGameTypeWashCode.setGameTypeName( rspGameType.getName().replace( "-", "" ) );
