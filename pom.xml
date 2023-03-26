@@ -25,7 +25,7 @@
         <module>game88-pay</module>
         <module>game88-game</module>
         <module>game88-lottery</module>
-        <module>game88-data</module>
+        <module>game88-general</module>
     </modules>
 
     <properties>

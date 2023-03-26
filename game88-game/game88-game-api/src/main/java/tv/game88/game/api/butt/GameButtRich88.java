@@ -21,149 +21,155 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
-@Repository(value = ConstantsGame.RICH88 + "GameProcessor")
-@SuppressWarnings("unchecked")
+@Repository( value = ConstantsGame.RICH88 + "GameProcessor" )
+@SuppressWarnings( "unchecked" )
 public class GameButtRich88 extends AbstractGameButt {
-
-    private static final String API_KEY = "api_key";
-    private static final String PF_ID = "pf_id";
-    private static final String TIMESTAMP = "timestamp";
-
     @Override
-    public void getToken(ReqJoinGame reqJoinGame) {
+    public void getToken( ReqJoinGame reqJoinGame ) {
         //ignore
     }
 
     @Override
-    public void createAccount(ReqJoinGame reqJoinGame) {
+    public void createAccount( ReqJoinGame reqJoinGame ) {
         //ignore
     }
 
     @Override
-    public void getJoinGameUrl(ReqJoinGame reqJoinGame) {
-        String url = reqJoinGame.getApiUrl() + "/v2/platform/login";
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("account", reqJoinGame.getGameMemberId());
-        addRequiredHeaders(reqJoinGame, params);
-        log.info("Join Game: {}", JsonUtil.object2Json(params));
-        Map<String, Object> resultMap = execute(HttpMethod.POST, url, params);
-        log.info(reqJoinGame.getGameCategory().getDes()
-                + "Join Game result:{}; userId:{}", JsonUtil.object2Json(resultMap), reqJoinGame.getGameMemberId());
-        if (isValid(resultMap)) {
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
-            String gameUrl = dataMap.getOrDefault("url", "").toString();
-            if (StringUtils.isEmpty(gameUrl)) {
-                throw new BusinessException("Game url is empty");
-            } else {
-                reqJoinGame.setGameUrl(gameUrl);
-            }
+    public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
+        String              url    = reqJoinGame.getApiUrl() + "/v2/platform/login";
+        Map<String, Object> params = new HashMap<>();
+        params.put( "account", reqJoinGame.getGameMemberId() );
+        params.put( "game_code", reqJoinGame.getKindId() );
+        params.put( "lang", "zh-CN" );
+
+        Map<String, Object> resultMap = execute( HttpMethod.POST, url, params, reqJoinGame );
+
+        if ( isValid( resultMap ) ) {
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            reqJoinGame.setGameUrl( dataMap.getOrDefault( "url", "" ).toString() );
+        }
+
+        if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+            throw new BusinessException( "获取游戏链接失败" );
         }
     }
 
     @Override
-    public void transferMoney(ReqJoinGame reqJoinGame) {
-        transact(reqJoinGame, true);
+    public void transferMoney( ReqJoinGame reqJoinGame ) {
+        transact( reqJoinGame, true );
     }
 
     @Override
-    public void withdrawal(ReqJoinGame reqJoinGame) {
-        transact(reqJoinGame, false);
+    public void withdrawal( ReqJoinGame reqJoinGame ) {
+        transact( reqJoinGame, false );
     }
 
     @Override
-    public BigDecimal queryBalance(ReqJoinGame reqJoinGame) {
-        String url = String.format("%s/v2/platform/balance/%s", reqJoinGame.getApiUrl(), reqJoinGame.getGameMemberId());
-        Map<String, String> params = new LinkedHashMap<>();
-        addRequiredHeaders(reqJoinGame, params);
-        log.info("Query Balance: {}, params: {}", url, JsonUtil.object2Json(params));
-        Map<String, Object> resultMap = execute(HttpMethod.GET, url, params);
-        log.info(reqJoinGame.getGameCategory().getDes()
-                + "Query Balance result:{}; userId:{}", JsonUtil.object2Json(resultMap), reqJoinGame.getGameMemberId());
-        if (isValid(resultMap)) {
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
-            return new BigDecimal(dataMap.getOrDefault("balance", "0").toString());
+    public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
+        if ( reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+            String url = String.format( "%s/v2/platform/logout/%s", reqJoinGame.getApiUrl(), reqJoinGame.getGameMemberId() );
+
+            Map<String, Object> resultMap = execute( HttpMethod.POST, url, null, reqJoinGame );
+
+            log.info( reqJoinGame.getGameCategory().getDes()
+                    + "强制登出玩家 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         }
+        String url = String.format( "%s/v2/platform/balance/%s", reqJoinGame.getApiUrl(), reqJoinGame.getGameMemberId() );
+
+        Map<String, Object> resultMap = execute( HttpMethod.GET, url, null, reqJoinGame );
+
+        if ( isValid( resultMap ) ) {
+            log.info( reqJoinGame.getGameCategory().getDes()
+                    + "查询余额 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            return new BigDecimal( dataMap.getOrDefault( "free_balance", "0" ).toString() );
+        }
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 
     @Override
-    public boolean queryTransfer(ReqJoinGame reqJoinGame) {
-        String url = String.format("%s/v2/platform/transfer/%s", reqJoinGame.getApiUrl(), reqJoinGame.getOrderId());
-        Map<String, String> params = new LinkedHashMap<>();
-        addRequiredHeaders(reqJoinGame, params);
-        log.info("Query Transfer: {}, params: {}", url, JsonUtil.object2Json(params));
-        Map<String, Object> resultMap = execute(HttpMethod.GET, url, params);
-        log.info(reqJoinGame.getGameCategory().getDes()
-                + "Query Transfer result:{}; userId:{}", JsonUtil.object2Json(resultMap), reqJoinGame.getGameMemberId());
-        if (isValid(resultMap)) {
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
-            return "1".equals(dataMap.getOrDefault("transfer_state", "").toString());
-        }
-        throw new BusinessException("查询结果为空,需要重试");
-    }
+    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
+        String url = String.format( "%s/v2/platform/transfer/%s", reqJoinGame.getApiUrl(), reqJoinGame.getOrderId() );
 
-    private void addRequiredHeaders(ReqJoinGame reqJoinGame, Map<String, String> params) {
-        String timestamp = String.valueOf(Math.round(System.currentTimeMillis() / 1000.0));
-        String apiKey = String.format("%s%s%s", reqJoinGame.getAgent(), reqJoinGame.getMd5(), timestamp);
-        params.put(API_KEY, DigestUtils.sha256Hex(apiKey));
-        params.put(PF_ID, reqJoinGame.getAgent());
-        params.put(TIMESTAMP, timestamp);
-    }
+        Map<String, Object> resultMap = execute( HttpMethod.GET, url, null, reqJoinGame );
 
-    private Map<String, Object> execute(HttpMethod method, String url, Map<String, String> params) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
-        httpHeaders.set(API_KEY, params.get(API_KEY));
-        httpHeaders.set(PF_ID, params.get(PF_ID));
-        httpHeaders.set(TIMESTAMP, params.get(TIMESTAMP));
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
-        HttpEntity<String> requestEntity =
-                new HttpEntity<>(HttpMethod.GET == method ? null : JsonUtil.object2Json(params), httpHeaders);
-
-        return restTemplate.execute(url, method,
-                restTemplate.httpEntityCallback(requestEntity), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String text;
-                    try (Reader reader = new InputStreamReader(bodyStream)) {
-                        text = IOUtils.toString(reader);
-                    }
-                    return JsonUtil.json2Map(text);
-                });
-    }
-
-    private void transact(ReqJoinGame reqJoinGame, boolean isDeposit) {
-        String url = reqJoinGame.getApiUrl() + "/v2/platform/transfer";
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("account", reqJoinGame.getGameMemberId());
-        params.put("transfer_no", reqJoinGame.getOrderId());
-        params.put("transfer_type", isDeposit ? "0" : "1");
-        params.put("amount", reqJoinGame.getTransferMoney().toString());
-        addRequiredHeaders(reqJoinGame, params);
-        log.info("isDeposit: {}, Transfer Money: {}", isDeposit, JsonUtil.object2Json(params));
-        Map<String, Object> resultMap = execute(HttpMethod.POST, url, params);
-        log.info(reqJoinGame.getGameCategory().getDes()
-                        + "isDeposit: {}, Transfer Money result:{}; userId:{}", isDeposit,
-                JsonUtil.object2Json(resultMap), reqJoinGame.getGameMemberId());
-        if (!isValid(resultMap)) {
-            throw new GameTransferException(reqJoinGame.getGameCategory().getDes() + "上分异常 - 上分失败或数据为空");
-        }
-    }
-
-    private boolean isValid(Map<String, Object> resultMap) {
-        boolean result = false;
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.get("data");
-            if (!CollectionUtils.isEmpty(dataMap) && "0".equals(resultMap.getOrDefault("code", "")) &&
-                    "Success".equals(resultMap.getOrDefault("msg", ""))) {
-                result = true;
+        if ( isValid( resultMap ) ) {
+            Map<String, Object> dataMap       = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
+            String              transferState = dataMap.getOrDefault( "transfer_state", "" ).toString();
+            if ( "1".equals( transferState ) || "2".equals( transferState ) ) {
+                return "1".equals( transferState );
             }
         }
-        return result;
+        if ( !CollectionUtils.isEmpty( resultMap ) && "15001".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+            return false;
+        }
+        throw new BusinessException( "查询结果为空,需要重试" );
+    }
+
+    private Map<String, Object> execute( HttpMethod method, String url, Map<String, Object> params, ReqJoinGame reqJoinGame ) {
+        String timestamp = String.valueOf( System.currentTimeMillis() / 1000 );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        httpHeaders.setAccept( List.of( MediaType.APPLICATION_JSON ) );
+        httpHeaders.set( "api_key", DigestUtils.sha256Hex( reqJoinGame.getAgent() + reqJoinGame.getMd5() + timestamp ) );
+        httpHeaders.set( "pf_id", reqJoinGame.getAgent() );
+        httpHeaders.set( "timestamp", timestamp );
+
+        if ( params != null ) {
+            log.warn( JsonUtil.object2Json( params ) );
+        }
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(
+                params == null ? new HashMap<>() : params, httpHeaders );
+
+        return restTemplate.execute( url, method, restTemplate.httpEntityCallback( requestEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+    }
+
+    private void transact( ReqJoinGame reqJoinGame, boolean isDeposit ) {
+        String url = reqJoinGame.getApiUrl() + "/v2/platform/transfer";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put( "account", reqJoinGame.getGameMemberId() );
+        params.put( "transfer_no", reqJoinGame.getOrderId() );
+        params.put( "transfer_type", isDeposit ? "0" : "1" );
+        params.put( "amount", reqJoinGame.getTransferMoney() );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = execute( HttpMethod.POST, url, params, reqJoinGame );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            throw new GameTransferException( e.getMessage() );
+        }
+
+        String action = isDeposit ? "上" : "下";
+        log.info( reqJoinGame.getGameCategory().getDes() + action
+                + "分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        if ( !isValid( resultMap ) ) {
+            throw new GameTransferException(
+                    reqJoinGame.getGameCategory().getDes() + action + "分异常 - " + action + "分失败或数据为空" );
+        }
+    }
+
+    private boolean isValid( Map<String, Object> resultMap ) {
+        return !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.getOrDefault( "code", "" ).toString() );
     }
 }

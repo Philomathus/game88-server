@@ -9,6 +9,6 @@ spring:
     password: EvYsN39ViArDumx4pWyH
     database: 2
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+  #configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

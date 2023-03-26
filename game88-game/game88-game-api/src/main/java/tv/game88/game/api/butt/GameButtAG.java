@@ -43,12 +43,8 @@ public class GameButtAG extends AbstractGameButt {
                 reqJoinGame.getGameMemberId() );
         Document document = request( params, reqJoinGame );
 
-        String status = document
-                .getElementsByTagName( "result" )
-                .item( 0 )
-                .getAttributes()
-                .getNamedItem( "info" )
-                .getTextContent();
+        String status = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
+                                .getTextContent();
         if ( "0".equals( status ) ) {
             redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
             return;
@@ -81,14 +77,19 @@ public class GameButtAG extends AbstractGameButt {
                 + "/\\\\\\\\/method=tc/\\\\\\\\/billno=%s/\\\\\\\\/type=IN/\\\\\\\\/credit=%s", reqJoinGame.getAgent(),
                 reqJoinGame.getGameMemberId(), reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(),
                 reqJoinGame.getTransferMoney() );
-        Document document = request( params, reqJoinGame );
+        Document document = null;
+        try {
+            document = request( params, reqJoinGame );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         String msg = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "msg" ).getTextContent();
         if ( StringUtils.isBlank( msg ) ) {
             String paramsC = String.format( "cagent=%s/\\\\\\\\/loginname=%s/\\\\\\\\/actype=1/\\\\\\\\/password=%s/\\\\\\\\/cur"
-                    + "=CNY/\\\\\\\\/flag=1/\\\\\\\\/method=tcc/\\\\\\\\/billno=%s/\\\\\\\\/type=IN/\\\\\\\\/credit=%s", reqJoinGame.getAgent()
-                    , reqJoinGame.getGameMemberId(), reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(),
-                    reqJoinGame.getTransferMoney() );
+                    + "=CNY/\\\\\\\\/flag=1/\\\\\\\\/method=tcc/\\\\\\\\/billno=%s/\\\\\\\\/type=IN/\\\\\\\\/credit=%s",
+                    reqJoinGame.getAgent(), reqJoinGame.getGameMemberId(), reqJoinGame.getGameMemberId(),
+                    reqJoinGame.getOrderId(), reqJoinGame.getTransferMoney() );
             Document documentC = null;
             try {
                 documentC = request( paramsC, reqJoinGame );
@@ -96,12 +97,8 @@ public class GameButtAG extends AbstractGameButt {
                 log.error( e.getMessage(), e );
                 throw new GameTransferException( "确认上分失败" );
             }
-            String status = documentC
-                    .getElementsByTagName( "result" )
-                    .item( 0 )
-                    .getAttributes()
-                    .getNamedItem( "info" )
-                    .getTextContent();
+            String status = documentC.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
+                                     .getTextContent();
             if ( status.equals( "0" ) ) {
                 return;
             }
@@ -151,7 +148,12 @@ public class GameButtAG extends AbstractGameButt {
                 + "/\\\\\\\\/method=tc/\\\\\\\\/billno=%s/\\\\\\\\/type=OUT/\\\\\\\\/credit=%s", reqJoinGame.getAgent(),
                 reqJoinGame.getGameMemberId(), reqJoinGame.getGameMemberId(), reqJoinGame.getOrderId(),
                 reqJoinGame.getTransferMoney() );
-        Document document = request( params, reqJoinGame );
+        Document document = null;
+        try {
+            document = request( params, reqJoinGame );
+        } catch ( Exception e ) {
+            throw new GameTransferException( e.getMessage() );
+        }
 
         String msg = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "msg" ).getTextContent();
         if ( StringUtils.isBlank( msg ) ) {
@@ -169,12 +171,8 @@ public class GameButtAG extends AbstractGameButt {
                 log.error( e.getMessage(), e );
                 throw new GameTransferException( "确认下分失败" );
             }
-            String status = documentC
-                    .getElementsByTagName( "result" )
-                    .item( 0 )
-                    .getAttributes()
-                    .getNamedItem( "info" )
-                    .getTextContent();
+            String status = documentC.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
+                                     .getTextContent();
             if ( status.equals( "0" ) ) {
                 return;
             }
@@ -188,12 +186,8 @@ public class GameButtAG extends AbstractGameButt {
                 + "/\\\\\\\\/method=gb/\\\\\\\\/password=%s", reqJoinGame.getAgent(), reqJoinGame.getGameMemberId(),
                 reqJoinGame.getGameMemberId() );
         Document document = request( params, reqJoinGame );
-        String money = document
-                .getElementsByTagName( "result" )
-                .item( 0 )
-                .getAttributes()
-                .getNamedItem( "info" )
-                .getTextContent();
+        String money = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
+                               .getTextContent();
         String msg = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "msg" ).getTextContent();
         return StringUtils.isNotBlank( msg ) ? BigDecimal.ZERO : new BigDecimal( money ).setScale( 2, RoundingMode.HALF_UP );
     }
@@ -203,12 +197,8 @@ public class GameButtAG extends AbstractGameButt {
         String params = String.format( "cagent=%s/\\\\\\\\/cur=CNY/\\\\\\\\/actype=1/\\\\\\\\/method=qos/\\\\\\\\/billno=%s",
                 reqJoinGame.getAgent(), reqJoinGame.getOrderId() );
         Document document = request( params, reqJoinGame );
-        String status = document
-                .getElementsByTagName( "result" )
-                .item( 0 )
-                .getAttributes()
-                .getNamedItem( "info" )
-                .getTextContent();
+        String status = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
+                                .getTextContent();
         return "0".equals( status );
     }
 }

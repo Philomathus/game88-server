@@ -57,7 +57,7 @@ public class MemberMoneyManager {
         BigDecimal charge   = null;
         BigDecimal codeMult = null;
         //会员充值
-        if ( enumMoney.getBcode() ) {
+        if ( enumMoney.getBcode() && mult.compareTo( BigDecimal.ZERO ) > 0 ) {
             charge   = addCount;
             codeMult = addCount.multiply( mult ).setScale( 2, RoundingMode.DOWN );
         }
@@ -91,7 +91,7 @@ public class MemberMoneyManager {
         int insertLogMoney = logMoneyMapper.insert( log, log.getUserId().substring( log.getUserId().length() - 1 ) );
         //打码
         int insertBcode = 1;
-        if ( enumMoney.getBcode() && codeMult.compareTo( BigDecimal.ZERO ) > 0 ) {
+        if ( enumMoney.getBcode() && codeMult != null && codeMult.compareTo( BigDecimal.ZERO ) > 0 ) {
             MemberBcode code = new MemberBcode();
             code.setIncome( codeMult );
             code.setCharge( addCount );

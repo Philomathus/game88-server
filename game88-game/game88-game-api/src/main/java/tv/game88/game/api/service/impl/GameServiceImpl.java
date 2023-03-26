@@ -70,6 +70,7 @@ public class GameServiceImpl implements GameService {
     @Resource
     private MemberGameMoneyService memberGameMoneyService;
 
+
     @Value( "${spring.profiles.active}" )
     private String profile;
     @Value( "${gameOrderPrefix:0}" )
@@ -184,6 +185,7 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
+
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
         try {
@@ -202,6 +204,8 @@ public class GameServiceImpl implements GameService {
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
                 // 扣除会员金额
                 memberGameMoneyService.beginGameEnter( reqJoinGame );
+                // 设置为上分操作
+                reqJoinGame.setMoneyType( 1 );
                 // 上分
                 baseGameButt.transferMoney( reqJoinGame );
             }
@@ -211,7 +215,6 @@ public class GameServiceImpl implements GameService {
         } catch ( Exception e ) {
             // 如果发生转账异常
             if ( e instanceof GameTransferException ) {
-                reqJoinGame.setMoneyType( 1 );
                 // 查询转账记录
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.enterGameSuccess( reqJoinGame );
@@ -258,6 +261,8 @@ public class GameServiceImpl implements GameService {
                     && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
                 baseGameButt.getToken( reqJoinGame );
             }
+            // 设置为下分操作
+            reqJoinGame.setMoneyType( 2 );
             BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
             // 金额高于0元才下分
             if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
@@ -270,7 +275,6 @@ public class GameServiceImpl implements GameService {
         } catch ( Exception e ) {
             // 如果发生提现异常
             if ( e instanceof GameTransferException ) {
-                reqJoinGame.setMoneyType( 2 );
                 if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.outGameSuccess( reqJoinGame );
                     return RspBase.ok( "下分成功" );
@@ -362,7 +366,7 @@ public class GameServiceImpl implements GameService {
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
-            case BOLE, JDB -> ( profile + memberId ).toLowerCase();
+            case BOLE, JDB, FG -> ( profile + memberId ).toLowerCase();
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
@@ -378,7 +382,7 @@ public class GameServiceImpl implements GameService {
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
         return switch ( gamePlatform.getGameCategory() ) {
-            case AG, BBIN, BG, XINGYUN, JDB -> this.getGameAtomicId( gamePlatform.getId() );
+            case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
@@ -386,6 +390,8 @@ public class GameServiceImpl implements GameService {
                                .concat( LocalDateTimeUtils.format( LocalDateTime.now(),
                                        LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                                .concat( RandomStringUtils.randomAlphabetic( 5 ) );
+            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
+                    LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
@@ -453,5 +459,4 @@ public class GameServiceImpl implements GameService {
         response.setData( rspData );
         return response;
     }
-
 }

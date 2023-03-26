@@ -3,6 +3,7 @@ package tv.game88.admin.system.controller;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,11 +37,14 @@ import java.util.Set;
 @RestController
 public class SysLoginController {
     @Resource
-    private ISysLoginService sysLoginService;
+    private ISysLoginService     sysLoginService;
     @Resource
-    private ISysMenuService  menuService;
+    private ISysMenuService      menuService;
     @Resource
     private SysPermissionService permissionService;
+
+    @Value( "${spring.profiles.active}" )
+    private String profile;
 
     /**
      * 登录方法
@@ -90,7 +94,7 @@ public class SysLoginController {
         List<SysMenu>       menus     = menuService.selectMenuTreeByUserId( user.getUserId() );
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "menus", menuService.buildMenus( menus ) );
-        resultMap.put( "vhostUrl", ConfigDomainCacheUtil.me.getDomainOssValue() );
+        resultMap.put( "vhostUrl", "general".equals( profile ) ? "" : ConfigDomainCacheUtil.me.getDomainOssValue() );
         return RspBase.ok( resultMap );
     }
 }

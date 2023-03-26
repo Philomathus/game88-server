@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum EnumGameCategory {
+    //
     LOTTERY( "lottery", "彩票游戏" ),
     KAIYUAN( ConstantsGame.KAI_YUAN, "开元棋牌" ),
     OG( ConstantsGame.OG, "OG电子" ),
     AG( ConstantsGame.AG, "AG电子" ),
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
-    ICG( ConstantsGame.ICG, "ICG电子" ),
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
     KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
     KAIXUAN_X( ConstantsGame.KAIXUAN_X, "凯旋棋牌X" ),
@@ -74,7 +74,6 @@ public enum EnumGameCategory {
             case AG -> List.of( 5 );
             case MG -> List.of( 6 );
             case UPG -> List.of( 7 );
-            case ICG -> List.of( 13 );
             case MEITIAN -> List.of( 14 );
             case KAIXUAN -> List.of( 15 );
             case NEWWORLD -> List.of( 17 );
@@ -107,7 +106,6 @@ public enum EnumGameCategory {
             case 5 -> AG;
             case 6 -> MG;
             case 7 -> UPG;
-            case 13 -> ICG;
             case 14 -> MEITIAN;
             case 15 -> KAIXUAN;
             case 17 -> NEWWORLD;

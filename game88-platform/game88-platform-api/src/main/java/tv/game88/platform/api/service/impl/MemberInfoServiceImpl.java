@@ -215,7 +215,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             if ( e instanceof BadCredentialsException ) {
-                log.error( e.getMessage() );
+                log.error( "密码错误:{} ", JsonUtil.object2Json( mobileLogin ) );
             } else {
                 log.error( e.getMessage(), e );
             }
@@ -635,6 +635,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType( MediaType.APPLICATION_JSON );
+            headers.set( "agent", profile );
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( params, headers );
             try {
                 restTemplate.exchange( noticeUrl, HttpMethod.POST, requestEntity, Object.class );
@@ -722,10 +723,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( !"0".equals( markorder ) ) {
             List<LogMoney> markList = null;
             if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-                markList = logMoneyMapper.findMark( userId, markorder, money, null, userId.substring( userId.length() - 1 ), null );
+                markList = logMoneyMapper.findMark( userId, markorder, money, null, userId.substring(
+                        userId.length() - 1 ), null );
             } else {
                 BigDecimal negate = money.negate();
-                markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring( userId.length() - 1 ), null );
+                markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring(
+                        userId.length() - 1 ), null );
             }
             if ( markList.size() > 0 ) {
                 return RspBase.businessError( "请查看此笔金额是否已经入款过，如否请输入其他订单备注" );
@@ -1422,9 +1425,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<?> insertBatchExcelMoney(String userIds) {
+    public RspBase<?> insertBatchExcelMoney( String userIds ) {
         this.baseMapper.clearMemberMoney();
-        this.baseMapper.insertBatchMemberMoney(userIds);
+        this.baseMapper.insertBatchMemberMoney( userIds );
         return RspBase.ok( "member_money updated" );
     }
 

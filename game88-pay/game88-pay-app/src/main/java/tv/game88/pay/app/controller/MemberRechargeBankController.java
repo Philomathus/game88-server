@@ -15,6 +15,7 @@ import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,8 +28,13 @@ public class MemberRechargeBankController extends BaseController {
     @Operation( summary = "获取充值银行卡列表" )
     @PostMapping( "/rechargeBankList" )
     public RspBase<List<RspPayRechargeBank>> rechargeBankList() {
-        PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        List<RspPayRechargeBank> data = memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
+        PlatformUser             platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
+        List<RspPayRechargeBank> data;
+        if ( platformUser.getStatus() == 6 ) {
+            data = new ArrayList<>();
+        } else {
+            data = memberRechargeBankService.selectList( platformUser.getId(), platformUser.getVip() );
+        }
         return RspBase.ok( data );
     }
 

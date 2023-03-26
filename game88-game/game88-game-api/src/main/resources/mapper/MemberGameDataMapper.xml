@@ -53,14 +53,13 @@
                m.game_start_time,
                m.game_end_time,
                m.game_round,
-               cg.platform_name,
-               cg.son_platform_name
+               p.name platform_name,
+               i.name son_platform_name
         FROM member_game_data${tableLast} m
-                 LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
-            AND m.kind_id = cg.son_platform_id
+                 LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
+                 LEFT JOIN game_platform p ON m.platform_id = p.id
         <where>
-            <include refid="whereSelect">
-            </include>
+            <include refid="whereSelect" />
         </where>
     </select>
 
@@ -72,7 +71,7 @@
             and m.account = #{account}
         </if>
         <if test="sonPlatformName != null and sonPlatformName != ''">
-            and cg.son_platform_name = #{sonPlatformName}
+            and i.name = #{sonPlatformName}
         </if>
         <if test="agent != null and agent != ''">
             and m.agent = #{agent}
@@ -166,18 +165,18 @@
     </update>
 
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
-        select game_id, cell_score, profit, game_end_time create_time, all_bet, agent, platform_id
-        from member_game_data${dbNodes}
-        where 1 = 1
+        select d.game_id, d.cell_score, d.profit, d.game_end_time create_time, d.all_bet, d.agent, d.platform_id
+        from member_game_data${dbNodes} d
+                 left join game_platform p on d.platform_id = p.id
+        where d.game_end_time &gt;= #{beginTime}
+          and d.game_end_time &lt;= #{endTime}
         <if test="memberId != null and memberId != ''">
-            and account = #{memberId}
+            and d.account = #{memberId}
         </if>
-        <if test="req != null and req.platformId != null">
-            and platform_id = #{req.platformId}
+        <if test="req != null and req.gameCategory != null">
+            and p.game_category = #{req.gameCategory}
         </if>
-        and game_end_time &gt;= #{beginTime}
-        and game_end_time &lt;= #{endTime}
-        order by game_end_time desc
+        order by d.game_end_time desc
     </select>
 
     <select id="getCountMemberGameDataList" resultType="tv.game88.game.api.entity.MemberGameData">
@@ -185,11 +184,18 @@
                cast(SUM(all_bet) AS decimal(10, 2))    totalBet,
                cast(SUM(profit) AS decimal(10, 2))     totalIncome
         FROM member_game_data${tableLast} m
-                 LEFT JOIN config_gametype cg ON m.agent = cg.platform_id
-            AND m.kind_id = cg.son_platform_id
+                 LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
         <where>
             <include refid="whereSelect">
             </include>
         </where>
+    </select>
+
+    <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
+        select platform_id, kind_id, sum(ABS(profit)) profit
+        from member_game_data${dbNodes}
+        where status = 0
+          and account = #{memberId}
+        GROUP BY platform_id, kind_id
     </select>
 </mapper>

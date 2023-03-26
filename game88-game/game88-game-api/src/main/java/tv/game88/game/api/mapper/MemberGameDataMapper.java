@@ -37,4 +37,6 @@ public interface MemberGameDataMapper extends BaseMapper<MemberGameData> {
                                              "endTime" ) String endDay );
 
     MemberGameData getCountMemberGameDataList( ReqMemberGameData reqMemberGameData );
+
+    List<MemberGameData> findMemWashPlatformKindLists( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId );
 }

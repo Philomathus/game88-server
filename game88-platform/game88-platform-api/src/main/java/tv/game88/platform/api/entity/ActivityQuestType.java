@@ -22,6 +22,11 @@ public class ActivityQuestType {
     private String name;
 
     /**
+     * 排序
+     */
+    private Integer sort;
+
+    /**
      * 创建人
      */
     private String createBy;
