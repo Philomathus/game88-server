@@ -316,10 +316,49 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
         List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
                 memberId.length() - 1 ), memberId );
+
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
+
+        List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
+        List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
+
+        List<RspGameTypeWashCode> rspGameTypeWashCodes = new ArrayList<>();
+        for ( RspGameType rspGameType : gameTypeList ) {
+            if ( Arrays.asList( 1L, 2L, 4L ).contains( rspGameType.getId() ) ) {
+                continue;
+            }
+            RspGameTypeWashCode rspGameTypeWashCode = new RspGameTypeWashCode();
+            rspGameTypeWashCode.setGameTypeId( rspGameType.getId() );
+            rspGameTypeWashCode.setGameTypeName( rspGameType.getName().replace( "-", "" ) );
+            rspGameTypeWashCode.setWashCodeAmount( BigDecimal.ZERO );
+            rspGameTypeWashCode.setCodeAmountTotal( sumGameTypeCodeMap.getOrDefault( rspGameType.getId(), BigDecimal.ZERO ) );
+            for ( ConfigWashCode washCode : configWashCodes ) {
+                if ( Objects.equals( rspGameType.getId(), washCode.getGameTypeId() ) ) {
+                    // 如果打码为0 则取第一条洗码配置
+                    if ( Objects.equals( rspGameTypeWashCode.getCodeAmountTotal(), BigDecimal.ZERO )
+                            && washCode.getCodeMin().compareTo( BigDecimal.ONE ) <= 0 ) {
+                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                    }
+                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) > 0
+                            && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
+                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
+                        rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
+                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() ) );
+                    }
+                }
+            }
+            info.setWashCodeAmount( info.getWashCodeAmount().add( rspGameTypeWashCode.getWashCodeAmount() ) );
+            rspGameTypeWashCodes.add( rspGameTypeWashCode );
+        }
+        info.setRspGameTypeWashCodes( rspGameTypeWashCodes );
+        return RspBase.ok( info );
+    }
+
+    private void processTypeCodeMap( Map<Long, BigDecimal> sumGameTypeCodeMap, List<MemberGameData> sumProfitKinds ) {
         if ( CollectionUtils.isNotEmpty( sumProfitKinds ) ) {
             Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
             Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
-
+            // 排除 热门游戏/老棋牌游戏/老电子游戏
             List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
                                                                                 .in( "kind_id", kindIds )
                                                                                 .notIn( "type_id", 1, 2, 4 ).list();
@@ -356,39 +395,6 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 }
             }
         }
-
-        List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
-        List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
-
-        List<RspGameTypeWashCode> rspGameTypeWashCodes = new ArrayList<>();
-        for ( RspGameType rspGameType : gameTypeList ) {
-            if ( Arrays.asList( 1L, 2L, 4L ).contains( rspGameType.getId() ) ) {
-                continue;
-            }
-            RspGameTypeWashCode rspGameTypeWashCode = new RspGameTypeWashCode();
-            rspGameTypeWashCode.setGameTypeId( rspGameType.getId() );
-            rspGameTypeWashCode.setGameTypeName( rspGameType.getName().replace( "-", "" ) );
-            rspGameTypeWashCode.setWashCodeAmount( BigDecimal.ZERO );
-            rspGameTypeWashCode.setCodeAmountTotal( sumGameTypeCodeMap.getOrDefault( rspGameType.getId(), BigDecimal.ZERO ) );
-            for ( ConfigWashCode washCode : configWashCodes ) {
-                if ( Objects.equals( rspGameType.getId(), washCode.getGameTypeId() ) ) {
-                    // 如果打码为0 则取第一条洗码配置
-                    if ( Objects.equals( rspGameTypeWashCode.getCodeAmountTotal(), BigDecimal.ZERO )
-                            && washCode.getCodeMin().compareTo( BigDecimal.ONE ) <= 0 ) {
-                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
-                    }
-                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) > 0
-                            && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
-                        rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
-                        rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
-                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() ) );
-                    }
-                }
-            }
-            rspGameTypeWashCodes.add( rspGameTypeWashCode );
-        }
-        info.setRspGameTypeWashCodes( rspGameTypeWashCodes );
-        return RspBase.ok( info );
     }
 
     @Override
@@ -416,45 +422,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         if ( CollectionUtils.isEmpty( sumProfitKinds ) ) {
             return;
         }
-        Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
-        Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
-
-        // 排除 热门游戏/老棋牌游戏/老电子游戏
-        List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
-                                                                            .in( "kind_id", kindIds ).notIn( "type_id", 1, 2, 4 )
-                                                                            .list();
         Map<Long, BigDecimal> sumGameTypeCodeMap = new HashMap<>();
-        for ( MemberGameData memberGameData : sumProfitKinds ) {
-            for ( GameInfo gameInfo : gameInfos ) {
-                if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
-                        memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
-                                "-" + memberGameData.getKindId() ) ) ) {
-                    Long       gameTypeId = gameInfo.getTypeId();
-                    BigDecimal profit     = new BigDecimal( memberGameData.getProfit() );
 
-                    if ( gameTypeId != null ) {
-                        BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                        sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
-                    } else {
-                        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
-                        if ( gamePlatform.getName().contains( "棋牌" ) ) {
-                            gameTypeId = 8L;
-                        } else if ( gamePlatform.getName().contains( "电子" ) ) {
-                            gameTypeId = 9L;
-                        } else if ( gamePlatform.getName().contains( "视讯" ) ) {
-                            gameTypeId = 7L;
-                        } else {
-                            log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
-                                    memberGameData.getKindId() );
-                        }
-                        if ( gameTypeId != null ) {
-                            BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                            sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
-                        }
-                    }
-                }
-            }
-        }
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
 
         List<GameWashCodeLog> gameWashCodeLogs = new ArrayList<>();
         LocalDateTime         now              = LocalDateTime.now();
