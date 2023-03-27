@@ -325,34 +325,33 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                                                                                 .notIn( "type_id", 1, 2, 4 ).list();
 
             for ( MemberGameData memberGameData : sumProfitKinds ) {
-                Long       gameTypeId = null;
-                BigDecimal profit     = null;
                 for ( GameInfo gameInfo : gameInfos ) {
                     if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
                             memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
                                     "-" + memberGameData.getKindId() ) ) ) {
-                        gameTypeId = gameInfo.getTypeId();
-                        profit     = new BigDecimal( memberGameData.getProfit() );
-                    }
-                }
-                if ( gameTypeId != null ) {
-                    BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                    sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-                } else {
-                    GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
-                    if ( gamePlatform.getName().contains( "棋牌" ) ) {
-                        gameTypeId = 8L;
-                    } else if ( gamePlatform.getName().contains( "电子" ) ) {
-                        gameTypeId = 9L;
-                    } else if ( gamePlatform.getName().contains( "视讯" ) ) {
-                        gameTypeId = 7L;
-                    } else {
-                        log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
-                                memberGameData.getKindId() );
-                    }
-                    if ( gameTypeId != null ) {
-                        BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                        sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
+                        Long       gameTypeId = gameInfo.getTypeId();
+                        BigDecimal profit     = new BigDecimal( memberGameData.getProfit() );
+                        if ( gameTypeId != null ) {
+                            BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                            sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                        } else {
+                            GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId()
+                                                                                                      .longValue() );
+                            if ( gamePlatform.getName().contains( "棋牌" ) ) {
+                                gameTypeId = 8L;
+                            } else if ( gamePlatform.getName().contains( "电子" ) ) {
+                                gameTypeId = 9L;
+                            } else if ( gamePlatform.getName().contains( "视讯" ) ) {
+                                gameTypeId = 7L;
+                            } else {
+                                log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
+                                        memberGameData.getKindId() );
+                            }
+                            if ( gameTypeId != null ) {
+                                BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                                sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                            }
+                        }
                     }
                 }
             }
@@ -426,33 +425,33 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                                                                             .list();
         Map<Long, BigDecimal> sumGameTypeCodeMap = new HashMap<>();
         for ( MemberGameData memberGameData : sumProfitKinds ) {
-            Long       gameTypeId = null;
-            BigDecimal profit     = null;
             for ( GameInfo gameInfo : gameInfos ) {
                 if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
                         memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
                                 "-" + memberGameData.getKindId() ) ) ) {
-                    gameTypeId = gameInfo.getTypeId();
-                    profit     = new BigDecimal( memberGameData.getProfit() );
-                }
-            }
-            if ( gameTypeId != null ) {
-                BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-            } else {
-                GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
-                if ( gamePlatform.getName().contains( "棋牌" ) ) {
-                    gameTypeId = 8L;
-                } else if ( gamePlatform.getName().contains( "电子" ) ) {
-                    gameTypeId = 9L;
-                } else if ( gamePlatform.getName().contains( "视讯" ) ) {
-                    gameTypeId = 7L;
-                } else {
-                    log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(), memberGameData.getKindId() );
-                }
-                if ( gameTypeId != null ) {
-                    BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                    sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
+                    Long       gameTypeId = gameInfo.getTypeId();
+                    BigDecimal profit     = new BigDecimal( memberGameData.getProfit() );
+
+                    if ( gameTypeId != null ) {
+                        BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                        sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                    } else {
+                        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
+                        if ( gamePlatform.getName().contains( "棋牌" ) ) {
+                            gameTypeId = 8L;
+                        } else if ( gamePlatform.getName().contains( "电子" ) ) {
+                            gameTypeId = 9L;
+                        } else if ( gamePlatform.getName().contains( "视讯" ) ) {
+                            gameTypeId = 7L;
+                        } else {
+                            log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
+                                    memberGameData.getKindId() );
+                        }
+                        if ( gameTypeId != null ) {
+                            BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                            sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                        }
+                    }
                 }
             }
         }
