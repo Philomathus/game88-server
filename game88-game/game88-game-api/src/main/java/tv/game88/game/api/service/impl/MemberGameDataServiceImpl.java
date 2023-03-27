@@ -433,16 +433,12 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
             if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
                 BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
-                // 过滤掉一分钱以下的
-                if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
-                    continue;
-                }
                 GameWashCodeLog gameWashCodeLog = new GameWashCodeLog();
                 gameWashCodeLog.setWashCodeTime( now );
                 gameWashCodeLog.setMemberId( memberId );
                 gameWashCodeLog.setGameTypeId( washCode.getGameTypeId() );
                 gameWashCodeLog.setWashCodeRate( washCode.getWashCodeRate() );
-                gameWashCodeLog.setWashCodeAmount( singeWashCode );
+                gameWashCodeLog.setWashCodeAmount( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ? BigDecimal.ZERO : singeWashCode );
                 gameWashCodeLog.setCodeAmount( value );
                 gameWashCodeLogs.add( gameWashCodeLog );
             }
@@ -452,6 +448,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     }
 
     @Override
+    @Transactional( rollbackFor = Exception.class )
     public void opWashCode( String memberId, List<GameWashCodeLog> gameWashCodeLogs, LocalDateTime now, String washId ) {
         this.baseMapper.updateByBatchClean( memberId.substring( memberId.length() - 1 ), memberId );
 
