@@ -26,4 +26,6 @@ public class GameWashCodeLog {
     private LocalDateTime washCodeTime;
     @Schema( title = "游戏类型ID" )
     private Long          gameTypeId;
+    @Schema( title = "打码比例" )
+    private BigDecimal    beat;
 }

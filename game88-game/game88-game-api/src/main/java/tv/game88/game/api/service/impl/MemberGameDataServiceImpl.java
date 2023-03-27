@@ -440,6 +440,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 gameWashCodeLog.setWashCodeRate( washCode.getWashCodeRate() );
                 gameWashCodeLog.setWashCodeAmount( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ? BigDecimal.ZERO : singeWashCode );
                 gameWashCodeLog.setCodeAmount( value );
+                gameWashCodeLog.setBeat( washCode.getBeat() );
                 gameWashCodeLogs.add( gameWashCodeLog );
             }
         }
@@ -465,7 +466,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
             BigDecimal value = gameWashCodeLog.getWashCodeAmount().setScale( 2, RoundingMode.HALF_UP );
             String     name  = "洗码金额:" + gameWashCodeLog.getCodeAmount() + "存入:" + value;
-            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getWashCodeRate(), name,
+            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getBeat(), name,
                     washId_, washId_ );
         }
     }
