@@ -66,7 +66,26 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Override
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
         pingjieReq( reqMemberGameData );
-        return this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
+            Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
+            Set<String>  kindIds     = memberGameData.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
+            // 排除 热门游戏/老棋牌游戏/老电子游戏
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
+                                                                                .in( "kind_id", kindIds ).list();
+
+            for ( MemberGameData memberGameDatum : memberGameData ) {
+                GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
+                memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
+                for ( GameInfo gameInfo : gameInfos ) {
+                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && memberGameDatum.getKindId()
+                                                                                                                  .equals( gameInfo.getKindId() ) ) {
+                        memberGameDatum.setSonPlatformName( gameInfo.getName() );
+                    }
+                }
+            }
+        }
+        return memberGameData;
     }
 
     private void pingjieReq( ReqMemberGameData reqMemberGameData ) {
@@ -432,13 +451,14 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         for ( ConfigWashCode washCode : configWashCodes ) {
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
             if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
-                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
+                BigDecimal      singeWashCode   = washCode.getWashCodeRate().multiply( value );
                 GameWashCodeLog gameWashCodeLog = new GameWashCodeLog();
                 gameWashCodeLog.setWashCodeTime( now );
                 gameWashCodeLog.setMemberId( memberId );
                 gameWashCodeLog.setGameTypeId( washCode.getGameTypeId() );
                 gameWashCodeLog.setWashCodeRate( washCode.getWashCodeRate() );
-                gameWashCodeLog.setWashCodeAmount( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ? BigDecimal.ZERO : singeWashCode );
+                gameWashCodeLog.setWashCodeAmount(
+                        singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ? BigDecimal.ZERO : singeWashCode );
                 gameWashCodeLog.setCodeAmount( value );
                 gameWashCodeLog.setBeat( washCode.getBeat() );
                 gameWashCodeLogs.add( gameWashCodeLog );
@@ -466,8 +486,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
             BigDecimal value = gameWashCodeLog.getWashCodeAmount().setScale( 2, RoundingMode.HALF_UP );
             String     name  = "洗码金额:" + gameWashCodeLog.getCodeAmount() + "存入:" + value;
-            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getBeat(), name,
-                    washId_, washId_ );
+            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getBeat(), name, washId_,
+                    washId_ );
         }
     }
 }
