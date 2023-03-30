@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
@@ -451,18 +452,23 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         for ( ConfigWashCode washCode : configWashCodes ) {
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
             if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
-                BigDecimal      singeWashCode   = washCode.getWashCodeRate().multiply( value );
+                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
+                if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
+                    continue;
+                }
                 GameWashCodeLog gameWashCodeLog = new GameWashCodeLog();
                 gameWashCodeLog.setWashCodeTime( now );
                 gameWashCodeLog.setMemberId( memberId );
                 gameWashCodeLog.setGameTypeId( washCode.getGameTypeId() );
                 gameWashCodeLog.setWashCodeRate( washCode.getWashCodeRate() );
-                gameWashCodeLog.setWashCodeAmount(
-                        singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ? BigDecimal.ZERO : singeWashCode );
+                gameWashCodeLog.setWashCodeAmount( singeWashCode );
                 gameWashCodeLog.setCodeAmount( value );
                 gameWashCodeLog.setBeat( washCode.getBeat() );
                 gameWashCodeLogs.add( gameWashCodeLog );
             }
+        }
+        if ( CollectionUtils.isEmpty( gameWashCodeLogs ) ) {
+            throw new BusinessException( "洗码金额不足0.01元,无需洗码" );
         }
         String washId = IdWorker.get32UUID();
         SpringUtils.getBean( MemberGameDataService.class ).opWashCode( memberId, gameWashCodeLogs, now, washId );
