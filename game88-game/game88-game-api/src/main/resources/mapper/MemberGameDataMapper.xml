@@ -189,7 +189,7 @@
     <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
         select platform_id, kind_id, sum(ABS(cell_score)) cell_score
         from member_game_data${dbNodes}
-        where status = 0
+        where status = 0 and profit <![CDATA[ <> ]]> 0
           and account = #{memberId}
         GROUP BY platform_id, kind_id
     </select>
