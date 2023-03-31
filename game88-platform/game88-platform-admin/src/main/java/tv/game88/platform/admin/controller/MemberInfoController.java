@@ -194,9 +194,6 @@ public class MemberInfoController extends BaseController {
     @Log( title = "加分", businessType = BusinessType.UPDATE )
     public RspBase<?> addScore( @RequestBody ReqAddScore req ) throws Exception {
         SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
-        if ( req.getBeatNum() != null && req.getBeatNum().compareTo( new BigDecimal( 100 ) ) >= 0 ) {
-            return RspBase.businessError( "打码倍数过大,请检查" );
-        }
         if ( !redisUtil.lock( "memberAddScore" + req.getId(), 15 ) ) {
             return RspBase.businessError( "请勿重复提交" );
         }
