@@ -49,8 +49,11 @@ public class ReportPlamGamesController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('report:plam-games:list')" )
     @GetMapping( "/list" )
-    public Object list( ReportPlamGames reportPlamGames ) throws ParseException {
-        return reportPlamGamesService.selectReportPlamGamesList( reportPlamGames );
+    public RspBase<List<ReportPlamGames>> list( ReportPlamGames reportPlamGames ) throws ParseException {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        startPage( pageDomain );
+        List<ReportPlamGames> list = reportPlamGamesService.selectReportPlamGamesList( reportPlamGames );
+        return getRspBasePage(list, pageDomain);
 
     }
 
