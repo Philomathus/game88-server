@@ -187,7 +187,7 @@
     </select>
 
     <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
-        select platform_id, kind_id, sum(ABS(profit)) profit
+        select platform_id, kind_id, sum(ABS(cell_score)) cell_score
         from member_game_data${dbNodes}
         where status = 0
           and account = #{memberId}

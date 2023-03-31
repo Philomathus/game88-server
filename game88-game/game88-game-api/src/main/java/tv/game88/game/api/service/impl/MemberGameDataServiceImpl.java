@@ -389,10 +389,10 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
                                     "-" + memberGameData.getKindId() ) ) ) {
                         Long       gameTypeId = gameInfo.getTypeId();
-                        BigDecimal profit     = new BigDecimal( memberGameData.getProfit() );
+                        BigDecimal cellScore     = new BigDecimal( memberGameData.getCellScore() );
                         if ( gameTypeId != null ) {
                             BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                            sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                            sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
                         } else {
                             GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId()
                                                                                                       .longValue() );
@@ -408,7 +408,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             }
                             if ( gameTypeId != null ) {
                                 BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                                sumGameTypeCodeMap.put( gameTypeId, value == null ? profit : value.add( profit ) );
+                                sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
                             }
                         }
                     }
