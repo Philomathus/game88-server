@@ -41,11 +41,14 @@
             <if test="gameplame != null  and gameplame != ''">
                 and gameplame = #{gameplame}
             </if>
-            <if test="begindate != null">
-                and begindate = #{begindate}
+            <if test="begindate != null and begindate != ''">
+                and begindate <![CDATA[ >= ]]> #{begindate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and begindate <![CDATA[ <= ]]> #{endDate}
             </if>
         </where>
-        order by game_uuid desc
+        order by begindate desc
     </select>
     <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
         {call prorep_plamgame(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
