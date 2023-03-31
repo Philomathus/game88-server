@@ -36,7 +36,18 @@
 
     <select id="selectReportPlamGamesList" parameterType="tv.game88.platform.api.entity.ReportPlamGames"
             resultMap="ReportPlamGamesResult">
-        <include refid="selectReportPlamGamesVo" />
+        select
+            sum(gamepepole)     as gamepepole,
+            sum(gametouzhu)     as gametouzhu,
+            sum(gamecell)       as gamecell,
+            sum(gamebet)        as gamebet,
+            sum(gamerevenve)    as gamerevenve,
+            sum(gameprofit)     as gameprofit,
+            sum(plampfit)       as plampfit,
+            CONCAT(ROUND(convert(-sum(gameprofit),decimal(10,2)) / convert(sum(gamecell),decimal(10,2)) * 100,2),'%') as bili,
+            CONCAT( #{begindate}, ' - ',#{endDate} ) as begindate
+        from
+             report_plam_games
         <where>
             <if test="gameplame != null  and gameplame != ''">
                 and gameplame = #{gameplame}
@@ -48,8 +59,11 @@
                 and begindate <![CDATA[ <= ]]> #{endDate}
             </if>
         </where>
-        order by begindate desc
+        GROUP BY
+            gameagent,gameplame
+
     </select>
+
     <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
         {call prorep_plamgame(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
                               #{result,mode=OUT,jdbcType=VARCHAR})}
