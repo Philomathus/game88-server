@@ -1,6 +1,7 @@
 package tv.game88.game.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,4 +27,7 @@ public class GameWashCodeLog {
     private LocalDateTime washCodeTime;
     @Schema( title = "游戏类型ID" )
     private Long          gameTypeId;
+    @TableField( exist = false )
+    @Schema( title = "打码比例" )
+    private BigDecimal    beat;
 }

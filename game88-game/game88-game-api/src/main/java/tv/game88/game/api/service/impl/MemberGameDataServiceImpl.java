@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
@@ -66,7 +67,26 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Override
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
         pingjieReq( reqMemberGameData );
-        return this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
+            Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
+            Set<String>  kindIds     = memberGameData.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
+            // 排除 热门游戏/老棋牌游戏/老电子游戏
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
+                                                                                .in( "kind_id", kindIds ).list();
+
+            for ( MemberGameData memberGameDatum : memberGameData ) {
+                GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
+                memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
+                for ( GameInfo gameInfo : gameInfos ) {
+                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && memberGameDatum.getKindId()
+                                                                                                                  .equals( gameInfo.getKindId() ) ) {
+                        memberGameDatum.setSonPlatformName( gameInfo.getName() );
+                    }
+                }
+            }
+        }
+        return memberGameData;
     }
 
     private void pingjieReq( ReqMemberGameData reqMemberGameData ) {
@@ -316,53 +336,17 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
         List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
                 memberId.length() - 1 ), memberId );
-        if ( CollectionUtils.isNotEmpty( sumProfitKinds ) ) {
-            Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
-            Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
 
-            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
-                                                                                .in( "kind_id", kindIds )
-                                                                                .notIn( "type_id", 1, 2, 4 ).list();
-
-            for ( MemberGameData memberGameData : sumProfitKinds ) {
-                Long       gameTypeId = null;
-                BigDecimal profit     = null;
-                for ( GameInfo gameInfo : gameInfos ) {
-                    if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
-                            memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
-                                    "-" + memberGameData.getKindId() ) ) ) {
-                        gameTypeId = gameInfo.getTypeId();
-                        profit     = new BigDecimal( memberGameData.getProfit() );
-                    }
-                }
-                if ( gameTypeId != null ) {
-                    BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                    sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-                } else {
-                    GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
-                    if ( gamePlatform.getName().contains( "棋牌" ) ) {
-                        gameTypeId = 8L;
-                    } else if ( gamePlatform.getName().contains( "电子" ) ) {
-                        gameTypeId = 9L;
-                    } else if ( gamePlatform.getName().contains( "视讯" ) ) {
-                        gameTypeId = 7L;
-                    } else {
-                        log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
-                                memberGameData.getKindId() );
-                    }
-                    if ( gameTypeId != null ) {
-                        BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                        sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-                    }
-                }
-            }
-        }
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
 
         List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
         List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
 
         List<RspGameTypeWashCode> rspGameTypeWashCodes = new ArrayList<>();
         for ( RspGameType rspGameType : gameTypeList ) {
+            if ( Arrays.asList( 1L, 2L, 4L ).contains( rspGameType.getId() ) ) {
+                continue;
+            }
             RspGameTypeWashCode rspGameTypeWashCode = new RspGameTypeWashCode();
             rspGameTypeWashCode.setGameTypeId( rspGameType.getId() );
             rspGameTypeWashCode.setGameTypeName( rspGameType.getName().replace( "-", "" ) );
@@ -383,10 +367,54 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     }
                 }
             }
+            info.setWashCodeAmount( info.getWashCodeAmount().add( rspGameTypeWashCode.getWashCodeAmount() ) );
             rspGameTypeWashCodes.add( rspGameTypeWashCode );
         }
         info.setRspGameTypeWashCodes( rspGameTypeWashCodes );
         return RspBase.ok( info );
+    }
+
+    private void processTypeCodeMap( Map<Long, BigDecimal> sumGameTypeCodeMap, List<MemberGameData> sumProfitKinds ) {
+        if ( CollectionUtils.isNotEmpty( sumProfitKinds ) ) {
+            Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
+            Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
+            // 排除 热门游戏/老棋牌游戏/老电子游戏
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
+                                                                                .in( "kind_id", kindIds )
+                                                                                .notIn( "type_id", 1, 2, 4 ).list();
+
+            for ( MemberGameData memberGameData : sumProfitKinds ) {
+                for ( GameInfo gameInfo : gameInfos ) {
+                    if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
+                            memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
+                                    "-" + memberGameData.getKindId() ) ) ) {
+                        Long       gameTypeId = gameInfo.getTypeId();
+                        BigDecimal cellScore     = new BigDecimal( memberGameData.getCellScore() );
+                        if ( gameTypeId != null ) {
+                            BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                            sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
+                        } else {
+                            GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId()
+                                                                                                      .longValue() );
+                            if ( gamePlatform.getName().contains( "棋牌" ) ) {
+                                gameTypeId = 8L;
+                            } else if ( gamePlatform.getName().contains( "电子" ) ) {
+                                gameTypeId = 9L;
+                            } else if ( gamePlatform.getName().contains( "视讯" ) ) {
+                                gameTypeId = 7L;
+                            } else {
+                                log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
+                                        memberGameData.getKindId() );
+                            }
+                            if ( gameTypeId != null ) {
+                                BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
+                                sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -414,45 +442,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         if ( CollectionUtils.isEmpty( sumProfitKinds ) ) {
             return;
         }
-        Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
-        Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
-
-        // 排除 热门游戏/老棋牌游戏/老电子游戏
-        List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
-                                                                            .in( "kind_id", kindIds ).notIn( "type_id", 1, 2, 4 )
-                                                                            .list();
         Map<Long, BigDecimal> sumGameTypeCodeMap = new HashMap<>();
-        for ( MemberGameData memberGameData : sumProfitKinds ) {
-            Long       gameTypeId = null;
-            BigDecimal profit     = null;
-            for ( GameInfo gameInfo : gameInfos ) {
-                if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
-                        memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
-                                "-" + memberGameData.getKindId() ) ) ) {
-                    gameTypeId = gameInfo.getTypeId();
-                    profit     = new BigDecimal( memberGameData.getProfit() );
-                }
-            }
-            if ( gameTypeId != null ) {
-                BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-            } else {
-                GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId().longValue() );
-                if ( gamePlatform.getName().contains( "棋牌" ) ) {
-                    gameTypeId = 8L;
-                } else if ( gamePlatform.getName().contains( "电子" ) ) {
-                    gameTypeId = 9L;
-                } else if ( gamePlatform.getName().contains( "视讯" ) ) {
-                    gameTypeId = 7L;
-                } else {
-                    log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(), memberGameData.getKindId() );
-                }
-                if ( gameTypeId != null ) {
-                    BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
-                    sumGameTypeCodeMap.put( gameTypeId, value == null ? BigDecimal.ZERO : value.add( profit ) );
-                }
-            }
-        }
+
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
 
         List<GameWashCodeLog> gameWashCodeLogs = new ArrayList<>();
         LocalDateTime         now              = LocalDateTime.now();
@@ -461,7 +453,6 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
             if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
                 BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
-                // 过滤掉一分钱以下的
                 if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
                     continue;
                 }
@@ -472,14 +463,19 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 gameWashCodeLog.setWashCodeRate( washCode.getWashCodeRate() );
                 gameWashCodeLog.setWashCodeAmount( singeWashCode );
                 gameWashCodeLog.setCodeAmount( value );
+                gameWashCodeLog.setBeat( washCode.getBeat() );
                 gameWashCodeLogs.add( gameWashCodeLog );
             }
+        }
+        if ( CollectionUtils.isEmpty( gameWashCodeLogs ) ) {
+            throw new BusinessException( "洗码金额不足0.01元,无需洗码" );
         }
         String washId = IdWorker.get32UUID();
         SpringUtils.getBean( MemberGameDataService.class ).opWashCode( memberId, gameWashCodeLogs, now, washId );
     }
 
     @Override
+    @Transactional( rollbackFor = Exception.class )
     public void opWashCode( String memberId, List<GameWashCodeLog> gameWashCodeLogs, LocalDateTime now, String washId ) {
         this.baseMapper.updateByBatchClean( memberId.substring( memberId.length() - 1 ), memberId );
 
@@ -496,8 +492,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
             BigDecimal value = gameWashCodeLog.getWashCodeAmount().setScale( 2, RoundingMode.HALF_UP );
             String     name  = "洗码金额:" + gameWashCodeLog.getCodeAmount() + "存入:" + value;
-            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getWashCodeRate(), name,
-                    washId_, washId_ );
+            memberMoneyManager.addMemberMoney( memberId, value, EnumMoney.CODE_CLEAN, gameWashCodeLog.getBeat(), name, washId_,
+                    washId_ );
         }
     }
 }

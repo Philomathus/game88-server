@@ -52,12 +52,8 @@
                m.platform_id,
                m.game_start_time,
                m.game_end_time,
-               m.game_round,
-               p.name platform_name,
-               i.name son_platform_name
+               m.game_round
         FROM member_game_data${tableLast} m
-                 LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
-                 LEFT JOIN game_platform p ON m.platform_id = p.id
         <where>
             <include refid="whereSelect" />
         </where>
@@ -70,9 +66,9 @@
         <if test="account != null and account != ''">
             and m.account = #{account}
         </if>
-        <if test="sonPlatformName != null and sonPlatformName != ''">
+        <!--<if test="sonPlatformName != null and sonPlatformName != ''">
             and i.name = #{sonPlatformName}
-        </if>
+        </if>-->
         <if test="agent != null and agent != ''">
             and m.agent = #{agent}
         </if>
@@ -184,7 +180,6 @@
                cast(SUM(all_bet) AS decimal(10, 2))    totalBet,
                cast(SUM(profit) AS decimal(10, 2))     totalIncome
         FROM member_game_data${tableLast} m
-                 LEFT JOIN game_info i ON m.platform_id = i.platform_id and m.kind_id = i.kind_id
         <where>
             <include refid="whereSelect">
             </include>
@@ -192,9 +187,9 @@
     </select>
 
     <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
-        select platform_id, kind_id, sum(ABS(profit)) profit
+        select platform_id, kind_id, sum(ABS(cell_score)) cell_score
         from member_game_data${dbNodes}
-        where status = 0
+        where status = 0 and profit <![CDATA[ <> ]]> 0
           and account = #{memberId}
         GROUP BY platform_id, kind_id
     </select>
