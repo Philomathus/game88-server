@@ -562,7 +562,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberInfo m = new MemberInfo();
         m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
         m.setId( makeMemberCode() );
-        if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) ) {
+        if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) && StringUtils.isAlphanumeric( mobileLogin.getInviterCode() ) ) {
             try {
                 m.setInviterCode( mobileLogin.getInviterCode() );
             } catch ( Exception e ) {
