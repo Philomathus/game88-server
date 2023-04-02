@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.platform.api.mapper.ReportPlamGamesMapper">
+    <select id="selectReportPlamGamesList" parameterType="tv.game88.platform.api.entity.ReportPlamGames"
+            resultMap="ReportPlamGamesResult">
+        select
+        gameagent,
+        gameplame,
+        sum(gamepepole)     as gamepepole,
+        sum(gametouzhu)     as gametouzhu,
+        sum(gamecell)       as gamecell,
+        sum(gamebet)        as gamebet,
+        sum(gameprofit)     as gameprofit,
+        CONCAT(ROUND(convert(sum(gameprofit),decimal(10,2)) / convert(sum(gamecell),decimal(10,2)) * 100,2),'%') as bili,
+        <choose>
+            <when test="endDate != null">
+                CONCAT( #{begindate}, ' - ', #{endDate} ) as begindate
+            </when>
+            <otherwise>
+                begindate
+            </otherwise>
+        </choose>
+        from
+        report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">
+                and gameplame = #{gameplame}
+            </if>
+            <if test="begindate != null and begindate != ''">
+                and begindate <![CDATA[ >= ]]> #{begindate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and begindate <![CDATA[ <= ]]> #{endDate}
+            </if>
+        </where>
+        GROUP BY
+        gameagent,gameplame
+        ORDER BY game_uuid DESC
+    </select>
+
     <resultMap type="tv.game88.platform.api.entity.ReportPlamGames" id="ReportPlamGamesResult">
         <result property="gameUuid" column="game_uuid" />
         <result property="gameagent" column="gameagent" />
@@ -34,19 +71,6 @@
         from report_plam_games
     </sql>
 
-    <select id="selectReportPlamGamesList" parameterType="tv.game88.platform.api.entity.ReportPlamGames"
-            resultMap="ReportPlamGamesResult">
-        <include refid="selectReportPlamGamesVo" />
-        <where>
-            <if test="gameplame != null  and gameplame != ''">
-                and gameplame = #{gameplame}
-            </if>
-            <if test="begindate != null">
-                and begindate = #{begindate}
-            </if>
-        </where>
-        order by game_uuid desc
-    </select>
     <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
         {call prorep_plamgame(#{timedateta,mode=IN,jdbcType=VARCHAR}, #{timedateta,mode=IN,jdbcType=VARCHAR},
                               #{result,mode=OUT,jdbcType=VARCHAR})}

@@ -3,6 +3,7 @@ package tv.game88.platform.api.service.impl;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.vo.RspBase;
 import tv.game88.platform.api.dto.RspPlamGamesMonth;
 import tv.game88.platform.api.entity.ReportPlamGames;
 import tv.game88.platform.api.mapper.ReportPlamGamesMapper;
@@ -24,7 +25,7 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
     private RedisUtils            redisUtils;
 
     @Override
-    public Object selectReportPlamGamesList( ReportPlamGames reportPlamGames ) {
+    public List<ReportPlamGames> selectReportPlamGamesList(ReportPlamGames reportPlamGames ) {
         String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
 
         if ( dateNowStr.equals( reportPlamGames.getBegindate() ) ) {
@@ -32,10 +33,11 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
                 storage( dateNowStr );
             }
         }
-        List<ReportPlamGames> allList   = reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
-        Map<String, Object>   resultMap = new HashMap<>();
-        resultMap.put( "rows", allList );
-        return resultMap;
+//        List<ReportPlamGames> allList   = reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
+//        Map<String, Object>   resultMap = new HashMap<>();
+//        resultMap.put( "rows", allList );
+//        return resultMap;
+        return reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
     }
 
     @Override
