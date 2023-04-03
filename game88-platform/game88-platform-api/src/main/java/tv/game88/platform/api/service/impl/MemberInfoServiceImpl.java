@@ -845,15 +845,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberCard memberCard1 = new MemberCard();
         memberCard1.setBankAccount( member.getBankAccount() );
         memberCard1.setMemberId( member.getMemberId() );
-        List<MemberCard> memberCards = memberCardMapper.selectMemberCardList( memberCard1 );
-        if ( !memberCards.isEmpty() ) {
-            MemberCard memberCard2 = memberCards.get( 0 );
-            //判断绑定的与修改成的是不是同一个,如果不是就不能修改
-            if ( !memberCard2.getId().equals( member.getId() ) ) {
-                log.error( "修改的id: {},上传的id: {}", memberCard2.getId(), member.getId() );
-                return RspBase.businessError( "用户已绑定该银行卡" );
-            }
+
+        List<MemberCard> memberCardList = memberCardMapper.findAllByBankAccount( member );
+        if(memberCardList.stream()
+                .filter((mc) -> !mc.getId().equals(member.getId()))
+                .anyMatch((mc) -> mc.getBankAccount().equals(member.getBankAccount()))){
+            return RspBase.businessError( "卡已绑定账号" );
         }
+
         MemberCard memberCard = memberCardMapper.selectById( id );
         memberCard.setRealName( member.getRealName() );
         memberCard.setBankId( member.getBankId() );
