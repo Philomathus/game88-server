@@ -96,6 +96,7 @@ public class VipPayServiceImpl implements VipPayService {
             }
             return JsonUtil.json2Map( text );
         } );
+        log.info( "vipPay登录信息:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String              code   = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
