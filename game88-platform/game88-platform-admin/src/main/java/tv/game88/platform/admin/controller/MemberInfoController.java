@@ -15,15 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.utils.ServletUtil;
+import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.security.service.SysUserTokenService;
+import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.core.admin.vo.LoginUser;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.vo.PlatformUser;
@@ -48,9 +50,13 @@ import java.util.Map;
 @Log4j2
 public class MemberInfoController extends BaseController {
     @Resource
-    private MemberInfoService memberInfoService;
+    private MemberInfoService   memberInfoService;
     @Resource
-    private RedisUtils        redisUtil;
+    private RedisUtils          redisUtil;
+    @Resource
+    private SysUserTokenService sysUserTokenService;
+    @Resource
+    private ISysUserService userService;
 
     /**
      * 查询用户信息列表
@@ -398,4 +404,161 @@ public class MemberInfoController extends BaseController {
 
         return memberInfoService.insertBatchExcelMoney( userIds );
     }
+
+    @PostMapping( value = "/memberSmallFeatures" )
+    public Object memberSmallFeatures( ReqSmallFeatures req ) throws Exception {
+        RspBase rspBase = new RspBase();
+        if ( req.getGoogleAuthCode() == null ) {
+            rspBase.setMsg( "请输入google验证码" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+
+        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
+        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
+
+        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
+            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        if ( sysUser.getOtpSecret().length() == 32 ) {
+            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
+                "secretkey" + "/googleAuthPrivateKey" ) );
+
+        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
+            rspBase.setMsg( "google验证码不正确，请检查" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        return RspBase.ok(memberInfoService.updatePhones( req ));
+    }
+
+    @PostMapping( value = "/queryPhones" )
+    public Object queryPhones( @RequestBody ReqSmallFeatures req ) throws Exception {
+        RspBase rspBase = new RspBase();
+        if ( req.getGoogleAuthCode() == null ) {
+            rspBase.setMsg( "请输入google验证码" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
+        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
+
+        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
+            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        if ( sysUser.getOtpSecret().length() == 32 ) {
+            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
+                "secretkey" + "/googleAuthPrivateKey" ) );
+
+        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
+            rspBase.setMsg( "google验证码不正确，请检查" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        return RspBase.ok(memberInfoService.queryPhones( req ));
+    }
+
+    /**
+     * 批量会员ID派送彩金
+     */
+    @PostMapping( value = "/commitMoney" )
+    public Object commitMoney( @RequestBody ReqSmallFeatures req ) throws Exception {
+        RspBase rspBase = new RspBase();
+        if ( req.getGoogleAuthCode() == null ) {
+            rspBase.setMsg( "请输入google验证码" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
+        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
+
+        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
+            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        if ( sysUser.getOtpSecret().length() == 32 ) {
+            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
+                "secretkey" + "/googleAuthPrivateKey" ) );
+
+        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
+            rspBase.setMsg( "google验证码不正确，请检查" );
+            rspBase.setCode( 1 );
+            return rspBase;
+        }
+        return RspBase.ok( memberInfoService.commitMoney( req ) );
+    }
+
+    @RequestMapping( value = "/batchInsertShops", method = RequestMethod.POST )
+    @Transactional( rollbackFor = Exception.class )
+    public Object batchInsert( @RequestParam( "excelFile" ) MultipartFile excelFile ) throws Exception {
+        Workbook      workbook = null;
+        StringBuilder userId   = new StringBuilder();
+        try {
+            workbook = WorkbookFactory.create( excelFile.getInputStream() );
+            excelFile.getInputStream().close();
+            //工作表对象
+            Sheet sheet = workbook.getSheetAt( 0 );
+            //总行数
+            int rowLength = sheet.getLastRowNum() + 1;
+            //工作表的列
+            Row row = sheet.getRow( 0 );
+            //总列数
+            //得到指定的单元格
+            for ( int i = 0; i < rowLength; i++ ) {
+                Cell cell = row.getCell( i );
+                row = sheet.getRow( i );
+                String cell1 = null;
+                String cell2 = null;
+                String cell3 = null;
+                for ( int j = 0; j < 3; j++ ) {
+                    cell = row.getCell( j );
+                    if ( cell != null ) {
+                        cell.setCellType( CellType.STRING );
+                        String data = cell.getStringCellValue();
+                        if ( j == 0 ) {
+                            cell1 = data.trim();
+                        } else if ( j == 1 ) {
+                            cell2 = data.trim();
+                        } else {
+                            cell3 = data.trim();
+                        }
+                    }
+                }
+                if ( StringUtils.isBlank( cell1 ) || StringUtils.isBlank( cell2 ) ) {
+                    break;
+                }
+                if ( StringUtils.isBlank( cell3 ) ) {
+                    cell3 = "1";
+                }
+                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
+                        .append( cell3 ).append( "),(" );
+            }
+        } catch ( Exception e ) {
+            e.getMessage();
+        }
+        userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
+        String userIds = String.valueOf( userId );
+        //清除表中数据
+        memberInfoService.clear();
+        memberInfoService.insertPaiSong( userIds );
+        return RspBase.ok();
+    }
+
 }
