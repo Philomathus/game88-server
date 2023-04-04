@@ -98,9 +98,9 @@ public class VipPayServiceImpl implements VipPayService {
         } );
         log.info( "vipPay登录信息:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String              code   = resultMap.getOrDefault( "code", "" ).toString();
-            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
-            if ( "200".equals( code ) && !CollectionUtils.isEmpty( result ) ) {
+            String code = resultMap.getOrDefault( "code", "" ).toString();
+            if ( "200".equals( code ) ) {
+                Map<String, Object> result   = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
                 String              token    = result.getOrDefault( "token", "" ).toString();
                 Map<String, Object> userInfo = ( Map<String, Object> ) result.getOrDefault( "userInfo", new HashMap<>() );
                 Map<String, Object> data     = ( Map<String, Object> ) result.getOrDefault( "data", new HashMap<>() );
@@ -126,7 +126,8 @@ public class VipPayServiceImpl implements VipPayService {
                 }
             }
         }
-        log.error( "vipPay登录失败结果:{}", JsonUtil.object2Json( resultMap ) );
+        log.error( "vipPay登录失败 - 会员:{} - 钱包地址:{} - 结果:{}", memberId, reqMap.get( "walletAddress" ),
+                JsonUtil.object2Json( resultMap ) );
         return RspBase.businessError( "vipPay登录失败,请重试" );
     }
 
