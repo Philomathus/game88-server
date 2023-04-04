@@ -194,10 +194,14 @@ public class VipPayServiceImpl implements VipPayService {
         } );
 
         log.warn( JsonUtil.object2Json( resultMap ) );
-        if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
-            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( result ) ) {
-                return RspBase.ok( "请求成功,请前往vipPay支付中心确认", result.getOrDefault( "redirectUrl", "" ).toString() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+                Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+                if ( !CollectionUtils.isEmpty( result ) ) {
+                    return RspBase.ok( "请求成功,请前往vipPay支付中心确认", result.getOrDefault( "redirectUrl", "" ).toString() );
+                }
+            } else {
+                return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
         return RspBase.businessError( "访问vipPay支付中心失败,请重试或者联系客服" );
