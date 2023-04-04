@@ -124,6 +124,8 @@ public class VipPayServiceImpl implements VipPayService {
                     rspVipPayLogin.setUrl( h5WebAddress + "?t=" + token );
                     return RspBase.ok( rspVipPayLogin );
                 }
+            } else {
+                return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
         log.error( "vipPay登录失败 - 会员:{} - 钱包地址:{} - 结果:{}", memberId, reqMap.get( "walletAddress" ),
@@ -193,7 +195,8 @@ public class VipPayServiceImpl implements VipPayService {
             return JsonUtil.json2Map( text );
         } );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        log.warn( "memberId:{} walletAddr:{} result:{}", memberId, memberCard.getBankAccount(),
+                JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
                 Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
