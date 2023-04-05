@@ -115,6 +115,27 @@ public class GameButtJDB extends AbstractGameButt {
     @Override
     @SuppressWarnings( "unchecked" )
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
+        if ( reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+            Map<String, Object> params = new LinkedHashMap<>();
+            params.put( "action", 17 );
+            params.put( "ts", System.currentTimeMillis() );
+            params.put( "parent", reqJoinGame.getAgent() );
+            params.put( "uid", reqJoinGame.getGameMemberId() );
+            String json = JsonUtil.object2Json( params );
+            log.info( "Force Logout: {}", json );
+            String encodedParam = null;
+            try {
+                encodedParam = AESCoder.encryptByKeyIvNoPadding( json, reqJoinGame.getMd5(), reqJoinGame.getDes() );
+            } catch ( Exception e ) {
+                log.error( e.getMessage(), e );
+                throw new BusinessException( e.getMessage() );
+            }
+            Map<String, Object> resultMap = execute( evaluateUrl( reqJoinGame.getApiUrl() ), encodedParam,
+                    reqJoinGame.getLinecode() );
+
+            log.info( reqJoinGame.getGameCategory().getDes()
+                    + "强制登出玩家 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        }
         Map<String, Object> params = new LinkedHashMap<>();
         params.put( "action", 15 );
         params.put( "ts", System.currentTimeMillis() );
