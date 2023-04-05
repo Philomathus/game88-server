@@ -358,7 +358,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             && washCode.getCodeMin().compareTo( BigDecimal.ONE ) <= 0 ) {
                         rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                     }
-                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) > 0
+                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) >= 0
                             && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
                         rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                         rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
