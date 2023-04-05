@@ -115,7 +115,7 @@ public class GameButtJDB extends AbstractGameButt {
     @Override
     @SuppressWarnings( "unchecked" )
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        if ( reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+        if ( reqJoinGame.getMoneyType() != null && reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
             Map<String, Object> params = new LinkedHashMap<>();
             params.put( "action", 17 );
             params.put( "ts", System.currentTimeMillis() );
