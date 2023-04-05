@@ -160,6 +160,15 @@
           and status = 0
     </update>
 
+    <update id="updateByIdsWash">
+        UPDATE member_game_data${dbNodes}
+        SET status =1
+        where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
         select d.game_id, d.cell_score, d.profit, d.game_end_time create_time, d.all_bet, d.agent, d.platform_id
         from member_game_data${dbNodes} d
