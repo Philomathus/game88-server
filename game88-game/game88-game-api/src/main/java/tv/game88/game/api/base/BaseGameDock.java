@@ -7,7 +7,7 @@ import tv.game88.game.api.dto.ReqJoinGame;
 
 import java.math.BigDecimal;
 
-public interface BaseGameButt {
+public interface BaseGameDock {
     /**
      * 获取游戏token,并存储Redis
      *

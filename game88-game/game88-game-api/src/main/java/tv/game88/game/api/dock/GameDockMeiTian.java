@@ -1,4 +1,4 @@
-package tv.game88.game.api.butt;
+package tv.game88.game.api.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -11,7 +11,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameButt;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.constants.ConstantsGame;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.MEITIAN + "GameProcessor" )
-public class GameButtMeiTian extends AbstractGameButt {
+public class GameDockMeiTian extends AbstractGameDock {
 
     private static final String CREATE_USER    = "/services/dg/player/playerCreate2";
     private static final String QUERY_BALANCE  = "/services/dg/player/getPlayerBalance";
