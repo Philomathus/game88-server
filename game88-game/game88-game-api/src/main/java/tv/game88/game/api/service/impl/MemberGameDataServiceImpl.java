@@ -362,7 +362,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
                         rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                         rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
-                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() ) );
+                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() )
+                                                                       .setScale( 2, RoundingMode.HALF_UP ) );
                     }
                 }
             }
@@ -465,7 +466,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         for ( ConfigWashCode washCode : configWashCodes ) {
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
             if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
-                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
+                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value ).setScale( 2, RoundingMode.HALF_UP );
                 if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
                     continue;
                 }
