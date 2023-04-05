@@ -7,7 +7,7 @@ import tv.game88.common.utils.RedisUtils;
 import javax.annotation.Resource;
 
 @Log4j2
-public abstract class AbstractGameButt implements BaseGameButt {
+public abstract class AbstractGameDock implements BaseGameDock {
     @Resource
     protected RestTemplate restTemplate;
     @Resource

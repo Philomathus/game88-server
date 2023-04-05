@@ -1,4 +1,4 @@
-package tv.game88.game.api.butt;
+package tv.game88.game.api.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +14,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameButt;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.constants.ConstantsGame;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.CQ9 + "GameProcessor" )
-public class GameButtCQ9 extends AbstractGameButt {
+public class GameDockCQ9 extends AbstractGameDock {
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {

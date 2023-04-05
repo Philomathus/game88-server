@@ -50,5 +50,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
 
     RspBase<RspWashCodeInfo> toWashCode( String memberId );
 
-    void opWashCode( String memberId, List<GameWashCodeLog> gameWashCodeLogs, LocalDateTime time, String washId );
+    void opWashCode( String memberId, List<String> memberGameDataIdList, List<GameWashCodeLog> gameWashCodeLogs,
+                     LocalDateTime time, String washId );
 }
