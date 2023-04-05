@@ -428,7 +428,13 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     @Override
     public List<RspGameWashCodeLog> getWashCodeLogs( String memberId ) {
-        return gameWashCodeLogMapper.selectRspList( memberId );
+        List<RspGameWashCodeLog> rspGameWashCodeLogs = gameWashCodeLogMapper.selectRspList( memberId );
+        for ( RspGameWashCodeLog rspGameWashCodeLog : rspGameWashCodeLogs ) {
+            if ( rspGameWashCodeLog.getGameTypeName().contains( "-" ) ) {
+                rspGameWashCodeLog.setGameTypeName( rspGameWashCodeLog.getGameTypeName().replace( "-", "" ) );
+            }
+        }
+        return rspGameWashCodeLogs;
     }
 
     @Override
@@ -465,7 +471,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         List<ConfigWashCode>  configWashCodes      = gameCacheUtils.getEffectWashCodeConfigList();
         for ( ConfigWashCode washCode : configWashCodes ) {
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
-            if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
+            if ( value != null && value.compareTo( washCode.getCodeMin() ) >= 0
+                    && value.compareTo( washCode.getCodeMax() ) < 0 ) {
                 BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value ).setScale( 2, RoundingMode.HALF_UP );
                 if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
                     continue;
