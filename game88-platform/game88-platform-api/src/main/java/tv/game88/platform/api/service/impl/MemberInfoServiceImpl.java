@@ -846,10 +846,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         memberCard1.setMemberId( member.getMemberId() );
 
         List<MemberCard> memberCardList = memberCardMapper.findAllByBankAccount( member );
-        if(memberCardList.stream()
-                .filter((mc) -> !mc.getId().equals(member.getId()))
-                .anyMatch((mc) -> mc.getBankAccount().equals(member.getBankAccount()))){
-            return RspBase.businessError( "卡已绑定账号" );
+        List<MemberCard> memberCardListFiltered = memberCardList.stream()
+                .filter((mc) ->
+                        !mc.getId().equals(member.getId()) && mc.getBankAccount().equals(member.getBankAccount()))
+                .collect(Collectors.toList());
+        if (!memberCardListFiltered.isEmpty() && memberCardListFiltered.get(0) != null) {
+            return RspBase.businessError( "卡已绑定帐号" + memberCardListFiltered.get(0).getMemberId());
         }
 
         MemberCard memberCard = memberCardMapper.selectById( id );
