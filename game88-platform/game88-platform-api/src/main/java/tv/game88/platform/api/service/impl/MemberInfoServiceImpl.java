@@ -219,6 +219,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             } else {
                 log.error( e.getMessage(), e );
             }
+            AuthContextHolderUtils.clearContext();
             return RspBase.businessError( "手机号不存在/密码错误" );
         } finally {
             AuthContextHolderUtils.clearContext();
