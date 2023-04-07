@@ -120,7 +120,7 @@ public class GameDataServiceImpl implements GameDataService {
         insertBatch( session, mapper, willCodeList );
         doBeatCode( willCodeMap );
         deQuestCheck( willCodeList );
-        log.info( "新拉单拉取条数：{},实际插入:{}", rspGameDataLogs.size(), willCodeList.size() );
+        log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
 
     @Override
