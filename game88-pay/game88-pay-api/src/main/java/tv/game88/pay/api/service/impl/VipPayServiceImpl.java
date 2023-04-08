@@ -108,15 +108,26 @@ public class VipPayServiceImpl implements VipPayService {
                         && !CollectionUtils.isEmpty( data ) ) {
                     String     h5WebAddress  = data.getOrDefault( "h5WebAddress", "" ).toString();
                     String     walletAddress = userInfo.getOrDefault( "walletAddress", "" ).toString();
+                    String     realName      = userInfo.getOrDefault( "realName", "" ).toString();
                     BigDecimal balance       = new BigDecimal( userInfo.getOrDefault( "balance", "0" ).toString() );
 
-                    if ( memberCard == null && StringUtils.isNotBlank( walletAddress ) ) {
-                        MemberCard newInsert = new MemberCard();
-                        newInsert.setBankId( VIPPAY_BANK_ID );
-                        newInsert.setMemberId( memberId );
-                        newInsert.setBankAccount( walletAddress );
-                        newInsert.setCreateTime( LocalDateTime.now() );
-                        memberCardMapper.insert( newInsert );
+                    if ( StringUtils.isNotBlank( walletAddress ) ) {
+                        if ( memberCard == null ) {
+                            MemberCard newInsert = new MemberCard();
+                            newInsert.setBankId( VIPPAY_BANK_ID );
+                            newInsert.setMemberId( memberId );
+                            newInsert.setBankAccount( walletAddress );
+                            newInsert.setCreateTime( LocalDateTime.now() );
+                            if ( StringUtils.isNotBlank( realName ) ) {
+                                newInsert.setRealName( realName );
+                            }
+                            memberCardMapper.insert( newInsert );
+                        } else if ( StringUtils.isNotBlank( realName ) ) {
+                            MemberCard update = new MemberCard();
+                            update.setId( memberCard.getId() );
+                            update.setRealName( realName );
+                            memberCardMapper.updateById( update );
+                        }
                     }
                     RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();
                     rspVipPayLogin.setBalance( balance );
