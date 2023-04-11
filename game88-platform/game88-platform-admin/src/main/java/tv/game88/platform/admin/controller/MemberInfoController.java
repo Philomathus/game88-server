@@ -52,11 +52,17 @@ public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService   memberInfoService;
     @Resource
+<<<<<<< game88-platform/game88-platform-admin/src/main/java/tv/game88/platform/admin/controller/MemberInfoController.java
+    private RedisUtils        redisUtil;
+    @Resource
+    private ISysUserService sysUserService;
+=======
     private RedisUtils          redisUtil;
     @Resource
     private SysUserTokenService sysUserTokenService;
     @Resource
     private ISysUserService userService;
+>>>>>>> game88-platform/game88-platform-admin/src/main/java/tv/game88/platform/admin/controller/MemberInfoController.java
 
     /**
      * 查询用户信息列表
@@ -211,15 +217,17 @@ public class MemberInfoController extends BaseController {
      */
     @RequestMapping( value = "/sendMsg", method = RequestMethod.POST )
     @Log( title = "会员发送短信", businessType = BusinessType.UPDATE )
-    public RspBase<?> sendMsg( @RequestBody Map map ) throws Exception {
+    public RspBase sendMsg( @RequestBody Map map ) throws Exception {
+        RspBase rspBase = new RspBase();
         String msg      = ( String ) map.get( "msg" );
         String memberId = ( String ) map.get( "memberId" );
         if ( StringUtils.isNotBlank( msg ) && StringUtils.isNotBlank( memberId ) ) {
-            //sysUserService.sendMsg( msg, memberId );
-            return RspBase.ok( "发送成功" );
+            sysUserService.sendMsg( msg, memberId );
+            rspBase.setMsg( "发送成功" );
         } else {
-            return RspBase.businessError( "发送失败" );
+            rspBase.setMsg( "发送失败" );
         }
+        return rspBase;
     }
 
     /**
