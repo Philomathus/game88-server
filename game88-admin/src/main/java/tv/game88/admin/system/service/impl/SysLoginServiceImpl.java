@@ -73,6 +73,7 @@ public class SysLoginServiceImpl implements ISysLoginService {
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
+            AuthContextHolderUtils.clearContext();
             if ( e instanceof BadCredentialsException ) {
                 String message = "用户不存在/密码错误";
                 AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,

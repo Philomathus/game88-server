@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CorsFilter;
 import tv.game88.common.security.config.PermitAllUrlProperties;
 import tv.game88.core.session.security.filter.MemberAuthenticationTokenFilter;
@@ -151,5 +152,11 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowUrlEncodedDoubleSlash( true );
         return firewall;
+    }
+
+    // 解决RequestContextHolder.getRequestAttributes()可能为空的问题
+    @Bean
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
     }
 }

@@ -45,7 +45,6 @@ public class MessageController extends BaseController {
 
     @Operation( summary = "获取站内信息列表" )
     @PostMapping( "/getMessageOnSites" )
-    @Anonymous
     public RspBase<List<RspMessageOnSite>> getOnSiteMessages() {
         String userId = MemberSecurityUtils.getUserId();
         return RspBase.ok( messageService.getMessageOnSites(userId) );
