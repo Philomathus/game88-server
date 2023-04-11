@@ -52,17 +52,13 @@ public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService   memberInfoService;
     @Resource
-<<<<<<< game88-platform/game88-platform-admin/src/main/java/tv/game88/platform/admin/controller/MemberInfoController.java
     private RedisUtils        redisUtil;
     @Resource
     private ISysUserService sysUserService;
-=======
-    private RedisUtils          redisUtil;
     @Resource
     private SysUserTokenService sysUserTokenService;
     @Resource
     private ISysUserService userService;
->>>>>>> game88-platform/game88-platform-admin/src/main/java/tv/game88/platform/admin/controller/MemberInfoController.java
 
     /**
      * 查询用户信息列表
