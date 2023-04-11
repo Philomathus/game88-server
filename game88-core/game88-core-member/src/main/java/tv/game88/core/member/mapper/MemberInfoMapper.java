@@ -2,6 +2,7 @@ package tv.game88.core.member.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.vo.PlatformUser;
@@ -116,4 +117,12 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     Integer insertBatchMemberMoney(String userIds);
 
     MemberInfo selectMemberInfoById(String id);
+    
+    int updatePhones(ReqSmallFeatures reqSmallFeatures);
+
+    List<ReqSmallFeatures> queryPhones(ReqSmallFeatures reqSmallFeatures);
+
+    Integer clear();
+
+    Integer insertPaiSong(@Param("userIds") String userIds);
 }

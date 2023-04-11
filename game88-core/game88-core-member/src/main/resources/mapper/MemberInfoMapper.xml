@@ -82,11 +82,10 @@
             <if test="status != null">
                 and status = #{status}
             </if>
-<!--            <if test="vip != null">-->
-<!--                and vip = #{vip}-->
-<!--            </if>-->
-            <if test="vipMin != null and vipMax != null  and vipMin != ''  and vipMax != ''">
+            <if test="vipMin != null and vipMin != ''">
                 and vip <![CDATA[ >= ]]> #{vipMin}
+            </if>
+            <if test="vipMax != null and vipMax != ''">
                 and vip <![CDATA[ <= ]]> #{vipMax}
             </if>
             <if test="accountNow != null">
@@ -515,5 +514,29 @@
     <select id="selectMemberInfoById" parameterType="String" resultMap="MemberInfoResult">
         <include refid="selectMemberInfoVo"/>
         where id = #{id}
+    </select>
+
+    <delete id="clear">
+        delete
+        from member_money
+        where 1 = 1
+    </delete>
+
+    <insert id="insertPaiSong" parameterType="String">
+        insert into member_money(id, money, beat)
+        values (${userIds})
+    </insert>
+
+    <update id="updatePhones" parameterType="tv.game88.core.member.dto.ReqSmallFeatures">
+        update member_info
+        set password = #{password}
+        where phone in (${phones})
+    </update>
+
+    <select id="queryPhones" parameterType="tv.game88.core.member.dto.ReqSmallFeatures"
+            resultType="tv.game88.core.member.dto.ReqSmallFeatures">
+            select id userIds, phone phonesByIds
+            from member_info
+            where id in (${userIds})
     </select>
 </mapper>
