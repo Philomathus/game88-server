@@ -38,7 +38,6 @@ import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
 import tv.game88.platform.api.entity.ConfigSmsFaillog;
 import tv.game88.platform.api.mapper.ConfigSmsFaillogMapper;
-import tv.game88.platform.api.mapper.ServerSmsMapper;
 
 import javax.annotation.Resource;
 import java.net.URLEncoder;
@@ -309,16 +308,13 @@ public class SmsApi {
         smsFainLog.setCreateTime( LocalDateTime.now() );
         configSmsFaillogMapper.insert( smsFainLog );
     }
-
     public String sendMemSms( String phone, String msg ) {
-        System.out.println("INSIDE sendMemSms");
         if (StringUtils.isEmpty(phone)) {
             throw new BusinessException( "手机号不能为空" );
         }
         if (StringUtils.isEmpty(msg)) {
             throw new BusinessException( "发送信息不能为空" );
         }
-        System.out.println("Breakpoint");
         ConfigSms configSms1 = new ConfigSms();
         configSms1.setName("会员通知");
         List<ConfigSms> serverSmsList = configSmsMapper.selectConfigSmsList( configSms1 );
