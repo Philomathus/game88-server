@@ -23,4 +23,6 @@ public interface ReportIncomeDayService {
 	public List<ReportIncomeDay> selectReportIncomeDayList( ReportIncomeDay reportIncomeDay);
 
     ReportIncomeDay countSuccessData(ReportIncomeDay reportIncomeDay);
+
+    void calldataProrepPlamcom( String paydate );
 }
