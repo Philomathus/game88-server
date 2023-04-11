@@ -19,9 +19,7 @@ import tv.game88.platform.api.service.ReportIncomeDayService;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,18 +41,20 @@ public class ReportIncomeDayController extends BaseController {
     @GetMapping( "/list" )
     public RspBase<List<ReportIncomeDay>> list( ReportIncomeDay reportIncomeDay ) throws ParseException {
         PageDomain pageDomain = TableSupport.buildPageRequest();
+
+        //        Date   d        = new Date();
+        //        String myString = reportIncomeDay.getPaydate();
+        //        if ( !StringUtils.isEmpty( myString ) ) {
+        //            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
+        //            Date             dd               = simpleDateFormat.parse( myString );
+        //            boolean          flag             = dd.before( d );
+        //            if ( !flag ) {
+        //                reportIncomeDay.setPaydate( null );
+        //            }
+        //        }
+        //
+        reportIncomeDayService.calldataProrepPlamcom( reportIncomeDay.getPaydate() );
         startPage( pageDomain );
-//        Date   d        = new Date();
-//        String myString = reportIncomeDay.getPaydate();
-//        if ( !StringUtils.isEmpty( myString ) ) {
-//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-//            Date             dd               = simpleDateFormat.parse( myString );
-//            boolean          flag             = dd.before( d );
-//            if ( !flag ) {
-//                reportIncomeDay.setPaydate( null );
-//            }
-//        }
-//
         List<ReportIncomeDay> list = reportIncomeDayService.selectReportIncomeDayList( reportIncomeDay );
         return getRspBasePage( list, pageDomain );
     }
