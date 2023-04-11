@@ -76,4 +76,8 @@ public class ConfigSms {
      * 创建者
      */
     private String        createBy;
+    /**
+     * 状态
+     */
+    private Integer isEffect;
 }
