@@ -22,4 +22,9 @@ public class ReportIncomeDayServiceImpl implements ReportIncomeDayService {
     public ReportIncomeDay countSuccessData( ReportIncomeDay reportIncomeDay ) {
         return reportIncomeDayMapper.countSuccessMoney( reportIncomeDay );
     }
+
+    @Override
+    public void calldataProrepPlamcom( String paydate ) {
+        reportIncomeDayMapper.calldataProrepPlamcom( paydate );
+    }
 }

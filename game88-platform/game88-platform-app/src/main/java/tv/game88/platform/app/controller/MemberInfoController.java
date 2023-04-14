@@ -9,14 +9,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.*;
 import tv.game88.core.member.enums.EnumMoney;
+import tv.game88.core.session.manager.MemberTokenManager;
 import tv.game88.core.session.utils.MemberSecurityUtils;
+import tv.game88.core.session.vo.MemberLoginUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,6 +30,9 @@ import java.util.List;
 public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService memberInfoService;
+
+    @Resource
+    private MemberTokenManager memberTokenManager;
 
     @Operation( summary = "查看是否开启保险箱", description = "返回值:true=输入密码,false设置密码" )
     @PostMapping( "/boxPassIsOpen" )
@@ -58,8 +66,15 @@ public class MemberInfoController extends BaseController {
 
     @Operation( summary = "获取会员信息" )
     @PostMapping( "/getAccountInfo" )
-    public RspBase<RspMember> getAccountInfo() {
-        return memberInfoService.getAccountInfo( MemberSecurityUtils.getUserId() );
+    public RspBase<RspMember> getAccountInfo( HttpServletRequest request ) {
+        String          userId    = MemberSecurityUtils.getUserId();
+        MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
+        if ( StringUtils.isNotBlank( userId ) && loginUser != null ) {
+            if ( !loginUser.getUserId().equals( userId ) ) {
+                log.error( "会员ID不一致!!! - userId:{} , MemberLoginUser:{}", userId, JsonUtil.object2Json( loginUser ) );
+            }
+        }
+        return memberInfoService.getAccountInfo( userId );
     }
 
     @Operation( summary = "获取会员资金明细" )

@@ -1,4 +1,4 @@
-package tv.game88.game.api.butt;
+package tv.game88.game.api.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
-import tv.game88.game.api.base.AbstractGameButt;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.constants.ConstantsGame;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
@@ -30,7 +30,7 @@ import static tv.game88.core.config.constants.Constants.GAME_PGSOFT_OT;
 @Log4j2
 @Repository(value = ConstantsGame.PG_SOFT + "GameProcessor")
 @SuppressWarnings("unchecked")
-public class GameButtPGSoft extends AbstractGameButt {
+public class GameDockPGSoft extends AbstractGameDock {
     @Override
     public void getToken(ReqJoinGame reqJoinGame) {
         //ignore

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.entity.MemberInfo;
@@ -337,7 +336,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
                 memberId.length() - 1 ), memberId );
 
-        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds, null );
 
         List<RspGameType>    gameTypeList    = gameCacheUtils.getEffectTypeList();
         List<ConfigWashCode> configWashCodes = gameCacheUtils.getEffectWashCodeConfigList();
@@ -359,11 +358,12 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             && washCode.getCodeMin().compareTo( BigDecimal.ONE ) <= 0 ) {
                         rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                     }
-                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) > 0
+                    if ( rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMin() ) >= 0
                             && rspGameTypeWashCode.getCodeAmountTotal().compareTo( washCode.getCodeMax() ) < 0 ) {
                         rspGameTypeWashCode.setWashCodeRate( Convert.rateConversion( washCode.getWashCodeRate() ) );
                         rspGameTypeWashCode.setWashCodeAmount( washCode.getWashCodeRate()
-                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() ) );
+                                                                       .multiply( rspGameTypeWashCode.getCodeAmountTotal() )
+                                                                       .setScale( 2, RoundingMode.HALF_UP ) );
                     }
                 }
             }
@@ -374,7 +374,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         return RspBase.ok( info );
     }
 
-    private void processTypeCodeMap( Map<Long, BigDecimal> sumGameTypeCodeMap, List<MemberGameData> sumProfitKinds ) {
+    private void processTypeCodeMap( Map<Long, BigDecimal> sumGameTypeCodeMap, List<MemberGameData> sumProfitKinds, Map<Long,
+            List<String>> gameTypeDateIdMaps ) {
         if ( CollectionUtils.isNotEmpty( sumProfitKinds ) ) {
             Set<Integer> platformIds = sumProfitKinds.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
             Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
@@ -389,10 +390,14 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
                                     "-" + memberGameData.getKindId() ) ) ) {
                         Long       gameTypeId = gameInfo.getTypeId();
-                        BigDecimal cellScore     = new BigDecimal( memberGameData.getCellScore() );
+                        BigDecimal cellScore  = new BigDecimal( memberGameData.getCellScore() );
                         if ( gameTypeId != null ) {
                             BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
                             sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
+                            if ( gameTypeDateIdMaps != null ) {
+                                List<String> ids = gameTypeDateIdMaps.computeIfAbsent( gameTypeId, k -> new ArrayList<>() );
+                                ids.add( memberGameData.getId() );
+                            }
                         } else {
                             GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId()
                                                                                                       .longValue() );
@@ -409,6 +414,10 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             if ( gameTypeId != null ) {
                                 BigDecimal value = sumGameTypeCodeMap.get( gameTypeId );
                                 sumGameTypeCodeMap.put( gameTypeId, value == null ? cellScore : value.add( cellScore ) );
+                                if ( gameTypeDateIdMaps != null ) {
+                                    List<String> ids = gameTypeDateIdMaps.computeIfAbsent( gameTypeId, k -> new ArrayList<>() );
+                                    ids.add( memberGameData.getId() );
+                                }
                             }
                         }
                     }
@@ -419,7 +428,13 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
 
     @Override
     public List<RspGameWashCodeLog> getWashCodeLogs( String memberId ) {
-        return gameWashCodeLogMapper.selectRspList( memberId );
+        List<RspGameWashCodeLog> rspGameWashCodeLogs = gameWashCodeLogMapper.selectRspList( memberId );
+        for ( RspGameWashCodeLog rspGameWashCodeLog : rspGameWashCodeLogs ) {
+            if ( rspGameWashCodeLog.getGameTypeName().contains( "-" ) ) {
+                rspGameWashCodeLog.setGameTypeName( rspGameWashCodeLog.getGameTypeName().replace( "-", "" ) );
+            }
+        }
+        return rspGameWashCodeLogs;
     }
 
     @Override
@@ -428,31 +443,37 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
             return RspBase.businessError( "请勿重复请求" );
         }
 
-        this.toWashCodeProcess( memberId );
+        RspBase<RspWashCodeInfo> rspBase = this.toWashCodeProcess( memberId );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
 
         redisUtils.unLock( "cleanCode" + memberId );
-        RspBase<RspWashCodeInfo> rspBase = this.getWashCodeDetail( memberId );
+        rspBase = this.getWashCodeDetail( memberId );
         rspBase.getData().setMoney( memberInfoMapper.getUserBalance( memberId ) );
         return rspBase;
     }
 
-    private void toWashCodeProcess( String memberId ) {
+    private RspBase<RspWashCodeInfo> toWashCodeProcess( String memberId ) {
         List<MemberGameData> sumProfitKinds = this.baseMapper.findMemWashPlatformKindLists( memberId.substring(
                 memberId.length() - 1 ), memberId );
         if ( CollectionUtils.isEmpty( sumProfitKinds ) ) {
-            return;
+            return null;
         }
-        Map<Long, BigDecimal> sumGameTypeCodeMap = new HashMap<>();
+        Map<Long, BigDecimal>   sumGameTypeCodeMap = new HashMap<>();
+        Map<Long, List<String>> gameTypeDateIdMaps = new HashMap<>();
 
-        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds );
+        this.processTypeCodeMap( sumGameTypeCodeMap, sumProfitKinds, gameTypeDateIdMaps );
 
-        List<GameWashCodeLog> gameWashCodeLogs = new ArrayList<>();
-        LocalDateTime         now              = LocalDateTime.now();
-        List<ConfigWashCode>  configWashCodes  = gameCacheUtils.getEffectWashCodeConfigList();
+        List<String>          memberGameDataIdList = new ArrayList<>();
+        List<GameWashCodeLog> gameWashCodeLogs     = new ArrayList<>();
+        LocalDateTime         now                  = LocalDateTime.now();
+        List<ConfigWashCode>  configWashCodes      = gameCacheUtils.getEffectWashCodeConfigList();
         for ( ConfigWashCode washCode : configWashCodes ) {
             BigDecimal value = sumGameTypeCodeMap.get( washCode.getGameTypeId() );
-            if ( value != null && value.compareTo( washCode.getCodeMin() ) > 0 && value.compareTo( washCode.getCodeMax() ) < 0 ) {
-                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value );
+            if ( value != null && value.compareTo( washCode.getCodeMin() ) >= 0
+                    && value.compareTo( washCode.getCodeMax() ) < 0 ) {
+                BigDecimal singeWashCode = washCode.getWashCodeRate().multiply( value ).setScale( 2, RoundingMode.HALF_UP );
                 if ( singeWashCode.compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
                     continue;
                 }
@@ -465,19 +486,23 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 gameWashCodeLog.setCodeAmount( value );
                 gameWashCodeLog.setBeat( washCode.getBeat() );
                 gameWashCodeLogs.add( gameWashCodeLog );
+                memberGameDataIdList.addAll( gameTypeDateIdMaps.get( washCode.getGameTypeId() ) );
             }
         }
         if ( CollectionUtils.isEmpty( gameWashCodeLogs ) ) {
-            throw new BusinessException( "洗码金额不足0.01元,无需洗码" );
+            return RspBase.businessError( "洗码金额不足0.01元,无需洗码" );
         }
         String washId = IdWorker.get32UUID();
-        SpringUtils.getBean( MemberGameDataService.class ).opWashCode( memberId, gameWashCodeLogs, now, washId );
+        SpringUtils.getBean( MemberGameDataService.class )
+                   .opWashCode( memberId, memberGameDataIdList, gameWashCodeLogs, now, washId );
+        return null;
     }
 
     @Override
     @Transactional( rollbackFor = Exception.class )
-    public void opWashCode( String memberId, List<GameWashCodeLog> gameWashCodeLogs, LocalDateTime now, String washId ) {
-        this.baseMapper.updateByBatchClean( memberId.substring( memberId.length() - 1 ), memberId );
+    public void opWashCode( String memberId, List<String> memberGameDataIdList, List<GameWashCodeLog> gameWashCodeLogs,
+                            LocalDateTime now, String washId ) {
+        this.baseMapper.updateByIdsWash( memberId.substring( memberId.length() - 1 ), memberGameDataIdList );
 
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
