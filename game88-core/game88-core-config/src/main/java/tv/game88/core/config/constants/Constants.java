@@ -37,4 +37,12 @@ public class Constants {
     public static final String GAME_PGSOFT_OT = GAME_PREX + "pgsoft:ot:";
     public static final String GAME_PGSOFT_KEY = GAME_PREX + "pgsoft:key:";
     public static final String GAME_PGSOFT_OPS = GAME_PREX + "pgsoft:ops:";
+
+    /**
+     * 直播
+     */
+    public static final String  LIVE_PREX                  = "live:";
+
+    public static final String  USER_TOKEN_KEY             = "CX:platform:user-token:";
+    public static final String  TOKEN_USER_KEY             = "CX:platform:token-user:";
 }
