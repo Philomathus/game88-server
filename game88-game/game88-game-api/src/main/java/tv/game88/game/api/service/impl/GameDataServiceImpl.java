@@ -109,13 +109,18 @@ public class GameDataServiceImpl implements GameDataService {
             gameDataLog.setGameRound( dataLog.getGame_round() );
 
             gameDataLog.setPlatformId( gamePlatform.getId().intValue() );
+            willCodeList.add( gameDataLog );
+
+            if ( new BigDecimal( gameDataLog.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 ) {
+                continue;
+            }
 
             BigDecimal beatAdd = new BigDecimal( dataLog.getCell_score() ).multiply( gamePlatform.getRateBeat() )
                                                                           .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
 
-            willCodeList.add( gameDataLog );
+
         }
         insertBatch( session, mapper, willCodeList );
         doBeatCode( willCodeMap );
