@@ -146,6 +146,4 @@ public interface ISysUserService {
 	 */
 	public int deleteUserByIds( Long[] userIds );
 
-	void sendMsg(String msg, String memberId);
-
 }
