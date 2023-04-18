@@ -84,7 +84,7 @@
         w.remark
         from member_recharge_usdt w
         where w.member_id = #{memberId}
-        and w.create_time >= DATE_SUB(NOW(),INTERVAL 15 DAY)
+        and w.create_time >= DATE_SUB(NOW(),INTERVAL 30 DAY)
         order by w.create_time desc
     </select>
 </mapper>

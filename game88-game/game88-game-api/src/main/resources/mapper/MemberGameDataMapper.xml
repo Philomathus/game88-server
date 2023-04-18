@@ -42,17 +42,17 @@
 
     <select id="selectMemberGameDataList" resultMap="MemberGameDataResult">
         SELECT m.agent,
-               m.game_id,
-               m.account,
-               m.cell_score,
-               m.all_bet,
-               m.profit,
-               m.kind_id,
-               m.revenue,
-               m.platform_id,
-               m.game_start_time,
-               m.game_end_time,
-               m.game_round
+        m.game_id,
+        m.account,
+        m.cell_score,
+        m.all_bet,
+        m.profit,
+        m.kind_id,
+        m.revenue,
+        m.platform_id,
+        m.game_start_time,
+        m.game_end_time,
+        m.game_round
         FROM member_game_data${tableLast} m
         <where>
             <include refid="whereSelect" />
@@ -61,7 +61,7 @@
 
     <sql id="whereSelect">
         <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
-                m.game_end_time <![CDATA[ >= ]]> #{startTime} and m.game_end_time <![CDATA[ <= ]]> #{endTime}
+            and m.game_end_time <![CDATA[ >= ]]> #{startTime} and m.game_end_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="account != null and account != ''">
             and m.account = #{account}
@@ -172,9 +172,9 @@
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
         select d.game_id, d.cell_score, d.profit, d.game_end_time create_time, d.all_bet, d.agent, d.platform_id
         from member_game_data${dbNodes} d
-                 left join game_platform p on d.platform_id = p.id
+        left join game_platform p on d.platform_id = p.id
         where d.game_end_time &gt;= #{beginTime}
-          and d.game_end_time &lt;= #{endTime}
+        and d.game_end_time &lt;= #{endTime}
         <if test="memberId != null and memberId != ''">
             and d.account = #{memberId}
         </if>
@@ -186,19 +186,19 @@
 
     <select id="getCountMemberGameDataList" resultType="tv.game88.game.api.entity.MemberGameData">
         SELECT cast(SUM(cell_score) AS decimal(10, 2)) totalSuccessBet,
-               cast(SUM(all_bet) AS decimal(10, 2))    totalBet,
-               cast(SUM(profit) AS decimal(10, 2))     totalIncome
+        cast(SUM(all_bet) AS decimal(10, 2)) totalBet,
+        cast(SUM(profit) AS decimal(10, 2)) totalIncome
         FROM member_game_data${tableLast} m
-        <where>
-            <include refid="whereSelect">
-            </include>
-        </where>
+        where m.profit <![CDATA[ <> ]]> 0
+        <include refid="whereSelect">
+        </include>
     </select>
 
     <select id="findMemWashPlatformKindLists" resultMap="MemberGameDataResult">
         select id, platform_id, kind_id, sum(ABS(cell_score)) cell_score
         from member_game_data${dbNodes}
-        where status = 0 and profit <![CDATA[ <> ]]> 0
+        where status = 0
+          and profit <![CDATA[ <> ]]> 0
           and account = #{memberId}
         GROUP BY id, platform_id, kind_id
     </select>

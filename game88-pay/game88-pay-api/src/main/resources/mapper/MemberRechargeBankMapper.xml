@@ -168,7 +168,7 @@
         from member_recharge_bank w
                  left join config_bank_list l on l.id = w.bank_id
         where w.member_id = #{memberId}
-          and w.create_time >= DATE_SUB(NOW(), INTERVAL 15 DAY)
+          and w.create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         order by w.create_time desc
     </select>
 
