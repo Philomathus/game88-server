@@ -79,6 +79,7 @@ public class GameButtBBIN extends AbstractGameButt {
             reqJoinGame.setToken( dataMap.getOrDefault( "sessionid", "" ).toString() );
         }
         if ( StringUtils.isBlank( reqJoinGame.getToken() ) ) {
+            log.error( reqJoinGame.getGameCategory().getDes() + " 获取token失败 ->{}", JsonUtil.object2Json( resultMap ) );
             throw new BusinessException( reqJoinGame.getGameCategory().getDes() + " - 获取sessionId失败" );
         }
     }
@@ -182,6 +183,8 @@ public class GameButtBBIN extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
         }
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
@@ -227,6 +230,8 @@ public class GameButtBBIN extends AbstractGameButt {
             log.error( e.getMessage(), e );
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
         }
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
@@ -262,6 +267,8 @@ public class GameButtBBIN extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
@@ -297,6 +304,8 @@ public class GameButtBBIN extends AbstractGameButt {
             }
             return JsonUtil.json2Map( text );
         } );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
