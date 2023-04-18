@@ -43,7 +43,7 @@ public class ConfigSmsController extends BaseController {
      * Get SMS config by id service controller
      */
     @PreAuthorize( "@ss.hasPermi('config:sms:query')" )
-    @GetMapping( "/id/{id}" )
+    @GetMapping( "/{id}" )
     public RspBase<ConfigSms> getById( @PathVariable Long id ) {
         return RspBase.ok( configSmsService.selectConfigSmsById( id ) );
     }
