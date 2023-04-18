@@ -375,7 +375,7 @@ public class GameServiceImpl implements GameService {
                           .apiUrl( gamePlatform.getApiUrl() ).recordUrl( gamePlatform.getRecordUrl() )
                           .linecode( gamePlatform.getLinecode() ).kindId( gameInfo == null ? null : gameInfo.getKindId() )
                           .gameMemberId( gameMemberId ).memberId( memberId ).transferMoney( changeMoney )
-                          .platformId( gamePlatform.getId() )
+                          .platformId( gamePlatform.getId() ).platformName( gamePlatform.getName() )
                           .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
                           .ip( ServletUtil.getIp() ).gameCategory( gamePlatform.getGameCategory() ).dev( dev ).build();
     }
