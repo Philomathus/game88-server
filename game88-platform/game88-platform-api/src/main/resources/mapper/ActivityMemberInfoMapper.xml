@@ -55,7 +55,7 @@
     </select>
 
     <select id="selectIpList" resultType="java.util.Map">
-        select inviter_code inviterCode, login_ip loginIp, COUNT(1) count
+        select inviter_code inviterCode, login_ip loginIp, COUNT(*) count
         from member_info
         <where>
             and (inviter_code is not null and inviter_code != '')
@@ -73,7 +73,7 @@
                 and register_time <![CDATA[ <= ]]> '${selectDate[1]}'
             </if>
         </where>
-        GROUP BY login_ip
-        HAVING COUNT(1) <![CDATA[ >= ]]> 2
+        GROUP BY inviter_code, login_ip
+        HAVING COUNT(*) <![CDATA[ >= ]]> 2
     </select>
 </mapper>
