@@ -40,5 +40,6 @@
                 and game_id = #{gameId}
             </if>
         </where>
+        order by sort
     </select>
 </mapper>
