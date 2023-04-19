@@ -28,10 +28,63 @@
         </where>
     </select>
 
+    <select id="selectMemberQuestById" parameterType="java.lang.String" resultMap="MemberQuestResult">
+        <include refid="selectMemberQuestVo"/>
+        where id = #{id}
+    </select>
+
     <!--    重置每日任务状态、打码量、有效时间-->
     <update id="resetDayTaskStatus">
         delete
         from member_quest
         where task_mode = 1
     </update>
+
+
+    <insert id="insertMemberQuest" parameterType="tv.game88.core.quest.entity.MemberQuest">
+        insert ignore into member_quest
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="memberId != null">member_id,</if>
+            <if test="questId != null">quest_id,</if>
+            <if test="status != null">status,</if>
+            <if test="curNum != null">cur_num,</if>
+            <if test="taskMode != null">task_mode,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="memberId != null">#{memberId},</if>
+            <if test="questId != null">#{questId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="curNum != null">#{curNum},</if>
+            <if test="taskMode != null">#{taskMode},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMemberQuest" parameterType="tv.game88.core.quest.entity.MemberQuest">
+        update member_quest
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="memberId != null">member_id = #{memberId},</if>
+
+            <if test="questId != null">quest_id = #{questId},</if>
+
+            <if test="status != null">status = #{status},</if>
+
+            <if test="curNum != null">cur_num = #{curNum},</if>
+
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMemberQuestById" parameterType="java.lang.String">
+        delete from member_quest where id = #{id}
+    </delete>
+
+    <delete id="deleteMemberQuestByIds" parameterType="java.lang.String">
+        delete from member_quest where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>
