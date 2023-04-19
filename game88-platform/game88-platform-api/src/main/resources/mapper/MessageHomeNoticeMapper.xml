@@ -39,5 +39,6 @@
                 and create_by = #{createBy}
             </if>
         </where>
+        order by sort
     </select>
 </mapper>
