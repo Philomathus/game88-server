@@ -502,7 +502,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Transactional( rollbackFor = Exception.class )
     public void opWashCode( String memberId, List<String> memberGameDataIdList, List<GameWashCodeLog> gameWashCodeLogs,
                             LocalDateTime now, String washId ) {
-        this.baseMapper.updateByIdsWash( memberId.substring( memberId.length() - 1 ), memberGameDataIdList );
+        this.baseMapper.updateByIdsWash( memberId.substring( memberId.length() - 1 ), memberGameDataIdList, memberId );
 
         MemberInfo update = new MemberInfo();
         update.setId( memberId );

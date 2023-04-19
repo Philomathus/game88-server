@@ -167,6 +167,8 @@
         <foreach item="id" collection="list" open="(" separator="," close=")">
             #{id}
         </foreach>
+        and account = #{memberId}
+        and status = 0
     </update>
 
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
