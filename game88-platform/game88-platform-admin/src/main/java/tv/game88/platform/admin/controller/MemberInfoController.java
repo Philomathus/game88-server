@@ -54,8 +54,6 @@ public class MemberInfoController extends BaseController {
     @Resource
     private RedisUtils        redisUtil;
     @Resource
-    private ISysUserService sysUserService;
-    @Resource
     private SysUserTokenService sysUserTokenService;
     @Resource
     private ISysUserService userService;
@@ -213,12 +211,12 @@ public class MemberInfoController extends BaseController {
      */
     @RequestMapping( value = "/sendMsg", method = RequestMethod.POST )
     @Log( title = "会员发送短信", businessType = BusinessType.UPDATE )
-    public RspBase sendMsg( @RequestBody Map map ) throws Exception {
+    public RspBase sendMsg( @RequestBody Map map ) {
         RspBase rspBase = new RspBase();
         String msg      = ( String ) map.get( "msg" );
         String memberId = ( String ) map.get( "memberId" );
         if ( StringUtils.isNotBlank( msg ) && StringUtils.isNotBlank( memberId ) ) {
-            sysUserService.sendMsg( msg, memberId );
+            memberInfoService.sendMsg( msg, memberId );
             rspBase.setMsg( "发送成功" );
         } else {
             rspBase.setMsg( "发送失败" );

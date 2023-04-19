@@ -98,4 +98,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<?>  clear();
 
+    void sendMsg(String msg, String memberId);
+
 }

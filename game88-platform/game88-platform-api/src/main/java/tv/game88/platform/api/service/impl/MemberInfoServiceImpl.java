@@ -1529,4 +1529,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         memberInfoMapper.clear();
         return RspBase.ok();
     }
+
+    @Override
+    public void sendMsg(String msg, String memberId) {
+        MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById(memberId);
+        String phone = memberInfo.getPhone();
+        smsApi.sendMemSms(phone,msg);
+    }
 }

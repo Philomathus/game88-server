@@ -1,7 +1,6 @@
 package tv.game88.core.admin.service.impl;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
@@ -16,14 +15,9 @@ import tv.game88.core.admin.mapper.SysUserMapper;
 import tv.game88.core.admin.mapper.SysUserRoleMapper;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysUserService;
-import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,10 +37,6 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserRoleMapper   userRoleMapper;
     @Resource
     private SysUserTokenService sysUserTokenService;
-    @Autowired
-    private MemberInfoMapper memberInfoMapper;
-    @Autowired
-    private SmsApi smsApi;
 
     /**
      * 根据条件分页查询用户列表
@@ -299,10 +289,4 @@ public class SysUserServiceImpl implements ISysUserService {
         return userMapper.deleteUserByIds( userIds );
     }
 
-    @Override
-    public void sendMsg(String msg, String memberId) {
-        MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById(memberId);
-        String phone = memberInfo.getPhone();
-        smsApi.sendMemSms(phone,msg);
-    }
 }
