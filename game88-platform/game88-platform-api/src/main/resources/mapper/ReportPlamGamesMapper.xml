@@ -34,8 +34,7 @@
             </if>
         </where>
         GROUP BY
-        gameagent,gameplame
-        ORDER BY game_uuid DESC
+        gameagent,gameplame,begindate
     </select>
 
     <resultMap type="tv.game88.platform.api.entity.ReportPlamGames" id="ReportPlamGamesResult">
