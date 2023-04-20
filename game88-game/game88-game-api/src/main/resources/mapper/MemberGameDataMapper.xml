@@ -167,6 +167,8 @@
         <foreach item="id" collection="list" open="(" separator="," close=")">
             #{id}
         </foreach>
+        and account = #{memberId}
+        and status = 0
     </update>
 
     <select id="findByAccount" resultType="tv.game88.game.api.dto.RspGameData">
@@ -179,7 +181,7 @@
             and d.account = #{memberId}
         </if>
         <if test="req != null and req.gameCategory != null">
-            and p.game_category = #{req.gameCategory}
+            and d.platform_id = (select id from game_platform where game_category = #{req.gameCategory})
         </if>
         order by d.game_end_time desc
     </select>

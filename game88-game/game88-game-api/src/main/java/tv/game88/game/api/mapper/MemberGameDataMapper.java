@@ -32,7 +32,8 @@ public interface MemberGameDataMapper extends BaseMapper<MemberGameData> {
 
     void updateByBatchClean( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId );
 
-    void updateByIdsWash( @Param( "dbNodes" ) String dbNodes, @Param( "list" ) List<String> memberGameDataIdList );
+    void updateByIdsWash( @Param( "dbNodes" ) String dbNodes, @Param( "list" ) List<String> memberGameDataIdList, @Param(
+            "memberId" ) String memberId );
 
     List<RspGameData> findByAccount( @Param( "dbNodes" ) String dbNodes, @Param( "memberId" ) String memberId,
                                      @Param( "req" ) ReqGameData reqGameData, @Param( "beginTime" ) String beginDay, @Param(
