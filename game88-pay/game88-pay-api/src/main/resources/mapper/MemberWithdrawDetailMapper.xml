@@ -249,10 +249,14 @@
     </select>
 
     <select id="selectMemberInfoWithdrawByIdl" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
-        select p.name as class_twoname,convert(sum(g.cell_score),decimal(10,2)) touZhu,convert(sum(g.profit),decimal(10,2)) yingLi
-        FROM member_game_data${tableLast} g
-        LEFT JOIN game_platform p on g.platform_id = p.id
-        WHERE account = #{userid} GROUP BY g.platform_id
+        SELECT a.touZhu, a.yingLi, p.`name` AS class_twoname
+        FROM (select convert(sum(g.cell_score), decimal(10, 2)) touZhu,
+                     convert(sum(g.profit), decimal(10, 2))     yingLi,
+                     g.platform_id
+              FROM member_game_data${tableLast} g
+              WHERE account = #{userid}
+              GROUP BY g.platform_id) a
+                 LEFT JOIN game_platform p ON a.platform_id = p.id
     </select>
 
     <select id="selectMemberInfoWithdrawByIdz" parameterType="java.lang.String" resultType="tv.game88.pay.api.dto.RspMemberInfoWithdraw">
