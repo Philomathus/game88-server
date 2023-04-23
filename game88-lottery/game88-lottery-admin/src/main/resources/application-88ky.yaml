@@ -4,6 +4,6 @@ spring:
     username: admin
     password: djkteCbsupY3RCDkPDPS
   redis:
-    host: r-j6crwayvx3knxgmy58.redis.rds.aliyuncs.com
+    host: ky88.zczoyz.ng.0001.ape1.cache.amazonaws.com
     port: 6379
-    password: qatrJElKsmZxy25j
+
