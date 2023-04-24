@@ -64,7 +64,7 @@ public class SwaggerProperties {
     /**
      * 邮箱
      */
-    private String contactEmail = "MengJun.jiang@qq.com";
+    private String contactEmail = "mengjun8877@gmail.com";
 
     /**
      * 地址
