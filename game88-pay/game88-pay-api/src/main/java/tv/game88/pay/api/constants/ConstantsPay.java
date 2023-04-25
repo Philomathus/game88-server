@@ -49,4 +49,5 @@ public abstract class ConstantsPay {
     public static final String SHANDIAN_PAY   = "shanDianPay";
     public static final String YATAI_PAY      = "yaTaiPay";
     public static final String ZHAOH_PAY      = "zhaohPay";
+    public static final String RG_PAY         = "rgPay";
 }
