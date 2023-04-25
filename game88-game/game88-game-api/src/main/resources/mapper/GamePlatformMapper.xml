@@ -100,4 +100,10 @@
           and p.effect = 1
         order by p.sort
     </select>
+
+    <select id="findSimpleLists" resultType="tv.game88.game.api.dto.RspGamePlatform">
+        select *
+        from game_platform
+        where effect =1
+    </select>
 </mapper>

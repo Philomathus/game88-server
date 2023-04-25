@@ -15,6 +15,8 @@ public class RspGamePlatform {
     private String            icon;
     @Schema( title = "卡片图标" )
     private String            cardIcon;
+    @Schema( title = "游戏类型" )
+    private String game_typeID;
     @Schema( title = "游戏信息列表" )
     private List<RspGameInfo> rspGameInfos = new ArrayList<>();
 }

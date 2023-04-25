@@ -267,12 +267,56 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     }
 
     @Override
-    public RspBase<?> getGameBetRecordData( MemberGameData memberGameData ) {
-        return null;
+    public List getGameBetRecordData( MemberGameData memberGameData ) {
+
+        Map map = new HashMap();
+        map.put( "gameID", "1");
+        map.put( "accounts", "2" );
+        map.put( "serverID", "3" );
+        map.put( "kindID", "4" );
+        map.put( "tableID", "5" );
+        map.put( "chairID", "6" );
+        map.put( "userCount", "7" );
+        map.put( "cellScore", "8" );
+        map.put( "allBet", "9" );
+        map.put( "profit", "10" );
+        map.put( "revenue", "11" );
+        map.put( "gameStartTime", "12" );
+        map.put( "gameEndTime", "13" );
+        map.put( "cardValue", "14" );
+        map.put( "channelID", "15" );
+        map.put( "lineCode", "16" );
+        map.put( "recordID", "17" );
+
+        List a = new ArrayList();
+        a.add(map);
+
+        return a;
     }
 
     @Override
-    public RspBase<?> getGameBetDetailData( MemberGameData memberGameData ) {
-        return null;
+    public List getGameBetDetailData( MemberGameData memberGameData ) {
+
+        Map map = new HashMap();
+        map.put( "gameId", "1");
+        map.put( "playName", "2" );
+        map.put( "gameRound", "3" );
+        map.put( "netAmount", "4" );
+        map.put( "betTime", "5" );
+        map.put( "gameType", "BAC" );
+        map.put( "betAmount", "7" );
+        map.put( "validBetAmount", "8" );
+        map.put( "flag", "0" );
+        map.put( "playType", "1" );
+        map.put( "tableCode", "11" );
+        map.put( "recalcuTime", "12" );
+        map.put( "beforeCredit", "13" );
+        map.put( "betIP", "14" );
+
+        List a = new ArrayList();
+        a.add(map);
+
+        return a;
+
     }
 }

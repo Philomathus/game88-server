@@ -1,5 +1,6 @@
 package tv.game88.game.admin.controllor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,8 +12,12 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.game.api.cache.GameCacheManager;
 import tv.game88.game.api.dto.ReqMemberGameData;
+import tv.game88.game.api.dto.RspGamePlatform;
+import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.service.GamePlatformService;
 import tv.game88.game.api.service.MemberGameDataService;
 
 import javax.annotation.Resource;
@@ -30,6 +35,10 @@ import java.util.List;
 public class MemberGameDataController extends BaseController {
     @Resource
     private MemberGameDataService memberGameDataService;
+    @Resource
+    private GamePlatformService gamePlatformService;
+    @Resource
+    private GameCacheManager gameCacheManager;
 
     /**
      * 查询会员注单数据列表
@@ -67,12 +76,25 @@ public class MemberGameDataController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:gameData:recordList')" )
     @GetMapping( value = "/recordList" )
     public RspBase<?> getGameRecordList( MemberGameData memberGameData ) {
-        return memberGameDataService.getGameBetRecordData( memberGameData );
+//        return memberGameDataService.getGameBetRecordData( memberGameData );
+
+        return getRspBasePage( memberGameDataService.getGameBetRecordData( memberGameData ) );
+
     }
 
     @PreAuthorize( "@ss.hasPermi('member:gameData:detailList')" )
     @GetMapping( value = "/detailList" )
     public RspBase<?> getGameDetailList( MemberGameData memberGameData ) {
-        return memberGameDataService.getGameBetDetailData( memberGameData );
+        return getRspBasePage(memberGameDataService.getGameBetDetailData( memberGameData ));
+    }
+
+    @GetMapping( value = "/platformList" )
+    public RspBase<?> platformList(MemberGameData memberGameData){
+        List<RspGamePlatform> list = gameCacheManager.getGamePlatformList(null);
+        if (list != null){
+            return RspBase.ok(list);
+        }
+        List<GamePlatform> list1 = gamePlatformService.selectGamePlatformList(new GamePlatform());
+        return RspBase.ok(list1);
     }
 }
