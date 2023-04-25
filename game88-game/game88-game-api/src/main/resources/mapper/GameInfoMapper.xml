@@ -140,4 +140,28 @@
           and i.type_id = #{typeId}
         order by i.sort asc
     </select>
+
+    <select id="findListByType" resultType="tv.game88.game.api.dto.RspGameInfo">
+        select t3.id,
+               t3.name,
+               t3.icon,
+               t3.maintain,
+               t3.large_icon,
+               t3.kind_id
+        from
+            (select t2.*
+             from
+                 (select distinct game_info_id
+                  from game_type_with
+                  where type_id = #{typeId}) t1 inner join
+                 (select id, name, type_id, icon,kind_id, maintain, recommend, large_icon, sort
+                  from game_info
+                  where effect = 1) t2
+                 on t1.game_info_id = t2.id) t3 order by t3.sort asc
+    </select>
+    <select id="findTypeList" resultType="tv.game88.game.api.dto.RspGameInfo">
+        select id, name,icon ,platform_id as platformId,kind_id as kindId
+        from game_info
+        where effect = 1
+    </select>
 </mapper>
