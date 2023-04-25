@@ -1,6 +1,9 @@
 package tv.game88.game.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import tv.game88.game.api.dto.ReqGameType;
+import tv.game88.game.api.dto.RspGameType;
 import tv.game88.game.api.entity.GameType;
 
 import java.util.List;
@@ -20,4 +23,7 @@ public interface GameTypeMapper extends BaseMapper<GameType> {
      * @return 游戏类型集合
      */
     public List<GameType> selectGameTypeList( GameType gameType );
+
+
+    List<RspGameType> findList(@Param("req") ReqGameType req);
 }
