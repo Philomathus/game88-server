@@ -72,7 +72,7 @@ public class RGPayProcessor extends AbstractPay {
         String sign = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "pay_md5sign", DigestUtils.md5Hex( sign ).toUpperCase() );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( bodyMap ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( bodyMap ), null );
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
