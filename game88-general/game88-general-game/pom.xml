@@ -14,5 +14,10 @@
     <description>88棋牌服务-总代以及三方游戏拉取Game服务</description>
 
     <dependencies>
+        <dependency>
+            <groupId>tv.game88.general</groupId>
+            <artifactId>game88-general-api</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 </project>
