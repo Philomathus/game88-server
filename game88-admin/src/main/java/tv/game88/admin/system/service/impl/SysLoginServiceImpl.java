@@ -59,7 +59,8 @@ public class SysLoginServiceImpl implements ISysLoginService {
         }
         String otpSecretKey = RSACoder.decryptByPrivateKey( user.getOtpSecret(), KeyConstants.GOOGLE_AUTH_PRIVATE_KEY );
         if ( !GoogleAuthUtil.verifyCode( otpSecretKey, loginBody.getCode() ) ) {
-            AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
+            AsyncManager.me()
+                        .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                 "MFA验证码错误" ) );
             return RspBase.businessError( "MFA验证码不正确，请检查" );
         }
@@ -77,10 +78,11 @@ public class SysLoginServiceImpl implements ISysLoginService {
             if ( e instanceof BadCredentialsException ) {
                 String message = "用户不存在/密码错误";
                 AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
-                                    message, loginBody.getPassword() ) );
+                        message + ":::" + loginBody.getPassword() ) );
                 return RspBase.businessError( message );
             } else {
-                AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
+                AsyncManager.me()
+                            .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
                                     e.getMessage() ) );
                 return RspBase.businessError( e.getMessage() );
             }
@@ -91,7 +93,8 @@ public class SysLoginServiceImpl implements ISysLoginService {
         String ip = ServletUtil.getIp();
         log.info( "管理员{}登录IP:{}", loginBody.getUsername(), ip );
 
-        AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_SUCCESS, "登录成功" ) );
+        AsyncManager.me()
+                    .execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_SUCCESS, "登录成功" ) );
         LoginUser loginUser = ( LoginUser ) authentication.getPrincipal();
 
         SysUser sysUser = new SysUser();

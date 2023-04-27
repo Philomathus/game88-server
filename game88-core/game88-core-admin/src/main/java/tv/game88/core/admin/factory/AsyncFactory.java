@@ -30,8 +30,7 @@ public class AsyncFactory {
      *
      * @return 任务task
      */
-    public static TimerTask recordLogininfor( final String username, final String status, final String message,
-                                              final Object... args ) {
+    public static TimerTask recordLogininfor( final String username, final String status, final String message) {
         HttpServletRequest request   = ServletUtil.getHttpServletRequest();
         final UserAgent    userAgent = UserAgent.parseUserAgentString( request.getHeader( "User-Agent" ) );
         final String       ip        = ServletUtil.getIp( request );
@@ -41,9 +40,8 @@ public class AsyncFactory {
                 String address = "";
                 // 打印信息到日志
                 String s = AsyncFactory.getBlock( ip ) + address + AsyncFactory.getBlock( username )
-                        + AsyncFactory.getBlock( status ) + AsyncFactory.getBlock( message ) + AsyncFactory.getBlock( userAgent )
-                        + AsyncFactory.getBlock( args );
-                log.info( s, args );
+                        + AsyncFactory.getBlock( status ) + AsyncFactory.getBlock( message ) + AsyncFactory.getBlock( userAgent );
+                log.info( s );
                 // 获取客户端操作系统
                 String os = userAgent.getOperatingSystem().getName();
                 // 获取客户端浏览器
