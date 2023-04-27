@@ -108,7 +108,7 @@ public class SysUserTokenService {
     public String createToken( LoginUser loginUser ) {
         String token = RandomStringUtils.randomAlphabetic( 2 ) + IdWorker.get32UUID();
         loginUser.setToken( token );
-        this.delToken( loginUser.getUserId() );
+        this.delToken( loginUser.getUser().getUserId() );
         setUserAgent( loginUser );
         setLoginUser( loginUser );
 

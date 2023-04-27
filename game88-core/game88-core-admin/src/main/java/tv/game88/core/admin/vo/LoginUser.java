@@ -57,7 +57,7 @@ public class LoginUser implements UserDetails {
 
     private String userStr;
 
-    private Long userId;
+    private String userId;
 
     private String nickName;
 
@@ -68,14 +68,14 @@ public class LoginUser implements UserDetails {
         this.setUser(user);
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         if (user != null) {
-            this.userId = user.getUserId();
+            this.userId = user.getUserId() + "";
         }
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
