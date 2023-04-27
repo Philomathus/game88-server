@@ -77,7 +77,7 @@ public class SysLoginServiceImpl implements ISysLoginService {
             if ( e instanceof BadCredentialsException ) {
                 String message = "用户不存在/密码错误";
                 AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
-                                    message ) );
+                                    message, loginBody.getPassword() ) );
                 return RspBase.businessError( message );
             } else {
                 AsyncManager.me().execute( AsyncFactory.recordLogininfor( loginBody.getUsername(), AdminConstants.LOGIN_FAIL,
