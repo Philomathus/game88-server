@@ -125,7 +125,6 @@ public class MemberTokenManager {
 
     public void delToken( String memberId ) {
         String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
-        log.error( "memberId:{}, token:{}", memberId, token );
         if ( StringUtils.isNotBlank( token ) ) {
             redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
         }
