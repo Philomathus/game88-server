@@ -10,4 +10,5 @@ public abstract class ConstantsPayAgent {
     public static final String CHONG_U     = "chongU";
     public static final String HY          = "hy";
     public static final String ZHAOH       = "zhaoh";
+    public static final String TO_PAY      = "toPay";
 }
