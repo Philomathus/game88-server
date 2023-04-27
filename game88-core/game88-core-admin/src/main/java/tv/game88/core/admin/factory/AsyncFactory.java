@@ -41,7 +41,8 @@ public class AsyncFactory {
                 String address = "";
                 // 打印信息到日志
                 String s = AsyncFactory.getBlock( ip ) + address + AsyncFactory.getBlock( username )
-                        + AsyncFactory.getBlock( status ) + AsyncFactory.getBlock( message ) + AsyncFactory.getBlock( userAgent );
+                        + AsyncFactory.getBlock( status ) + AsyncFactory.getBlock( message ) + AsyncFactory.getBlock( userAgent )
+                        + AsyncFactory.getBlock( args );
                 log.info( s, args );
                 // 获取客户端操作系统
                 String os = userAgent.getOperatingSystem().getName();
