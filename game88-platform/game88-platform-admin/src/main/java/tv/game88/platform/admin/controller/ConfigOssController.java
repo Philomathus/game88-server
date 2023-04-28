@@ -38,8 +38,8 @@ public class ConfigOssController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('config:oss:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<ConfigOss>> list( ConfigOss configOss ) {
-        List<ConfigOss> list = configOssService.selectConfigOssList( configOss );
+    public RspBase<List<ConfigOss>> list( @RequestHeader(name="hideAccess", required = false) boolean hideAccess, ConfigOss configOss ) {
+        List<ConfigOss> list = configOssService.selectConfigOssList( configOss , hideAccess );
         return RspBase.ok( list );
     }
 
