@@ -38,10 +38,7 @@ import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
-import tv.game88.core.member.dto.ReqLogMoney;
-import tv.game88.core.member.dto.RspCodeFlow;
-import tv.game88.core.member.dto.RspLogMoney;
-import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.dto.*;
 import tv.game88.core.member.entity.*;
 import tv.game88.core.member.enums.EnumDev;
 import tv.game88.core.member.enums.EnumMoney;
@@ -112,6 +109,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Resource
     private ConfigEnvironmentService configEnvironmentService;
+    @Resource
+    private MemberInfoMapper  memberInfoMapper;
 
     @Value( "${im.tokenUrl:null}" )
     private String getImTokenUrl;
@@ -846,15 +845,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberCard memberCard1 = new MemberCard();
         memberCard1.setBankAccount( member.getBankAccount() );
         memberCard1.setMemberId( member.getMemberId() );
-        List<MemberCard> memberCards = memberCardMapper.selectMemberCardList( memberCard1 );
-        if ( !memberCards.isEmpty() ) {
-            MemberCard memberCard2 = memberCards.get( 0 );
-            //判断绑定的与修改成的是不是同一个,如果不是就不能修改
-            if ( !memberCard2.getId().equals( member.getId() ) ) {
-                log.error( "修改的id: {},上传的id: {}", memberCard2.getId(), member.getId() );
-                return RspBase.businessError( "用户已绑定该银行卡" );
-            }
+
+        List<MemberCard> memberCardList = memberCardMapper.findAllByBankAccount( member );
+        List<MemberCard> memberCardListFiltered = memberCardList.stream()
+                .filter((mc) ->
+                        !mc.getId().equals(member.getId()) && mc.getBankAccount().equals(member.getBankAccount()))
+                .collect(Collectors.toList());
+        if (!memberCardListFiltered.isEmpty() && memberCardListFiltered.get(0) != null) {
+            return RspBase.businessError( "卡已绑定帐号" + memberCardListFiltered.get(0).getMemberId());
         }
+
         MemberCard memberCard = memberCardMapper.selectById( id );
         memberCard.setRealName( member.getRealName() );
         memberCard.setBankId( member.getBankId() );
@@ -898,7 +898,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         resultSet.add( ImmutableMap.of( "memberId", memberId ) );
 
         Map<String, Object> resultMap = resultSet.stream().map( Map::entrySet ).flatMap( Set::stream )
-                                                 .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
+                .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
 
         List<Map> mapList = this.baseMapper.personalGameData( startTime, endTime, memberId, memberId.substring(
                 memberId.length() - 1 ) );
@@ -952,7 +952,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
                 if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
                     PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
-                                                                                  .toString(), PlatformUser.class );
+                            .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     platformUser.setNickName( nickName );
                     loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
@@ -992,9 +992,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Override
     public RspBase<RspMoney> boxAccount( String memberId, ReqBoxPass boxPass ) {
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
-                                                                          .select( "id", "box_account", "account_now",
-                                                                                  "box_pass" )
-                                                                          .one();
+                .select( "id", "box_account", "account_now",
+                        "box_pass" )
+                .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }
@@ -1018,7 +1018,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "处理中请稍后" );
         }
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
-                                                                          .select( "id", "box_account", "account_now" ).one();
+                .select( "id", "box_account", "account_now" ).one();
         BigDecimal boxAccount = memberInfo.getBoxAccount();
         BigDecimal accountNow = memberInfo.getAccountNow();
         boolean    flag       = false;
@@ -1034,7 +1034,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         SpringUtils.getBean( MemberInfoService.class ).updateSafeBox( memberInfo, addAccount, flag );
         MemberInfo newInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId )
-                                                                       .select( "id", "box_account", "account_now" ).one();
+                .select( "id", "box_account", "account_now" ).one();
         RspMoney money = new RspMoney();
         money.setBoxAccount( newInfo.getBoxAccount() );
         money.setAccountNow( newInfo.getAccountNow() );
@@ -1071,7 +1071,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         BeanUtils.copyProperties( memberInfo, rspMember );
 
         List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
-                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         Integer vip = 1;
         for ( ConfigVip configVip : configVips ) {
             if ( memberInfo.getCodeTotal().compareTo( configVip.getBcode() ) < 0 ) {
@@ -1089,7 +1089,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 if ( StringUtils.isNotBlank( token ) && redisUtils.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
                     Map loginUserMap = redisUtils.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
                     PlatformUser platformUser = JsonUtil.json2Object( loginUserMap.getOrDefault( "platformUserStr", "" )
-                                                                                  .toString(), PlatformUser.class );
+                            .toString(), PlatformUser.class );
                     platformUser.setVip( vip );
                     loginUserMap.put( "platformUserStr", JsonUtil.object2Json( platformUser ) );
                     redisUtils.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, loginUserMap );
@@ -1267,13 +1267,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         try {
             token = restTemplate.execute( this.getImTokenUrl, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ),
                     response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return text;
-            } );
+                        InputStream bodyStream = response.getBody();
+                        String      text;
+                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                            text = IOUtils.toString( reader );
+                        }
+                        return text;
+                    } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
@@ -1411,7 +1411,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Override
     public RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String memberId ) {
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "id", memberId ).select( "id", "inviter_code" )
-                                                                          .one();
+                .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }
@@ -1432,4 +1432,101 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         return RspBase.ok( "member_money updated" );
     }
 
+    @Override
+    public RspBase updatePhones(ReqSmallFeatures req) {
+        if (org.springframework.util.StringUtils.hasText(req.getPhones()) && org.springframework.util.StringUtils.hasText(req.getPassword())) {
+            if (req.getPhones().contains("\n")) {
+                try {
+                    String[] phones = req.getPhones().split("\n");
+                    StringBuilder phone = new StringBuilder();
+                    for (int i = 0; i < phones.length; i++) {
+                        phone.append("\"").append(phones[i]).append("\"").append(",");
+                    }
+                    phone = new StringBuilder(phone.substring(0, phone.length() - 1));
+                    req.setPhones(phone.toString());
+                } catch (Exception e) {
+                    return RspBase.businessError("分割手机号出错,请检查格式");
+                }
+            } else {
+                req.setPhones("\"" + req.getPhones() + "\"");
+            }
+            memberInfoMapper.updatePhones(req);
+            return RspBase.ok();
+        }
+        return RspBase.businessError("请输入批量手机号和密码");
+    }
+
+    @Override
+    public RspBase<?> queryPhones(ReqSmallFeatures req) {
+        if (org.springframework.util.StringUtils.hasText(req.getUserIds())) {
+            if (req.getUserIds().contains("\n")) {
+                try {
+                    String[] userIds = req.getUserIds().split("\n");
+                    StringBuilder userId = new StringBuilder();
+                    for (int i = 0; i < userIds.length; i++) {
+                        userId.append("\"").append(userIds[i]).append("\"").append(",");
+                    }
+                    userId = new StringBuilder(userId.substring(0, userId.length() - 1));
+                    req.setUserIds(userId.toString());
+                } catch (Exception e) {
+                    return RspBase.businessError("分割会员ID出错,请检查格式");
+                }
+            } else {
+                req.setUserIds("\"" + req.getUserIds() + "\"");
+            }
+            List<ReqSmallFeatures> phonesAndUserId = memberInfoMapper.queryPhones(req);
+            List<String> phonesByIds = new ArrayList<>();
+            for (ReqSmallFeatures ph : phonesAndUserId) {
+                phonesByIds.add(ph.getUserIds() + ":" + ph.getPhonesByIds());
+            }
+            return RspBase.ok(phonesByIds);
+        }
+        return RspBase.businessError("请输入批量会员ID");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public RspBase<?> commitMoney(ReqSmallFeatures req) {
+        if (org.springframework.util.StringUtils.hasText(req.getMemberIds())) {
+            String[] userIds = null;
+            if (req.getMemberIds().contains("\n")) {
+                try {
+                    userIds = req.getMemberIds().split("\n");
+                    StringBuilder userId = new StringBuilder();
+                    for (int i = 0; i < userIds.length; i++) {
+                        userId.append("\"").append(userIds[i]).append("\"")
+                                .append(",").append(req.getMoney())
+                                .append(",").append(req.getMoney())
+                                .append("),(");
+                    }
+                    userId = new StringBuilder(userId.substring(0, userId.length() - 3));
+                    req.setUserIds(userId.toString());
+                } catch (Exception e) {
+                    return RspBase.businessError("分割会员ID出错,请检查格式");
+                }
+            } else {
+                req.setUserIds("\"" + req.getMemberIds() + "\"" + "," + req.getMoney() + "," + req.getMoney());
+            }
+            //清除表中数据
+            memberInfoMapper.clear();
+            memberInfoMapper.insertPaiSong(req.getUserIds());
+            return RspBase.ok();
+        }
+        return RspBase.businessError("请输入批量会员ID");
+    }
+
+    @Override
+    public RspBase<?> insertPaiSong(String userIds) {
+        if (org.springframework.util.StringUtils.hasText(userIds)) {
+            memberInfoMapper.insertPaiSong(userIds);
+            return RspBase.ok();
+        }
+        return RspBase.businessError("请输入批量会员ID");
+    }
+
+    @Override
+    public RspBase<?> clear() {
+        memberInfoMapper.clear();
+        return RspBase.ok();
+    }
 }

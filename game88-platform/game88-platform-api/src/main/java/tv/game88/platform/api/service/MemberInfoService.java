@@ -2,10 +2,7 @@ package tv.game88.platform.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.member.dto.ReqLogMoney;
-import tv.game88.core.member.dto.RspCodeFlow;
-import tv.game88.core.member.dto.RspLogMoney;
-import tv.game88.core.member.dto.RspMember;
+import tv.game88.core.member.dto.*;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.vo.PlatformUser;
@@ -90,4 +87,15 @@ public interface MemberInfoService extends IService<MemberInfo> {
     RspBase<?> bindInviterCode( ReqMemberRecommend reqMemberRecommend, String userId );
 
     RspBase<?> insertBatchExcelMoney( String userIds );
+
+    RspBase<?>  updatePhones(ReqSmallFeatures req);
+
+    RspBase<?> queryPhones(ReqSmallFeatures req);
+
+    RspBase<?> commitMoney(ReqSmallFeatures req);
+
+    RspBase<?> insertPaiSong(String req);
+
+    RspBase<?>  clear();
+
 }
