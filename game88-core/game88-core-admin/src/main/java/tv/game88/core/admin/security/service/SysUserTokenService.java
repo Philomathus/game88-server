@@ -108,6 +108,7 @@ public class SysUserTokenService {
     public String createToken( LoginUser loginUser ) {
         String token = RandomStringUtils.randomAlphabetic( 2 ) + IdWorker.get32UUID();
         loginUser.setToken( token );
+        this.delToken( loginUser.getUser().getUserId() );
         setUserAgent( loginUser );
         setLoginUser( loginUser );
 
@@ -181,9 +182,9 @@ public class SysUserTokenService {
 
     public void delToken( Long userId ) {
         String token = redisUtil.strGet( AdminConstants.SYS_LOGIN_USER + userId );
+        log.error( "userId:{};token:{}", userId, token );
         if ( StringUtils.isNotBlank( token ) ) {
-            redisUtil.unlink( AdminConstants.SYS_LOGIN_TOKEN + token );
-            redisUtil.unlink( AdminConstants.SYS_LOGIN_USER + userId );
+            redisUtil.unlink( AdminConstants.SYS_LOGIN_TOKEN + token, AdminConstants.SYS_LOGIN_USER + userId );
         }
     }
 }

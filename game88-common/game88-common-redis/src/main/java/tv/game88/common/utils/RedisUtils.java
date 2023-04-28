@@ -16,10 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings( "unused" )
 @Log4j2
@@ -143,8 +140,8 @@ public class RedisUtils {
     /**
      * 删除一个或多个key-value，但是，相比DEL会产生阻塞，该命令会在另一个线程中回收内存，因此它是非阻塞的。
      */
-    public Long unlink( Collection<String> keys ) {
-        return stringRedisTemplate.unlink( keys );
+    public Long unlink( String... keys ) {
+        return stringRedisTemplate.unlink( Arrays.asList( keys ) );
     }
 
     /**
