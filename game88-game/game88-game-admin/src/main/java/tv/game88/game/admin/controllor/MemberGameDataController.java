@@ -76,9 +76,7 @@ public class MemberGameDataController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:gameData:recordList')" )
     @GetMapping( value = "/recordList" )
     public RspBase<?> getGameRecordList( MemberGameData memberGameData ) {
-//        return memberGameDataService.getGameBetRecordData( memberGameData );
-
-        return getRspBasePage( memberGameDataService.getGameBetRecordData( memberGameData ) );
+        return  memberGameDataService.getGameBetRecordData( memberGameData );
 
     }
 

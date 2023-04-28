@@ -278,7 +278,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     }
 
     @Override
-    public List getGameBetRecordData( MemberGameData memberGameData ) {
+    public RspBase getGameBetRecordData( MemberGameData memberGameData ) {
 
         Map map = new HashMap();
         map.put( "gameID", "1");
@@ -302,7 +302,10 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         List a = new ArrayList();
         a.add(map);
 
-        return a;
+        Map returnMap = new HashMap();
+        returnMap.put("list", a);
+
+        return RspBase.ok(returnMap);
     }
 
     @Override
