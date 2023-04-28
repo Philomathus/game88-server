@@ -17,8 +17,8 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.game.api.base.BaseGameButt;
-import tv.game88.game.api.base.GameButtFactoryUtil;
+import tv.game88.game.api.base.BaseGameDock;
+import tv.game88.game.api.base.GameDockFactoryUtil;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.GameInfo;
@@ -58,7 +58,7 @@ public class GameServiceImpl implements GameService {
     @Resource
     private GameCacheUtils         gameCacheUtils;
     @Resource
-    private GameButtFactoryUtil    gameButtFactoryUtil;
+    private GameDockFactoryUtil    gameDockFactoryUtil;
     @Resource
     private MemberInfoMapper       memberInfoMapper;
     @Resource
@@ -187,27 +187,27 @@ public class GameServiceImpl implements GameService {
         }
 
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
-        BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
             if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
                 // 创建账号
-                baseGameButt.createAccount( reqJoinGame );
+                baseGameDock.createAccount( reqJoinGame );
             }
             // 获取token
-            baseGameButt.getToken( reqJoinGame );
+            baseGameDock.getToken( reqJoinGame );
             if ( gamePlatform.getGameCategory() != EnumGameCategory.CQ9 ) {
                 // 创建账号
-                baseGameButt.createAccount( reqJoinGame );
+                baseGameDock.createAccount( reqJoinGame );
             }
             // 获取游戏链接
-            baseGameButt.getJoinGameUrl( reqJoinGame );
+            baseGameDock.getJoinGameUrl( reqJoinGame );
             if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
                 // 扣除会员金额
                 memberGameMoneyService.beginGameEnter( reqJoinGame );
                 // 设置为上分操作
                 reqJoinGame.setMoneyType( 1 );
                 // 上分
-                baseGameButt.transferMoney( reqJoinGame );
+                baseGameDock.transferMoney( reqJoinGame );
             }
             memberGameMoneyService.enterGameSuccess( reqJoinGame );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
@@ -216,7 +216,7 @@ public class GameServiceImpl implements GameService {
             // 如果发生转账异常
             if ( e instanceof GameTransferException ) {
                 // 查询转账记录
-                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
+                if ( baseGameDock.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.enterGameSuccess( reqJoinGame );
                     redisUtils.unLock( "joinGame" + platformUser.getId() );
                     return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
@@ -254,28 +254,28 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-        BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
             // 获取token
             if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                     && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
-                baseGameButt.getToken( reqJoinGame );
+                baseGameDock.getToken( reqJoinGame );
             }
             // 设置为下分操作
             reqJoinGame.setMoneyType( 2 );
-            BigDecimal balance = baseGameButt.queryBalance( reqJoinGame );
+            BigDecimal balance = baseGameDock.queryBalance( reqJoinGame );
             // 金额高于0元才下分
             if ( balance.compareTo( BigDecimal.ZERO ) <= 0 ) {
                 return RspBase.ok( "游戏余额为0，无需下分" );
             }
             reqJoinGame.setTransferMoney( balance );
-            baseGameButt.withdrawal( reqJoinGame );
+            baseGameDock.withdrawal( reqJoinGame );
             memberGameMoneyService.outGameSuccess( reqJoinGame );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             // 如果发生提现异常
             if ( e instanceof GameTransferException ) {
-                if ( baseGameButt.queryTransfer( reqJoinGame ) ) {
+                if ( baseGameDock.queryTransfer( reqJoinGame ) ) {
                     memberGameMoneyService.outGameSuccess( reqJoinGame );
                     return RspBase.ok( "下分成功" );
                 } else {
@@ -303,16 +303,16 @@ public class GameServiceImpl implements GameService {
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
         for ( GamePlatform gamePlatform : gamePlatforms ) {
             ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-            BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
                 try {
                     // 获取token
                     if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                             && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
-                        baseGameButt.getToken( reqJoinGame );
+                        baseGameDock.getToken( reqJoinGame );
                     }
-                    balance = baseGameButt.queryBalance( reqJoinGame );
+                    balance = baseGameDock.queryBalance( reqJoinGame );
                 } catch ( Exception e ) {
                     log.error( "查询游戏余额异常:" + e.getMessage(), e );
                     balance = new BigDecimal( -1 );
@@ -353,8 +353,8 @@ public class GameServiceImpl implements GameService {
         }
         if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
             ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null );
-            BaseGameButt baseGameButt = gameButtFactoryUtil.createGameButtProcessor( gamePlatform.getGameCategory() );
-            baseGameButt.getToken( reqJoinGame );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
+            baseGameDock.getToken( reqJoinGame );
             return RspBase.ok( "", reqJoinGame.getToken() );
         }
         return RspBase.ok( "", redisUtils.strGet( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) );

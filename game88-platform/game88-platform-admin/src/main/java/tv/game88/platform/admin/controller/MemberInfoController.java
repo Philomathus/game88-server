@@ -163,9 +163,8 @@ public class MemberInfoController extends BaseController {
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
                 redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
-                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
-                                                        .toString();
-                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
+                PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
                 platformUser.setStatus( status );
                 redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
@@ -201,7 +200,6 @@ public class MemberInfoController extends BaseController {
     @Log( title = "加分", businessType = BusinessType.UPDATE )
     public RspBase<?> addScore( @RequestBody ReqAddScore req ) throws Exception {
         SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
-
         if ( !redisUtil.lock( "memberAddScore" + req.getId(), 15 ) ) {
             return RspBase.businessError( "请勿重复提交" );
         }

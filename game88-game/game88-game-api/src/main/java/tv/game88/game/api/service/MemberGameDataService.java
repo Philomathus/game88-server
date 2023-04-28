@@ -3,12 +3,15 @@ package tv.game88.game.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.game.api.dto.*;
+import tv.game88.game.api.entity.GameWashCodeLog;
 import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
+import tv.game88.game.api.dto.RspWashCodeInfo;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 会员游戏注单数据Service接口
@@ -36,7 +39,18 @@ public interface MemberGameDataService extends IService<MemberGameData> {
 
     MemberGameData getCount( ReqMemberGameData reqMemberGameData );
 
-    RspBase<?> getGameBetRecordData( MemberGameData memberGameData );
+    List<?> getGameBetRecordData( MemberGameData memberGameData );
 
-    RspBase<?> getGameBetDetailData( MemberGameData memberGameData );
+    List<?> getGameBetDetailData(MemberGameData memberGameData );
+
+    List<RspWashCodeRate> getWashCodeRateList();
+
+    RspBase<RspWashCodeInfo> getWashCodeDetail( String memberId );
+
+    List<RspGameWashCodeLog> getWashCodeLogs( String memberId );
+
+    RspBase<RspWashCodeInfo> toWashCode( String memberId );
+
+    void opWashCode( String memberId, List<String> memberGameDataIdList, List<GameWashCodeLog> gameWashCodeLogs,
+                     LocalDateTime time, String washId );
 }

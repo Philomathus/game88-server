@@ -274,7 +274,8 @@
         w.create_time requestTime,
         l.bank_name bankName,
         w.`status`,
-        w.remark
+        w.remark,
+        w.bank_account bankAccount
         from member_withdraw_detail w
         left join config_bank_list l on l.id = w.bank_id
         where w.withdraw_id = #{memberId}

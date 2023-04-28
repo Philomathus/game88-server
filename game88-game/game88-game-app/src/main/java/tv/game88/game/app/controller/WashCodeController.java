@@ -12,6 +12,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.enums.EnumReqTime;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.*;
+import tv.game88.game.api.dto.RspWashCodeInfo;
 import tv.game88.game.api.service.MemberGameDataService;
 import tv.game88.game.api.type.EnumGameCategory;
 
@@ -59,5 +60,32 @@ public class WashCodeController extends BaseController {
         }
         return getRspBasePage( memberGameDataService.getGameDataList( MemberSecurityUtils.getUserId(), reqGameData ),
                 reqGameData );
+    }
+
+    // ========== 新洗码接口 ============
+
+    @Operation( summary = "洗码比例 - 新" )
+    @PostMapping( "/getWashCodeRateList" )
+    public RspBase<List<RspWashCodeRate>> getWashCodeRateList() {
+        return RspBase.ok( memberGameDataService.getWashCodeRateList() );
+    }
+
+    @Operation( summary = "会员洗码详情 - 新" )
+    @PostMapping( "/getWashCodeDetail" )
+    public RspBase<RspWashCodeInfo> getWashCodeDetail() {
+        return memberGameDataService.getWashCodeDetail( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "会员洗码记录 - 新" )
+    @PostMapping( "/getWashCodeLogs" )
+    public RspBase<List<RspGameWashCodeLog>> getWashCodeLogs( @RequestBody PageDomain pageDomain ) {
+        startPage( pageDomain );
+        return getRspBasePage( memberGameDataService.getWashCodeLogs( MemberSecurityUtils.getUserId() ), pageDomain );
+    }
+
+    @Operation( summary = "会员手动洗码 - 新" )
+    @PostMapping( "/toWashCode" )
+    public RspBase<RspWashCodeInfo> toWashCode() {
+        return memberGameDataService.toWashCode( MemberSecurityUtils.getUserId() );
     }
 }

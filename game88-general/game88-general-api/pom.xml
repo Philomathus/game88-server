@@ -14,5 +14,32 @@
     <description>88棋牌服务-总代以及三方游戏拉取API服务</description>
 
     <dependencies>
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-http</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-orm</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

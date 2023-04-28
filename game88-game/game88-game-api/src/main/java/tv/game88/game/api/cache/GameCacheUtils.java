@@ -11,8 +11,10 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.dto.RspGameType;
+import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.mapper.ConfigWashCodeMapper;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
@@ -25,35 +27,32 @@ import java.util.stream.Collectors;
 @Component
 public class GameCacheUtils {
 
-    public static final String GAME_TYPE_KEY          = Constants.GAME_PREX + "type:effect";
-    public static final String GAME_PLATFORM_KEY      = Constants.GAME_PREX + "platform:";
-    public static final String GAME_PLATFORM_LIST_KEY = Constants.GAME_PREX + "platformList";
-    public static final String GAME_INFO_KEY          = Constants.GAME_PREX + "info:";
-    public static final String GAME_INFO_LIST_KEY     = Constants.GAME_PREX + "infoList:";
-    public static final String GAME_INFO_S_KEY        = Constants.GAME_PREX + "infos:";
+    public static final String GAME_TYPE_KEY                  = Constants.GAME_PREX + "type:effect";
+    public static final String GAME_PLATFORM_KEY              = Constants.GAME_PREX + "platform:";
+    public static final String GAME_INFO_KEY                  = Constants.GAME_PREX + "info:";
+    public static final String GAME_INFO_LIST_KEY             = Constants.GAME_PREX + "infoList:";
+    public static final String GAME_INFO_S_KEY                = Constants.GAME_PREX + "infos:";
+    public static final String GAME_WASH_CODE_CONFIG_LIST_KEY = Constants.GAME_PREX + "washCodeConfigList";
 
     @Resource
-    private RedisUtils         redisUtils;
+    private RedisUtils           redisUtils;
     @Resource
-    private GameTypeMapper     gameTypeMapper;
+    private GameTypeMapper       gameTypeMapper;
     @Resource
-    private GamePlatformMapper gamePlatformMapper;
+    private GamePlatformMapper   gamePlatformMapper;
     @Resource
-    private GameInfoMapper     gameInfoMapper;
+    private GameInfoMapper       gameInfoMapper;
+    @Resource
+    private ConfigWashCodeMapper configWashCodeMapper;
 
     public List<RspGameType> getEffectTypeList() {
         if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
-            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper )
-                    .eq( "effect", 1 )
-                    .orderByAsc( "sort" )
-                    .list()
-                    .stream()
-                    .map( gameType -> {
+            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper ).eq( "effect", 1 ).orderByAsc( "sort" ).list()
+                                                                                   .stream().map( gameType -> {
                         RspGameType rspGameType = new RspGameType();
                         BeanUtils.copyProperties( gameType, rspGameType );
                         return rspGameType;
-                    } )
-                    .collect( Collectors.toList() );
+                    } ).collect( Collectors.toList() );
             if ( !CollectionUtils.isEmpty( gameTypes ) ) {
                 redisUtils.strSet( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
             }
@@ -73,18 +72,6 @@ public class GameCacheUtils {
         }
         String s = redisUtils.strGet( GAME_PLATFORM_KEY + platformId );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, GamePlatform.class );
-    }
-
-    public List<GamePlatform> getGamePlatformList() {
-        if ( !redisUtils.exists( GAME_PLATFORM_LIST_KEY ) ) {
-            List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-            if ( !CollectionUtils.isEmpty( gamePlatforms ) ) {
-                redisUtils.strSet( GAME_PLATFORM_LIST_KEY, JsonUtil.object2Json( gamePlatforms ) );
-            }
-            return gamePlatforms;
-        }
-        String s = redisUtils.strGet( GAME_PLATFORM_LIST_KEY );
-        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
     public GameInfo getGameInfo( Long infoId ) {
@@ -145,9 +132,6 @@ public class GameCacheUtils {
     }
 
     public void clear( String key ) {
-        if ( key.startsWith( GAME_PLATFORM_KEY ) ) {
-            redisUtils.unlink( GAME_PLATFORM_LIST_KEY );
-        }
         redisUtils.unlink( key );
     }
 
@@ -161,5 +145,18 @@ public class GameCacheUtils {
             this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
             this.clear( GAME_INFO_S_KEY + rspGameType.getId() );
         }
+    }
+
+    public List<ConfigWashCode> getEffectWashCodeConfigList() {
+        if ( !redisUtils.exists( GAME_WASH_CODE_CONFIG_LIST_KEY ) ) {
+            ConfigWashCode configWashCode = new ConfigWashCode();
+            configWashCode.setEffect( true );
+            List<ConfigWashCode> configWashCodes = configWashCodeMapper.selectConfigWashCodeList( configWashCode );
+
+            redisUtils.strSet( GAME_WASH_CODE_CONFIG_LIST_KEY, JsonUtil.object2Json( configWashCodes ) );
+            return configWashCodes;
+        }
+        String s = redisUtils.strGet( GAME_WASH_CODE_CONFIG_LIST_KEY );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 }

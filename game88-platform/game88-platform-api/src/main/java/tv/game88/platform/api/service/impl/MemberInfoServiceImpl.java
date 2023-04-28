@@ -214,10 +214,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             if ( e instanceof BadCredentialsException ) {
-                log.error( e.getMessage() );
+                log.error( "密码错误:{} ", JsonUtil.object2Json( mobileLogin ) );
             } else {
                 log.error( e.getMessage(), e );
             }
+            AuthContextHolderUtils.clearContext();
             return RspBase.businessError( "手机号不存在/密码错误" );
         } finally {
             AuthContextHolderUtils.clearContext();
@@ -561,7 +562,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberInfo m = new MemberInfo();
         m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
         m.setId( makeMemberCode() );
-        if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) ) {
+        if ( StringUtils.isNotBlank( mobileLogin.getInviterCode() ) && StringUtils.isAlphanumeric( mobileLogin.getInviterCode() ) ) {
             try {
                 m.setInviterCode( mobileLogin.getInviterCode() );
             } catch ( Exception e ) {
