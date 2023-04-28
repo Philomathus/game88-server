@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface ConfigOssService {
 
-    List<ConfigOss> selectConfigOssList(ConfigOss configOss);
+    List<ConfigOss> selectConfigOssList(ConfigOss configOss, boolean hideAccess );
 
     public ConfigOss selectConfigOssById( Long id );
 

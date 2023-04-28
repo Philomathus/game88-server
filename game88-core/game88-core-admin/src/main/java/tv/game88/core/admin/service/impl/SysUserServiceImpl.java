@@ -288,4 +288,5 @@ public class SysUserServiceImpl implements ISysUserService {
         userRoleMapper.deleteUserRole( userIds );
         return userMapper.deleteUserByIds( userIds );
     }
+
 }

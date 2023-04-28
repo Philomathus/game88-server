@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 游戏投注报表子表对象 report_plam_gameschilds
@@ -101,6 +100,7 @@ public class ReportPlamGameschilds {
     @JsonFormat( pattern = "yyyy-MM-dd" )
     @Excel( name = "日期", width = 30, databaseFormat = "yyyy-MM-dd" )
     private String begindate;
+    private String endDate;
 
     @Override
     public String toString() {

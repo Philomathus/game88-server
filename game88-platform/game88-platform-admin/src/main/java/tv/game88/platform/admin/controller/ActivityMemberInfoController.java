@@ -46,8 +46,8 @@ public class ActivityMemberInfoController extends BaseController {
 
     @PreAuthorize( "@ss.hasPermi('activity:memberInfo:list')" )
     @GetMapping( "/ipList" )
-    public List<Map> ipList( ActivityMemberInfo activityMemberInfo ) {
-        return activityMemberInfoService.selectIpList( activityMemberInfo );
+    public RspBase<List<Map>> ipList( ActivityMemberInfo activityMemberInfo ) {
+        return RspBase.ok(activityMemberInfoService.selectIpList( activityMemberInfo ));
     }
 
     /**

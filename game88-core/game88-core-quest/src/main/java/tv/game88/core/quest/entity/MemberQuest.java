@@ -28,4 +28,6 @@ public class MemberQuest {
     private Integer curNum;
     @Schema( title = "任务模型" )
     private Integer taskMode;
+    @Schema( name = "目标任务数量" )
+    private Integer target;
 }

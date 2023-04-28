@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.SpeakIpBlackListMapper">
+
+    <resultMap type="tv.game88.platform.api.entity.SpeakIpBlackList" id="SpeakIpBlackListResult">
+        <result property="id"    column="id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="userIp"    column="user_ip"    />
+        <result property="userId"    column="user_id"    />
+        <result property="msg"    column="msg"    />
+    </resultMap>
+
+    <sql id="selectSpeakIpBlackListVo">
+        select id,msg, create_time,user_id,user_ip from speak_ip_black_list
+    </sql>
+
+    <select id="selectSpeakIpBlackListList" parameterType="tv.game88.platform.api.entity.SpeakIpBlackList" resultMap="SpeakIpBlackListResult">
+        <include refid="selectSpeakIpBlackListVo"/>
+        <where>
+            <if test="userIp != null  and userIp != ''"> and user_ip = #{userIp}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectSpeakIpBlackListById" parameterType="String" resultMap="SpeakIpBlackListResult">
+        <include refid="selectSpeakIpBlackListVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSpeakIpBlackList" parameterType="tv.game88.platform.api.entity.SpeakIpBlackList">
+        insert into speak_ip_black_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="userIp != null">user_ip,</if>
+            <if test="msg != null">msg,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="userIp != null">#{userIp},</if>
+            <if test="msg != null">#{msg},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSpeakIpBlackList" parameterType="tv.game88.platform.api.entity.SpeakIpBlackList">
+        update speak_ip_black_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createTime != null">create_time = UNIX_TIMESTAMP(#{createTime}),</if>
+
+            <if test="userIp != null">user_ip = #{userIp},</if>
+
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSpeakIpBlackListById" parameterType="String">
+        delete from speak_ip_black_list where id = #{id}
+    </delete>
+
+    <delete id="deleteSpeakIp" parameterType="String">
+        delete from speak_ip_black_list where user_ip = #{userIp}
+    </delete>
+    <delete id="deleteSpeakIpBlackListByIds" parameterType="String">
+        delete from speak_ip_black_list where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
