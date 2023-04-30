@@ -23,6 +23,4 @@ public interface GamePlatformMapper extends BaseMapper<GamePlatform> {
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform );
 
     List<RspGamePlatform> selectRspList( Long infoTypeId );
-
-    List<RspGamePlatform> findSimpleLists();
 }

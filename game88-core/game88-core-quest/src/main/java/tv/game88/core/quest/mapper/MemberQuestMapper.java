@@ -8,18 +8,18 @@ import java.util.List;
 public interface MemberQuestMapper extends BaseMapper<MemberQuest> {
 
     /**
-     * 查询【请填写功能名称】
+     * 查询会员任务
      *
-     * @param id 【请填写功能名称】ID
-     * @return 【请填写功能名称】
+     * @param id 会员任务ID
+     * @return 会员任务
      */
     MemberQuest selectMemberQuestById(String id);
 
     /**
-     * 查询【请填写功能名称】列表
+     * 查询会员任务列表
      *
-     * @param memberQuest 【请填写功能名称】
-     * @return 【请填写功能名称】集合
+     * @param memberQuest 会员任务
+     * @return 会员任务集合
      */
     List<MemberQuest> selectMemberQuestList( MemberQuest memberQuest );
 
@@ -29,31 +29,31 @@ public interface MemberQuestMapper extends BaseMapper<MemberQuest> {
     void resetDayTaskStatus();
 
     /**
-     * 新增【请填写功能名称】
+     * 新增会员任务
      *
-     * @param memberQuest 【请填写功能名称】
+     * @param memberQuest 会员任务
      * @return 结果
      */
     int insertMemberQuest(MemberQuest memberQuest);
 
     /**
-     * 修改【请填写功能名称】
+     * 修改会员任务
      *
-     * @param memberQuest 【请填写功能名称】
+     * @param memberQuest 会员任务
      * @return 结果
      */
     int updateMemberQuest(MemberQuest memberQuest);
 
     /**
-     * 删除【请填写功能名称】
+     * 删除会员任务
      *
-     * @param id 【请填写功能名称】ID
+     * @param id 会员任务ID
      * @return 结果
      */
     int deleteMemberQuestById(String id);
 
     /**
-     * 批量删除【请填写功能名称】
+     * 批量删除会员任务
      *
      * @param ids 需要删除的数据ID
      * @return 结果

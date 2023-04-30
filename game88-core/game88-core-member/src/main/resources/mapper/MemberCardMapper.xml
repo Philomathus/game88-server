@@ -84,11 +84,4 @@
             #{id}
         </foreach>
     </select>
-
-    <select id="findAllByBankAccount" resultMap="MemberCardResult">
-        select 	*
-        from 	member_card
-        where 	bank_account = #{bankAccount}
-
-    </select>
 </mapper>
