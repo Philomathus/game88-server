@@ -1,10 +1,6 @@
 package tv.game88.platform.api.service.impl;
 
 import org.springframework.stereotype.Service;
-import tv.game88.common.utils.RedisUtils;
-import tv.game88.core.member.entity.MemberInfo;
-import tv.game88.core.member.mapper.MemberInfoMapper;
-import tv.game88.platform.api.cache.MemberForbidUtil;
 import tv.game88.platform.api.entity.SpeakIpBlackList;
 import tv.game88.platform.api.mapper.SpeakIpBlackListMapper;
 import tv.game88.platform.api.service.SpeakIpBlackListService;
@@ -14,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 【请填写功能名称】Service业务层处理
+ * 封禁IPService业务层处理
  *
  * @author 77tv
  * @date 2021-02-22
@@ -23,19 +19,12 @@ import java.util.List;
 public class SpeakIpBlackListServiceImpl implements SpeakIpBlackListService {
     @Resource
     private SpeakIpBlackListMapper speakIpBlackListMapper;
-    @Resource
-    private MemberInfoMapper memberInfoMapper;
-    @Resource
-    private MemberForbidUtil memberForbidUtil;
-
-    @Resource
-    private RedisUtils redisUtil;
 
     /**
-     * 查询【请填写功能名称】
+     * 查询封禁IP
      *
-     * @param id 【请填写功能名称】ID
-     * @return 【请填写功能名称】
+     * @param id 封禁IPID
+     * @return 封禁IP
      */
     @Override
     public SpeakIpBlackList selectSpeakIpBlackListById(String id) {
@@ -43,10 +32,10 @@ public class SpeakIpBlackListServiceImpl implements SpeakIpBlackListService {
     }
 
     /**
-     * 查询【请填写功能名称】列表sdasdasd
+     * 查询封禁IP列表sdasdasd
      *
-     * @param speakIpBlackList 【请填写功能名称】
-     * @return 【请填写功能名称】
+     * @param speakIpBlackList 封禁IP
+     * @return 封禁IP
      */
     @Override
     public List<SpeakIpBlackList> selectSpeakIpBlackListList(SpeakIpBlackList speakIpBlackList) {
@@ -54,9 +43,9 @@ public class SpeakIpBlackListServiceImpl implements SpeakIpBlackListService {
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增封禁IP
      *
-     * @param speakIpBlackList 【请填写功能名称】
+     * @param speakIpBlackList 封禁IP
      * @return 结果
      */
     @Override
@@ -66,28 +55,9 @@ public class SpeakIpBlackListServiceImpl implements SpeakIpBlackListService {
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 批量删除封禁IP
      *
-     * @param speakIpBlackList 【请填写功能名称】
-     * @return 结果
-     */
-    @Override
-    public int updateSpeakIpBlackList(SpeakIpBlackList speakIpBlackList) {
-        // 解封账号
-        MemberInfo update = new MemberInfo();
-        update.setId( speakIpBlackList.getUserId() );
-        update.setStatus( 1 );
-//        update.setSpeak("0");
-        memberInfoMapper.updateById( update );
-        memberForbidUtil.setPlatformUserSpeak( speakIpBlackList.getUserId(), false );
-        speakIpBlackListMapper.deleteSpeakIp( speakIpBlackList.getUserIp());
-        return 1;
-    }
-
-    /**
-     * 批量删除【请填写功能名称】
-     *
-     * @param ids 需要删除的【请填写功能名称】ID
+     * @param ids 需要删除的封禁IPID
      * @return 结果
      */
     @Override
@@ -96,9 +66,9 @@ public class SpeakIpBlackListServiceImpl implements SpeakIpBlackListService {
     }
 
     /**
-     * 删除【请填写功能名称】信息
+     * 删除封禁IP信息
      *
-     * @param id 【请填写功能名称】ID
+     * @param id 封禁IPID
      * @return 结果
      */
     @Override
