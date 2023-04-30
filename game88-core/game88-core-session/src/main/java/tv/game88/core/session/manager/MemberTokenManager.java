@@ -12,14 +12,13 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.RspMember;
-import tv.game88.core.session.vo.MemberLoginUser;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.session.vo.MemberLoginUser;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -126,7 +125,7 @@ public class MemberTokenManager {
     public void delToken( String memberId ) {
         String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
         if ( StringUtils.isNotBlank( token ) ) {
-            redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+            redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
         }
     }
 }

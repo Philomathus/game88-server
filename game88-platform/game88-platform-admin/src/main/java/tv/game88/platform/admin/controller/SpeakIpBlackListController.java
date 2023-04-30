@@ -18,21 +18,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 【请填写功能名称】Controller
- *
- * @author 77tv
- * @date 2021-02-22
- */
 @RestController
 @RequestMapping("/admin/speakIpBlackList")
 public class SpeakIpBlackListController extends BaseController {
     @Autowired
     private SpeakIpBlackListService speakIpBlackListService;
 
-    /**
-     * 查询【请填写功能名称】列表
-     */
     @GetMapping("/list")
     public RspBase<List<SpeakIpBlackList>> list(SpeakIpBlackList speakIpBlackList) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -52,50 +43,29 @@ public class SpeakIpBlackListController extends BaseController {
         return getRspBasePage(list, pageDomain);
     }
 
-    /**
-     * 导出【请填写功能名称】列表
-     */
     @PreAuthorize("@ss.hasPermi('admin:speakIpBlackList:export')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @Log(title = "封禁IP", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public void export(SpeakIpBlackList speakIpBlackList, HttpServletResponse response) {
         List<SpeakIpBlackList> list = speakIpBlackListService.selectSpeakIpBlackListList(speakIpBlackList);
         ExportExcelUtil.exportExcel(list, "禁言IP", "禁言IP表", SpeakIpBlackList.class, response);
     }
 
-    /**
-     * 获取【请填写功能名称】详细信息
-     */
     @PreAuthorize("@ss.hasPermi('admin:speakIpBlackList:query')")
     @GetMapping(value = "/{id}")
     public RspBase<SpeakIpBlackList> getInfo(@PathVariable("id") String id) {
         return RspBase.ok(speakIpBlackListService.selectSpeakIpBlackListById(id));
     }
 
-    /**
-     * 新增【请填写功能名称】
-     */
     @PreAuthorize("@ss.hasPermi('admin:speakIpBlackList:add')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @Log(title = "封禁IP", businessType = BusinessType.INSERT)
     @PostMapping
     public RspBase<?> add(@RequestBody SpeakIpBlackList speakIpBlackList) {
         return toResult(speakIpBlackListService.insertSpeakIpBlackList(speakIpBlackList));
     }
 
-    /**
-     * 修改【请填写功能名称】
-     */
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public RspBase<?> edit(@RequestBody SpeakIpBlackList speakIpBlackList) {
-        return toResult(speakIpBlackListService.updateSpeakIpBlackList(speakIpBlackList));
-    }
-
-    /**
-     * 删除【请填写功能名称】
-     */
     @PreAuthorize("@ss.hasPermi('admin:speakIpBlackList:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
+    @Log(title = "封禁IP", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public RspBase<?> remove(@PathVariable String[] ids) {
         return toResult(speakIpBlackListService.deleteSpeakIpBlackListByIds(ids));

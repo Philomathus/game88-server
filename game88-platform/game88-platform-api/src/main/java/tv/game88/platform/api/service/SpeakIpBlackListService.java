@@ -37,14 +37,6 @@ public interface SpeakIpBlackListService {
 	public int insertSpeakIpBlackList(SpeakIpBlackList speakIpBlackList);
 
 	/**
-	 * 修改【请填写功能名称】
-	 *
-	 * @param speakIpBlackList 【请填写功能名称】
-	 * @return 结果
-	 */
-	public int updateSpeakIpBlackList(SpeakIpBlackList speakIpBlackList);
-
-	/**
 	 * 批量删除【请填写功能名称】
 	 *
 	 * @param ids 需要删除的【请填写功能名称】ID
