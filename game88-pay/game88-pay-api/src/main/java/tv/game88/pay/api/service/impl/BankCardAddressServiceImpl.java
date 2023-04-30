@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 【请填写功能名称】Service业务层处理
+ * 出款银行地址黑名单Service业务层处理
  *
  * @author Rajesh
  * @date 2022-12-28
@@ -22,10 +22,10 @@ public class BankCardAddressServiceImpl extends ServiceImpl<BankCardAddressMappe
     private BankCardAddressMapper bankCardAddressMapper;
 
     /**
-     * 查询【请填写功能名称】列表
+     * 查询出款银行地址黑名单列表
      * list all bank card address service impl
-     * @param bankCardAddress 【请填写功能名称】
-     * @return 【请填写功能名称】
+     * @param bankCardAddress 出款银行地址黑名单
+     * @return 出款银行地址黑名单
      */
     @Override
     public List<BankCardAddress> selectBankCardAddressList( BankCardAddress bankCardAddress ) {
@@ -33,9 +33,9 @@ public class BankCardAddressServiceImpl extends ServiceImpl<BankCardAddressMappe
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 修改出款银行地址黑名单
      * update bank card address service impl
-     * @param bankCardAddress 【请填写功能名称】
+     * @param bankCardAddress 出款银行地址黑名单
      * @return 结果
      */
     @Override

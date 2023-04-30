@@ -29,9 +29,4 @@
             </if>
         </where>
     </select>
-
-    <select id="findListForCache" resultType="tv.game88.core.member.dto.RspVipSet">
-        select level, level_bonus, week_bonus, bcode from config_vip order by level
-    </select>
-
 </mapper>

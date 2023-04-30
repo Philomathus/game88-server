@@ -26,14 +26,4 @@
             </if>
         </where>
     </select>
-
-    <select id="findList" resultType="tv.game88.game.api.dto.RspGameType">
-        select *
-        from game_type
-        where 1=1
-        <if test="req.name != null and req.name != ''">
-            and name = #{req.name}
-        </if>
-        order by sort asc
-    </select>
 </mapper>

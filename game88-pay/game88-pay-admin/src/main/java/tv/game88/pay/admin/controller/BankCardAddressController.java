@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 【请填写功能名称】Controller
+ * 出款银行地址黑名单Controller
  *
  * @author Rajesh
  * @date 2022-12-28
@@ -29,7 +29,7 @@ public class BankCardAddressController extends BaseController {
     private BankCardAddressService bankCardAddressService;
 
     /**
-     * 查询【请填写功能名称】列表 list data
+     * 查询出款银行地址黑名单列表 list data
      */
     @PreAuthorize( "@ss.hasPermi('pay:bankCardAddress:list')" )
     @GetMapping("/list")
@@ -41,17 +41,17 @@ public class BankCardAddressController extends BaseController {
     }
 
     /**
-     * 新增【请填写功能名称】add new bank card address
+     * 新增出款银行地址黑名单add new bank card address
      */
     @PreAuthorize( "@ss.hasPermi('pay:bankCardAddress:add')" )
-    @Log( title = "【请填写功能名称】", businessType = BusinessType.INSERT )
+    @Log( title = "出款银行地址黑名单", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody BankCardAddress bankCardAddress ){
         return RspBase.ok(bankCardAddressService.save( bankCardAddress ));
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取出款银行地址黑名单详细信息
      * fetch data by id
      */
     @PreAuthorize( "@ss.hasPermi('pay:bankCardAddress:query')" )
@@ -61,7 +61,7 @@ public class BankCardAddressController extends BaseController {
     }
 
     /**
-     * 删除【请填写功能名称】
+     * 删除出款银行地址黑名单
      * delete by id
      */
     @PreAuthorize( "@ss.hasPermi('pay:bankCardAddress:remove')" )

@@ -41,6 +41,4 @@ public class RspGameInfo {
     public Boolean getMaintain() {
         return BooleanUtils.isTrue( maintain ) || BooleanUtils.isTrue( platformMaintain );
     }
-
-    public String getIdasString() {return Long.toString(id);}
 }

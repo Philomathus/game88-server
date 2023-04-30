@@ -29,6 +29,4 @@ public interface MemberCardMapper extends BaseMapper<MemberCard> {
     List<RspMemberCard> selectRspList( @Param( "memberId" ) String memberId );
 
     List<MemberCard> selectRealNameByMemberIds( @Param( "list" ) Set<String> memberIds );
-
-    List<MemberCard> findAllByBankAccount(MemberCard memberCard);
 }

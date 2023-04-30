@@ -2,7 +2,6 @@ package tv.game88.platform.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import tv.game88.core.member.dto.RspVipSet;
 
 import java.util.List;
 
