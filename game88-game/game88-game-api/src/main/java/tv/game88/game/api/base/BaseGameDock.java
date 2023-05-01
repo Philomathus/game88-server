@@ -2,6 +2,7 @@ package tv.game88.game.api.base;
 
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.web.client.HttpServerErrorException;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.game.api.dto.ReqJoinGame;
 
@@ -67,7 +68,8 @@ public interface BaseGameDock {
      *
      * @return 是否存在转账记录
      */
-    @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
+    @Retryable( value = { Exception.class, HttpServerErrorException.class }, exclude = BusinessException.class, maxAttempts = 5
+            , backoff = @Backoff( delay = 500 ) )
     boolean queryTransfer( ReqJoinGame reqJoinGame );
 
     //List<Map<String, Object>> queryBetRecord();
