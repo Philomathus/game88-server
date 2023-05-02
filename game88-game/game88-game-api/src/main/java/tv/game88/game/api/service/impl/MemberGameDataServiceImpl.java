@@ -76,9 +76,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
                 memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
                 for ( GameInfo gameInfo : gameInfos ) {
-                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && (
-                            memberGameDatum.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
-                                    "-" + memberGameDatum.getKindId() ) ) ) {
+                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && gameInfo.getKindId() != null
+                            && ( memberGameDatum.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
+                            "-" + memberGameDatum.getKindId() ) ) ) {
                         memberGameDatum.setSonPlatformName( gameInfo.getName() );
                     }
                 }
