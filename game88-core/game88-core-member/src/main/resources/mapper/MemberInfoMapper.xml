@@ -465,6 +465,7 @@
                      platform_id                   platformId
               from member_game_data${dbNodes}
               where account = #{memberId}
+                and profit <![CDATA[ <> ]]> 0
                 and game_end_time >= #{startTime}
                 and game_end_time <![CDATA[ <= ]]> #{endTime}
               GROUP BY platform_id) a
