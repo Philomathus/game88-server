@@ -69,17 +69,16 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
         if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
             Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
-            Set<String>  kindIds     = memberGameData.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
             // 排除 热门游戏/老棋牌游戏/老电子游戏
-            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds )
-                                                                                .in( "kind_id", kindIds ).list();
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
 
             for ( MemberGameData memberGameDatum : memberGameData ) {
                 GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
                 memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
                 for ( GameInfo gameInfo : gameInfos ) {
-                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && memberGameDatum.getKindId()
-                                                                                                                  .equals( gameInfo.getKindId() ) ) {
+                    if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && (
+                            memberGameDatum.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
+                                    "-" + memberGameDatum.getKindId() ) ) ) {
                         memberGameDatum.setSonPlatformName( gameInfo.getName() );
                     }
                 }
@@ -281,7 +280,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     public RspBase getGameBetRecordData( MemberGameData memberGameData ) {
 
         Map map = new HashMap();
-        map.put( "gameID", "1");
+        map.put( "gameID", "1" );
         map.put( "accounts", "2" );
         map.put( "serverID", "3" );
         map.put( "kindID", "4" );
@@ -300,7 +299,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         map.put( "recordID", "17" );
 
         List a = new ArrayList();
-        a.add(map);
+        a.add( map );
 
         Map returnMap = new HashMap();
         returnMap.put("list", a);
@@ -312,7 +311,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     public List getGameBetDetailData( MemberGameData memberGameData ) {
 
         Map map = new HashMap();
-        map.put( "gameId", "1");
+        map.put( "gameId", "1" );
         map.put( "playName", "2" );
         map.put( "gameRound", "3" );
         map.put( "netAmount", "4" );
@@ -328,7 +327,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
         map.put( "betIP", "14" );
 
         List a = new ArrayList();
-        a.add(map);
+        a.add( map );
 
         return a;
 
