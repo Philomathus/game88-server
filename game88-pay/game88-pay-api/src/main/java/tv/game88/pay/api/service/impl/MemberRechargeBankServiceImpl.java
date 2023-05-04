@@ -164,6 +164,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         }
+        if ( configEnvCacheUtil.getConfBool( "is_display_topay" ) ) {
+            rspWithdrawBank.getSpecialBankInfoMap().put( "TOPAY", configBankListMapper.findBankIdByNameOrCode( "TOPAY" ) );
+        } else {
+            memberCardList.removeIf( rspMemberCard -> "TOPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
+                    || "TOPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        }
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspMemberCard memberCard : memberCardList ) {
             if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {
