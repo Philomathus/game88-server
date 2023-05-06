@@ -21,7 +21,7 @@ public class GameDataTask {
     @Resource
     private GameDataService gameDataService;
 
-    @Scheduled( fixedDelay = 30000, initialDelay = 1 )
+    @Scheduled( cron = "0/15 * * * * ? " )
     public void runTask() {
         if ( !redisUtils.lock( "GameDataTask", 20 ) ) {
             return;
