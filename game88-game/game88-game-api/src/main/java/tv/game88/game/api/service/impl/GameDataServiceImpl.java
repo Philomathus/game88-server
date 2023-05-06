@@ -283,6 +283,7 @@ public class GameDataServiceImpl implements GameDataService {
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                 .eq( "effect", 1 ).gt( "game_type_id", 0 ) );
 
+        log.warn( JsonUtil.object2Json( listConfQuest ) );
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
@@ -305,6 +306,7 @@ public class GameDataServiceImpl implements GameDataService {
                     if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
                         continue;
                     }
+                    log.warn( JsonUtil.object2Json( confQuest ) );
                     memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
