@@ -306,7 +306,6 @@ public class GameDataServiceImpl implements GameDataService {
                     if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
                         continue;
                     }
-                    log.warn( JsonUtil.object2Json( confQuest ) );
                     memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
