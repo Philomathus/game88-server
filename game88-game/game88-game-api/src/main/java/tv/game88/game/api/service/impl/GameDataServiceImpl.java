@@ -69,9 +69,10 @@ public class GameDataServiceImpl implements GameDataService {
         List<RspGameDataLog> rspGameDataLogs = gameService.remoteDataGrab( start, end, account,
                 gameCategory != null ? EnumGameCategory.getDataRemoteByEnum( gameCategory ) : null );
         if ( CollectionUtils.isEmpty( rspGameDataLogs ) ) {
+            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
             return;
         }
-        log.warn( "拉单条数:{}", rspGameDataLogs.size() );
+        log.info( "拉单条数:{}", rspGameDataLogs.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
                                                                            .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
