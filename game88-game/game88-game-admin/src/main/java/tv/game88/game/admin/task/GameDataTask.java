@@ -26,6 +26,7 @@ public class GameDataTask {
         if ( !redisUtils.lock( "GameDataTask", 20 ) ) {
             return;
         }
+        log.warn( "进来了" );
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusMinutes( 2 );
         String        begin   = LocalDateTimeUtils.format( starDay );
