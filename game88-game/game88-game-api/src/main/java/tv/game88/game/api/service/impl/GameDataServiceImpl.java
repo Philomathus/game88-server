@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
@@ -83,6 +84,7 @@ public class GameDataServiceImpl implements GameDataService {
         for ( RspGameDataLog dataLog : rspGameDataLogs ) {
             EnumGameCategory enumGameCategory = EnumGameCategory.getEnumByDataRemote( dataLog.getPlatform_id() );
             if ( enumGameCategory == null ) {
+                log.error( JsonUtil.object2Json( dataLog ) );
                 continue;
             }
             GamePlatform gamePlatform = gamePlatformMap.get( enumGameCategory );
