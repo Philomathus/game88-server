@@ -1,5 +1,6 @@
 package tv.game88.game.admin.task;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,8 @@ public class GameDataTask {
         if ( !redisUtils.lock( "GameDataTask", 20 ) ) {
             return;
         }
-        log.warn( "进来了" );
+        String uuid = IdWorker.get32UUID();
+        log.warn( "进来了" + uuid );
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusMinutes( 2 );
         String        begin   = LocalDateTimeUtils.format( starDay );
@@ -62,5 +64,6 @@ public class GameDataTask {
                 log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }
         }
+        log.warn( "结束了" + uuid  );
     }
 }
