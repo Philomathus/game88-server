@@ -71,6 +71,7 @@ public class GameDataServiceImpl implements GameDataService {
         if ( CollectionUtils.isEmpty( rspGameDataLogs ) ) {
             return;
         }
+        log.warn( "拉单条数:{}", rspGameDataLogs.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
                                                                            .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
