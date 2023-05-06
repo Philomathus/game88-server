@@ -126,8 +126,11 @@ public class GameDataServiceImpl implements GameDataService {
 
 
         }
+        log.warn( "11" );
         insertBatch( session, mapper, willCodeList );
+        log.warn( "22" );
         doBeatCode( willCodeMap );
+        log.warn( "33" );
         deQuestCheck( willCodeList );
         log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
