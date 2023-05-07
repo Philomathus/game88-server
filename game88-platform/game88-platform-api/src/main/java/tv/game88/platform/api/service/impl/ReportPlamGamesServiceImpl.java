@@ -3,7 +3,6 @@ package tv.game88.platform.api.service.impl;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
-import tv.game88.common.vo.RspBase;
 import tv.game88.platform.api.dto.RspPlamGamesMonth;
 import tv.game88.platform.api.entity.ReportPlamGames;
 import tv.game88.platform.api.mapper.ReportPlamGamesMapper;
@@ -15,7 +14,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
@@ -28,7 +29,7 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
     public List<ReportPlamGames> selectReportPlamGamesList(ReportPlamGames reportPlamGames ) {
         String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
 
-        if ( dateNowStr.equals( reportPlamGames.getBegindate() ) ) {
+        if ( dateNowStr.equals( reportPlamGames.getEndDate() ) ) {
             if ( !redisUtils.exists( "admin-reportPlamGames" ) ) {
                 storage( dateNowStr );
             }
