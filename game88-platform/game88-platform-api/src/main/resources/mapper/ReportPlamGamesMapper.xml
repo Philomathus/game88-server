@@ -33,8 +33,7 @@
                 and begindate <![CDATA[ <= ]]> #{endDate}
             </if>
         </where>
-        GROUP BY
-        gameagent,gameplame,begindate
+        GROUP BY gameagent,gameplame
     </select>
 
     <resultMap type="tv.game88.platform.api.entity.ReportPlamGames" id="ReportPlamGamesResult">
