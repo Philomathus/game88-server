@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
@@ -73,7 +74,7 @@ public class GameDataServiceImpl implements GameDataService {
             log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
             return;
         }
-        log.info( "拉单条数:{}", rspGameDataLogs.size() );
+        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", rspGameDataLogs.size(), start, end );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
                                                                            .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
@@ -126,11 +127,9 @@ public class GameDataServiceImpl implements GameDataService {
 
 
         }
-        log.warn( "11" );
+        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
         insertBatch( session, mapper, willCodeList );
-        log.warn( "22" );
         doBeatCode( willCodeMap );
-        log.warn( "33" );
         deQuestCheck( willCodeList );
         log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
@@ -278,6 +277,7 @@ public class GameDataServiceImpl implements GameDataService {
         }
     }
 
+    @Async
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
