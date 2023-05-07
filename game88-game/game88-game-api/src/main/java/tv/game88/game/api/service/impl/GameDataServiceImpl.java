@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
@@ -129,8 +130,9 @@ public class GameDataServiceImpl implements GameDataService {
         }
         log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
         insertBatch( session, mapper, willCodeList );
-        doBeatCode( willCodeMap );
-        deQuestCheck( willCodeList );
+        GameDataService gameDataService = SpringUtils.getBean( GameDataService.class );
+        gameDataService.doBeatCode( willCodeMap );
+        gameDataService.deQuestCheck( willCodeList );
         log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
 
@@ -178,10 +180,9 @@ public class GameDataServiceImpl implements GameDataService {
         }
 
         insertBatch( session, mapper, willCodeList );
-
-        doBeatCode( willCodeMap );
-
-        deQuestCheck( willCodeList );
+        GameDataService gameDataService = SpringUtils.getBean( GameDataService.class );
+        gameDataService.doBeatCode( willCodeMap );
+        gameDataService.deQuestCheck( willCodeList );
     }
 
     public void insertBatch( SqlSession session, MemberGameDataMapper mapper, List<MemberGameData> willCodeList ) {
@@ -207,6 +208,7 @@ public class GameDataServiceImpl implements GameDataService {
         session.close();
     }
 
+    @Async
     public void doBeatCode( Map<String, BigDecimal> willCodeMap ) {
         Map<String, BigDecimal> codeAccountMap = new HashMap<>();
         MemberBcode             query          = new MemberBcode();
