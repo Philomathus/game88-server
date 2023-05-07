@@ -18,6 +18,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
+import tv.game88.pay.api.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -34,13 +35,23 @@ import java.util.*;
 @Log4j2
 public class SanJinPayAgentProcessor extends AbstractPayAgent {
     @Override
+    public String getName() {
+        return "三金代付";
+    }
+
+    @Override
     public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
                              PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "action", "AgentPay" );
         bodyMap.put( "mer_no", payAgentChannel.getMerId() );
-        Map<String, String> cardInfoMap = new HashMap<>();
-        cardInfoMap.put( "bankName", withdrawDetail.get );
+        Map<String, String>     cardInfoMap = new HashMap<>();
+        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
+        for ( RspConfigBankList rspConfigBank : effectList ) {
+            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
+                cardInfoMap.put( "bankName", rspConfigBank.getBankName() );
+            }
+        }
         cardInfoMap.put( "cardNo", withdrawDetail.getBankAccount().trim() );
         cardInfoMap.put( "name", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "card_info", JsonUtil.object2Json( cardInfoMap ) );
@@ -89,7 +100,7 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
             } else {
                 reqPayAgent.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
 
-                payAgentService.callBackOrder( withdrawDetail, payAgentPlatform );
+                payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             }
         }
         log.warn( payAgentPlatform.getName() + "订单提交失败 - orderNo:{}", withdrawDetail.getWithdrawOrderNo() );
@@ -98,11 +109,24 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
 
     @Override
     public String callbackPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp ) throws Exception {
+        if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {
+            log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );
+            return "fail";
+        }
+
         String sign    = requestMap.remove( "hmac" ).toString();
         String ts      = requestMap.remove( "ts" ).toString();
         String dataStr = requestMap.getOrDefault( "data", "" ).toString();
 
+        Map<String, Object> dataMap  = JsonUtil.json2Map( dataStr );
+        String              merOrder = dataMap.getOrDefault( "mer_order", "" ).toString();
+        String              status   = dataMap.getOrDefault( "status", "" ).toString();
+        String              tradeNo  = dataMap.getOrDefault( "trade_no", "" ).toString();
+
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
+
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( merOrder );
+        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
@@ -111,15 +135,12 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
 
         log.info( payAgentPlatform.getName() + "回调签名字符串:" + sign + "_" + signStr );
         if ( sign.equalsIgnoreCase( signStr ) ) {
-            Map<String, Object> dataMap  = JsonUtil.json2Map( dataStr );
-            String              merOrder = dataMap.getOrDefault( "mer_order", "" ).toString();
-            String              status   = dataMap.getOrDefault( "status", "" ).toString();
-            String              tradeNo  = dataMap.getOrDefault( "trade_no", "" ).toString();
+
             if ( StringUtils.isBlank( merOrder ) ) {
                 log.error( "提现相关记录丢失 - merOrderNo:{}", merOrder );
                 return "fail";
             }
-            MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectByOrderNo( merOrder );
+            MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( merOrder );
             if ( withdrawDetail == null ) {
                 log.error( "提现相关记录丢失 - merOrderNo:{}", merOrder );
                 return "fail";
@@ -128,8 +149,7 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
                 log.error( "已有代付记录 - merOrderNo:{}", merOrder );
                 return "success";
             }
-            PayAgentLog payAgentLog = payAgentLogMapper.selectByWithdrawOrderNo( merOrder );
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, tradeNo, payAgentPlatform,
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, tradeNo, payAgentChannel,
                     "TRADE_SUCCESS".equals( status ) );
             return "success";
         }
@@ -144,16 +164,16 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
 
     @Override
     public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectByOrderNo( payAgentLog.getWithdrawOrderNo() );
-        PayAgentPlatform     payAgentPlatform =
-                payAgentPlatformMapper.selectPayAgentPlatformById( payAgentLog.getPayAgentPlatId() );
+        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
+        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
+        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> paramsMap = new TreeMap<>();
         paramsMap.put( "action", "OrderQuery" );
-        paramsMap.put( "order_no", withdrawDetail.getOrderNo() );
+        paramsMap.put( "order_no", withdrawDetail.getWithdrawOrderNo() );
         paramsMap.put( "mer_no", payAgentChannel.getMerId() );
 
-        String ts = DateFormatUtils.formate( new Date(), DateFormatUtils.TIGHT_PATTERN_DATETIME );
+        String ts = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
@@ -172,12 +192,12 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
 
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.execute( payAgentPlatform.getPayOrderQueryAddr(), HttpMethod.POST,
+            resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
                     restTemplate.httpEntityCallback( httpEntity ), response -> {
                 InputStream bodyStream = response.getBody();
                 String      text;
                 try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = CharStreams.toString( reader );
+                    text = IOUtils.toString( reader );
                 }
                 return JsonUtil.json2Map( text );
             } );
@@ -194,13 +214,13 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
                     } else if ( "TRADE_FAIL".equals( state ) ) {
                         status = 5;
                     }
-                    payAgentService.processOrder( payAgentPlatform, withdrawDetail, withdrawDetail.getUpdateTime(), status, 0 );
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status, 0 );
                 }
                 return resultMap.getOrDefault( "msg", "" ).toString();
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
-        return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawDetail.getOrderNo();
+        return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawDetail.getWithdrawOrderNo();
     }
 }
