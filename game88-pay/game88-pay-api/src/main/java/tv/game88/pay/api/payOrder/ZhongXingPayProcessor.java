@@ -19,7 +19,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 @Log4j2
-@Repository( value = ConstantsPay.ZHONG_XIN_PAY + "Processor" )
+@Repository( value = ConstantsPay.ZHONG_XING_PAY + "Processor" )
 public class ZhongXingPayProcessor extends AbstractPay {
 
     @Override
