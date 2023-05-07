@@ -24,7 +24,8 @@ public class GameDataTask {
 
     @Scheduled( cron = "0/15 * * * * ? " )
     public void runTask() {
-        if ( !redisUtils.lock( "GameDataTask", 20 ) ) {
+        if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
+            log.error( "没拿到锁" );
             return;
         }
         String uuid = IdWorker.get32UUID();
@@ -64,6 +65,6 @@ public class GameDataTask {
                 log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }
         }
-        log.warn( "结束了" + uuid  );
+        log.warn( "结束了" + uuid );
     }
 }
