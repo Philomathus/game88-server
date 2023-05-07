@@ -36,8 +36,11 @@ public class FixDataTask {
         if ( !redisUtils.lock( "FixDataTask", 150 ) ) {
             return;
         }
-        List<GamePlatform>      gamePlatforms       = new QueryChainWrapper<>( gamePlatformMapper ).list();
-        List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 ).list();
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+
+        List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 )
+                                                                                                        .isNotNull( "platform_id" )
+                                                                                                        .list();
         for ( MemberGameDataFix memberGameDataFix : memberGameDataFixes ) {
             for ( GamePlatform gamePlatform : gamePlatforms ) {
                 if ( memberGameDataFix.getPlatformId() == gamePlatform.getId().intValue() ) {

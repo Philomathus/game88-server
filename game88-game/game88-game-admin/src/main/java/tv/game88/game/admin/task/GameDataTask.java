@@ -22,7 +22,7 @@ public class GameDataTask {
     @Resource
     private GameDataService gameDataService;
 
-    @Scheduled( cron = "0/15 * * * * ? " )
+    @Scheduled( fixedDelay = 30000, initialDelay = 1 )
     public void runTask() {
         if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
             log.error( "没拿到锁" );
