@@ -6,12 +6,10 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.SpringUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
@@ -130,9 +128,8 @@ public class GameDataServiceImpl implements GameDataService {
         }
         log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
         insertBatch( session, mapper, willCodeList );
-        GameDataService gameDataService = SpringUtils.getBean( GameDataService.class );
-        gameDataService.doBeatCode( willCodeMap );
-        gameDataService.deQuestCheck( willCodeList );
+        this.doBeatCode( willCodeMap );
+        this.deQuestCheck( willCodeList );
         log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
 
@@ -180,9 +177,8 @@ public class GameDataServiceImpl implements GameDataService {
         }
 
         insertBatch( session, mapper, willCodeList );
-        GameDataService gameDataService = SpringUtils.getBean( GameDataService.class );
-        gameDataService.doBeatCode( willCodeMap );
-        gameDataService.deQuestCheck( willCodeList );
+        this.doBeatCode( willCodeMap );
+        this.deQuestCheck( willCodeList );
     }
 
     public void insertBatch( SqlSession session, MemberGameDataMapper mapper, List<MemberGameData> willCodeList ) {
@@ -208,7 +204,6 @@ public class GameDataServiceImpl implements GameDataService {
         session.close();
     }
 
-    @Async
     public void doBeatCode( Map<String, BigDecimal> willCodeMap ) {
         Map<String, BigDecimal> codeAccountMap = new HashMap<>();
         MemberBcode             query          = new MemberBcode();
@@ -279,7 +274,6 @@ public class GameDataServiceImpl implements GameDataService {
         }
     }
 
-    @Async
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
@@ -290,23 +284,20 @@ public class GameDataServiceImpl implements GameDataService {
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
                 continue;
             }
+
             int add = new BigDecimal( data.getCellScore() ).intValue();
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
-                if ( gameTypeId == 4 ) {// 4 是电子游戏
-                    // MG UPG 记入电子游戏任务
-                    RspGameInfo rspGameInfoMG = new RspGameInfo();
-                    rspGameInfoMG.setPlatformId( 9 );
-                    effectInfoList.add( rspGameInfoMG );
-                    RspGameInfo rspGameInfoUPG = new RspGameInfo();
-                    rspGameInfoUPG.setPlatformId( 11 );
-                    effectInfoList.add( rspGameInfoUPG );
-                }
+                boolean           y              = false;
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
-                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
-                        continue;
+                    if ( data.getPlatformId() == rspGameInfo.getPlatformId() && (
+                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
+                                    "-" + data.getKindId() ) ) ) {
+                        y = true;
                     }
+                }
+                if ( y ) {
                     memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
