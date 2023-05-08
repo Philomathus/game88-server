@@ -288,7 +288,7 @@ public class GameDataServiceImpl implements GameDataService {
             int add = new BigDecimal( data.getCellScore() ).intValue();
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
-                List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
+                List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );
                 boolean           y              = false;
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
                     if ( rspGameInfo.getKindId() == null ) {
