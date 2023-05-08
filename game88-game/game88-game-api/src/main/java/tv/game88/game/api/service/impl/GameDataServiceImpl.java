@@ -291,6 +291,9 @@ public class GameDataServiceImpl implements GameDataService {
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
                 boolean           y              = false;
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
+                    if ( rspGameInfo.getKindId() == null ) {
+                        continue;
+                    }
                     if ( data.getPlatformId() == rspGameInfo.getPlatformId() && (
                             data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
                                     "-" + data.getKindId() ) ) ) {
