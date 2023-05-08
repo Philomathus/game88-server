@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -40,7 +41,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
         params.put( "PayTypeIdFormat", "URL" );
         params.put( "Remark", "remark" );
 
-        String signStr = this.assemblyUrl( params ) + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         params.put( "Sign", DigestUtils.md5Hex( signStr ) );
 
@@ -68,7 +69,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
         reqMap.put( "MerchantId", payPlatform.getMerId() );
         reqMap.put( "MerchantUniqueOrderId", memberRechargeOnline.getOrderNo() );
 
-        String signStr = this.assemblyUrl( reqMap ) + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( reqMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         reqMap.put( "Sign", DigestUtils.md5Hex( signStr ) );
 
@@ -120,7 +121,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        String signStr = this.assemblyUrl( bodyMap ) + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         String rel     = DigestUtils.md5Hex( signStr );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
