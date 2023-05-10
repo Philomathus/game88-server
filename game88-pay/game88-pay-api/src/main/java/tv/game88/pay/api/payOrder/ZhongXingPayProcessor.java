@@ -2,6 +2,7 @@ package tv.game88.pay.api.payOrder;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
@@ -32,7 +33,8 @@ public class ZhongXingPayProcessor extends AbstractPay {
     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new TreeMap<>();
         params.put( "Amount", reqPayRecharge.getMoney().setScale( 2, RoundingMode.HALF_UP ) );
-        params.put( "ClientRealName", "name" );
+        String realName = memberCardMapper.findRealNameById( reqPayRecharge.getUserId() );
+        params.put( "ClientRealName", StringUtils.isBlank( realName ) ? "name" : realName );
         params.put( "Ip", DigestUtils.md5Hex( reqPayRecharge.getUserId() ) );
         params.put( "MerchantId", payPlatform.getMerId() );
         params.put( "MerchantUniqueOrderId", reqPayRecharge.getOrderNo() );
