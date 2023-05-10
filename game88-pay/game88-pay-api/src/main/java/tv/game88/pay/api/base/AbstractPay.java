@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
+import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqPayRecharge;
 import tv.game88.pay.api.entity.PayPlatform;
@@ -42,6 +43,8 @@ public abstract class AbstractPay implements BasePay {
     protected ConfigEnvCacheUtil         configEnvCacheUtil;
     @Resource
     protected PayCacheUtil               payCacheUtil;
+    @Resource
+    protected MemberCardMapper           memberCardMapper;
 
     private static final Pattern URL_PATTERN = Pattern.compile(
             "(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;" + "]+[-A-Za-z0-9+&@#/%=~_|]" );
@@ -137,12 +140,8 @@ public abstract class AbstractPay implements BasePay {
     protected static String packageFormHtml( String url, ReqPayRecharge reqPayRecharge, Map<String, String> bodyMap ) {
         StringBuilder sb = new StringBuilder( "<form id='Form1' name='Form1' method='post' action='" + url + "'>" );
 
-        bodyMap.forEach( ( k, v ) -> sb
-                .append( "<input type='hidden' name='" )
-                .append( k )
-                .append( "' value='" )
-                .append( v )
-                .append( "'>" ) );
+        bodyMap.forEach( ( k, v ) -> sb.append( "<input type='hidden' name='" ).append( k ).append( "' value='" ).append( v )
+                                       .append( "'>" ) );
 
         sb.append( "</form><script>var form = document.getElementById('Form1');form.submit();</script>" );
         reqPayRecharge.setUrlType( 1 );
