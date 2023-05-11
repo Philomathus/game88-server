@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,14 +59,13 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     @Resource
     private ConfigEnvCacheUtil           configEnvCacheUtil;
     @Resource
+    private TelegramBotMessage           telegramBotMessage;
+    @Resource
     private RedisUtils                   redisUtils;
     @Resource
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
 
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-
-    @Autowired
-    private TelegramBotMessage telegramBotMessage;
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {

@@ -20,7 +20,6 @@ import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -54,13 +53,13 @@ import java.util.Map;
 @Component
 public class SmsApi {
     @Resource
+    private ConfigSmsMapper        configSmsMapper;
+    @Resource
     private ConfigSmsCacheUtil     configSmsCacheUtil;
     @Resource
     private ConfigSmsFaillogMapper configSmsFaillogMapper;
     @Resource
     private RestTemplate           restTemplate;
-    @Autowired
-    private ConfigSmsMapper configSmsMapper;
 
     //无需修改,用于格式化鉴权头域,给"X-WSSE"参数赋值
     private static final String WSSE_HEADER_FORMAT =
@@ -211,10 +210,10 @@ public class SmsApi {
                 throw new BusinessException( "今日发送短信过多，请明日重试" );
             } else if ( "FailedOperation.PhoneNumberOnBlacklist".equals( rspCode )
                     || "FailedOperation.PhoneNumberInBlacklist".equals( rspCode ) ) {
-                throw new BusinessException("您的号码在黑名单库中，请联系客服");
-            } else if ("insufficient balance in SMS package".equals( rspCode )
+                throw new BusinessException( "您的号码在黑名单库中，请联系客服" );
+            } else if ( "insufficient balance in SMS package".equals( rspCode )
                     || "FailedOperation.InsufficientBalanceInSmsPackage".equals( rspCode ) ) {
-                throw new BusinessException("短信包中的余额不足");
+                throw new BusinessException( "短信包中的余额不足" );
             } else {
                 throw new BusinessException( "发送短信失败，请联系客服" );
             }
@@ -308,32 +307,33 @@ public class SmsApi {
         smsFainLog.setCreateTime( LocalDateTime.now() );
         configSmsFaillogMapper.insert( smsFainLog );
     }
+
     public String sendMemSms( String phone, String msg ) {
-        if (StringUtils.isEmpty(phone)) {
+        if ( StringUtils.isEmpty( phone ) ) {
             throw new BusinessException( "手机号不能为空" );
         }
-        if (StringUtils.isEmpty(msg)) {
+        if ( StringUtils.isEmpty( msg ) ) {
             throw new BusinessException( "发送信息不能为空" );
         }
         ConfigSms configSms1 = new ConfigSms();
-        configSms1.setName("会员通知");
+        configSms1.setName( "会员通知" );
         List<ConfigSms> serverSmsList = configSmsMapper.selectConfigSmsList( configSms1 );
-        if (serverSmsList.isEmpty()) {
+        if ( serverSmsList.isEmpty() ) {
             throw new BusinessException( "会员sms通道不存在,无法发送" );
-        }else {
-            ConfigSms configSms = serverSmsList.get(0);
+        } else {
+            ConfigSms configSms = serverSmsList.get( 0 );
             switch ( configSms.getProvider() ) {
-                case 0:
-                    msg = this.sendSmsTencent( configSms, phone, msg );
-                    break;
-                case 1:
-                    msg = this.sendSmsAliyun( configSms, phone, msg );
-                    break;
-                case 2:
-                    msg = this.sendSmsBaidu( configSms, phone,msg );
-                    break;
-                default:
-                    throw new BusinessException( "不支持的短信运营商类型" );
+            case 0:
+                msg = this.sendSmsTencent( configSms, phone, msg );
+                break;
+            case 1:
+                msg = this.sendSmsAliyun( configSms, phone, msg );
+                break;
+            case 2:
+                msg = this.sendSmsBaidu( configSms, phone, msg );
+                break;
+            default:
+                throw new BusinessException( "不支持的短信运营商类型" );
             }
         }
         return msg;

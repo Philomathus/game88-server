@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -81,8 +80,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     private ConfigEnvCacheUtil configEnvCacheUtil;
     @Resource
     private RedisUtils         redisUtils;
-
-    @Autowired
+    @Resource
     private TelegramBotMessage telegramBotMessage;
 
     @Override
@@ -539,7 +537,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         int i = this.baseMapper.insert( rechargeBank );
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的公司入款充值订单,金额:{},请及时处理!
-            telegramBotMessage.sendByChatId( String.format( "您有新的公司入款充值订单,金额:%s,请及时处理!", rechargeBank.getRechargeMoney()),
+            telegramBotMessage.sendByChatId( String.format( "您有新的公司入款充值订单,金额:%s,请及时处理!", rechargeBank.getRechargeMoney() ),
                     "recharge_log_telegram" );
             return RspBase.ok( "充值请求成功" );
         }
