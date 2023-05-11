@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
+import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.pay.api.base.BasePayAgent;
 import tv.game88.pay.api.base.PayAgentProcessorFactoryUtil;
 import tv.game88.pay.api.dto.*;
@@ -63,6 +65,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
 
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    private TelegramBotMessage telegramBotMessage;
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
@@ -837,6 +842,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: withdraw_log_telegram ; message: 您有新的提现订单,金额:{},请及时处理!
+            telegramBotMessage.sendByChatId( String.format( "您有新的提现订单,金额:%s,请及时处理!", req.getWithdrawMoney() ),
+                    "recharge_log_telegram" );
             return RspBase.ok( "提现申请请求成功，请耐心等待" );
         }
         return RspBase.businessError( "提现申请请求失败" );
