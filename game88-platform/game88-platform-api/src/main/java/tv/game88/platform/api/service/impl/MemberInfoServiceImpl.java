@@ -245,6 +245,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
+        setNextLevelIntegral(memberInfo, rspMember);
         return RspBase.ok( "登录成功", rspMember );
     }
 
@@ -1537,5 +1538,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById( memberId );
         String     phone      = memberInfo.getPhone();
         smsApi.sendMemSms( phone, msg );
+    }
+
+    private void setNextLevelIntegral(MemberInfo memberInfo, RspMember rspMember) {
+        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
+        for ( ConfigVip configVip : configVips ) {
+            if ( memberInfo.getCodeTotal().compareTo( configVip.getBcode() ) < 0 ) {
+                rspMember.setNextLevelIntegral( configVip.getBcode().subtract( rspMember.getCodeTotal() ) );
+                break;
+            }
+        }
     }
 }
