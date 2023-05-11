@@ -84,4 +84,12 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="findRealNameById" resultType="java.lang.String">
+        select real_name
+        from member_card
+        where member_id = #{memberId}
+          and real_name is not null
+        limit 1
+    </select>
 </mapper>

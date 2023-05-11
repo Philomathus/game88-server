@@ -164,6 +164,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             memberCardList.removeIf( rspMemberCard -> "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "VIPPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         }
+        if ( configEnvCacheUtil.getConfBool( "is_display_topay" ) ) {
+            rspWithdrawBank.getSpecialBankInfoMap().put( "TOPAY", configBankListMapper.findBankIdByNameOrCode( "TOPAY" ) );
+        } else {
+            memberCardList.removeIf( rspMemberCard -> "TOPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
+                    || "TOPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        }
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspMemberCard memberCard : memberCardList ) {
             if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {
@@ -526,7 +532,11 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         rechargeBank.setDiscountBill( configEnvCacheUtil.getConfBd( "recharge_discount_rate" ) );
         rechargeBank.setIp( req.getIp() );
         int i = this.baseMapper.insert( rechargeBank );
-        return i > 0 ? RspBase.ok( "充值请求成功" ) : RspBase.businessError( "充值请求失败" );
+        if ( i > 0 ) {
+            // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的公司入款充值订单,金额:{},请及时处理!
+            return RspBase.ok( "充值请求成功" );
+        }
+        return RspBase.businessError( "充值请求失败" );
     }
 
     @Override

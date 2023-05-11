@@ -31,6 +31,7 @@ public class GameCacheUtils {
     public static final String GAME_PLATFORM_KEY              = Constants.GAME_PREX + "platform:";
     public static final String GAME_INFO_KEY                  = Constants.GAME_PREX + "info:";
     public static final String GAME_INFO_LIST_KEY             = Constants.GAME_PREX + "infoList:";
+    public static final String GAME_INFO_LIST_ALL_KEY             = Constants.GAME_PREX + "infoListAll:";
     public static final String GAME_INFO_S_KEY                = Constants.GAME_PREX + "infos:";
     public static final String GAME_WASH_CODE_CONFIG_LIST_KEY = Constants.GAME_PREX + "washCodeConfigList";
 
@@ -84,6 +85,24 @@ public class GameCacheUtils {
         }
         String s = redisUtils.strGet( GAME_INFO_KEY + infoId );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, GameInfo.class );
+    }
+
+    public List<RspGameInfo> getInfoAllList( Long typeId ) {
+        if ( !redisUtils.exists( GAME_INFO_LIST_ALL_KEY + typeId ) ) {
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspAllList( typeId );
+            if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
+                for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
+                    if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
+                            && StringUtils.isNotBlank( rspGameInfo.getKindId() ) ) {
+                        rspGameInfo.setLotteryId( Long.parseLong( rspGameInfo.getKindId() ) );
+                    }
+                }
+                redisUtils.strSet( GAME_INFO_LIST_ALL_KEY + typeId, JsonUtil.object2Json( rspGameInfoList ) );
+            }
+            return rspGameInfoList;
+        }
+        String s = redisUtils.strGet( GAME_INFO_LIST_ALL_KEY + typeId );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId ) {

@@ -63,6 +63,23 @@
         order by sort asc
     </select>
 
+    <select id="selectRspAllList" resultType="tv.game88.game.api.dto.RspGameInfo">
+        select i.id,
+               i.name,
+               i.icon,
+               i.maintain,
+               i.recommend,
+               i.large_icon,
+               p.game_category,
+               p.maintain platform_maintain,
+               i.kind_id,
+               i.platform_id
+        from game_info i
+                 left join game_platform p on p.id = i.platform_id
+        where i.type_id = #{typeId}
+        order by i.sort asc
+    </select>
+
     <select id="selectRspList" resultType="tv.game88.game.api.dto.RspGameInfo">
         select i.id,
                i.name,

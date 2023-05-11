@@ -23,6 +23,7 @@
         <module>game88-core-session</module>
         <module>game88-core-quest</module>
         <module>game88-core-lottery</module>
+        <module>game88-core-telegramBot</module>
     </modules>
 
     <build>

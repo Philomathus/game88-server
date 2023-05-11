@@ -198,12 +198,12 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         }
         if ( chargeGive.compareTo( BigDecimal.ZERO ) > 0 ) {
             //充值彩金日志
-            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE, update.getRemark(),
-                    null, update.getRechargeOrderNo() );
+            memberMoneyManager.addMemberMoney( memberInfo.getId(), chargeGive, EnumMoney.DEPOSIT_BONUS, BigDecimal.ONE,
+                    update.getRemark(), null, update.getRechargeOrderNo() );
         }
         //usdt充值日志
-        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, BigDecimal.ONE, update.getRemark(),
-                update.getRechargeOrderNo(), update.getRechargeOrderNo() );
+        memberMoneyManager.addMemberMoney( memberInfo.getId(), rechargeMoney, EnumMoney.USDT, BigDecimal.ONE,
+                update.getRemark(), update.getRechargeOrderNo(), update.getRechargeOrderNo() );
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, rechargeMoney );
         //更新usdt充值记录表状态
@@ -236,10 +236,10 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         if ( count1 > 0 ) {
             return RspBase.businessError( "该交易ID已存在,如不是本人提交请联系客服" );
         }
-        Long count2 = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeUsdt>()
-                .eq( "member_id", platformUser.getId() )
-                .ne( "status", 3 )
-                .between( "create_time", LocalDateTimeUtils.getStartOfToday(), LocalDateTimeUtils.getEndOfToday() ) );
+        Long count2 = this.baseMapper.selectCount( new QueryWrapper<MemberRechargeUsdt>().eq( "member_id", platformUser.getId() )
+                                                                                         .ne( "status", 3 )
+                                                                                         .between( "create_time",
+                                                                                                 LocalDateTimeUtils.getStartOfToday(), LocalDateTimeUtils.getEndOfToday() ) );
         if ( count2 >= 10 ) {
             return RspBase.businessError( "您的当日已提交未处理订单已有10单,请联系客服处理后再提交" );
         }
@@ -259,7 +259,11 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         BigDecimal accountCharge = memberInfoMapper.getUserCharge( platformUser.getId() );
         memberRechargeUsdt.setFirst( accountCharge.compareTo( BigDecimal.ZERO ) == 0 );
         int i = this.baseMapper.insert( memberRechargeUsdt );
-        return i > 0 ? RspBase.ok( "USDT充值订单提交成功" ) : RspBase.businessError( "USDT充值订单提交失败" );
+        if ( i > 0 ) {
+            // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的USDT充值订单,金额:{},请及时处理!
+            return RspBase.ok( "USDT充值订单提交成功" );
+        }
+        return RspBase.businessError( "USDT充值订单提交失败" );
     }
 }
 

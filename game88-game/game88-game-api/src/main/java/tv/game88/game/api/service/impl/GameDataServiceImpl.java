@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
@@ -69,8 +70,10 @@ public class GameDataServiceImpl implements GameDataService {
         List<RspGameDataLog> rspGameDataLogs = gameService.remoteDataGrab( start, end, account,
                 gameCategory != null ? EnumGameCategory.getDataRemoteByEnum( gameCategory ) : null );
         if ( CollectionUtils.isEmpty( rspGameDataLogs ) ) {
+            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
             return;
         }
+        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", rspGameDataLogs.size(), start, end );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
                                                                            .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
@@ -81,6 +84,7 @@ public class GameDataServiceImpl implements GameDataService {
         for ( RspGameDataLog dataLog : rspGameDataLogs ) {
             EnumGameCategory enumGameCategory = EnumGameCategory.getEnumByDataRemote( dataLog.getPlatform_id() );
             if ( enumGameCategory == null ) {
+                log.error( JsonUtil.object2Json( dataLog ) );
                 continue;
             }
             GamePlatform gamePlatform = gamePlatformMap.get( enumGameCategory );
@@ -122,9 +126,10 @@ public class GameDataServiceImpl implements GameDataService {
 
 
         }
+        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
         insertBatch( session, mapper, willCodeList );
-        doBeatCode( willCodeMap );
-        deQuestCheck( willCodeList );
+        this.doBeatCode( willCodeMap );
+        this.deQuestCheck( willCodeList );
         log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", rspGameDataLogs.size(), willCodeList.size(), start, end );
     }
 
@@ -172,10 +177,8 @@ public class GameDataServiceImpl implements GameDataService {
         }
 
         insertBatch( session, mapper, willCodeList );
-
-        doBeatCode( willCodeMap );
-
-        deQuestCheck( willCodeList );
+        this.doBeatCode( willCodeMap );
+        this.deQuestCheck( willCodeList );
     }
 
     public void insertBatch( SqlSession session, MemberGameDataMapper mapper, List<MemberGameData> willCodeList ) {
@@ -281,23 +284,23 @@ public class GameDataServiceImpl implements GameDataService {
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
                 continue;
             }
+
             int add = new BigDecimal( data.getCellScore() ).intValue();
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
-                List<RspGameInfo> effectInfoList = gameCacheUtils.getEffectInfoList( gameTypeId );
-                if ( gameTypeId == 4 ) {// 4 是电子游戏
-                    // MG UPG 记入电子游戏任务
-                    RspGameInfo rspGameInfoMG = new RspGameInfo();
-                    rspGameInfoMG.setPlatformId( 9 );
-                    effectInfoList.add( rspGameInfoMG );
-                    RspGameInfo rspGameInfoUPG = new RspGameInfo();
-                    rspGameInfoUPG.setPlatformId( 11 );
-                    effectInfoList.add( rspGameInfoUPG );
-                }
+                List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );
+                boolean           y              = false;
                 for ( RspGameInfo rspGameInfo : effectInfoList ) {
-                    if ( !rspGameInfo.getPlatformId().equals( data.getPlatformId() ) ) {
+                    if ( rspGameInfo.getKindId() == null ) {
                         continue;
                     }
+                    if ( data.getPlatformId() == rspGameInfo.getPlatformId() && (
+                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
+                                    "-" + data.getKindId() ) ) ) {
+                        y = true;
+                    }
+                }
+                if ( y ) {
                     memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
