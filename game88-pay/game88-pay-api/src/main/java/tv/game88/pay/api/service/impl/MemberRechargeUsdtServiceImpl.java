@@ -2,6 +2,7 @@ package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -18,6 +19,7 @@ import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.pay.api.dto.ReqMemberRechargeUsdt;
 import tv.game88.pay.api.entity.MemberRechargeUsdt;
 import tv.game88.pay.api.entity.PayRechargeUsdt;
@@ -49,6 +51,10 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
     private RedisUtils                          redisUtils;
     @Resource
     private ConfigEnvCacheUtil                  configEnvCacheUtil;
+
+    @Autowired
+    private TelegramBotMessage telegramBotMessage;
+
 
     @Override
     public List<MemberRechargeUsdt> selectMemberRechargeUsdtList( ReqMemberRechargeUsdt req ) {
@@ -261,6 +267,7 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
         int i = this.baseMapper.insert( memberRechargeUsdt );
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的USDT充值订单,金额:{},请及时处理!
+            telegramBotMessage.sendByChatId( String.format( "您有新的USDT充值订单,金额:%s,请及时处理!",memberRechargeUsdt.getRechargeMoney() ),"recharge_log_telegram" );
             return RspBase.ok( "USDT充值订单提交成功" );
         }
         return RspBase.businessError( "USDT充值订单提交失败" );

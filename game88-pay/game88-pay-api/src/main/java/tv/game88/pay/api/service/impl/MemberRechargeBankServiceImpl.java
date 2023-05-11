@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -27,6 +28,7 @@ import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
+import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.ConfigBankList;
 import tv.game88.pay.api.entity.MemberRechargeBank;
@@ -79,6 +81,9 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     private ConfigEnvCacheUtil configEnvCacheUtil;
     @Resource
     private RedisUtils         redisUtils;
+
+    @Autowired
+    private TelegramBotMessage telegramBotMessage;
 
     @Override
     public List<RspPayRechargeBank> selectList( String memberId, Integer vip ) {
@@ -534,6 +539,8 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         int i = this.baseMapper.insert( rechargeBank );
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的公司入款充值订单,金额:{},请及时处理!
+            telegramBotMessage.sendByChatId( String.format( "您有新的公司入款充值订单,金额:%s,请及时处理!", rechargeBank.getRechargeMoney()),
+                    "recharge_log_telegram" );
             return RspBase.ok( "充值请求成功" );
         }
         return RspBase.businessError( "充值请求失败" );
