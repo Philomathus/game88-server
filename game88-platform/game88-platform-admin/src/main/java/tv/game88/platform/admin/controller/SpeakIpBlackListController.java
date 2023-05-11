@@ -1,6 +1,5 @@
 package tv.game88.platform.admin.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -13,6 +12,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.platform.api.entity.SpeakIpBlackList;
 import tv.game88.platform.api.service.SpeakIpBlackListService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/speakIpBlackList")
 public class SpeakIpBlackListController extends BaseController {
-    @Autowired
+    @Resource
     private SpeakIpBlackListService speakIpBlackListService;
 
     @GetMapping("/list")
