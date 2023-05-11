@@ -34,13 +34,13 @@
 
         <spring.boot.version>${project.parent.version}</spring.boot.version>
 
-        <mysql-connector-java.version>8.0.31</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
         <mybatis-spring-boot-starter.version>2.3.0</mybatis-spring-boot-starter.version>
         <pagehelper.starter.version>1.4.6</pagehelper.starter.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
 
-        <springdoc.version>1.6.14</springdoc.version>
-        <swagger-api.version>2.2.6</swagger-api.version>
+        <springdoc.version>1.7.0</springdoc.version>
+        <swagger-api.version>2.2.9</swagger-api.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -50,7 +50,8 @@
         <googleauth.version>1.5.0</googleauth.version>
         <bitwalker.version>1.21</bitwalker.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <caffeine.version>3.1.4</caffeine.version>
+        <caffeine.version>3.1.6</caffeine.version>
+        <telegrambots.version>6.5.0</telegrambots.version>
 
         <tencentcloud.vesion>3.1.617</tencentcloud.vesion>
         <aliyun.core.version>4.6.2</aliyun.core.version>
@@ -101,6 +102,11 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-api.version}</version>
             </dependency>
 
             <!-- apache commons工具 -->
@@ -181,6 +187,13 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- telegram bot -->
+            <dependency>
+                <groupId>org.telegram</groupId>
+                <artifactId>telegrambots</artifactId>
+                <version>${telegrambots.version}</version>
             </dependency>
 
             <!-- 百度SDK -->

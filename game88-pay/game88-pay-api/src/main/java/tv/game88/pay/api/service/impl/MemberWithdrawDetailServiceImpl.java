@@ -835,7 +835,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             update.setRechargeWithdrawRate( BigDecimal.ZERO );
         }
         int i = this.baseMapper.updateById( update );
-        return i > 0 ? RspBase.ok( "提现申请请求成功，请耐心等待" ) : RspBase.businessError( "提现申请请求失败" );
+        if ( i > 0 ) {
+            // TODO send message to telegram ; ID: withdraw_log_telegram ; message: 您有新的提现订单,金额:{},请及时处理!
+            return RspBase.ok( "提现申请请求成功，请耐心等待" );
+        }
+        return RspBase.businessError( "提现申请请求失败" );
     }
 
     @Transactional( rollbackFor = Exception.class )
