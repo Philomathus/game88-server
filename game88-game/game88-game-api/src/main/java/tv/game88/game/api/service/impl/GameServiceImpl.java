@@ -30,7 +30,7 @@ import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
