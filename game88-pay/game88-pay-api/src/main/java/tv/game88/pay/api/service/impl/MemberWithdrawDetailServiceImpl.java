@@ -841,7 +841,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: withdraw_log_telegram ; message: 您有新的提现订单,金额:{},请及时处理!
             telegramBotMessage.sendByChatId( String.format( "您有新的提现订单,金额:%s,请及时处理!", req.getWithdrawMoney() ),
-                    "recharge_log_telegram" );
+                    configEnvCacheUtil.getConf("recharge_log_telegram") );
             return RspBase.ok( "提现申请请求成功，请耐心等待" );
         }
         return RspBase.businessError( "提现申请请求失败" );

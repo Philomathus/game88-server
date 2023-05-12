@@ -538,7 +538,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的公司入款充值订单,金额:{},请及时处理!
             telegramBotMessage.sendByChatId( String.format( "您有新的公司入款充值订单,金额:%s,请及时处理!", rechargeBank.getRechargeMoney() ),
-                    "recharge_log_telegram" );
+                     configEnvCacheUtil.getConf("recharge_log_telegram") );
             return RspBase.ok( "充值请求成功" );
         }
         return RspBase.businessError( "充值请求失败" );
