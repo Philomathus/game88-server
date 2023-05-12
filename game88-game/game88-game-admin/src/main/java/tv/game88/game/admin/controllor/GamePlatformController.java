@@ -15,10 +15,10 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.RspGame;
-import tv.game88.game.api.dto.RspGameCategory;
+import tv.game88.core.game.dto.RspGameCategory;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.service.GamePlatformService;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;

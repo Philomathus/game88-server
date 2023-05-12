@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.game.dto.RspCleanPlatform;
+import tv.game88.core.game.dto.RspGameCategory;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.core.member.manager.MemberMoneyManager;
@@ -18,7 +20,7 @@ import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.*;
 import tv.game88.game.api.mapper.*;
 import tv.game88.game.api.service.MemberGameDataService;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;

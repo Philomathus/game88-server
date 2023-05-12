@@ -1,7 +1,7 @@
 package tv.game88.game.api.service;
 
 import tv.game88.game.api.entity.MemberGameData;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,4 +1,4 @@
-package tv.game88.game.api.constants;
+package tv.game88.core.game.constants;
 
 public class ConstantsGame {
     public static final String KAI_YUAN   = "kaiYuan";

@@ -27,19 +27,16 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
     @Override
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform ) {
         List<GamePlatform> gamePlatforms = this.baseMapper.selectGamePlatformList( gamePlatform );
+        String             domainValue   = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( GamePlatform platform : gamePlatforms ) {
             platform.setDes( null );
             platform.setMd5( null );
-        }
 
-        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
-
-        for ( GamePlatform gamePlatform1 : gamePlatforms ) {
-            if ( StringUtils.isNotBlank( gamePlatform1.getIcon() ) && !gamePlatform1.getIcon().startsWith( "http" ) ) {
-                gamePlatform1.setIcon( domainValue + gamePlatform1.getIcon() );
+            if ( StringUtils.isNotBlank( platform.getIcon() ) && !platform.getIcon().startsWith( "http" ) ) {
+                platform.setIcon( domainValue + platform.getIcon() );
             }
-            if ( StringUtils.isNotBlank( gamePlatform1.getCardIcon() ) && !gamePlatform1.getCardIcon().startsWith( "http" ) ) {
-                gamePlatform1.setCardIcon( domainValue + gamePlatform1.getCardIcon() );
+            if ( StringUtils.isNotBlank( platform.getCardIcon() ) && !platform.getCardIcon().startsWith( "http" ) ) {
+                platform.setCardIcon( domainValue + platform.getCardIcon() );
             }
         }
         return gamePlatforms;

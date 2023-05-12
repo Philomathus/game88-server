@@ -145,7 +145,7 @@
                 #{req.serverId})
     </insert>
 
-    <select id="findMemCleanPlatformLists" resultType="tv.game88.game.api.dto.RspCleanPlatform">
+    <select id="findMemCleanPlatformLists" resultType="tv.game88.core.game.dto.RspCleanPlatform">
         select platform_id id, sum(ABS(profit)) codeAmount
         from member_game_data${dbNodes}
         where account = #{memberId}

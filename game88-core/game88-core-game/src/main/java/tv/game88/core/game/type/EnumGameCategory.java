@@ -1,8 +1,8 @@
-package tv.game88.game.api.type;
+package tv.game88.core.game.type;
 
 import lombok.Getter;
-import tv.game88.game.api.constants.ConstantsGame;
-import tv.game88.game.api.dto.RspGameCategory;
+import tv.game88.core.game.constants.ConstantsGame;
+import tv.game88.core.game.dto.RspGameCategory;
 
 import java.util.Arrays;
 import java.util.List;
