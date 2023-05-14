@@ -8,6 +8,7 @@
         <result property="status" column="status" />
         <result property="curNum" column="cur_num" />
         <result property="taskMode" column="task_mode" />
+        <result property="title" column="title" />
     </resultMap>
 
     <sql id="selectMemberQuestVo">
@@ -17,11 +18,10 @@
 
     <select id="selectMemberQuestList" parameterType="tv.game88.core.quest.entity.MemberQuest"
             resultMap="MemberQuestResult">
-        SELECT mq.id, mq.member_id, mq.status, mq.cur_num, aqi.target, mq.task_mode
-        FROM member_quest mq,
-             activity_quest_info aqi
+        SELECT mq.id ,mq.member_id, mq.status, mq.cur_num, aqi.target,aqi.title, mq.task_mode
+        FROM member_quest mq left join
+             activity_quest_info aqi on mq.quest_id = aqi.id
         <where>
-            mq.quest_id = aqi.id
             <if test="memberId != null  and memberId != ''">
                 AND mq.member_id = #{memberId}
             </if>

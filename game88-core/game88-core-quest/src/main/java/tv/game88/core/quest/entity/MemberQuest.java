@@ -30,4 +30,6 @@ public class MemberQuest {
     private Integer taskMode;
     @Schema( name = "目标任务数量" )
     private Integer target;
+
+    private String title;
 }
