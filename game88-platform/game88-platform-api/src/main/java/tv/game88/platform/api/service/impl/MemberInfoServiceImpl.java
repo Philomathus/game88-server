@@ -1335,14 +1335,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( mobileBind.getPasswd() ) ) {
             return RspBase.businessError( "请输入登录密码" );
         }
-        String phone = this.baseMapper.getUserPhone( platformUser.getId() );
-        if ( StringUtils.isNotBlank( phone ) ) {
-            return RspBase.businessError( "您已绑定手机号,请勿重复绑定" );
-        }
-
         RspBase<?> rspBase = verificationPhoneCode( mobileBind.getMobile(), mobileBind.getCode() );
         if ( rspBase != null ) {
             return rspBase;
+        }
+        String phone = this.baseMapper.getUserPhone( platformUser.getId() );
+        if ( StringUtils.isNotBlank( phone ) ) {
+            return RspBase.businessError( "您已绑定手机号,请勿重复绑定" );
         }
         Long phoneCount = this.baseMapper.selectCount( new QueryWrapper<MemberInfo>().eq( "phone", mobileBind.getMobile() ) );
         if ( phoneCount > 0 ) {

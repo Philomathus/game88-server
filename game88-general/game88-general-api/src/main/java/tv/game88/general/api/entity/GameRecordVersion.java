@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 游戏平台对象 game_platform
+ * 游戏注单版本对象 game_record_version
  *
  * @author MengJun
  */
