@@ -1,6 +1,7 @@
 package tv.game88.general.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.mapper.GamePlatformMapper;
@@ -13,6 +14,7 @@ import java.util.List;
  *
  * @author MengJun
  */
+@Log4j2
 @Service
 public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, GamePlatform> implements GamePlatformService {
     /**
@@ -26,8 +28,8 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform ) {
         List<GamePlatform> gamePlatforms = this.baseMapper.selectGamePlatformList( gamePlatform );
         for ( GamePlatform platform : gamePlatforms ) {
-            platform.setDes( null );
-            platform.setMd5( null );
+            platform.setDes( "******" );
+            platform.setMd5( "******" );
         }
         return gamePlatforms;
     }

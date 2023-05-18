@@ -46,15 +46,35 @@ public class GameDataRecord {
      */
     private String kindId;
     /**
-     * 游戏注单ID
+     * 桌号
      */
-    private String serverId;
     private String tableId;
+    /**
+     * 椅子id
+     */
     private String chairId;
-    private String cellScore;
+    /**
+     * 总下注
+     */
     private String allBet;
+    /**
+     * 有效下注
+     */
+    private String cellScore;
+    /**
+     * 盈利
+     */
     private String profit;
+    /**
+     * 抽水
+     */
     private String revenue;
+    /**
+     * 游戏开始时间
+     */
     private String gameStartTime;
+    /**
+     * 游戏结束时间
+     */
     private String gameEndTime;
 }

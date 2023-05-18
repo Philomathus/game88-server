@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+    url: jdbc:mysql://livedata-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
     username: admin
     password: dRmBstReqberz!14Xm#
   redis:

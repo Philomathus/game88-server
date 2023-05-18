@@ -12,7 +12,6 @@
         <result property="md5" column="md5" />
         <result property="linecode" column="linecode" />
         <result property="effect" column="effect" />
-        <result property="maintain" column="maintain" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
@@ -32,7 +31,6 @@
                rate_clean,
                rate_beat,
                effect,
-               maintain,
                create_by,
                create_time,
                update_by,
@@ -64,9 +62,6 @@
             </if>
             <if test="effect != null">
                 and effect = #{effect}
-            </if>
-            <if test="maintain != null">
-                and maintain = #{maintain}
             </if>
             <if test="createBy != null  and createBy != ''">
                 and create_by = #{createBy}
