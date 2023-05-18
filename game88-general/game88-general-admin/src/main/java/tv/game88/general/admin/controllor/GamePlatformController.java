@@ -82,7 +82,6 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setCreateBy( SecurityUtils.getUsername() );
         gamePlatform.setCreateTime( LocalDateTime.now() );
         gamePlatform.setEffect( false );
-        gamePlatform.setMaintain( false );
         if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
             gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDes() ) );
         }
@@ -102,7 +101,6 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setUpdateBy( SecurityUtils.getUsername() );
         gamePlatform.setUpdateTime( LocalDateTime.now() );
         gamePlatform.setEffect( null );
-        gamePlatform.setMaintain( null );
 
         GamePlatform gamePlatformOld = gamePlatformService.getById( gamePlatform.getId() );
         String       a               = "***";
@@ -142,17 +140,6 @@ public class GamePlatformController extends BaseController {
         GamePlatform update = new GamePlatform();
         update.setId( id );
         update.setEffect( effect );
-        boolean isSave = gamePlatformService.updateById( update );
-        return toResult( isSave );
-    }
-
-    @PreAuthorize( "@ss.hasPermi('game:platform:effect')" )
-    @Log( title = "游戏平台维护状态修改", businessType = BusinessType.EFFECT )
-    @PutMapping( "/changeMaintain/{id}/{maintain}" )
-    public RspBase<?> changeMaintain( @PathVariable Long id, @PathVariable Boolean maintain ) {
-        GamePlatform update = new GamePlatform();
-        update.setId( id );
-        update.setMaintain( maintain );
         boolean isSave = gamePlatformService.updateById( update );
         return toResult( isSave );
     }

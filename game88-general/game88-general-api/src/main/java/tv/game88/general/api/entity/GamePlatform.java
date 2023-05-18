@@ -61,10 +61,6 @@ public class GamePlatform {
      */
     private Boolean          effect;
     /**
-     * 是否维护(1是0否)
-     */
-    private Boolean          maintain;
-    /**
      * 创建者
      */
     private String           createBy;

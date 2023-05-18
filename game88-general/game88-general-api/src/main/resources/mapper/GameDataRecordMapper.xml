@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.GameDataRecordMapper">
+    <resultMap type="tv.game88.general.api.entity.GameDataRecord" id="GameDataRecordResult">
+        <result column="id" property="id" />
+        <result column="agent" property="agent" />
+        <result column="game_agent" property="gameAgent" />
+        <result column="platform_id" property="platformId" />
+        <result column="game_id" property="gameId" />
+        <result column="game_round" property="gameRound" />
+        <result column="account" property="account" />
+        <result column="kind_id" property="kindId" />
+        <result column="table_id" property="tableId" />
+        <result column="chair_id" property="chairId" />
+        <result column="all_bet" property="allBet" />
+        <result column="cell_score" property="cellScore" />
+        <result column="profit" property="profit" />
+        <result column="revenue" property="revenue" />
+        <result column="game_start_time" property="gameStartTime" />
+        <result column="game_end_time" property="gameEndTime" />
+    </resultMap>
+
+    <sql id="selectGameDataRecordVo">
+        select id,
+               agent,
+               game_agent,
+               platform_id,
+               game_id,
+               game_round,
+               account,
+               kind_id,
+               table_id,
+               chair_id,
+               all_bet,
+               cell_score,
+               profit,
+               revenue,
+               game_start_time,
+               game_end_time
+        from game_data_record
+    </sql>
+    <update id="createGameDateRecordTable">
+        create table if not EXISTS ${tableName} like game_data_record
+    </update>
+</mapper>
