@@ -51,14 +51,17 @@ public class MemberInfo implements Serializable {
     @Excel( name = "会员vip" )
     private Integer vip;
 
-    @TableField(exist = false)
+    @TableField( exist = false )
     private String vipMin;
 
-    @TableField(exist = false)
+    @TableField( exist = false )
     private String vipMax;
 
     @Schema( title = "提现密码" )
     private String withdrawalPass;
+
+    @Schema( title = "提现状态" )
+    private Boolean withdrawalStatus;
 
     @Schema( title = "当前可用余额" )
     @Excel( name = "当前可用余额" )
@@ -179,7 +182,7 @@ public class MemberInfo implements Serializable {
      * 会员编号
      */
     @Excel( name = "银行卡号" )
-    @TableField(exist = false)
+    @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String bankAccount;
 
@@ -187,7 +190,7 @@ public class MemberInfo implements Serializable {
      * 账号
      */
     @Excel( name = "账号" )
-    @TableField(exist = false)
+    @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String userName;
 
