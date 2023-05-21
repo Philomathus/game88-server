@@ -169,6 +169,9 @@ public class MemberInfo implements Serializable {
     @Excel( name = "渠道号" )
     private String channelCode;
 
+    @Excel( name = "withdrawStatus" )
+    private Boolean withdrawStatus;
+
     @TableField( exist = false )
     private String cardRealName;
 
