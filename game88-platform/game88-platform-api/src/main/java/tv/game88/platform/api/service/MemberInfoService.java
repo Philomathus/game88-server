@@ -32,7 +32,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     Map listCount( MemberInfo memberInfo );
 
-    RspBase<?> updateMobile( String newMobile, String memberId );
+    RspBase<?> updateMobile( String oldMobile,String newMobile, String memberId );
 
     List<MemberCard> selectMemberCardList( String memberId );
 
