@@ -15,7 +15,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.common.utils.XmlUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.game.api.base.AbstractGameDock;
-import tv.game88.game.api.constants.ConstantsGame;
+import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
 

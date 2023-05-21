@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-game</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>tv.game88.core</groupId>
             <artifactId>game88-core-member</artifactId>
             <version>1.0</version>
         </dependency>

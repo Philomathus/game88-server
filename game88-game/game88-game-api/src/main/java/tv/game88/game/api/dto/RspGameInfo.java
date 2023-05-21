@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 @Data
 public class RspGameInfo {

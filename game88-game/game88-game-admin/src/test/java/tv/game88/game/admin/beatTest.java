@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.game.api.service.GameDataService;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;

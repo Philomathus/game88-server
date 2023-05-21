@@ -18,7 +18,7 @@ import tv.game88.game.api.mapper.ConfigWashCodeMapper;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.util.List;

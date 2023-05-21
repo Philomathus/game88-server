@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.GamePlatformMapper">
+    <resultMap type="tv.game88.general.api.entity.GamePlatform" id="GamePlatformResult">
+        <result property="id" column="id" />
+        <result property="gameCategory" column="game_category" />
+        <result property="name" column="name" />
+        <result property="agent" column="agent" />
+        <result property="apiUrl" column="api_url" />
+        <result property="recordUrl" column="record_url" />
+        <result property="des" column="des" />
+        <result property="md5" column="md5" />
+        <result property="linecode" column="linecode" />
+        <result property="effect" column="effect" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectGamePlatformVo">
+        select id,
+               game_category,
+               name,
+               agent,
+               api_url,
+               record_url,
+               des,
+               md5,
+               linecode,
+               rate_clean,
+               rate_beat,
+               effect,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from game_platform
+    </sql>
+
+    <select id="selectGamePlatformList" parameterType="tv.game88.general.api.entity.GamePlatform"
+            resultMap="GamePlatformResult">
+        <include refid="selectGamePlatformVo" />
+        <where>
+            <if test="gameCategory != null  and gameCategory != ''">
+                and game_category = #{gameCategory}
+            </if>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="agent != null  and agent != ''">
+                and agent = #{agent}
+            </if>
+            <if test="apiUrl != null  and apiUrl != ''">
+                and api_url = #{apiUrl}
+            </if>
+            <if test="recordUrl != null  and recordUrl != ''">
+                and record_url = #{recordUrl}
+            </if>
+            <if test="linecode != null  and linecode != ''">
+                and linecode = #{linecode}
+            </if>
+            <if test="effect != null">
+                and effect = #{effect}
+            </if>
+            <if test="createBy != null  and createBy != ''">
+                and create_by = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateBy != null  and updateBy != ''">
+                and update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

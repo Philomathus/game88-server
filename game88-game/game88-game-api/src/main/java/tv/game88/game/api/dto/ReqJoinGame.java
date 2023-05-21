@@ -2,7 +2,7 @@ package tv.game88.game.api.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import java.math.BigDecimal;
 

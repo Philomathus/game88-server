@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.game.dto.RspGameCategory;
 import tv.game88.core.member.enums.EnumReqTime;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.dto.RspWashCodeInfo;
 import tv.game88.game.api.service.MemberGameDataService;
-import tv.game88.game.api.type.EnumGameCategory;
+import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.util.List;

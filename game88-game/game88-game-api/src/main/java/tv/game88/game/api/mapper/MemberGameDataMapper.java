@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import tv.game88.game.api.dto.ReqGameData;
 import tv.game88.game.api.dto.ReqMemberGameData;
-import tv.game88.game.api.dto.RspCleanPlatform;
+import tv.game88.core.game.dto.RspCleanPlatform;
 import tv.game88.game.api.dto.RspGameData;
 import tv.game88.game.api.entity.MemberGameData;
 
