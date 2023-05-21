@@ -286,6 +286,9 @@ public class GameDataServiceImpl implements GameDataService {
             }
 
             int add = new BigDecimal( data.getCellScore() ).intValue();
+            if ( "M168702".equals( data.getAccount() ) ) {
+                log.warn( "M168702用户完成任务:" + JsonUtil.object2Json( listConfQuest ) + " 任务金:" + add );
+            }
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );
@@ -294,10 +297,11 @@ public class GameDataServiceImpl implements GameDataService {
                     if ( rspGameInfo.getKindId() == null ) {
                         continue;
                     }
-                    if ( data.getPlatformId() == rspGameInfo.getPlatformId() && (
+                    if ( Objects.equals( data.getPlatformId(), rspGameInfo.getPlatformId() ) && (
                             data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
                                     "-" + data.getKindId() ) ) ) {
                         y = true;
+                        break;
                     }
                 }
                 if ( y ) {
