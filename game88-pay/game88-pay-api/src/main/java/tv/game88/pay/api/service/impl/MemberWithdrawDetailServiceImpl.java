@@ -778,6 +778,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
             return RspBase.businessError( "请绑定手机号后提现" );
         }
+        if ( memberInfo.getWithdrawalStatus() != null && memberInfo.getWithdrawalStatus() ) {
+            return RspBase.businessError( "出款通道维护,请联系客服!" );
+        }
         BigDecimal minimumWithdrawalAmount = configEnvCacheUtil.getConfBd( "minimum_withdrawal_amount" );
         if ( req.getWithdrawMoney().compareTo( minimumWithdrawalAmount ) < 0 ) {
             return RspBase.businessError( "提现金额必须大于" + minimumWithdrawalAmount );
