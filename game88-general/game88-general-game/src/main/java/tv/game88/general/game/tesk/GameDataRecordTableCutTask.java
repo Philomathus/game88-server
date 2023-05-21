@@ -8,7 +8,6 @@ import tv.game88.general.api.service.GameDataRecordService;
 
 import javax.annotation.Resource;
 
-
 @Log4j2
 @Component
 public class GameDataRecordTableCutTask {

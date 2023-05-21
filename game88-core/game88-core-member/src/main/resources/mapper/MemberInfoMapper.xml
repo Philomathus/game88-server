@@ -7,6 +7,7 @@
         <result property="nickName" column="nick_name" />
         <result property="status" column="status" />
         <result property="withdrawalPass" column="withdrawal_pass" />
+        <result property="withdrawalSatus" column="withdrawal_pass" />
         <result property="vip" column="vip" />
         <result property="accountNow" column="account_now" />
         <result property="accountCharge" column="account_charge" />
