@@ -797,7 +797,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<?> updateMobile( String newMobile, String memberId ) {
+    public RspBase<?> updateMobile( String oldMobile,String newMobile, String memberId) {
         if ( this.baseMapper.exists( new QueryWrapper<MemberInfo>().eq( "phone", newMobile ) ) ) {
             return RspBase.businessError( "此手机号已经存在" );
         }

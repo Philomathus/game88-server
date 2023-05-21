@@ -232,9 +232,13 @@ public class MemberInfoController extends BaseController {
      */
     @PostMapping( value = "/updateMobile/{memberId}" )
     @Log( title = "更新会员手机号", businessType = BusinessType.UPDATE )
-    public RspBase<?> updateMobile( @PathVariable String memberId, String newMobile, Integer googleAuthCode ) throws Exception {
+    public RspBase<?> updateMobile( @PathVariable String memberId,@RequestBody Map map  ) throws Exception {
+        String newMobile      = ( String ) map.get( "newMobile" );
+        String phone      = ( String ) map.get( "oldMobile" );
+        int googleAuthCode = Integer.parseInt( ( java.lang.String ) map.get( "googleAuthCode" ) );
+
         SecurityUtils.verifyMFACode( googleAuthCode );
-        return memberInfoService.updateMobile( newMobile, memberId );
+        return memberInfoService.updateMobile( phone,newMobile, memberId );
     }
 
     /**
