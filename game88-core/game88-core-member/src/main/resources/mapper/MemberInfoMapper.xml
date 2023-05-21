@@ -34,6 +34,7 @@
         <result property="registerType" column="register_type" />
         <result property="remark" column="remark" />
         <result property="cleanTime" column="clean_time" />
+        <result property="withdrawStatus" column="withdraw_status" />
     </resultMap>
 
     <sql id="selectMemberInfoVo">
@@ -68,7 +69,8 @@
                phone_model,
                register_type,
                remark,
-               clean_time
+               clean_time,
+               withdraw_status
         from member_info
     </sql>
 

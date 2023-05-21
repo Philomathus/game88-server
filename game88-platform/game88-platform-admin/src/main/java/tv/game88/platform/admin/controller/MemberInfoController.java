@@ -23,6 +23,7 @@ import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.platform.api.cache.ActivityCacheUtil;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
@@ -477,5 +478,21 @@ public class MemberInfoController extends BaseController {
         memberInfoService.insertPaiSong( userIds );
         return RspBase.ok();
     }
+
+
+    /**
+     * 出款状态
+     */
+    @Log( title = "激活状态", businessType = BusinessType.EFFECT )
+    @PutMapping( "/changeWithdrawStatus/{id}/{withdrawStatus}")
+    public RspBase<?> changeWithdrawStatus( @PathVariable String id, @PathVariable Boolean withdrawStatus ) {
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setId( String.valueOf( id ) );
+        memberInfo.setWithdrawStatus( withdrawStatus );
+        boolean isUpdate = memberInfoService.updateById( memberInfo );
+        return toResult( isUpdate );
+    }
+
+
 
 }
