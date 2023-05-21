@@ -12,7 +12,14 @@
         sum(gamebet)        as gamebet,
         sum(gameprofit)     as gameprofit,
         CONCAT(ROUND(convert(sum(gameprofit),decimal(10,2)) / convert(sum(gamecell),decimal(10,2)) * 100,2),'%') as bili,
-        begindate
+        <choose>
+            <when test="endDate != null">
+                CONCAT( #{begindate}, ' - ', #{endDate} ) as begindate
+            </when>
+            <otherwise>
+                begindate
+            </otherwise>
+        </choose>
         from
         report_plam_games
         <where>
