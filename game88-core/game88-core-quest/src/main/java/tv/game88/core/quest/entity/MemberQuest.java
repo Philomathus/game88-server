@@ -1,6 +1,7 @@
 package tv.game88.core.quest.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -31,5 +32,6 @@ public class MemberQuest {
     @Schema( name = "目标任务数量" )
     private Integer target;
 
+    @TableField( exist = false )
     private String title;
 }
