@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * <p>
  *
@@ -18,19 +20,19 @@ import lombok.Data;
 public class MemberQuest {
     @Schema( title = "系统编号" )
     @TableId( type = IdType.INPUT )
-    private String  id;
+    private String     id;
     @Schema( title = "会员id" )
-    private String  memberId;
+    private String     memberId;
     @Schema( title = "任务id" )
-    private Long    questId;
+    private Long       questId;
     @Schema( title = "0=进行中1=已经完成2 领奖完成" )
-    private Integer status;
+    private Integer    status;
     @Schema( title = "当前任务数量" )
-    private Integer curNum;
+    private BigDecimal curNum;
     @Schema( title = "任务模型" )
-    private Integer taskMode;
+    private Integer    taskMode;
     @Schema( name = "目标任务数量" )
-    private Integer target;
+    private Integer    target;
 
     @TableField( exist = false )
     private String title;
