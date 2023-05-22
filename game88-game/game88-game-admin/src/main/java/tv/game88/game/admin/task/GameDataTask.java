@@ -25,11 +25,9 @@ public class GameDataTask {
     @Scheduled( fixedDelay = 30000, initialDelay = 1 )
     public void runTask() {
         if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
-            log.error( "没拿到锁" );
             return;
         }
         String uuid = IdWorker.get32UUID();
-        log.warn( "进来了" + uuid );
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusMinutes( 2 );
         String        begin   = LocalDateTimeUtils.format( starDay );
@@ -65,6 +63,5 @@ public class GameDataTask {
                 log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }
         }
-        log.warn( "结束了" + uuid );
     }
 }

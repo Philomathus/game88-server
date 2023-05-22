@@ -285,10 +285,7 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
 
-            int add = new BigDecimal( data.getCellScore() ).intValue();
-            if ( "M168702".equals( data.getAccount() ) ) {
-                log.warn( "M168702用户完成任务:" + JsonUtil.object2Json( listConfQuest ) + " 任务金:" + add );
-            }
+            BigDecimal add = new BigDecimal( data.getCellScore() );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );

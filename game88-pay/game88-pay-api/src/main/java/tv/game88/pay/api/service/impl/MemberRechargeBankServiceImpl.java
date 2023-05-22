@@ -390,8 +390,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                 .eq( "effect", 1 ).eq( "game_type_id", -1 ) );
         for ( ActivityQuestInfo confQuest : listConfQuest ) {
-            memberQuestManager.memberQuestProcess( memberInfo.getId(), memberRechargeBank.getRechargeMoney()
-                                                                                         .intValue(), confQuest );
+            memberQuestManager.memberQuestProcess( memberInfo.getId(), memberRechargeBank.getRechargeMoney(), confQuest );
         }
 
         redisUtils.unLock( "RechargeBankFinalAudit" + req.getId() );
@@ -538,7 +537,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: recharge_log_telegram ; message: 您有新的公司入款充值订单,金额:{},请及时处理!
             telegramBotMessage.sendByChatId( String.format( "您有新的公司入款充值订单,金额:%s,请及时处理!", rechargeBank.getRechargeMoney() ),
-                     configEnvCacheUtil.getConf("recharge_log_telegram") );
+                    configEnvCacheUtil.getConf( "recharge_log_telegram" ) );
             return RspBase.ok( "充值请求成功" );
         }
         return RspBase.businessError( "充值请求失败" );
