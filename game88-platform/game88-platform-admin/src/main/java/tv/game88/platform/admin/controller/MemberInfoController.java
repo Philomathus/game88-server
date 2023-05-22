@@ -250,6 +250,11 @@ public class MemberInfoController extends BaseController {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<MemberCard> list = memberInfoService.selectMemberCardList( memberId );
+        for ( MemberCard memberCard : list ) {
+            memberCard.setOldBankAccount( memberCard.getBankAccount() );
+            memberCard.setOldBankId( memberCard.getBankId() );
+            memberCard.setOldRealName(  memberCard.getRealName());
+        }
         return getRspBasePage( list, pageDomain );
     }
 
