@@ -285,7 +285,7 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
 
-            int add = new BigDecimal( data.getCellScore() ).intValue();
+            BigDecimal add = new BigDecimal( data.getCellScore() );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );
@@ -294,10 +294,11 @@ public class GameDataServiceImpl implements GameDataService {
                     if ( rspGameInfo.getKindId() == null ) {
                         continue;
                     }
-                    if ( data.getPlatformId() == rspGameInfo.getPlatformId() && (
+                    if ( Objects.equals( data.getPlatformId(), rspGameInfo.getPlatformId() ) && (
                             data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
                                     "-" + data.getKindId() ) ) ) {
                         y = true;
+                        break;
                     }
                 }
                 if ( y ) {

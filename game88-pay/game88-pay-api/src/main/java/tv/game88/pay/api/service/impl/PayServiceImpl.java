@@ -230,7 +230,7 @@ public class PayServiceImpl implements PayService {
             List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                     .eq( "effect", 1 ).eq( "game_type_id", -2 ) );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
-                memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney.intValue(), confQuest );
+                memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney, confQuest );
             }
         }
 
