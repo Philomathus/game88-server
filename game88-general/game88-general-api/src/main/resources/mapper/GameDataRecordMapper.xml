@@ -64,4 +64,8 @@
                 #{data.profit}, #{data.revenue}, #{data.gameStartTime},
                 #{data.gameEndTime})
     </insert>
+
+    <select id="findCount" resultType="java.lang.Long">
+        select count(1) from ${tableName} where id = #{id}
+    </select>
 </mapper>

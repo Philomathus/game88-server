@@ -1,11 +1,14 @@
 package tv.game88.general.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.type.EnumGameCategory;
 
 import java.time.LocalDateTime;
@@ -78,4 +81,21 @@ public class GamePlatform {
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime    updateTime;
+
+    @TableField( exist = false )
+    private String versionValue;
+
+    public String getDes() {
+        if ( StringUtils.isNotBlank( des ) ) {
+            return AESCoder.decrypt( des );
+        }
+        return des;
+    }
+
+    public String getMd5() {
+        if ( StringUtils.isNotBlank( md5 ) ) {
+            return AESCoder.decrypt( md5 );
+        }
+        return md5;
+    }
 }

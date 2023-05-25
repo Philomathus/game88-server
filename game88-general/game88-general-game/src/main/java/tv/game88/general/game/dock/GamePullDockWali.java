@@ -19,7 +19,7 @@ public class GamePullDockWali extends AbstractGamePull {
     }
 
     @Override
-    public List<GameDataRecord> handleResult( List<Map<String, Object>> dataListMap, GamePlatform gamePlatform ) {
+    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
         return null;
     }
 }
