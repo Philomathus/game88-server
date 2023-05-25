@@ -37,9 +37,31 @@
                revenue,
                game_start_time,
                game_end_time
-        from game_data_record
+        from ${tableName}
     </sql>
+
+    <select id="selectGameDataRecordList" parameterType="tv.game88.general.api.entity.GameDataRecord"
+            resultMap="GameDataRecordResult">
+        <include refid="selectGameDataRecordVo" />
+        where game_end_time <![CDATA[ >= ]]> #{gameStartTime} and game_end_time <![CDATA[ <= ]]> #{gameEndTime}
+        <if test="account != null ">and account = #{account}</if>
+    </select>
+
     <update id="createGameDateRecordTable">
         create table if not EXISTS ${tableName} like game_data_record
     </update>
+
+    <insert id="insertByTableName">
+        insert ignore into ${tableName}
+        (id, agent, game_agent, platform_id,
+         game_id, game_round, account, kind_id,
+         table_id, chair_id, all_bet, cell_score,
+         profit, revenue, game_start_time, game_end_time)
+        values (#{data.id}, #{data.agent}, #{data.gameAgent},
+                #{data.platformId}, #{data.gameId}, #{data.gameRound},
+                #{data.account}, #{data.kindId}, #{data.tableId},
+                #{data.chairId}, #{data.allBet}, #{data.cellScore},
+                #{data.profit}, #{data.revenue}, #{data.gameStartTime},
+                #{data.gameEndTime})
+    </insert>
 </mapper>
