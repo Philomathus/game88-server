@@ -100,7 +100,7 @@ public class LocalDateTimeUtils {
         if ( timestamp == 0 ) {
             return null;
         }
-        return LocalDateTime.ofInstant( Instant.ofEpochSecond( timestamp ), TimeZone.getDefault().toZoneId() );
+        return LocalDateTime.ofInstant( Instant.ofEpochMilli( timestamp ), TimeZone.getDefault().toZoneId() );
     }
 
     /**
