@@ -9,5 +9,5 @@ import java.util.Map;
 public interface BaseGamePull {
     List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform );
 
-    List<GameDataRecord> handleResult( List<Map<String, Object>> dataListMap, GamePlatform gamePlatform );
+    GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform );
 }
