@@ -94,9 +94,13 @@ public abstract class AbstractGamePull implements BaseGamePull {
     }
 
     protected Map<String, Object> sendGetMap( String url ) {
+        return sendGetMap( url , null );
+    }
+
+    protected Map<String, Object> sendGetMap( String url , HttpEntity<?> httpEntity) {
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( null ), response -> {
+            resultMap = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
                 InputStream bodyStream = response.getBody();
                 String      text;
                 try ( Reader reader = new InputStreamReader( bodyStream ) ) {
