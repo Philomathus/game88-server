@@ -39,7 +39,7 @@ public interface MemberGameDataService extends IService<MemberGameData> {
 
     MemberGameData getCount( ReqMemberGameData reqMemberGameData );
 
-    RspBase getGameBetRecordData( MemberGameData memberGameData );
+    List<?> getGameBetRecordData( MemberGameData memberGameData );
 
     List<?> getGameBetDetailData(MemberGameData memberGameData );
 

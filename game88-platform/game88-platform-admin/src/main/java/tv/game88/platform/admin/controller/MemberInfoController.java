@@ -2,12 +2,7 @@ package tv.game88.platform.admin.controller;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.*;
+import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
-import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.security.service.SysUserTokenService;
-import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.utils.SecurityUtils;
-import tv.game88.core.admin.vo.LoginUser;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.entity.MemberCard;
@@ -37,7 +31,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -51,13 +44,9 @@ import java.util.Map;
 @Log4j2
 public class MemberInfoController extends BaseController {
     @Resource
-    private MemberInfoService   memberInfoService;
+    private MemberInfoService memberInfoService;
     @Resource
-    private RedisUtils          redisUtil;
-    @Resource
-    private SysUserTokenService sysUserTokenService;
-    @Resource
-    private ISysUserService userService;
+    private RedisUtils        redisUtil;
 
     /**
      * 查询用户信息列表
@@ -162,10 +151,11 @@ public class MemberInfoController extends BaseController {
         if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
-                redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+                redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
-                String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
-                PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
+                                                        .toString();
+                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
                 platformUser.setStatus( status );
                 redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
@@ -188,7 +178,7 @@ public class MemberInfoController extends BaseController {
         if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) ) {
-                redisUtil.unlink( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
+                redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
             }
         }
         return toResult( b );
@@ -212,15 +202,17 @@ public class MemberInfoController extends BaseController {
      */
     @RequestMapping( value = "/sendMsg", method = RequestMethod.POST )
     @Log( title = "会员发送短信", businessType = BusinessType.UPDATE )
-    public RspBase<?> sendMsg( @RequestBody Map map ) throws Exception {
-        String msg      = ( String ) map.get( "msg" );
-        String memberId = ( String ) map.get( "memberId" );
+    public RspBase sendMsg( @RequestBody Map map ) {
+        RspBase rspBase  = new RspBase();
+        String  msg      = ( String ) map.get( "msg" );
+        String  memberId = ( String ) map.get( "memberId" );
         if ( StringUtils.isNotBlank( msg ) && StringUtils.isNotBlank( memberId ) ) {
-            //sysUserService.sendMsg( msg, memberId );
-            return RspBase.ok( "发送成功" );
+            memberInfoService.sendMsg( msg, memberId );
+            rspBase.setMsg( "发送成功" );
         } else {
-            return RspBase.businessError( "发送失败" );
+            rspBase.setMsg( "发送失败" );
         }
+        return rspBase;
     }
 
     /**
@@ -417,67 +409,14 @@ public class MemberInfoController extends BaseController {
 
     @PostMapping( value = "/memberSmallFeatures" )
     public Object memberSmallFeatures( ReqSmallFeatures req ) throws Exception {
-        RspBase rspBase = new RspBase();
-        if ( req.getGoogleAuthCode() == null ) {
-            rspBase.setMsg( "请输入google验证码" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-
-        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
-        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
-
-        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
-            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        if ( sysUser.getOtpSecret().length() == 32 ) {
-            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
-                "secretkey" + "/googleAuthPrivateKey" ) );
-
-        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
-            rspBase.setMsg( "google验证码不正确，请检查" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        return RspBase.ok(memberInfoService.updatePhones( req ));
+        SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
+        return RspBase.ok( memberInfoService.updatePhones( req ) );
     }
 
     @PostMapping( value = "/queryPhones" )
     public Object queryPhones( @RequestBody ReqSmallFeatures req ) throws Exception {
-        RspBase rspBase = new RspBase();
-        if ( req.getGoogleAuthCode() == null ) {
-            rspBase.setMsg( "请输入google验证码" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
-        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
-
-        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
-            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        if ( sysUser.getOtpSecret().length() == 32 ) {
-            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
-                "secretkey" + "/googleAuthPrivateKey" ) );
-
-        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
-            rspBase.setMsg( "google验证码不正确，请检查" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        return RspBase.ok(memberInfoService.queryPhones( req ));
+        SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
+        return RspBase.ok( memberInfoService.queryPhones( req ) );
     }
 
     /**
@@ -485,33 +424,7 @@ public class MemberInfoController extends BaseController {
      */
     @PostMapping( value = "/commitMoney" )
     public Object commitMoney( @RequestBody ReqSmallFeatures req ) throws Exception {
-        RspBase rspBase = new RspBase();
-        if ( req.getGoogleAuthCode() == null ) {
-            rspBase.setMsg( "请输入google验证码" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        LoginUser loginUser        = sysUserTokenService.getLoginUser( ServletUtil.getHttpServletRequest() );
-        SysUser    sysUser         = userService.selectOtpSecretByUserName( loginUser.getUsername() );
-
-        if ( !org.springframework.util.StringUtils.hasText( sysUser.getOtpSecret() ) ) {
-            rspBase.setMsg( "未绑定google验证秘钥，无法审核" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        if ( sysUser.getOtpSecret().length() == 32 ) {
-            rspBase.setMsg( "google验证秘钥未加密，请重新登录" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
-        String googleAuthKey = RSACoder.decryptByPrivateKey( sysUser.getOtpSecret(), LoadResourceUtil.getSecurityKeyStr(
-                "secretkey" + "/googleAuthPrivateKey" ) );
-
-        if ( !GoogleAuthUtil.verifyCode( googleAuthKey, req.getGoogleAuthCode() ) ) {
-            rspBase.setMsg( "google验证码不正确，请检查" );
-            rspBase.setCode( 1 );
-            return rspBase;
-        }
+        SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
         return RspBase.ok( memberInfoService.commitMoney( req ) );
     }
 
@@ -558,7 +471,7 @@ public class MemberInfoController extends BaseController {
                     cell3 = "1";
                 }
                 userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
-                        .append( cell3 ).append( "),(" );
+                               .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
             e.getMessage();
