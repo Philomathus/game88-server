@@ -38,6 +38,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
     public void batchInsert( List<GameDataRecord> gameDataRecords ) {
         SqlSession           session = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         GameDataRecordMapper mapper  = session.getMapper( GameDataRecordMapper.class );
+        int                  i       = 0;
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
             LocalDateTime gameEndTime = LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
             String        day         = LocalDateTimeUtils.format( gameEndTime, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
@@ -45,8 +46,15 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
                 continue;
             }
             mapper.insertByTableName( gameDataRecord, TABLE_PREFIX + day );
+            i++;
+            if ( i > 100 ) {
+                session.commit();
+                i = 0;
+            }
         }
-        session.commit();
+        if ( i > 0 ) {
+            session.commit();
+        }
         session.close();
     }
 
