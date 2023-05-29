@@ -1,10 +1,7 @@
 package tv.game88.common.utils;
 
 import java.sql.Timestamp;
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
@@ -170,5 +167,32 @@ public class LocalDateTimeUtils {
      */
     public static boolean isSameDay( LocalDateTime one, LocalDateTime two ) {
         return one.toLocalDate().compareTo( two.toLocalDate() ) == 0;
+    }
+
+    /**
+     * 当地时区时间转换成美东时间
+     *
+     * @param localDateTime
+     *
+     * @return LocalDateTime
+     */
+    public static LocalDateTime convertToMeiDong( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedtime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedtime.withZoneSameInstant( ZoneId.of( "America/Caracas" ) );
+        return converted.toLocalDateTime();
+    }
+
+    /**
+     * 美东时间转换成当地时区时间
+     *
+     * @param time
+     *
+     * @return LocalDateTime
+     */
+    public static LocalDateTime convertMeiDongToDefault( String time ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        ZonedDateTime zonedtime = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime converted = zonedtime.withZoneSameInstant( ZoneId.systemDefault() );
+        return converted.toLocalDateTime();
     }
 }

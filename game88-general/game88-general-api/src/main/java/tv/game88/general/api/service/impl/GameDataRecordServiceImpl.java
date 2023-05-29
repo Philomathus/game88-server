@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.general.api.dto.ReqGameDataRecord;
 import tv.game88.general.api.entity.GameDataRecord;
+import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.mapper.GameDataRecordMapper;
 import tv.game88.general.api.service.GameDataRecordService;
 
@@ -35,10 +36,11 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
     }
 
     @Override
-    public void batchInsert( List<GameDataRecord> gameDataRecords ) {
+    public void batchInsert( List<GameDataRecord> gameDataRecords, GamePlatform gamePlatform ) {
         SqlSession           session = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         GameDataRecordMapper mapper  = session.getMapper( GameDataRecordMapper.class );
         int                  i       = 0;
+        int                  num     = 0;
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
             LocalDateTime gameEndTime = LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
             String        day         = LocalDateTimeUtils.format( gameEndTime, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
@@ -46,6 +48,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
                 continue;
             }
             mapper.insertByTableName( gameDataRecord, TABLE_PREFIX + day );
+            num++;
             i++;
             if ( i > 100 ) {
                 session.commit();
@@ -56,6 +59,8 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
             session.commit();
         }
         session.close();
+
+        log.info( "{}注单数据开始存库,预存数据条数:{};实际存储数据条数:{}", gamePlatform.getName(), gameDataRecords.size(), num );
     }
 
     @Override

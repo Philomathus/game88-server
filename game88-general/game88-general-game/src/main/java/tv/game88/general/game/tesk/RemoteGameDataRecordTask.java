@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordVersion;
@@ -66,19 +67,24 @@ public class RemoteGameDataRecordTask {
                         List<GameDataRecord> gameDataRecords = new ArrayList<>();
                         for ( Map<String, Object> remoteGameDatum : remoteGameData ) {
                             GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
-                            gameDataRecords.add( gameDataRecord );
-                        }
-                        gameDataRecordService.batchInsert( gameDataRecords );
-
-                        LocalDateTime localDateTime = null;
-                        for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-                            LocalDateTime gameEndTime = LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
-                            if ( localDateTime == null || gameEndTime.isAfter( localDateTime ) ) {
-                                localDateTime = gameEndTime;
+                            if ( gameDataRecord != null ) {
+                                gameDataRecords.add( gameDataRecord );
                             }
                         }
-                        if ( localDateTime != null ) {
-                            gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( localDateTime ) ) );
+                        gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
+
+                        if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+                            LocalDateTime localDateTime = null;
+                            for ( GameDataRecord gameDataRecord : gameDataRecords ) {
+                                LocalDateTime gameEndTime =
+                                        LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
+                                if ( localDateTime == null || gameEndTime.isAfter( localDateTime ) ) {
+                                    localDateTime = gameEndTime;
+                                }
+                            }
+                            if ( localDateTime != null ) {
+                                gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( localDateTime ) ) );
+                            }
                         }
                     }
                     if ( !StringUtils.equals( gamePlatform.getVersionValue(), gameRecordVersion.getVersionValue() ) ) {

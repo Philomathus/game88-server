@@ -8,18 +8,17 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.util.List;
-import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.WALI + "GamePullProcessor" )
 public class GamePullDockWali extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
+    public GameDataRecord handleResult( Object obj, GamePlatform gamePlatform ) {
         return null;
     }
 }

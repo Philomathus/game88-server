@@ -34,7 +34,6 @@ import java.util.Map;
 @Repository( value = ConstantsGame.BBIN + "GameProcessor" )
 public class GameDockBBIN extends AbstractGameDock {
 
-    private static final String WEBSSITE            = "rtwrt1";
     private static final String CREATE_SESSION_KEY8 = "0P2McG5jG";
     private static final String TRANSFER_KEY8       = "un5zaZl";
     private static final String JOIN_GAME_KEY8      = "7G7kc84PxB";
@@ -50,10 +49,10 @@ public class GameDockBBIN extends AbstractGameDock {
     public void getToken( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 9 );
         String c   = RandomStringUtils.randomAlphabetic( 9 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + CREATE_SESSION_KEY8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( reqJoinGame.getMd5() + reqJoinGame.getGameMemberId() + CREATE_SESSION_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "username", reqJoinGame.getGameMemberId() );
         requestMap.set( "uppername", reqJoinGame.getAgent() );
         requestMap.set( "lang", "zh-cn" );
@@ -101,10 +100,10 @@ public class GameDockBBIN extends AbstractGameDock {
 
         String a   = RandomStringUtils.randomAlphabetic( 4 );
         String c   = RandomStringUtils.randomAlphabetic( 1 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + JOIN_GAME_KEY8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( reqJoinGame.getMd5() + JOIN_GAME_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "lang", "zh-cn" );
         requestMap.set( "sessionid", reqJoinGame.getToken() );
         if ( StringUtils.isNotBlank( gameUrlId ) ) {
@@ -154,10 +153,10 @@ public class GameDockBBIN extends AbstractGameDock {
         String a = RandomStringUtils.randomAlphabetic( 9 );
         String c = RandomStringUtils.randomAlphabetic( 1 );
         String md5 = DigestUtils.md5Hex(
-                WEBSSITE + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
+                reqJoinGame.getMd5() + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "username", reqJoinGame.getGameMemberId() );
         requestMap.set( "uppername", reqJoinGame.getAgent() );
         requestMap.set( "remitno", reqJoinGame.getOrderId() );
@@ -201,10 +200,10 @@ public class GameDockBBIN extends AbstractGameDock {
         String a = RandomStringUtils.randomAlphabetic( 9 );
         String c = RandomStringUtils.randomAlphabetic( 1 );
         String md5 = DigestUtils.md5Hex(
-                WEBSSITE + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
+                reqJoinGame.getMd5() + reqJoinGame.getGameMemberId() + reqJoinGame.getOrderId() + TRANSFER_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "username", reqJoinGame.getGameMemberId() );
         requestMap.set( "uppername", reqJoinGame.getAgent() );
         requestMap.set( "remitno", reqJoinGame.getOrderId() );
@@ -247,10 +246,10 @@ public class GameDockBBIN extends AbstractGameDock {
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 2 );
         String c   = RandomStringUtils.randomAlphabetic( 2 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + reqJoinGame.getGameMemberId() + QUERY_BALANCE_KEY8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( reqJoinGame.getMd5() + reqJoinGame.getGameMemberId() + QUERY_BALANCE_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "username", reqJoinGame.getGameMemberId() );
         requestMap.set( "uppername", reqJoinGame.getAgent() );
         requestMap.set( "key", a + md5 + c );
@@ -285,10 +284,10 @@ public class GameDockBBIN extends AbstractGameDock {
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         String a   = RandomStringUtils.randomAlphabetic( 4 );
         String c   = RandomStringUtils.randomAlphabetic( 9 );
-        String md5 = DigestUtils.md5Hex( WEBSSITE + CHECK_TRANSFER_KEY8 + convertTime() );
+        String md5 = DigestUtils.md5Hex( reqJoinGame.getMd5() + CHECK_TRANSFER_KEY8 + convertTime() );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-        requestMap.set( "website", WEBSSITE );
+        requestMap.set( "website", reqJoinGame.getMd5() );
         requestMap.set( "transid", reqJoinGame.getOrderId() );
         requestMap.set( "key", a + md5 + c );
         UriComponents uriComponents = UriComponentsBuilder
