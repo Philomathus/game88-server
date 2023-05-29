@@ -23,7 +23,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -61,11 +60,11 @@ public class RemoteGameDataRecordTask {
 
                 BaseGamePull baseGamePull = gamePullDockFactoryUtil.createGamePullProcessor( gamePlatform.getGameCategory() );
                 try {
-                    List<Map<String, Object>> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
+                    List<Object> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
                     if ( !CollectionUtils.isEmpty( remoteGameData ) ) {
                         log.info( "{}拉取数据成功, 条数:{}", gamePlatform.getName(), remoteGameData.size() );
                         List<GameDataRecord> gameDataRecords = new ArrayList<>();
-                        for ( Map<String, Object> remoteGameDatum : remoteGameData ) {
+                        for ( Object remoteGameDatum : remoteGameData ) {
                             GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
                             if ( gameDataRecord != null ) {
                                 gameDataRecords.add( gameDataRecord );
