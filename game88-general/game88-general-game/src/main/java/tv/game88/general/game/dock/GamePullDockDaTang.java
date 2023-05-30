@@ -5,23 +5,25 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.DesCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
-import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
-import tv.game88.general.game.util.UuidUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.BG + "GamePullProcessor" )
-public class GamePullDockBG extends AbstractGamePull {
+@Repository( value = ConstantsGame.DATANG + "GamePullProcessor" )
+public class GamePullDockDaTang extends AbstractGamePull {
     @Override
     public List<Map<String, Object>> requestRemoteGameData(GamePlatform gamePlatform) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
@@ -33,32 +35,32 @@ public class GamePullDockBG extends AbstractGamePull {
 
         long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
         long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+
         String time   = String.valueOf( System.currentTimeMillis() );
         String params = String.format( "s=%s&startTime=%s&endTime=%s", 6, startTime, endTime );
         String param  = null;
         try {
-            param = DesCoder.encrypt( params, gamePlatform.getDes() );
+            param = AESCoder.encryptByKey( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
         String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
 
-        String id = UuidUtil.getRandomUuidWithoutSeparator();
-        String sn = gamePlatform.getAgent();
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put( "random", id );
-        requestMap.put( "sn", sn );
-        requestMap.put( "sign", DigestUtils.md5Hex( id + sn + keyParams ));
+        requestMap.put( "agentid", gamePlatform.getAgent() );
+        requestMap.put( "timestamp", time );
+        requestMap.put( "paraValue", param );
+        requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
 
-        String url = gamePlatform.getRecordUrl() + this.assemblyUrl( requestMap );
+        String url = gamePlatform.getRecordUrl() + "/Reconciliation" + this.assemblyUrl( requestMap ); //
 
         Map<String, Object> resultMap = this.sendGetMap( url );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Map<String,Object>> items = (List<Map<String, Object>>)resultMap.getOrDefault( "items", new ArrayList<Map<>>() );
-            if( !CollectionUtils.isEmpty( items ) ){
-                gamePlatform.setVersionValue(String.valueOf(endTime));
-                return items;
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
+                gamePlatform.setVersionValue( String.valueOf( endTime ) );
+                return ( List<Map<String, Object>> ) d.getOrDefault( "data", new ArrayList<>() );
             }
         }
         return null;
@@ -67,20 +69,20 @@ public class GamePullDockBG extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult(Map<String, Object> remoteGameDatum, GamePlatform gamePlatform) {
         GameDataRecord gameDataRecord = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameInfoID" ) ) );
         String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
 //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "uid" ) ) );
+        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
 //        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
-        gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "bAmount" ) ) ) );
-        gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "issueId" ) ) ) );
-        gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "payment" ) ) ) );
-        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "tableId" ) ) );
-        gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "startTime" ) ) );
-        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endTime" ) ) );
-//        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "" ) ) );
+        gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ) );
+        gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ) );
+        gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "Profit" ) ) ) );
+        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
+        gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
+        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "GameEndTime" ) ) );
+        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "AgentID" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
