@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -21,6 +22,7 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,17 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
 
     @Override
     public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + 30000;
+
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
+        // 如果不是3分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 5 ) ) ) {
+            return null;
+        }
+
+        LocalDateTime end = start.plusMinutes( 1 );
+
+        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
 
         String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", String.valueOf( startTime ), String.valueOf( endTime ) );
         String param = null;
@@ -41,10 +52,6 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
-        }
-        // 如果不是1分钟前的时间,跳过
-        if ( startTime > ( System.currentTimeMillis() + 60000 ) ) {
-            return null;
         }
 
         String key = DigestUtils.md5Hex( gamePlatform.getAgent() + startTime + gamePlatform.getMd5() );
@@ -78,7 +85,7 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
                     ArrayList<Map<>>() );
             if ( ! CollectionUtils.isEmpty( records ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
-                gamePlatform.setVersionValue( String.valueOf( resultMap.getOrDefault( "time", endTime ) ) );
+                gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return records;
             }
         }

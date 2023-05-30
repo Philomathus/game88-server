@@ -22,18 +22,17 @@ public class GamePullDockRich88 extends AbstractGamePull {
     @Override
     public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
-        // 如果不是1分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 1 ) ) ) {
+        // 如果不是3分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
             return null;
         }
-
         LocalDateTime end = start.plusMinutes( 1 );
 
-        String startDateTime = LocalDateTimeUtils.format( start );
-        String endDateTime   = LocalDateTimeUtils.format( end );
+        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         String time   = String.valueOf( System.currentTimeMillis() );
-        String params = String.format( "from=%s&to=%s", startDateTime, endDateTime );
+        String params = String.format( "from=%s&to=%s", startTime, endTime );
 
         String apiKey = DigestUtils.sha256Hex( gamePlatform.getAgent() + gamePlatform.getMd5() + time );
 
@@ -52,7 +51,7 @@ public class GamePullDockRich88 extends AbstractGamePull {
                     ArrayList<Map<>>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
-                gamePlatform.setVersionValue( String.valueOf( endDateTime ) );
+                gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return d;
             }
         }

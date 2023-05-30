@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -21,6 +22,7 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +34,16 @@ public class GamePullDockNewWorld extends AbstractGamePull {
 
     @Override
     public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + 300000;
+
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
+        // 如果不是3分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
+            return null;
+        }
+        LocalDateTime end = start.plusMinutes( 1 );
+
+        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         String params = String.format( "method=6&startTime=%s&endTime=%s", String.valueOf( startTime ), String.valueOf( endTime ) );
         String param = null;
