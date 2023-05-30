@@ -1,30 +1,18 @@
 package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.JDB + "GamePullProcessor" )
@@ -46,7 +34,7 @@ public class GamePullDockJDB extends AbstractGamePull {
         long intervalTime = endTime - ts;
 
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put( "action", intervalTime > 7200000L ?  "64" : "29");
+        requestMap.put( "action", intervalTime > 7200000L ? "64" : "29" );
         requestMap.put( "ts", String.valueOf( ts ) );
         requestMap.put( "parent", gamePlatform.getAgent() );
         requestMap.put( "starttime", LocalDateTimeUtils.format( start, LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER ) );
@@ -56,9 +44,9 @@ public class GamePullDockJDB extends AbstractGamePull {
         String url = gamePlatform.getRecordUrl() + "/apiRequest.do";
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
             List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( dataMapList ) && "0000".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( ! CollectionUtils.isEmpty( dataMapList ) && "0000".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return dataMapList;

@@ -19,5 +19,11 @@
             <artifactId>game88-general-api</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-config</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
