@@ -22,8 +22,8 @@ import java.util.Map;
 public class GamePullDockBoLe extends AbstractGamePull {
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
-        long ts = System.currentTimeMillis();
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
+        long          ts    = System.currentTimeMillis();
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -31,10 +31,10 @@ public class GamePullDockBoLe extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
-        String nonce = GenerateOrderCacheUtils.me.getOrderId( "", 5 );
-        String sign = AESCoder.encrypt( gamePlatform.getDes() + nonce + String.valueOf( ts ) );
+        long   startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long   endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+        String nonce     = GenerateOrderCacheUtils.me.getOrderId( "", 5 );
+        String sign      = AESCoder.encrypt( gamePlatform.getDes() + nonce + String.valueOf( ts ) );
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "AccessKeyId", gamePlatform.getDes() );
@@ -47,13 +47,14 @@ public class GamePullDockBoLe extends AbstractGamePull {
         String url = gamePlatform.getRecordUrl() + "/v1/game/get_all_record_list";
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
-        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> respMsgMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_msg", new HashMap<>() );
-            if ( ! CollectionUtils.isEmpty( resultMap ) && "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 Map<String, Object> respDataMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_data", new HashMap<>() );
-                if ( ! CollectionUtils.isEmpty( respDataMap ) ) {
-                    List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data", new ArrayList<HashMap<>>() );
+                if ( !CollectionUtils.isEmpty( respDataMap ) ) {
+                    List<Object> dataMapList = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<Map<String,
+                            Object>>() );
                     gamePlatform.setVersionValue( String.valueOf( endTime ) );
                     return dataMapList;
                 }
@@ -63,13 +64,11 @@ public class GamePullDockBoLe extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
-        GameDataRecord gameDataRecord = new GameDataRecord();
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "room_id" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "player_account" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );

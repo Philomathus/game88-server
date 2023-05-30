@@ -32,7 +32,7 @@ import java.util.Map;
 public class GamePullDockBaiSheng extends AbstractGamePull {
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
@@ -45,8 +45,9 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
         long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
 
-        String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", String.valueOf( startTime ), String.valueOf( endTime ) );
-        String param = null;
+        String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", String.valueOf( startTime ),
+                String.valueOf( endTime ) );
+        String param  = null;
         try {
             param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
@@ -64,26 +65,21 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
 
         String url = gamePlatform.getRecordUrl() + "/Api/interface?" + params;
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( url )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( requestMap ).build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                }
-        );
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
-        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
-            List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records", new
-                    ArrayList<Map<>>() );
-            if ( ! CollectionUtils.isEmpty( records ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            List<Object> records = ( List<Object> ) resultMap.getOrDefault( "records", new ArrayList<Map<String, Object>>() );
+            if ( !CollectionUtils.isEmpty( records ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return records;
@@ -93,25 +89,26 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
-        GameDataRecord gameDataRecord = new GameDataRecord();
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
 
         String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( logId );
-        gameDataRecord.setGameRound(    String.valueOf( remoteGameDatum.get( "round_id" ) ) );
-        gameDataRecord.setAccount(      String.valueOf( remoteGameDatum.get( "user_id" ) ) );
-        gameDataRecord.setKindId(       String.valueOf( remoteGameDatum.get( "room_id" ) ) );
-        gameDataRecord.setCellScore(    String.valueOf( remoteGameDatum.get( "avail_bet" ) ) );
-        gameDataRecord.setAllBet(       String.valueOf( remoteGameDatum.get( "all_bet" ) ) );
-        gameDataRecord.setProfit(       String.valueOf( remoteGameDatum.get( "profit" ) ) );
-        gameDataRecord.setTableId(      String.valueOf( remoteGameDatum.get( "seat_id" ) ) );
+        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
+        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "user_id" ) ) );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "room_id" ) ) );
+        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "avail_bet" ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "all_bet" ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "profit" ) ) );
+        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "seat_id" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "start_time" ) ) );
-        gameDataRecord.setGameEndTime(  String.valueOf( remoteGameDatum.get( "end_time" ) ) );
-        gameDataRecord.setAgent(        String.valueOf( remoteGameDatum.get( "channel_id" ) ) );
-        gameDataRecord.setGameAgent(    gamePlatform.getAgent() );
-        gameDataRecord.setPlatformId(   gamePlatform.getId() );
+        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "end_time" ) ) );
+        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "channel_id" ) ) );
+        gameDataRecord.setGameAgent( gamePlatform.getAgent() );
+        gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
     }
 }

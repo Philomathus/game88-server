@@ -28,22 +28,22 @@ import java.util.*;
 public class GamePullDockXingYun extends AbstractGamePull {
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
             return null;
         }
-        LocalDateTime end = start.plusMinutes( 1 );
-        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
+        LocalDateTime end       = start.plusMinutes( 1 );
+        long          startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long          endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "platformno", gamePlatform.getAgent() );
         params.put( "requesttime", System.currentTimeMillis() / 1000 );
-        params.put( "sign",  gamePlatform.getDes() );
-        params.put( "starttime",  startTime / 1000 );
-        params.put( "endtime",  endTime / 1000 );
+        params.put( "sign", gamePlatform.getDes() );
+        params.put( "starttime", startTime / 1000 );
+        params.put( "endtime", endTime / 1000 );
 
         String param = null;
         try {
@@ -63,7 +63,8 @@ public class GamePullDockXingYun extends AbstractGamePull {
 
         String url = gamePlatform.getRecordUrl() + "/Game/roundRecord";
 
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ), response -> {
+        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
+                restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -72,9 +73,9 @@ public class GamePullDockXingYun extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        if ( ! CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
-            List<Map<String, Object>> recordMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "result", new HashMap<>() );
-            if ( ! CollectionUtils.isEmpty( recordMapList ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
+            List<Object> recordMapList = ( List<Object> ) resultMap.getOrDefault( "result", new ArrayList<>() );
+            if ( !CollectionUtils.isEmpty( recordMapList ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return recordMapList;
             }
@@ -83,8 +84,9 @@ public class GamePullDockXingYun extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
-        GameDataRecord gameDataRecord = new GameDataRecord();
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
 
         String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );

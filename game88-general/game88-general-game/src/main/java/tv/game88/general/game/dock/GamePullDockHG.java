@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
 public class GamePullDockHG extends AbstractGamePull {
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -72,7 +73,7 @@ public class GamePullDockHG extends AbstractGamePull {
                 } );
 
         if ( ! CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
-            List<Map<String, Object>> recordMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            List<Object> recordMapList = ( List<Object> ) resultMap.getOrDefault( "result", new ArrayList<>() );
             if ( ! CollectionUtils.isEmpty( recordMapList ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return recordMapList;
@@ -82,7 +83,8 @@ public class GamePullDockHG extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
 

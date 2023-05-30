@@ -14,12 +14,13 @@ import java.util.Map;
 @Repository( value = ConstantsGame.WALI + "GamePullProcessor" )
 public class GamePullDockWali extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         return null;
     }
 }

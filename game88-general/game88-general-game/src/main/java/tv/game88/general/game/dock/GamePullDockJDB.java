@@ -10,6 +10,7 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class GamePullDockJDB extends AbstractGamePull {
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         long ts = System.currentTimeMillis();
 
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
@@ -45,7 +46,7 @@ public class GamePullDockJDB extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
         if ( ! CollectionUtils.isEmpty( resultMap ) ) {
-            List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            List<Object> dataMapList = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
             if ( ! CollectionUtils.isEmpty( dataMapList ) && "0000".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
@@ -56,7 +57,8 @@ public class GamePullDockJDB extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "seqNo" ) ) );
 

@@ -18,11 +18,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 
 @Log4j2
 public abstract class AbstractGamePull implements BaseGamePull {
     @Resource
     protected RestTemplate restTemplate;
+    @Resource
+    protected ForkJoinPool forkJoinPool;
 
     @Resource
     protected RedisUtils redisUtils;
