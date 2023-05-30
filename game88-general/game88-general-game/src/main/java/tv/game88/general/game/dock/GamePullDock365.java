@@ -28,15 +28,11 @@ public class GamePullDock365 extends AbstractGamePull {
         requestMap.put( "st",  startTime );
         requestMap.put( "et", endTime );
 
-        String url = String.format( gamePlatform.getRecordUrl() + "getTransactionsByPayTime");
+        String url = gamePlatform.getRecordUrl() + "getTransactionsByPayTime";
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String  status = resultMap.getOrDefault("status", "").toString();
-            int     count  = ( int ) resultMap.getOrDefault( "count", -1);
-            if ( "1".equals( status ) && count == 1 ){
-                return ( List<Map<String, Object>> ) resultMap.getOrDefault( "transactions", Collections.emptyMap() );
-            }
+        if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals( resultMap.getOrDefault("status", "").toString() ) ) {
+            return ( List<Map<String, Object>> ) resultMap.getOrDefault( "transactions", Collections.emptyMap() );
         }
         return null;
     }
