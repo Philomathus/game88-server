@@ -6,9 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import org.apache.commons.codec.digest.DigestUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -63,6 +61,7 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameType" ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ) );
+        gameDataRecord.setRevenue( fenToYuan( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "commissionable" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "income" ) ) ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
