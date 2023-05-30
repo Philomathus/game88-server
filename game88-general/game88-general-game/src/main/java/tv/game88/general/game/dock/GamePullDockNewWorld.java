@@ -53,9 +53,6 @@ public class GamePullDockNewWorld extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        if ( startTime > ( System.currentTimeMillis() + 300000 ) ) {
-            return null;
-        }
 
         String key = DigestUtils.md5Hex( gamePlatform.getAgent() + startTime + gamePlatform.getMd5() );
 
