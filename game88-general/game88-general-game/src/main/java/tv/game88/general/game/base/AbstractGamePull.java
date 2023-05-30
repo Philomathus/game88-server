@@ -10,6 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.general.api.entity.GamePlatform;
 
 import javax.annotation.Resource;
@@ -22,6 +23,9 @@ import java.util.Map;
 public abstract class AbstractGamePull implements BaseGamePull {
     @Resource
     protected RestTemplate restTemplate;
+
+    @Resource
+    protected RedisUtils redisUtils;
 
     protected String createRecordId( GamePlatform info, String tarId ) {
         return String.valueOf( info.getId() ).concat( "-" ).concat( tarId );
