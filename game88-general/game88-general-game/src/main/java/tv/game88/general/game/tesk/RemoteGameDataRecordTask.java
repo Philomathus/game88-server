@@ -42,7 +42,7 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService    gameDataRecordService;
 
-    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    @Scheduled( cron = "0/20 * * * * ?" ) // 每20秒执行一次
     public void remoteGameDataRecord() {
         if ( !redisUtils.lock( this.getClass().getSimpleName(), 14 ) ) {
             return;
@@ -72,7 +72,8 @@ public class RemoteGameDataRecordTask {
                         }
                         gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
 
-                        if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN ) {
+                        if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                                && gamePlatform.getGameCategory() != EnumGameCategory.AG ) {
                             LocalDateTime localDateTime = null;
                             for ( GameDataRecord gameDataRecord : gameDataRecords ) {
                                 LocalDateTime gameEndTime =

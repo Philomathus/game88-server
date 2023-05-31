@@ -16,7 +16,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.utils.XmlUtil;
@@ -88,8 +87,8 @@ public class GamePullDockAG extends AbstractGamePull {
         String startTime;
         String endTime;
         if ( "gethunterscene.xml".equals( queryXml ) ) {
-            startTime = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( startMD ) );
-            endTime   = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( endMD ) );
+            startTime = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( startMD ) / 1000L );
+            endTime   = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( endMD ) / 1000L );
         } else {
             startTime = LocalDateTimeUtils.format( startMD );
             endTime   = LocalDateTimeUtils.format( endMD );
@@ -98,16 +97,21 @@ public class GamePullDockAG extends AbstractGamePull {
         String by      = "DESC";
         String page    = "1";
         String perpage = "500";
+        String order   = "";
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "cagent", gamePlatform.getLinecode() );
         requestMap.set( "startdate", startTime );
         requestMap.set( "enddate", endTime );
+        if ( "gethunterscene.xml".equals( queryXml ) ) {
+            order = "billtime";
+            requestMap.set( "order", order );
+        }
         requestMap.set( "by", by );
         requestMap.set( "page", page );
         requestMap.set( "perpage", perpage );
-        requestMap.set( "key", DigestUtils.md5Hex(
-                gamePlatform.getLinecode() + startTime + endTime + by + page + perpage + "5F14237EE2A67EF102203A4C97603BC5" ) );
+        requestMap.set( "key", DigestUtils.md5Hex( gamePlatform.getLinecode() + startTime + endTime + order + by + page + perpage
+                + "5F14237EE2A67EF102203A4C97603BC5" ) );
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() + queryXml )
                                                           .queryParams( requestMap ).build();
@@ -126,7 +130,10 @@ public class GamePullDockAG extends AbstractGamePull {
             }
             return text;
         } );
-        log.warn( queryXml + ":::" + resultXml );
+        if ( resultXml.length() < 1000 ) {
+            log.warn( queryXml + ":::" + resultXml );
+            log.warn( queryXml + ":::" + uriComponents.toUriString() );
+        }
         if ( StringUtils.isNotBlank( resultXml ) ) {
             try {
                 Document document = XmlUtil.getDocument( resultXml );
@@ -150,12 +157,19 @@ public class GamePullDockAG extends AbstractGamePull {
         if ( StringUtils.isBlank( reckontime ) ) {
             reckontime = element.getAttribute( "betTime" );
         }
+        String reckonTime;
+        if ( StringUtils.isBlank( reckontime ) ) {
+            String        billtime = element.getAttribute( "billtime" ) + "000";
+            LocalDateTime meiDong  = LocalDateTimeUtils.convertTimestampToMeiDong( Long.parseLong( billtime ) );
+            reckonTime = LocalDateTimeUtils.format( meiDong );
+        } else {
+            reckonTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
+        }
         String account = element.getAttribute( "username" );
         if ( StringUtils.isBlank( account ) ) {
             account = element.getAttribute( "playName" );
         }
-        String agent      = account.split( "_" )[ 0 ].toLowerCase();
-        String reckonTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
+        String agent = account.split( "_" )[ 0 ].toLowerCase();
 
         gameDataRecord.setGameId( element.getAttribute( "billno" ) );
         String gameCode = element.getAttribute( "gameCode" );
@@ -195,8 +209,6 @@ public class GamePullDockAG extends AbstractGamePull {
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
-
-        log.warn( JsonUtil.object2Json( gameDataRecord ) );
         return gameDataRecord;
     }
 
