@@ -9,10 +9,11 @@ public class LocalDateTimeUtils {
     public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd" );
     public static final DateTimeFormatter YYYYMMDD_FORMATTER   = DateTimeFormatter.ofPattern( "yyyyMMdd" );
 
-    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
-    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER      = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
-    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER   = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
-    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER      = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
+    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER         = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER              = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
+    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER           = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
+    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER              = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
+    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SS_XXXFORMATTER    = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssXXX" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
     public static final DateTimeFormatter HHMMSS_FORMATTER   = DateTimeFormatter.ofPattern( "HHmmss" );
