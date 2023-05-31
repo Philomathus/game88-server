@@ -47,11 +47,10 @@ public class GamePullDockRich88 extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendGetMap( url, httpHeaders );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Object> d = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<Map<String, Object>>() );
-            if ( !CollectionUtils.isEmpty( d ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return d;
+                return ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<Map<String, Object>>() );
             }
         }
         return null;

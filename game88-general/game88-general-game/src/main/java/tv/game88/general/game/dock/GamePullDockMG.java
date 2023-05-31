@@ -11,10 +11,8 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
-import tv.game88.general.api.service.GamePlatformService;
 import tv.game88.general.game.base.AbstractGamePull;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +20,6 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.MG + "GamePullProcessor" )
 public class GamePullDockMG extends AbstractGamePull {
-
-    @Resource
-    private GamePlatformService gamePlatformService;
-
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 

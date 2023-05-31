@@ -74,7 +74,7 @@ public class GamePullDockCQ9 extends AbstractGamePull {
                     HashMap<>() );
             if ( "0".equals( statusMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 List<Object> dataMap = ( List<Object> ) resultMap.getOrDefault( "data", new
-                        ArrayList<Map<>>() );
+                        ArrayList<>() );
                 if ( ! CollectionUtils.isEmpty( dataMap ) ) {
                     gamePlatform.setVersionValue( String.valueOf( endTime ) );
                     return dataMap;
