@@ -29,9 +29,9 @@ public class GamePullDockRich88 extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
 
-        String time   = String.valueOf( System.currentTimeMillis() );
+        String time = String.valueOf( System.currentTimeMillis() );
         String params = String.format( "from=%s&to=%s", startTime, endTime );
 
         String apiKey = DigestUtils.sha256Hex( gamePlatform.getAgent() + gamePlatform.getMd5() + time );
@@ -46,9 +46,9 @@ public class GamePullDockRich88 extends AbstractGamePull {
         String url = gamePlatform.getRecordUrl() + "/v2/platform/bet/records?" + params;
 
         Map<String, Object> resultMap = this.sendGetMap( url, httpHeaders );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
             List<Object> d = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<Map<String, Object>>() );
-            if ( !CollectionUtils.isEmpty( d ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( ! CollectionUtils.isEmpty( d ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return d;
@@ -60,12 +60,9 @@ public class GamePullDockRich88 extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "account" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );

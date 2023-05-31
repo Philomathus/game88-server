@@ -87,10 +87,7 @@ public class GamePullDockHG extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameNumber" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "userName" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "arenaId" ) ) );

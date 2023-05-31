@@ -43,11 +43,11 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
 
         String params = String.format( "method=6&startTime=%s&endTime=%s", String.valueOf( startTime ),
                 String.valueOf( endTime ) );
-        String param  = null;
+        String param = null;
         try {
             param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
@@ -69,19 +69,19 @@ public class GamePullDockNewWorld extends AbstractGamePull {
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> dataStr = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             List<Object> contentsMapList = ( List<Object> ) dataStr.getOrDefault( "contents",
                     new ArrayList<Map<String, Object>>() );
-            if ( !CollectionUtils.isEmpty( contentsMapList ) && "0".equals( dataStr.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( ! CollectionUtils.isEmpty( contentsMapList ) && "0".equals( dataStr.getOrDefault( "code", "-1" ).toString() ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return contentsMapList;
             }
@@ -92,13 +92,9 @@ public class GamePullDockNewWorld extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord      gameDataRecord  = new GameDataRecord();
-
+        GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "GameArrNo" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "PlayerAccount" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "ServerCode" ) ) );

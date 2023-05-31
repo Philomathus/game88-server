@@ -86,12 +86,9 @@ public class GamePullDockXingYun extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "recordid" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "username" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "roomname" ) ) );

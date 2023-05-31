@@ -61,10 +61,7 @@ public class GamePullDockJDB extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "seqNo" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundSeqNo" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gType" ) ) );
