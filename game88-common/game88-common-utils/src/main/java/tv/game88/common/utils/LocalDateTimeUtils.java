@@ -179,9 +179,18 @@ public class LocalDateTimeUtils {
      * @return LocalDateTime
      */
     public static LocalDateTime convertToMeiDong( LocalDateTime localDateTime ) {
-        ZonedDateTime zonedtime = localDateTime.atZone( ZoneId.systemDefault() );
-        ZonedDateTime converted = zonedtime.withZoneSameInstant( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "America/Caracas" ) );
         return converted.toLocalDateTime();
+    }
+
+    /**
+     * 时间戳转换成美东时间
+     *
+     * @return LocalDateTime
+     */
+    public static LocalDateTime convertTimestampToMeiDong( long timestamp ) {
+        return LocalDateTime.ofInstant( Instant.ofEpochMilli( timestamp ), ZoneId.of( "America/Caracas" ) );
     }
 
     /**
@@ -193,8 +202,8 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime convertMeiDongToDefault( String time ) {
         LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
-        ZonedDateTime zonedtime = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
-        ZonedDateTime converted = zonedtime.withZoneSameInstant( ZoneId.systemDefault() );
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
 }
