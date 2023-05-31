@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.DesCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -25,7 +24,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.DATANG + "GamePullProcessor" )
 public class GamePullDockDaTang extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -45,7 +44,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
+        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9, 1, time ) + gamePlatform.getMd5();
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "agentid", gamePlatform.getAgent() );
@@ -60,22 +59,23 @@ public class GamePullDockDaTang extends AbstractGamePull {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return ( List<Map<String, Object>> ) d.getOrDefault( "data", new ArrayList<>() );
+                return ( List<Object> ) d.getOrDefault( "data", new ArrayList<>() );
             }
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Map<String, Object> remoteGameDatum, GamePlatform gamePlatform) {
-        GameDataRecord gameDataRecord = new GameDataRecord();
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameInfoID" ) ) );
-        String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String id = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
-//        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
-//        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "Profit" ) ) ) );

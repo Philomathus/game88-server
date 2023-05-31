@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -20,10 +21,9 @@ import java.util.*;
 @Log4j2
 @Repository( value = ConstantsGame.MEIBO + "GamePullProcessor" )
 public class GamePullDockMeiBo extends AbstractGamePull {
-    private static final String MD5 = "WCPT";
 
     @Override
-    public List<Map<String, Object>> requestRemoteGameData( GamePlatform gamePlatform ) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -43,7 +43,7 @@ public class GamePullDockMeiBo extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=%s", gamePlatform.getAgent(), time, MD5 );
+        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=WCPT", gamePlatform.getAgent(), time );
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "agent", gamePlatform.getAgent() );
@@ -54,20 +54,23 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         String url = gamePlatform.getRecordUrl() + "/third/getGameRecord";
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
+
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return ( List<Map<String, Object>> ) d.getOrDefault( "record", new ArrayList<>() );
+                return ( List<Object> ) d.getOrDefault( "record", new ArrayList<>() );
             }
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult( Map<String, Object> remoteGameDatum, GamePlatform gamePlatform ) {
-        GameDataRecord gameDataRecord = new GameDataRecord();
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameOrder" ) ) );
         String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
         String account = String.valueOf( remoteGameDatum.get( "thirdUid" ) ).toLowerCase();

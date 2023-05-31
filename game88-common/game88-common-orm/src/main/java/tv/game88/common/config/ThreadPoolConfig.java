@@ -83,7 +83,7 @@ public class ThreadPoolConfig {
     public ForkJoinPoolFactoryBean forkJoinPoolFactoryBean() {
         final ForkJoinPoolFactoryBean poolFactory = new ForkJoinPoolFactoryBean();
         poolFactory.setCommonPool( true );
-        poolFactory.setParallelism( 2 * Runtime.getRuntime().availableProcessors() );
+        poolFactory.setParallelism( maxPoolSize );
         return poolFactory;
     }
 }

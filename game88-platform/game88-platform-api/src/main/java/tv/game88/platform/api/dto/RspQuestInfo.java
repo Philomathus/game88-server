@@ -20,9 +20,9 @@ public class RspQuestInfo {
     @Schema( title = "完成后增加的资金" )
     private BigDecimal reward;
     @Schema( title = "当前任务数量" )
-    private Integer    curNum     = 0;
+    private BigDecimal curNum = BigDecimal.ZERO;
     @Schema( title = "0=进行中1=已经完成2 领奖完成" )
-    private Integer    status     = 0;
+    private Integer    status = 0;
     @Schema( title = "游戏类型ID" )
     private Integer    gameTypeId;
 

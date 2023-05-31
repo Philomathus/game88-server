@@ -16,6 +16,7 @@ import tv.game88.platform.api.dto.RspMessageOnSite;
 import tv.game88.platform.api.service.MessageService;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 @RestController
@@ -46,7 +47,7 @@ public class MessageController extends BaseController {
     @Operation( summary = "获取站内信息列表" )
     @PostMapping( "/getMessageOnSites" )
     public RspBase<List<RspMessageOnSite>> getOnSiteMessages() {
-        String userId = MemberSecurityUtils.getUserId();
-        return RspBase.ok( messageService.getMessageOnSites(userId) );
+//        String userId = MemberSecurityUtils.getUserId();
+        return RspBase.ok( messageService.getMessageOnSites("M10098") );
     }
 }
