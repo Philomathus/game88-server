@@ -60,7 +60,7 @@ public class GamePullDockHG extends AbstractGamePull {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getApiUrl(), gamePlatform.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getRecordUrl(), gamePlatform.getDes() );
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {

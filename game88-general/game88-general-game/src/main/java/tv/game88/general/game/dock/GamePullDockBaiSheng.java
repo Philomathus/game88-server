@@ -63,7 +63,7 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         requestMap.set( "timestamp", String.valueOf( startTime ) );
         requestMap.set( "key", key );
 
-        String url = gamePlatform.getRecordUrl() + "/Api/interface?" + params;
+        String url = gamePlatform.getApiUrl() + "/Api/interface?" + params;
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( requestMap ).build( true );
 

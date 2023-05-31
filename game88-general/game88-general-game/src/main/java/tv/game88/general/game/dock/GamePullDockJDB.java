@@ -42,7 +42,7 @@ public class GamePullDockJDB extends AbstractGamePull {
         requestMap.put( "endtime", LocalDateTimeUtils.format( end, LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER ) );
         requestMap.put( "gTypes", gamePlatform.getGameCategory().getType() );
 
-        String url = gamePlatform.getRecordUrl() + "/apiRequest.do";
+        String url = gamePlatform.getApiUrl() + "/apiRequest.do";
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
         if ( ! CollectionUtils.isEmpty( resultMap ) ) {

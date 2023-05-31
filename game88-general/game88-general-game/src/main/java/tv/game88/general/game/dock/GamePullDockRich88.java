@@ -43,7 +43,7 @@ public class GamePullDockRich88 extends AbstractGamePull {
 
         HttpEntity<MultiValueMap<String, Object>> httpHeaders = this.packageForm( headerParams );
 
-        String url = gamePlatform.getRecordUrl() + "/v2/platform/bet/records?" + params;
+        String url = gamePlatform.getApiUrl() + "/v2/platform/bet/records?" + params;
 
         Map<String, Object> resultMap = this.sendGetMap( url, httpHeaders );
         if ( ! CollectionUtils.isEmpty( resultMap ) ) {

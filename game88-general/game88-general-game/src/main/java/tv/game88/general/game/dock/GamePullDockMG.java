@@ -29,7 +29,7 @@ public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
-        String url = gamePlatform.getRecordUrl() + "/agents/" + gamePlatform.getAgent() + "/bets?";
+        String url = gamePlatform.getApiUrl() + "/agents/" + gamePlatform.getAgent() + "/bets?";
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "limit", "20000" );

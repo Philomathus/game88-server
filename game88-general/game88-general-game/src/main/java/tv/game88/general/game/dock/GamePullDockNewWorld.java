@@ -63,7 +63,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         requestMap.set( "timestamp", String.valueOf( startTime ) );
         requestMap.set( "key", key );
 
-        String url = gamePlatform.getRecordUrl() + "/record?" + params;
+        String url = gamePlatform.getApiUrl() + "/record?" + params;
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( requestMap ).build( true );
 

@@ -48,7 +48,7 @@ public class GamePullDockCQ9 extends AbstractGamePull {
         requestMap.set( "endtime", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SS_XXXFORMATTER ) );
         requestMap.set( "page", String.valueOf( 1 ) );
 
-        String url = gamePlatform.getRecordUrl() + "/gameboy/order/view?";
+        String url = gamePlatform.getApiUrl() + "/gameboy/order/view?";
 
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( url )

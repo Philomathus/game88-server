@@ -44,7 +44,7 @@ public class GamePullDockBoLe extends AbstractGamePull {
         requestMap.put( "start_time", startTime );
         requestMap.put( "end_time", endTime );
 
-        String url = gamePlatform.getRecordUrl() + "/v1/game/get_all_record_list";
+        String url = gamePlatform.getApiUrl() + "/v1/game/get_all_record_list";
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {

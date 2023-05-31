@@ -61,7 +61,7 @@ public class GamePullDockXingYun extends AbstractGamePull {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        String url = gamePlatform.getRecordUrl() + "/Game/roundRecord";
+        String url = gamePlatform.getApiUrl() + "/Game/roundRecord";
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
