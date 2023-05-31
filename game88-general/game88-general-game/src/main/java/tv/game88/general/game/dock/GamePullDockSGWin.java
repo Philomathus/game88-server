@@ -72,8 +72,6 @@ public class GamePullDockSGWin extends AbstractGamePull {
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
         String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "agentId" ) ).toLowerCase();
-        String agent   = account.split( "_" )[ 0 ];
 
         gameDataRecord.setId( id );
 //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
@@ -85,7 +83,7 @@ public class GamePullDockSGWin extends AbstractGamePull {
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "deskId" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "openTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endTime" ) ) );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "agentId" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
