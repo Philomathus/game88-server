@@ -18,7 +18,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.GAMING_365 + "GamePullProcessor" )
 public class GamePullDock365 extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List< Object > requestRemoteGameData(GamePlatform gamePlatform) {
         long startTime = Long.parseLong( gamePlatform.getVersionValue() );
         long endTime = startTime + 60000;
 
@@ -32,13 +32,14 @@ public class GamePullDock365 extends AbstractGamePull {
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals( resultMap.getOrDefault("status", "").toString() ) ) {
-            return ( List<Map<String, Object>> ) resultMap.getOrDefault( "transactions", Collections.emptyMap() );
+            return ( List< Object > ) resultMap.getOrDefault( "transactions", Collections.emptyMap() );
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Map<String, Object> remoteGameDatum, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         String logId      = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
         String createTime = remoteGameDatum.get( "createTime" ).toString();

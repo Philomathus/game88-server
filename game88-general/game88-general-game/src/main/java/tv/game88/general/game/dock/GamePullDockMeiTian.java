@@ -21,7 +21,7 @@ import java.util.*;
 @Repository( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
 public class GamePullDockMeiTian extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
         LocalDateTime startTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         LocalDateTime endTime   = startTime.plusMinutes( 1 );
 
@@ -44,13 +44,14 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( Collections.emptyMap() ) );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals(resultMap.getOrDefault("resultCode", "").toString() ) ) {
-            return ( List<Map<String, Object>> ) resultMap.getOrDefault( "transList", Collections.emptyMap() );
+            return ( List<Object> ) resultMap.getOrDefault( "transList", Collections.emptyMap() );
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Map<String, Object> remoteGameDatum, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         String logId      = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 

@@ -16,18 +16,19 @@ import java.util.*;
 @Repository( value = ConstantsGame.FG + "GamePullProcessor" )
 public class GamePullDockFG extends AbstractGamePull {
     @Override
-    public List<Map<String, Object>> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
         String url = gamePlatform.getRecordUrl() + "v3/agent/log_by_page/gt/" + gamePlatform.getGameCategory().getType();
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( Collections.emptyMap() ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
-            return ( List<Map<String, Object>> ) resultMap.getOrDefault( "data", new ArrayList<>() );
+            return ( List< Object > ) resultMap.getOrDefault( "data", new ArrayList<>() );
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Map<String, Object> remoteGameDatum, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
