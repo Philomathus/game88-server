@@ -120,4 +120,10 @@ public abstract class AbstractGamePull implements BaseGamePull {
         }
         return resultMap;
     }
+
+    protected String assemblyUrl( Map<String, ?> bodyMap ) {
+        StringBuilder sb = new StringBuilder();
+        bodyMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
+        return sb.substring( 0, sb.length() - 1 );
+    }
 }
