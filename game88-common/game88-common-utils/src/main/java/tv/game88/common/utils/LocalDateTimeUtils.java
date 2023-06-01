@@ -7,16 +7,26 @@ import java.util.TimeZone;
 
 public class LocalDateTimeUtils {
     public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd" );
-    public static final DateTimeFormatter YYYYMMDD_FORMATTER   = DateTimeFormatter.ofPattern( "yyyyMMdd" );
 
-    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER         = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
-    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER              = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
-    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER           = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
-    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER              = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
-    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SS_XXXFORMATTER    = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssXXX" );
+    public static final DateTimeFormatter YYYYMMDD_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMdd" );
+
+    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+
+
+    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
+
+    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
+
+    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
+
+    public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
+
+    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SS_XXXFORMATTER = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm" + ":ssXXX" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
-    public static final DateTimeFormatter HHMMSS_FORMATTER   = DateTimeFormatter.ofPattern( "HHmmss" );
+
+    public static final DateTimeFormatter HHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "HHmmss" );
 
     /**
      * 格式化LocalDate
@@ -202,8 +212,8 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime convertMeiDongToDefault( String time ) {
         LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
-        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
-        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
 }
