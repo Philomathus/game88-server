@@ -8,5 +8,5 @@ import java.util.List;
 public interface BaseGamePull {
     List<Object> requestRemoteGameData( GamePlatform gamePlatform );
 
-    GameDataRecord handleResult( Object remoteGameDatum, GamePlatform gamePlatform );
+    GameDataRecord handleResult( Object object, GamePlatform gamePlatform );
 }
