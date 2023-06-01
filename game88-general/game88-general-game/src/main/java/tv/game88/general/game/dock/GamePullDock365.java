@@ -39,9 +39,11 @@ public class GamePullDock365 extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageForm( requestMap ) );
 
-        log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
+        String status = resultMap.getOrDefault( "status", "" ).toString();
+        if ( !CollectionUtils.isEmpty( resultMap ) && !"1".equals( status ) ) {
+            log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
+        }
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String status = resultMap.getOrDefault( "status", "" ).toString();
             if ( "1".equals( status ) || "1003".equals( status ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
