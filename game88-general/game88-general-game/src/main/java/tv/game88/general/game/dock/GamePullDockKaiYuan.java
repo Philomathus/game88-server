@@ -5,7 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.DesCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -21,11 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Log4j2
-@Repository( value = ConstantsGame.DATANG + "GamePullProcessor" )
-public class GamePullDockDaTang extends AbstractGamePull {
+@Repository( value = ConstantsGame.KAI_YUAN + "GamePullProcessor" )
+public class GamePullDockKaiYuan extends AbstractGamePull {
     @Override
-    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List< Object > requestRemoteGameData(GamePlatform gamePlatform) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -40,7 +40,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
         String params = String.format( "s=%s&startTime=%s&endTime=%s", 6, startTime, endTime );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, gamePlatform.getDes() );
+            param = DesCoder.encrypt( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -48,42 +48,42 @@ public class GamePullDockDaTang extends AbstractGamePull {
         String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
 
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put( "agentid", gamePlatform.getAgent() );
+        requestMap.put( "agent", gamePlatform.getAgent() );
         requestMap.put( "timestamp", time );
-        requestMap.put( "paraValue", param );
+        requestMap.put( "param", param );
         requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
 
-        String url = gamePlatform.getRecordUrl() + "/Reconciliation" + this.assemblyUrl( requestMap ); //
+        String url = gamePlatform.getRecordUrl() + "/getRecordHandle" + this.assemblyUrl( requestMap ); //
 
         Map<String, Object> resultMap = this.sendGetMap( url );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return ( List<Object> ) d.getOrDefault( "data", new ArrayList<>() );
+                return ( List< Object > ) d.getOrDefault( "list", new ArrayList<>() );
             }
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult(Object object, GamePlatform gamePlatform) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameInfoID" ) ) );
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameID" ) ) );
         String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
-//        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
-//        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
+        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "ServerID" ) ) );
+        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "userCode" ) ) );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "Profit" ) ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "GameEndTime" ) ) );
-        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "AgentID" ) ) );
+        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "Accounts" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
