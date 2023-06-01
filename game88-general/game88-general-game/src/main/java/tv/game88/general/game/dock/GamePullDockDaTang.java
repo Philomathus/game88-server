@@ -24,7 +24,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.DATANG + "GamePullProcessor" )
 public class GamePullDockDaTang extends AbstractGamePull {
     @Override
-    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -44,7 +44,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
+        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9, 1, time ) + gamePlatform.getMd5();
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "agentid", gamePlatform.getAgent() );
@@ -66,16 +66,16 @@ public class GamePullDockDaTang extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameInfoID" ) ) );
-        String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String id = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
-//        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
-//        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "Profit" ) ) ) );

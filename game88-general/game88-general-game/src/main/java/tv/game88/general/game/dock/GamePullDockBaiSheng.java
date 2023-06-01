@@ -43,11 +43,10 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
+        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
-        String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", String.valueOf( startTime ),
-                String.valueOf( endTime ) );
-        String param = null;
+        String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", startTime, endTime );
+        String param  = null;
         try {
             param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
@@ -69,17 +68,17 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
-        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             List<Object> records = ( List<Object> ) resultMap.getOrDefault( "records", new ArrayList<Map<String, Object>>() );
-            if ( ! CollectionUtils.isEmpty( records ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( !CollectionUtils.isEmpty( records ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return records;
@@ -91,7 +90,7 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );

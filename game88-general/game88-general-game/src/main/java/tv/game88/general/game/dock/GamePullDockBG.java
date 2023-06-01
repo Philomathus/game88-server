@@ -1,5 +1,6 @@
 package tv.game88.general.game.dock;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
@@ -8,22 +9,23 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.DesCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
-import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
-import tv.game88.general.game.util.UuidUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.BG + "GamePullProcessor" )
 public class GamePullDockBG extends AbstractGamePull {
     @Override
-    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -31,57 +33,54 @@ public class GamePullDockBG extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
-        String time   = String.valueOf( System.currentTimeMillis() );
-        String params = String.format( "s=%s&startTime=%s&endTime=%s", 6, startTime, endTime );
-        String param  = null;
+        long   startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long   endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+        String time      = String.valueOf( System.currentTimeMillis() );
+        String params    = String.format( "s=%s&startTime=%s&endTime=%s", 6, startTime, endTime );
+        String param     = null;
         try {
             param = DesCoder.encrypt( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
+        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9, 1, time ) + gamePlatform.getMd5();
 
-        String id = UuidUtil.getRandomUuidWithoutSeparator();
-        String sn = gamePlatform.getAgent();
+        String              id         = IdWorker.get32UUID();
+        String              sn         = gamePlatform.getAgent();
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "random", id );
         requestMap.put( "sn", sn );
-        requestMap.put( "sign", DigestUtils.md5Hex( id + sn + keyParams ));
+        requestMap.put( "sign", DigestUtils.md5Hex( id + sn + keyParams ) );
 
         String url = gamePlatform.getRecordUrl() + this.assemblyUrl( requestMap );
 
         Map<String, Object> resultMap = this.sendGetMap( url );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Object> items = (List<Object>)resultMap.getOrDefault( "items", new ArrayList<Map<>>() );
-            if( !CollectionUtils.isEmpty( items ) ){
-                gamePlatform.setVersionValue(String.valueOf(endTime));
-                return items;
-            }
+            List<Object> items = ( List<Object> ) resultMap.getOrDefault( "items", new ArrayList<>() );
+            gamePlatform.setVersionValue( String.valueOf( endTime ) );
+            return items;
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
-        String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String id = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
-//        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "uid" ) ) );
-//        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
+        //        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "bAmount" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "issueId" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "payment" ) ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "tableId" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "startTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endTime" ) ) );
-//        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

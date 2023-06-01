@@ -42,9 +42,9 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService    gameDataRecordService;
 
-    @Scheduled( cron = "0/20 * * * * ?" ) // 每20秒执行一次
+    @Scheduled( cron = "0/30 * * * * ?" ) // 每30秒执行一次
     public void remoteGameDataRecord() {
-        if ( !redisUtils.lock( this.getClass().getSimpleName(), 14 ) ) {
+        if ( !redisUtils.lock( this.getClass().getSimpleName(), 29 ) ) {
             return;
         }
         List<GamePlatform> gamePlatformList = new QueryChainWrapper<>( gamePlatformMapper ).eq( "effect", 1 ).list();

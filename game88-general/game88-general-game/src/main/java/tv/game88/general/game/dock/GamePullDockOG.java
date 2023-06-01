@@ -11,7 +11,6 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +26,6 @@ public class GamePullDockOG extends AbstractGamePull {
             return null;
         }
         LocalDateTime end = start.plusMinutes( 1 );
-        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         Map<String, Object> requestMap = new HashMap<>();
 
@@ -46,7 +43,7 @@ public class GamePullDockOG extends AbstractGamePull {
             Map<String, Object> dataMapList = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( dataMapList ) && "0".equals( dataMapList.getOrDefault( "status", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
-                gamePlatform.setVersionValue( String.valueOf( endTime ) );
+                gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
                 return ( List<Object> ) dataMapList;
             }
         }
@@ -67,7 +64,7 @@ public class GamePullDockOG extends AbstractGamePull {
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winloseamount" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "mtype" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "bettingdate" ) ) );
-//        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "bettingdate" ) ) );
+        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "bettingdate" ) ) );
         gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "vendor_id" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

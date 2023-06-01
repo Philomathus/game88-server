@@ -25,7 +25,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.KAI_YUAN + "GamePullProcessor" )
 public class GamePullDockKaiYuan extends AbstractGamePull {
     @Override
-    public List< Object > requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -45,7 +45,7 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
+        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9, 1, time ) + gamePlatform.getMd5();
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "agent", gamePlatform.getAgent() );
@@ -60,26 +60,26 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return ( List< Object > ) d.getOrDefault( "list", new ArrayList<>() );
+                return ( List<Object> ) d.getOrDefault( "list", new ArrayList<>() );
             }
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult(Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameID" ) ) );
-        String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String id = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "ServerID" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "userCode" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
-        gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ) );
-        gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ) );
-        gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "Profit" ) ) ) );
+        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "CellScore" ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "Profit" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "GameEndTime" ) ) );
@@ -87,9 +87,5 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
-    }
-
-    private String fenToYuan( String money ) {
-        return new BigDecimal( money ).divide( new BigDecimal( 100 ), 2, RoundingMode.HALF_UP ).toString();
     }
 }

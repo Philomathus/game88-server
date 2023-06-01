@@ -5,7 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.DesCoder;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -13,8 +12,6 @@ import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +22,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.SGWIN + "GamePullProcessor" )
 public class GamePullDockSGWin extends AbstractGamePull {
     @Override
-    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
@@ -45,7 +42,7 @@ public class GamePullDockSGWin extends AbstractGamePull {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
         }
-        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9 , 1 , time ) + gamePlatform.getMd5() ;
+        String keyParams = String.format( "ac=%s&all=%s&timestamp=%s", 9, 1, time ) + gamePlatform.getMd5();
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "agentId", gamePlatform.getAgent() );
@@ -68,19 +65,19 @@ public class GamePullDockSGWin extends AbstractGamePull {
     }
 
     @Override
-    public GameDataRecord handleResult(Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
-        String id   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String id = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
 
         gameDataRecord.setId( id );
-//        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
+        //        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
         gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "userCode" ) ) );
-//        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "nid" ) ) );
-        gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "effectBet" ) ) ) );
-        gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "totalBet" ) ) ) );
-        gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "allWin" ) ) ) );
+        //        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "nid" ) ) );
+        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effectBet" ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "totalBet" ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "allWin" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "deskId" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "openTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endTime" ) ) );
@@ -88,10 +85,6 @@ public class GamePullDockSGWin extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
-    }
-
-    private String fenToYuan( String money ) {
-        return new BigDecimal( money ).divide( new BigDecimal( 100 ), 2, RoundingMode.HALF_UP ).toString();
     }
 
 }

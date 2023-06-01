@@ -39,9 +39,9 @@ public class GamePullDockCQ9 extends AbstractGamePull {
             return null;
         }
 
-        LocalDateTime end = start.plusMinutes( 1 );
-        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long endTime = LocalDateTimeUtils.localDateToTimestamp( end );
+        LocalDateTime end       = start.plusMinutes( 1 );
+        long          startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long          endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.set( "starttime", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SS_XXXFORMATTER ) );
@@ -50,18 +50,16 @@ public class GamePullDockCQ9 extends AbstractGamePull {
 
         String url = gamePlatform.getApiUrl() + "/gameboy/order/view?";
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( url )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( requestMap ).build( true );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set( "Authorization", gamePlatform.getMd5() );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( null, httpHeaders );
 
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ), response -> {
+        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.GET,
+                restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
-            String text;
+            String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
                 text = IOUtils.toString( reader );
             }
@@ -69,13 +67,11 @@ public class GamePullDockCQ9 extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        if ( ! CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> statusMap = ( Map<String, Object> ) resultMap.getOrDefault( "status", new
-                    HashMap<>() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            Map<String, Object> statusMap = ( Map<String, Object> ) resultMap.getOrDefault( "status", new HashMap<>() );
             if ( "0".equals( statusMap.getOrDefault( "code", "-1" ).toString() ) ) {
-                List<Object> dataMap = ( List<Object> ) resultMap.getOrDefault( "data", new
-                        ArrayList<>() );
-                if ( ! CollectionUtils.isEmpty( dataMap ) ) {
+                List<Object> dataMap = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( dataMap ) ) {
                     gamePlatform.setVersionValue( String.valueOf( endTime ) );
                     return dataMap;
                 }
