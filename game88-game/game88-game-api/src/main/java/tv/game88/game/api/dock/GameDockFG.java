@@ -55,7 +55,7 @@ public class GameDockFG extends AbstractGameDock {
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add( "member_code", reqJoinGame.getGameMemberId() );
-            params.add( "password", reqJoinGame.getGameMemberId() + "88771234" );
+            params.add( "password", ( reqJoinGame.getGameMemberId() + "88771234" ).split( "_" )[ 1 ] );
 
             resultMap = execute( url, params, reqJoinGame );
 
