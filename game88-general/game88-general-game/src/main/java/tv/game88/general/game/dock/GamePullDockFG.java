@@ -85,6 +85,7 @@ public class GamePullDockFG extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
@@ -104,19 +105,19 @@ public class GamePullDockFG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
 
-        String account    = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
-        String agent  = account.split( "_" )[ 0 ];
-        String createTime = remoteGameDatum.get( "time" ).toString();
+        String account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
+        String agent   = account.split( "_" )[ 0 ];
 
-        gameDataRecord.setGameRound( gameDataRecord.getGameId() ); //TODO: Not sure
+        gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( account );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "all_bets" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "total_bets" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "result" ) ) );
 
-        String timestamp = remoteGameDatum.get( "time" ) + "000";
-        LocalDateTime time = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( timestamp ) );
+        String        timestamp = remoteGameDatum.get( "time" ) + "000";
+        LocalDateTime time      = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( timestamp ) );
+
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( time ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         gameDataRecord.setAgent( agent );
