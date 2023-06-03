@@ -46,7 +46,7 @@ public class GamePullDock365 extends AbstractGamePull {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return ( List<Object> ) resultMap.getOrDefault( "transactions", new ArrayList<>() );
             } else {
-                log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;

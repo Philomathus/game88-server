@@ -69,7 +69,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return ( List<Object> ) d.getOrDefault( "list", new ArrayList<>() );
             } else {
-                log.warn( uriString + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( uriString + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
@@ -92,8 +92,10 @@ public class GamePullDockDaTang extends AbstractGamePull {
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "Revenue" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.get( "ChairID" ) ) );
-        gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
-        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "GameEndTime" ) ) );
+        String gameStartTime = String.valueOf( remoteGameDatum.get( "GameStartTime" ) );
+        gameDataRecord.setGameStartTime( gameStartTime.substring( 0, gameStartTime.length() - 4 ) );
+        String gameEndTime = String.valueOf( remoteGameDatum.get( "GameEndTime" ) );
+        gameDataRecord.setGameEndTime( gameEndTime.substring( 0, gameEndTime.length() - 4 ) );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
