@@ -216,4 +216,35 @@ public class LocalDateTimeUtils {
         ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
+
+    /**
+     * 当地时区时间转换成UTC+0时间
+     *
+     * @param localDateTime
+     *
+     * @return LocalDateTime
+     */
+    public static LocalDateTime convertToUTC0( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
+        return converted.toLocalDateTime();
+    }
+
+    /**
+     * UTC+0时间转换成当地时区时间
+     *
+     * @param time
+     *
+     * @return LocalDateTime
+     */
+    public static LocalDateTime convertUTC0ToDefault( String time ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "UTC+0" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
+        return converted.toLocalDateTime();
+    }
+
+    public static void main( String[] args ) {
+        System.out.println(LocalDateTimeUtils.format( convertToUTC0(LocalDateTime.now()) ));
+    }
 }
