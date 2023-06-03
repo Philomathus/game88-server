@@ -85,7 +85,7 @@ public class GamePullDockFG extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
-        log.warn( JsonUtil.object2Json( resultMap ) );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
@@ -121,7 +121,7 @@ public class GamePullDockFG extends AbstractGamePull {
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( time ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         gameDataRecord.setAgent( agent );
-        gameDataRecord.setGameAgent( String.valueOf( remoteGameDatum.get( "total_agent_uid" ) ) );
+        gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
     }

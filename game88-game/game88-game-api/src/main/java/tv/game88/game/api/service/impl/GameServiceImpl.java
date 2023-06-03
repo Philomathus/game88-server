@@ -365,7 +365,6 @@ public class GameServiceImpl implements GameService {
         // BBIN会员ID只能是英文加数字
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
-            //case FG -> ( profile + "FGG" + memberId ).toLowerCase();
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
             case BOLE, JDB -> ( profile + memberId ).toLowerCase();
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
