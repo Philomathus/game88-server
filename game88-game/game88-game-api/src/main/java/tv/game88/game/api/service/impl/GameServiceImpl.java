@@ -185,6 +185,10 @@ public class GameServiceImpl implements GameService {
         if ( changeMoney.compareTo( BigDecimal.ZERO ) < 0 ) {
             changeMoney = BigDecimal.ZERO;
         }
+        if ( gamePlatform.getGameCategory() == EnumGameCategory.DATANG
+                && changeMoney.compareTo( new BigDecimal( 500000 ) ) > 0 ) {
+            changeMoney = new BigDecimal( 500000 );
+        }
 
         ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
         BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
