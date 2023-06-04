@@ -2,6 +2,9 @@ package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
@@ -12,10 +15,7 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Repository( value = ConstantsGame.RICH88 + "GamePullProcessor" )
@@ -33,16 +33,21 @@ public class GamePullDockRich88 extends AbstractGamePull {
         String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( start ) );
         String endTime   = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( end ) );
 
-        String time = String.valueOf( System.currentTimeMillis() );
+        String timestamp = String.valueOf( System.currentTimeMillis() / 1000 );
 
-        Map<String, Object> headerParams = new LinkedHashMap<>();
-        headerParams.put( "api_key", DigestUtils.sha256Hex( gamePlatform.getAgent() + gamePlatform.getMd5() + time ) );
-        headerParams.put( "pf_id", gamePlatform.getAgent() );
-        headerParams.put( "timestamp", time );
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        httpHeaders.setAccept( List.of( MediaType.APPLICATION_JSON ) );
+        httpHeaders.set( "api_key", DigestUtils.sha256Hex( gamePlatform.getAgent() + gamePlatform.getMd5() + timestamp ) );
+        httpHeaders.set( "pf_id", gamePlatform.getAgent() );
+        httpHeaders.set( "timestamp", timestamp );
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>( httpHeaders );
 
         String url = String.format( "%s/v2/platform/bet/records?from=%s&to=%s", gamePlatform.getApiUrl(), startTime, endTime );
 
-        Map<String, Object> resultMap = this.sendGetMap( url, packageForm( headerParams ) );
+        Map<String, Object> resultMap = this.sendGetMap( url, requestEntity );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询

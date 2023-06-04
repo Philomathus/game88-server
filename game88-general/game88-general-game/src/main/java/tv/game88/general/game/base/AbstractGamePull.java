@@ -17,6 +17,9 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 
@@ -125,5 +128,19 @@ public abstract class AbstractGamePull implements BaseGamePull {
         StringBuilder sb = new StringBuilder();
         bodyMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
         return sb.substring( 0, sb.length() - 1 );
+    }
+
+    protected static List<Object> convertMapArrayToListMap( Map<String, List<Object>> originalMap, String existKey ) {
+        List<Object> resultList = new ArrayList<>();
+        List<Object> objects    = originalMap.get( existKey );
+        for ( int i = 0; i < objects.size(); i++ ) {
+            Map<String, Object> resultMap = new HashMap<>();
+            for ( String key : originalMap.keySet() ) {
+                List<Object> values = originalMap.get( key );
+                resultMap.put( key, values.get( i ) );
+            }
+            resultList.add( resultMap );
+        }
+        return resultList;
     }
 }

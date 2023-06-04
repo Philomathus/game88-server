@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.general.api.service.GameDataRecordService;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 @Log4j2
@@ -18,6 +19,7 @@ public class GameDataRecordTableCutTask {
 
     //每天凌晨一点执行一次
     @Scheduled( cron = "0 0 1 * * ?" )
+    @PostConstruct
     public void gameDataRecordTableCut() {
         if ( !redisUtils.lock( this.getClass().getSimpleName(), 30 ) ) {
             return;

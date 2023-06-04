@@ -77,4 +77,6 @@ public class GameDataRecord {
      * 游戏结束时间
      */
     private String gameEndTime;
+
+    private String detail;
 }
