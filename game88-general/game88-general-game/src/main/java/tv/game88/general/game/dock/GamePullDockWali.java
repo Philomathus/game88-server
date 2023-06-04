@@ -110,7 +110,6 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "profit" ) ) );
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
-        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "detailUrl" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "gameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "recordTime" ) ) );
         gameDataRecord.setAgent( agent );
