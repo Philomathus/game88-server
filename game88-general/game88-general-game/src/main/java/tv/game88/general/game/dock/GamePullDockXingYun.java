@@ -1,6 +1,7 @@
 package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,20 +35,24 @@ public class GamePullDockXingYun extends AbstractGamePull {
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
             return null;
         }
-        LocalDateTime end       = start.plusMinutes( 1 );
-        long          startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long          endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
+        LocalDateTime end = start.plusMinutes( 1 );
+
+        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "platformno", gamePlatform.getAgent() );
         params.put( "requesttime", System.currentTimeMillis() / 1000 );
-        params.put( "sign", gamePlatform.getDes() );
         params.put( "starttime", startTime / 1000 );
         params.put( "endtime", endTime / 1000 );
-
+        params.put( "page", 1 );
+        params.put( "pagesize", 2000 );
+        StringBuilder sb = new StringBuilder();
+        params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
+        String sign  = DigestUtils.md5Hex( sb + "key=" + gamePlatform.getMd5() );
         String param = null;
         try {
-            param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), gamePlatform.getMd5() );
+            param = AESCoder.encryptByKey( sb + "sign=" + sign.toUpperCase(), gamePlatform.getMd5() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -59,9 +64,9 @@ public class GamePullDockXingYun extends AbstractGamePull {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
 
-        String url = gamePlatform.getApiUrl() + "/Game/roundRecord";
+        String url = gamePlatform.getApiUrl() + "/Game/pullRoundRecord";
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
@@ -73,34 +78,43 @@ public class GamePullDockXingYun extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
-            List<Object> recordMapList = ( List<Object> ) resultMap.getOrDefault( "result", new ArrayList<>() );
-            if ( !CollectionUtils.isEmpty( recordMapList ) ) {
+        log.warn( JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String code = resultMap.get( "code" ).toString();
+            if ( "0".equals( code ) || "30007".equals( code ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                return recordMapList;
+                return ( List<Object> ) resultMap.getOrDefault( "result", new ArrayList<>() );
             }
         }
+        log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
         return null;
     }
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "recordid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "recordid" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "username" ) ) );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "roomname" ) ) );
+
+        String   userName      = String.valueOf( remoteGameDatum.get( "username" ) );
+        String[] userNameSplit = userName.split( "_" );
+        String   agent         = userNameSplit[ userNameSplit.length - 2 ];
+        String   account       = agent + "_" + userNameSplit[ userNameSplit.length - 1 ];
+        gameDataRecord.setAccount( account );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effectivebet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "totalbet" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "platform_profit " ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "losewincoin" ) ) );
+        gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "winextract" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "tableno" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "starttime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endtime" ) ) );
-        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "platformid " ) ) );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+        gameDataRecord.setDetail( String.valueOf( remoteGameDatum.get( "showpage" ) ) );
         return gameDataRecord;
     }
 }
