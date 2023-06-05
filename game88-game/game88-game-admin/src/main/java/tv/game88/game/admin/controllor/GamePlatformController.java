@@ -57,15 +57,12 @@ public class GamePlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:platform:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<RspGame>> listAll() {
-        List<RspGame> list = gamePlatformService
-                .list( new QueryWrapper<GamePlatform>().select( "id", "name", "agent" ) )
-                .stream()
-                .map( p -> {
-                    RspGame rspGame = new RspGame();
-                    BeanUtils.copyProperties( p, rspGame );
-                    return rspGame;
-                } )
-                .collect( Collectors.toList() );
+        List<RspGame> list = gamePlatformService.list( new QueryWrapper<GamePlatform>().select( "id", "name", "agent" ) ).stream()
+                                                .map( p -> {
+                                                    RspGame rspGame = new RspGame();
+                                                    BeanUtils.copyProperties( p, rspGame );
+                                                    return rspGame;
+                                                } ).collect( Collectors.toList() );
         return RspBase.ok( list );
     }
 
@@ -88,10 +85,12 @@ public class GamePlatformController extends BaseController {
         if ( gamePlatform != null ) {
             String a = "**********";
             if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
-                gamePlatform.setDes( a );
+                String des = AESCoder.decrypt( gamePlatform.getDes() );
+                gamePlatform.setDes( des.substring( 0, 4 ) + a + des.substring( des.length() - 4 ) );
             }
             if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
-                gamePlatform.setMd5( a );
+                String md5 = AESCoder.decrypt( gamePlatform.getMd5() );
+                gamePlatform.setMd5( md5.substring( 0, 4 ) + a + md5.substring( md5.length() - 4 ) );
             }
         }
         return RspBase.ok( gamePlatform );
