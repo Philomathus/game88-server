@@ -86,11 +86,20 @@ public class GamePlatformController extends BaseController {
             String a = "**********";
             if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
                 String des = AESCoder.decrypt( gamePlatform.getDes() );
-                gamePlatform.setDes( des.substring( 0, 4 ) + a + des.substring( des.length() - 4 ) );
+                if ( des.length() > 4 ) {
+                    gamePlatform.setDes( des.substring( 0, 4 ) + a + des.substring( des.length() - 4 ) );
+                } else {
+                    gamePlatform.setDes( "**" + des.substring( des.length() - 2 ) );
+                }
             }
             if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
                 String md5 = AESCoder.decrypt( gamePlatform.getMd5() );
-                gamePlatform.setMd5( md5.substring( 0, 4 ) + a + md5.substring( md5.length() - 4 ) );
+                if ( md5.length() > 4 ) {
+                    gamePlatform.setMd5( md5.substring( 0, 4 ) + a + md5.substring( md5.length() - 4 ) );
+                } else {
+                    gamePlatform.setMd5( "**" + md5.substring( md5.length() - 2 ) );
+                }
+
             }
         }
         return RspBase.ok( gamePlatform );
