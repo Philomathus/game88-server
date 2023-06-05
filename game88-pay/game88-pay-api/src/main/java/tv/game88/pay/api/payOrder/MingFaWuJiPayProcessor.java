@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -30,22 +31,22 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatformNew, ReqPayRecharge reqPayRecharge ) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         SortedMap<String, Object> params = new TreeMap<>();
-        params.put( "merchId", payPlatformNew.getMerId() );
+        params.put( "merchId", payPlatform.getMerId() );
         params.put( "outTradeNo", reqPayRecharge.getOrderNo() );
         params.put( "amount", reqPayRecharge.getMoney().setScale( 2, RoundingMode.HALF_UP ).toString() );
         params.put( "channelCode", payChannel.getChannelCode().trim() );
-        params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatformNew.getCode() );
+        params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatformNew.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         String sign = DigestUtils.md5Hex( signStr );
         params.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatformNew.getPayUrl(), packageJson( params ), reqPayRecharge );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
-        log.warn( payPlatformNew.getName()
+        log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
@@ -61,17 +62,17 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatformNew, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
         SortedMap<String, Object> params = new TreeMap<>();
-        params.put( "merchId", payPlatformNew.getMerId() );
+        params.put( "merchId", payPlatform.getMerId() );
         params.put( "outTradeNo", memberRechargeOnline.getOrderNo() );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatformNew.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         params.put( "sign", DigestUtils.md5Hex( signStr ) );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatformNew.getQueryUrl(), packageJson( params ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( params ), null );
 
-        log.warn( payPlatformNew.getName()
+        log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "20000".equals( resultMap.getOrDefault( "code", "40000" ).toString() ) ) {
@@ -94,17 +95,16 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
             log.warn( "订单已成功，无需继续回调 - orderNo:{}", merOrderNo );
             return "success";
         }
-        PayPlatform payPlatformNew = payCacheUtil.getPayPlatform( memberRechargeOnline.getPlatformId() );
-        PayChannel  payChannel     = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
-        if ( this.verifyIP( requestMap, realIp, payPlatformNew ) ) {
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( memberRechargeOnline.getPlatformId() );
+        PayChannel  payChannel  = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
+        if ( this.verifyIP( requestMap, realIp, payPlatform ) ) {
             return "fail";
         }
         if ( this.diffPayTime12Hour( memberRechargeOnline.getPayTime(), merOrderNo ) ) {
             return "fail";
         }
         if ( !payChannel.getCanCallback() ) {
-            log.warn( "平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatformNew.getName(), payChannel.getName(),
-                    merOrderNo );
+            log.warn( "平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), merOrderNo );
             return "fail";
         }
 
@@ -112,14 +112,15 @@ public class MingFaWuJiPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> treeMap = new TreeMap<>( requestMap );
         String                    sign    = ( String ) treeMap.remove( "sign" );
-        String mySign = DigestUtils.md5Hex( this.assemblyUrl( treeMap ) + "&key=" + payPlatformNew.getSignMd5() );
+        String                    mySign  = DigestUtils.md5Hex(
+                this.assemblyUrl( treeMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() ) );
 
-        if ( StringUtils.equals( sign, mySign ) && this.queryPay( memberRechargeOnline, payPlatformNew, payChannel ) ) {
+        if ( StringUtils.equals( sign, mySign ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
             memberRechargeOnline.setUpperOrderNo( requestMap.getOrDefault( "tradeNo", "" ).toString() );
             return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
                     payChannel.getName() );
         }
-        log.info( payPlatformNew.getName() + "回调验签失败" );
+        log.info( payPlatform.getName() + "回调验签失败" );
         return "fail";
     }
 }
