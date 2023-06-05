@@ -47,7 +47,14 @@
             resultMap="GameDataRecordResult">
         <include refid="selectGameDataRecordVo" />
         where game_end_time <![CDATA[ >= ]]> #{gameStartTime} and game_end_time <![CDATA[ <= ]]> #{gameEndTime}
-        <if test="account != null ">and account = #{account}</if>
+        <if test="account != null and account != ''">and account = #{account}</if>
+        <if test="agent != null and agent != ''">and agent = #{agent}</if>
+        <if test="platformIds != null">
+            and platformId in
+            <foreach collection="platformIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <update id="createGameDateRecordTable">

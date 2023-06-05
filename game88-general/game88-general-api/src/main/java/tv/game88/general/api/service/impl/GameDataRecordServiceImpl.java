@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.general.api.dto.ReqGameDataRecord;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -16,6 +17,7 @@ import tv.game88.general.api.service.GameDataRecordService;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
@@ -64,13 +66,38 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
     }
 
     @Override
-    public List<GameDataRecord> getListByReq( ReqGameDataRecord req ) {
+    public List<RspGameDataLog> getListByReq( ReqGameDataRecord req ) {
         LocalDateTime  startTime      = LocalDateTimeUtils.parseLocalDateTime( req.getStartTime() );
         String         day            = LocalDateTimeUtils.format( startTime, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setAgent( req.getAgent() );
+        gameDataRecord.setAccount( req.getAccount() );
+        gameDataRecord.setPlatformIds( req.getPlatformIds() );
+        gameDataRecord.setAgent( req.getAgent() );
         gameDataRecord.setGameStartTime( req.getStartTime() );
         gameDataRecord.setGameEndTime( req.getEndTime() );
-        return this.baseMapper.selectGameDataRecordList( gameDataRecord, TABLE_PREFIX + day );
+        List<GameDataRecord> gameDataRecords = this.baseMapper.selectGameDataRecordList( gameDataRecord, TABLE_PREFIX + day );
+        List<RspGameDataLog> resultList = new ArrayList<>();
+        for ( GameDataRecord dataRecord : gameDataRecords ) {
+            RspGameDataLog rspGameDataLog = new RspGameDataLog();
+            rspGameDataLog.setGame_id( dataRecord.getGameId() );
+            rspGameDataLog.setAccount( dataRecord.getAccount() );
+            rspGameDataLog.setCx_agent( dataRecord.getAgent() );
+            rspGameDataLog.setAgent( dataRecord.getGameAgent() );
+            rspGameDataLog.setGame_round( dataRecord.getGameRound() );
+            rspGameDataLog.setId( dataRecord.getId() );
+            rspGameDataLog.setAll_bet( dataRecord.getAllBet() );
+            rspGameDataLog.setCell_score( dataRecord.getCellScore() );
+            rspGameDataLog.setChair_id( dataRecord.getChairId() );
+            rspGameDataLog.setKind_id( dataRecord.getKindId() );
+            rspGameDataLog.setPlatform_id( dataRecord.getPlatformId().intValue() );
+            rspGameDataLog.setTable_id( dataRecord.getTableId() );
+            rspGameDataLog.setProfit( dataRecord.getProfit() );
+            rspGameDataLog.setRevenue( dataRecord.getRevenue() );
+            rspGameDataLog.setGame_start_time( dataRecord.getGameStartTime() );
+            rspGameDataLog.setGame_end_time( dataRecord.getGameEndTime() );
+            resultList.add( rspGameDataLog );
+        }
+        return resultList;
     }
 }

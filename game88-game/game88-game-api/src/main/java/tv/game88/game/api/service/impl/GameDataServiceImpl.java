@@ -22,7 +22,7 @@ import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
-import tv.game88.game.api.dto.RspGameDataLog;
+import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;

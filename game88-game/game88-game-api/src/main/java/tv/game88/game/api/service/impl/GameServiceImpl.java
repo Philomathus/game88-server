@@ -15,6 +15,7 @@ import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.base.BaseGameDock;
@@ -420,14 +421,22 @@ public class GameServiceImpl implements GameService {
 
         List<Map<String, Object>> resultList = restTemplate.postForObject(
                 hosts.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/game-data-log/getDataByAgent", httpEntity, List.class );
+        List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
         if ( !CollectionUtils.isEmpty( resultList ) ) {
-            List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
             for ( Map<String, Object> resultMap : resultList ) {
                 rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
             }
-            return rspGameDataLogs;
         }
-        return new ArrayList<>();
+        List<String> hosts2 = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
+
+        List<Map<String, Object>> resultList2 = restTemplate.postForObject(
+                hosts2.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/gameDataRecord/getList", httpEntity, List.class );
+        if ( !CollectionUtils.isEmpty( resultList2 ) ) {
+            for ( Map<String, Object> resultMap : resultList2 ) {
+                rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
+            }
+        }
+        return rspGameDataLogs;
     }
 
     @Override

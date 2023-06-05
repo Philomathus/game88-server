@@ -3,6 +3,7 @@ package tv.game88.game.api.service;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.dto.*;
 
