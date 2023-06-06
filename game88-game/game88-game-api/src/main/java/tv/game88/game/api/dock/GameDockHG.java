@@ -29,7 +29,7 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.HG + "GameProcessor" )
 public class GameDockHG extends AbstractGameDock {
-    private static final String MODE = "1";
+    private static final String MODE = "2";
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {

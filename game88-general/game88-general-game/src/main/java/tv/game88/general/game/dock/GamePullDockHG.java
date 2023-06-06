@@ -30,7 +30,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.HG + "GamePullProcessor" )
 public class GamePullDockHG extends AbstractGamePull {
 
-    private static final String MODE = "1";
+    private static final String MODE = "2";
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
