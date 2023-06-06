@@ -46,12 +46,12 @@
     <select id="selectGameDataRecordList" parameterType="tv.game88.general.api.entity.GameDataRecord"
             resultMap="GameDataRecordResult">
         <include refid="selectGameDataRecordVo" />
-        where game_end_time <![CDATA[ >= ]]> #{gameStartTime} and game_end_time <![CDATA[ <= ]]> #{gameEndTime}
-        <if test="account != null and account != ''">and account = #{account}</if>
-        <if test="agent != null and agent != ''">and agent = #{agent}</if>
-        <if test="platformIds != null">
+        where game_end_time <![CDATA[ >= ]]> #{req.gameStartTime} and game_end_time <![CDATA[ <= ]]> #{req.gameEndTime}
+        <if test="req.account != null and req.account != ''">and account = #{req.account}</if>
+        <if test="req.agent != null and req.agent != ''">and agent = #{req.agent}</if>
+        <if test="req.platformIds != null">
             and platformId in
-            <foreach collection="platformIds" item="id" index="index" open="(" close=")" separator=",">
+            <foreach collection="req.platformIds" item="id" index="index" open="(" close=")" separator=",">
                 #{id}
             </foreach>
         </if>
