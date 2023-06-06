@@ -86,17 +86,17 @@ public enum EnumGameCategory {
             case BAISHENG -> List.of( 55 );
             case BG -> List.of( 56 );
             case MEIBO -> List.of( 57 );
-            case DATANG -> List.of( 58 );
-            case HG -> List.of( 59 );
-            case XINGYUN -> List.of( 60 );
-            case WALI -> List.of( 61 );
-            case SGWIN -> List.of( 62 );
-            case FG -> List.of( 63 );
             case JDB -> List.of( 64 );
             case CQ9 -> List.of( 65 );
             case AT -> List.of( 66 );
-            case RICH88 -> List.of( 67 );
-            case PG_SOFT -> List.of( 68 );
+            case FG -> List.of( 34 );
+            case WALI -> List.of( 32 );
+            case SGWIN -> List.of( 33 );
+            case PG_SOFT -> List.of( 35 );
+            case RICH88 -> List.of( 36 );
+            case DATANG -> List.of( 27 );
+            case HG -> List.of( 28 );
+            case XINGYUN -> List.of( 29 );
         };
     }
 
@@ -118,17 +118,16 @@ public enum EnumGameCategory {
             case 55 -> BAISHENG;
             case 56 -> BG;
             case 57 -> MEIBO;
-            case 58 -> DATANG;
-            case 59 -> HG;
-            case 60 -> XINGYUN;
-            case 61 -> WALI;
-            case 62 -> SGWIN;
-            case 63 -> FG;
             case 64 -> JDB;
             case 65 -> CQ9;
-            case 66 -> AT;
-            case 67 -> RICH88;
-            case 68 -> PG_SOFT;
+            case 34 -> FG;
+            case 32 -> WALI;
+            case 33 -> SGWIN;
+            case 35 -> PG_SOFT;
+            case 36 -> RICH88;
+            case 27 -> DATANG;
+            case 28 -> HG;
+            case 29 -> XINGYUN;
             default -> null;
         };
     }
