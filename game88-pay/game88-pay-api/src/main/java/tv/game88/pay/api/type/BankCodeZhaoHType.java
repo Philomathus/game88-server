@@ -10,7 +10,7 @@ public enum BankCodeZhaoHType {
     ICBC( 3L ),
     CCB( 2L ),
     ABC( 4L ),
-    PSBS( 5L ),
+    PSBC( 5L ),
     BOC( 1L ),
     BCM( 6L ),
     CMB( 7L ),
