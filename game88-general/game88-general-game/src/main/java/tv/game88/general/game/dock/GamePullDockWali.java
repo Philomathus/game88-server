@@ -72,7 +72,6 @@ public class GamePullDockWali extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
