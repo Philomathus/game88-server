@@ -75,7 +75,6 @@ public class GamePullDockFG extends AbstractGamePull {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( httpHeaders );
 
-        log.warn( url );
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
