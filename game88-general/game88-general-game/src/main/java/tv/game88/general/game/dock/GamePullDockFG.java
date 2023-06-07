@@ -89,6 +89,7 @@ public class GamePullDockFG extends AbstractGamePull {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( "0".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
+                log.warn( url + ":::" + JsonUtil.object2Json( dataMap ) );
                 return ( List<Map<String, Object>> ) dataMap.getOrDefault( "data", new ArrayList<>() );
             } else {
                 log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
