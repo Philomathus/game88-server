@@ -78,7 +78,6 @@ public class GamePullDockXingYun extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String code = resultMap.get( "code" ).toString();
             if ( "0".equals( code ) || "30007".equals( code ) ) {
