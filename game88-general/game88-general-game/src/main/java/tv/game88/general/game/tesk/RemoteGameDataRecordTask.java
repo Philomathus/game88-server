@@ -79,6 +79,7 @@ public class RemoteGameDataRecordTask {
                         gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
 
                         if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                                && gamePlatform.getGameCategory() != EnumGameCategory.FG
                                 && gamePlatform.getGameCategory() != EnumGameCategory.AG ) {
                             LocalDateTime localDateTime = null;
                             for ( GameDataRecord gameDataRecord : gameDataRecords ) {
