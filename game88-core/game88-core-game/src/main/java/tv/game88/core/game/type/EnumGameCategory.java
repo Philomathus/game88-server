@@ -85,7 +85,7 @@ public enum EnumGameCategory {
             case BOLE -> List.of( 54 );
             case BAISHENG -> List.of( 55 );
             case BG -> List.of( 56 );
-            case MEIBO -> List.of( 57 );
+            case MEIBO -> List.of( 26 );
             case JDB -> List.of( 64 );
             case CQ9 -> List.of( 65 );
             case AT -> List.of( 66 );
@@ -117,7 +117,7 @@ public enum EnumGameCategory {
             case 54 -> BOLE;
             case 55 -> BAISHENG;
             case 56 -> BG;
-            case 57 -> MEIBO;
+            case 26 -> MEIBO;
             case 64 -> JDB;
             case 65 -> CQ9;
             case 34 -> FG;
