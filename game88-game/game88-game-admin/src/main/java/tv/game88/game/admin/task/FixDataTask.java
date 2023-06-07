@@ -54,6 +54,7 @@ public class FixDataTask {
                         }
                     } else {
                         try {
+                            log.warn( "开始补单{}游戏", gamePlatform.getName() );
                             gameDataService.beatGameCodeAgent( begin, begin, end, memberGameDataFix.getMemberId(),
                                     gamePlatform.getGameCategory() );
                         } catch ( Exception e ) {
