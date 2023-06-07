@@ -18,6 +18,8 @@
         <result column="revenue" property="revenue" />
         <result column="game_start_time" property="gameStartTime" />
         <result column="game_end_time" property="gameEndTime" />
+        <result column="game_end_time" property="gameEndTime" />
+        <result column="detail" property="detail" />
     </resultMap>
 
     <sql id="selectGameDataRecordVo">
@@ -36,15 +38,23 @@
                profit,
                revenue,
                game_start_time,
-               game_end_time
+               game_end_time,
+               detail
         from ${tableName}
     </sql>
 
     <select id="selectGameDataRecordList" parameterType="tv.game88.general.api.entity.GameDataRecord"
             resultMap="GameDataRecordResult">
         <include refid="selectGameDataRecordVo" />
-        where game_end_time <![CDATA[ >= ]]> #{gameStartTime} and game_end_time <![CDATA[ <= ]]> #{gameEndTime}
-        <if test="account != null ">and account = #{account}</if>
+        where game_end_time <![CDATA[ >= ]]> #{req.gameStartTime} and game_end_time <![CDATA[ <= ]]> #{req.gameEndTime}
+        <if test="req.account != null and req.account != ''">and account = #{req.account}</if>
+        <if test="req.agent != null and req.agent != ''">and agent = #{req.agent}</if>
+        <if test="req.platformIds != null">
+            and platform_id in
+            <foreach collection="req.platformIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <update id="createGameDateRecordTable">
@@ -56,13 +66,13 @@
         (id, agent, game_agent, platform_id,
          game_id, game_round, account, kind_id,
          table_id, chair_id, all_bet, cell_score,
-         profit, revenue, game_start_time, game_end_time)
+         profit, revenue, game_start_time, game_end_time, detail)
         values (#{data.id}, #{data.agent}, #{data.gameAgent},
                 #{data.platformId}, #{data.gameId}, #{data.gameRound},
                 #{data.account}, #{data.kindId}, #{data.tableId},
                 #{data.chairId}, #{data.allBet}, #{data.cellScore},
                 #{data.profit}, #{data.revenue}, #{data.gameStartTime},
-                #{data.gameEndTime})
+                #{data.gameEndTime}, #{data.detail})
     </insert>
 
     <select id="findCount" resultType="java.lang.Long">

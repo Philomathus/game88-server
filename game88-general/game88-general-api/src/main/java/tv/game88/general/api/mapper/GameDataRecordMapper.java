@@ -12,7 +12,8 @@ import java.util.List;
  * @author MengJun
  */
 public interface GameDataRecordMapper extends BaseMapper<GameDataRecord> {
-    List<GameDataRecord> selectGameDataRecordList( GameDataRecord gameDataRecord, @Param( "tableName" ) String tableName );
+    List<GameDataRecord> selectGameDataRecordList( @Param( "req" ) GameDataRecord gameDataRecord,
+                                                   @Param( "tableName" ) String tableName );
 
     void createGameDateRecordTable( String tableName );
 

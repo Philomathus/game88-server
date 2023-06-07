@@ -131,8 +131,8 @@ public class GamePullDockAG extends AbstractGamePull {
             return text;
         } );
         if ( resultXml.length() < 1000 ) {
-            log.warn( queryXml + ":::" + resultXml );
-            log.warn( queryXml + ":::" + uriComponents.toUriString() );
+            log.error( queryXml + ":::" + resultXml );
+            log.error( queryXml + ":::" + uriComponents.toUriString() );
         }
         if ( StringUtils.isNotBlank( resultXml ) ) {
             try {

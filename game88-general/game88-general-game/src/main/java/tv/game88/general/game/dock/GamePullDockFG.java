@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
@@ -39,9 +40,12 @@ public class GamePullDockFG extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
+        String startTime = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( start ) / 1000L );
+        String endTime   = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) / 1000L );
+
         List<Callable<List<Map<String, Object>>>> forkJoinTasks = new ArrayList<>();
         for ( String gt : GT_TYPE_LIST ) {
-            forkJoinTasks.add( () -> this.queryList( gamePlatform, gt, start, end ) );
+            forkJoinTasks.add( () -> this.queryList( gamePlatform, gt, startTime, endTime ) );
         }
         List<Future<List<Map<String, Object>>>> futures = forkJoinPool.invokeAll( forkJoinTasks );
         List<List<Map<String, Object>>> collect = futures.stream().map( t -> {
@@ -60,8 +64,8 @@ public class GamePullDockFG extends AbstractGamePull {
         return resultList;
     }
 
-    private List<Map<String, Object>> queryList( GamePlatform gamePlatform, String gt, LocalDateTime start, LocalDateTime end ) {
-        String url = gamePlatform.getApiUrl() + "/v3/agent/log_by_page/gt/" + gt + "/";
+    private List<Map<String, Object>> queryList( GamePlatform gamePlatform, String gt, String start, String end ) {
+        String url = gamePlatform.getApiUrl() + "/v3_1/agent/log_by_page/gt/" + gt + "/start_time/" + start + "/end_time/" + end;
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
@@ -71,7 +75,6 @@ public class GamePullDockFG extends AbstractGamePull {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( httpHeaders );
 
-        log.warn( url );
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
@@ -82,28 +85,41 @@ public class GamePullDockFG extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String              code    = resultMap.getOrDefault( "code", "" ).toString();
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+            if ( "0".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
+                return ( List<Map<String, Object>> ) dataMap.getOrDefault( "data", new ArrayList<>() );
+            } else {
+                log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
+            }
+        }
         return null;
     }
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
-        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase(); //TODO: Not sure
-        String createTime = remoteGameDatum.get( "time" ).toString();
-        gameDataRecord.setId( logId );
-        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "" ) ) ); //TODO: Not sure
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
+
+        String account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
+        String agent   = account.split( "_" )[ 0 ];
+
+        gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( account );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gt" ) ) );
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "total_bets" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "all_bets" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "all_wins" ) ) );
-        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "scene_id" ) ) );
-        gameDataRecord.setGameStartTime( createTime );
-        gameDataRecord.setGameEndTime( createTime );
-        gameDataRecord.setAgent( remoteGameDatum.get( "agent_uid" ).toString() );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
+        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "all_bets" ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "total_bets" ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "result" ) ) );
+
+        String        timestamp = remoteGameDatum.get( "time" ) + "000";
+        LocalDateTime time      = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( timestamp ) );
+
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( time ) );
+        gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
