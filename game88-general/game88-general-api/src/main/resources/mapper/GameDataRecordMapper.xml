@@ -50,7 +50,7 @@
         <if test="req.account != null and req.account != ''">and account = #{req.account}</if>
         <if test="req.agent != null and req.agent != ''">and agent = #{req.agent}</if>
         <if test="req.platformIds != null">
-            and platformId in
+            and platform_id in
             <foreach collection="req.platformIds" item="id" index="index" open="(" close=")" separator=",">
                 #{id}
             </foreach>
