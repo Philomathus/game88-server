@@ -118,7 +118,7 @@ public class GameDockSGWin extends AbstractGameDock {
             if ( !data.isEmpty() ) {
                 log.info( reqJoinGame.getGameCategory().getDes()
                         + "查询余额 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
-                return new BigDecimal( String.valueOf( data.getOrDefault( "money", 0 ) ) ).setScale( 2, RoundingMode.HALF_UP );
+                return new BigDecimal( String.valueOf( data.getOrDefault( "money", 0 ) ) ).setScale( 2, RoundingMode.DOWN );
             }
         }
         log.error( reqJoinGame.getGameCategory().getDes()
