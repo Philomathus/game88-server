@@ -72,12 +72,12 @@
                 and update_by = #{updateBy}
             </if>
 
-            <if test="params.beginTime != null and params.beginTime != ''">
-                AND update_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')
-            </if>
-            <if test="params.endTime != null and params.endTime != ''">
-                AND update_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')
-            </if>
+<!--            <if test="params.beginTime != null and params.beginTime != ''">-->
+<!--                AND update_time <![CDATA[ >= ]]> STR_TO_DATE(#{params.beginTime}, '%Y-%m-%d %H:%i:%s')-->
+<!--            </if>-->
+<!--            <if test="params.endTime != null and params.endTime != ''">-->
+<!--                AND update_time <![CDATA[ <= ]]> STR_TO_DATE(#{params.endTime}, '%Y-%m-%d %H:%i:%s')-->
+<!--            </if>-->
 
         </where>
         order by sort asc
