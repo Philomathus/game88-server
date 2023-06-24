@@ -21,6 +21,7 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -78,8 +79,7 @@ public class GamePullDockWali extends AbstractGamePull {
             if ( "0".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( until ) ) );
-                Map<String, List<Object>> listMap = ( Map<String, List<Object>> ) dataMap.getOrDefault( "list",
-                        new HashMap<>() );
+                Map<String, List<Object>> listMap = ( Map<String, List<Object>> ) dataMap.getOrDefault( "list", new HashMap<>() );
                 return convertMapArrayToListMap( listMap, "uid" );
             } else {
                 log.error( uriComponents.toUriString() + ":::" + JsonUtil.object2Json( resultMap ) );
@@ -107,7 +107,8 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "validBet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "profit" ) ) );
+        String profit = String.valueOf( remoteGameDatum.get( "profit" ) );
+        gameDataRecord.setProfit( new BigDecimal( profit ).negate().toString() );
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "gameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "recordTime" ) ) );

@@ -132,7 +132,7 @@ public class GameDockWali extends AbstractGameDock {
             String              code = String.valueOf( resultMap.getOrDefault( "code", "-1" ) );
             if ( "0".equals( code ) ) {
                 return new BigDecimal( String.valueOf( data.getOrDefault( "transferable", 0 ) ) ).setScale( 2,
-                        RoundingMode.HALF_UP );
+                        RoundingMode.DOWN );
             }
         }
         log.error( reqJoinGame.getGameCategory().getDes()

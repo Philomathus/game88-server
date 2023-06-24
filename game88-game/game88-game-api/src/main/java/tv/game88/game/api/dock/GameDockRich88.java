@@ -71,7 +71,7 @@ public class GameDockRich88 extends AbstractGameDock {
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        if ( reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+        if ( reqJoinGame.getMoneyType() != null && reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
             String url = String.format( "%s/v2/platform/logout/%s", reqJoinGame.getApiUrl(), reqJoinGame.getGameMemberId() );
 
             Map<String, Object> resultMap = execute( HttpMethod.POST, url, null, reqJoinGame );

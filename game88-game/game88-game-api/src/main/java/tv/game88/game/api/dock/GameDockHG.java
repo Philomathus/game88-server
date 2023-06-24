@@ -38,7 +38,8 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
-        if ( redisUtils.sIsMember( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
+        if ( redisUtils.sIsMember(
+                Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), "ALTUENO_" + reqJoinGame.getGameMemberId() ) ) {
             return;
         }
         String              url    = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );

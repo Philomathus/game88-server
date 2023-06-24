@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -89,6 +90,7 @@ public class GamePullDockFG extends AbstractGamePull {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( "0".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
+                log.warn( url + ":::" + JsonUtil.object2Json( dataMap ) );
                 return ( List<Map<String, Object>> ) dataMap.getOrDefault( "data", new ArrayList<>() );
             } else {
                 log.warn( url + ":::" + JsonUtil.object2Json( resultMap ) );
@@ -110,8 +112,13 @@ public class GamePullDockFG extends AbstractGamePull {
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( account );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "all_bets" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "total_bets" ) ) );
+        String allBets = String.valueOf( remoteGameDatum.get( "all_bets" ) );
+        gameDataRecord.setCellScore( allBets );
+        String totalBets = String.valueOf( remoteGameDatum.get( "total_bets" ) );
+        if ( StringUtils.isBlank( totalBets ) || "null".equals( totalBets ) ) {
+            totalBets = allBets;
+        }
+        gameDataRecord.setAllBet( totalBets );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "result" ) ) );
 
         String        timestamp = remoteGameDatum.get( "time" ) + "000";

@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
-import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordVersion;
@@ -78,7 +77,8 @@ public class RemoteGameDataRecordTask {
                         }
                         gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
 
-                        if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                        /*if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
+                                && gamePlatform.getGameCategory() != EnumGameCategory.FG
                                 && gamePlatform.getGameCategory() != EnumGameCategory.AG ) {
                             LocalDateTime localDateTime = null;
                             for ( GameDataRecord gameDataRecord : gameDataRecords ) {
@@ -91,7 +91,7 @@ public class RemoteGameDataRecordTask {
                             if ( localDateTime != null ) {
                                 gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( localDateTime ) ) );
                             }
-                        }
+                        }*/
                     }
                     if ( !StringUtils.equals( gamePlatform.getVersionValue(), gameRecordVersion.getVersionValue() ) ) {
                         gameRecordVersion.setVersionValue( gamePlatform.getVersionValue() );

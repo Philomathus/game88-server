@@ -189,7 +189,7 @@ public class GameDockAG extends AbstractGameDock {
         String money = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "info" )
                                .getTextContent();
         String msg = document.getElementsByTagName( "result" ).item( 0 ).getAttributes().getNamedItem( "msg" ).getTextContent();
-        return StringUtils.isNotBlank( msg ) ? BigDecimal.ZERO : new BigDecimal( money ).setScale( 2, RoundingMode.HALF_UP );
+        return StringUtils.isNotBlank( msg ) ? BigDecimal.ZERO : new BigDecimal( money ).setScale( 2, RoundingMode.DOWN );
     }
 
     @Override
