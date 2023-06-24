@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.pay.api.mapper.RechargeLogMapper">
+
+    <resultMap type="tv.game88.pay.api.entity.RechargeLog" id="RechargeLogResult">
+        <result property="memberId"    column="member_id"    />
+        <result property="ip"    column="ip"    />
+        <result property="vip"    column="vip"    />
+        <result property="card"    column="card"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectRechargeLog">
+        select member_id, ip,vip, card, create_time from recharge_log
+    </sql>
+
+    <select id="selectRechargeLogList" parameterType="tv.game88.pay.api.entity.RechargeLog" resultMap="RechargeLogResult">
+        <include refid="selectRechargeLog"/>
+        <where>
+            <if test="card != null  and card != ''"> and card like concat('%', #{card}, '%')</if>
+            <if test="memberId != null and memberId !=''"> and member_id = #{memberId}</if>
+            <if test="ip != null and ip !=''"> and ip = #{ip}</if>
+            <if test="selectStartDate != null and selectStartDate != ''">
+                and create_time <![CDATA[ >= ]]> #{selectStartDate} and create_time <![CDATA[ <= ]]> #{selectEndDate}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+</mapper>
