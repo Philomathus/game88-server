@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import java.util.regex.Pattern;
 
 @Log4j2
 public abstract class AbstractGamePull implements BaseGamePull {
@@ -32,6 +33,8 @@ public abstract class AbstractGamePull implements BaseGamePull {
 
     @Resource
     protected RedisUtils redisUtils;
+
+    protected static final Pattern GET_NUMBER = Pattern.compile("\\d+$");
 
     protected String createRecordId( GamePlatform info, String tarId ) {
         return String.valueOf( info.getId() ).concat( "-" ).concat( tarId );
