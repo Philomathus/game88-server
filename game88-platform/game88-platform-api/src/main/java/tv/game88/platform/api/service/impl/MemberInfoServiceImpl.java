@@ -802,6 +802,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "此手机号已经存在" );
         }
         MemberInfo memberInfo = new MemberInfo();
+        if( memberInfo.getPhone().length() != 11){
+            return RspBase.businessError( "新手机号码长度不能是非11位" );
+        }
         memberInfo.setPhone( newMobile );
         memberInfo.setId( memberId );
         int i = this.baseMapper.updateById( memberInfo );
