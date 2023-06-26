@@ -1,63 +1,67 @@
 package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 
 @Log4j2
-@Repository( value = ConstantsGame.BOLE + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.BOLE + "GamePullProcessor" )
 public class GamePullDockBoLe extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        long          ts    = System.currentTimeMillis();
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
-        // 如果不是3分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
+        // 如果不是6分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 6 ) ) ) {
             return null;
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        long   startTime = LocalDateTimeUtils.localDateToTimestamp( start );
-        long   endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
-        String nonce     = GenerateOrderCacheUtils.me.getOrderId( "", 5 );
-        String sign      = AESCoder.encrypt( gamePlatform.getDes() + nonce + String.valueOf( ts ) );
+        long startTime = LocalDateTimeUtils.localDateToTimestamp( start );
+        long endTime   = LocalDateTimeUtils.localDateToTimestamp( end );
 
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put( "AccessKeyId", gamePlatform.getDes() );
-        requestMap.put( "Timestamp", String.valueOf( ts ) );
-        requestMap.put( "nonce", nonce );
-        requestMap.put( "sign", sign );
-        requestMap.put( "start_time", startTime );
-        requestMap.put( "end_time", endTime );
+        Map<String, Object> params = new HashMap<>();
+        params.put( "AccessKeyId", gamePlatform.getDes() );
+        long time = System.currentTimeMillis() / 1000;
+        params.put( "Timestamp", time );
+        String nonce = UUID.randomUUID().toString();
+        params.put( "Nonce", nonce );
+        params.put( "Sign", DigestUtils.sha1Hex( gamePlatform.getMd5() + nonce + time ) );
+
+        params.put( "start_time", startTime / 1000 );
+        params.put( "end_time", endTime / 1000 );
+        params.put( "page", 1 );
+        params.put( "page_size", 10000 );
 
         String url = gamePlatform.getApiUrl() + "/v1/game/get_all_record_list";
 
-        Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
+        Map<String, Object> resultMap = this.sendPostMap( url, packageForm( params ) );
+
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> respMsgMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_msg", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
+            if ( "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
+                gamePlatform.setVersionValue( String.valueOf( endTime ) );
+
                 Map<String, Object> respDataMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_data", new HashMap<>() );
                 if ( !CollectionUtils.isEmpty( respDataMap ) ) {
-                    List<Object> dataMapList = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<Map<String,
+                    return ( List<Object> ) respDataMap.getOrDefault( "data", new ArrayList<Map<String,
                             Object>>() );
-                    gamePlatform.setVersionValue( String.valueOf( endTime ) );
-                    return dataMapList;
                 }
+            } else {
+                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
@@ -67,18 +71,37 @@ public class GamePullDockBoLe extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "sn" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "room_id" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "player_account" ) ) );
+        gameDataRecord.setGameRound( gameDataRecord.getGameId() );
+        String account = String.valueOf( remoteGameDatum.get( "player_account" ) ).toUpperCase();
+        String agent    = null;
+        String memberId = null;
+        if ( account.startsWith( "88" ) ) {
+            agent = account.substring( 0, account.lastIndexOf( "m" ) );
+            memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+        } else if ( account.startsWith( "77" ) ) {
+            Matcher matcher = GET_NUMBER.matcher( account );
+            if ( matcher.find() ) {
+                String memberAccount = matcher.group();
+                agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                memberId = agent + "_" + memberAccount;
+            }
+        }
+        if ( agent == null || memberId == null ) {
+            return null;
+        }
+        gameDataRecord.setAccount( memberId );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "bet_num_valid" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "income_gold" ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet_num" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "gain_gold" ) ) );
-        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "scene" ) ) );
-        gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "start_time" ) ) );
-        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "end_time" ) ) );
-        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "sn" ) ) );
+        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "report_id" ) ) );
+        long gameStartTime = Long.parseLong( remoteGameDatum.get( "start_time" ) + "000" );
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.getDateTimeFromTimestamp( gameStartTime ) ) );
+        long gameEndTime = Long.parseLong( remoteGameDatum.get( "end_time" ) + "000" );
+        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.getDateTimeFromTimestamp( gameEndTime ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

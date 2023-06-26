@@ -41,18 +41,15 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService    gameDataRecordService;
 
-    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    @Scheduled ( cron = "0/15 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
-        if ( !redisUtils.lock( this.getClass().getSimpleName(), 14 ) ) {
-            return;
-        }
         List<GamePlatform> gamePlatformList = new QueryChainWrapper<>( gamePlatformMapper ).eq( "effect", 1 ).list();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
             GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
             if ( gameRecordVersion == null ) {
                 continue;
             }
-            if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 30 ) ) {
+            if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 14 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
@@ -99,7 +96,6 @@ public class RemoteGameDataRecordTask {
                     }
                 } catch ( Exception e ) {
                     log.error( e.getMessage(), e );
-                } finally {
                     redisUtils.unLock( this.getClass().getSimpleName() + ":" + gamePlatform.getId() );
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
