@@ -766,7 +766,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             List<MemberCard> memberCards = memberCardMapper.selectRealNameByMemberIds( memberIds );
             for ( MemberInfo info : memberInfoList ) {
                 if ( StringUtils.isNotBlank( info.getPhone() ) ) {
-                    info.setPhone( info.getPhone().substring( 0, 3 ) + "****" + info.getPhone().substring( 7, 11 ) );
+                    info.setPhone( info.getPhone().substring( 0, 3 ) + "****" + info.getPhone().substring( 7 ) );
                 }
                 for ( MemberCard memberCard : memberCards ) {
                     if ( info.getId().equals( memberCard.getMemberId() ) ) {

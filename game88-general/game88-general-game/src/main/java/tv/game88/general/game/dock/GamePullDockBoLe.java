@@ -48,7 +48,7 @@ public class GamePullDockBoLe extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageForm( params ) );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> respMsgMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_msg", new HashMap<>() );
             if ( "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
