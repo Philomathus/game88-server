@@ -74,7 +74,7 @@ public class GamePullDockBoLe extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "sn" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "player_account" ) ).toUpperCase();
+        String account = String.valueOf( remoteGameDatum.get( "player_account" ) ).toLowerCase();
         String agent    = null;
         String memberId = null;
         if ( account.startsWith( "88" ) ) {
