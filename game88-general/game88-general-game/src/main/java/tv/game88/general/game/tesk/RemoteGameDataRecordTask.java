@@ -53,10 +53,14 @@ public class RemoteGameDataRecordTask {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                LocalDateTime versionTime =
-                        LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
+                if ( StringUtils.isNumeric( gameRecordVersion.getVersionValue() ) ) {
+                    LocalDateTime versionTime =
+                            LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
 
-                log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
+                    log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
+                } else {
+                    log.info( "开始执行{}注单拉取程序, 开始版本:{}", gamePlatform.getName(), gameRecordVersion.getVersionValue() );
+                }
 
                 gamePlatform.setVersionValue( gameRecordVersion.getVersionValue() );
 
