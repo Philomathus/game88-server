@@ -69,7 +69,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
                 .queryParams( requestMap )
                 .build( true );
 
-        log.warn( uriComponents.toUriString() );
+        // log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
                 response -> {
                     InputStream bodyStream = response.getBody();
@@ -80,7 +80,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
                     return JsonUtil.json2Map( text );
                 } );
 
-        log.warn( uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
+        // log.warn( uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
