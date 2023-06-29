@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Log4j2
-@Repository( value = ConstantsGame.AG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.AG + "GamePullProcessor" )
 public class GamePullDockAG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -88,10 +88,10 @@ public class GamePullDockAG extends AbstractGamePull {
         String endTime;
         if ( "gethunterscene.xml".equals( queryXml ) ) {
             startTime = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( startMD ) / 1000L );
-            endTime   = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( endMD ) / 1000L );
+            endTime = String.valueOf( LocalDateTimeUtils.localDateToTimestamp( endMD ) / 1000L );
         } else {
             startTime = LocalDateTimeUtils.format( startMD );
-            endTime   = LocalDateTimeUtils.format( endMD );
+            endTime = LocalDateTimeUtils.format( endMD );
         }
 
         String by      = "DESC";
@@ -114,7 +114,7 @@ public class GamePullDockAG extends AbstractGamePull {
                 + "5F14237EE2A67EF102203A4C97603BC5" ) );
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() + queryXml )
-                                                          .queryParams( requestMap ).build();
+                .queryParams( requestMap ).build();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
@@ -123,13 +123,13 @@ public class GamePullDockAG extends AbstractGamePull {
 
         String resultXml = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( httpEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return text;
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return text;
+                } );
         if ( resultXml.length() < 1000 ) {
             log.error( queryXml + ":::" + resultXml );
             log.error( queryXml + ":::" + uriComponents.toUriString() );
@@ -159,8 +159,8 @@ public class GamePullDockAG extends AbstractGamePull {
         }
         String reckonTime;
         if ( StringUtils.isBlank( reckontime ) ) {
-            String        billtime = element.getAttribute( "billtime" ) + "000";
-            LocalDateTime meiDong  = LocalDateTimeUtils.convertTimestampToMeiDong( Long.parseLong( billtime ) );
+            String        billtime = element.getAttribute( "billtime" );
+            LocalDateTime meiDong  = LocalDateTimeUtils.convertMeiDongToDefault( billtime );
             reckonTime = LocalDateTimeUtils.format( meiDong );
         } else {
             reckonTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
