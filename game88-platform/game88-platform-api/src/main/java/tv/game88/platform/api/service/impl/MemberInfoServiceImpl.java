@@ -803,7 +803,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         MemberInfo memberInfo = new MemberInfo();
         if( memberInfo.getPhone().length() != 11){
-            return RspBase.businessError( "新手机号码长度不能超过11位" );
+            return RspBase.businessError( "新手机号码长度不能是非11位" );
         }
         memberInfo.setPhone( newMobile );
         memberInfo.setId( memberId );
