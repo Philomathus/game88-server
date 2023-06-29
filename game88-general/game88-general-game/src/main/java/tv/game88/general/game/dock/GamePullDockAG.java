@@ -160,7 +160,13 @@ public class GamePullDockAG extends AbstractGamePull {
         String reckonTime;
         if ( StringUtils.isBlank( reckontime ) ) {
             String        billtime = element.getAttribute( "billtime" );
-            LocalDateTime meiDong  = LocalDateTimeUtils.convertMeiDongToDefault( billtime );
+            LocalDateTime meiDong;
+            if ( StringUtils.isNumeric( billtime ) ) {
+                LocalDateTime toMeiDong = LocalDateTimeUtils.convertTimestampToMeiDong( Long.parseLong( billtime + "000" ) );
+                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( toMeiDong ) );
+            } else {
+                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( billtime );
+            }
             reckonTime = LocalDateTimeUtils.format( meiDong );
         } else {
             reckonTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
