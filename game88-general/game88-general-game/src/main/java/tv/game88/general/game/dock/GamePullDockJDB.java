@@ -52,7 +52,7 @@ public class GamePullDockJDB extends AbstractGamePull {
             throw new BusinessException( e.getMessage() );
         }
 
-        log.warn( json );
+        // log.warn( json );
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "dc", gamePlatform.getLinecode() );

@@ -89,7 +89,7 @@ public class GamePullDockBG extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( resultMap.get( "result" ) != null && resultMap.get( "error" ) == null ) {
                 Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
