@@ -109,6 +109,8 @@ public class GamePullDockBBIN extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
+
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap.getOrDefault( "result", "false" )
                                                                                        .toString() ) ) {
             return ( List<Map<String, Object>> ) resultMap.get( "data" );
