@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository( value = ConstantsGame.BBIN + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.BBIN + "GamePullProcessor" )
 public class GamePullDockBBIN extends AbstractGamePull {
     private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", "30", "31",
             "38", "66", "73", "76", "93", "99", "109" );
@@ -102,17 +102,16 @@ public class GamePullDockBBIN extends AbstractGamePull {
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap.getOrDefault( "result", "false" )
-                                                                                       .toString() ) ) {
+                .toString() ) ) {
             return ( List<Map<String, Object>> ) resultMap.get( "data" );
         } else {
             log.error( JsonUtil.object2Json( resultMap ) + ":::" + wagerTypes[ 0 ] );
@@ -132,9 +131,12 @@ public class GamePullDockBBIN extends AbstractGamePull {
         String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
         String account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
 
-        LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get(
-                "ModifiedDate" ) ) );
-        String endString = LocalDateTimeUtils.format( modifiedDate );
+        Object modifiedDateObj = remoteGameDatum.get( "ModifiedDate" );
+        if(modifiedDateObj == null){
+            log.error( JsonUtil.object2Json( remoteGameDatum ) );
+        }
+        LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( modifiedDateObj ) );
+        String        endString    = LocalDateTimeUtils.format( modifiedDate );
 
         gameDataRecord.setId( logId );
         gameDataRecord.setAccount( account.toLowerCase() );
