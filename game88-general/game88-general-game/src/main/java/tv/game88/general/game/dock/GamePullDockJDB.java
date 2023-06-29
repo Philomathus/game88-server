@@ -29,7 +29,7 @@ public class GamePullDockJDB extends AbstractGamePull {
 
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 4 ) ) ) {
             return null;
         }
         LocalDateTime end = start.plusMinutes( 1 );
