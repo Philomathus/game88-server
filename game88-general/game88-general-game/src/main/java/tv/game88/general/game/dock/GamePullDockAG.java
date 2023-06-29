@@ -130,9 +130,6 @@ public class GamePullDockAG extends AbstractGamePull {
                     }
                     return text;
                 } );
-        if ( resultXml.length() < 1000 ) {
-            log.warn( queryXml + ":::" + uriComponents.toUriString() + ":::" + resultXml );
-        }
         if ( StringUtils.isNotBlank( resultXml ) ) {
             try {
                 Document document = XmlUtil.getDocument( resultXml );
@@ -140,7 +137,7 @@ public class GamePullDockAG extends AbstractGamePull {
                 NodeList nodeList = root.getElementsByTagName( "row" );
                 return IntStream.range( 0, nodeList.getLength() ).mapToObj( nodeList::item ).collect( Collectors.toList() );
             } catch ( Exception e ) {
-                log.error( e.getMessage(), e );
+                log.error( e.getMessage() + " : " + resultXml, e );
                 throw new BusinessException( e.getMessage() );
             }
         }
