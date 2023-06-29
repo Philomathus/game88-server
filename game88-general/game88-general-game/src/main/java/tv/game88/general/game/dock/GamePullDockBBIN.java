@@ -131,12 +131,14 @@ public class GamePullDockBBIN extends AbstractGamePull {
         String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
         String account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
 
-        Object modifiedDateObj = remoteGameDatum.get( "ModifiedDate" );
-        if(modifiedDateObj == null){
-            log.error( JsonUtil.object2Json( remoteGameDatum ) );
+        String endString;
+        if ( remoteGameDatum.containsKey( "ModifiedDate" ) ) {
+            LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "ModifiedDate" ) ) );
+            endString = LocalDateTimeUtils.format( modifiedDate );
+        } else {
+            LocalDateTime payoutTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "PayoutTime" ) ) );
+            endString = LocalDateTimeUtils.format( payoutTime );
         }
-        LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( modifiedDateObj ) );
-        String        endString    = LocalDateTimeUtils.format( modifiedDate );
 
         gameDataRecord.setId( logId );
         gameDataRecord.setAccount( account.toLowerCase() );
