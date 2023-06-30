@@ -87,23 +87,25 @@ public class GamePullDockNewWorld extends AbstractGamePull {
             if ( !CollectionUtils.isEmpty( d ) && ( "0".equals( code ) || "204".equals( code ) ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
 
-                Map<String, Object> list       = ( Map<String, Object> ) d.getOrDefault( "contents", new HashMap<>() );
-                Integer             count      = ( Integer ) d.getOrDefault( "sum", 0 );
-                RspZdXsjList        rspZdList  = JsonUtil.map2Object( list, RspZdXsjList.class );
-                String[]            fieldNames = getFiledName( rspZdList );
+                Map<String, Object> list = ( Map<String, Object> ) d.getOrDefault( "contents", new HashMap<>() );
+                if ( !CollectionUtils.isEmpty( list ) ) {
+                    Integer      count      = ( Integer ) d.getOrDefault( "sum", 0 );
+                    RspZdXsjList rspZdList  = JsonUtil.map2Object( list, RspZdXsjList.class );
+                    String[]     fieldNames = getFiledName( rspZdList );
 
-                List<Object> resultList = new ArrayList<>();
-                for ( int i = 0; i < count; i++ ) {
-                    Map<String, Object> map = new HashMap<>();
-                    //获取属性的名字
-                    for ( String name : fieldNames ) {
-                        List<Object> listValue = ( List<Object> ) getFieldValueByName( name, rspZdList );
-                        Object       value     = listValue.get( i );
-                        map.put( name, value );
+                    List<Object> resultList = new ArrayList<>();
+                    for ( int i = 0; i < count; i++ ) {
+                        Map<String, Object> map = new HashMap<>();
+                        //获取属性的名字
+                        for ( String name : fieldNames ) {
+                            List<Object> listValue = ( List<Object> ) getFieldValueByName( name, rspZdList );
+                            Object       value     = listValue.get( i );
+                            map.put( name, value );
+                        }
+                        resultList.add( map );
                     }
-                    resultList.add( map );
+                    return resultList;
                 }
-                return resultList;
             } else {
                 log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::" + JsonUtil.object2Json( resultMap ) );
             }
