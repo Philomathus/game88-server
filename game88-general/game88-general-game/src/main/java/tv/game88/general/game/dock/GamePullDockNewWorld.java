@@ -82,14 +82,15 @@ public class GamePullDockNewWorld extends AbstractGamePull {
 
         // log.warn( uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
+            Map<String, Object> d    = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
+            String              code = d.getOrDefault( "code", "-1" ).toString();
+            if ( !CollectionUtils.isEmpty( d ) && ( "0".equals( code ) || "204".equals( code ) ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
 
                 Map<String, Object> list       = ( Map<String, Object> ) d.getOrDefault( "contents", new HashMap<>() );
-                Integer   count      = ( Integer ) d.getOrDefault( "sum", 0 );
-                RspZdXsjList rspZdList  = JsonUtil.map2Object( list, RspZdXsjList.class );
-                String[]  fieldNames = getFiledName( rspZdList );
+                Integer             count      = ( Integer ) d.getOrDefault( "sum", 0 );
+                RspZdXsjList        rspZdList  = JsonUtil.map2Object( list, RspZdXsjList.class );
+                String[]            fieldNames = getFiledName( rspZdList );
 
                 List<Object> resultList = new ArrayList<>();
                 for ( int i = 0; i < count; i++ ) {

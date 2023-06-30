@@ -80,8 +80,9 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
 
         // log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
+            Map<String, Object> d    = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            String              code = d.getOrDefault( "code", "-1" ).toString();
+            if ( !CollectionUtils.isEmpty( d ) && ( "0".equals( code ) || "16".equals( code ) ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
 
                 Map<String, Object> list       = ( Map<String, Object> ) d.getOrDefault( "list", new HashMap<>() );
