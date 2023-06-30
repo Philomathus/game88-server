@@ -86,8 +86,17 @@ public class GamePullDockJDB extends AbstractGamePull {
         String agent    = null;
         String memberId = null;
         if ( account.startsWith( "88" ) ) {
-            agent = account.substring( 0, account.lastIndexOf( "m" ) );
-            memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
+                Matcher matcher = GET_NUMBER.matcher( account );
+                if ( matcher.find() ) {
+                    String memberAccount = matcher.group();
+                    agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                    memberId = agent + "_" + memberAccount;
+                }
+            } else {
+                agent = account.substring( 0, account.lastIndexOf( "m" ) );
+                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            }
         } else if ( account.startsWith( "77" ) ) {
             Matcher matcher = GET_NUMBER.matcher( account );
             if ( matcher.find() ) {
