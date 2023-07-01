@@ -135,9 +135,12 @@ public class GamePullDockBBIN extends AbstractGamePull {
         if ( remoteGameDatum.containsKey( "ModifiedDate" ) ) {
             LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "ModifiedDate" ) ) );
             endString = LocalDateTimeUtils.format( modifiedDate );
-        } else {
+        } else if (remoteGameDatum.containsKey( "PayoutTime" )){
             LocalDateTime payoutTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "PayoutTime" ) ) );
             endString = LocalDateTimeUtils.format( payoutTime );
+        }else {
+            log.error( JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
         }
 
         gameDataRecord.setId( logId );
