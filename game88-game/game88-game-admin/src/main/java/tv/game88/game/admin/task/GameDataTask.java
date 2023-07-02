@@ -1,6 +1,7 @@
 package tv.game88.game.admin.task;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.LocalDateTimeUtils;
@@ -21,11 +22,15 @@ public class GameDataTask {
     @Resource
     private GameDataService gameDataService;
 
+    @Async
     @Scheduled( cron = "0/30 * * * * ?")
     public void runTask() {
+        log.warn( 0 );
         if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
+            log.warn( 1 );
             return;
         }
+        log.warn( 2 );
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusMinutes( 3 );
         String        begin   = LocalDateTimeUtils.format( starDay );
