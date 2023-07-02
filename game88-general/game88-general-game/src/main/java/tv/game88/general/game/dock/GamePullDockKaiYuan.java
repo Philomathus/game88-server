@@ -3,7 +3,6 @@ package tv.game88.general.game.dock;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +14,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.dto.RspZdList;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -123,8 +123,9 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
         if ( !gamePlatform.getAgent().equals( splitParam[ 0 ] ) ) {
             return null;
         }
-        gameDataRecord.setAccount( StringUtils.substringAfter( accounts, "_" ) );
-        gameDataRecord.setAgent( splitParam[ 1 ] );
+        String agent = splitParam[ 1 ].toLowerCase();
+        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "CellScore" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );

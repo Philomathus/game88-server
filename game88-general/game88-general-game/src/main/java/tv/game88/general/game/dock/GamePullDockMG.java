@@ -30,7 +30,7 @@ public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
-        String url = gamePlatform.getApiUrl() + gamePlatform.getAgent() + "/bets?limit=100";
+        String url = gamePlatform.getApiUrl() + gamePlatform.getAgent() + "/bets?limit=300";
         if ( !StringUtils.isEmpty( gamePlatform.getVersionValue() ) ) {
             url = url.concat( "&startingAfter=" ).concat( gamePlatform.getVersionValue() );
         }
