@@ -75,7 +75,7 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
                     return JsonUtil.json2Map( text );
                 } );
 
-        //log.warn( JsonUtil.object2Json( resultMap ) );
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
