@@ -68,11 +68,16 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Override
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
         pingjieReq( reqMemberGameData );
+        long                 s1             = System.currentTimeMillis();
         List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        long                 s2             = System.currentTimeMillis();
+        log.warn( "11:" + ( s2 - s1 ) );
         if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
             Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
             // 排除 热门游戏/老棋牌游戏/老电子游戏
             List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
+            long           s3        = System.currentTimeMillis();
+            log.warn( "22:" + ( s3 - s2 ) );
             for ( MemberGameData memberGameDatum : memberGameData ) {
                 GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
                 memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
@@ -84,6 +89,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     }
                 }
             }
+            long         s4           = System.currentTimeMillis();
+            log.warn( "33:" + ( s4 - s3 ) );
         }
         return memberGameData;
     }
