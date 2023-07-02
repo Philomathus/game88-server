@@ -27,7 +27,7 @@ public class GameDataTask {
             return;
         }
         LocalDateTime endDay  = LocalDateTime.now();
-        LocalDateTime starDay = endDay.minusMinutes( 2 );
+        LocalDateTime starDay = endDay.minusMinutes( 3 );
         String        begin   = LocalDateTimeUtils.format( starDay );
         String        end     = LocalDateTimeUtils.format( endDay );
         if ( LocalDateTimeUtils.isSameDay( starDay, endDay ) ) {
