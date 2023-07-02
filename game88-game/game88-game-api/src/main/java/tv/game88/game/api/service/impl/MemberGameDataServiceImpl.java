@@ -68,19 +68,15 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Override
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
         pingjieReq( reqMemberGameData );
-        long                 s1             = System.currentTimeMillis();
         List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
-        long                 s2             = System.currentTimeMillis();
-        log.warn( "11:" + ( s2 - s1 ) );
         if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
             Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
             // 排除 热门游戏/老棋牌游戏/老电子游戏
-            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
-            long           s3        = System.currentTimeMillis();
-            log.warn( "22:" + ( s3 - s2 ) );
+            List<GameInfo>     gameInfos         = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
+            List<GamePlatform> gamePlatforms     = new QueryChainWrapper<>( gamePlatformMapper ).list();
+            Map<Long, String>  gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId, GamePlatform::getName ) );
             for ( MemberGameData memberGameDatum : memberGameData ) {
-                GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameDatum.getPlatformId().longValue() );
-                memberGameDatum.setPlatformName( gamePlatform != null ? gamePlatform.getName() : "" );
+                memberGameDatum.setPlatformName( gamePlatformIdMap.get( memberGameDatum.getPlatformId().longValue() ) );
                 for ( GameInfo gameInfo : gameInfos ) {
                     if ( gameInfo.getPlatformId().intValue() == memberGameDatum.getPlatformId() && gameInfo.getKindId() != null
                             && ( memberGameDatum.getKindId().equals( gameInfo.getKindId() ) || gameInfo.getKindId().endsWith(
@@ -89,8 +85,6 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     }
                 }
             }
-            long         s4           = System.currentTimeMillis();
-            log.warn( "33:" + ( s4 - s3 ) );
         }
         return memberGameData;
     }
@@ -435,6 +429,9 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     .in( "kind_id", kindIds )
                     .notIn( "type_id", 1, 2, 4 ).list();
 
+            List<GamePlatform> gamePlatforms     = new QueryChainWrapper<>( gamePlatformMapper ).list();
+            Map<Long, String>  gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId, GamePlatform::getName ) );
+
             for ( MemberGameData memberGameData : sumProfitKinds ) {
                 for ( GameInfo gameInfo : gameInfos ) {
                     if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
@@ -450,13 +447,12 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                                 ids.add( memberGameData.getId() );
                             }
                         } else {
-                            GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( memberGameData.getPlatformId()
-                                    .longValue() );
-                            if ( gamePlatform.getName().contains( "棋牌" ) ) {
+                            String platformName = gamePlatformIdMap.get( memberGameData.getPlatformId().longValue() );
+                            if ( "棋牌".contains( platformName ) ) {
                                 gameTypeId = 8L;
-                            } else if ( gamePlatform.getName().contains( "电子" ) ) {
+                            } else if ( "电子".contains( platformName ) ) {
                                 gameTypeId = 9L;
-                            } else if ( gamePlatform.getName().contains( "视讯" ) ) {
+                            } else if ( "视讯".contains( platformName ) ) {
                                 gameTypeId = 7L;
                             } else {
                                 log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
