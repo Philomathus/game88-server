@@ -86,6 +86,7 @@ public class GamePullDockMG extends AbstractGamePull {
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+        log.warn( JsonUtil.object2Json( gameDataRecord ) );
         return gameDataRecord;
     }
 

@@ -39,9 +39,6 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( StringUtils.equals( "1", resultMap.getOrDefault( "resultCode", "-2" ).toString() ) ) {
                 List<Object> transList = ( List<Object> ) resultMap.get( "transList" );
-                if ( !CollectionUtils.isEmpty( transList ) && transList.size() > 100 ) {
-                    transList = transList.subList( 0, 100 );
-                }
                 if ( !CollectionUtils.isEmpty( transList ) ) {
                     Map<String, Object> o = ( Map<String, Object> ) transList.get( transList.size() - 1 );
                     gamePlatform.setVersionValue( String.valueOf( o.get( "recordID" ) ) );

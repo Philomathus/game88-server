@@ -171,7 +171,9 @@ public class GamePullDockAG extends AbstractGamePull {
         if ( StringUtils.isBlank( account ) ) {
             account = element.getAttribute( "playName" );
         }
-        String agent = account.split( "_" )[ 0 ].toLowerCase();
+
+        String[] accounts = account.toUpperCase().split( "_" );
+        String   agent    = accounts[ 0 ].toLowerCase();
 
         gameDataRecord.setGameId( element.getAttribute( "billno" ) );
         String gameCode = element.getAttribute( "gameCode" );
@@ -180,7 +182,7 @@ public class GamePullDockAG extends AbstractGamePull {
         }
         gameDataRecord.setGameRound( gameCode );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        gameDataRecord.setAccount( account.toLowerCase() );
+        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
 
         String gametype = element.getAttribute( "gametype" );
         if ( StringUtils.isBlank( gametype ) ) {
