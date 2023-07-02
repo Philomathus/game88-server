@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordVersion;
@@ -53,10 +54,13 @@ public class RemoteGameDataRecordTask {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                LocalDateTime versionTime =
-                        LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
+                if ( StringUtils.isNumeric( gameRecordVersion.getVersionValue() ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN ) {
+                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
 
-                log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
+                    log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
+                } else {
+                    log.info( "开始执行{}注单拉取程序, 开始版本:{}", gamePlatform.getName(), gameRecordVersion.getVersionValue() );
+                }
 
                 gamePlatform.setVersionValue( gameRecordVersion.getVersionValue() );
 

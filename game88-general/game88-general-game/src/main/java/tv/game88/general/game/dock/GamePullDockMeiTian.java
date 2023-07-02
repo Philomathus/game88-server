@@ -1,12 +1,11 @@
 package tv.game88.general.game.dock;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -14,61 +13,80 @@ import tv.game88.general.game.base.AbstractGamePull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
 public class GamePullDockMeiTian extends AbstractGamePull {
+    private final String QUERY_RECORD_2 = "/services/dg/player/queryMerchantGameRecord2";
+
     @Override
-    public List<Object> requestRemoteGameData(GamePlatform gamePlatform) {
-        LocalDateTime startTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
-        LocalDateTime endTime   = startTime.plusMinutes( 1 );
+    public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put( "recordID", 0 );
-        dataMap.put( "gameType", gamePlatform.getGameCategory() );
-        dataMap.put( "startTime", LocalDateTimeUtils.format( startTime, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        dataMap.put( "endTime",  LocalDateTimeUtils.format( endTime, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        dataMap.put( "currency", "CNY" );
+        Map<String, String> rawData = new LinkedHashMap<>();
+        rawData.put( "recordID", gamePlatform.getVersionValue() );
+        String rawDataStr = JsonUtil.object2Json( rawData );
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String data = "";
-        try {
-            data = objectMapper.writeValueAsString(dataMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        String url = new StringBuilder( gamePlatform.getApiUrl() + QUERY_RECORD_2 )
+                .append( "/" )
+                .append( gamePlatform.getAgent() )
+                .append( "/" )
+                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) ).toString();
 
-        String url = String.format( gamePlatform.getRecordUrl() + "queryMerchantGameRecord2/%s/%s", gamePlatform.getAgent(), Base64Utils.encodeToUrlSafeString( data.getBytes() ) );
-        Map<String, Object> resultMap = this.sendPostMap( url, packageJson( Collections.emptyMap() ) );
+        Map<String, Object> resultMap = restTemplate.postForObject( url, null, Map.class );
 
-        if ( !CollectionUtils.isEmpty( resultMap ) && "1".equals(resultMap.getOrDefault("resultCode", "").toString() ) ) {
-            return ( List<Object> ) resultMap.getOrDefault( "transList", Collections.emptyMap() );
+        //log.warn( JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( StringUtils.equals( "1", resultMap.getOrDefault( "resultCode", "-2" ).toString() ) ) {
+                List<Object> transList = ( List<Object> ) resultMap.get( "transList" );
+                if ( !CollectionUtils.isEmpty( transList ) && transList.size() > 100 ) {
+                    transList = transList.subList( 0, 100 );
+                }
+                if ( !CollectionUtils.isEmpty( transList ) ) {
+                    Map<String, Object> o = ( Map<String, Object> ) transList.get( transList.size() - 1 );
+                    gamePlatform.setVersionValue( String.valueOf( o.get( "recordID" ) ) );
+                }
+                return transList;
+            } else {
+                log.warn( url + "::" + JsonUtil.object2Json( resultMap ) );
+            }
         }
         return null;
     }
 
     @Override
-    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform) {
+    public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord gameDataRecord = new GameDataRecord();
-        String logId      = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
-        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "rowID" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "playerName" ) ) );
-        gameDataRecord.setGameStartTime( remoteGameDatum.get( "gameDate" ).toString() );
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameType" ) ) );
+        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "rowID" ) ) );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
+        gameDataRecord.setGameRound( gameDataRecord.getGameId() );
+        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "period" ) ) );
+        String account = String.valueOf( remoteGameDatum.get( "playerName" ) ).toUpperCase();
+        if ( account.contains( "DEMO" ) ) {
+            return null;
+        }
+        if ( account.contains( "WWUFA3TEST" ) ) {
+            return null;
+        }
+        String[] split = account.split( "_" );
+        String   agent = split[ 0 ].toLowerCase();
+        gameDataRecord.setAccount( agent + "_" + split[ 1 ] );
+        gameDataRecord.setAgent( agent );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ) );
-        gameDataRecord.setRevenue( fenToYuan( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "commissionable" ) ) ) );
         gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "income" ) ) ) );
-        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
-
+        String gameDate = String.valueOf( remoteGameDatum.get( "gameDate" ) );
+        gameDataRecord.setGameEndTime( gameDate );
+        gameDataRecord.setGameStartTime( gameDate );
+        gameDataRecord.setGameAgent( gamePlatform.getAgent() );
+        gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
     }
+
     private String fenToYuan( String money ) {
         return new BigDecimal( money ).divide( new BigDecimal( 100 ), 2, RoundingMode.HALF_UP ).toString();
     }

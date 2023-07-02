@@ -6,36 +6,37 @@ import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 public class LocalDateTimeUtils {
-    public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd" );
 
-    public static final DateTimeFormatter YYYYMMDD_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public static final DateTimeFormatter YYYYMMDD_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMdd" );
 
-    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+    public static final DateTimeFormatter YYYY_MM_DDTHH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss" );
 
 
-    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
 
-    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
 
-    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    public static final DateTimeFormatter DDMMYYYYHHMM00_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:00");
+    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
+    public static final DateTimeFormatter DDMMYYYYHHMM00_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:00" );
 
-    public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss.SSS");
+    public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
 
     public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
 
-    public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
 
-    public static final DateTimeFormatter HHMMSS_FORMATTER = DateTimeFormatter.ofPattern("HHmmss");
+    public static final DateTimeFormatter HHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "HHmmss" );
 
     /**
      * 格式化LocalDate
      *
      * @param date
      */
-    public static String format(LocalDate date, DateTimeFormatter formatter) {
-        return date.format(formatter);
+    public static String format( LocalDate date, DateTimeFormatter formatter ) {
+        return date.format( formatter );
     }
 
     /**
@@ -43,8 +44,8 @@ public class LocalDateTimeUtils {
      *
      * @param date
      */
-    public static String format(LocalDate date) {
-        return date.format(LocalDateTimeUtils.YYYY_MM_DD_FORMATTER);
+    public static String format( LocalDate date ) {
+        return date.format( LocalDateTimeUtils.YYYY_MM_DD_FORMATTER );
     }
 
     /**
@@ -52,8 +53,8 @@ public class LocalDateTimeUtils {
      *
      * @param time
      */
-    public static String format(LocalDateTime time, DateTimeFormatter formatter) {
-        return time.format(formatter);
+    public static String format( LocalDateTime time, DateTimeFormatter formatter ) {
+        return time.format( formatter );
     }
 
     /**
@@ -61,8 +62,8 @@ public class LocalDateTimeUtils {
      *
      * @param time
      */
-    public static String format(LocalDateTime time) {
-        return time.format(LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER);
+    public static String format( LocalDateTime time ) {
+        return time.format( LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
     }
 
     /**
@@ -70,8 +71,8 @@ public class LocalDateTimeUtils {
      *
      * @param dateStr
      */
-    public static LocalDate parseLocalDate(String dateStr, DateTimeFormatter formatter) {
-        return LocalDate.parse(dateStr, formatter);
+    public static LocalDate parseLocalDate( String dateStr, DateTimeFormatter formatter ) {
+        return LocalDate.parse( dateStr, formatter );
     }
 
     /**
@@ -79,8 +80,8 @@ public class LocalDateTimeUtils {
      *
      * @param dateStr
      */
-    public static LocalDate parseLocalDate(String dateStr) {
-        return LocalDate.parse(dateStr, YYYY_MM_DD_FORMATTER);
+    public static LocalDate parseLocalDate( String dateStr ) {
+        return LocalDate.parse( dateStr, YYYY_MM_DD_FORMATTER );
     }
 
     /**
@@ -88,8 +89,8 @@ public class LocalDateTimeUtils {
      *
      * @param dateStr
      */
-    public static LocalDateTime parseLocalDateTime(String dateStr, DateTimeFormatter formatter) {
-        return LocalDateTime.parse(dateStr, formatter);
+    public static LocalDateTime parseLocalDateTime( String dateStr, DateTimeFormatter formatter ) {
+        return LocalDateTime.parse( dateStr, formatter );
     }
 
     /**
@@ -97,8 +98,8 @@ public class LocalDateTimeUtils {
      *
      * @param dateStr
      */
-    public static LocalDateTime parseLocalDateTime(String dateStr) {
-        return LocalDateTime.parse(dateStr, YYYY_MM_DD_HH_MM_SS_FORMATTER);
+    public static LocalDateTime parseLocalDateTime( String dateStr ) {
+        return LocalDateTime.parse( dateStr, YYYY_MM_DD_HH_MM_SS_FORMATTER );
     }
 
     /**
@@ -106,11 +107,11 @@ public class LocalDateTimeUtils {
      *
      * @param timestamp
      */
-    public static LocalDateTime getDateTimeFromTimestamp(long timestamp) {
-        if(timestamp == 0) {
+    public static LocalDateTime getDateTimeFromTimestamp( long timestamp ) {
+        if ( timestamp == 0 ) {
             return null;
         }
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
+        return LocalDateTime.ofInstant( Instant.ofEpochMilli( timestamp ), TimeZone.getDefault().toZoneId() );
     }
 
     /**
@@ -118,8 +119,8 @@ public class LocalDateTimeUtils {
      *
      * @param timestamp
      */
-    public static LocalDate getDateFromTimestamp(long timestamp) {
-        LocalDateTime date = getDateTimeFromTimestamp(timestamp);
+    public static LocalDate getDateFromTimestamp( long timestamp ) {
+        LocalDateTime date = getDateTimeFromTimestamp( timestamp );
         return date == null ? null : date.toLocalDate();
     }
 
@@ -128,8 +129,8 @@ public class LocalDateTimeUtils {
      *
      * @param date
      */
-    public static long localDateToTimestamp(LocalDateTime date) {
-        return Timestamp.valueOf(date).getTime();
+    public static long localDateToTimestamp( LocalDateTime date ) {
+        return Timestamp.valueOf( date ).getTime();
     }
 
     /**
@@ -145,7 +146,7 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime getEndOfToday() {
         LocalDate localDate = LocalDate.now();
-        return localDate.atTime(23, 59, 59);
+        return localDate.atTime( 23, 59, 59 );
     }
 
     /**
@@ -154,10 +155,10 @@ public class LocalDateTimeUtils {
      * @param one
      * @param two
      */
-    public static boolean isSameWeek(LocalDateTime one, LocalDateTime two) {
-        LocalDate oneLocalDate = one.with(DayOfWeek.MONDAY).toLocalDate();
-        LocalDate twoLocalDate = two.with(DayOfWeek.MONDAY).toLocalDate();
-        return oneLocalDate.compareTo(twoLocalDate) == 0;
+    public static boolean isSameWeek( LocalDateTime one, LocalDateTime two ) {
+        LocalDate oneLocalDate = one.with( DayOfWeek.MONDAY ).toLocalDate();
+        LocalDate twoLocalDate = two.with( DayOfWeek.MONDAY ).toLocalDate();
+        return oneLocalDate.compareTo( twoLocalDate ) == 0;
     }
 
     /**
@@ -166,10 +167,10 @@ public class LocalDateTimeUtils {
      * @param one
      * @param two
      */
-    public static boolean isSameMonth(LocalDateTime one, LocalDateTime two) {
-        LocalDate oneLocalDate = LocalDate.of(one.getYear(), one.getMonth(), 1);
-        LocalDate twoLocalDate = LocalDate.of(two.getYear(), two.getMonth(), 1);
-        return oneLocalDate.compareTo(twoLocalDate) == 0;
+    public static boolean isSameMonth( LocalDateTime one, LocalDateTime two ) {
+        LocalDate oneLocalDate = LocalDate.of( one.getYear(), one.getMonth(), 1 );
+        LocalDate twoLocalDate = LocalDate.of( two.getYear(), two.getMonth(), 1 );
+        return oneLocalDate.compareTo( twoLocalDate ) == 0;
     }
 
     /**
@@ -178,8 +179,8 @@ public class LocalDateTimeUtils {
      * @param one
      * @param two
      */
-    public static boolean isSameDay(LocalDateTime one, LocalDateTime two) {
-        return one.toLocalDate().compareTo(two.toLocalDate()) == 0;
+    public static boolean isSameDay( LocalDateTime one, LocalDateTime two ) {
+        return one.toLocalDate().compareTo( two.toLocalDate() ) == 0;
     }
 
     /**
@@ -187,9 +188,9 @@ public class LocalDateTimeUtils {
      *
      * @return long 毫秒
      */
-    public static long getIntervalTime(LocalDateTime end, LocalDateTime now) {
-        long time2 = Timestamp.valueOf(now).getTime();
-        long time1 = Timestamp.valueOf(end).getTime();
+    public static long getIntervalTime( LocalDateTime end, LocalDateTime now ) {
+        long time2 = Timestamp.valueOf( now ).getTime();
+        long time1 = Timestamp.valueOf( end ).getTime();
         return time2 - time1;
     }
 
@@ -199,9 +200,9 @@ public class LocalDateTimeUtils {
      * @param localDateTime
      * @return LocalDateTime
      */
-    public static LocalDateTime convertToMeiDong(LocalDateTime localDateTime) {
-        ZonedDateTime zonedTime = localDateTime.atZone(ZoneId.systemDefault());
-        ZonedDateTime converted = zonedTime.withZoneSameInstant(ZoneId.of("America/Caracas"));
+    public static LocalDateTime convertToMeiDong( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "America/Caracas" ) );
         return converted.toLocalDateTime();
     }
 
@@ -210,8 +211,8 @@ public class LocalDateTimeUtils {
      *
      * @return LocalDateTime
      */
-    public static LocalDateTime convertTimestampToMeiDong(long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("America/Caracas"));
+    public static LocalDateTime convertTimestampToMeiDong( long timestamp ) {
+        return LocalDateTime.ofInstant( Instant.ofEpochMilli( timestamp ), ZoneId.of( "America/Caracas" ) );
     }
 
     /**
@@ -220,10 +221,10 @@ public class LocalDateTimeUtils {
      * @param time
      * @return LocalDateTime
      */
-    public static LocalDateTime convertMeiDongToDefault(String time) {
-        LocalDateTime localDateTime = LocalDateTime.parse(time, YYYY_MM_DD_HH_MM_SS_FORMATTER);
-        ZonedDateTime zonedTime     = localDateTime.atZone(ZoneId.of("America/Caracas"));
-        ZonedDateTime converted     = zonedTime.withZoneSameInstant(ZoneId.systemDefault());
+    public static LocalDateTime convertMeiDongToDefault( String time ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
 
@@ -233,9 +234,9 @@ public class LocalDateTimeUtils {
      * @param localDateTime
      * @return LocalDateTime
      */
-    public static LocalDateTime convertToUTC0(LocalDateTime localDateTime) {
-        ZonedDateTime zonedTime = localDateTime.atZone(ZoneId.systemDefault());
-        ZonedDateTime converted = zonedTime.withZoneSameInstant(ZoneId.of("UTC+0"));
+    public static LocalDateTime convertToUTC0( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
         return converted.toLocalDateTime();
     }
 
@@ -245,10 +246,10 @@ public class LocalDateTimeUtils {
      * @param time
      * @return LocalDateTime
      */
-    public static LocalDateTime convertUTC0ToDefault(String time) {
-        LocalDateTime localDateTime = LocalDateTime.parse(time, YYYY_MM_DD_HH_MM_SS_FORMATTER);
-        ZonedDateTime zonedTime     = localDateTime.atZone(ZoneId.of("UTC+0"));
-        ZonedDateTime converted     = zonedTime.withZoneSameInstant(ZoneId.systemDefault());
+    public static LocalDateTime convertUTC0ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, dateTimeFormatter );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "UTC+0" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
 
@@ -258,9 +259,9 @@ public class LocalDateTimeUtils {
      * @param localDateTime
      * @return LocalDateTime
      */
-    public static LocalDateTime convertToUTC_4(LocalDateTime localDateTime) {
-        ZonedDateTime zonedTime = localDateTime.atZone(ZoneId.systemDefault());
-        ZonedDateTime converted = zonedTime.withZoneSameInstant(ZoneId.of("UTC-4"));
+    public static LocalDateTime convertToUTC_4( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC-4" ) );
         return converted.toLocalDateTime();
     }
 
@@ -270,14 +271,14 @@ public class LocalDateTimeUtils {
      * @param time
      * @return LocalDateTime
      */
-    public static LocalDateTime convertUTC_4ToDefault(String time, DateTimeFormatter dateTimeFormatter) {
-        LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
-        ZonedDateTime zonedTime     = localDateTime.atZone(ZoneId.of("UTC-4"));
-        ZonedDateTime converted     = zonedTime.withZoneSameInstant(ZoneId.systemDefault());
+    public static LocalDateTime convertUTC_4ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, dateTimeFormatter );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "UTC-4" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
 
-    public static void main(String[] args) {
-        System.out.println(LocalDateTimeUtils.format(convertToUTC0(LocalDateTime.now())));
+    public static void main( String[] args ) {
+        System.out.println( LocalDateTimeUtils.format( convertToUTC0( LocalDateTime.now() ) ) );
     }
 }

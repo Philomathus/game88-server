@@ -1,6 +1,5 @@
 package tv.game88.game.admin.task;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,9 +26,8 @@ public class GameDataTask {
         if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
             return;
         }
-        String uuid = IdWorker.get32UUID();
         LocalDateTime endDay  = LocalDateTime.now();
-        LocalDateTime starDay = endDay.minusMinutes( 2 );
+        LocalDateTime starDay = endDay.minusMinutes( 3 );
         String        begin   = LocalDateTimeUtils.format( starDay );
         String        end     = LocalDateTimeUtils.format( endDay );
         if ( LocalDateTimeUtils.isSameDay( starDay, endDay ) ) {

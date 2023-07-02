@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.RICH88 + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.RICH88 + "GamePullProcessor" )
 public class GamePullDockRich88 extends AbstractGamePull {
 
     @Override
@@ -76,9 +76,11 @@ public class GamePullDockRich88 extends AbstractGamePull {
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "profit" ) ) );
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "round_start_at" ) );
-        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime ) ) );
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
+                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "round_end_at" ) );
-        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime ) ) );
+        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime,
+                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

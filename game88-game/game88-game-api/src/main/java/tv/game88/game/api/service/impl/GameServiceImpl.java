@@ -417,16 +417,7 @@ public class GameServiceImpl implements GameService {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
 
-        List<String> hosts = Arrays.asList( "http://47.57.4.185:42000", "http://47.57.230.133:42000" );
-
-        List<Map<String, Object>> resultList = restTemplate.postForObject(
-                hosts.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/game-data-log/getDataByAgent", httpEntity, List.class );
         List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
-        if ( !CollectionUtils.isEmpty( resultList ) ) {
-            for ( Map<String, Object> resultMap : resultList ) {
-                rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
-            }
-        }
         List<String> hosts2 = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
 
         List<Map<String, Object>> resultList2 = restTemplate.postForObject(

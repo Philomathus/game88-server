@@ -8,8 +8,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.core.game.dto.RspGameDataLog;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
@@ -22,7 +23,6 @@ import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
-import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GamePlatform;
 import tv.game88.game.api.entity.MemberGameData;
@@ -30,7 +30,6 @@ import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
 import tv.game88.game.api.service.GameDataService;
 import tv.game88.game.api.service.GameService;
-import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -67,32 +66,28 @@ public class GameDataServiceImpl implements GameDataService {
 
     @Override
     public void beatGameCodeAgent( String dTime, String start, String end, String account, EnumGameCategory gameCategory ) {
+        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+
+        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
+                .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
+
+        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
+
         List<RspGameDataLog> rspGameDataLogs = gameService.remoteDataGrab( start, end, account,
-                gameCategory != null ? EnumGameCategory.getDataRemoteByEnum( gameCategory ) : null );
+                gameCategory != null ? Collections.singletonList( gamePlatformMap.get( gameCategory ).getId().intValue() ) : null );
         if ( CollectionUtils.isEmpty( rspGameDataLogs ) ) {
             log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
             return;
         }
         log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", rspGameDataLogs.size(), start, end );
-        List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream()
-                                                                           .collect( Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
+
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
         SqlSession              session      = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         MemberGameDataMapper    mapper       = session.getMapper( MemberGameDataMapper.class );
         for ( RspGameDataLog dataLog : rspGameDataLogs ) {
-            EnumGameCategory enumGameCategory = EnumGameCategory.getEnumByDataRemote( dataLog.getPlatform_id() );
-            if ( enumGameCategory == null ) {
-                log.error( JsonUtil.object2Json( dataLog ) );
-                continue;
-            }
-            GamePlatform gamePlatform = gamePlatformMap.get( enumGameCategory );
-            if ( gamePlatform == null ) {
-                log.error( dataLog.getPlatform_id() + ":" + enumGameCategory.name() );
-                continue;
-            }
-            String memberId = dataLog.getAccount().toUpperCase().split( "_" )[ 1 ];
+            GamePlatform gamePlatform = gamePlatformIdMap.get( dataLog.getPlatform_id().longValue() );
+            String       memberId     = dataLog.getAccount().toUpperCase().split( "_" )[ 1 ];
             if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), dataLog.getId() ) != null ) {
                 continue;
             }
@@ -120,7 +115,7 @@ public class GameDataServiceImpl implements GameDataService {
             }
 
             BigDecimal beatAdd = new BigDecimal( dataLog.getCell_score() ).multiply( gamePlatform.getRateBeat() )
-                                                                          .setScale( 4, RoundingMode.HALF_UP );
+                    .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
 
@@ -142,7 +137,7 @@ public class GameDataServiceImpl implements GameDataService {
         log.warn( "彩票拉取注单数量" + list.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
         GamePlatform gamePlatform = gamePlatforms.stream().filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
-                                                 .findFirst().get();
+                .findFirst().get();
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -268,7 +263,7 @@ public class GameDataServiceImpl implements GameDataService {
         }
 
         List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
-                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         for ( String userId : willCodeMap.keySet() ) {
             memberMoneyManager.checkAndUpdateVip( userId, configVips );
         }
