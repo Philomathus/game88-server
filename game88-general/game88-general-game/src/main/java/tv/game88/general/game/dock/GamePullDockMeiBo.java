@@ -77,15 +77,15 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameOrder" ) ) );
-        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "thirdUid" ) ).toLowerCase();
-        String agent   = account.split( "_" )[ 0 ];
+        String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String   account = String.valueOf( remoteGameDatum.get( "thirdUid" ) ).toLowerCase();
+        String[] spl     = account.split( "_" );
 
         String createTime = remoteGameDatum.get( "createTimeDate" ).toString();
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
-        gameDataRecord.setAccount( account );
+        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "nid" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "validBet" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "input" ) ) ) );
@@ -93,7 +93,7 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "sceneId" ) ) );
         gameDataRecord.setGameStartTime( createTime );
         gameDataRecord.setGameEndTime( createTime );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

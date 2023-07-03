@@ -130,6 +130,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
         String account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
+        String[] spl = account.split( "_" );
 
         String endString;
         if ( remoteGameDatum.containsKey( "ModifiedDate" ) ) {
@@ -144,13 +145,14 @@ public class GamePullDockBBIN extends AbstractGamePull {
         }
 
         gameDataRecord.setId( logId );
-        gameDataRecord.setAccount( account.toLowerCase() );
+        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameType" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "Commissionable" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "BetAmount" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "Payoff" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "GameCode" ) ) );
-        gameDataRecord.setAgent( account.split( "_" )[ 0 ].toLowerCase() );
+
+        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameStartTime( endString );
