@@ -8,7 +8,6 @@ import org.springframework.util.MultiValueMap;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -76,7 +75,7 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         String payoutAmount = String.valueOf( remoteGameDatum.get( "payoutAmount" ) );
-        String profit = betAmountDeci.subtract( new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ) )
+        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ).subtract( betAmountDeci )
                 .setScale( 2, RoundingMode.HALF_UP ).toString();
         gameDataRecord.setProfit( profit );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );
@@ -87,9 +86,6 @@ public class GamePullDockMG extends AbstractGamePull {
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
-        if ( RandomUtils.randomIntWithMax( 0, 99 ) == 88 ) {
-            log.warn( JsonUtil.object2Json( gameDataRecord ) );
-        }
         return gameDataRecord;
     }
 

@@ -16,9 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.XmlUtil;
+import tv.game88.common.utils.*;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -181,7 +179,11 @@ public class GamePullDockAG extends AbstractGamePull {
         String[] accounts = account.toUpperCase().split( "_" );
         String   agent    = accounts[ 0 ].toLowerCase();
 
-        gameDataRecord.setGameId( element.getAttribute( "billno" ) );
+        String billno = element.getAttribute( "billno" );
+        if ( StringUtils.isBlank( billno ) ) {
+            billno = element.getAttribute( "billNo" );
+        }
+        gameDataRecord.setGameId( billno );
         String gameCode = element.getAttribute( "gameCode" );
         if ( StringUtils.isBlank( gameCode ) ) {
             gameCode = element.getAttribute( "gmcode" );
@@ -219,6 +221,10 @@ public class GamePullDockAG extends AbstractGamePull {
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+
+        if ( RandomUtils.randomIntWithMax( 0, 99 ) == 88 ) {
+            log.warn( JsonUtil.object2Json( gameDataRecord ) );
+        }
         return gameDataRecord;
     }
 
