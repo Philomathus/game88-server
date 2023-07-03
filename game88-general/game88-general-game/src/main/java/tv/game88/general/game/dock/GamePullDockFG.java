@@ -107,11 +107,11 @@ public class GamePullDockFG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
 
-        String account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
-        String agent   = account.split( "_" )[ 0 ];
+        String   account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
+        String[] spl     = account.split( "_" );
 
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        gameDataRecord.setAccount( account );
+        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         String allBets = String.valueOf( remoteGameDatum.get( "all_bets" ) );
         gameDataRecord.setCellScore( allBets );
@@ -128,7 +128,7 @@ public class GamePullDockFG extends AbstractGamePull {
 
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( time ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
