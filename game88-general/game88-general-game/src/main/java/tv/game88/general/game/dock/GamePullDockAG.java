@@ -130,6 +130,9 @@ public class GamePullDockAG extends AbstractGamePull {
                     }
                     return text;
                 } );
+        if ( "getorders.xml".equals( queryXml ) ) {
+            log.error( resultXml );
+        }
         if ( StringUtils.isNotBlank( resultXml ) ) {
             try {
                 Document document = XmlUtil.getDocument( resultXml );
