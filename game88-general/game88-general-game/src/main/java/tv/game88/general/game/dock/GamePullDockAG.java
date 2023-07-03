@@ -135,6 +135,9 @@ public class GamePullDockAG extends AbstractGamePull {
                 Document document = XmlUtil.getDocument( resultXml );
                 Element  root     = document.getDocumentElement(); // 获取根元素
                 NodeList nodeList = root.getElementsByTagName( "row" );
+                if ( nodeList.getLength() == 500 ) {
+                    log.warn( resultXml );
+                }
                 return IntStream.range( 0, nodeList.getLength() ).mapToObj( nodeList::item ).collect( Collectors.toList() );
             } catch ( Exception e ) {
                 log.error( e.getMessage() + " : " + resultXml, e );
