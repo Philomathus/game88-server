@@ -115,6 +115,7 @@ public class MyPayAgentProcessor extends AbstractPayAgent {
             log.info( payAgentPlatform.getName() + "订单号:{},回调状态:{},", merchantOrderNo, "1".equals( status ) ? "成功" : "失败" );
             return "success";
         }
+        log.warn( payAgentChannel.getName() + "验签失败");
         return "fail";
     }
 
