@@ -10,7 +10,7 @@ public enum BankCodeMyType {
     ICBC( 3 ),
     CCB( 2 ),
     ABC( 4 ),
-    PSBS( 5 ),
+    PSBC( 5 ),
     BOC( 1 ),
     COMM( 6 ),
     CMB( 7 ),
