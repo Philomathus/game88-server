@@ -46,11 +46,14 @@ public class PayAgentServiceImpl implements PayAgentService {
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
     @Resource
     private RedisUtils                   redisUtil;
-    @Value( "${payAgentLimitLianFuBao:5000}" )
-    private Integer                      payAgentLimitLianFuBao;
+
+    @Value ( "${payAgentLimitLianFuBao:5000}" )
+    private Integer payAgentLimitLianFuBao;
+    @Value ( "${payAgentLimitMY:5000}" )
+    private Integer payAgentLimitMY;
 
     @Override
-    @Transactional( rollbackFor = Exception.class )
+    @Transactional ( rollbackFor = Exception.class )
     public void processOrderPay( MemberWithdrawDetail withdrawLog, PayAgentLog payAgentLog, String orderNo,
                                  PayAgentChannel payAgentChannel, boolean isSuccess ) {
         LocalDateTime        now            = LocalDateTime.now();
@@ -143,9 +146,13 @@ public class PayAgentServiceImpl implements PayAgentService {
             return RspBase.businessError( "审核流程非法" );
         }
 
-        if ( payAgentPlatform.getCode().contains( ConstantsPayAgent.LIAN_FU_BAO )
+        if ( payAgentPlatform.getCode().equals( ConstantsPayAgent.LIAN_FU_BAO )
                 && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitLianFuBao ) ) > 0 ) {
             return RspBase.businessError( "此代付暂不支持" + payAgentLimitLianFuBao + "以上出款" );
+        }
+        if ( payAgentPlatform.getCode().equals( ConstantsPayAgent.MY_PAY )
+                && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitMY ) ) > 0 ) {
+            return RspBase.businessError( "此代付暂不支持" + payAgentLimitMY + "以上出款" );
         }
 
         long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
@@ -255,7 +262,7 @@ public class PayAgentServiceImpl implements PayAgentService {
     }
 
     @Override
-    @Transactional( rollbackFor = Exception.class )
+    @Transactional ( rollbackFor = Exception.class )
     public void processOrder( PayAgentChannel payAgentChannel, MemberWithdrawDetail memberWithdrawLog, LocalDateTime now,
                               int status, int orderState ) {
         MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
@@ -281,17 +288,17 @@ public class PayAgentServiceImpl implements PayAgentService {
         PayAgentLog newPayAgentLog = new PayAgentLog();
         newPayAgentLog.setWithdrawOrderNo( memberWithdrawLog.getWithdrawOrderNo() );
         switch ( status ) {
-        case 4 -> newPayAgentLog.setCallbackStatus( 0 );
-        case 5 -> {
-            newPayAgentLog.setCallbackTime( now );
-            newPayAgentLog.setCallbackStatus( 2 );
-        }
-        case 6 -> {
-            newPayAgentLog.setCallbackTime( now );
-            newPayAgentLog.setCallbackStatus( 1 );
-        }
-        default -> {
-        }
+            case 4 -> newPayAgentLog.setCallbackStatus( 0 );
+            case 5 -> {
+                newPayAgentLog.setCallbackTime( now );
+                newPayAgentLog.setCallbackStatus( 2 );
+            }
+            case 6 -> {
+                newPayAgentLog.setCallbackTime( now );
+                newPayAgentLog.setCallbackStatus( 1 );
+            }
+            default -> {
+            }
         }
         if ( payAgentLog == null ) {
             newPayAgentLog.setCreateTime( now );
@@ -308,7 +315,7 @@ public class PayAgentServiceImpl implements PayAgentService {
     }
 
     @Override
-    @Transactional( rollbackFor = Exception.class )
+    @Transactional ( rollbackFor = Exception.class )
     public void callBackOrder( MemberWithdrawDetail withdrawLog, String channelName ) {
         // 更改withdrawLog状态
         MemberWithdrawDetail newWithdrawLog = new MemberWithdrawDetail();
