@@ -56,7 +56,7 @@ public class GamePullDockAG extends AbstractGamePull {
         // 获取电子游戏订单数据
         forkJoinTasks.add( () -> this.queryList( gamePlatform, "getslotorders_ex.xml", startMD, endMD ) );
         // 获取捕鱼场景订单数据
-        forkJoinTasks.add( () -> this.queryList( gamePlatform, "gethunterscene.xml", startMD, endMD ) );
+        forkJoinTasks.add( () -> this.queryList( gamePlatform, "gethunterscene.xml", start, end ) );
         // 获取AG Sport订单数据
         forkJoinTasks.add( () -> this.queryList( gamePlatform, "getagsportorders_ex.xml", startMD, endMD ) );
         // 获取YoPlay订单数据
@@ -221,10 +221,6 @@ public class GamePullDockAG extends AbstractGamePull {
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
-
-        if ( RandomUtils.randomIntWithMax( 0, 99 ) == 88 ) {
-            log.warn( JsonUtil.object2Json( gameDataRecord ) );
-        }
         return gameDataRecord;
     }
 
