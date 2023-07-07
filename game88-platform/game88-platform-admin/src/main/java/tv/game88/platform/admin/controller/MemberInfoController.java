@@ -1,5 +1,6 @@
 package tv.game88.platform.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -129,6 +130,12 @@ public class MemberInfoController extends BaseController {
     @PostMapping
     public RspBase<?> add( @RequestBody MemberInfo memberInfo ) {
         return memberInfoService.insertMemberInfo( memberInfo.getPhone(), memberInfo.getPassword() );
+    }
+
+    @Log( title = "用户信息", businessType = BusinessType.UPDATE )
+    @PutMapping("updateCodeTotal")
+    public RspBase<?> update( @RequestBody MemberInfo memberInfo ) {
+        return RspBase.ok(memberInfoService.updateCodeTotal( memberInfo ));
     }
 
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:changeStatus')" )
