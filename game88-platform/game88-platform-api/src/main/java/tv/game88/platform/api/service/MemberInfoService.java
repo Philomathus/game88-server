@@ -100,4 +100,5 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     void sendMsg(String msg, String memberId);
 
+    RspBase<?> updateCodeTotal( MemberInfo memberInfo );
 }

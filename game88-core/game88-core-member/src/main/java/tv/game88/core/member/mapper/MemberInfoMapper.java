@@ -125,4 +125,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     Integer clear();
 
     Integer insertPaiSong(@Param("userIds") String userIds);
+
+    int updateCodeTotal( MemberInfo memberInfo );
 }
