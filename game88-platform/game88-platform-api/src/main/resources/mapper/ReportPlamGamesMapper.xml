@@ -81,8 +81,13 @@
             <if test="gameplame != null  and gameplame != ''">
                 and gameplame = #{gameplame}
             </if>
-            <if test="begindate != null">
-                and begindate = #{begindate}
+            <if test="begindate != null and begindate != ''">
+                <!-- 开始时间检索 -->
+                AND begindate <![CDATA[ >= ]]>  STR_TO_DATE(#{begindate}, '%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                <!-- 结束时间检索 -->
+                AND begindate <![CDATA[ <= ]]> STR_TO_DATE(#{endDate}, '%Y-%m-%d')
             </if>
         </where>
     </select>
