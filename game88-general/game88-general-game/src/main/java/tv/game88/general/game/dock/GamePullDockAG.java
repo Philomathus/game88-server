@@ -16,9 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.XmlUtil;
+import tv.game88.common.utils.*;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -58,7 +56,7 @@ public class GamePullDockAG extends AbstractGamePull {
         // 获取电子游戏订单数据
         forkJoinTasks.add( () -> this.queryList( gamePlatform, "getslotorders_ex.xml", startMD, endMD ) );
         // 获取捕鱼场景订单数据
-        forkJoinTasks.add( () -> this.queryList( gamePlatform, "gethunterscene.xml", startMD, endMD ) );
+        forkJoinTasks.add( () -> this.queryList( gamePlatform, "gethunterscene.xml", start, end ) );
         // 获取AG Sport订单数据
         forkJoinTasks.add( () -> this.queryList( gamePlatform, "getagsportorders_ex.xml", startMD, endMD ) );
         // 获取YoPlay订单数据
@@ -135,6 +133,9 @@ public class GamePullDockAG extends AbstractGamePull {
                 Document document = XmlUtil.getDocument( resultXml );
                 Element  root     = document.getDocumentElement(); // 获取根元素
                 NodeList nodeList = root.getElementsByTagName( "row" );
+                if ( nodeList.getLength() == 500 ) {
+                    log.warn( resultXml );
+                }
                 return IntStream.range( 0, nodeList.getLength() ).mapToObj( nodeList::item ).collect( Collectors.toList() );
             } catch ( Exception e ) {
                 log.error( e.getMessage() + " : " + resultXml, e );
@@ -171,16 +172,22 @@ public class GamePullDockAG extends AbstractGamePull {
         if ( StringUtils.isBlank( account ) ) {
             account = element.getAttribute( "playName" );
         }
-        String agent = account.split( "_" )[ 0 ].toLowerCase();
 
-        gameDataRecord.setGameId( element.getAttribute( "billno" ) );
+        String[] accounts = account.toUpperCase().split( "_" );
+        String   agent    = accounts[ 0 ].toLowerCase();
+
+        String billno = element.getAttribute( "billno" );
+        if ( StringUtils.isBlank( billno ) ) {
+            billno = element.getAttribute( "billNo" );
+        }
+        gameDataRecord.setGameId( billno );
         String gameCode = element.getAttribute( "gameCode" );
         if ( StringUtils.isBlank( gameCode ) ) {
             gameCode = element.getAttribute( "gmcode" );
         }
         gameDataRecord.setGameRound( gameCode );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        gameDataRecord.setAccount( account.toLowerCase() );
+        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
 
         String gametype = element.getAttribute( "gametype" );
         if ( StringUtils.isBlank( gametype ) ) {

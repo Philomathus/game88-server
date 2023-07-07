@@ -8,3 +8,4 @@ spring:
     port: 6379
 
 payAgentLimitLianFuBao: 20000
+payAgentLimitMY: 50000

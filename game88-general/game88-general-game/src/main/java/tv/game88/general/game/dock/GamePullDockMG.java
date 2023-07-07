@@ -29,7 +29,7 @@ public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
-        String url = gamePlatform.getApiUrl() + gamePlatform.getAgent() + "/bets?limit=100";
+        String url = gamePlatform.getApiUrl() + gamePlatform.getAgent() + "/bets?limit=1000";
         if ( !StringUtils.isEmpty( gamePlatform.getVersionValue() ) ) {
             url = url.concat( "&startingAfter=" ).concat( gamePlatform.getVersionValue() );
         }
@@ -75,7 +75,7 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         String payoutAmount = String.valueOf( remoteGameDatum.get( "payoutAmount" ) );
-        String profit = betAmountDeci.subtract( new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ) )
+        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ).subtract( betAmountDeci )
                 .setScale( 2, RoundingMode.HALF_UP ).toString();
         gameDataRecord.setProfit( profit );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );

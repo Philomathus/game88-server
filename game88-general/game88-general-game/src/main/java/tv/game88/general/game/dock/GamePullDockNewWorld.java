@@ -125,6 +125,9 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         if ( !gamePlatform.getAgent().equals( splitParam[ 0 ] ) ) {
             return null;
         }
+        String agent = splitParam[ 1 ].toLowerCase();
+        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setAccount( StringUtils.substringAfter( accounts, "_" ) );
         gameDataRecord.setAgent( splitParam[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameArrNo" ) ) );
