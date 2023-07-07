@@ -16,10 +16,13 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.MEIBO + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.MEIBO + "GamePullProcessor" )
 public class GamePullDockMeiBo extends AbstractGamePull {
 
     @Override
@@ -55,13 +58,15 @@ public class GamePullDockMeiBo extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) && "0".equals( d.getOrDefault( "code", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
                 return ( List<Object> ) d.getOrDefault( "record", new ArrayList<>() );
+            } else {
+                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;

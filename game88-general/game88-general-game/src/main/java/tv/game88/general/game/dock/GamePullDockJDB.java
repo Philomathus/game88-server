@@ -29,7 +29,7 @@ public class GamePullDockJDB extends AbstractGamePull {
 
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 4 ) ) ) {
             return null;
         }
         LocalDateTime end = start.plusMinutes( 1 );
@@ -52,7 +52,7 @@ public class GamePullDockJDB extends AbstractGamePull {
             throw new BusinessException( e.getMessage() );
         }
 
-        log.warn( json );
+        // log.warn( json );
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "dc", gamePlatform.getLinecode() );
@@ -86,8 +86,17 @@ public class GamePullDockJDB extends AbstractGamePull {
         String agent    = null;
         String memberId = null;
         if ( account.startsWith( "88" ) ) {
-            agent = account.substring( 0, account.lastIndexOf( "m" ) );
-            memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
+                Matcher matcher = GET_NUMBER.matcher( account );
+                if ( matcher.find() ) {
+                    String memberAccount = matcher.group();
+                    agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                    memberId = agent + "_" + memberAccount;
+                }
+            } else {
+                agent = account.substring( 0, account.lastIndexOf( "m" ) );
+                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            }
         } else if ( account.startsWith( "77" ) ) {
             Matcher matcher = GET_NUMBER.matcher( account );
             if ( matcher.find() ) {

@@ -48,7 +48,7 @@ public class GamePullDockBoLe extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageForm( params ) );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> respMsgMap = ( Map<String, Object> ) resultMap.getOrDefault( "resp_msg", new HashMap<>() );
             if ( "200".equals( respMsgMap.getOrDefault( "code", "-1" ).toString() ) ) {
@@ -74,12 +74,21 @@ public class GamePullDockBoLe extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "sn" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "player_account" ) ).toLowerCase();
+        String account  = String.valueOf( remoteGameDatum.get( "player_account" ) ).toLowerCase();
         String agent    = null;
         String memberId = null;
         if ( account.startsWith( "88" ) ) {
-            agent = account.substring( 0, account.lastIndexOf( "m" ) );
-            memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
+                Matcher matcher = GET_NUMBER.matcher( account );
+                if ( matcher.find() ) {
+                    String memberAccount = matcher.group();
+                    agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                    memberId = agent + "_" + memberAccount;
+                }
+            } else {
+                agent = account.substring( 0, account.lastIndexOf( "m" ) );
+                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+            }
         } else if ( account.startsWith( "77" ) ) {
             Matcher matcher = GET_NUMBER.matcher( account );
             if ( matcher.find() ) {

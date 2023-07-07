@@ -4,44 +4,54 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.MG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.MG + "GamePullProcessor" )
 public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
-        String url = gamePlatform.getApiUrl() + "/agents/" + gamePlatform.getAgent() + "/bets?";
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add( "limit", "20000" );
-        params.add( "channel", "true" );
+        String url = gamePlatform.getApiUrl() + gamePlatform.getAgent() + "/bets?limit=100";
+        if ( !StringUtils.isEmpty( gamePlatform.getVersionValue() ) ) {
+            url = url.concat( "&startingAfter=" ).concat( gamePlatform.getVersionValue() );
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add( "Authorization", "Bearer " + getToken( gamePlatform ) );
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( headers );
 
-        ResponseEntity<Map> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, Map.class );
+        ResponseEntity<ArrayList> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, ArrayList.class );
+
+        // log.warn( url + "::" + JsonUtil.object2Json( responseGameResult.getBody() ) );
         if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
             List<Object> resultMap = ( List<Object> ) responseGameResult.getBody();
-
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
-                gamePlatform.setVersionValue( String.valueOf( System.currentTimeMillis() ) );
+                Map obj = ( Map ) resultMap.get( resultMap.size() - 1 );
+                gamePlatform.setVersionValue( obj.get( "betUID" ).toString() );
+
                 return resultMap;
+            } else {
+                log.warn( url + "::" + JsonUtil.object2Json( responseGameResult ) );
             }
         }
         return null;
@@ -51,50 +61,51 @@ public class GamePullDockMG extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
-
-        String logId = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-
-        gameDataRecord.setId( logId );
-        gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
-        gameDataRecord.setAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "platform" ) ) );
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "betAmount" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "PCA" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "payoutAmount" ) ) );
-        //        gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "seat_id" ) ) );
-        gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ) );
-        gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "gameEndTimeUTC" ) ) );
-        gameDataRecord.setAgent( String.valueOf( remoteGameDatum.get( "channel" ) ) );
+        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
+        gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
+        // gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
+        String account = String.valueOf( remoteGameDatum.get( "playerId" ) );
+        String agent   = account.split( "_" )[ 0 ];
+        gameDataRecord.setAccount( account );
+        gameDataRecord.setAgent( agent );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
+        String     betAmount     = String.valueOf( remoteGameDatum.get( "betAmount" ) );
+        BigDecimal betAmountDeci = new BigDecimal( betAmount.equals( "0" ) ? "0" : betAmount );
+        String     bet           = betAmountDeci.setScale( 2, RoundingMode.HALF_UP ).toString();
+        gameDataRecord.setCellScore( bet );
+        gameDataRecord.setAllBet( bet );
+        String payoutAmount = String.valueOf( remoteGameDatum.get( "payoutAmount" ) );
+        String profit = betAmountDeci.subtract( new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ) )
+                .setScale( 2, RoundingMode.HALF_UP ).toString();
+        gameDataRecord.setProfit( profit );
+        String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+        String gameEndTime = String.valueOf( remoteGameDatum.get( "gameEndTimeUTC" ) ).substring( 0, 19 );
+        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime,
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
     }
 
     public String getToken( GamePlatform gamePlatform ) {
+        if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
+            Map<String, Object> params = new HashMap<>();
+            params.put( "client_id", gamePlatform.getAgent() );
+            params.put( "client_secret", gamePlatform.getMd5() );
+            params.put( "grant_type", "client_credentials" );
 
-        String retToken = "";
-
-        if ( !redisUtils.exists( "token:" + gamePlatform.getId() ) ) {
-            HttpHeaders                   headers = new HttpHeaders();
-            MultiValueMap<String, String> params  = new LinkedMultiValueMap<>();
-            params.add( "client_id", gamePlatform.getAgent() );
-            params.add( "client_secret", gamePlatform.getMd5() );
-            params.add( "grant_type", "client_credentials" );
-            headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
-            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>( params, headers );
-
-            Map<String, Object> resultMap = restTemplate.postForObject( gamePlatform.getApiUrl(), httpEntity, Map.class );
+            Map<String, Object> resultMap = this.sendPostMap( gamePlatform.getRecordUrl(), packageForm( params ) );
             Object              obj       = resultMap.get( "access_token" );
-            retToken = obj == null ? null : obj.toString();
-            if ( StringUtils.isBlank( retToken ) ) {
-                throw new BusinessException( gamePlatform.getGameCategory().getDes() + " - 获取token失败" );
+            String              token     = obj == null ? null : obj.toString();
+            if ( StringUtils.isBlank( token ) ) {
+                throw new BusinessException( gamePlatform.getName() + " - 获取token失败" );
             }
-            redisUtils.strSet( "token:" + gamePlatform.getId(), retToken, Duration.ofMinutes( 50 ) );
+            redisUtils.strSet( Constants.GAME_TOKEN_PREX + gamePlatform.getId(), token, Duration.ofMinutes( 50 ) );
+            return token;
         } else {
-            retToken = redisUtils.strGet( "token:" + gamePlatform.getId() );
+            return redisUtils.strGet( Constants.GAME_TOKEN_PREX + gamePlatform.getId() );
         }
-
-        return retToken;
     }
 }
