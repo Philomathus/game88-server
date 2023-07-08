@@ -199,17 +199,26 @@ public class GamePullDockAG extends AbstractGamePull {
         if ( StringUtils.isBlank( cellScore ) ) {
             cellScore = element.getAttribute( "validBetAmount" );
         }
+        if ( StringUtils.isBlank( cellScore ) ) {
+            cellScore = element.getAttribute( "totalbulletcost" );
+        }
         gameDataRecord.setCellScore( this.convertNum( cellScore ) );
 
         String allBet = element.getAttribute( "account" );
         if ( StringUtils.isBlank( allBet ) ) {
             allBet = element.getAttribute( "betAmount" );
         }
+        if ( StringUtils.isBlank( allBet ) ) {
+            allBet = element.getAttribute( "totalbulletcost" );
+        }
         gameDataRecord.setAllBet( this.convertNum( allBet ) );
 
         String cusAccount = element.getAttribute( "cus_account" );
         if ( StringUtils.isBlank( cusAccount ) ) {
             cusAccount = element.getAttribute( "netAmount" );
+        }
+        if ( StringUtils.isBlank( cusAccount ) ) {
+            cusAccount = element.getAttribute( "profit" );
         }
         gameDataRecord.setProfit( this.convertNum( cusAccount ) );
         gameDataRecord.setTableId( element.getAttribute( "tableCode" ) );
