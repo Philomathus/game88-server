@@ -547,7 +547,7 @@
     <update id="updateCodeTotal" parameterType="tv.game88.core.member.entity.MemberInfo">
         update member_info
             set vip = (select max(level) from config_vip
-                        where level_bonus <![CDATA[ <= ]]> #{codeTotal}),
+                        where bcode <![CDATA[ <= ]]> #{codeTotal}),
                 code_total = #{codeTotal}
         where id = #{id}
 

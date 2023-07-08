@@ -11,8 +11,6 @@ import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +39,6 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( StringUtils.equals( "1", resultMap.getOrDefault( "resultCode", "-2" ).toString() ) ) {
                 List<Object> transList = ( List<Object> ) resultMap.get( "transList" );
-                if ( !CollectionUtils.isEmpty( transList ) && transList.size() > 100 ) {
-                    transList = transList.subList( 0, 100 );
-                }
                 if ( !CollectionUtils.isEmpty( transList ) ) {
                     Map<String, Object> o = ( Map<String, Object> ) transList.get( transList.size() - 1 );
                     gamePlatform.setVersionValue( String.valueOf( o.get( "recordID" ) ) );
@@ -76,18 +71,14 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         gameDataRecord.setAccount( agent + "_" + split[ 1 ] );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
-        gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ) );
-        gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "commissionable" ) ) ) );
-        gameDataRecord.setProfit( fenToYuan( String.valueOf( remoteGameDatum.get( "income" ) ) ) );
+        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "betAmount" ) ) );
+        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "commissionable" ) ) );
+        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "income" ) ) );
         String gameDate = String.valueOf( remoteGameDatum.get( "gameDate" ) );
         gameDataRecord.setGameEndTime( gameDate );
         gameDataRecord.setGameStartTime( gameDate );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
-    }
-
-    private String fenToYuan( String money ) {
-        return new BigDecimal( money ).divide( new BigDecimal( 100 ), 2, RoundingMode.HALF_UP ).toString();
     }
 }

@@ -20,6 +20,8 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -27,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository( value = ConstantsGame.FG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.FG + "GamePullProcessor" )
 public class GamePullDockFG extends AbstractGamePull {
 
     private static final List<String> GT_TYPE_LIST = Arrays.asList( "hunter", "chess", "slot", "arcade" );
@@ -78,13 +80,13 @@ public class GamePullDockFG extends AbstractGamePull {
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String              code    = resultMap.getOrDefault( "code", "" ).toString();
@@ -105,11 +107,11 @@ public class GamePullDockFG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
 
-        String account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
-        String agent   = account.split( "_" )[ 0 ];
+        String   account = String.valueOf( remoteGameDatum.get( "player_name" ) ).toLowerCase();
+        String[] spl     = account.split( "_" );
 
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        gameDataRecord.setAccount( account );
+        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         String allBets = String.valueOf( remoteGameDatum.get( "all_bets" ) );
         gameDataRecord.setCellScore( allBets );
@@ -118,14 +120,15 @@ public class GamePullDockFG extends AbstractGamePull {
             totalBets = allBets;
         }
         gameDataRecord.setAllBet( totalBets );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "result" ) ) );
+        String result = String.valueOf( remoteGameDatum.get( "result" ) );
+        gameDataRecord.setProfit( new BigDecimal( result ).setScale( 2, RoundingMode.HALF_UP ).toString() );
 
         String        timestamp = remoteGameDatum.get( "time" ) + "000";
         LocalDateTime time      = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( timestamp ) );
 
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( time ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
