@@ -132,12 +132,6 @@ public class MemberInfoController extends BaseController {
         return memberInfoService.insertMemberInfo( memberInfo.getPhone(), memberInfo.getPassword() );
     }
 
-    @Log( title = "用户信息", businessType = BusinessType.UPDATE )
-    @PutMapping("updateCodeTotal")
-    public RspBase<?> update( @RequestBody MemberInfo memberInfo ) {
-        return RspBase.ok(memberInfoService.updateCodeTotal( memberInfo ));
-    }
-
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:changeStatus')" )
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus/{memberId}" )
@@ -503,6 +497,12 @@ public class MemberInfoController extends BaseController {
         memberInfo.setWithdrawStatus( withdrawStatus );
         boolean isUpdate = memberInfoService.updateById( memberInfo );
         return toResult( isUpdate );
+    }
+
+    @Log( title = "更新总代码和VIP级别", businessType = BusinessType.UPDATE )
+    @PutMapping("updateCodeTotal")
+    public RspBase<?> updateCodeTotal( @RequestBody MemberInfo memberInfo ) {
+        return RspBase.ok(memberInfoService.updateCodeTotalVipLevel( memberInfo ));
     }
 
 
