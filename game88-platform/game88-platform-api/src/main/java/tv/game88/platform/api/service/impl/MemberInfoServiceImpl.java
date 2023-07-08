@@ -1554,8 +1554,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<?> updateCodeTotal( MemberInfo memberInfo ) {
-        if (memberInfoMapper.updateCodeTotal(memberInfo) != 1) {
+    public RspBase<?> updateCodeTotalVipLevel( MemberInfo memberInfo ) {
+        if (memberInfoMapper.updateCodeTotalVipLevel(memberInfo) != 1) {
             throw new BusinessException( "更新代码总数和vip级别失败" );
         }
         return RspBase.ok();

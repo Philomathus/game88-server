@@ -126,5 +126,5 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     Integer insertPaiSong(@Param("userIds") String userIds);
 
-    int updateCodeTotal( MemberInfo memberInfo );
+    int updateCodeTotalVipLevel( MemberInfo memberInfo );
 }
