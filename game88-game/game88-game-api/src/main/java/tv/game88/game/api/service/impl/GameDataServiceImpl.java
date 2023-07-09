@@ -179,8 +179,12 @@ public class GameDataServiceImpl implements GameDataService {
     public void insertBatch( SqlSession session, MemberGameDataMapper mapper, List<MemberGameData> willCodeList ) {
         int count = 0;
         for ( MemberGameData in : willCodeList ) {
+            String dbNodes = in.getAccount().substring( in.getAccount().length() - 1 );
             try {
-                mapper.insertMemberGameData( in, in.getAccount().substring( in.getAccount().length() - 1 ) );
+                if ( mapper.findExist( dbNodes, in.getId() ) != null ) {
+                    continue;
+                }
+                mapper.insertMemberGameData( in, dbNodes );
                 count += 1;
                 if ( count >= 500 ) {
                     session.commit();

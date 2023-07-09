@@ -25,12 +25,9 @@ public class GameDataTask {
     @Async
     @Scheduled( cron = "0/30 * * * * ?")
     public void runTask() {
-        log.warn( 0 );
-        if ( !redisUtils.lock( "GameDataTask", 10 ) ) {
-            log.warn( 1 );
+        if ( !redisUtils.lock( "GameDataTask", 29 ) ) {
             return;
         }
-        log.warn( 2 );
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusMinutes( 3 );
         String        begin   = LocalDateTimeUtils.format( starDay );
