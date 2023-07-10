@@ -31,7 +31,7 @@ public class FixDataTask {
     @Resource
     private MemberGameDataFixMapper memberGameDataFixMapper;
 
-    @Scheduled( fixedDelay = 180000, initialDelay = 1 )
+    @Scheduled( fixedDelay = 360000, initialDelay = 1 )
     public void runTask() {
         if ( !redisUtils.lock( "FixDataTask", 150 ) ) {
             return;
