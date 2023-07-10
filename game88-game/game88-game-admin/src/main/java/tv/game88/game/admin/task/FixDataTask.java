@@ -31,42 +31,39 @@ public class FixDataTask {
     @Resource
     private MemberGameDataFixMapper memberGameDataFixMapper;
 
-    @Scheduled( fixedDelay = 360000, initialDelay = 1 )
+    @Scheduled ( fixedDelay = 360000, initialDelay = 1 )
     public void runTask() {
-        if ( !redisUtils.lock( "FixDataTask", 150 ) ) {
+        if ( !redisUtils.lock( "FixDataTask", 9999 ) ) {
             return;
         }
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
         List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 )
-                                                                                                        .isNotNull( "platform_id" )
-                                                                                                        .list();
+                .isNotNull( "platform_id" )
+                .list();
         for ( MemberGameDataFix memberGameDataFix : memberGameDataFixes ) {
             for ( GamePlatform gamePlatform : gamePlatforms ) {
-                if ( memberGameDataFix.getPlatformId() == gamePlatform.getId().intValue() ) {
-                    String begin = LocalDateTimeUtils.format( memberGameDataFix.getGameStartTime() );
-                    String end   = LocalDateTimeUtils.format( memberGameDataFix.getGameEndTime() );
-                    if ( gamePlatform.getGameCategory() == EnumGameCategory.LOTTERY ) {
-                        try {
+                try {
+                    if ( memberGameDataFix.getPlatformId() == gamePlatform.getId().intValue() ) {
+                        String begin = LocalDateTimeUtils.format( memberGameDataFix.getGameStartTime() );
+                        String end   = LocalDateTimeUtils.format( memberGameDataFix.getGameEndTime() );
+                        if ( gamePlatform.getGameCategory() == EnumGameCategory.LOTTERY ) {
                             gameDataService.beatLotteryCode( begin, end );
-                        } catch ( Exception e ) {
-                            log.error( "补单彩票拉取注单异常{}", e.getMessage(), e );
-                        }
-                    } else {
-                        try {
+                        } else {
                             log.warn( "开始补单{}游戏", gamePlatform.getName() );
                             gameDataService.beatGameCodeAgent( begin, begin, end, memberGameDataFix.getMemberId(),
                                     gamePlatform.getGameCategory() );
-                        } catch ( Exception e ) {
-                            log.error( "补单游戏拉取注单异常{}", e.getMessage(), e );
                         }
+                        MemberGameDataFix update = new MemberGameDataFix();
+                        update.setId( memberGameDataFix.getId() );
+                        update.setStatus( 1 );
+                        memberGameDataFixMapper.updateById( update );
                     }
-                    MemberGameDataFix update = new MemberGameDataFix();
-                    update.setId( memberGameDataFix.getId() );
-                    update.setStatus( 1 );
-                    memberGameDataFixMapper.updateById( update );
+                } catch ( Exception e ) {
+                    log.error( "补单彩票拉取注单异常{}", e.getMessage(), e );
                 }
             }
         }
+        redisUtils.unLock( "FixDataTask" );
     }
 }
