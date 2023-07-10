@@ -108,7 +108,7 @@
     </sql>
 
     <select id="findExist" resultType="java.lang.Integer">
-        SELECT status
+        SELECT count(0)
         FROM member_game_data${dbNodes}
         WHERE id = #{keyId}
     </select>

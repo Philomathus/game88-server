@@ -88,7 +88,7 @@ public class GameDataServiceImpl implements GameDataService {
         for ( RspGameDataLog dataLog : rspGameDataLogs ) {
             GamePlatform gamePlatform = gamePlatformIdMap.get( dataLog.getPlatform_id().longValue() );
             String       memberId     = dataLog.getAccount().toUpperCase().split( "_" )[ 1 ];
-            if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), dataLog.getId() ) != null ) {
+            if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), dataLog.getId() ) > 0 ) {
                 continue;
             }
             MemberGameData gameDataLog = new MemberGameData();
@@ -144,7 +144,7 @@ public class GameDataServiceImpl implements GameDataService {
         SqlSession              session      = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         MemberGameDataMapper    mapper       = session.getMapper( MemberGameDataMapper.class );
         for ( LotteryBet og : list ) {
-            if ( mapper.findExist( og.getMemberId().substring( og.getMemberId().length() - 1 ), og.getId() ) != null ) {
+            if ( mapper.findExist( og.getMemberId().substring( og.getMemberId().length() - 1 ), og.getId() ) > 0 ) {
                 continue;
             }
             MemberGameData gameDataLog = new MemberGameData();
@@ -181,7 +181,7 @@ public class GameDataServiceImpl implements GameDataService {
         for ( MemberGameData in : willCodeList ) {
             String dbNodes = in.getAccount().substring( in.getAccount().length() - 1 );
             try {
-                if ( mapper.findExist( dbNodes, in.getId() ) != null ) {
+                if ( mapper.findExist( dbNodes, in.getId() ) > 0 ) {
                     continue;
                 }
                 mapper.insertMemberGameData( in, dbNodes );
