@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>tv.game88</groupId>
+        <artifactId>game88-server</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <groupId>tv.game88.wallet</groupId>
+    <artifactId>game88-wallet</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Game88 Server Wallet Parent</name>
+    <description>88棋牌服务-虚拟钱包服务</description>
+
+    <modules>
+        <module>game88-wallet-api</module>
+        <module>game88-wallet-app</module>
+        <module>game88-wallet-admin</module>
+    </modules>
+</project>
