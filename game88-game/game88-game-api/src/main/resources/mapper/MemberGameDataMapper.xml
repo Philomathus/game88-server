@@ -114,7 +114,7 @@
     </select>
 
     <insert id="insertMemberGameData">
-        insert into member_game_data${dbNodes}
+        insert ignore into member_game_data${dbNodes}
         (id,
          game_id,
          account,
