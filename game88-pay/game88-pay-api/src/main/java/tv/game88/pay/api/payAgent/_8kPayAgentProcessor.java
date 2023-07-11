@@ -24,6 +24,7 @@ import tv.game88.pay.api.type.BankCodeMyType;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,7 +48,7 @@ public class _8kPayAgentProcessor extends AbstractPayAgent {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "merchantId", payAgentChannel.getMerId() );
         dataMap.put( "merchantOrderNo", withdrawDetail.getWithdrawOrderNo() );
-        dataMap.put( "amount", withdrawDetail.getWithdrawMoney() );
+        dataMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
         dataMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         dataMap.put( "bankcardAccountName", withdrawDetail.getBankUserName() );
         dataMap.put( "bankcardAccountNo", withdrawDetail.getBankAccount() );
