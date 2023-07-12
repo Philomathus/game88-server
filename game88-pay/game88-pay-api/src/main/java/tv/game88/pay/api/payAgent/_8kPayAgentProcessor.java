@@ -57,6 +57,8 @@ public class _8kPayAgentProcessor extends AbstractPayAgent {
 
         String tempStr        = this.assemblyUrl( dataMap );
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
+        log.warn( tempStr );
+        log.warn( signPrivateKey );
         String sign           = RSACoder.signSha1Rsa( tempStr, signPrivateKey );
         dataMap.put( "sign", sign );
 
