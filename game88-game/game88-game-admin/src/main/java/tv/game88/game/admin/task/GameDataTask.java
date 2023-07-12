@@ -38,7 +38,7 @@ public class GameDataTask {
             } catch ( Exception e ) {
                 log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
             }
-            endDay  = LocalDateTime.now().minusMinutes( 7 );
+            endDay  = LocalDateTime.now().minusMinutes( 5 );
             starDay = endDay.minusMinutes( 3 );
             begin   = LocalDateTimeUtils.format( starDay );
             end     = LocalDateTimeUtils.format( endDay );
