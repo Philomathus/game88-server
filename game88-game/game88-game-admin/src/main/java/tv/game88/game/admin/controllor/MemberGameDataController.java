@@ -1,5 +1,6 @@
 package tv.game88.game.admin.controllor;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,9 @@ import java.util.List;
  * @author 77tv
  * @date 2021-01-29
  */
+@Log4j2
 @RestController
-@RequestMapping( "/member/memberGameData" )
+@RequestMapping ( "/member/memberGameData" )
 public class MemberGameDataController extends BaseController {
     @Resource
     private MemberGameDataService memberGameDataService;
@@ -34,20 +36,23 @@ public class MemberGameDataController extends BaseController {
     /**
      * 查询会员注单数据列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:gameData:list')" )
-    @GetMapping( "/list" )
+    @PreAuthorize ( "@ss.hasPermi('member:gameData:list')" )
+    @GetMapping ( "/list" )
     public RspBase<List<MemberGameData>> list( ReqMemberGameData reqMemberGameData ) {
+        long       a1         = System.currentTimeMillis();
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<MemberGameData> list = memberGameDataService.selectMemberGameDataList( reqMemberGameData );
+        long                 a2   = System.currentTimeMillis();
+        log.warn( "111:" + ( a2 - a1 ) );
         return getRspBasePage( list, pageDomain );
     }
 
     /**
      * 查询会员注单数据统计
      */
-    @PreAuthorize( "@ss.hasPermi('member:gameData:list')" )
-    @GetMapping( "/getCount" )
+    @PreAuthorize ( "@ss.hasPermi('member:gameData:list')" )
+    @GetMapping ( "/getCount" )
     public RspBase<MemberGameData> getCount( ReqMemberGameData reqMemberGameData ) {
         MemberGameData memberGameData = memberGameDataService.getCount( reqMemberGameData );
         return RspBase.ok( memberGameData );
@@ -56,16 +61,16 @@ public class MemberGameDataController extends BaseController {
     /**
      * 导出会员注单数据列表
      */
-    @PreAuthorize( "@ss.hasPermi('member:gameData:export')" )
-    @Log( title = "会员注单数据", businessType = BusinessType.EXPORT )
-    @GetMapping( "/export" )
+    @PreAuthorize ( "@ss.hasPermi('member:gameData:export')" )
+    @Log ( title = "会员注单数据", businessType = BusinessType.EXPORT )
+    @GetMapping ( "/export" )
     public void export( ReqMemberGameData reqMemberGameData, HttpServletResponse response ) {
         List<MemberGameData> list = memberGameDataService.selectMemberGameDataList( reqMemberGameData );
         ExportExcelUtil.exportExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
     }
 
-    @PreAuthorize( "@ss.hasPermi('member:gameData:recordList')" )
-    @GetMapping( value = "/recordList" )
+    @PreAuthorize ( "@ss.hasPermi('member:gameData:recordList')" )
+    @GetMapping ( value = "/recordList" )
     public RspBase<?> getGameRecordList( MemberGameData memberGameData ) {
         //        return memberGameDataService.getGameBetRecordData( memberGameData );
 
@@ -73,8 +78,8 @@ public class MemberGameDataController extends BaseController {
 
     }
 
-    @PreAuthorize( "@ss.hasPermi('member:gameData:detailList')" )
-    @GetMapping( value = "/detailList" )
+    @PreAuthorize ( "@ss.hasPermi('member:gameData:detailList')" )
+    @GetMapping ( value = "/detailList" )
     public RspBase<?> getGameDetailList( MemberGameData memberGameData ) {
         return getRspBasePage( memberGameDataService.getGameBetDetailData( memberGameData ) );
     }
