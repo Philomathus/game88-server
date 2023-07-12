@@ -92,6 +92,8 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                     }
                 }
             }
+            long               a5            = System.currentTimeMillis();
+            log.warn( "4:" + ( a5 - a4 ) );
         }
         return memberGameData;
     }
