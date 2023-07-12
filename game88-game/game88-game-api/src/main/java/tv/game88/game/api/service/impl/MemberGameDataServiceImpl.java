@@ -68,13 +68,20 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
     @Override
     public List<MemberGameData> selectMemberGameDataList( ReqMemberGameData reqMemberGameData ) {
         pingjieReq( reqMemberGameData );
+        long                 a1             = System.currentTimeMillis();
         List<MemberGameData> memberGameData = this.baseMapper.selectMemberGameDataList( reqMemberGameData );
+        long                 a2             = System.currentTimeMillis();
+        log.warn( "1:" + ( a2 - a1 ) );
         if ( CollectionUtils.isNotEmpty( memberGameData ) ) {
             Set<Integer> platformIds = memberGameData.stream().map( MemberGameData::getPlatformId ).collect( Collectors.toSet() );
             // 排除 热门游戏/老棋牌游戏/老电子游戏
-            List<GameInfo>     gameInfos         = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
-            List<GamePlatform> gamePlatforms     = new QueryChainWrapper<>( gamePlatformMapper ).list();
-            Map<Long, String>  gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId, GamePlatform::getName ) );
+            List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper ).in( "platform_id", platformIds ).list();
+            long           a3        = System.currentTimeMillis();
+            log.warn( "2:" + ( a3 - a2 ) );
+            List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+            long               a4            = System.currentTimeMillis();
+            log.warn( "3:" + ( a4 - a3 ) );
+            Map<Long, String> gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId, GamePlatform::getName ) );
             for ( MemberGameData memberGameDatum : memberGameData ) {
                 memberGameDatum.setPlatformName( gamePlatformIdMap.get( memberGameDatum.getPlatformId().longValue() ) );
                 for ( GameInfo gameInfo : gameInfos ) {
