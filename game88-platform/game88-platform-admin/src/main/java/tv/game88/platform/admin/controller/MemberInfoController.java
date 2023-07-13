@@ -500,6 +500,7 @@ public class MemberInfoController extends BaseController {
     }
 
     @Log( title = "更新总代码和VIP级别", businessType = BusinessType.UPDATE )
+    @PreAuthorize( "@ss.hasPermi('member:memberInfo:editCode')" )
     @PutMapping("/updateCodeTotal")
     public RspBase<?> updateCodeTotal( @RequestBody MemberInfo memberInfo ) {
         return RspBase.ok(memberInfoService.updateCodeTotalVipLevel( memberInfo ));
