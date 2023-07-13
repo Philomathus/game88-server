@@ -17,11 +17,13 @@ public interface MemberRechargeOnlineMapper extends BaseMapper<MemberRechargeOnl
 
     Map listCount( ReqMemberRechargeOnline req );
 
-    List<RspWithdrawRechargeDetail> selectRspDetail( @Param( "memberId" ) String memberId );
+    List<RspWithdrawRechargeDetail> selectRspDetail( @Param ( "memberId" ) String memberId );
 
-    MemberRechargeOnline selectMemberRechargeOnlineById(String id);
+    MemberRechargeOnline selectMemberRechargeOnlineById( String id );
 
     List<RspRechargeOnline> selectRspReportList( ReqMemberRechargeOnline req );
 
     Map reportListCount( ReqMemberRechargeOnline req );
+
+    int successTodayCount( @Param ( "memberId" ) String memberId, @Param ( "platformId" ) Long platformId );
 }
