@@ -499,7 +499,7 @@ public class MemberInfoController extends BaseController {
         return toResult( isUpdate );
     }
 
-    @Log( title = "更新总代码和VIP级别", businessType = BusinessType.UPDATE )
+    @Log( title = "修改总打码和VIP等级", businessType = BusinessType.UPDATE )
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:editCode')" )
     @PutMapping("/updateCodeTotal")
     public RspBase<?> updateCodeTotal( @RequestBody MemberInfo memberInfo ) {
