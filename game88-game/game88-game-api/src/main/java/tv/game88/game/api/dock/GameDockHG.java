@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.HG + "GameProcessor" )
+@Repository ( value = ConstantsGame.HG + "GameProcessor" )
 public class GameDockHG extends AbstractGameDock {
     private static final String MODE = "2";
 
@@ -39,7 +39,7 @@ public class GameDockHG extends AbstractGameDock {
     @Override
     public void createAccount( ReqJoinGame reqJoinGame ) {
         if ( redisUtils.sIsMember(
-                Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), "ALTUENO_" + reqJoinGame.getGameMemberId() ) ) {
+                Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
             return;
         }
         String              url    = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
@@ -64,16 +64,22 @@ public class GameDockHG extends AbstractGameDock {
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
-        if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
-            Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
-            if ( !CollectionUtils.isEmpty( result ) ) {
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String code = resultMap.get( "code" ).toString();
+            if ( "0".equals( code ) ) {
+                Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+                if ( !CollectionUtils.isEmpty( result ) ) {
+                    redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
+                    return;
+                }
+            } else if ( "EX001".equals( code ) ) {
                 redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
                 return;
             }
@@ -109,13 +115,13 @@ public class GameDockHG extends AbstractGameDock {
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.get( "code" ).toString() ) ) {
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
@@ -253,13 +259,13 @@ public class GameDockHG extends AbstractGameDock {
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
@@ -296,13 +302,13 @@ public class GameDockHG extends AbstractGameDock {
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
