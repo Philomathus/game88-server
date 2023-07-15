@@ -80,7 +80,7 @@ public class PayServiceImpl implements PayService {
             //移除 类型层级比会员vip层级大 的类型
             payTypeList.removeIf( payType -> payType.getOpenLevelMin() != null && payType.getOpenLevelMax() != null
                     && platformUser.getVip() != null && ( platformUser.getVip() < payType.getOpenLevelMin()
-                                                                  || platformUser.getVip() > payType.getOpenLevelMax() ) );
+                    || platformUser.getVip() > payType.getOpenLevelMax() ) );
             payTypeList.removeIf( payType -> payType.getType() == 2 && platformUser.getStatus() == 6 );
             payTypeList.removeIf( payType -> "1".equals( deviceType ) && StringUtils.isNotBlank( payType.getDeviceType() )
                     && !payType.getDeviceType().contains( "1" ) ); //移除ios外的支付类型
@@ -142,7 +142,7 @@ public class PayServiceImpl implements PayService {
             // 35是新火箭支付平台ID，0.85是扣除15%费率后的值，判断下单金额扣除15%费率后是否与实际金额相等，不相等拒绝回调
             if ( memberRechargeOnline.getPlatformId() == -1 ) {
                 if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) )
-                                         .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
+                        .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
                     log.warn( "下单金额与实际金额不符拒绝回调 - orderNo:{};money:{};subMoney:{}", memberRechargeOnline.getOrderNo(),
                             memberRechargeOnline.getMoney(), memberRechargeOnline.getRealMoney() );
                     return notifyResultWays[ 1 ];
@@ -164,7 +164,7 @@ public class PayServiceImpl implements PayService {
     }
 
 
-    @Transactional( rollbackFor = Exception.class )
+    @Transactional ( rollbackFor = Exception.class )
     public void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String mark ) {
         //更新支付订单状态
         MemberRechargeOnline updatePayJour = new MemberRechargeOnline();
@@ -188,15 +188,50 @@ public class PayServiceImpl implements PayService {
 
         //支付通道优惠比例
         BigDecimal chargeGive = null;
-        PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
-        if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
-            chargeGive = configEnvCacheUtil.getConfBd( "vippay_rate" ).multiply( payJourMoney )
-                                           .setScale( 2, RoundingMode.HALF_UP );
-        } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
-            chargeGive = new BigDecimal( payChannel.getDiscountBill() ).multiply( payJourMoney )
-                                                                       .setScale( 2, RoundingMode.HALF_UP );
-        } else {
-            chargeGive = new BigDecimal( 0 );
+
+        String firstRechargeRate = configEnvCacheUtil.getConf( "pay_first_recharge_rate" );
+        String nextRechargeRate  = configEnvCacheUtil.getConf( "pay_next_recharge_rate" );
+
+        if ( StringUtils.isNotBlank( firstRechargeRate ) && StringUtils.isNotBlank( nextRechargeRate ) ) {
+            String[] payFirstPlatformRates = firstRechargeRate.split( ";" );
+
+            String[] payNextPlatformRates = nextRechargeRate.split( ";" );
+
+            for ( String payPlatformRate : payFirstPlatformRates ) {
+                String[] firstPaySplit = payPlatformRate.split( "," );
+                if ( memberRechargeOnline.getPlatformId().toString().equals( firstPaySplit[ 0 ] )
+                        && memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(), memberRechargeOnline.getPlatformId() ) == 0 ) {
+                    BigDecimal firstRate = new BigDecimal( firstPaySplit[ 1 ] );
+                    chargeGive = payJourMoney.multiply( firstRate ).setScale( 2, RoundingMode.HALF_UP );
+                    log.warn( "首冲 {},{},{}", chargeGive, memberRechargeOnline.getPlatformId(), memberInfo.getId() );
+                    break;
+                }
+            }
+            if ( chargeGive == null ) {
+                for ( String payPlatformRate : payNextPlatformRates ) {
+                    String[] firstPaySplit = payPlatformRate.split( "," );
+                    if ( memberRechargeOnline.getPlatformId().toString().equals( firstPaySplit[ 0 ] )
+                            && memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(), memberRechargeOnline.getPlatformId() ) > 0 ) {
+                        BigDecimal firstRate = new BigDecimal( firstPaySplit[ 1 ] );
+                        chargeGive = payJourMoney.multiply( firstRate ).setScale( 2, RoundingMode.HALF_UP );
+                        log.warn( "每笔 {},{},{}", chargeGive, memberRechargeOnline.getPlatformId(), memberInfo.getId() );
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ( chargeGive == null ) {
+            PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
+            if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
+                chargeGive = configEnvCacheUtil.getConfBd( "vippay_rate" ).multiply( payJourMoney )
+                        .setScale( 2, RoundingMode.HALF_UP );
+            } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
+                chargeGive = new BigDecimal( payChannel.getDiscountBill() ).multiply( payJourMoney )
+                        .setScale( 2, RoundingMode.HALF_UP );
+            } else {
+                chargeGive = new BigDecimal( 0 );
+            }
         }
 
         //套利号无优惠
@@ -252,13 +287,13 @@ public class PayServiceImpl implements PayService {
     }
 
     @Override
-    @Transactional( rollbackFor = Exception.class )
+    @Transactional ( rollbackFor = Exception.class )
     public void payQuery10Min() throws Exception {
         QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>().eq( "status", -1 )
-                                                                                                  .le( "pay_time",
-                                                                                                          LocalDateTimeUtils.format( LocalDateTime
-                                                                                                          .now()
-                                                                                                          .minusMinutes( 10 ) ) );
+                .le( "pay_time",
+                        LocalDateTimeUtils.format( LocalDateTime
+                                .now()
+                                .minusMinutes( 10 ) ) );
         List<MemberRechargeOnline> memberRechargeOnlineList = memberRechargeOnlineMapper.selectList( queryWrapper );
         for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlineList ) {
             MemberRechargeOnline update = new MemberRechargeOnline();
