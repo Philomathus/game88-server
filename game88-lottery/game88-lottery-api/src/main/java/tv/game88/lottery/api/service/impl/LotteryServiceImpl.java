@@ -73,9 +73,9 @@ public class LotteryServiceImpl implements LotteryService {
     @Resource
     private ExLotteryFactoryUtil exLotteryFactoryUtil;
 
-    @Value( "${spring.profiles.active}" )
+    @Value ( "${spring.profiles.active}" )
     private String profile;
-    @Value( "${lotteryCenter:8800}" )
+    @Value ( "${lotteryCenter:8800}" )
     private String lotteryAgent;
 
     /**
@@ -157,24 +157,24 @@ public class LotteryServiceImpl implements LotteryService {
         if ( betRecord.getCode() != null ) {
             int kindId = LotteryUtils.getKindId( lotteryId );
             switch ( kindId ) {
-            case 1:
-                //betRecord.setAnalyse( Ex11xuan5.concatBetString(betMap));
-                break;
-            case 4:
-                String[] s = betRecord.getCode().split( " " );
-                String tarCode = s[ s.length - 1 ];
-                betRecord.setAnalyse( Ex6HeCai.getShengXiao( tarCode ) );
-                break;
-            case 2:
-                int total = Arrays.stream( betRecord.getCode().split( " " ) ).mapToInt( Integer::parseInt ).sum();
-                betRecord.setAnalyse( ExKuai3.getZongDaXiao( total ) + "" + ExKuai3.getZongDanShuang( total ) );
-                break;
-            case 3:
-                //betRecord.setAnalyse( ExSanChe.concatBetString(betMap));
-                break;
-            case 0:
-                //betRecord.setAnalyse( ExShiShiCai.concatBetString(betMap));
-                break;
+                case 1:
+                    //betRecord.setAnalyse( Ex11xuan5.concatBetString(betMap));
+                    break;
+                case 4:
+                    String[] s = betRecord.getCode().split( " " );
+                    String tarCode = s[ s.length - 1 ];
+                    betRecord.setAnalyse( Ex6HeCai.getShengXiao( tarCode ) );
+                    break;
+                case 2:
+                    int total = Arrays.stream( betRecord.getCode().split( " " ) ).mapToInt( Integer::parseInt ).sum();
+                    betRecord.setAnalyse( ExKuai3.getZongDaXiao( total ) + "" + ExKuai3.getZongDanShuang( total ) );
+                    break;
+                case 3:
+                    //betRecord.setAnalyse( ExSanChe.concatBetString(betMap));
+                    break;
+                case 0:
+                    //betRecord.setAnalyse( ExShiShiCai.concatBetString(betMap));
+                    break;
             }
         }
     }
@@ -360,7 +360,7 @@ public class LotteryServiceImpl implements LotteryService {
                 resultList = ( List<String> ) resultMap.get( "resultsList" );
 
                 totalPrize = ( BigDecimal ) resultMap.get( "totalPrize" );
-                killRate   = ( BigDecimal ) resultMap.get( "killRate" );
+                killRate = ( BigDecimal ) resultMap.get( "killRate" );
             } else {
                 String result = countLotteryResultById( lotteryId, totalBet, info.getKillRate(), peiMap );
                 if ( result != null ) {
@@ -369,7 +369,7 @@ public class LotteryServiceImpl implements LotteryService {
 
                     resultList = Arrays.asList( re[ 0 ].split( "-" ) );
                     totalPrize = new BigDecimal( re[ 2 ] );
-                    killRate   = new BigDecimal( re[ 1 ] );
+                    killRate = new BigDecimal( re[ 1 ] );
                 }
             }
             if ( resultList != null ) {
@@ -384,7 +384,7 @@ public class LotteryServiceImpl implements LotteryService {
         BigDecimal killNeed = BigDecimal.ZERO;
         BigDecimal prize    = BigDecimal.ZERO;
         if ( totalBet > 0 ) {
-            prize    = this.coutPrize( kindId, listTem, peiMap );
+            prize = this.coutPrize( kindId, listTem, peiMap );
             killNeed = totalBetBig.subtract( prize ).divide( totalBetBig, 2, RoundingMode.HALF_UP );
         }
         log.info( "投注金额{}小于免杀金额{},无杀派奖 historyId：{}", totalBetBig, info.getMinCost(), historyId );
@@ -395,6 +395,7 @@ public class LotteryServiceImpl implements LotteryService {
         ExLottery exLottery       = exLotteryFactoryUtil.createExProcessor( LotteryUtils.getKindId( lotteryId ) );
         String    concatBetString = exLottery.concatBetString( betMap );
         try {
+            log.warn( "11调用存储过程{},totalBet:{},killRate：{},betString:{}", lotteryId, totalBet, killRate, concatBetString );
             return lotteryHistoryMapper.countLotteryResult( lotteryId, totalBet, killRate, concatBetString, new HashMap<>() );
         } catch ( Exception e ) {
             log.error( "$$$###### {}调用存储过程出错,totalBet:{},killRate：{},betString:{}", lotteryId, totalBet, killRate,
@@ -659,7 +660,7 @@ public class LotteryServiceImpl implements LotteryService {
             updateList.add( updateBet );
 
             totalPrize = totalPrize.add( prize );
-            totalBet   = totalBet.add( bet.getCost() );
+            totalBet = totalBet.add( bet.getCost() );
         }
         LotteryBase lotteryBase = LotteryCacheUtils.me.getLotteryBase( lotteryId );
         lotteryHistoryService.awardByLotteryResult( updateList, prizeMap, result.getId(), nowMoney, lotteryBase.getName() );
@@ -678,7 +679,7 @@ public class LotteryServiceImpl implements LotteryService {
             }
 
             totalPrize = totalPrize.add( db.getTotalPrize() );
-            totalBet   = totalBet.add( new BigDecimal( db.getTotalBet() ) );
+            totalBet = totalBet.add( new BigDecimal( db.getTotalBet() ) );
             BigDecimal killRate = BigDecimal.ZERO;
             if ( totalBet.intValue() > 0 ) {
                 killRate = totalBet.subtract( totalPrize );
