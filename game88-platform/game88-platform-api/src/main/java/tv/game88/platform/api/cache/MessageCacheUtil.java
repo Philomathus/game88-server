@@ -15,7 +15,6 @@ import tv.game88.platform.api.mapper.MessageHomeNoticeMapper;
 import tv.game88.platform.api.mapper.MessageOnSiteMapper;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +65,10 @@ public class MessageCacheUtil {
             return result;
         }
         List<String> list = redisUtils.lRange( HOME_NOTICE, 0, -1 );
-        return list.stream().map( a -> JsonUtil.json2Object( a, RspMessageHomeNotice.class ) ).collect( Collectors.toList() );
+        return list
+                .stream()
+                .map( a -> JsonUtil.json2Object( a, RspMessageHomeNotice.class ) )
+                .collect( Collectors.toList() );
     }
 
     public List<RspMessageCommonProblem> getMessageCommonProblems() {
@@ -95,39 +97,22 @@ public class MessageCacheUtil {
             return result;
         }
         List<String> list = redisUtils.lRange( COMMON_PROBLEM, 0, -1 );
-        return list.stream().map( a -> JsonUtil.json2Object( a, RspMessageCommonProblem.class ) ).collect( Collectors.toList() );
+        return list
+                .stream()
+                .map( a -> JsonUtil.json2Object( a, RspMessageCommonProblem.class ) )
+                .collect( Collectors.toList() );
     }
 
-    public List<RspMessageOnSite> getMessageOnSites(String userId) {
-        Boolean exists = redisUtils.exists( ON_SITE );
-        if ( exists == null || !exists ) {
-            List<RspMessageOnSite> result = new QueryChainWrapper<>( messageOnSiteMapper )
-                    .eq("receiver_user_id", userId)
-                    .or().isNull("receiver_user_id")
-                    .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
-                    .orderByDesc( "create_time" )
-                    .list()
-                    .stream()
-                    .map( hn -> {
-                        RspMessageOnSite rsp = new RspMessageOnSite();
-                        BeanUtils.copyProperties( hn, rsp );
-                        return rsp;
-                    } )
-                    .collect( Collectors.toList() );
-            if ( result.size() > 0 ) {
-                if ( redisUtils.lock( ON_SITE, 3 ) ) {
-                    redisUtils.lRightPushAll( ON_SITE, result
-                            .stream()
-                            .map( JsonUtil::object2Json )
-                            .collect( Collectors.toList() ) );
-                    redisUtils.expire( ON_SITE, Duration.ofDays( 1 ) );
-                    redisUtils.unLock( ON_SITE );
-                }
-            }
-            return result;
-        }
-        List<String> list = redisUtils.lRange( ON_SITE, 0, -1 );
-        return list.stream().map( a -> JsonUtil.json2Object( a, RspMessageOnSite.class ) ).collect( Collectors.toList() );
+    public List<RspMessageOnSite> getMessageOnSites( String userId ) {
+        return new QueryChainWrapper<>( messageOnSiteMapper )
+                .eq( "receiver_user_id", userId ).or().isNull( "receiver_user_id" )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .orderByDesc( "create_time" )
+                .list().stream().map( hn -> {
+                    RspMessageOnSite rsp = new RspMessageOnSite();
+                    BeanUtils.copyProperties( hn, rsp );
+                    return rsp;
+                } ).collect( Collectors.toList() );
     }
 
     public void clear( String key ) {
