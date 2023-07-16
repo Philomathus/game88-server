@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.BBIN + "GameProcessor" )
+@Repository ( value = ConstantsGame.BBIN + "GameProcessor" )
 public class GameDockBBIN extends AbstractGameDock {
 
     private static final String CREATE_SESSION_KEY8 = "0P2McG5jG";
@@ -64,13 +64,13 @@ public class GameDockBBIN extends AbstractGameDock {
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
@@ -94,7 +94,7 @@ public class GameDockBBIN extends AbstractGameDock {
         String gameUrlId   = null;
         String gameUrlKind = null;
         if ( reqJoinGame.getKindId().contains( "-" ) ) {
-            gameUrlId   = reqJoinGame.getKindId().split( "-" )[ 0 ];
+            gameUrlId = reqJoinGame.getKindId().split( "-" )[ 0 ];
             gameUrlKind = reqJoinGame.getKindId().split( "-" )[ 1 ];
         }
 
@@ -123,13 +123,13 @@ public class GameDockBBIN extends AbstractGameDock {
         log.warn( uriComponents.toUri().toString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
                 .getOrDefault( "result", "false" )
                 .toString() ) ) {
@@ -139,6 +139,8 @@ public class GameDockBBIN extends AbstractGameDock {
                 String              mobile  = dataMap.getOrDefault( "mobile", "" ).toString();
                 String              html5   = dataMap.getOrDefault( "html5", "" ).toString();
                 reqJoinGame.setGameUrl( StringUtils.isBlank( mobile ) ? html5 : mobile );
+                log.info( reqJoinGame.getGameCategory().getDes()
+                        + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
@@ -171,13 +173,13 @@ public class GameDockBBIN extends AbstractGameDock {
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
                     response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return JsonUtil.json2Map( text );
-            } );
+                        InputStream bodyStream = response.getBody();
+                        String      text;
+                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                            text = IOUtils.toString( reader );
+                        }
+                        return JsonUtil.json2Map( text );
+                    } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "上分失败" );
@@ -218,13 +220,13 @@ public class GameDockBBIN extends AbstractGameDock {
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
                     response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return JsonUtil.json2Map( text );
-            } );
+                        InputStream bodyStream = response.getBody();
+                        String      text;
+                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                            text = IOUtils.toString( reader );
+                        }
+                        return JsonUtil.json2Map( text );
+                    } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + "下分失败" );
@@ -259,13 +261,13 @@ public class GameDockBBIN extends AbstractGameDock {
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
@@ -296,13 +298,13 @@ public class GameDockBBIN extends AbstractGameDock {
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+                    InputStream bodyStream = response.getBody();
+                    String      text;
+                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                        text = IOUtils.toString( reader );
+                    }
+                    return JsonUtil.json2Map( text );
+                } );
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap
