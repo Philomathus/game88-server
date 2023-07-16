@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.platform.api.cache.MessageCacheUtil;
+import tv.game88.platform.api.dto.MessageReceiverId;
 import tv.game88.platform.api.dto.RspMessageCommonProblem;
 import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
@@ -46,7 +47,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<RspMessageOnSite> getMessageOnSites(String userId) {
-        return messageCacheUtil.getMessageOnSites(userId);
+    public List<RspMessageOnSite> getMessageOnSites( String userId ) {
+        return messageCacheUtil.getMessageOnSites( userId );
     }
 }

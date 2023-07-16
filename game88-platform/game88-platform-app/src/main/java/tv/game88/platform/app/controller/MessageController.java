@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.session.utils.MemberSecurityUtils;
+import tv.game88.platform.api.dto.MessageReceiverId;
 import tv.game88.platform.api.dto.RspMessageCommonProblem;
 import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
@@ -47,7 +49,7 @@ public class MessageController extends BaseController {
     @Operation( summary = "获取站内信息列表" )
     @PostMapping( "/getMessageOnSites" )
     public RspBase<List<RspMessageOnSite>> getOnSiteMessages() {
-//        String userId = MemberSecurityUtils.getUserId();
-        return RspBase.ok( messageService.getMessageOnSites("M10098") );
+        String userId = MemberSecurityUtils.getUserId();
+        return RspBase.ok( messageService.getMessageOnSites( userId ) );
     }
 }
