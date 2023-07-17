@@ -13,4 +13,17 @@
 
     <name>Game88 Server Wallet Admin</name>
     <description>88棋牌服务-虚拟钱包Admin服务</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>tv.game88.wallet</groupId>
+            <artifactId>game88-wallet-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-admin</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 </project>
