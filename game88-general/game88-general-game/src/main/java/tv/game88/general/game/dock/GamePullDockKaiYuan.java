@@ -109,6 +109,8 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
             } else {
                 log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::" + JsonUtil.object2Json( resultMap ) );
             }
+        } else {
+            log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         }
         return null;
     }
