@@ -34,7 +34,7 @@ public class XiaoMaPayProcessor extends AbstractPay {
     @Override
     public String orderPay(PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
         Map<String, Object> params = new TreeMap<>();
-        params.put("mchId", payChannel.getId());
+        params.put("mchId",  payPlatform.getMerId() );
         params.put("productId", payChannel.getChannelCode() );
         params.put("mchOrderNo", reqPayRecharge.getOrderNo());
         params.put("amount", reqPayRecharge.getMoney().multiply( BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).intValue());
