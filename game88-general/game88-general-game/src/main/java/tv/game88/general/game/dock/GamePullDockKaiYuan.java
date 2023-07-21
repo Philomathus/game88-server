@@ -70,6 +70,8 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
                 .queryParams( requestMap )
                 .build( true );
 
+        log.warn( uriComponents.toUriString() );
+
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
                 response -> {
                     InputStream bodyStream = response.getBody();
