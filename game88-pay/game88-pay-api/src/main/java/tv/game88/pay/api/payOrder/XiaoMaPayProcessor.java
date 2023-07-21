@@ -39,9 +39,9 @@ public class XiaoMaPayProcessor extends AbstractPay {
         params.put("mchOrderNo", reqPayRecharge.getOrderNo());
         params.put("amount", reqPayRecharge.getMoney().multiply( BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).intValue());
 
-        params.put("notifyUrl", configEnvCacheUtil.getConf("payCallbackUrl") + "&key=" + payPlatform.getCode());
+        params.put("notifyUrl", configEnvCacheUtil.getConf("payCallbackUrl") +  payPlatform.getCode());
 
-        String signStr = this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
         params.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
