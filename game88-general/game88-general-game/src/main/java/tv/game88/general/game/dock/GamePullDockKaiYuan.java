@@ -63,6 +63,8 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
+        log.warn( JsonUtil.object2Json( requestMap ) );
+
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getRecordUrl() )
                 .queryParams( requestMap )
