@@ -5,10 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
@@ -25,7 +21,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPay.QIDIAN_PAY + "Processor" )
+@Repository ( value = ConstantsPay.QIDIAN_PAY + "Processor" )
 @Log4j2
 public class QiDianPayProcessor extends AbstractPay {
     @Override
@@ -40,7 +36,7 @@ public class QiDianPayProcessor extends AbstractPay {
         params.put( "out_trade_no", reqPayRecharge.getOrderNo() );
         params.put( "trade_type", payChannel.getChannelCode() );
         params.put( "total_amount", reqPayRecharge.getMoney().multiply( BigDecimal.valueOf( 100 ) )
-                                                  .setScale( 0, RoundingMode.HALF_UP ) );
+                .setScale( 0, RoundingMode.HALF_UP ) );
 
         params.put( "notify_url", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
 
@@ -55,9 +51,8 @@ public class QiDianPayProcessor extends AbstractPay {
 
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", resultStr, payChannel.getChannelCode(), reqPayRecharge.getOrderNo() );
-        if ( resultStr.contains( "http" ) ) {
-            reqPayRecharge.setUrlType( 1 );
-            return resultStr;
+        if ( StringUtils.isNotEmpty( resultStr ) ) {
+            return filterSpecialStr( resultStr ).replaceAll( "&amp;", "&" );
         } else {
             // 存档失败原因
             reqPayRecharge.setFailReason( resultStr );
@@ -129,7 +124,7 @@ public class QiDianPayProcessor extends AbstractPay {
             String status = requestMap.getOrDefault( "trade_status", "" ).toString();
             if ( "SUCCESS".equals( status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( tradeNo );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "SUCCESS", "FAIL" },
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[]{ "SUCCESS", "FAIL" },
                         payChannel.getName() );
             }
         }
