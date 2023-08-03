@@ -62,6 +62,7 @@ public class MemberRechargeBankController extends BaseController {
     @Operation( summary = "银行卡充值" )
     @PostMapping( "/bankRecharge" )
     public RspBase<?> bankCardRecharge( @Validated @RequestBody ReqMemberCardRecharge req ) {
+        log.info( "the parameters are : {} ", req );
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
         return memberRechargeBankService.bankCardRecharge( platformUser, req );
     }
