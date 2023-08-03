@@ -469,25 +469,25 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         String[] bank_charge_limits = configEnvCacheUtil.getConf( "bank_charge_limit" ).split( "," );
         if ( payRechargeBank.getRechargeLimitMin() != null && payRechargeBank.getRechargeLimitMax() == null ) {
             if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMin() ) < 0 ) {
-                return RspBase.businessError( "最低充值金额1" + payRechargeBank.getRechargeLimitMin() + "元" );
+                return RspBase.businessError( "最低充值金额" + payRechargeBank.getRechargeLimitMin() + "元" );
             }
         } else if ( payRechargeBank.getRechargeLimitMin() == null && payRechargeBank.getRechargeLimitMax() != null ) {
             if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMax() ) > 0 ) {
-                return RspBase.businessError( "最高充值金额2" + payRechargeBank.getRechargeLimitMax() + "元" );
+                return RspBase.businessError( "最高充值金额" + payRechargeBank.getRechargeLimitMax() + "元" );
             }
         } else if ( payRechargeBank.getRechargeLimitMin() != null && payRechargeBank.getRechargeLimitMax() != null ) {
             if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMin() ) < 0 ) {
-                return RspBase.businessError( "最低充值金额3" + payRechargeBank.getRechargeLimitMin() + "元" );
+                return RspBase.businessError( "最低充值金额" + payRechargeBank.getRechargeLimitMin() + "元" );
             }
             if ( req.getRechargeMoney().compareTo( payRechargeBank.getRechargeLimitMax() ) > 0 ) {
-                return RspBase.businessError( "最高充值金额4" + payRechargeBank.getRechargeLimitMax() + "元" );
+                return RspBase.businessError( "最高充值金额" + payRechargeBank.getRechargeLimitMax() + "元" );
             }
         } else {
             if ( req.getRechargeMoney().compareTo( new BigDecimal( bank_charge_limits[ 0 ] ) ) < 0 ) {
-                return RspBase.businessError( "最低充值金额5" + bank_charge_limits[ 0 ] + "元" );
+                return RspBase.businessError( "最低充值金额" + bank_charge_limits[ 0 ] + "元" );
             }
             if ( req.getRechargeMoney().compareTo( new BigDecimal( bank_charge_limits[ 1 ] ) ) > 0 ) {
-                return RspBase.businessError( "最高充值金额6" + bank_charge_limits[ 1 ] + "元" );
+                return RspBase.businessError( "最高充值金额" + bank_charge_limits[ 1 ] + "元" );
             }
         }
         // 入款相同金额限制
