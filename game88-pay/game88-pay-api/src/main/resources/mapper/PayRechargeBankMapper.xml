@@ -22,6 +22,7 @@
         <result property="bankName" column="bank_name" />
         <result property="bankIcon" column="bank_icon" />
         <result property="sort" column="sort" />
+        <result property="text2" column="text2" />
     </resultMap>
 
     <sql id="selectPayRechargeBankVo">
