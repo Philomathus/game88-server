@@ -68,4 +68,7 @@ public class PayRechargeBank {
 
     @Excel( name = "排序" )
     private Integer       sort;
+
+    @Excel( name = "text2" )
+    private String text2;
 }

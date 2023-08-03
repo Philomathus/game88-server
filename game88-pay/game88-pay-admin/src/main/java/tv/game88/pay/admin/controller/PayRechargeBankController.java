@@ -117,4 +117,14 @@ public class PayRechargeBankController extends BaseController {
         return toResult( payRechargeBankService.updateById( update ) );
     }
 
+    /**
+     * 修改text2的状态
+     */
+    @PreAuthorize( "@ss.hasPermi('pay:payRechargeBank:edit')" )
+    @Log( title = "修改text2的状态", businessType = BusinessType.EFFECT )
+    @PutMapping( "/changeText" )
+    public RspBase<?> updateText( @RequestBody PayRechargeBank payRechargeBank ) {
+        return toResult( payRechargeBankService.updateById( payRechargeBank ) );
+    }
+
 }
