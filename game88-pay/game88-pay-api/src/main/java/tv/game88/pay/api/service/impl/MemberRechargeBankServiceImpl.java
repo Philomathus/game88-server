@@ -450,7 +450,6 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     @Override
     public RspBase<?> bankCardRecharge( PlatformUser platformUser, ReqMemberCardRecharge req ) {
         log.info( "testing2 {}" , req );
-        log.info(  req );
         if ( StringUtils.isBlank( req.getRechargeUserName() ) ) {
             return RspBase.businessError( "请输入真实的绑定银行卡姓名" );
         }
