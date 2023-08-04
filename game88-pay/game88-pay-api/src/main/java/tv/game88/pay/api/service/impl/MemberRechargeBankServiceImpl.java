@@ -115,22 +115,20 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             String bankChargeLimit = configEnvCacheUtil.getConf( "bank_charge_limit", "" );
             String domainValue     = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( RspPayRechargeBank rspPayRechargeBank : configBankList ) {
-                if ( StringUtils.isNotBlank( bankChargeLimit ) ) {
-                    if ( StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMin() )
-                            && StringUtils.isNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
-                        rspPayRechargeBank.setBankChargeLimit(
-                                rspPayRechargeBank.getRechargeLimitMin() + "," + bankChargeLimit.split( "," )[ 1 ] );
-                    } else if ( StringUtils.isNull( rspPayRechargeBank.getRechargeLimitMin() )
-                            && StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
-                        rspPayRechargeBank.setBankChargeLimit(
-                                bankChargeLimit.split( "," )[ 0 ] + "," + rspPayRechargeBank.getRechargeLimitMax() );
-                    } else if ( StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMin() )
-                            && StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
-                        rspPayRechargeBank.setBankChargeLimit(
-                                rspPayRechargeBank.getRechargeLimitMin() + "," + rspPayRechargeBank.getRechargeLimitMax() );
-                    } else {
-                        rspPayRechargeBank.setBankChargeLimit( bankChargeLimit );
-                    }
+                if ( StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMin() )
+                        && StringUtils.isNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
+                    rspPayRechargeBank.setBankChargeLimit(
+                            rspPayRechargeBank.getRechargeLimitMin() + "," + bankChargeLimit.split( "," )[ 1 ] );
+                } else if ( StringUtils.isNull( rspPayRechargeBank.getRechargeLimitMin() )
+                        && StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
+                    rspPayRechargeBank.setBankChargeLimit(
+                            bankChargeLimit.split( "," )[ 0 ] + "," + rspPayRechargeBank.getRechargeLimitMax() );
+                } else if ( StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMin() )
+                        && StringUtils.isNotNull( rspPayRechargeBank.getRechargeLimitMax() ) ) {
+                    rspPayRechargeBank.setBankChargeLimit(
+                            rspPayRechargeBank.getRechargeLimitMin() + "," + rspPayRechargeBank.getRechargeLimitMax() );
+                } else {
+                    rspPayRechargeBank.setBankChargeLimit( bankChargeLimit );
                 }
                 if ( rspPayRechargeBank.getBankAddress() == null ) {
                     rspPayRechargeBank.setBankAddress( "" );
