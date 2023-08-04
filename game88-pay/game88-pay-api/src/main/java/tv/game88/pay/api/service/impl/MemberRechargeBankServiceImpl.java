@@ -133,8 +133,8 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                 if ( rspPayRechargeBank.getBankAddress() == null ) {
                     rspPayRechargeBank.setBankAddress( "" );
                 }
-                if ( StringUtils.isNotBlank( rspPayRechargeBank.getBankIcon() ) && !rspPayRechargeBank.getBankIcon()
-                                                                                                      .startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( rspPayRechargeBank.getBankIcon() )
+                        && !rspPayRechargeBank.getBankIcon().startsWith( "http" ) ) {
                     rspPayRechargeBank.setBankIcon( domainValue + rspPayRechargeBank.getBankIcon() );
                 }
             }
