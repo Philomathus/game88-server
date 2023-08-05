@@ -24,7 +24,6 @@ import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.platform.api.cache.ActivityCacheUtil;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
