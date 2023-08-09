@@ -36,9 +36,9 @@
         <spring.boot.version>${project.parent.version}</spring.boot.version>
 
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
-        <mybatis-spring-boot-starter.version>2.3.0</mybatis-spring-boot-starter.version>
-        <pagehelper.starter.version>1.4.6</pagehelper.starter.version>
-        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <mybatis-spring-boot-starter.version>2.3.1</mybatis-spring-boot-starter.version>
+        <pagehelper.starter.version>1.4.7</pagehelper.starter.version>
+        <mybatis-plus.version>3.5.3.2</mybatis-plus.version>
 
         <springdoc.version>1.7.0</springdoc.version>
         <swagger-api.version>2.2.9</swagger-api.version>
