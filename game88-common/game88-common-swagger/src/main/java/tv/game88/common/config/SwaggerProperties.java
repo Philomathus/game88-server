@@ -39,7 +39,7 @@ public class SwaggerProperties {
     /**
      * 描述
      */
-    private String description = "Spring Boot Plugin Swagger 2 Web Api Documentation";
+    private String description = "Spring Boot Plugin Swagger 3 Web Api Documentation";
 
     /**
      * 服务条款地址
