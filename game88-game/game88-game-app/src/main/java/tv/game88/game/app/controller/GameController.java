@@ -21,16 +21,16 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@Tag( name = "游戏相关接口" )
+@Tag ( name = "游戏相关接口" )
 @Log4j2
 public class GameController extends BaseController {
     @Resource
     private GameService gameService;
 
-    @Operation( summary = "获取游戏分类列表" )
-    @PostMapping( "/getGameTypes" )
+    @Operation ( summary = "获取游戏分类列表" )
+    @PostMapping ( "/getGameTypes" )
     @Anonymous
-    public RspBase<RspGameTypes> getGameTypes( @RequestHeader( value = "version", required = false ) String version ) {
+    public RspBase<RspGameTypes> getGameTypes( @RequestHeader ( value = "version", required = false ) String version ) {
         RspGameTypes gameTypes = gameService.getGameTypes( version );
         if ( !CollectionUtils.isEmpty( gameTypes.getRspGameInfos() ) ) {
             for ( RspGameInfo gameInfo : gameTypes.getRspGameInfos() ) {
@@ -42,8 +42,8 @@ public class GameController extends BaseController {
         return RspBase.ok( gameTypes );
     }
 
-    @Operation( summary = "根据类型获取游戏列表" )
-    @PostMapping( "/getGameInfoList" )
+    @Operation ( summary = "根据类型获取游戏列表" )
+    @PostMapping ( "/getGameInfoList" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfoList( @Validated @RequestBody ReqGame req ) {
         List<RspGameInfo> gameInfos = gameService.getGameInfoList( req.getId() );
@@ -55,8 +55,8 @@ public class GameController extends BaseController {
         return RspBase.ok( gameInfos );
     }
 
-    @Operation( summary = "根据类型获取游戏列表-新" )
-    @PostMapping( "/getGameInfos" )
+    @Operation ( summary = "根据类型获取游戏列表-新" )
+    @PostMapping ( "/getGameInfos" )
     @Anonymous
     public RspBase<List<RspGameInfo>> getGameInfos( @Validated @RequestBody ReqGameInfo req ) {
         List<RspGameInfo> gameInfos = gameService.getGameInfos( req.getId(), req.getPid() );
@@ -68,8 +68,8 @@ public class GameController extends BaseController {
         return RspBase.ok( gameInfos );
     }
 
-    @Operation( summary = "根据类型获取游戏分组" )
-    @PostMapping( "/getGameInfoGroup" )
+    @Operation ( summary = "根据类型获取游戏分组" )
+    @PostMapping ( "/getGameInfoGroup" )
     @Anonymous
     public RspBase<List<RspGamePlatform>> getGameInfoGroup( @Validated @RequestBody ReqGame req ) {
         RspBase<List<RspGamePlatform>> gameInfoGroup = gameService.getGameInfoGroup( req.getId() );
@@ -87,41 +87,41 @@ public class GameController extends BaseController {
         return gameInfoGroup;
     }
 
+    @Operation ( summary = "进入游戏" )
+    @PostMapping ( "/joinGame" )
+    public RspBase<?> joinGame( @RequestHeader ( value = "dev", required = false ) Integer dev,
+                                @Validated @RequestBody ReqGame req ) {
+        return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser(), dev );
+    }
+
+    @Operation ( summary = "会员游戏下分" )
+    @PostMapping ( "/escGame" )
+    public RspBase<?> escGame( @Validated @RequestBody ReqGame req ) {
+        return gameService.escGame( req.getId(), MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation ( summary = "自主查询游戏余额" )
+    @PostMapping ( "/getGameBalance" )
+    public RspBase<List<RspGameMoney>> getGameBalance() {
+        return gameService.getGameBalance( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation ( summary = "自主游戏下分" )
+    @PostMapping ( "/gameWithdrawal" )
+    public RspBase<?> gameWithdrawal( @Validated @RequestBody ReqGame req ) {
+        return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
+    }
+
     // 获取游戏token,内部接口
-    @GetMapping( "/getGameToken" )
+    @GetMapping ( "/getGameToken" )
     @Hidden
     public RspBase<String> getGameToken( String agent, String gameCategory ) {
         return gameService.getGameTokenByAgent( agent, gameCategory );
     }
 
-    @Operation( summary = "进入游戏" )
-    @PostMapping( "/joinGame" )
-    public RspBase<?> joinGame( @RequestHeader( value = "dev", required = false ) Integer dev,
-                                @Validated @RequestBody ReqGame req ) {
-        return gameService.joinGame( req.getId(), MemberSecurityUtils.getLoginUser().getPlatformUser(), dev );
-    }
-
-    @Operation( summary = "会员游戏下分" )
-    @PostMapping( "/escGame" )
-    public RspBase<?> escGame( @Validated @RequestBody ReqGame req ) {
-        return gameService.escGame( req.getId(), MemberSecurityUtils.getUserId() );
-    }
-
-    @Operation( summary = "自主查询游戏余额" )
-    @PostMapping( "/getGameBalance" )
-    public RspBase<List<RspGameMoney>> getGameBalance() {
-        return gameService.getGameBalance( MemberSecurityUtils.getUserId() );
-    }
-
-    @Operation( summary = "自主游戏下分" )
-    @PostMapping( "/gameWithdrawal" )
-    public RspBase<?> gameWithdrawal( @Validated @RequestBody ReqGame req ) {
-        return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
-    }
-
-    @Operation( summary = "PG Verify Session" )
-    @PostMapping( value = "/VerifySession", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE } )
-    public RspBase<?> verifySession( @RequestParam( value = "trace_id" ) String traceId, @Validated ReqPGSoftGameData data ) {
+    @Operation ( summary = "PG Verify Session" )
+    @PostMapping ( value = "/VerifySession", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE } )
+    public RspBase<?> verifySession( @RequestParam ( value = "trace_id" ) String traceId, @Validated ReqPGSoftGameData data ) {
         return gameService.verify( traceId, data );
     }
 }
