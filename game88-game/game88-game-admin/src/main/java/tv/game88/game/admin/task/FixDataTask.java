@@ -31,9 +31,9 @@ public class FixDataTask {
     @Resource
     private MemberGameDataFixMapper memberGameDataFixMapper;
 
-    @Scheduled ( fixedDelay = 360000, initialDelay = 1 )
+    @Scheduled( cron = "0 * * * * ?")
     public void runTask() {
-        if ( !redisUtils.lock( "FixDataTask", 9999 ) ) {
+        if ( !redisUtils.lock( "FixDataTask", 99990 ) ) {
             return;
         }
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
