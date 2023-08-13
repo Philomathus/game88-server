@@ -116,7 +116,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         } else {
             log.error( JsonUtil.object2Json( resultMap ) + ":::" + wagerTypes[ 0 ] );
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
