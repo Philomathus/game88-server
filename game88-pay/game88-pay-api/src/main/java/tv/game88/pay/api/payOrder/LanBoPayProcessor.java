@@ -5,9 +5,12 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.RSACoder;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.ReqPayRecharge;
@@ -17,57 +20,47 @@ import tv.game88.pay.api.entity.PayPlatform;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @Repository(value = ConstantsPay.LAN_BO_PAY + "Processor")
 @Log4j2
 public class LanBoPayProcessor extends AbstractPay {
+
     @Override
     public String getName() {
-        return "兰博支付";
+        return "枫夜支付";
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String orderPay(PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge) {
-        Map<String, Object> params = new TreeMap<>();
-        params.put("merId", payPlatform.getMerId());
-        params.put("orderId", reqPayRecharge.getOrderNo());
-        params.put("orderAmt", reqPayRecharge.getMoney());
-        params.put("channel", payChannel.getChannelCode());
-        params.put("desc", "desc");
-        params.put("attch", "attch");
-        params.put("smstyle", "1");
-        params.put("userId", reqPayRecharge.getUserId());
-        params.put("ip", reqPayRecharge.getRealIp());
+        SortedMap<String, Object> params = new TreeMap<>();
+        params.put("mchId", payPlatform.getMerId());
+        params.put("productId", Integer.parseInt(payChannel.getChannelCode()));
+        params.put("mchOrderNo", reqPayRecharge.getOrderNo());
+        params.put("amount", reqPayRecharge.getMoney()
+              .multiply( BigDecimal.valueOf( 100 ) )
+              .setScale( 0, RoundingMode.HALF_UP )
+              .toString());
         params.put("notifyUrl", configEnvCacheUtil.getConf("payCallbackUrl") + payPlatform.getCode());
         params.put("returnUrl", configEnvCacheUtil.getConf("payReturnUrl"));
-        params.put("nonceStr", UUID.randomUUID().toString().replace("-", ""));
 
-        String tempStr = this.assemblyUrl(params) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
-        log.warn("Order: {}", tempStr);
-        String signUppercase = DigestUtils.md5Hex(tempStr).toUpperCase();
-        String sign = null;
-        try {
-            sign = RSACoder.signSha256Rsa(signUppercase, AESCoder.decrypt(payPlatform.getSignPrivateKey()));
-        } catch (Exception e) {
-            reqPayRecharge.setFailReason(e.getMessage());
-            return null;
-        }
-        params.put("sign", sign);
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String sign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        params.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap(payPlatform.getPayUrl(), packageForm(params), reqPayRecharge);
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn(payPlatform.getName()
                         + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json(resultMap), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo());
         if (!CollectionUtils.isEmpty(resultMap)) {
-            String code = resultMap.getOrDefault("code", "").toString();
-            if ("1".equals(code)) {
-                Map<String, Object> payParams = (Map<String, Object>) resultMap.get("data");
-                return payParams.get("payurl").toString();
+            if ("SUCCESS".equals(resultMap.get("retCode"))) {
+                Map urlsMap = (Map) resultMap.get("payParams");
+                return urlsMap.get("payUrl").toString();
             } else {
-                reqPayRecharge.setFailReason(resultMap.getOrDefault("msg", "").toString());
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
         }
         return null;
@@ -75,85 +68,86 @@ public class LanBoPayProcessor extends AbstractPay {
 
     @Override
     public boolean queryPay(MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel) {
-        SortedMap<String, Object> params = new TreeMap<>();
-        params.put("merId", payPlatform.getMerId());
-        params.put("orderId", memberRechargeOnline.getOrderNo());
-        params.put("nonceStr", UUID.randomUUID().toString().replace("-", ""));
-        String signStr = this.assemblyUrl(params) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
-        log.warn("Query: {}", signStr);
-        signStr = DigestUtils.md5Hex(signStr).toUpperCase();
-        try {
-            signStr = RSACoder.signSha256Rsa(signStr, AESCoder.decrypt(payPlatform.getSignPrivateKey()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        params.put("sign", signStr);
+        SortedMap<String, String> params = new TreeMap<>();
+        params.put("mchId", payPlatform.getMerId());
+        params.put("mchOrderNo", memberRechargeOnline.getOrderNo());
 
-        Map<String, Object> resultMap = this.sendPostMap(payPlatform.getQueryUrl(), packageForm(params), null);
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
+        params.put( "sign", sign );
+
+        MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
+        requestMap.setAll( params );
+
+        log.warn( JsonUtil.object2Json( requestMap ) );
+
+        UriComponents uriComponents = UriComponentsBuilder
+                .fromUriString( payPlatform.getQueryUrl() )
+                .queryParams( requestMap )
+                .build();
+
+        Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
+
 
         log.warn(payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
-        if (!CollectionUtils.isEmpty(resultMap) && "1".equals(resultMap.getOrDefault("code", -1).toString())) {
-            Map<String, Object> dataMap = (Map<String, Object>) resultMap.getOrDefault("data", new HashMap<>());
-            int status = Integer.parseInt(dataMap.getOrDefault("status", -1).toString());
-            if (status == 1) {
-                BigDecimal amount = new BigDecimal(dataMap.getOrDefault("orderAmt", 0).toString());
-                memberRechargeOnline.setRealMoney(amount.setScale(2, RoundingMode.HALF_UP));
-                return true;
+            String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
+            if (!CollectionUtils.isEmpty(resultMap) && "SUCCESS".equals(retCode)) {
+                BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
+                if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
+                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
+                    return true;
+                }
             }
-        }
         return false;
     }
 
     @Override
     public String callbackPay(Map<String, Object> requestMap, String realIp) {
-        String payOrderId = requestMap.getOrDefault("orderId", "").toString();
-        MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById(payOrderId);
 
-        if (memberRechargeOnline.getStatus() == 1) {
-            log.warn("订单已成功，无需继续回调 - orderNo:{}", payOrderId);
+        String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
+        String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
+        MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
+
+        if ( memberRechargeOnline.getStatus() == 1 ) {
+            log.warn( "订单已成功，无需继续回调 - orderNo:{}", mchOrderNo );
             return "success";
         }
 
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform(memberRechargeOnline.getPlatformId());
-        PayChannel payChannel = payCacheUtil.getPayChannel(memberRechargeOnline.getChannelId());
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( memberRechargeOnline.getPlatformId() );
+        PayChannel  payChannel  = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
 
-        String sign = requestMap.remove("sign").toString();
+        if ( this.verifyIP( requestMap, realIp, payPlatform ) ) {
+            return "fail";
+        }
+        if ( this.diffPayTime12Hour( memberRechargeOnline.getPayTime(), mchOrderNo ) ) {
+            return "fail";
+        }
+        if ( !payChannel.getCanCallback() ) {
+            log.warn( "平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), mchOrderNo );
+            return "fail";
+        }
+        String sign = requestMap.remove( "sign" ).toString();
         // 去除空值
-        requestMap.entrySet().removeIf(me -> me.getValue() == null || StringUtils.isBlank(me.getValue().toString()));
-        SortedMap<String, Object> bodyMap = new TreeMap<>(requestMap);
-        String signStr = this.assemblyUrl(bodyMap) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
-        log.warn("Callback: {}", signStr);
-        String rel = DigestUtils.md5Hex(signStr).toUpperCase();
+        requestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
 
-        log.info(payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel);
-        try {
-            if (!RSACoder.verifySha256Rsa(rel, AESCoder.decrypt(payPlatform.getSignPublicKey()), sign)) {
-                log.warn("验签失败");
-                return "fail";
+        SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
+
+        String signStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( signStr );
+        String rel = DigestUtils.md5Hex( signStr ).toUpperCase();
+        log.warn( rel + ":" + sign );
+
+        log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );
+        if ( rel.equalsIgnoreCase( sign ) ) {
+            String status = requestMap.getOrDefault( "status", 0 ).toString();
+            if ( ( "2".equals( status ) || "3".equals( status ) )
+                    && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
+                memberRechargeOnline.setUpperOrderNo( payOrderId );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
-        if (this.verifyIP(requestMap, realIp, payPlatform)) {
-            return "fail";
-        }
-        if (this.diffPayTime12Hour(memberRechargeOnline.getPayTime(), payOrderId)) {
-            return "fail";
-        }
-        if (!payChannel.getCanCallback()) {
-            log.warn("平台已拒绝三方支付通道回调 - 三方支付平台:{};三方支付编码:{};orderNo:{}", payPlatform.getName(), payChannel.getName(), payOrderId);
-            return "fail";
-        }
-
-        String status = requestMap.getOrDefault("status", 0).toString();
-        if (("1".equals(status)) && this.queryPay(memberRechargeOnline, payPlatform, payChannel)) {
-            memberRechargeOnline.setUpperOrderNo(requestMap.getOrDefault("sysOrderId", "").toString());
-            return payService.updatePayJourStatus(memberRechargeOnline, new String[]{"success", "fail"},
-                    payChannel.getName());
-        }
-        log.info(payPlatform.getName() + "回调验签失败");
+        log.info( payPlatform.getName() + "回调验签失败" );
         return "fail";
     }
-
 }
