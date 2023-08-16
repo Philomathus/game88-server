@@ -30,7 +30,7 @@ public class LanBoPayProcessor extends AbstractPay {
 
     @Override
     public String getName() {
-        return "枫夜支付";
+        return "兰博支付";
     }
 
     @Override
