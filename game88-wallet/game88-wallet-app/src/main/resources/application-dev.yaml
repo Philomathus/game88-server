@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://8.210.10.193:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+    url: jdbc:mysql://8.210.10.193:3306/wallet?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
     username: root
     password: f:e=h>EVUH,!N7zS&J`9
   redis:
