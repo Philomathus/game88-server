@@ -16,14 +16,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>tv.game88.common</groupId>
-            <artifactId>game88-common-redis</artifactId>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-config</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>tv.game88.common</groupId>
-            <artifactId>game88-common-orm</artifactId>
-            <version>1.0</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
         </dependency>
     </dependencies>
 
