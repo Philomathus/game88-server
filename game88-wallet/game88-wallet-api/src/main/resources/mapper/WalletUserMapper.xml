@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.wallet.api.mapper.WalletUserMapper">
+
+    <resultMap id="WalletUserResult" type="tv.game88.wallet.api.entity.WalletUser">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="secretKey" column="secret_key" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="amount" column="amount" jdbcType="DECIMAL"/>
+            <result property="fundPassword" column="fund_password" jdbcType="VARCHAR"/>
+            <result property="isVerified" column="is_verified" jdbcType="INTEGER"/>
+            <result property="verifiedTime" column="verified_time" jdbcType="TIMESTAMP"/>
+            <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+            <result property="idNumber" column="id_number" jdbcType="VARCHAR"/>
+            <result property="idFrontPic" column="id_front_pic" jdbcType="VARCHAR"/>
+            <result property="idBackPic" column="id_back_pic" jdbcType="VARCHAR"/>
+            <result property="creditRating" column="credit_rating" jdbcType="INTEGER"/>
+            <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
+            <result property="deviceId" column="device_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="selectWalletUserVo">
+        select id,
+               nick_name,
+               password,
+               secret_key,
+               phone,
+               amount,
+               fund_password,
+               is_verified,
+               verified_time,
+               real_name,
+               id_number,
+               id_front_pic,
+               id_back_pic,
+               credit_rating,
+               created_time,
+               status,
+               login_ip,
+               device_id
+        from wallet_user
+    </sql>
+</mapper>

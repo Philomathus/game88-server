@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.wallet.api.mapper.WalletTransactionMapper">
+
+    <resultMap id="WalletTransactionResult" type="tv.game88.wallet.api.entity.WalletTransaction">
+            <id property="transactionId" column="transaction_id" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+            <result property="payMethodType" column="pay_method_type"/>
+            <result property="payMethodId" column="pay_method_id" jdbcType="INTEGER"/>
+            <result property="canSplit" column="can_split" jdbcType="TINYINT"/>
+            <result property="amount" column="amount" jdbcType="DECIMAL"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="successTransTime" column="success_trans_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="selectWalletTransactionVo">
+        select transaction_id,
+               user_id,
+               pay_method_type,
+               pay_method_id,
+               can_split,
+               amount,
+               status,
+               create_time,
+               success_trans_time
+        from wallet_transaction
+    </sql>
+</mapper>
