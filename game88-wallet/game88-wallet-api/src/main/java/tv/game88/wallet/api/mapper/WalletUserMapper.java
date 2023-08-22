@@ -3,6 +3,7 @@ package tv.game88.wallet.api.mapper;
 import org.apache.ibatis.annotations.Param;
 import tv.game88.wallet.api.entity.WalletUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tv.game88.wallet.api.vo.PlatformUser;
 
 import java.math.BigDecimal;
 
@@ -23,6 +24,8 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     int addChargeMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal addMoney );
 
     int reduceSaleMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal reduceMoney );
+
+    PlatformUser selectPlatformUserByUserId( @Param( "userId" ) String userId );
 }
 
 

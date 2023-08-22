@@ -57,6 +57,12 @@
         where id = #{userId}
     </select>
 
+    <select id="selectPlatformUserByUserId" resultType="tv.game88.wallet.api.vo.PlatformUser">
+        select id, nick_name, status, password
+        from wallet_user
+        where id = #{userId}
+    </select>
+
     <update id="addMoney">
         update wallet_user
         set amount = amount + #{money}

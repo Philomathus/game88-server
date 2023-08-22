@@ -13,4 +13,34 @@
 
     <name>Game88 Server Wallet App</name>
     <description>88棋牌服务-虚拟钱包App服务</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>tv.game88.wallet</groupId>
+            <artifactId>game88-wallet-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-security</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!--Token生成与解析-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 </project>
