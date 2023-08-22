@@ -12,17 +12,19 @@ import java.util.Objects;
  */
 @Getter
 public enum WalletUserFundEnum {
-    TRANSFER_IN( 1, "资金转入" ),
+    TRANSFER_IN( 1, "资金转入", false ),
 
-    TRANSFER_OUT( -1, "资金转出" ),
+    TRANSFER_OUT( -1, "资金转出", false ),
     ;
 
     private Integer type;
     private String  des;
+    private Boolean isTransaction;
 
-    WalletUserFundEnum( Integer type, String des ) {
-        this.type = type;
-        this.des  = des;
+    WalletUserFundEnum( Integer type, String des, Boolean isTransaction ) {
+        this.type          = type;
+        this.des           = des;
+        this.isTransaction = isTransaction;
     }
 
     public static WalletUserFundEnum getByType( Integer type ) {

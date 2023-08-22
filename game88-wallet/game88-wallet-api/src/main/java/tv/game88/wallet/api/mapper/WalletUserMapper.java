@@ -19,6 +19,10 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     int addMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal addMoney );
 
     int reduceMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal reduceMoney );
+
+    int addChargeMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal addMoney );
+
+    int reduceSaleMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal reduceMoney );
 }
 
 

@@ -69,4 +69,19 @@
         where id = #{userId}
           and amount - #{money} >= 0
     </update>
+
+    <update id="addChargeMoney">
+        update wallet_user
+        set amount = amount + #{money},
+            total_charge = total_charge + #{money}
+        where id = #{userId}
+    </update>
+
+    <update id="reduceSaleMoney">
+        update wallet_user
+        set amount = amount - #{money},
+            total_sale = total_sale + #{money}
+        where id = #{userId}
+          and amount - #{money} >= 0
+    </update>
 </mapper>

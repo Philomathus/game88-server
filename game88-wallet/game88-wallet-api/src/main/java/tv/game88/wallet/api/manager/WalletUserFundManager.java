@@ -39,7 +39,12 @@ public class WalletUserFundManager {
         }
         BigDecimal userBalance = walletUserMapper.getUserMoney( userId );
 
-        int updateMoney = walletUserMapper.addMoney( userId, addMoney );
+        int updateMoney;
+        if ( fundEnum.getIsTransaction() ) {
+            updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
+        } else {
+            updateMoney = walletUserMapper.addMoney( userId, addMoney );
+        }
 
         //日志
         WalletFundLog log = new WalletFundLog();
@@ -79,7 +84,13 @@ public class WalletUserFundManager {
         }
         BigDecimal userMoney = walletUserMapper.getUserMoney( userId );
         //扣减金额
-        if ( walletUserMapper.reduceMoney( userId, reduceMoney ) <= 0 ) {
+        int reducedMoney;
+        if ( fundEnum.getIsTransaction() ) {
+            reducedMoney = walletUserMapper.reduceSaleMoney( userId, reduceMoney );
+        } else {
+            reducedMoney = walletUserMapper.reduceMoney( userId, reduceMoney );
+        }
+        if ( reducedMoney <= 0 ) {
             throw new NoMoneyException( "余额不足" );
         }
         //插入会员资金信息记录
