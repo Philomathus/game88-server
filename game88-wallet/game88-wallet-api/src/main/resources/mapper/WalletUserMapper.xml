@@ -5,24 +5,26 @@
 <mapper namespace="tv.game88.wallet.api.mapper.WalletUserMapper">
 
     <resultMap id="WalletUserResult" type="tv.game88.wallet.api.entity.WalletUser">
-            <id property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
-            <result property="password" column="password" jdbcType="VARCHAR"/>
-            <result property="secretKey" column="secret_key" jdbcType="VARCHAR"/>
-            <result property="phone" column="phone" jdbcType="VARCHAR"/>
-            <result property="amount" column="amount" jdbcType="DECIMAL"/>
-            <result property="fundPassword" column="fund_password" jdbcType="VARCHAR"/>
-            <result property="isVerified" column="is_verified" jdbcType="INTEGER"/>
-            <result property="verifiedTime" column="verified_time" jdbcType="TIMESTAMP"/>
-            <result property="realName" column="real_name" jdbcType="VARCHAR"/>
-            <result property="idNumber" column="id_number" jdbcType="VARCHAR"/>
-            <result property="idFrontPic" column="id_front_pic" jdbcType="VARCHAR"/>
-            <result property="idBackPic" column="id_back_pic" jdbcType="VARCHAR"/>
-            <result property="creditRating" column="credit_rating" jdbcType="INTEGER"/>
-            <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
-            <result property="status" column="status" jdbcType="INTEGER"/>
-            <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
-            <result property="deviceId" column="device_id" jdbcType="VARCHAR"/>
+        <id property="id" column="id" jdbcType="VARCHAR" />
+        <result property="nickName" column="nick_name" jdbcType="VARCHAR" />
+        <result property="password" column="password" jdbcType="VARCHAR" />
+        <result property="secretKey" column="secret_key" jdbcType="VARCHAR" />
+        <result property="phone" column="phone" jdbcType="VARCHAR" />
+        <result property="amount" column="amount" jdbcType="DECIMAL" />
+        <result property="fundPassword" column="fund_password" jdbcType="VARCHAR" />
+        <result property="isVerified" column="is_verified" jdbcType="INTEGER" />
+        <result property="verifiedTime" column="verified_time" jdbcType="TIMESTAMP" />
+        <result property="realName" column="real_name" jdbcType="VARCHAR" />
+        <result property="idNumber" column="id_number" jdbcType="VARCHAR" />
+        <result property="idFrontPic" column="id_front_pic" jdbcType="VARCHAR" />
+        <result property="idBackPic" column="id_back_pic" jdbcType="VARCHAR" />
+        <result property="creditRating" column="credit_rating" jdbcType="INTEGER" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="status" column="status" jdbcType="INTEGER" />
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
+        <result property="deviceId" column="device_id" jdbcType="VARCHAR" />
+        <result property="totalCharge" column="total_charge" jdbcType="DECIMAL" />
+        <result property="totalSale" column="total_sale" jdbcType="DECIMAL" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
@@ -43,7 +45,28 @@
                created_time,
                status,
                login_ip,
-               device_id
+               device_id,
+               total_charge,
+               total_sale
         from wallet_user
     </sql>
+
+    <select id="getUserMoney" resultType="java.math.BigDecimal">
+        select amount
+        from wallet_user
+        where id = #{userId}
+    </select>
+
+    <update id="addMoney">
+        update wallet_user
+        set amount = amount + #{money}
+        where id = #{userId}
+    </update>
+
+    <update id="reduceMoney">
+        update wallet_user
+        set amount = amount - #{money}
+        where id = #{userId}
+          and amount - #{money} >= 0
+    </update>
 </mapper>

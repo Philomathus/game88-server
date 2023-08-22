@@ -12,9 +12,9 @@ import java.util.Objects;
  */
 @Getter
 public enum WalletUserFundEnum {
-    TRANSFER_IN( 1, "转入" ),
+    TRANSFER_IN( 1, "资金转入" ),
 
-    TRANSFER_OUT( -1, "转出" ),
+    TRANSFER_OUT( -1, "资金转出" ),
     ;
 
     private Integer type;

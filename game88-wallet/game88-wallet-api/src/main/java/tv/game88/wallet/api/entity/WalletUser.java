@@ -109,4 +109,13 @@ public class WalletUser implements Serializable {
      * 设备ID
      */
     private String deviceId;
+
+    /**
+     * 累积充值金额
+     */
+    private BigDecimal totalCharge;
+    /**
+     * 累积出售金额
+     */
+    private BigDecimal totalSale;
 }
