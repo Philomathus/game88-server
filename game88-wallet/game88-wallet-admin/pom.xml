@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>tv.game88.core</groupId>
-            <artifactId>game88-core-admin</artifactId>
+            <artifactId>game88-core-admin-config</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

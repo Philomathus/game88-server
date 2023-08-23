@@ -1,4 +1,4 @@
-package tv.game88.platform.api.service.impl;
+package tv.game88.core.admin.service.impl;
 
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
@@ -24,10 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.service.UploadService;
 import tv.game88.core.config.cache.ConfigOssCacheUtil;
 import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
-import tv.game88.platform.api.service.UploadService;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;

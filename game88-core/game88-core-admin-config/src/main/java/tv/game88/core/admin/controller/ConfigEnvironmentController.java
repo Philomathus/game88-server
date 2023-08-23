@@ -1,4 +1,4 @@
-package tv.game88.platform.admin.controller;
+package tv.game88.core.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +14,8 @@ import tv.game88.core.admin.cache.DictUtils;
 import tv.game88.core.admin.entity.SysDictData;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.mapper.SysDictDataMapper;
+import tv.game88.core.admin.service.ConfigEnvironmentService;
 import tv.game88.core.config.entity.ConfigEnvironment;
-import tv.game88.platform.api.service.ConfigEnvironmentService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;

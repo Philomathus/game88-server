@@ -1,4 +1,4 @@
-package tv.game88.platform.admin.controller;
+package tv.game88.core.admin.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -6,9 +6,9 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.service.ConfigSmsService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigSms;
-import tv.game88.platform.api.service.ConfigSmsService;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;

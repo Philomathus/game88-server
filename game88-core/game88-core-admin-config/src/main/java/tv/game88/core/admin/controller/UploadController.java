@@ -1,4 +1,4 @@
-package tv.game88.platform.admin.controller;
+package tv.game88.core.admin.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.platform.api.service.UploadService;
+import tv.game88.core.admin.service.UploadService;
 
 import javax.annotation.Resource;
 import java.io.IOException;

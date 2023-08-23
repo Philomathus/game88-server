@@ -36,7 +36,6 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.member.cache.ConfigVipCacheUtils;
 import tv.game88.core.member.dto.*;
 import tv.game88.core.member.entity.*;
@@ -54,7 +53,6 @@ import tv.game88.platform.api.entity.MemberVipGift;
 import tv.game88.platform.api.entity.MobileLimit;
 import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.mapper.MobileLimitMapper;
-import tv.game88.platform.api.service.ConfigEnvironmentService;
 import tv.game88.platform.api.service.MemberInfoService;
 
 import javax.annotation.Resource;
@@ -77,21 +75,21 @@ import java.util.stream.Collectors;
 @Service( "memberInfoService" )
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo> implements MemberInfoService {
     @Resource
-    private RedisUtils          redisUtils;
+    private RedisUtils             redisUtils;
     @Resource
-    private ConfigEnvCacheUtil  configEnvCacheUtil;
+    private ConfigEnvCacheUtil     configEnvCacheUtil;
     @Resource
-    private RestTemplate        restTemplate;
+    private RestTemplate           restTemplate;
     @Resource
     private AuthenticationManager  authenticationManager;
     @Resource
     private SmsPhoneCacheUtil      smsPhoneCacheUtil;
     @Resource
-    private ConfigVipCacheUtils configVipCacheUtils;
+    private ConfigVipCacheUtils    configVipCacheUtils;
     @Resource
-    private SmsApi              smsApi;
+    private SmsApi                 smsApi;
     @Resource
-    private ForkJoinPool        forkJoinPool;
+    private ForkJoinPool           forkJoinPool;
     @Resource
     private MemberCardMapper       memberCardMapper;
     @Resource
@@ -106,11 +104,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private MobileLimitMapper      mobileLimitMapper;
     @Resource
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
     @Resource
-    private ConfigEnvironmentService configEnvironmentService;
-    @Resource
-    private MemberInfoMapper         memberInfoMapper;
+    private MemberInfoMapper       memberInfoMapper;
 
     @Value( "${im.tokenUrl:null}" )
     private String getImTokenUrl;
@@ -245,7 +240,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
-        setNextLevelIntegral(memberInfo, rspMember);
+        setNextLevelIntegral( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
     }
 
@@ -704,13 +699,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         BigDecimal total         = oldmemberInfo.getAccountNow();
 
         if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
-            String            addMoney;
-            ConfigEnvironment configEnvMoney = configEnvironmentService.selectConfigEnvironmentById( "addMoney" );
-            if ( configEnvMoney == null ) {
-                addMoney = "1000000";
-            } else {
-                addMoney = configEnvMoney.getEnvValue();
-            }
+            String addMoney = configEnvCacheUtil.getConf( "addMoney", "1000000" );
             if ( money.compareTo( new BigDecimal( Integer.parseInt( addMoney ) ) ) > 0 ) {
                 return RspBase.businessError( "最大金额为" + Integer.parseInt( addMoney ) );
             }
@@ -797,12 +786,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase<?> updateMobile( String oldMobile,String newMobile, String memberId) {
+    public RspBase<?> updateMobile( String oldMobile, String newMobile, String memberId ) {
         if ( this.baseMapper.exists( new QueryWrapper<MemberInfo>().eq( "phone", newMobile ) ) ) {
             return RspBase.businessError( "此手机号已经存在" );
         }
         MemberInfo memberInfo = new MemberInfo();
-        if( newMobile.length() != 11){
+        if ( newMobile.length() != 11 ) {
             return RspBase.businessError( "新手机号码长度不能是非11位" );
         }
         memberInfo.setPhone( newMobile );
@@ -855,8 +844,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 .eq( "bank_account", member.getBankAccount() ).list();
 
         List<MemberCard> memberCardListFiltered = memberCardList.stream()
-                                                                .filter( ( mc ) -> !mc.getId().equals( member.getId() )
-                                                                        && mc.getBankAccount().equals( member.getBankAccount() ) )
+                                                                .filter( ( mc ) -> !mc.getId().equals( member.getId() ) && mc
+                                                                        .getBankAccount().equals( member.getBankAccount() ) )
                                                                 .toList();
         if ( !memberCardListFiltered.isEmpty() && memberCardListFiltered.get( 0 ) != null ) {
             return RspBase.businessError( "卡已绑定帐号" + memberCardListFiltered.get( 0 ).getMemberId() );
@@ -1542,9 +1531,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         smsApi.sendMemSms( phone, msg );
     }
 
-    private void setNextLevelIntegral(MemberInfo memberInfo, RspMember rspMember) {
+    private void setNextLevelIntegral( MemberInfo memberInfo, RspMember rspMember ) {
         List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
+                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         for ( ConfigVip configVip : configVips ) {
             if ( memberInfo.getCodeTotal().compareTo( configVip.getBcode() ) < 0 ) {
                 rspMember.setNextLevelIntegral( configVip.getBcode().subtract( rspMember.getCodeTotal() ) );
@@ -1555,7 +1544,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<?> updateCodeTotalVipLevel( MemberInfo memberInfo ) {
-        if (memberInfoMapper.updateCodeTotalVipLevel(memberInfo) != 1) {
+        if ( memberInfoMapper.updateCodeTotalVipLevel( memberInfo ) != 1 ) {
             throw new BusinessException( "更新代码总数和vip级别失败" );
         }
         return RspBase.ok();

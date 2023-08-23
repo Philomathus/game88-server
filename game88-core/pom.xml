@@ -17,6 +17,7 @@
 
     <modules>
         <module>game88-core-admin</module>
+        <module>game88-core-admin-config</module>
         <module>game88-core-admin-dict</module>
         <module>game88-core-config</module>
         <module>game88-core-member</module>
