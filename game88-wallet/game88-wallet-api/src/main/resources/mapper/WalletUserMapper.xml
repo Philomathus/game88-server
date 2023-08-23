@@ -58,7 +58,7 @@
     </select>
 
     <select id="selectPlatformUserByUserId" resultType="tv.game88.wallet.api.vo.PlatformUser">
-        select id, nick_name, status, password
+        select id, nick_name, status, password, is_verified, credit_rating
         from wallet_user
         where id = #{userId}
     </select>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.platform.api.mapper.ConfigSmsFaillogMapper">
-    <resultMap type="tv.game88.platform.api.entity.ConfigSmsFaillog" id="ConfigSmsFaillogResult">
+<mapper namespace="tv.game88.core.mapper.ConfigSmsFaillogMapper">
+    <resultMap type="tv.game88.core.entity.ConfigSmsFaillog" id="ConfigSmsFaillogResult">
             <result property="id" column="id"/>
             <result property="errorCode" column="error_code"/>
             <result property="errorMessage" column="error_message"/>

@@ -11,6 +11,7 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
+import tv.game88.wallet.api.dto.RspMember;
 import tv.game88.wallet.api.vo.PlatformUser;
 import tv.game88.wallet.app.vo.MemberLoginUser;
 

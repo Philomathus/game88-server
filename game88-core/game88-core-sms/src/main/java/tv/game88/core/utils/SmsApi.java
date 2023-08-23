@@ -1,4 +1,4 @@
-package tv.game88.platform.api.sms;
+package tv.game88.core.utils;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -35,8 +35,8 @@ import tv.game88.common.utils.RandomUtils;
 import tv.game88.core.config.cache.ConfigSmsCacheUtil;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
-import tv.game88.platform.api.entity.ConfigSmsFaillog;
-import tv.game88.platform.api.mapper.ConfigSmsFaillogMapper;
+import tv.game88.core.entity.ConfigSmsFaillog;
+import tv.game88.core.mapper.ConfigSmsFaillogMapper;
 
 import javax.annotation.Resource;
 import java.net.URLEncoder;

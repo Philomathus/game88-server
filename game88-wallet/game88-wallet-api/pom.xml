@@ -24,6 +24,12 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-sms</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

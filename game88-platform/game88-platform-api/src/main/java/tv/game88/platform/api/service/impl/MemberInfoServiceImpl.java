@@ -48,6 +48,7 @@ import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.utils.SmsApi;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.entity.MemberVipGift;
 import tv.game88.platform.api.entity.MobileLimit;
@@ -55,7 +56,6 @@ import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.service.ConfigEnvironmentService;
 import tv.game88.platform.api.service.MemberInfoService;
-import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
@@ -77,21 +77,21 @@ import java.util.stream.Collectors;
 @Service( "memberInfoService" )
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo> implements MemberInfoService {
     @Resource
-    private RedisUtils             redisUtils;
+    private RedisUtils          redisUtils;
     @Resource
-    private ConfigEnvCacheUtil     configEnvCacheUtil;
+    private ConfigEnvCacheUtil  configEnvCacheUtil;
     @Resource
-    private RestTemplate           restTemplate;
+    private RestTemplate        restTemplate;
     @Resource
     private AuthenticationManager  authenticationManager;
     @Resource
     private SmsPhoneCacheUtil      smsPhoneCacheUtil;
     @Resource
-    private ConfigVipCacheUtils    configVipCacheUtils;
+    private ConfigVipCacheUtils configVipCacheUtils;
     @Resource
-    private SmsApi                 smsApi;
+    private SmsApi              smsApi;
     @Resource
-    private ForkJoinPool           forkJoinPool;
+    private ForkJoinPool        forkJoinPool;
     @Resource
     private MemberCardMapper       memberCardMapper;
     @Resource

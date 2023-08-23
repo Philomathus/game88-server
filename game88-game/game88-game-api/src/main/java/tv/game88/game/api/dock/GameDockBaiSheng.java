@@ -60,10 +60,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         log.warn( reqJoinGame.getGameCategory().getDes() + "访问游戏链接:{}", uriComponents.toUri().toString() );
 
@@ -82,11 +80,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
             reqJoinGame.setGameUrl( url );
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(),
-                    uriComponents
-                    .toUri()
-                    .toString() );
+            log.error( reqJoinGame.getGameCategory().getDes() + "获取游戏链接失败:{}; userId:{}; url:{}",
+                    JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), uriComponents.toUri().toString() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -111,10 +106,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -162,10 +155,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = null;
         try {
@@ -212,10 +203,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -260,10 +249,8 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
-                .build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
+                                                          .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {

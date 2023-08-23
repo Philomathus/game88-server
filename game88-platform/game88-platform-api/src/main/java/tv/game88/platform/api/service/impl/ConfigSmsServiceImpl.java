@@ -8,8 +8,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigSmsCacheUtil;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
+import tv.game88.core.utils.SmsApi;
 import tv.game88.platform.api.service.ConfigSmsService;
-import tv.game88.platform.api.sms.SmsApi;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;

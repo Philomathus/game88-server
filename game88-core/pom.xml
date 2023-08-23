@@ -25,6 +25,7 @@
         <module>game88-core-lottery</module>
         <module>game88-core-telegramBot</module>
         <module>game88-core-game</module>
+        <module>game88-core-sms</module>
     </modules>
 
     <build>
