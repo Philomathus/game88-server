@@ -39,12 +39,11 @@ public class LoginController {
     @PostMapping( "/login" )
     @Anonymous
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
-                                           @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
-                                           @RequestBody MobileLogin mobileLogin ) {
+                                           @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
             mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
         }
-        RspBase<RspMember> rspMemberRspBase = walletUserService.login( mobileLogin, dev, version, loginUrl );
+        RspBase<RspMember> rspMemberRspBase = walletUserService.login( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }
@@ -53,12 +52,11 @@ public class LoginController {
     @PostMapping( "/register" )
     @Anonymous
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
-                                        @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
-                                        @RequestBody MobileLogin mobileLogin ) throws Exception {
+                                        @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
             mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
         }
-        RspBase<RspMember> rspMemberRspBase = walletUserService.register( mobileLogin, dev, version, loginUrl );
+        RspBase<RspMember> rspMemberRspBase = walletUserService.register( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
     }

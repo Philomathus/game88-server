@@ -25,6 +25,10 @@
         <result property="deviceId" column="device_id" jdbcType="VARCHAR" />
         <result property="totalCharge" column="total_charge" jdbcType="DECIMAL" />
         <result property="totalSale" column="total_sale" jdbcType="DECIMAL" />
+        <result property="phoneModel" column="phone_model" jdbcType="VARCHAR" />
+        <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
+        <result property="linkUrl" column="link_url" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
@@ -47,7 +51,11 @@
                login_ip,
                device_id,
                total_charge,
-               total_sale
+               total_sale,
+               phone_model,
+               login_device,
+               login_time,
+               link_url
         from wallet_user
     </sql>
 
@@ -85,9 +93,22 @@
 
     <update id="reduceSaleMoney">
         update wallet_user
-        set amount = amount - #{money},
+        set amount     = amount - #{money},
             total_sale = total_sale + #{money}
         where id = #{userId}
           and amount - #{money} >= 0
     </update>
+
+    <select id="findMemberHistoryByMobile" resultType="tv.game88.wallet.api.entity.WalletUser">
+        select *
+        from wallet_user_history
+        where phone = #{phone}
+        limit 1
+    </select>
+
+    <delete id="deleteByHistoryKey">
+        delete
+        from wallet_user_history
+        where id = #{userId}
+    </delete>
 </mapper>

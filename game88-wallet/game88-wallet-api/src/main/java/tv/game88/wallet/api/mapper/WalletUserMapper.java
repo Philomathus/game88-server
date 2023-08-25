@@ -26,6 +26,10 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     int reduceSaleMoney( @Param( "userId" ) String userId, @Param( "money" ) BigDecimal reduceMoney );
 
     PlatformUser selectPlatformUserByUserId( @Param( "userId" ) String userId );
+
+    WalletUser findMemberHistoryByMobile( @Param( "mobile" ) String mobile );
+
+    int deleteByHistoryKey( @Param( "userId" ) String userId );
 }
 
 

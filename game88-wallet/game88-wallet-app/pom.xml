@@ -42,5 +42,11 @@
             <artifactId>jjwt-jackson</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>tv.game88.common</groupId>
+            <artifactId>game88-common-swagger</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 </project>

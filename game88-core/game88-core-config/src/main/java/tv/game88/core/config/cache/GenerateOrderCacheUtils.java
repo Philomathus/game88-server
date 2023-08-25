@@ -1,5 +1,6 @@
 package tv.game88.core.config.cache;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.LocalDateTimeUtils;
@@ -37,6 +38,20 @@ public class GenerateOrderCacheUtils {
                 + RandomStringUtils.randomAlphabetic( randomDigits );
         if ( !redisUtil.strSetIfAbsent( CONFIG_ORDER_ID + orderNo, "", Duration.ofSeconds( 10 ) ) ) {
             return getOrderId( prefix, randomDigits );
+        }
+        return orderNo;
+    }
+
+    /**
+     * <h2>分布式生成唯一订单号</h2>
+     * <p>使用redis生成分布唯一订单号, 格式为 32位UUID + randomDigits位数的随机a-z,0-9的字符串</p>
+     *
+     * @param randomDigits 随机a-z,0-9的字符串,长度为randomDigits
+     */
+    public String getOrderIdNoTime( int randomDigits ) {
+        String orderNo = IdWorker.get32UUID() + RandomStringUtils.randomAlphanumeric( randomDigits - 32 ).toLowerCase();
+        if ( !redisUtil.strSetIfAbsent( CONFIG_ORDER_ID + orderNo, "", Duration.ofSeconds( 10 ) ) ) {
+            return getOrderIdNoTime( randomDigits );
         }
         return orderNo;
     }

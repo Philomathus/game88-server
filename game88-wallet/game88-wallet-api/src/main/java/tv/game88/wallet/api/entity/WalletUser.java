@@ -22,100 +22,99 @@ public class WalletUser implements Serializable {
      * 钱包ID
      */
     @TableId( type = IdType.INPUT )
-    private String id;
-
+    private String        id;
     /**
      * 昵称
      */
-    private String nickName;
-
+    private String        nickName;
     /**
      * 登录密码
      */
-    private String password;
-
+    private String        password;
     /**
      * OTP密钥
      */
-    private String secretKey;
-
+    private String        secretKey;
     /**
      * 手机号
      */
-    private String phone;
-
+    private String        phone;
     /**
      * 金额
      */
-    private BigDecimal amount;
-
+    private BigDecimal    amount;
     /**
      * 资金密码
      */
-    private String fundPassword;
-
+    private String        fundPassword;
     /**
      * 是否实名认证 (0 未认证 1 申请认证 2 已认证)
      */
-    private Integer isVerified;
-
+    private Integer       isVerified;
     /**
      * 实名认证时间
      */
     private LocalDateTime verifiedTime;
-
     /**
      * 真实姓名
      */
-    private String realName;
-
+    private String        realName;
     /**
      * 身份证号码
      */
-    private String idNumber;
-
+    private String        idNumber;
     /**
      * 身份证正面图片地址
      */
-    private String idFrontPic;
-
+    private String        idFrontPic;
     /**
      * 身份证背面图片地址
      */
-    private String idBackPic;
-
+    private String        idBackPic;
     /**
      * 信用等级 (默认1级 最高5级)
      */
-    private Integer creditRating;
-
+    private Integer       creditRating;
     /**
      * 创建时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createdTime;
-
     /**
      * 用户状态 (0 禁用 1正常)
      */
-    private Integer status;
-
+    private Integer       status;
     /**
      * 登录IP
      */
-    private String loginIp;
-
+    private String        loginIp;
     /**
      * 设备ID
      */
-    private String deviceId;
-
+    private String        deviceId;
     /**
      * 累积充值金额
      */
-    private BigDecimal totalCharge;
+    private BigDecimal    totalCharge;
     /**
      * 累积出售金额
      */
-    private BigDecimal totalSale;
+    private BigDecimal    totalSale;
+    /**
+     * 手机型号
+     */
+    private String        phoneModel;
+    /**
+     * 登录设备
+     */
+    private Integer       loginDevice;
+    /**
+     * 登录时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime loginTime;
+    /**
+     * 登录域名
+     */
+    private String        linkUrl;
 }

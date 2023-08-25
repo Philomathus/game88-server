@@ -67,3 +67,51 @@ spring:
     scheduling:
       pool:
         size: 50
+
+pagehelper:
+  autoRuntimeDialect: true
+
+swagger:
+  title: Game88 Wallet App Swagger 3 Api Documentation
+  description: Game88 Wallet App Spring Boot Plugin Swagger 3 Web Api Documentation
+  version: 1.0.0
+springdoc:
+  api-docs:
+    enabled: false
+  packages-to-scan: tv.game88.wallet.app.controller
+
+management:
+  endpoint:
+    health:
+      enabled: true
+      show-details: when_authorized
+    beans:
+      enabled: false
+    info:
+      enabled: false
+    conditions:
+      enabled: false
+    shutdown:
+      enabled: false
+    configprops:
+      enabled: false
+    auditevents:
+      enabled: false
+    caches:
+      enabled: false
+    env:
+      enabled: false
+    metrics:
+      enabled: false
+    scheduledtasks:
+      enabled: false
+    mappings:
+      enabled: false
+    loggers:
+      enabled: false
+    integrationgraph:
+      enabled: false
+    heapdump:
+      enabled: false
+    threaddump:
+      enabled: false

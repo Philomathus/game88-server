@@ -8,3 +8,7 @@ spring:
     port: 6379
     password: EvYsN39ViArDumx4pWyH
     database: 3
+
+springdoc:
+  api-docs:
+    enabled: true

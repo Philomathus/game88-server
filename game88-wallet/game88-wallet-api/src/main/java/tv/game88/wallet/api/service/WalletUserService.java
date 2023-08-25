@@ -16,7 +16,7 @@ public interface WalletUserService extends IService<WalletUser> {
 
     RspBase<?> sendSmsVerifyCode( Phone phone );
 
-    RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
+    RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String loginUrl );
 
-    RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
+    RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String loginUrl );
 }
