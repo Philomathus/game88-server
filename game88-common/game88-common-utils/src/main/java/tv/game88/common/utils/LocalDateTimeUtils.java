@@ -13,6 +13,9 @@ public class LocalDateTimeUtils {
     public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
     public static final DateTimeFormatter YYYY_MM_DDTHH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss" );
 
+    public static final DateTimeFormatter YYYY_MM_DDTHH_MM_SS_SSS_FORMATTER = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm" + ":ss.SSS" );
+
 
     public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
 
@@ -24,7 +27,7 @@ public class LocalDateTimeUtils {
     public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
 
     public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+            "yyyy-MM-dd'T'HH" + ":mm:ss.SSS'Z'" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
 
@@ -198,6 +201,7 @@ public class LocalDateTimeUtils {
      * 当地时区时间转换成美东时间
      *
      * @param localDateTime
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertToMeiDong( LocalDateTime localDateTime ) {
@@ -219,6 +223,7 @@ public class LocalDateTimeUtils {
      * 美东时间转换成当地时区时间
      *
      * @param time
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertMeiDongToDefault( String time ) {
@@ -232,6 +237,7 @@ public class LocalDateTimeUtils {
      * 当地时区时间转换成UTC+0时间
      *
      * @param localDateTime
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertToUTC0( LocalDateTime localDateTime ) {
@@ -244,6 +250,7 @@ public class LocalDateTimeUtils {
      * UTC+0时间转换成当地时区时间
      *
      * @param time
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertUTC0ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
@@ -257,6 +264,7 @@ public class LocalDateTimeUtils {
      * 当地时区时间转换成UTC-4时间
      *
      * @param localDateTime
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertToUTC_4( LocalDateTime localDateTime ) {
@@ -269,6 +277,7 @@ public class LocalDateTimeUtils {
      * UTC-4时间转换成当地时区时间
      *
      * @param time
+     *
      * @return LocalDateTime
      */
     public static LocalDateTime convertUTC_4ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
