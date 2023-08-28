@@ -96,15 +96,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.getOrDefault( "away_id", remoteGameDatum.get( "team_id" ) ) ) );
 
         gameDataRecord.setPlatformId( gamePlatform.getId() );
-        Object settlementTimeObj = remoteGameDatum.get( "settlement_time" );
-        if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
-            log.error( "shaba settlement_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
-            return null;
-        }
-        LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj )
-                                                                                    .substring( 0, 19 ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
-        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
+
         Object transactionTimeObj = remoteGameDatum.get( "transaction_time" );
         if ( transactionTimeObj == null || transactionTimeObj.toString().equals( "null" ) ) {
             log.error( "shaba transaction_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
@@ -114,6 +106,17 @@ public class GamePullDockShaBa extends AbstractGamePull {
                                                                                      .substring( 0, 19 ),
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( transactionTime ) );
+
+        Object settlementTimeObj = remoteGameDatum.get( "settlement_time" );
+        if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
+            log.error( "shaba settlement_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
+            gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
+        } else {
+            LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj )
+                                                                                        .substring( 0, 19 ),
+                    LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+            gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
+        }
         return gameDataRecord;
     }
 
