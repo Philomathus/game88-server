@@ -101,17 +101,24 @@ public class GamePullDockShaBa extends AbstractGamePull {
             log.error( "shaba settlement_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_SSS_FORMATTER );
+        LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj )
+                                                                                    .substring( 0, 19 ),
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
-        Object        transactionTimeObj = remoteGameDatum.get( "transaction_time" );
+        Object transactionTimeObj = remoteGameDatum.get( "transaction_time" );
         if ( transactionTimeObj == null || transactionTimeObj.toString().equals( "null" ) ) {
             log.error( "shaba transaction_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        LocalDateTime transactionTime    = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( transactionTimeObj ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_SSS_FORMATTER );
+        LocalDateTime transactionTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( transactionTimeObj )
+                                                                                     .substring( 0, 19 ),
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( transactionTime ) );
         return gameDataRecord;
+    }
+
+    public static void main( String[] args ) {
+        String data = "2023-08-28T18:46:59.94";
+        System.out.println( data.substring( 0, 19 ) );
     }
 }
