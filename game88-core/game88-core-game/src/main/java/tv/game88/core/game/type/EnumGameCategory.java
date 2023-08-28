@@ -18,8 +18,7 @@ public enum EnumGameCategory {
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
     MEITIAN( ConstantsGame.MEITIAN, "美天棋牌" ),
-    KAIXUAN( ConstantsGame.KAIXUAN, "凯旋棋牌" ),
-    KAIXUAN_X( ConstantsGame.KAIXUAN_X, "凯旋棋牌X" ),
+    KAIXUAN_X( ConstantsGame.KAIXUAN_X, "凯旋棋牌" ),
     NEWWORLD( ConstantsGame.NEWWORLD, "新世界棋牌" ),
     BBIN( ConstantsGame.BBIN, "BBIN电子" ),
     LEYOU( ConstantsGame.LE_YOU, "乐游棋牌" ),
@@ -36,9 +35,9 @@ public enum EnumGameCategory {
     FG( ConstantsGame.FG, "FG棋牌" ),
     JDB( ConstantsGame.JDB, "JDB电子" ),
     CQ9( ConstantsGame.CQ9, "CQ9电子" ),
-    AT( ConstantsGame.AT, "AT电子" ),
     RICH88( ConstantsGame.RICH88, "Rich88电子" ),
     PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
+    SHABA( ConstantsGame.SHABA, "沙巴体育" ),
     ;
 
     private final String type;

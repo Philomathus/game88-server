@@ -14,7 +14,7 @@ public class GameDockFactoryUtil {
     public BaseGameDock createGameDockProcessor( EnumGameCategory enumGameCategory ) {
         return switch ( enumGameCategory ) {
             case UPG, MG -> ( BaseGameDock ) context.getBean( EnumGameCategory.MG.getType() + "GameProcessor" );
-            case KAIXUAN, KAIXUAN_X, KAIYUAN, LEYOU -> ( BaseGameDock ) context.getBean(
+            case KAIXUAN_X, KAIYUAN, LEYOU -> ( BaseGameDock ) context.getBean(
                     EnumGameCategory.KAIYUAN.getType() + "GameProcessor" );
             default -> ( BaseGameDock ) context.getBean( enumGameCategory.getType() + "GameProcessor" );
         };
