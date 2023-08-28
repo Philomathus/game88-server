@@ -109,7 +109,6 @@ public class GamePullDockShaBa extends AbstractGamePull {
 
         Object settlementTimeObj = remoteGameDatum.get( "settlement_time" );
         if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
-            log.error( "shaba settlement_time = null : " + JsonUtil.object2Json( remoteGameDatum ) );
             gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         } else {
             LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj )
