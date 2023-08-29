@@ -1,14 +1,13 @@
 package tv.game88.game.api.service;
 
 import tv.game88.game.api.entity.MemberGameData;
-import tv.game88.core.game.type.EnumGameCategory;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 public interface GameDataService {
-    void beatGameCodeAgent( String dTime, String start, String end, String account, EnumGameCategory gameCategory );
+    void beatGameCodeAgent( String dTime, String start, String end, String account, Long id );
 
     void beatLotteryCode( String begin, String end );
 

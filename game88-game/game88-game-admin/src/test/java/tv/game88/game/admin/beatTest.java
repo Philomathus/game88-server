@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.game.api.service.GameDataService;
-import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -28,7 +27,7 @@ public class beatTest {
         LocalDateTime starDay = endDay.minusHours( 4 );
         String        begin   = LocalDateTimeUtils.format( starDay );
         String        end     = LocalDateTimeUtils.format( endDay );
-        gameDataService.beatGameCodeAgent( begin, begin, end, null, EnumGameCategory.KAIXUAN_X );
+        gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
     }
 
     @Test

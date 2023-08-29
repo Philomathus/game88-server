@@ -71,13 +71,12 @@ public class GameDataServiceImpl implements GameDataService {
     private static final String TABLE_PREFIX = "game_data_record_";
 
     @Override
-    public void beatGameCodeAgent( String dTime, String start, String end, String account, EnumGameCategory gameCategory ) {
+    public void beatGameCodeAgent( String dTime, String start, String end, String account, Long platformId ) {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
-        Map<EnumGameCategory, GamePlatform> gamePlatformMap = gamePlatforms.stream().collect(
-                Collectors.toMap( GamePlatform::getGameCategory, Function.identity() ) );
 
-        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream().collect( Collectors.toMap( GamePlatform::getId,
+        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream()
+                                                                 .collect( Collectors.toMap( GamePlatform::getId,
                                                                          Function.identity() ) );
 
         /*List<RspGameDataLog> rspGameDataLogs = gameService.remoteDataGrab( start, end, account,
@@ -86,8 +85,7 @@ public class GameDataServiceImpl implements GameDataService {
 
         String day = end.substring( 0, 10 ).replace( "-", "" );
         List<GameDataRecord> gameDataRecords = gameDataRecordMapper.selectGameDataRecordAgentList(
-                TABLE_PREFIX + day, start, end, profile, account,
-                gameCategory != null ? gamePlatformMap.get( gameCategory ).getId() : null );
+                TABLE_PREFIX + day, start, end, profile, account, platformId );
 
         if ( CollectionUtils.isEmpty( gameDataRecords ) ) {
             log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );

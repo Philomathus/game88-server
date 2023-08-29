@@ -52,7 +52,7 @@ public class FixDataTask {
                         } else {
                             log.warn( "开始补单{}游戏", gamePlatform.getName() );
                             gameDataService.beatGameCodeAgent( begin, begin, end, memberGameDataFix.getMemberId(),
-                                    gamePlatform.getGameCategory() );
+                                    gamePlatform.getId() );
                         }
                         MemberGameDataFix update = new MemberGameDataFix();
                         update.setId( memberGameDataFix.getId() );
