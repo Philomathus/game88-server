@@ -18,7 +18,6 @@
         <result column="revenue" property="revenue" />
         <result column="game_start_time" property="gameStartTime" />
         <result column="game_end_time" property="gameEndTime" />
-        <result column="game_end_time" property="gameEndTime" />
         <result column="detail" property="detail" />
     </resultMap>
 

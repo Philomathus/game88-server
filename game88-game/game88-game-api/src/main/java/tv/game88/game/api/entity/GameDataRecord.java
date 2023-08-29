@@ -1,13 +1,10 @@
-package tv.game88.general.api.entity;
+package tv.game88.game.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * 游戏注单对象 game_data_record
@@ -80,9 +77,4 @@ public class GameDataRecord {
      * 游戏结束时间
      */
     private String gameEndTime;
-
-    private String detail;
-
-    @TableField( exist = false )
-    private List<String> platformIds;
 }

@@ -96,6 +96,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.getOrDefault( "away_id", remoteGameDatum.get( "team_id" ) ) ) );
 
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+        gameDataRecord.setGameAgent( gamePlatform.getAgent() );
 
         Object transactionTimeObj = remoteGameDatum.get( "transaction_time" );
         if ( transactionTimeObj == null || transactionTimeObj.toString().equals( "null" ) ) {
