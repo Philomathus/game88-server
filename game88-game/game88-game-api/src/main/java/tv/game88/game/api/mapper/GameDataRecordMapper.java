@@ -14,7 +14,7 @@ import java.util.List;
  */
 @DS( "secondary" )
 public interface GameDataRecordMapper extends BaseMapper<GameDataRecord> {
-    List<GameDataRecord> selectGameDataRecordAgentList( @Param( "tableNode" ) String tableNode, @Param( "start" ) String start,
+    List<GameDataRecord> selectGameDataRecordAgentList( @Param( "tableName" ) String tableNode, @Param( "start" ) String start,
                                                         @Param( "end" ) String end, @Param( "agent" ) String agent,
                                                         @Param( "account" ) String account, @Param( "platformId" ) Long platformId );
 }
