@@ -59,7 +59,7 @@ public class MybatisConfig {
 		// 配置数据源，此处配置为关键配置，如果没有将 dynamicDataSource作为数据源则不能实现切换
 		sessionFactory.setDataSource( dynamicDataSource );
 		// 扫描Model
-		sessionFactory.setTypeAliasesPackage( "com.qiqilm.server.admin.domain" );
+		sessionFactory.setTypeAliasesPackage( "tv.game88.**.entity" );
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		// 扫描映射文件
 		sessionFactory.setMapperLocations( resolver.getResources( "classpath*:mapper/*.xml" ) );
