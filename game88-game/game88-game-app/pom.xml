@@ -17,6 +17,12 @@
             <groupId>tv.game88.game</groupId>
             <artifactId>game88-game-api</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>tv.game88.common</groupId>
+                    <artifactId>game88-common-dynamicDataSource</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>tv.game88.core</groupId>
