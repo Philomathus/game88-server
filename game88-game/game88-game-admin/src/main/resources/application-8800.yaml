@@ -1,13 +1,15 @@
 spring:
   datasource:
-    primary:
-      jdbc-url: jdbc:mysql://8.210.10.193:3306/8800?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
-      username: root
-      password: f:e=h>EVUH,!N7zS&J`9
-    secondary:
-      jdbc-url: mysql://livedata-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
-      username: admin
-      password: dRmBstReqberz!14Xm#
+    dynamic:
+      datasource:
+        master:
+          url: jdbc:mysql://8.210.10.193:3306/8800?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: root
+          password: f:e=h>EVUH,!N7zS&J`9
+        secondary:
+          url: mysql://livedata-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: admin
+          password: dRmBstReqberz!14Xm#
   redis:
     host: 8.210.10.193
     port: 6379

@@ -19,8 +19,8 @@
             <version>1.0</version>
             <exclusions>
                 <exclusion>
-                    <groupId>tv.game88.common</groupId>
-                    <artifactId>game88-common-dynamicDataSource</artifactId>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
