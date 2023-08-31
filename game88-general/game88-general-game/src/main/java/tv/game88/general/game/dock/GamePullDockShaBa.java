@@ -102,8 +102,8 @@ public class GamePullDockShaBa extends AbstractGamePull {
         if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
             return null;
         } else {
-            LocalDateTime settlementTime = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( settlementTimeObj )
-                                                                                        .substring( 0, 19 ),
+            LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( settlementTimeObj )
+                                                                                             .substring( 0, 19 ),
                     LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
             gameDataRecord.setGameStartTime( gameDataRecord.getGameEndTime() );

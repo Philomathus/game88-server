@@ -233,6 +233,13 @@ public class LocalDateTimeUtils {
         return converted.toLocalDateTime();
     }
 
+    public static LocalDateTime convertMeiDongToDefault( String time, DateTimeFormatter formatter ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, formatter );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
+        return converted.toLocalDateTime();
+    }
+
     /**
      * 当地时区时间转换成UTC+0时间
      *
