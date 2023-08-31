@@ -34,7 +34,7 @@ public class GameDataTask {
         String        end     = LocalDateTimeUtils.format( endDay );
         if ( LocalDateTimeUtils.isSameDay( starDay, endDay ) ) {
             try {
-                gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
+                gameDataService.beatGameCodeAgent( begin, end, null, null );
             } catch ( Exception e ) {
                 log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
             }
@@ -44,21 +44,21 @@ public class GameDataTask {
             end     = LocalDateTimeUtils.format( endDay );
 
             try {
-                gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
+                gameDataService.beatGameCodeAgent( begin, end, null, null );
             } catch ( Exception e ) {
                 log.error( "4游戏拉取注单异常{}", e.getMessage(), e );
             }
         } else {
             end = LocalDateTimeUtils.format( starDay.plusMinutes( 5 ).toLocalDate().atStartOfDay() );
             try {
-                gameDataService.beatGameCodeAgent( begin, begin, end, null, null );
+                gameDataService.beatGameCodeAgent( begin, end, null, null );
             } catch ( Exception e ) {
                 log.error( "2游戏拉取注单异常{}", e.getMessage(), e );
             }
             begin = end;
             end   = LocalDateTimeUtils.format( endDay );
             try {
-                gameDataService.beatGameCodeAgent( end, begin, end, null, null );
+                gameDataService.beatGameCodeAgent( begin, end, null, null );
             } catch ( Exception e ) {
                 log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }

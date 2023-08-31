@@ -71,7 +71,7 @@ public class GameDataServiceImpl implements GameDataService {
     private static final String TABLE_PREFIX = "game_data_record_";
 
     @Override
-    public void beatGameCodeAgent( String dTime, String start, String end, String account, Long platformId ) {
+    public void beatGameCodeAgent( String start, String end, String account, Long platformId ) {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
 

@@ -51,7 +51,7 @@ public class FixDataTask {
                             gameDataService.beatLotteryCode( begin, end );
                         } else {
                             log.warn( "开始补单{}游戏", gamePlatform.getName() );
-                            gameDataService.beatGameCodeAgent( begin, begin, end, memberGameDataFix.getMemberId(),
+                            gameDataService.beatGameCodeAgent( begin, end, memberGameDataFix.getMemberId(),
                                     gamePlatform.getId() );
                         }
                         MemberGameDataFix update = new MemberGameDataFix();

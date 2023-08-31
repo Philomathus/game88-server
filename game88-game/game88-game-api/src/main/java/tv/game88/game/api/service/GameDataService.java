@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface GameDataService {
-    void beatGameCodeAgent( String dTime, String start, String end, String account, Long id );
+    void beatGameCodeAgent( String start, String end, String account, Long id );
 
     void beatLotteryCode( String begin, String end );
 
