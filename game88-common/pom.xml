@@ -25,7 +25,6 @@
         <module>game88-common-utils</module>
         <module>game88-common-rateLimiter</module>
         <module>game88-common-security</module>
-        <module>game88-common-dynamicDataSource</module>
     </modules>
 
     <build>
