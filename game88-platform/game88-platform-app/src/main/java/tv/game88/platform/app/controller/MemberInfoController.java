@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
@@ -66,7 +67,8 @@ public class MemberInfoController extends BaseController {
 
     @Operation( summary = "获取会员信息" )
     @PostMapping( "/getAccountInfo" )
-    public RspBase<RspMember> getAccountInfo( HttpServletRequest request ) {
+    public RspBase<RspMember> getAccountInfo( HttpServletRequest request,
+                                              @RequestHeader( value = "agent", required = false ) String agent ) {
         String          userId    = MemberSecurityUtils.getUserId();
         MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
         if ( StringUtils.isNotBlank( userId ) && loginUser != null ) {
@@ -74,6 +76,7 @@ public class MemberInfoController extends BaseController {
                 log.error( "会员ID不一致!!! - userId:{} , MemberLoginUser:{}", userId, JsonUtil.object2Json( loginUser ) );
             }
         }
+        log.warn( "会员获取详细信息 - userId:{} - agent:{}", userId, agent );
         return memberInfoService.getAccountInfo( userId );
     }
 
