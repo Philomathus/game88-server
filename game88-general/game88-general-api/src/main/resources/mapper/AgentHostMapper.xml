@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.AgentHostMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="tv.game88.general.api.entity.AgentHost">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="api_url" property="apiUrl" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="code" property="code" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,code, api_url, lottery_url, status, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="findAgentHost" resultType="tv.game88.general.api.dto.RspAgent">
+        select *
+        from agent_host
+        where code = #{code}
+        limit 1
+    </select>
+
+</mapper>
