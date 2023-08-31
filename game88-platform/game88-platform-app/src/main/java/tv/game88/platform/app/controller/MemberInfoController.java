@@ -68,7 +68,8 @@ public class MemberInfoController extends BaseController {
     @Operation( summary = "获取会员信息" )
     @PostMapping( "/getAccountInfo" )
     public RspBase<RspMember> getAccountInfo( HttpServletRequest request,
-                                              @RequestHeader( value = "agent", required = false ) String agent ) {
+                                              @RequestHeader( value = "agent", required = false ) String agent,
+                                              @RequestHeader( value = "version", required = false ) String version ) {
         String          userId    = MemberSecurityUtils.getUserId();
         MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
         if ( StringUtils.isNotBlank( userId ) && loginUser != null ) {
@@ -76,7 +77,7 @@ public class MemberInfoController extends BaseController {
                 log.error( "会员ID不一致!!! - userId:{} , MemberLoginUser:{}", userId, JsonUtil.object2Json( loginUser ) );
             }
         }
-        log.warn( "会员获取详细信息 - userId:{} - agent:{}", userId, agent );
+        log.warn( "会员获取详细信息 - userId:{} - agent:{} - version:{}", userId, agent, version );
         return memberInfoService.getAccountInfo( userId );
     }
 
