@@ -42,7 +42,7 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService    gameDataRecordService;
 
-    @Scheduled ( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = new QueryChainWrapper<>( gamePlatformMapper ).eq( "effect", 1 ).list();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
@@ -54,7 +54,9 @@ public class RemoteGameDataRecordTask {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                if ( StringUtils.isNumeric( gameRecordVersion.getVersionValue() ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN ) {
+                if ( StringUtils.isNumeric( gameRecordVersion.getVersionValue() )
+                        && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
+                        && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
                     LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
 
                     log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
