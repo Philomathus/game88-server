@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.AgentSecureMapper">
+
+    <resultMap type="tv.game88.general.api.entity.AgentSecure" id="AgentSecureResult">
+        <result property="id" column="id" />
+        <result property="publickey" column="publicKey" />
+        <result property="privatekey" column="privateKey" />
+        <result property="urls" column="urls" />
+        <result property="secureUrls" column="secure_urls" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectAgentSecureVo">
+        select id,
+               publicKey,
+               privateKey,
+               urls,
+               secure_urls,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from agent_secure
+    </sql>
+
+    <select id="selectAgentSecureList" parameterType="tv.game88.general.api.entity.AgentSecure" resultMap="AgentSecureResult">
+        <include refid="selectAgentSecureVo" />
+        <where>
+            <if test="publickey != null  and publickey != ''">and publicKey = #{publickey}</if>
+            <if test="privatekey != null  and privatekey != ''">and privateKey = #{privatekey}</if>
+            <if test="urls != null  and urls != ''">and urls = #{urls}</if>
+            <if test="secureUrls != null  and secureUrls != ''">and secure_urls = #{secureUrls}</if>
+        </where>
+    </select>
+</mapper>

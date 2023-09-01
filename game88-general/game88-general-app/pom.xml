@@ -23,6 +23,18 @@
                     <groupId>tv.game88.core</groupId>
                     <artifactId>game88-core-game</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aliyun.oss</groupId>
+                    <artifactId>aliyun-sdk-oss</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aliyun</groupId>
+                    <artifactId>aliyun-java-sdk-sts</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

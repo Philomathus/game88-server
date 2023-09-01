@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.ReportPlamGameschildsMapper">
+
+    <resultMap type="tv.game88.general.api.entity.ReportPlamGameschilds" id="ReportPlamGameschildsResult">
+        <result property="gameUuid" column="game_uuid" />
+        <result property="gameagent" column="gameagent" />
+        <result property="gameplame" column="gameplame" />
+        <result property="agentchild" column="agentchild" />
+        <result property="agentchildname" column="agentchildname" />
+        <result property="gamepepole" column="gamepepole" />
+        <result property="gametouzhu" column="gametouzhu" />
+        <result property="gamecell" column="gamecell" />
+        <result property="gamebet" column="gamebet" />
+        <result property="gamerevenve" column="gamerevenve" />
+        <result property="gameprofit" column="gameprofit" />
+        <result property="plampfit" column="plampfit" />
+        <result property="bili" column="bili" />
+        <result property="begindate" column="begindate" />
+    </resultMap>
+
+    <sql id="selectReportPlamGameschildsVo">
+        select game_uuid,
+               gameagent,
+               gameplame,
+               agentchild,
+               agentchildname,
+               gamepepole,
+               gametouzhu,
+               gamecell,
+               gamebet,
+               gamerevenve,
+               gameprofit,
+               plampfit,
+               bili,
+               begindate
+        from report_plam_gameschilds
+    </sql>
+
+    <select id="selectReportPlamGameschildsList" parameterType="tv.game88.general.api.entity.ReportPlamGameschilds"
+            resultMap="ReportPlamGameschildsResult">
+        <include refid="selectReportPlamGameschildsVo" />
+        <where>
+            <if test="gameagent != null  and gameagent != ''">and gameagent = #{gameagent}</if>
+            <if test="gameplame != null  and gameplame != ''">and gameplame = #{gameplame}</if>
+            <if test="agentchild != null  and agentchild != ''">and agentchild = #{agentchild}</if>
+            <if test="agentchildname != null  and agentchildname != ''">and agentchildname like concat('%',
+                #{agentchildname}, '%')
+            </if>
+            <if test="gamepepole != null ">and gamepepole = #{gamepepole}</if>
+            <if test="gametouzhu != null ">and gametouzhu = #{gametouzhu}</if>
+            <if test="gamecell != null ">and gamecell = #{gamecell}</if>
+            <if test="gamebet != null ">and gamebet = #{gamebet}</if>
+            <if test="gamerevenve != null ">and gamerevenve = #{gamerevenve}</if>
+            <if test="gameprofit != null ">and gameprofit = #{gameprofit}</if>
+            <if test="plampfit != null ">and plampfit = #{plampfit}</if>
+            <if test="bili != null  and bili != ''">and bili = #{bili}</if>
+            <if test="begindate != null ">and begindate = #{begindate}</if>
+        </where>
+    </select>
+</mapper>

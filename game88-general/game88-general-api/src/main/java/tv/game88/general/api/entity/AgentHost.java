@@ -1,14 +1,12 @@
 package tv.game88.general.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.time.LocalDateTime;
+import tv.game88.common.vo.BaseEntity;
 
 @Data
 @EqualsAndHashCode( callSuper = false )
-public class AgentHost {
+public class AgentHost extends BaseEntity {
     /**
      * 代理号
      */
@@ -29,23 +27,5 @@ public class AgentHost {
      * 邀请码
      */
     private String        code;
-    /**
-     * 创建人
-     */
-    private String        createBy;
-    /**
-     * 创建时间
-     */
-    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private LocalDateTime createTime;
-    /**
-     * 最后更新人
-     */
-    private String        updateBy;
-    /**
-     * 最后更新时间
-     */
-    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private LocalDateTime updateTime;
 
 }

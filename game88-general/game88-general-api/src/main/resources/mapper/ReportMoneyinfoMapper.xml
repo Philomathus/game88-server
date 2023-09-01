@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.ReportMoneyinfoMapper">
+
+    <resultMap type="tv.game88.general.api.entity.ReportMoneyinfo" id="ReportMoneyinfoResult">
+        <result property="repId" column="rep_id" />
+        <result property="reptime" column="reptime" />
+        <result property="gsRukuanrenshu" column="gs_rukuanrenshu" />
+        <result property="gsRukuanjine" column="gs_rukuanjine" />
+        <result property="xsRukunanrenshu" column="xs_rukunanrenshu" />
+        <result property="xsRukunanjine" column="xs_rukunanjine" />
+        <result property="rgRukunanrenshu" column="rg_rukunanrenshu" />
+        <result property="rgRukunanjine" column="rg_rukunanjine" />
+        <result property="palmYouhuirenshu" column="palm_youhuirenshu" />
+        <result property="palmYouhuijine" column="palm_youhuijine" />
+        <result property="totalRukuanrenshu" column="total_rukuanrenshu" />
+        <result property="totalRukuanjine" column="total_rukuanjine" />
+        <result property="totalChukuanrenshu" column="total_chukuanrenshu" />
+        <result property="totalChukuanjine" column="total_chukuanjine" />
+        <result property="totalAccount" column="total_account" />
+        <result property="totalProfile" column="total_profile" />
+        <result property="totalGiveprop" column="total_giveprop" />
+        <result property="totalLast" column="total_last" />
+        <result property="updateTime" column="updatetime" />
+    </resultMap>
+
+    <sql id="selectReportMoneyinfoVo">
+        select rep_id,
+               reptime,
+               gs_rukuanrenshu,
+               gs_rukuanjine,
+               xs_rukunanrenshu,
+               xs_rukunanjine,
+               rg_rukunanrenshu,
+               rg_rukunanjine,
+               palm_youhuirenshu,
+               palm_youhuijine,
+               total_rukuanrenshu,
+               total_rukuanjine,
+               total_chukuanrenshu,
+               total_chukuanjine,
+               total_account,
+               total_profile,
+               total_giveprop,
+               total_last,
+               updatetime as updateTime
+        from report_moneyinfo
+    </sql>
+
+    <select id="selectReportMoneyinfoList" parameterType="tv.game88.general.api.entity.ReportMoneyinfo"
+            resultMap="ReportMoneyinfoResult">
+        <include refid="selectReportMoneyinfoVo" />
+        <where>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(reptime,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(reptime,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            order by reptime desc
+
+        </where>
+    </select>
+
+    <select id="countMoneyInfoData" resultType="tv.game88.general.api.entity.ReportMoneyinfo">
+        select
+        sum(total_rukuanjine) as paymentAmount,sum(total_chukuanjine) as outMoney,sum(total_giveprop) as
+        totalAccountGifts
+        FROM report_moneyinfo
+        <where>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(reptime,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(reptime,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_moneyinfo(#{dateNowStr,mode=IN,jdbcType=VARCHAR},
+                                                #{dateNowStr,mode=IN,jdbcType=VARCHAR},
+                                                #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+</mapper>

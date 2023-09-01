@@ -2,24 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.general.api.mapper.AgentHostClientMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="tv.game88.general.api.entity.AgentHostClient">
-        <id column="id" property="id" />
-        <result column="dev" property="dev" />
-        <result column="version" property="version" />
-        <result column="version_name" property="versionName" />
-        <result column="latest_fore" property="latestFore" />
-        <result column="url" property="url" />
-        <result column="update_text" property="updateText" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="update_time" property="updateTime" />
+    <resultMap type="tv.game88.general.api.entity.AgentHostClient" id="AgentHostClientResult">
+        <result property="id" column="id" />
+        <result property="dev" column="dev" />
+        <result property="version" column="version" />
+        <result property="url" column="url" />
+        <result property="updateText" column="update_text" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
     </resultMap>
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, dev, version,version_name,latest_fore, url, update_text, create_by, create_time, update_by, update_time
+
+    <sql id="selectAgentHostClientVo">
+        select id,
+               dev,
+               version,
+               url,
+               update_text,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from agent_host_client
     </sql>
+
+    <select id="selectAgentHostClientList" parameterType="tv.game88.general.api.entity.AgentHostClient" resultMap="AgentHostClientResult">
+        <include refid="selectAgentHostClientVo" />
+        <where>
+            <if test="dev != null  and dev != ''">and dev = #{dev}</if>
+            <if test="version != null  and version != ''">and version = #{version}</if>
+            <if test="url != null  and url != ''">and url = #{url}</if>
+            <if test="updateText != null  and updateText != ''">and update_text = #{updateText}</if>
+        </where>
+    </select>
 
 
     <select id="findLatestHostClient" resultType="tv.game88.general.api.dto.RspHostClient">

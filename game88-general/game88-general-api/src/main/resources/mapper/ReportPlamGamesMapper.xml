@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.general.api.mapper.ReportPlamGamesMapper">
+
+    <resultMap type="tv.game88.general.api.entity.ReportPlamGames" id="ReportPlamGamesResult">
+        <result property="gameUuid" column="game_uuid" />
+        <result property="gameagent" column="gameagent" />
+        <result property="gameplame" column="gameplame" />
+        <result property="gamepepole" column="gamepepole" />
+        <result property="gametouzhu" column="gametouzhu" />
+        <result property="gamecell" column="gamecell" />
+        <result property="gamebet" column="gamebet" />
+        <result property="gamerevenve" column="gamerevenve" />
+        <result property="gameprofit" column="gameprofit" />
+        <result property="plampfit" column="plampfit" />
+        <result property="bili" column="bili" />
+        <result property="begindate" column="begindate" />
+        <result property="updateTime" column="updatetime" />
+    </resultMap>
+
+    <sql id="selectReportPlamGamesVo">
+        select game_uuid,
+               gameagent,
+               gameplame,
+               gamepepole,
+               gametouzhu,
+               gamecell,
+               gamebet,
+               gamerevenve,
+               gameprofit,
+               plampfit,
+               bili,
+               begindate,
+               updatetime as updateTime
+        from report_plam_games
+    </sql>
+
+    <select id="selectReportPlamGamesList" parameterType="tv.game88.general.api.entity.ReportPlamGames"
+            resultMap="ReportPlamGamesResult">
+        <include refid="selectReportPlamGamesVo" />
+        <where>
+            <if test="gameplame != null  and gameplame != ''">and gameplame = #{gameplame}</if>
+            <if test="begindate != null ">and begindate = #{begindate}</if>
+        </where>
+        order by game_uuid desc
+    </select>
+    <select id="calldataProrepPlamcom" resultType="string" statementType="CALLABLE">
+        {call prorep_plamgame(#{timedateta,mode=IN,jdbcType=VARCHAR},
+                                               #{timedateta,mode=IN,jdbcType=VARCHAR},
+                                               #{result,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="countBetData" resultType="tv.game88.general.api.entity.ReportPlamGames">
+        select sum(gamecell) as countBetMoney,sum(gamepepole) as countBetPeople,sum(gameprofit) as memberProfit
+        from report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">and gameplame = #{gameplame}</if>
+            <if test="begindate != null ">and begindate = #{begindate}</if>
+        </where>
+    </select>
+
+    <select id="selectReportPlamGamesListMonth" resultType="tv.game88.general.api.dto.RspPlamGamesMonth">
+        select gameplame,
+        SUM(gamecell) as gamecell,
+        SUM(gamecell) - SUM(plampfit) as paicai,
+        SUM(plampfit) as gameprofit
+        from report_plam_games
+        <where>
+            <if test="gameplame != null  and gameplame != ''">and gameplame = #{gameplame}</if>
+            <if test="begindate!= null and begindate != ''"><!-- 开始时间检索 -->
+                AND begindate &gt;= STR_TO_DATE(#{begindate},'%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''"><!-- 结束时间检索 -->
+                AND begindate &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d')
+            </if>
+        </where>
+        GROUP BY gameplame
+        <if test="!agentPlatform.startsWith('88')">
+            UNION all
+            select '送礼金额' as liveprop,
+            '0' as gamecell,
+            '0' as paicai,
+            SUM(ticket) from ${agentPlatformLive}.live_host_wage_day
+            where id like concat(#{dateTime}, '%') and ticket is not NULL
+            UNION all
+            SELECT '主播结算打码' AS liveprop, '0' AS gamecell, '0' AS paicai, SUM( lottery_cost ) FROM
+            ${agentPlatformLive}.live_host_wage_day WHERE id LIKE concat(#{dateTime}, '%') and lottery_cost is not NULL
+            UNION ALL
+            select '坐骑金额' as liveprop,'0' as gamecell,'0' as paicai,SUM(total_diamonds) from
+            ${agentPlatformLive}.live_video_prop where p_user_id not in
+            (select id from member_info
+            <where>
+                AND STATUS in ('2'))
+                <if test="begindate!= null and begindate != ''"><!-- 开始时间检索 -->
+                    AND create_date &gt;= STR_TO_DATE(#{begindate},'%Y-%m-%d')
+                </if>
+                <if test="endDate != null and endDate != ''"><!-- 结束时间检索 -->
+                    AND create_date &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d')
+                </if>
+                AND prop_id = '-2'
+            </where>
+        </if>
+    </select>
+</mapper>

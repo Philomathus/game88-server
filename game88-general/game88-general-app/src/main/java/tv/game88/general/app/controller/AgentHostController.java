@@ -9,8 +9,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.general.api.dto.ReqAgent;
 import tv.game88.general.api.dto.RspAgent;
 import tv.game88.general.api.dto.RspHostClient;
-import tv.game88.general.api.service.IAgentHostClientService;
-import tv.game88.general.api.service.IAgentHostService;
+import tv.game88.general.api.service.AgentHostClientService;
+import tv.game88.general.api.service.AgentHostService;
 
 import javax.annotation.Resource;
 
@@ -22,10 +22,10 @@ import javax.annotation.Resource;
 public class AgentHostController {
 
     @Resource
-    private IAgentHostService agentHostService;
+    private AgentHostService agentHostService;
 
     @Resource
-    private IAgentHostClientService agentHostClientService;
+    private AgentHostClientService agentHostClientService;
 
     @PostMapping( "agent" )
     @Operation( summary = "主播获取代理信息" )

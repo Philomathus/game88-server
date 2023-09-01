@@ -2,25 +2,49 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.general.api.mapper.AgentHostMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="tv.game88.general.api.entity.AgentHost">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="api_url" property="apiUrl" />
-        <result column="status" property="status" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="code" property="code" />
-        <result column="update_time" property="updateTime" />
+    <resultMap type="tv.game88.general.api.entity.AgentHost" id="AgentHostResult">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="apiUrl" column="api_url" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="code" column="code" />
     </resultMap>
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id,code, api_url, lottery_url, status, create_by, create_time, update_by, update_time
+
+    <sql id="selectAgentHostVo">
+        select id,
+               name,
+               code,
+               api_url,
+               lottery_url,
+               status,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from agent_host
     </sql>
 
+    <select id="selectAgentHostList" parameterType="tv.game88.general.api.entity.AgentHost" resultMap="AgentHostResult">
+        <include refid="selectAgentHostVo" />
+        <where>
+            <if test="name != null  and name != ''">and name like concat(#{name}, '%')</if>
+            <if test="apiUrl != null  and apiUrl != ''">and api_url like concat(#{apiUrl}, '%')</if>
+            <if test="lotteryUrl != null  and lotteryUrl != ''">and lottery_url like concat(#{lotteryUrl}, '%')</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="code != null ">and `code` = #{code}</if>
+        </where>
+    </select>
+
+    <select id="getAgentList" resultType="java.util.Map">
+        SELECT id dictValue FROM agent_host
+    </select>
+
     <select id="findAgentHost" resultType="tv.game88.general.api.dto.RspAgent">
-        select *
+        select name, api_url
         from agent_host
         where code = #{code}
         limit 1

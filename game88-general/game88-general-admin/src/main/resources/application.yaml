@@ -14,25 +14,45 @@ spring:
   application:
     name: game88-general-admin
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      minimum-idle: 1
-      ## 空闲连接存活最大时间，默认600000（10分钟）
-      idle-timeout: 20000
-      ## 连接池最大连接数，默认是10
-      maximum-pool-size: 200
-      ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
-      auto-commit: true
-      ## 连接池名称
-      pool-name: HikariPool
-      ## 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
-      max-lifetime: 30000
-      ## 数据库连接超时时间,默认30秒，即30000
-      connection-timeout: 60000
-      connection-test-query: SELECT 1 FROM DUAL
-      validation-timeout: 3000
-      login-timeout: 5
+    dynamic:
+      primary: master #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      datasource:
+        master:
+          type: com.zaxxer.hikari.HikariDataSource
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          hikari:
+            minimum-idle: 10
+            ## 空闲连接存活最大时间，默认600000（10分钟）
+            idle-timeout: 20000
+            ## 连接池最大连接数，默认是10
+            maximum-pool-size: 5000
+            ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+            is-auto-commit: true
+            ## 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+            max-lifetime: 30000
+            ## 数据库连接超时时间,默认30秒，即30000
+            connection-timeout: 60000
+            connection-test-query: SELECT 1 FROM DUAL
+            validation-timeout: 3000
+        slave:
+          type: com.zaxxer.hikari.HikariDataSource
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          hikari:
+            ## 最小空闲连接数量
+            minimum-idle: 5
+            ## 空闲连接存活最大时间，默认600000（10分钟）
+            idle-timeout: 120000
+            ## 连接池最大连接数，默认是10
+            maximum-pool-size: 50
+            ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+            is-auto-commit: true
+            ## 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+            max-lifetime: 30000
+            ## 数据库连接超时时间,默认30秒，即30000
+            connection-timeout: 60000
+            connection-test-query: SELECT 1 FROM DUAL
+            validation-timeout: 3000
 
   ## Redis 配置
   redis:

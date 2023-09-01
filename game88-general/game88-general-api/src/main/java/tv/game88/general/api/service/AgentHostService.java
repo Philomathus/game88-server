@@ -1,14 +1,12 @@
-package tv.game88.general.api.mapper;
+package tv.game88.general.api.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
+import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.general.api.dto.RspAgent;
 import tv.game88.general.api.entity.AgentHost;
 
 import java.util.List;
-import java.util.Map;
 
-public interface AgentHostMapper extends BaseMapper<AgentHost> {
+public interface AgentHostService extends IService<AgentHost> {
     /**
      * 查询主播域名管理列表
      *
@@ -18,7 +16,5 @@ public interface AgentHostMapper extends BaseMapper<AgentHost> {
      */
     public List<AgentHost> selectAgentHostList( AgentHost agentHost );
 
-    public List<Map> getAgentList();
-
-    RspAgent findAgentHost( @Param( "code" ) String agent );
+    RspAgent findAgentHost( String agent );
 }
