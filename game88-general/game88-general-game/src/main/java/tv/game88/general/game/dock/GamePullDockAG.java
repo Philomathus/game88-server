@@ -229,7 +229,12 @@ public class GamePullDockAG extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
 
         if ( gameDataRecord.getKindId().equals( "SPTA" ) ) {
-            log.warn( JsonUtil.object2Json( gameDataRecord ) );
+            try {
+                log.warn( JsonUtil.object2Json( gameDataRecord ) );
+                log.warn( XmlUtil.elementToString(element) );
+            } catch ( Exception e ) {
+               log.error( e.getMessage(), e );
+            }
         }
         return gameDataRecord;
     }
