@@ -40,8 +40,8 @@ spring:
           password: dRmBstReqberz!14Xm#
         slave-7709:
           url: jdbc:mysql://rdsdb-7709.c6uwqqgyc6gv.ap-northeast-1.rds.amazonaws.com:3306/7709_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
-          username: ENC(Oio1NRHNaaJOZR97fZvEaY5UE+D4oBpvlSGzCsbr1s6vbPVXecQ3/IEKVIdSPyjq)
-          password: ENC(+CdDSfBay8eP/qc4mf/yPve5LsUgY6SMz9+J6u5vJDkjQIe3sUu/+atlTXrhHIa6JzjUJYFE2Ni8pp5nSnpiiQ==)
+          username: tv77admin
+          password: 5eypHP13jn2Nvaqgfsdjfsada
         slave-7710:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7710_main?useUnicode=true&allowMultiQueries=true
           username: admin
