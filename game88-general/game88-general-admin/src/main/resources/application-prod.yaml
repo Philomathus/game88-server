@@ -10,122 +10,98 @@ spring:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/db_cx001?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7702:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7702_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7703:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7703_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7704:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7704_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7705:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7704_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7706:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7706_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7707:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7707_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7708:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7708_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7709:
           url: jdbc:mysql://rdsdb-7709.c6uwqqgyc6gv.ap-northeast-1.rds.amazonaws.com:3306/7709_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: tv77admin
           password: 5eypHP13jn2Nvaqgfsdjfsada
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7710:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7710_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_7711:
           url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7711_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77yutu:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77yutu_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77jp:
           url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77jp_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77xy:
           url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77xy_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77ml:
           url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77ml_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77je:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77je_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77yt:
           url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77yt_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_88ky:
           url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/88ky?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_88vns:
           url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/88ky2?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77bl:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77bl_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77miai:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77miai_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77mt:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77mt_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77wm:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77wm_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
         slave_77cp:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77cp_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-          driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
     port: 6379
