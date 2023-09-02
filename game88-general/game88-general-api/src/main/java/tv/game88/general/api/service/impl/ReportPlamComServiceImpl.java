@@ -53,7 +53,7 @@ public class ReportPlamComServiceImpl extends ServiceImpl<ReportPlamComMapper, R
             }
         }
 
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamCom.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamCom.getAgentPlatform() );
 
         List<ReportPlamCom> allList = this.baseMapper.selectReportPlamComList( reportPlamCom );
 
@@ -65,7 +65,7 @@ public class ReportPlamComServiceImpl extends ServiceImpl<ReportPlamComMapper, R
 
     @Override
     public List<ReportPlamCom> exportPlamComList( ReportPlamCom reportPlamCom ) {
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamCom.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamCom.getAgentPlatform() );
 
         List<ReportPlamCom> allList = this.baseMapper.selectReportPlamComList( reportPlamCom );
 
@@ -75,7 +75,7 @@ public class ReportPlamComServiceImpl extends ServiceImpl<ReportPlamComMapper, R
 
     public void storage( String dateNowStr, String reportPlamCom ) {
         redisUtil.strSet( "admin-reportPlamCom", "0", Duration.ofMinutes( 5 ) );
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamCom );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamCom );
 
         this.baseMapper.calldataProrepPlamcom( dateNowStr );
 

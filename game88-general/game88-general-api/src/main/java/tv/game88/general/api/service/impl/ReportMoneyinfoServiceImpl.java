@@ -48,7 +48,7 @@ public class ReportMoneyinfoServiceImpl extends ServiceImpl<ReportMoneyinfoMappe
         log.info( "endTime:" + endTime );
         Map<String, Object> resultMap = new HashMap<>();
 
-        DynamicDataSourceContextHolder.push( "slave-" + reportMoneyinfo.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportMoneyinfo.getAgentPlatform() );
 
         log.info( "请求对象:" + reportMoneyinfo.getParams().get( "beginTime" ) + "," + reportMoneyinfo.getParams()
                                                                                                       .get( "endTime" ) );
@@ -77,7 +77,7 @@ public class ReportMoneyinfoServiceImpl extends ServiceImpl<ReportMoneyinfoMappe
             reportMoneyinfo.setTotalAccountGifts( BigDecimal.ZERO );
             return reportMoneyinfo;
         }
-        DynamicDataSourceContextHolder.push( "slave-" + reportMoneyinfo.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportMoneyinfo.getAgentPlatform() );
 
         ReportMoneyinfo reportMoneyinfo1 = this.baseMapper.countMoneyInfoData( reportMoneyinfo );
 
@@ -98,7 +98,7 @@ public class ReportMoneyinfoServiceImpl extends ServiceImpl<ReportMoneyinfoMappe
 
     @Override
     public List<ReportMoneyinfo> exportMoneyinfoList( ReportMoneyinfo reportMoneyinfo ) {
-        DynamicDataSourceContextHolder.push( "slave-" + reportMoneyinfo.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportMoneyinfo.getAgentPlatform() );
 
         List<ReportMoneyinfo> allList = this.baseMapper.selectReportMoneyinfoList( reportMoneyinfo );
 

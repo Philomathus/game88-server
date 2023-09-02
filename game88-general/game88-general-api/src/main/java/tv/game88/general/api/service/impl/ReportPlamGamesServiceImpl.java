@@ -35,7 +35,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
                 storage( dateNowStr, reportPlamGames.getAgentPlatform() );
             }
         }
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGames.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
         List<ReportPlamGames> allList = this.baseMapper.selectReportPlamGamesList( reportPlamGames );
         DynamicDataSourceContextHolder.poll();
 
@@ -45,7 +45,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
 
     @Override
     public ReportPlamGames countBetData( ReportPlamGames reportPlamGames ) {
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGames.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
 
         ReportPlamGames reportPlamGames1 = this.baseMapper.countBetData( reportPlamGames );
 
@@ -57,7 +57,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
     public void storage( String dateNowStr, String agentPlatform ) {
         redisUtil.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
 
-        DynamicDataSourceContextHolder.push( "slave-" + agentPlatform );
+        DynamicDataSourceContextHolder.push( "slave_" + agentPlatform );
 
         this.baseMapper.calldataProrepPlamcom( dateNowStr, agentPlatform );
 
@@ -66,7 +66,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
 
     @Override
     public List<ReportPlamGames> exportPlamGamesList( ReportPlamGames reportPlamGames ) {
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGames.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
 
         List<ReportPlamGames> allList = this.baseMapper.selectReportPlamGamesList( reportPlamGames );
 
@@ -78,7 +78,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
     public List<RspPlamGamesMonth> selectReportPlamGamesListMonth( ReportPlamGames reportPlamGames ) throws ParseException {
         ReportPlamGames reportPlamGames1 = getTime( reportPlamGames );
 
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGames.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
 
         List<RspPlamGamesMonth> allList = this.baseMapper.selectReportPlamGamesListMonth( reportPlamGames1 );
 
@@ -94,7 +94,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
     public RspPlamGamesMonth countBet( ReportPlamGames reportPlamGames ) throws ParseException {
         ReportPlamGames reportPlamGames1 = getTime( reportPlamGames );
 
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGames.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
 
         List<RspPlamGamesMonth> allList = this.baseMapper.selectReportPlamGamesListMonth( reportPlamGames1 );
 

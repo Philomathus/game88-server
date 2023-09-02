@@ -28,7 +28,7 @@ public class ReportPlamGameschildsServiceImpl extends ServiceImpl<ReportPlamGame
     @Override
     public List<ReportPlamGameschilds> selectReportPlamGameschildsList( ReportPlamGameschilds reportPlamGameschilds ) {
 
-        DynamicDataSourceContextHolder.push( "slave-" + reportPlamGameschilds.getAgentPlatform() );
+        DynamicDataSourceContextHolder.push( "slave_" + reportPlamGameschilds.getAgentPlatform() );
 
         List<ReportPlamGameschilds> allList = this.baseMapper.selectReportPlamGameschildsList( reportPlamGameschilds );
 
