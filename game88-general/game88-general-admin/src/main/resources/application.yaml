@@ -26,7 +26,7 @@ spring:
             ## 空闲连接存活最大时间，默认600000（10分钟）
             idle-timeout: 20000
             ## 连接池最大连接数，默认是10
-            maximum-pool-size: 5000
+            maximum-pool-size: 100
             ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
             is-auto-commit: true
             ## 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟

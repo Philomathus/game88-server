@@ -103,6 +103,11 @@
                 <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
                 <version>${dynamic.datasource.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring</artifactId>
+                <version>${dynamic.datasource.version}</version>
+            </dependency>
 
             <!-- swagger -->
             <dependency>
