@@ -19,15 +19,15 @@ spring:
         ## 最小空闲连接数量
         minimum-idle: 5
         ## 空闲连接存活最大时间，默认600000（10分钟）
-        idle-timeout: 120000
+        idle-timeout: 30000
         ## 连接池最大连接数，默认是10
         maximum-pool-size: 20
         ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
         is-auto-commit: true
         ## 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
-        max-lifetime: 30000
+        max-lifetime: 60000
         ## 数据库连接超时时间,默认30秒，即30000
-        connection-timeout: 60000
+        connection-timeout: 30000
         connection-test-query: SELECT 1 FROM DUAL
         validation-timeout: 3000
       primary: master #设置默认的数据源或者数据源组,默认值即为master
