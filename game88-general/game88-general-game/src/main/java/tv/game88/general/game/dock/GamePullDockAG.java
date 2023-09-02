@@ -136,6 +136,9 @@ public class GamePullDockAG extends AbstractGamePull {
                 if ( nodeList.getLength() == 500 ) {
                     log.warn( resultXml );
                 }
+                if ( resultXml.contains( "SPTA" ) ) {
+                    log.warn( resultXml );
+                }
                 return IntStream.range( 0, nodeList.getLength() ).mapToObj( nodeList::item ).collect( Collectors.toList() );
             } catch ( Exception e ) {
                 log.error( e.getMessage() + " : " + resultXml, e );
@@ -229,12 +232,7 @@ public class GamePullDockAG extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
 
         if ( gameDataRecord.getKindId().equals( "SPTA" ) ) {
-            try {
-                log.warn( JsonUtil.object2Json( gameDataRecord ) );
-                log.warn( XmlUtil.elementToString(element) );
-            } catch ( Exception e ) {
-               log.error( e.getMessage(), e );
-            }
+            log.warn( JsonUtil.object2Json( gameDataRecord ) );
         }
         return gameDataRecord;
     }

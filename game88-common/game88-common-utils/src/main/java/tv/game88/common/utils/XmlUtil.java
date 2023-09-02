@@ -27,17 +27,17 @@ public class XmlUtil {
     }
 
     public static String elementToString( Element element ) throws Exception {
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder        domBuilder = domFactory.newDocumentBuilder();
+        DocumentBuilder db  = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-        Document newDoc = domBuilder.newDocument();
+        Document newDoc = db.newDocument();
         newDoc.appendChild( element );
 
-        DOMSource    domSource   = new DOMSource( newDoc );
-        Transformer  transformer = TransformerFactory.newInstance().newTransformer();
-        StringWriter sw          = new StringWriter();
-        StreamResult sr          = new StreamResult( sw );
-        transformer.transform( domSource, sr );
-        return sw.toString();
+        DOMSource domSource = new DOMSource(newDoc);
+        StringWriter stringWriter = new StringWriter();
+        StreamResult streamResult = new StreamResult(stringWriter);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(domSource, streamResult);
+        return stringWriter.toString();
     }
 }

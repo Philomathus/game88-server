@@ -50,7 +50,7 @@ public class RemoteGameDataRecordTask {
             if ( gameRecordVersion == null ) {
                 continue;
             }
-            if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 14 ) ) {
+            if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 30 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
