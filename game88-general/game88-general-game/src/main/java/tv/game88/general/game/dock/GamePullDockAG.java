@@ -153,6 +153,11 @@ public class GamePullDockAG extends AbstractGamePull {
         Element        element        = ( Element ) object;
         GameDataRecord gameDataRecord = new GameDataRecord();
 
+        String flag = element.getAttribute( "flag" );
+        if ( StringUtils.isNotBlank( flag ) && !"1".equals( flag ) ) {
+            return null;
+        }
+
         String reckontime = element.getAttribute( "reckontime" );
         if ( StringUtils.isBlank( reckontime ) ) {
             reckontime = element.getAttribute( "betTime" );
