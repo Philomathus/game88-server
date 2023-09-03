@@ -157,25 +157,6 @@ public class GamePullDockAG extends AbstractGamePull {
         if ( StringUtils.isNotBlank( flag ) && !"1".equals( flag ) ) {
             return null;
         }
-
-        String reckontime = element.getAttribute( "reckontime" );
-        if ( StringUtils.isBlank( reckontime ) ) {
-            reckontime = element.getAttribute( "betTime" );
-        }
-        String reckonTime;
-        if ( StringUtils.isBlank( reckontime ) ) {
-            String        billtime = element.getAttribute( "billtime" );
-            LocalDateTime meiDong;
-            if ( StringUtils.isNumeric( billtime ) ) {
-                LocalDateTime toMeiDong = LocalDateTimeUtils.convertTimestampToMeiDong( Long.parseLong( billtime + "000" ) );
-                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( toMeiDong ) );
-            } else {
-                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( billtime );
-            }
-            reckonTime = LocalDateTimeUtils.format( meiDong );
-        } else {
-            reckonTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
-        }
         String account = element.getAttribute( "username" );
         if ( StringUtils.isBlank( account ) ) {
             account = element.getAttribute( "playName" );
@@ -230,8 +211,28 @@ public class GamePullDockAG extends AbstractGamePull {
         }
         gameDataRecord.setProfit( this.convertNum( cusAccount ) );
         gameDataRecord.setTableId( element.getAttribute( "tableCode" ) );
-        gameDataRecord.setGameStartTime( reckonTime );
-        gameDataRecord.setGameEndTime( reckonTime );
+        String betTime = element.getAttribute( "betTime" );
+        if ( StringUtils.isBlank( betTime ) ) {
+            String        billtime = element.getAttribute( "billtime" );
+            LocalDateTime meiDong;
+            if ( StringUtils.isNumeric( billtime ) ) {
+                LocalDateTime toMeiDong = LocalDateTimeUtils.convertTimestampToMeiDong( Long.parseLong( billtime + "000" ) );
+                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( toMeiDong ) );
+            } else {
+                meiDong = LocalDateTimeUtils.convertMeiDongToDefault( billtime );
+            }
+            betTime = LocalDateTimeUtils.format( meiDong );
+        } else {
+            betTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( betTime ) );
+        }
+        gameDataRecord.setGameStartTime( betTime );
+        String reckontime = element.getAttribute( "reckontime" );
+        if ( StringUtils.isNotBlank( reckontime ) ) {
+            reckontime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( reckontime ) );
+        } else {
+            reckontime = LocalDateTimeUtils.format( LocalDateTime.now() );
+        }
+        gameDataRecord.setGameEndTime( reckontime );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
