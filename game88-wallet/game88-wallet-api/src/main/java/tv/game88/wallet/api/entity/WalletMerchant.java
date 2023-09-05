@@ -45,6 +45,11 @@ public class WalletMerchant implements Serializable {
     private String secretKey;
 
     /**
+     * MD5密钥
+     */
+    private String md5Key;
+
+    /**
      * 状态 (0 禁用 1正常)
      */
     private Integer status;
