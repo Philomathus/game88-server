@@ -136,9 +136,6 @@ public class GamePullDockAG extends AbstractGamePull {
                 if ( nodeList.getLength() == 500 ) {
                     log.warn( resultXml );
                 }
-                if ( resultXml.contains( "SPTA" ) ) {
-                    log.warn( resultXml );
-                }
                 return IntStream.range( 0, nodeList.getLength() ).mapToObj( nodeList::item ).collect( Collectors.toList() );
             } catch ( Exception e ) {
                 log.error( e.getMessage() + " : " + resultXml, e );

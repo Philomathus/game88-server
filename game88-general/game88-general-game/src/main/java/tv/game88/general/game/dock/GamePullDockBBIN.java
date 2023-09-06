@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -25,7 +26,6 @@ import java.io.Reader;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Log4j2
@@ -60,7 +60,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         List<List<Map<String, Object>>> collect = futures.stream().map( t -> {
             try {
                 return t.get();
-            } catch ( InterruptedException | ExecutionException e ) {
+            } catch ( Exception e ) {
                 throw new IllegalStateException( e );
             }
         } ).filter( Objects::nonNull ).toList();
@@ -115,8 +115,9 @@ public class GamePullDockBBIN extends AbstractGamePull {
             return ( List<Map<String, Object>> ) resultMap.get( "data" );
         } else {
             log.error( JsonUtil.object2Json( resultMap ) + ":::" + wagerTypes[ 0 ] );
+            throw new BusinessException( JsonUtil.object2Json( resultMap ) );
         }
-        return new ArrayList<>();
+        //return new ArrayList<>();
     }
 
     @Override
