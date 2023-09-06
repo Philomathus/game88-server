@@ -6,7 +6,7 @@
 
     <resultMap id="WalletRecordResult" type="tv.game88.wallet.api.entity.WalletRecord">
             <id property="tradeNo" column="trade_no" jdbcType="VARCHAR"/>
-            <result property="merchantId" column="merchant_id" jdbcType="VARCHAR"/>
+            <result property="merchantId" column="merchant_id" jdbcType="BIGINT"/>
             <result property="userId" column="user_id" jdbcType="VARCHAR"/>
             <result property="tradeType" column="trade_type" jdbcType="INTEGER"/>
             <result property="amount" column="amount" jdbcType="DECIMAL"/>

@@ -27,7 +27,7 @@ public class WalletRecord implements Serializable {
     /**
      * 商户ID
      */
-    private String merchantId;
+    private Long merchantId;
 
     /**
      * 钱包用户ID
@@ -57,6 +57,7 @@ public class WalletRecord implements Serializable {
     /**
      * 状态
      */
+    //0 处理失败，1 处理成功 ，2 处理中
     private Integer status;
 
     /**

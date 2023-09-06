@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.exception.NoMoneyException;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.wallet.api.entity.WalletFundLog;
-import tv.game88.wallet.api.mapper.WalletFundLogMapper;
+import tv.game88.wallet.api.entity.WalletUserFundLog;
+import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 @Log4j2
 public class WalletUserFundManager {
     @Resource
-    private WalletFundLogMapper walletFundLogMapper;
+    private WalletUserFundLogMapper walletUserFundLogMapper;
     @Resource
-    private WalletUserMapper    walletUserMapper;
+    private WalletUserMapper        walletUserMapper;
 
     /**
      * 会员加钱
@@ -47,7 +47,7 @@ public class WalletUserFundManager {
         }
 
         //日志
-        WalletFundLog log = new WalletFundLog();
+        WalletUserFundLog log = new WalletUserFundLog();
         if ( StringUtils.isNotBlank( businessId ) ) {
             log.setId( businessId );
         } else {
@@ -63,7 +63,7 @@ public class WalletUserFundManager {
         log.setTotalBefore( userBalance );
         log.setTotal( userBalance.add( addMoney ) );
         log.setMarkorder( markorder );
-        int insertLogMoney = walletFundLogMapper.insert( log );
+        int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( updateMoney <= 0 || insertLogMoney <= 0 ) {
             throw new BusinessException( "资金日志记入失败,请重试" );
         }
@@ -94,7 +94,7 @@ public class WalletUserFundManager {
             throw new NoMoneyException( "余额不足" );
         }
         //插入会员资金信息记录
-        WalletFundLog log = new WalletFundLog();
+        WalletUserFundLog log = new WalletUserFundLog();
         log.setId( IdWorker.get32UUID() );
         log.setUserId( userId );
         log.setCreateTime( LocalDateTime.now() );
@@ -105,7 +105,7 @@ public class WalletUserFundManager {
         log.setMark( mark );
         log.setTotalBefore( userMoney );
         log.setTotal( userMoney.subtract( reduceMoney ) );
-        int insertLogMoney = walletFundLogMapper.insert( log );
+        int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( insertLogMoney <= 0 ) {
             throw new BusinessException( "资金日志记入失败,请重试" );
         }
