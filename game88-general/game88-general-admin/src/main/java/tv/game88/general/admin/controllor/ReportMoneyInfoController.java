@@ -21,36 +21,36 @@ import java.util.List;
 /**
  * 平台资金报，记录平台每日收入及支出总额，预估当前会员的积分余额Controller
  *
- * @author 77tv
- * @date 2021-01-25
+ * @author MengJun
+ * @date 2023-07-01
  */
 @RestController
-@RequestMapping( "/web/report-moneyinfo" )
+@RequestMapping( "/admin/report/moneyInfo" )
 @Log4j2
-public class ReportMoneyinfoController extends BaseController {
+public class ReportMoneyInfoController extends BaseController {
     @Resource
-    private IReportMoneyinfoService reportMoneyinfoService;
+    private IReportMoneyinfoService reportMoneyInfoService;
 
     /**
      * 查询平台资金报，记录平台每日收入及支出总额，预估当前会员的积分余额列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:report-moneyinfo:list')" )
+    @PreAuthorize( "@ss.hasPermi('admin:report-moneyInfo:list')" )
     @GetMapping( "/list" )
     public Object list( ReportMoneyinfo reportMoneyinfo ) throws ParseException {
-        return reportMoneyinfoService.selectReportMoneyinfoList( reportMoneyinfo );
+        return reportMoneyInfoService.selectReportMoneyinfoList( reportMoneyinfo );
     }
 
     @GetMapping( value = "/count" )
     public RspBase<ReportMoneyinfo> countMoneyData( ReportMoneyinfo reportMoneyinfo ) throws ParseException {
-        ReportMoneyinfo reportMoneyinfo1 = reportMoneyinfoService.countMoneyData( reportMoneyinfo );
+        ReportMoneyinfo reportMoneyinfo1 = reportMoneyInfoService.countMoneyData( reportMoneyinfo );
         return RspBase.ok( reportMoneyinfo1 );
     }
 
-    @PreAuthorize( "@ss.hasPermi('admin:report-moneyinfo:export')" )
+    @PreAuthorize( "@ss.hasPermi('admin:report-moneyInfo:export')" )
     @Log( title = "平台资金报表导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) {
-        List<ReportMoneyinfo> list = reportMoneyinfoService.exportMoneyinfoList( reportMoneyinfo );
+        List<ReportMoneyinfo> list = reportMoneyInfoService.exportMoneyinfoList( reportMoneyinfo );
         ExportExcelUtil.exportExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
     }
 
