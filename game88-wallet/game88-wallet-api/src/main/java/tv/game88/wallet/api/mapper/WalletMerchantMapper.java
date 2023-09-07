@@ -1,7 +1,10 @@
 package tv.game88.wallet.api.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.math.BigDecimal;
 
 /**
  * @author meng.jun
@@ -11,6 +14,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface WalletMerchantMapper extends BaseMapper<WalletMerchant> {
 
+    BigDecimal getMerchantMoney( @Param( "merchantId" ) Long merchantId );
+
+    int reduceMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) BigDecimal reduceMoney );
+
+    int addMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) BigDecimal addMoney );
 }
 
 

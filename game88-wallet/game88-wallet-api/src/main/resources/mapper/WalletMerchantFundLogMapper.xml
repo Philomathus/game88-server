@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.wallet.api.mapper.WalletMerchantFundLogMapper">
+
+    <resultMap id="WalletMerchantFundLogResult" type="tv.game88.wallet.api.entity.WalletMerchantFundLog">
+        <id property="id" column="id" jdbcType="VARCHAR" />
+        <result property="merchantId" column="merchant_id" jdbcType="BIGINT" />
+        <result property="type" column="type" jdbcType="INTEGER" />
+        <result property="des" column="des" jdbcType="VARCHAR" />
+        <result property="income" column="income" jdbcType="DECIMAL" />
+        <result property="pay" column="pay" jdbcType="DECIMAL" />
+        <result property="totalBefore" column="total_before" jdbcType="DECIMAL" />
+        <result property="total" column="total" jdbcType="DECIMAL" />
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+        <result property="mark" column="mark" jdbcType="VARCHAR" />
+        <result property="markorder" column="markorder" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="selectWalletMerchantFundLogVo">
+        select id,
+               merchant_id,
+               type,
+               des,
+               income,
+               pay,
+               total_before,
+               total,
+               create_time,
+               mark,
+               markorder
+        from wallet_merchant_fund_log
+    </sql>
+</mapper>

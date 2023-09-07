@@ -42,4 +42,23 @@
                remark
         from wallet_merchant
     </sql>
+
+    <select id="getMerchantMoney" resultType="java.math.BigDecimal">
+        select amount
+        from wallet_merchant
+        where id = #{merchantId}
+    </select>
+
+    <update id="reduceMoney">
+        update wallet_merchant
+        set amount = amount - #{money}
+        where id = #{merchantId}
+          and amount - #{money} >= 0
+    </update>
+
+    <update id="addMoney">
+        update wallet_merchant
+        set amount = amount + #{money}
+        where id = #{merchantId}
+    </update>
 </mapper>

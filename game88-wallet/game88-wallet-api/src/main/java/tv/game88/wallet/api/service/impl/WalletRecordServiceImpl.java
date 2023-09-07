@@ -17,7 +17,7 @@ import tv.game88.wallet.api.cache.WalletMerchantCacheUtil;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
-import tv.game88.wallet.api.manager.WalletUserFundManager;
+import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletRecordMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletRecordService;
@@ -43,7 +43,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Resource
     private WalletMerchantCacheUtil walletMerchantCacheUtil;
     @Resource
-    private WalletUserFundManager   walletUserFundManager;
+    private WalletFundManager       walletFundManager;
     @Resource
     private WalletUserMapper        walletUserMapper;
 
@@ -81,6 +81,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         RspPayResult   rspPayResult   = this.validated( reqWithdrawOrder, walletMerchant );
         if ( rspPayResult != null ) {
             return rspPayResult;
+        }
+        if ( walletMerchant.getAmount().compareTo( reqWithdrawOrder.getAmount() ) < 0 ) {
+            return RspPayResult.businessError( "商户余额不足:" + walletMerchant.getAmount() );
         }
         QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqWithdrawOrder.getMerchantId() ).eq( "order_no", reqWithdrawOrder.getOrderNo() );
@@ -151,11 +154,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             walletRecord.setUserId( reqWithdrawOrder.getWalletAddress() );
 
             // 添加会员金额
-            walletUserFundManager.addWalletUserMoney( reqWithdrawOrder.getWalletAddress(), reqWithdrawOrder.getAmount(),
-                    WalletUserFundEnum.TRANSFER_IN,
+            walletFundManager.addWalletUserMoney( reqWithdrawOrder.getWalletAddress(), reqWithdrawOrder.getMerchantId(),
+                    reqWithdrawOrder.getAmount(), WalletUserFundEnum.TRANSFER_IN,
                     "钱包用户资金转入" + reqWithdrawOrder.getAmount(), walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
-
-            //
         }
         this.baseMapper.insert( walletRecord );
     }
