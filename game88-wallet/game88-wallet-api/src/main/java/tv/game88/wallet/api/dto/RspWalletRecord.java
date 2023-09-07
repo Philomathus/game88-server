@@ -1,43 +1,22 @@
-package tv.game88.wallet.api.entity;
+package tv.game88.wallet.api.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 钱包用户上下分记录
- *
- * @TableName wallet_record
- */
-@TableName( value = "wallet_record" )
 @Data
-public class WalletRecord implements Serializable {
+public class RspWalletRecord {
     /**
      * 交易号
      */
-    @TableId( type = IdType.INPUT )
     private String tradeNo;
 
     /**
      * 商户ID
      */
-    private Long merchantId;
-
-    /**
-     * 钱包用户ID
-     */
-    private String userId;
-
-    /**
-     * 交易类型 （1-下分充值 2-上分提现）
-     */
-    private Integer tradeType;
+    private String merchantId;
 
     /**
      * 交易金额
@@ -57,7 +36,6 @@ public class WalletRecord implements Serializable {
     /**
      * 状态
      */
-    //0 处理失败，1 处理成功 ，2 处理中
     private Integer status;
 
     /**
@@ -76,4 +54,6 @@ public class WalletRecord implements Serializable {
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
+
+    private String sign;
 }

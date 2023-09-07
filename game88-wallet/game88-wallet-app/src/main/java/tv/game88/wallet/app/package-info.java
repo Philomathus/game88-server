@@ -1,1 +1,0 @@
-package tv.game88.wallet.app;

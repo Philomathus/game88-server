@@ -16,6 +16,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.game.dto.RspGameDataLog;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.game.api.base.BaseGameDock;
@@ -31,11 +32,11 @@ import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
-import tv.game88.core.game.type.EnumGameCategory;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -382,21 +383,23 @@ public class GameServiceImpl implements GameService {
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
-        return switch ( gamePlatform.getGameCategory() ) {
+        String orderId = switch ( gamePlatform.getGameCategory() ) {
             case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
             case HG -> AESCoder.decrypt( gamePlatform.getDes() )
-                               .concat( LocalDateTimeUtils.format( LocalDateTime.now(),
-                                       LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                               .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                                .concat( RandomStringUtils.randomAlphabetic( 5 ) );
-            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
-                    LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
+            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
         };
+        if ( !redisUtils.strSetIfAbsent( Constants.CONFIG_PREX + "orderId:" + orderId, "", Duration.ofSeconds( 10 ) ) ) {
+            return getGameOrderId( gameMemberId, agent, gamePlatform );
+        }
+        return orderId;
     }
 
     private String getGameAtomicId( Long platformId ) {

@@ -5,21 +5,22 @@
 <mapper namespace="tv.game88.wallet.api.mapper.WalletMerchantMapper">
 
     <resultMap id="WalletMerchantResult" type="tv.game88.wallet.api.entity.WalletMerchant">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="account" column="account" jdbcType="VARCHAR"/>
-            <result property="password" column="password" jdbcType="VARCHAR"/>
-            <result property="secretKey" column="secret_key" jdbcType="VARCHAR"/>
-            <result property="status" column="status" jdbcType="INTEGER"/>
-            <result property="email" column="email" jdbcType="VARCHAR"/>
-            <result property="phone" column="phone" jdbcType="VARCHAR"/>
-            <result property="amount" column="amount" jdbcType="DECIMAL"/>
-            <result property="frozenAmount" column="frozen_amount" jdbcType="DECIMAL"/>
-            <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
-            <result property="loginTime" column="login_time" jdbcType="TIMESTAMP"/>
-            <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
-            <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
-            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <id property="id" column="id" jdbcType="BIGINT" />
+        <result property="name" column="name" jdbcType="VARCHAR" />
+        <result property="account" column="account" jdbcType="VARCHAR" />
+        <result property="password" column="password" jdbcType="VARCHAR" />
+        <result property="secretKey" column="secret_key" jdbcType="VARCHAR" />
+        <result property="md5Key" column="md5_key" jdbcType="VARCHAR" />
+        <result property="status" column="status" jdbcType="INTEGER" />
+        <result property="email" column="email" jdbcType="VARCHAR" />
+        <result property="phone" column="phone" jdbcType="VARCHAR" />
+        <result property="amount" column="amount" jdbcType="DECIMAL" />
+        <result property="frozenAmount" column="frozen_amount" jdbcType="DECIMAL" />
+        <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
+        <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="remark" column="remark" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletMerchantVo">
@@ -28,6 +29,7 @@
                account,
                password,
                secret_key,
+               md5_key,
                status,
                email,
                phone,

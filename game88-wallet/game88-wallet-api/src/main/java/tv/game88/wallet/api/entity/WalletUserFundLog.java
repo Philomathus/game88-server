@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 /**
  * 用户资金日志表
  *
- * @TableName wallet_fund_log
+ * @TableName wallet_user_fund_log
  */
-@TableName( value = "wallet_fund_log" )
+@TableName( value = "wallet_user_fund_log" )
 @Data
-public class WalletFundLog {
+public class WalletUserFundLog {
     /**
      * 系统编号
      */

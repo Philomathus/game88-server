@@ -50,17 +50,17 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
      * 退出处理类
      */
     @Resource
-    private MemberLogoutSuccessHandle       logoutSuccessHandler;
+    private MemberLogoutSuccessHandle            logoutSuccessHandler;
     /**
      * token认证过滤器
      */
     @Resource
-    private MemberAuthenticationTokenFilter authenticationTokenFilter;
+    private MemberAuthenticationTokenFilter      authenticationTokenFilter;
     /**
      * 跨域过滤器
      */
     @Resource
-    private CorsFilter                      corsFilter;
+    private CorsFilter                           corsFilter;
     /**
      * 允许匿名访问的地址
      */
@@ -103,18 +103,12 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
                 // 基于token，所以不需要session
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
                 // 过滤请求
-                .authorizeRequests()
-                .antMatchers( HttpMethod.GET, // Swagger的资源路径需要允许访问
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**"
-                )
-                .permitAll()
+                .authorizeRequests().antMatchers( HttpMethod.GET, // Swagger的资源路径需要允许访问
+                        "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
                 // actuator 健康检查
                 .antMatchers( "/actuator/**" ).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
-                .anyRequest().authenticated()
-                .and()
-                .headers().frameOptions().disable();
+                .anyRequest().authenticated().and().headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler );
         // 添加token有效性校验 filter
         httpSecurity.addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class );
@@ -132,9 +126,9 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
 
     @Bean( name = "myPasswordEncoder" )
     public PasswordEncoder getPasswordEncoder() {
-        DelegatingPasswordEncoder delPasswordEncoder    =
+        DelegatingPasswordEncoder delPasswordEncoder =
                 ( DelegatingPasswordEncoder ) PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        BCryptPasswordEncoder     bcryptPasswordEncoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         delPasswordEncoder.setDefaultPasswordEncoderForMatches( bcryptPasswordEncoder );
         return delPasswordEncoder;
     }

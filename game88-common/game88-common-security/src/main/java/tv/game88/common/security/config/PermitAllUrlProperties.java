@@ -1,5 +1,7 @@
 package tv.game88.common.security.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.RegExUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,6 +31,8 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
 
     private ApplicationContext applicationContext;
 
+    @Getter
+    @Setter
     private List<String> urls = new ArrayList<>();
 
     public String ASTERISK = "*";
@@ -58,13 +62,5 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
     @Override
     public void setApplicationContext( ApplicationContext context ) throws BeansException {
         this.applicationContext = context;
-    }
-
-    public List<String> getUrls() {
-        return urls;
-    }
-
-    public void setUrls( List<String> urls ) {
-        this.urls = urls;
     }
 }

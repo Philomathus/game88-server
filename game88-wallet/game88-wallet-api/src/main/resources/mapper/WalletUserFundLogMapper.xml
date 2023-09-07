@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.wallet.api.mapper.WalletFundLogMapper">
+<mapper namespace="tv.game88.wallet.api.mapper.WalletUserFundLogMapper">
 
-    <resultMap id="WalletFundLogResult" type="tv.game88.wallet.api.entity.WalletFundLog">
+    <resultMap id="WalletUserFundLogResult" type="tv.game88.wallet.api.entity.WalletUserFundLog">
         <id property="id" column="id" jdbcType="VARCHAR" />
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
         <result property="type" column="type" jdbcType="INTEGER" />
@@ -18,7 +18,7 @@
         <result property="markorder" column="markorder" jdbcType="VARCHAR" />
     </resultMap>
 
-    <sql id="selectWalletFundLogVo">
+    <sql id="selectWalletUserFundLogVo">
         select id,
                user_id,
                type,
@@ -30,6 +30,6 @@
                create_time,
                mark,
                markorder
-        from wallet_fund_log
+        from wallet_user_fund_log
     </sql>
 </mapper>
