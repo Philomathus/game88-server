@@ -21,7 +21,7 @@ spring:
       ## 空闲连接存活最大时间，默认600000（10分钟）
       idle-timeout: 20000
       ## 连接池最大连接数，默认是10
-      maximum-pool-size: 200
+      maximum-pool-size: 2000
       ## 此属性控制从池返回的连接的默认自动提交行为,默认值：true
       auto-commit: true
       ## 连接池名称
@@ -61,6 +61,8 @@ spring:
   mvc:
     async:
       request-timeout: 20000
+    pathmatch:
+      matching-strategy: ant_path_matcher
   lifecycle:
     timeout-per-shutdown-phase: 10s
   task:
@@ -70,6 +72,11 @@ spring:
 
 pagehelper:
   autoRuntimeDialect: true
+
+# token配置
+token:
+  # 令牌有效期（默认1天）
+  expireTime: 7
 
 swagger:
   title: Game88 Wallet App Swagger 3 Api Documentation

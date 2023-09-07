@@ -5,25 +5,29 @@
 <mapper namespace="tv.game88.wallet.api.mapper.WalletRecordMapper">
 
     <resultMap id="WalletRecordResult" type="tv.game88.wallet.api.entity.WalletRecord">
-            <id property="tradeId" column="trade_id" jdbcType="VARCHAR"/>
-            <result property="merchantId" column="merchant_id" jdbcType="VARCHAR"/>
+            <id property="tradeNo" column="trade_no" jdbcType="VARCHAR"/>
+            <result property="merchantId" column="merchant_id" jdbcType="BIGINT"/>
             <result property="userId" column="user_id" jdbcType="VARCHAR"/>
             <result property="tradeType" column="trade_type" jdbcType="INTEGER"/>
             <result property="amount" column="amount" jdbcType="DECIMAL"/>
-            <result property="orderId" column="order_id" jdbcType="VARCHAR"/>
+            <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="TINYINT"/>
             <result property="notifyUrl" column="notify_url" jdbcType="VARCHAR"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="selectWalletRecordVo">
-        select trade_id,
+        select trade_no,
                merchant_id,
                user_id,
                trade_type,
                amount,
-               order_id,
+               order_no,
+               status,
                notify_url,
+               remark,
                create_time,
                update_time
         from wallet_record
