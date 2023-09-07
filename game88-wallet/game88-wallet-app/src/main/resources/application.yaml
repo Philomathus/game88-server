@@ -69,6 +69,13 @@ spring:
     scheduling:
       pool:
         size: 50
+  freemarker:
+    request-context-attribute: req
+    suffix: .html
+    cache: false
+    template-loader-path: classpath:/views/
+    settings:
+      number_format: '0.##' #数字格式,无小数点
 
 pagehelper:
   autoRuntimeDialect: true

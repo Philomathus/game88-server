@@ -159,6 +159,11 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
                     "钱包用户资金转入" + reqWithdrawOrder.getAmount(), walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
         }
         this.baseMapper.insert( walletRecord );
+
+        if ( tradeType == 2 ) {
+            // 设置redis队列,定时推送回调
+
+        }
     }
 
     private RspPayResult validated( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant ) {
