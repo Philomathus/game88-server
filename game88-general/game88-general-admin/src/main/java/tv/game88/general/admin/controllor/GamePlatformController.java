@@ -27,7 +27,7 @@ import java.util.List;
  * @author MengJun
  */
 @RestController
-@RequestMapping( "/game/platform" )
+@RequestMapping( "/admin/game/platform" )
 public class GamePlatformController extends BaseController {
     @Resource
     private GamePlatformService gamePlatformService;

@@ -28,8 +28,6 @@
                des,
                md5,
                linecode,
-               rate_clean,
-               rate_beat,
                effect,
                create_by,
                create_time,
