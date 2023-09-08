@@ -30,14 +30,14 @@ public class LoginController extends BaseController {
     private MemberTokenManager memberTokenManager;
 
     @Operation( summary = "发送短信验证码" )
-    @PostMapping( "/sendSmsVerifyCode" )
+    @PostMapping( "/api/sendSmsVerifyCode" )
     @Anonymous
     public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
         return walletUserService.sendSmsVerifyCode( phone );
     }
 
     @Operation( summary = "手机号密码登录接口" )
-    @PostMapping( "/login" )
+    @PostMapping( "/api/login" )
     @Anonymous
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                            @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
@@ -50,7 +50,7 @@ public class LoginController extends BaseController {
     }
 
     @Operation( summary = "注册接口", description = "手机号验证码注册,同时也会更新密码以及直接登录" )
-    @PostMapping( "/register" )
+    @PostMapping( "/api/register" )
     @Anonymous
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                         @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {

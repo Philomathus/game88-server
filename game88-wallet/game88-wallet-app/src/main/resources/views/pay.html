@@ -214,50 +214,50 @@
 </head>
 
 <body>
-    <header>
-        <!-- <img src="" alt=""> -->
-        &lt;
-        <span>VIPPay</span>
-    </header>
-    <main>
-        <div class="title">XXPAY</div>
-        <div class="main-container">
-            <div class="first">
-                <div class="info">订单编号:</div>
+<header>
+    <!-- <img src="" alt=""> -->
+    &lt;
+    <span>VIPPay</span>
+</header>
+<main>
+    <div class="title">XXPAY</div>
+    <div class="main-container">
+        <div class="first">
+            <div class="info">订单编号:</div>
 
-                <div class="code">P20230905201727771gj</div>
-                <div class="purpleInfo">充值金额</div>
-                <div class="amountContainer">
-                    <div class="amount">
-                        133.00
-                    </div>
-                    <div class="logoBank">
-                        G
-                    </div>
+            <div class="code">${orderNo}</div>
+            <div class="purpleInfo">充值金额</div>
+            <div class="amountContainer">
+                <div class="amount">
+                    ${orderMoney}
+                </div>
+                <div class="logoBank">
+                    G
                 </div>
             </div>
-            <div class="second">
-                <div class="labelName">您的XxPay余额:</div>
-                <div class="labelAmount">0.00 G币</div>
-            </div>
-            <div class="third">
-                <div class="label">您的钱包资金密码:</div>
-                <label>
-                    <input type="password" />
-                </label>
-            </div>
-            <div class="fourth">
-                温馨提示:
-                <br />
-                如您是首次使用XxPay,遭未设置資金密码,
-                <br>
-                请使用钱包管理,完善個人資料後設置。
-            </div>
-            <div class="button">
-                确定
-            </div>
         </div>
-    </main>
+        <div class="second">
+            <div class="labelName">您的XxPay余额:</div>
+            <div class="labelAmount">${userMoney} G币</div>
+        </div>
+        <div class="third">
+            <div class="label">您的钱包资金密码:</div>
+            <label>
+                <input type="password"/>
+            </label>
+        </div>
+        <div class="fourth">
+            温馨提示:
+            <br/>
+            如您是首次使用XxPay,遭未设置資金密码,
+            <br>
+            请使用钱包管理,完善個人資料後設置。
+        </div>
+        <div class="button">
+            确定
+        </div>
+    </div>
+</main>
 </body>
 
 </html>

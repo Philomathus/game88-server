@@ -1,9 +1,12 @@
 package tv.game88.wallet.api.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.servlet.ModelAndView;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
-import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Map;
 
 /**
  * @author meng.jun
@@ -12,11 +15,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WalletRecordService extends IService<WalletRecord> {
 
-    RspPayResult payOrder( ReqDepositOrder reqDepositOrder );
+    RspPayResult payOrder( ReqDepositOrder reqDepositOrder ) throws Exception;
 
     RspPayResult withdrawOrder( ReqWithdrawOrder reqWithdrawOrder );
 
     RspPayResult orderQuery( ReqOrderQuery reqOrderQuery );
 
     void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType );
+
+    ModelAndView toDepositOrder( Map<String, Object> resultMap );
 }

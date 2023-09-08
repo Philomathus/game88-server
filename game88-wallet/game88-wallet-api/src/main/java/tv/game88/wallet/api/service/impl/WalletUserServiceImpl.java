@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
@@ -15,9 +16,7 @@ import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.utils.SmsApi;
-import tv.game88.wallet.api.dto.MobileLogin;
-import tv.game88.wallet.api.dto.Phone;
-import tv.game88.wallet.api.dto.RspMember;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletUserService;
@@ -25,6 +24,7 @@ import tv.game88.wallet.api.service.WalletUserService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -243,6 +243,47 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "验证码错误" );
         }
         return null;
+    }
+
+    @Override
+    public RspPayResult embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
+        WalletUser walletUser = null;
+        WalletUser oldm       = null;
+        if ( StringUtils.isBlank( reqEmbeddedLogin.getWalletAddress() ) ) {
+            walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", reqEmbeddedLogin.getPhone() ).one();
+            if ( walletUser == null ) {
+                //检查是不是归档会员回归
+                oldm = this.baseMapper.findMemberHistoryByMobile( reqEmbeddedLogin.getPhone() );
+                if ( oldm != null ) {
+                    walletUser = oldm;
+                } else {
+                    walletUser = this.newWalletUserReg( new MobileLogin() );
+                    walletUser.setPhone( reqEmbeddedLogin.getPhone() );
+                }
+            }
+        } else {
+            walletUser = this.baseMapper.selectById( reqEmbeddedLogin.getWalletAddress() );
+            if ( walletUser == null ) {
+                //检查是不是归档会员回归
+                oldm = this.baseMapper.findMemberHistoryById( reqEmbeddedLogin.getWalletAddress() );
+                if ( oldm != null ) {
+                    walletUser = oldm;
+                } else {
+                    return RspPayResult.businessError( "钱包地址有误" );
+                }
+            }
+        }
+        if ( !redisUtils.lock( "memberLogin:" + reqEmbeddedLogin.getPhone(), 5 ) ) {
+            return RspPayResult.businessError( "请勿重复访问" );
+        }
+        this.baseMapper.insert( walletUser );
+        if ( oldm != null ) {
+            this.baseMapper.deleteByHistoryKey( oldm.getId() );
+        }
+
+        Map<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
+        return RspPayResult.ok( "成功", resultMap );
     }
 }
 

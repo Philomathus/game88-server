@@ -31,7 +31,7 @@ public class MemberAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain chain ) throws ServletException, IOException {
         MemberLoginUser loginUser = memberTokenManager.getLoginUser( request );
         if ( StringUtils.isNotNull( loginUser ) && StringUtils.isNull( MemberSecurityUtils.getAuthentication() ) ) {
-            memberTokenManager.refreshLoginUserCache( loginUser );
+            memberTokenManager.refreshLoginUserCache( loginUser.getUserId() );
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginUser, null,
                     loginUser.getAuthorities() );
             authenticationToken.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ) );

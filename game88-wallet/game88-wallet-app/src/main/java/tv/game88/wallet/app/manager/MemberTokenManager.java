@@ -55,6 +55,26 @@ public class MemberTokenManager {
     }
 
     /**
+     * 设置会员token
+     *
+     * @param platformUser 会员信息
+     * @param ip           登录IP
+     */
+    public String setRspMemberToken( PlatformUser platformUser, String ip ) {
+        if ( platformUser != null ) {
+            String token = this.refreshLoginUserCache( platformUser.getId() );
+            if ( StringUtils.isNotBlank( token ) ) {
+                return token;
+            }
+            MemberLoginUser loginUser = new MemberLoginUser( platformUser );
+            loginUser.setLoginTime( LocalDateTime.now() );
+            loginUser.setLoginIp( ip );
+            return this.createToken( loginUser );
+        }
+        return null;
+    }
+
+    /**
      * 获取用户身份信息
      *
      * @return 用户信息
@@ -67,6 +87,19 @@ public class MemberTokenManager {
             if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
                 return JsonUtil.map2Object( loginUserMap, MemberLoginUser.class );
             }
+        }
+        return null;
+    }
+
+    /**
+     * 获取用户身份信息
+     *
+     * @return 用户信息
+     */
+    public MemberLoginUser getLoginUser( String token ) {
+        Map<Object, Object> loginUserMap = redisUtil.hGetAll( Constants.MEMBER_LOGIN_TOKEN + token );
+        if ( !CollectionUtils.isEmpty( loginUserMap ) ) {
+            return JsonUtil.map2Object( loginUserMap, MemberLoginUser.class );
         }
         return null;
     }
@@ -92,7 +125,7 @@ public class MemberTokenManager {
      * @return 令牌
      */
     private String createToken( MemberLoginUser loginUser ) {
-        String token = RandomStringUtils.randomAlphabetic( 2 ) + IdWorker.get32UUID();
+        String token = RandomStringUtils.randomAlphabetic( 3 ) + IdWorker.get32UUID();
         setLoginUserCache( loginUser, token );
         return token;
     }
@@ -100,13 +133,14 @@ public class MemberTokenManager {
     /**
      * 刷新令牌有效期
      */
-    public void refreshLoginUserCache( MemberLoginUser loginUser ) {
-        String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + loginUser.getUserId() );
+    public String refreshLoginUserCache( String userId ) {
+        String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + userId );
         if ( StringUtils.isNotBlank( token ) ) {
             Duration duration = Duration.ofDays( expireTime );
-            redisUtil.expire( Constants.MEMBER_LOGIN_USER + loginUser.getUserId(), duration );
+            redisUtil.expire( Constants.MEMBER_LOGIN_USER + userId, duration );
             redisUtil.expire( Constants.MEMBER_LOGIN_TOKEN + token, duration );
         }
+        return token;
     }
 
     /**

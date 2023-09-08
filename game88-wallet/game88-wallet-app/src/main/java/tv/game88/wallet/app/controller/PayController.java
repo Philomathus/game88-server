@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
-import tv.game88.wallet.api.dto.ReqDepositOrder;
-import tv.game88.wallet.api.dto.ReqOrderQuery;
-import tv.game88.wallet.api.dto.ReqWithdrawOrder;
-import tv.game88.wallet.api.dto.RspPayResult;
+import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.JsonUtil;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletRecordService;
+import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.vo.PlatformUser;
+import tv.game88.wallet.app.manager.MemberTokenManager;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -30,6 +32,10 @@ import java.util.Map;
 public class PayController extends BaseController {
     @Resource
     private WalletRecordService walletRecordService;
+    @Resource
+    private WalletUserService   walletUserService;
+    @Resource
+    private MemberTokenManager  memberTokenManager;
 
     @ResponseStatus( HttpStatus.BAD_REQUEST )
     @ResponseBody
@@ -49,7 +55,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/depositOrder" )
     @ResponseBody
     @Anonymous
-    public RspPayResult payOrder( @RequestBody @Validated ReqDepositOrder reqDepositOrder ) {
+    public RspPayResult payOrder( @RequestBody @Validated ReqDepositOrder reqDepositOrder ) throws Exception {
         return walletRecordService.payOrder( reqDepositOrder );
     }
 
@@ -72,8 +78,24 @@ public class PayController extends BaseController {
     @Operation( summary = "用户进入支付页面" )
     @GetMapping( "/common/toDepositOrder" )
     @Anonymous
-    public ModelAndView toDepositOrder() {
-        Map<String, String> model = Maps.of( "", "" ).build();
-        return new ModelAndView( "pay", model );
+    public ModelAndView toDepositOrder( @RequestParam( value = "s" ) String sign, @RequestParam( value = "t" ) long time ) throws Exception {
+        String              data      = AESCoder.decryptByKey( sign, AESCoder.secretKey + time );
+        Map<String, Object> resultMap = JsonUtil.json2Map( data );
+        return walletRecordService.toDepositOrder( resultMap );
+    }
+
+    @Operation( summary = "内嵌登录接口" )
+    @PostMapping( "/common/embeddedLogin" )
+    @Anonymous
+    public RspPayResult embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) {
+        RspPayResult rspMemberRspBase = walletUserService.embeddedLogin( reqEmbeddedLogin );
+        Object       object           = rspMemberRspBase.getResult();
+        if ( object != null ) {
+            Map<String, Object> resultMap = ( Map<String, Object> ) object;
+
+            String token = memberTokenManager.setRspMemberToken( ( PlatformUser ) resultMap.get( "userIfo" ), null );
+            resultMap.put( "token", token );
+        }
+        return rspMemberRspBase;
     }
 }

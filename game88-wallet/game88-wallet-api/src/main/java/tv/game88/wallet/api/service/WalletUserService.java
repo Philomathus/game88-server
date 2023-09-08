@@ -1,9 +1,7 @@
 package tv.game88.wallet.api.service;
 
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.MobileLogin;
-import tv.game88.wallet.api.dto.Phone;
-import tv.game88.wallet.api.dto.RspMember;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -19,4 +17,6 @@ public interface WalletUserService extends IService<WalletUser> {
     RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String loginUrl );
 
     RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String loginUrl );
+
+    RspPayResult embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin );
 }

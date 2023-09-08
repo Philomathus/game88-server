@@ -86,7 +86,7 @@
 
     <update id="addChargeMoney">
         update wallet_user
-        set amount = amount + #{money},
+        set amount       = amount + #{money},
             total_charge = total_charge + #{money}
         where id = #{userId}
     </update>
@@ -111,4 +111,10 @@
         from wallet_user_history
         where id = #{userId}
     </delete>
+
+    <select id="findMemberHistoryById" resultType="tv.game88.wallet.api.entity.WalletUser">
+        select *
+        from wallet_user_history
+        where id = #{id}
+    </select>
 </mapper>
