@@ -16,11 +16,11 @@ public interface AgentMapper extends BaseMapper<Agent> {
     /**
      * 查询代理管理列表
      *
-     * @param Agent 代理管理
+     * @param agent 代理管理
      *
      * @return 代理管理集合
      */
-    public List<Agent> selectAgentList( Agent Agent );
+    public List<Agent> selectAgentList( Agent agent );
 
     List<Agent> selectAllAgentList();
 }
