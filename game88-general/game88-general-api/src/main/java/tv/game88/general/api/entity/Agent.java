@@ -1,8 +1,8 @@
 package tv.game88.general.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -25,6 +25,9 @@ public class Agent extends BaseEntity {
 
     /** 状态(1启用0停用) */
     private String status;
+
+    @TableField(exist = false)
+    private String remark;
 
     @Override
     public String toString() {
