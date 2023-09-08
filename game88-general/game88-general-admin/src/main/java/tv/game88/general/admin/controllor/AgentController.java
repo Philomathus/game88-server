@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2021-04-16
  */
 @RestController
-@RequestMapping( "/admin/Agent" )
+@RequestMapping( "/admin/agent" )
 public class AgentController extends BaseController {
     @Resource
     private AgentService agentService;
