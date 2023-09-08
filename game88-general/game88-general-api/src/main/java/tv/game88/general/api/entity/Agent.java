@@ -2,6 +2,7 @@ package tv.game88.general.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -16,7 +17,7 @@ import tv.game88.common.vo.BaseEntity;
 @Data
 public class Agent extends BaseEntity {
     /** 代理key */
-    @TableId( type = IdType.INPUT )
+    @TableId( type = IdType.INPUT, value = "`key`")
     private String key;
 
     /** 公司名称 */

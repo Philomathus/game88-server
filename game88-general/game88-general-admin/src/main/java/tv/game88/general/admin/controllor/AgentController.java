@@ -9,12 +9,13 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.general.api.entity.Agent;
 import tv.game88.general.api.service.AgentService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,10 +35,10 @@ public class AgentController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('admin:agent:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<Agent>> list( Agent Agent ) {
+    public RspBase<List<Agent>> list( Agent agent ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        List<Agent> list = agentService.selectAgentList( Agent );
+        List<Agent> list = agentService.selectAgentList( agent );
         return getRspBasePage( list, pageDomain );
     }
 
@@ -67,8 +68,11 @@ public class AgentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agent:add')" )
     @Log( title = "代理管理", businessType = BusinessType.INSERT )
     @PostMapping
-    public RspBase<?> add( @RequestBody Agent Agent ) {
-        return toResult( agentService.save( Agent ) );
+    public RspBase<?> add( @RequestBody Agent agent ) {
+        agent.setCreateTime( LocalDateTime.now() );
+        agent.setCreateBy( SecurityUtils.getUsername() );
+        agent.setStatus(agent.getStatus().equals("true") ? "1" : "0");
+        return toResult( agentService.save( agent ) );
     }
 
     /**
@@ -77,8 +81,11 @@ public class AgentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agent:edit')" )
     @Log( title = "代理管理", businessType = BusinessType.UPDATE )
     @PutMapping
-    public RspBase<?> edit( @RequestBody Agent Agent ) {
-        return toResult( agentService.updateById( Agent ) );
+    public RspBase<?> edit( @RequestBody Agent agent ) {
+        agent.setUpdateTime( LocalDateTime.now() );
+        agent.setUpdateBy( SecurityUtils.getUsername() );
+        agent.setStatus(agent.getStatus().equals("true") ? "1" : "0");
+        return toResult( agentService.updateById( agent ) );
     }
 
     /**
@@ -86,9 +93,9 @@ public class AgentController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('admin:agent:remove')" )
     @Log( title = "代理管理", businessType = BusinessType.DELETE )
-    @DeleteMapping( "/{ids}" )
-    public RspBase<?> remove( @PathVariable String[] ids ) {
-        return toResult( agentService.removeBatchByIds( Arrays.asList( ids ) ) );
+    @DeleteMapping( "/{key}" )
+    public RspBase<?> remove( @PathVariable String key ) {
+        return toResult( agentService.removeById(  key )  );
     }
 
     /**
@@ -97,7 +104,11 @@ public class AgentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agent:edit')" )
     @Log( title = "代理管理状态修改", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus" )
-    public RspBase<?> changeStatus( @RequestBody Agent Agent ) {
-        return toResult( agentService.updateById( Agent ) );
+    public RspBase<?> changeStatus( @RequestBody Agent agent ) {
+        Agent newAgent = new Agent();
+        newAgent.setKey( agent.getKey() );
+        newAgent.setUpdateTime( LocalDateTime.now() );
+        newAgent.setUpdateBy( SecurityUtils.getUsername() );
+        return toResult( agentService.updateById( newAgent ) );
     }
 }

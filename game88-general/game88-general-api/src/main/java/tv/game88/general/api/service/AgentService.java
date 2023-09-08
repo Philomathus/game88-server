@@ -1,6 +1,7 @@
 package tv.game88.general.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import tv.game88.common.vo.RspBase;
 import tv.game88.general.api.entity.Agent;
 
 import java.util.List;
@@ -15,11 +16,11 @@ public interface AgentService extends IService<Agent> {
     /**
      * 查询代理管理列表
      *
-     * @param Agent 代理管理
+     * @param agent 代理管理
      *
      * @return 代理管理集合
      */
-    public List<Agent> selectAgentList( Agent Agent );
+    public List<Agent> selectAgentList( Agent agent );
 
     List<Agent> selectAllAgentList();
 }
