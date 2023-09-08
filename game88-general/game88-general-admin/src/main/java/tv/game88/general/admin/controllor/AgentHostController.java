@@ -10,6 +10,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.general.api.entity.Agent;
 import tv.game88.general.api.entity.AgentHost;
 import tv.game88.general.api.service.AgentHostService;
 
@@ -95,5 +96,19 @@ public class AgentHostController extends BaseController {
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable String[] ids ) {
         return toResult( agentHostService.removeBatchByIds( Arrays.asList( ids ) ) );
+    }
+
+    /**
+     * 代理管理状态修改
+     */
+    @Log( title = "代理管理状态修改", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeStatus" )
+    public RspBase<?> changeStatus( @RequestBody AgentHost agentHost ) {
+        AgentHost newAgentHost = new AgentHost();
+        newAgentHost.setId( agentHost.getId() );
+        newAgentHost.setStatus( agentHost.getStatus());
+        newAgentHost.setUpdateTime( LocalDateTime.now() );
+        newAgentHost.setUpdateBy( SecurityUtils.getUsername() );
+        return toResult( agentHostService.updateById( newAgentHost ) );
     }
 }

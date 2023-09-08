@@ -19,7 +19,6 @@
                name,
                code,
                api_url,
-               lottery_url,
                status,
                create_by,
                create_time,
@@ -33,7 +32,6 @@
         <where>
             <if test="name != null  and name != ''">and name like concat(#{name}, '%')</if>
             <if test="apiUrl != null  and apiUrl != ''">and api_url like concat(#{apiUrl}, '%')</if>
-            <if test="lotteryUrl != null  and lotteryUrl != ''">and lottery_url like concat(#{lotteryUrl}, '%')</if>
             <if test="status != null ">and status = #{status}</if>
             <if test="code != null ">and `code` = #{code}</if>
         </where>
