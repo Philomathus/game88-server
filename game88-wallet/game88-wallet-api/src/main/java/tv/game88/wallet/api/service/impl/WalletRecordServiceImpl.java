@@ -6,20 +6,20 @@ import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
 import tv.game88.common.exception.BusinessException;
-import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.JsonUtil;
-import tv.game88.common.utils.SpringUtils;
-import tv.game88.common.utils.StringUtils;
+import tv.game88.common.utils.*;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.wallet.api.cache.WalletMerchantCacheUtil;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
+import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletRecordMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
@@ -28,7 +28,7 @@ import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.api.vo.PlatformUser;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.SortedMap;
@@ -43,6 +43,8 @@ import java.util.TreeMap;
 @Log4j2
 public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, WalletRecord> implements WalletRecordService {
     @Resource
+    private RedisUtils              redisUtils;
+    @Resource
     private ConfigEnvCacheUtil      configEnvCacheUtil;
     @Resource
     private WalletMerchantCacheUtil walletMerchantCacheUtil;
@@ -50,6 +52,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     private WalletFundManager       walletFundManager;
     @Resource
     private WalletUserMapper        walletUserMapper;
+    @Resource
+    private PasswordEncoder         passwordEncoder;
 
     @Override
     public RspPayResult payOrder( ReqDepositOrder reqDepositOrder ) throws Exception {
@@ -160,7 +164,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
         if ( tradeType == 2 ) {
             // 设置redis队列,定时推送回调
-
+            this.sendRedisCallbackTask( walletRecord.getTradeNo() );
         }
     }
 
@@ -208,8 +212,11 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Override
-    public ModelAndView toDepositOrder( Map<String, Object> resultMap ) {
-        String merchantId    = resultMap.getOrDefault( "merchant_id", "-1" ).toString();
+    public ModelAndView toDepositOrder( String s, long t ) throws Exception {
+        String              data      = AESCoder.decryptByKey( s, AESCoder.secretKey + t );
+        Map<String, Object> resultMap = JsonUtil.json2Map( data );
+
+        long   merchantId    = Long.parseLong( resultMap.getOrDefault( "merchant_id", "-1" ).toString() );
         String orderNo       = resultMap.getOrDefault( "order_no", "" ).toString();
         String walletAddress = resultMap.getOrDefault( "walletAddress", "" ).toString();
 
@@ -218,15 +225,114 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( walletRecord == null ) {
             throw new BusinessException( "订单不存在" );
         }
-        BigDecimal userMoney = walletUserMapper.getUserMoney( walletAddress );
-        if ( userMoney == null ) {
+        WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( merchantId );
+        if ( walletMerchant == null ) {
+            throw new BusinessException( "商户不存在" );
+        }
+        if ( walletMerchant.getStatus() == 0 ) {
+            throw new BusinessException( "此商户已封禁,请联系客服" );
+        }
+        WalletUser walletUser = walletUserMapper.selectById( walletAddress );
+        if ( walletUser == null ) {
             throw new BusinessException( "钱包用户不存在" );
         }
+        if ( walletUser.getStatus() != 1 ) {
+            throw new BusinessException( "用户状态异常,请联系客服" );
+        }
+        if ( walletUser.getIsVerified() < 2 ) {
+            throw new BusinessException( "用户未实名或实名未认证" );
+        }
+
         Map<String, Object> model = Maps.newHashMap();
         model.put( "orderNo", orderNo );
-        model.put( "userMoney", userMoney );
+        model.put( "userMoney", walletUser.getAmount() );
         model.put( "orderMoney", walletRecord.getAmount() );
-        return new ModelAndView("pay", model );
+        return new ModelAndView( "pay", model );
+    }
+
+    @Override
+    public RspPayResult payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
+        String data = AESCoder.decryptByKey( reqPayDepositOrder.getS(), AESCoder.secretKey + reqPayDepositOrder.getT() );
+
+        Map<String, Object> resultMap     = JsonUtil.json2Map( data );
+        long                merchantId    = Long.parseLong( resultMap.getOrDefault( "merchant_id", "-1" ).toString() );
+        String              orderNo       = resultMap.getOrDefault( "order_no", "" ).toString();
+        String              walletAddress = resultMap.getOrDefault( "walletAddress", "" ).toString();
+
+        WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>().eq( "merchant_id", merchantId )
+                                                                                               .eq( "order_no", orderNo ) );
+        if ( walletRecord == null ) {
+            return RspPayResult.businessError( "订单不存在" );
+        }
+        WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( merchantId );
+        if ( walletMerchant == null ) {
+            return RspPayResult.businessError( "商户不存在" );
+        }
+        if ( walletMerchant.getStatus() == 0 ) {
+            return RspPayResult.businessError( "此商户已封禁,请联系客服" );
+        }
+        WalletUser walletUser = walletUserMapper.selectById( walletAddress );
+        if ( walletUser == null ) {
+            return RspPayResult.businessError( "钱包用户不存在" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspPayResult.businessError( "用户状态异常,请联系客服" );
+        }
+        if ( walletUser.getIsVerified() < 2 ) {
+            return RspPayResult.businessError( "用户未实名或实名未认证" );
+        }
+        RspPayResult rspPayResult = this.validatedPasswordTimes( reqPayDepositOrder.getP().toString(), walletUser );
+        if ( rspPayResult != null ) {
+            return rspPayResult;
+        }
+        if ( walletUser.getAmount().compareTo( walletRecord.getAmount() ) < 0 ) {
+            return RspPayResult.businessError( "用户余额不足" );
+        }
+        // 修改用户支付订单状态并扣除会员金额,然后异步通知支付回调
+        SpringUtils.getBean( WalletRecordService.class ).updateOrderAndSendTask( walletRecord );
+
+        return RspPayResult.ok( "支付成功", null );
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void updateOrderAndSendTask( WalletRecord walletRecord ) {
+        WalletRecord update = new WalletRecord();
+        update.setTradeNo( walletRecord.getTradeNo() );
+        update.setStatus( 1 );
+        update.setUpdateTime( LocalDateTime.now() );
+        this.baseMapper.updateById( update );
+        // 扣除会员金额
+        walletFundManager.reduceWalletUserMoney( walletRecord.getUserId(), walletRecord.getMerchantId(),
+                walletRecord.getAmount(), WalletUserFundEnum.TRANSFER_OUT,
+                "钱包用户资金转出" + walletRecord.getAmount(), walletRecord.getTradeNo(), walletRecord.getOrderNo() );
+
+        // 设置redis队列,定时推送回调
+        this.sendRedisCallbackTask( walletRecord.getTradeNo() );
+    }
+
+    private void sendRedisCallbackTask( String tradeNo ) {
+
+    }
+
+    private RspPayResult validatedPasswordTimes( String rawPassword, WalletUser walletUser ) {
+        if ( StringUtils.isBlank( walletUser.getFundPassword() ) ) {
+            return RspPayResult.businessError( "请设置资金密码" );
+        }
+        String key = Constants.WALLET_PREX + "lock:fundPassword:" + walletUser.getId();
+        if ( !passwordEncoder.matches( rawPassword, walletUser.getFundPassword() ) ) {
+            Long num = redisUtils.strIncrement( key );
+            redisUtils.expire( key, Duration.ofMinutes( 5 ) );
+            if ( num >= 5 ) {
+                return RspPayResult.businessError( "资金密码错误5次，账号被锁定五分钟,请五分钟后再尝试" );
+            }
+            return RspPayResult.businessError( "资金密码错误，请重新输入" );
+        } else {
+            if ( redisUtils.exists( key ) ) {
+                redisUtils.unlink( key );
+            }
+        }
+        return null;
     }
 }
 

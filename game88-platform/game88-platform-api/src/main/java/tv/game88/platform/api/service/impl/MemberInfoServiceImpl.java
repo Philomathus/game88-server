@@ -22,7 +22,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -112,7 +112,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Value( "${spring.profiles.active}" )
     private String profile;
 
-    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public RspInit getLoginInit( Integer dev, String version ) {
@@ -980,7 +981,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         }
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
-        update.setBoxPass( bCryptPasswordEncoder.encode( boxPass.getBoxPass() ) );
+        update.setBoxPass( passwordEncoder.encode( boxPass.getBoxPass() ) );
         int i = this.baseMapper.updateById( update );
         return i > 0 ? RspBase.ok() : RspBase.businessError( "设置保险箱密码异常，请稍后再试" );
     }
@@ -995,7 +996,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "会员不存在" );
         }
         if ( StringUtils.isNotBlank( memberInfo.getBoxPass() )
-                && !bCryptPasswordEncoder.matches( boxPass.getBoxPass(), memberInfo.getBoxPass() ) ) {
+                && !passwordEncoder.matches( boxPass.getBoxPass(), memberInfo.getBoxPass() ) ) {
             return RspBase.businessError( "保险箱密码错误，请重新输入" );
         }
         RspMoney money = new RspMoney();
@@ -1303,7 +1304,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "此手机号已经存在" );
         }
         MemberInfo m = new MemberInfo();
-        m.setPassword( bCryptPasswordEncoder.encode( password ) );
+        m.setPassword( passwordEncoder.encode( password ) );
         m.setHeadImg( String.valueOf( RandomUtils.randomIntWithMax( 1, 14 ) ) );
         m.setId( makeMemberCode() );
         m.setNickName( m.getId() );
@@ -1388,7 +1389,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( passwd ) ) {
             return RspBase.businessError( "非手机注册用户,请绑定手机号" );
         }
-        if ( !bCryptPasswordEncoder.matches( reqResetPasswd.getOldPasswd(), passwd ) ) {
+        if ( !passwordEncoder.matches( reqResetPasswd.getOldPasswd(), passwd ) ) {
             return RspBase.businessError( "原登录密码错误" );
         }
         MemberInfo update = new MemberInfo();

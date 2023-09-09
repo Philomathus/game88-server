@@ -3,6 +3,7 @@ package tv.game88.admin.system.controller;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.admin.system.entity.req.UserResetPwdReq;
@@ -44,7 +45,9 @@ import java.util.stream.Collectors;
 @RequestMapping( "/system/user" )
 public class SysUserController extends BaseController {
     @Resource
-    private ISysUserService userService;
+    private PasswordEncoder     passwordEncoder;
+    @Resource
+    private ISysUserService     userService;
     @Resource
     private ISysRoleService     roleService;
     @Resource
@@ -52,7 +55,7 @@ public class SysUserController extends BaseController {
     @Resource
     private SysUserMapper       sysUserMapper;
     @Value( "${spring.profiles.active}" )
-    private String          profile;
+    private String              profile;
 
     /**
      * 获取用户列表
@@ -103,7 +106,7 @@ public class SysUserController extends BaseController {
             return RspBase.businessError( "新增用户'" + user.getUserName() + "'失败，登录账号已存在" );
         }
         user.setCreateBy( SecurityUtils.getUsername() );
-        user.setPassword( SecurityUtils.encryptPassword( user.getPassword() ) );
+        user.setPassword( passwordEncoder.encode( user.getPassword() ) );
         return toResult( userService.insertUser( user ) );
     }
 
@@ -141,7 +144,7 @@ public class SysUserController extends BaseController {
         }
         SecurityUtils.verifyMFACode( userResetPwdReq.getOtpCode() );
         SysUser user = new SysUser( userResetPwdReq.getUserId() );
-        user.setPassword( SecurityUtils.encryptPassword( userResetPwdReq.getPassword() ) );
+        user.setPassword( passwordEncoder.encode( userResetPwdReq.getPassword() ) );
         user.setUpdateBy( SecurityUtils.getUsername() );
         return toResult( userService.resetPwd( user ) );
     }

@@ -92,8 +92,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             }
             walletUser = oldm;
         }
-        if ( walletUser.getStatus() == 0 ) {
-            return RspBase.businessError( "您被限制登录,请联系客服" );
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
         }
 
         try {

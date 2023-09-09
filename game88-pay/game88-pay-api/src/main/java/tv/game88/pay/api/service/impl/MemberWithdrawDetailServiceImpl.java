@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -64,8 +64,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     private RedisUtils                   redisUtils;
     @Resource
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
-
-    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    @Resource
+    private PasswordEncoder              passwordEncoder;
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
@@ -754,7 +754,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
-        update.setWithdrawalPass( bCryptPasswordEncoder.encode( boxPass.getBoxPass() ) );
+        update.setWithdrawalPass( passwordEncoder.encode( boxPass.getBoxPass() ) );
         int i = memberInfoMapper.updateById( update );
         return i > 0 ? RspBase.ok() : RspBase.businessError( "设置提现密码异常，请稍后再试" );
     }
@@ -772,7 +772,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( StringUtils.isBlank( memberInfo.getWithdrawalPass() ) ) {
             return RspBase.businessError( "请设置提现密码!" );
         }
-        if ( !bCryptPasswordEncoder.matches( req.getWithdrawalPass(), memberInfo.getWithdrawalPass() ) ) {
+        if ( !passwordEncoder.matches( req.getWithdrawalPass(), memberInfo.getWithdrawalPass() ) ) {
             return RspBase.businessError( "提现密码错误，请联系客服!" );
         }
         if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {

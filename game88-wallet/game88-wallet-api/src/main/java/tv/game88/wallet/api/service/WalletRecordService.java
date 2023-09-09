@@ -6,8 +6,6 @@ import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
 
-import java.util.Map;
-
 /**
  * @author meng.jun
  * @description 针对表【wallet_record(钱包用户上下分记录)】的数据库操作Service
@@ -23,5 +21,9 @@ public interface WalletRecordService extends IService<WalletRecord> {
 
     void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType );
 
-    ModelAndView toDepositOrder( Map<String, Object> resultMap );
+    ModelAndView toDepositOrder( String s, long t ) throws Exception;
+
+    RspPayResult payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
+
+    void updateOrderAndSendTask( WalletRecord walletRecord );
 }

@@ -3,6 +3,7 @@ package tv.game88.wallet.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,7 +17,6 @@ import tv.game88.wallet.api.dto.Phone;
 import tv.game88.wallet.api.dto.RspMember;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.app.manager.MemberTokenManager;
-import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import javax.annotation.Resource;
 
@@ -28,6 +28,8 @@ public class LoginController extends BaseController {
     private WalletUserService  walletUserService;
     @Resource
     private MemberTokenManager memberTokenManager;
+    @Resource
+    private PasswordEncoder    passwordEncoder;
 
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/api/sendSmsVerifyCode" )
@@ -42,7 +44,7 @@ public class LoginController extends BaseController {
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                            @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
         RspBase<RspMember> rspMemberRspBase = walletUserService.login( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
@@ -55,7 +57,7 @@ public class LoginController extends BaseController {
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                         @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
         RspBase<RspMember> rspMemberRspBase = walletUserService.register( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );

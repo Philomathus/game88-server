@@ -1,6 +1,7 @@
 package tv.game88.admin.system.controller;
 
 import com.google.common.collect.ImmutableMap;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.constant.HttpStatus;
@@ -32,6 +33,8 @@ public class SysProfileController extends BaseController {
     private ISysUserService     userService;
     @Resource
     private SysUserTokenService sysUserTokenService;
+    @Resource
+    private PasswordEncoder     passwordEncoder;
 
     /**
      * 个人信息
@@ -81,15 +84,15 @@ public class SysProfileController extends BaseController {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         String    userName  = loginUser.getUsername();
         String    password  = loginUser.getPassword();
-        if ( !SecurityUtils.matchesPassword( oldPassword, password ) ) {
+        if ( !passwordEncoder.matches( oldPassword, password ) ) {
             return RspBase.businessError( "修改密码失败，旧密码错误" );
         }
-        if ( SecurityUtils.matchesPassword( newPassword, password ) ) {
+        if ( passwordEncoder.matches( newPassword, password ) ) {
             return RspBase.businessError( "新密码不能与旧密码相同" );
         }
-        if ( userService.resetUserPwd( userName, SecurityUtils.encryptPassword( newPassword ) ) > 0 ) {
+        if ( userService.resetUserPwd( userName, passwordEncoder.encode( newPassword ) ) > 0 ) {
             // 更新缓存用户密码
-            loginUser.getUser().setPassword( SecurityUtils.encryptPassword( newPassword ) );
+            loginUser.getUser().setPassword( passwordEncoder.encode( newPassword ) );
             sysUserTokenService.setLoginUser( loginUser );
             return RspBase.ok();
         }

@@ -1,10 +1,10 @@
 package tv.game88.platform.admin.controller;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +45,8 @@ import java.util.Map;
 public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService memberInfoService;
+    @Resource
+    private PasswordEncoder   passwordEncoder;
     @Resource
     private RedisUtils        redisUtil;
 
@@ -173,7 +175,7 @@ public class MemberInfoController extends BaseController {
 
         MemberInfo update = new MemberInfo();
         update.setId( memberId );
-        update.setPassword( SecurityUtils.encryptPassword( passwd ) );// 这里使用管理员的加密方法和会员的是一样的
+        update.setPassword( passwordEncoder.encode( passwd ) );// 这里使用管理员的加密方法和会员的是一样的
         boolean b = memberInfoService.updateById( update );
         if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );

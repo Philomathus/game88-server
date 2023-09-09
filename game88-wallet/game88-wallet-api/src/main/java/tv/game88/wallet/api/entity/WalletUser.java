@@ -81,7 +81,7 @@ public class WalletUser implements Serializable {
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createdTime;
     /**
-     * 用户状态 (0 禁用 1正常)
+     * 用户状态 (0 禁用 1正常 2 锁定)
      */
     private Integer       status;
     /**

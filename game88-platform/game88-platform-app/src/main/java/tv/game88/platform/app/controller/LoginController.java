@@ -3,6 +3,7 @@ package tv.game88.platform.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,8 @@ public class LoginController extends BaseController {
     private MemberInfoService  memberInfoService;
     @Resource
     private MemberTokenManager memberTokenManager;
+    @Resource
+    private PasswordEncoder    passwordEncoder;
 
     @Operation( summary = "初始化接口" )
     @PostMapping( "/init" )
@@ -57,7 +60,7 @@ public class LoginController extends BaseController {
                                            @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                            @RequestBody MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
         RspBase<RspMember> rspMemberRspBase = memberInfoService.login( mobileLogin, dev, version, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
@@ -82,7 +85,7 @@ public class LoginController extends BaseController {
                                         @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
                                         @RequestBody MobileLogin mobileLogin ) throws Exception {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileLogin.getPasswd() ) );
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
         RspBase<RspMember> rspMemberRspBase = memberInfoService.register( mobileLogin, dev, version, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
@@ -100,7 +103,7 @@ public class LoginController extends BaseController {
     @PostMapping( "/bindPhone" )
     public RspBase<?> bindPhone( @RequestBody MobileBind mobileBind ) {
         if ( StringUtils.isNotBlank( mobileBind.getPasswd() ) ) {
-            mobileBind.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( mobileBind.getPasswd() ) );
+            mobileBind.setPasswordEncrypt( passwordEncoder.encode( mobileBind.getPasswd() ) );
         }
         return memberInfoService.bindPhone( mobileBind, MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
@@ -109,7 +112,7 @@ public class LoginController extends BaseController {
     @PostMapping( "/resetPasswd" )
     public RspBase<?> resetPasswd( @RequestBody ReqResetPasswd reqResetPasswd ) {
         if ( StringUtils.isNotBlank( reqResetPasswd.getNewPasswd() ) ) {
-            reqResetPasswd.setPasswordEncrypt( MemberSecurityUtils.encryptPassword( reqResetPasswd.getNewPasswd() ) );
+            reqResetPasswd.setPasswordEncrypt( passwordEncoder.encode( reqResetPasswd.getNewPasswd() ) );
         }
         return memberInfoService.resetPasswd( reqResetPasswd, MemberSecurityUtils.getLoginUser().getPlatformUser() );
     }
