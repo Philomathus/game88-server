@@ -15,6 +15,8 @@ public class RspMember {
     private String     id;
     @Schema( title = "昵称" )
     private String     nickName;
+    @Schema( title = "真实姓名" )
+    private String     realName;
     @Schema( title = "状态" )
     private Integer    status;
     @Schema( title = "手机号" )
@@ -39,5 +41,12 @@ public class RspMember {
             return phone.substring( 0, 3 ) + "****" + phone.substring( 7 );
         }
         return phone;
+    }
+
+    public String getRealName() {
+        if ( StringUtils.isNotBlank( realName ) ) {
+            return phone.charAt( 0 ) + "**";
+        }
+        return realName;
     }
 }
