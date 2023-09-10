@@ -89,7 +89,7 @@ public class OrderCallbackProcessTask {
         if ( !redisUtils.lock( "OrderCallback:processTimeoutOrder", 30 ) ) {
             return;
         }
-        // 将15分钟前为完成的订单设置为失败 
+        // 将15分钟前未完成的订单设置为失败
         LocalDateTime dateTime = LocalDateTime.now().minusMinutes( 15 );
         walletRecordService.update( new UpdateWrapper<WalletRecord>().set( "status", 0 ).eq( "status", 2 )
                                                                      .ge( "update_time", dateTime ) );
