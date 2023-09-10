@@ -1,5 +1,7 @@
 package tv.game88.general.api.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import tv.game88.common.vo.BaseEntity;
@@ -27,5 +29,9 @@ public class AgentHost extends BaseEntity {
      * 邀请码
      */
     private String        code;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    private String remark;
 
 }
