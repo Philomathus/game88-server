@@ -26,4 +26,6 @@ public interface WalletRecordService extends IService<WalletRecord> {
     RspPayResult payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
 
     void updateOrderAndSendTask( WalletRecord walletRecord );
+
+    RspWalletRecord getRspData( String tradeNo );
 }

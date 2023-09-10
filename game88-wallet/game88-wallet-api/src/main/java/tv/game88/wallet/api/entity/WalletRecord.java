@@ -61,9 +61,19 @@ public class WalletRecord implements Serializable {
     private Integer status;
 
     /**
+     * 通知状态
+     */
+    //0 无需通知, 1 通知成功, 2 通知失败
+    private Integer notifyStatus;
+
+    /**
+     * 通知结果
+     */
+    private String  notifyResult;
+    /**
      * 商户备注
      */
-    private String remark;
+    private String  remark;
 
     /**
      * 交易时间

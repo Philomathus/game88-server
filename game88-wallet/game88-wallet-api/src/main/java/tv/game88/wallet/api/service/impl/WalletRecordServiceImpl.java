@@ -137,6 +137,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         WalletRecord walletRecord = new WalletRecord();
         walletRecord.setTradeNo( GenerateOrderCacheUtils.me.getOrderIdNoTime( 32 ) );
         walletRecord.setStatus( 2 ); //0 处理失败，1 处理成功 ，2 处理中
+        walletRecord.setNotifyStatus( 0 ); //0 无需通知, 1 通知成功, 2 通知失败
         walletRecord.setMerchantId( reqOrderBase.getMerchantId() );
         walletRecord.setOrderNo( reqOrderBase.getOrderNo() );
         walletRecord.setTradeType( tradeType );
@@ -164,7 +165,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
         if ( tradeType == 2 ) {
             // 设置redis队列,定时推送回调
-            this.sendRedisCallbackTask( walletRecord.getTradeNo() );
+            this.sendRedisCallbackTask( walletRecord.getTradeNo(), walletRecord.getNotifyUrl() );
         }
     }
 
@@ -300,6 +301,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         WalletRecord update = new WalletRecord();
         update.setTradeNo( walletRecord.getTradeNo() );
         update.setStatus( 1 );
+        update.setNotifyStatus( 0 );
         update.setUpdateTime( LocalDateTime.now() );
         this.baseMapper.updateById( update );
         // 扣除会员金额
@@ -308,11 +310,20 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
                 "钱包用户资金转出" + walletRecord.getAmount(), walletRecord.getTradeNo(), walletRecord.getOrderNo() );
 
         // 设置redis队列,定时推送回调
-        this.sendRedisCallbackTask( walletRecord.getTradeNo() );
+        this.sendRedisCallbackTask( walletRecord.getTradeNo(), walletRecord.getNotifyUrl() );
     }
 
-    private void sendRedisCallbackTask( String tradeNo ) {
+    private void sendRedisCallbackTask( String tradeNo, String notifyUrl ) {
+        if ( StringUtils.isBlank( notifyUrl ) ) {
+            return;
+        }
+        long timestamp = LocalDateTimeUtils.localDateToTimestamp( LocalDateTime.now().plusSeconds( 5 ) );
 
+        Map<String, Object> map = Maps.newHashMap();
+        map.put( "time", timestamp );
+        map.put( "num", 0 );
+        map.put( "notifyUrl", notifyUrl );
+        redisUtils.hSet( Constants.WALLET_PREX + "callback:orderNo", tradeNo, JsonUtil.object2Json( map ) );
     }
 
     private RspPayResult validatedPasswordTimes( String rawPassword, WalletUser walletUser ) {
@@ -333,6 +344,17 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             }
         }
         return null;
+    }
+
+    @Override
+    public RspWalletRecord getRspData( String tradeNo ) {
+        WalletRecord    walletRecord    = this.baseMapper.selectById( tradeNo );
+        WalletMerchant  walletMerchant  = walletMerchantCacheUtil.getWalletMerchantCache( walletRecord.getMerchantId() );
+        RspWalletRecord rspWalletRecord = new RspWalletRecord();
+        BeanUtils.copyProperties( walletRecord, rspWalletRecord );
+        Map<String, Object> reqquestMap = JsonUtil.object2Map( rspWalletRecord );
+        rspWalletRecord.setSign( this.sign( reqquestMap, walletMerchant ) );
+        return rspWalletRecord;
     }
 }
 
