@@ -32,6 +32,8 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     int deleteByHistoryKey( @Param( "userId" ) String userId );
 
     WalletUser findMemberHistoryById( @Param( "id" ) String walletAddress );
+
+    String getUserPasswd( String userId );
 }
 
 

@@ -3,7 +3,6 @@ package tv.game88.wallet.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
-import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.MobileLogin;
 import tv.game88.wallet.api.dto.Phone;
+import tv.game88.wallet.api.dto.ReqResetPasswd;
 import tv.game88.wallet.api.dto.RspMember;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.app.manager.MemberTokenManager;
+import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import javax.annotation.Resource;
 
@@ -29,8 +29,6 @@ public class LoginController extends BaseController {
     private WalletUserService  walletUserService;
     @Resource
     private MemberTokenManager memberTokenManager;
-    @Resource
-    private PasswordEncoder    passwordEncoder;
 
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/api/sendSmsVerifyCode" )
@@ -45,9 +43,6 @@ public class LoginController extends BaseController {
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                            @RequestHeader( value = "dev", required = false ) Integer dev,
                                            @RequestBody @Validated MobileLogin mobileLogin ) {
-        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
-        }
         RspBase<RspMember> rspMemberRspBase = walletUserService.login( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
@@ -59,11 +54,14 @@ public class LoginController extends BaseController {
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
                                         @RequestHeader( value = "dev", required = false ) Integer dev,
                                         @RequestBody @Validated MobileLogin mobileLogin ) {
-        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
-        }
         RspBase<RspMember> rspMemberRspBase = walletUserService.register( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
+    }
+
+    @Operation( summary = "重置登录密码", description = "根据旧密码重置登录密码,需要登录token" )
+    @PostMapping( "/api/resetPasswd" )
+    public RspBase<?> resetPasswd( @RequestBody @Validated ReqResetPasswd reqResetPasswd ) {
+        return walletUserService.resetPasswd( reqResetPasswd, MemberSecurityUtils.getUserId() );
     }
 }

@@ -60,7 +60,7 @@ public abstract class ControllerExceptionHandler {
     public RspBase<?> methodArgumentNotValidException( MethodArgumentNotValidException ex ) {
         BindingResult    result      = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        RspBase<?>       error       = new RspBase<>( HttpStatus.BAD_REQUEST.value(), "字段验证错误:" );
+        RspBase<?>       error       = new RspBase<>( HttpStatus.BAD_REQUEST.value(), "数据验证错误:" );
         for ( FieldError fieldError : fieldErrors ) {
             error.setMsg( error.getMsg().concat( fieldError.getField() + ":" + fieldError.getDefaultMessage() + ";" ) );
         }

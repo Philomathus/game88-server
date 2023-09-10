@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
@@ -18,12 +19,16 @@ import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.utils.SmsApi;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletUser;
+import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,6 +50,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     private ConfigEnvCacheUtil    configEnvCacheUtil;
     @Resource
     private AuthenticationManager authenticationManager;
+    @Resource
+    private PasswordEncoder       passwordEncoder;
+
+    @Resource
+    private WalletUserFundLogMapper walletUserFundLogMapper;
 
     @Override
     public RspBase<?> sendSmsVerifyCode( Phone phone ) {
@@ -136,7 +146,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             walletUser.setLinkUrl( loginUrl );
         }
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
-            walletUser.setPassword( mobileLogin.getPasswordEncrypt() );
+            walletUser.setPassword( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
     }
 
@@ -262,6 +272,68 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
         return RspBase.ok( "成功", resultMap );
+    }
+
+    @Override
+    public RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, String userId ) {
+        String passwd = this.baseMapper.getUserPasswd( userId );
+        if ( StringUtils.isBlank( passwd ) ) {
+            // TODO
+        }
+        if ( !passwordEncoder.matches( reqResetPasswd.getOldPasswd(), passwd ) ) {
+            return RspBase.businessError( "原登录密码错误" );
+        }
+        WalletUser update = new WalletUser();
+        update.setId( userId );
+        update.setPassword( passwordEncoder.encode( reqResetPasswd.getNewPasswd() ) );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok( "登录密码更新成功" ) : RspBase.businessError( "登录密码更新失败,请重试" );
+    }
+
+    @Override
+    public RspBase<RspAmount> getAmount( String userId ) {
+        RspAmount rspAmount = new RspAmount();
+        rspAmount.setAmount( this.baseMapper.getUserMoney( userId ).setScale( 2, RoundingMode.HALF_DOWN ) );
+        return RspBase.ok( rspAmount );
+    }
+
+    @Override
+    public RspBase<RspMember> getUserInfo( String userId ) {
+        WalletUser walletUser = this.baseMapper.selectById( userId );
+        RspMember  rspMember  = new RspMember();
+        BeanUtils.copyProperties( walletUser, rspMember );
+        return RspBase.ok( rspMember );
+    }
+
+    @Override
+    public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
+        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "fund_password" )
+                                                                          .one();
+        if ( walletUser == null ) {
+            return RspBase.businessError( "用户不存在" );
+        }
+        if ( StringUtils.isNotBlank( walletUser.getFundPassword() ) ) {
+            return RspBase.businessError( "已经设置过资金密码" );
+        }
+        WalletUser update = new WalletUser();
+        update.setId( userId );
+        update.setFundPassword( passwordEncoder.encode( reqFundPass.getFundPass() ) );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "设置资金密码异常，请稍后再试" );
+    }
+
+    @Override
+    public List<RspLogFund> getFundDetails( String userId, ReqLogFund reqLogFund ) {
+        String           beginDay     = reqLogFund.getEnumReqTime().getBeginDayTime();
+        String           endDay       = reqLogFund.getEnumReqTime().getEndDayTime();
+        List<RspLogFund> logMoneyList = walletUserFundLogMapper.findLogFundList( userId, reqLogFund, beginDay, endDay );
+        for ( RspLogFund rspLogMoney : logMoneyList ) {
+            WalletUserFundEnum byType = WalletUserFundEnum.getByType( rspLogMoney.getType() );
+            if ( byType != null ) {
+                rspLogMoney.setDes( byType.getDes() );
+            }
+        }
+        return logMoneyList;
     }
 }
 

@@ -117,4 +117,9 @@
         from wallet_user_history
         where id = #{id}
     </select>
+    <select id="getUserPasswd" resultType="java.lang.String">
+        select password
+        from wallet_user
+        where id = #{userId}
+    </select>
 </mapper>
