@@ -14,4 +14,6 @@ import javax.annotation.Resource;
 public class TransactionController extends BaseController {
     @Resource
     private WalletTransactionService walletTransactionService;
+
+    
 }

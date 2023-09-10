@@ -13,7 +13,7 @@
             <result property="amount" column="amount" jdbcType="DECIMAL"/>
             <result property="status" column="status" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="successTransTime" column="success_trans_time" jdbcType="TIMESTAMP"/>
+            <result property="transEndTime" column="trans_end_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="selectWalletTransactionVo">
@@ -25,7 +25,7 @@
                amount,
                status,
                create_time,
-               success_trans_time
+               trans_end_time
         from wallet_transaction
     </sql>
 </mapper>

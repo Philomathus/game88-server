@@ -1,5 +1,6 @@
 package tv.game88.wallet.app.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 @Controller
 @Tag( name = "支付接口" )
+@Hidden
 @Log4j2
 public class PayController extends BaseController {
     @Resource

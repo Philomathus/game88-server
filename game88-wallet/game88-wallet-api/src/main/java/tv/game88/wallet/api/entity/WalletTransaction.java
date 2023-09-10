@@ -65,5 +65,5 @@ public class WalletTransaction implements Serializable {
      * 交易完成时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private LocalDateTime successTransTime;
+    private LocalDateTime transEndTime;
 }
