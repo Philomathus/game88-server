@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.servlet.ModelAndView;
+import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
@@ -13,17 +14,17 @@ import tv.game88.wallet.api.entity.WalletRecord;
  */
 public interface WalletRecordService extends IService<WalletRecord> {
 
-    RspPayResult payOrder( ReqDepositOrder reqDepositOrder ) throws Exception;
+    RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception;
 
-    RspPayResult withdrawOrder( ReqWithdrawOrder reqWithdrawOrder );
+    RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder );
 
-    RspPayResult orderQuery( ReqOrderQuery reqOrderQuery );
+    RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery );
 
     void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType );
 
     ModelAndView toDepositOrder( String s, long t ) throws Exception;
 
-    RspPayResult payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
+    RspBase<?> payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
 
     void updateOrderAndSendTask( WalletRecord walletRecord );
 

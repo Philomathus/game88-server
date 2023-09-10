@@ -18,5 +18,5 @@ public interface WalletUserService extends IService<WalletUser> {
 
     RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String loginUrl );
 
-    RspPayResult embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin );
+    RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin );
 }

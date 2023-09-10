@@ -1,19 +1,15 @@
 package tv.game88.wallet.app.controller;
 
-import io.jsonwebtoken.lang.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
+import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletRecordService;
 import tv.game88.wallet.api.service.WalletUserService;
@@ -21,7 +17,6 @@ import tv.game88.wallet.api.vo.PlatformUser;
 import tv.game88.wallet.app.manager.MemberTokenManager;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -35,25 +30,11 @@ public class PayController extends BaseController {
     @Resource
     private MemberTokenManager  memberTokenManager;
 
-    @ResponseStatus( HttpStatus.BAD_REQUEST )
-    @ResponseBody
-    @ExceptionHandler( MethodArgumentNotValidException.class )
-    public RspPayResult methodArgumentNotValidException( MethodArgumentNotValidException ex ) {
-        BindingResult    result      = ex.getBindingResult();
-        List<FieldError> fieldErrors = result.getFieldErrors();
-        RspPayResult     error       = new RspPayResult( HttpStatus.BAD_REQUEST.value(), "字段验证错误" );
-        for ( FieldError fieldError : fieldErrors ) {
-            error.getError()
-                 .add( Maps.of( "field", fieldError.getField() ).and( "message", fieldError.getDefaultMessage() ).build() );
-        }
-        return error;
-    }
-
     @Operation( summary = "支付下单接口" )
     @PostMapping( "/common/depositOrder" )
     @ResponseBody
     @Anonymous
-    public RspPayResult payOrder( @RequestBody @Validated ReqDepositOrder reqDepositOrder ) throws Exception {
+    public RspBase<RspWalletRecordPay> payOrder( @RequestBody @Validated ReqDepositOrder reqDepositOrder ) throws Exception {
         return walletRecordService.payOrder( reqDepositOrder );
     }
 
@@ -61,7 +42,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/withdrawOrder" )
     @ResponseBody
     @Anonymous
-    public RspPayResult withdrawOrder( @RequestBody @Validated ReqWithdrawOrder reqWithdrawOrder ) {
+    public RspBase<RspWalletRecord> withdrawOrder( @RequestBody @Validated ReqWithdrawOrder reqWithdrawOrder ) {
         return walletRecordService.withdrawOrder( reqWithdrawOrder );
     }
 
@@ -69,7 +50,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/orderQuery" )
     @ResponseBody
     @Anonymous
-    public RspPayResult orderQuery( @RequestBody @Validated ReqOrderQuery reqOrderQuery ) {
+    public RspBase<RspWalletRecord> orderQuery( @RequestBody @Validated ReqOrderQuery reqOrderQuery ) {
         return walletRecordService.orderQuery( reqOrderQuery );
     }
 
@@ -83,9 +64,9 @@ public class PayController extends BaseController {
     @Operation( summary = "内嵌登录接口" )
     @PostMapping( "/common/embeddedLogin" )
     @Anonymous
-    public RspPayResult embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) {
-        RspPayResult rspMemberRspBase = walletUserService.embeddedLogin( reqEmbeddedLogin );
-        Object       object           = rspMemberRspBase.getResult();
+    public RspBase<?> embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) {
+        RspBase<?> rspMemberRspBase = walletUserService.embeddedLogin( reqEmbeddedLogin );
+        Object       object           = rspMemberRspBase.getData();
         if ( object != null ) {
             Map<String, Object> resultMap = ( Map<String, Object> ) object;
 
@@ -98,7 +79,7 @@ public class PayController extends BaseController {
     @Operation( summary = "用户请求支付" )
     @PostMapping( "/common/payDepositOrder" )
     @Anonymous
-    public RspPayResult payDepositOrder( @RequestBody @Validated ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
+    public RspBase<?> payDepositOrder( @RequestBody @Validated ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
         return walletRecordService.payDepositOrder( reqPayDepositOrder );
     }
 }

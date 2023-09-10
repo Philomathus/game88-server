@@ -3,6 +3,9 @@ package tv.game88.common.exception;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,6 +14,7 @@ import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 控制器异常处理
@@ -30,7 +34,6 @@ public abstract class ControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus( HttpStatus.OK )
     public RspBase<?> resolveException( Exception e ) throws Exception {
-
         if ( e instanceof SessionExpireException || e instanceof NotLoginException ) {
             return RspBase.sessionError( e.getMessage() );
         } else if ( e instanceof NumberFormatException ) {
@@ -49,5 +52,18 @@ public abstract class ControllerExceptionHandler {
                     e.getMessage(), request.getHeader( "dev" ), e );
             return RspBase.businessError( "系统错误,请联系值班技术" );
         }
+    }
+
+    @ResponseStatus( HttpStatus.BAD_REQUEST )
+    @ResponseBody
+    @ExceptionHandler( MethodArgumentNotValidException.class )
+    public RspBase<?> methodArgumentNotValidException( MethodArgumentNotValidException ex ) {
+        BindingResult    result      = ex.getBindingResult();
+        List<FieldError> fieldErrors = result.getFieldErrors();
+        RspBase<?>       error       = new RspBase<>( HttpStatus.BAD_REQUEST.value(), "字段验证错误:" );
+        for ( FieldError fieldError : fieldErrors ) {
+            error.setMsg( error.getMsg().concat( fieldError.getField() + ":" + fieldError.getDefaultMessage() + ";" ) );
+        }
+        return error;
     }
 }

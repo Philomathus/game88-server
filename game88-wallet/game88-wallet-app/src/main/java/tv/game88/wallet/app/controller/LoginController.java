@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -34,7 +35,7 @@ public class LoginController extends BaseController {
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/api/sendSmsVerifyCode" )
     @Anonymous
-    public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
+    public RspBase<?> loginPasswd( @RequestBody @Validated Phone phone ) {
         return walletUserService.sendSmsVerifyCode( phone );
     }
 
@@ -42,7 +43,8 @@ public class LoginController extends BaseController {
     @PostMapping( "/api/login" )
     @Anonymous
     public RspBase<RspMember> loginPasswd( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
-                                           @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
+                                           @RequestHeader( value = "dev", required = false ) Integer dev,
+                                           @RequestBody @Validated MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
             mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }
@@ -55,7 +57,8 @@ public class LoginController extends BaseController {
     @PostMapping( "/api/register" )
     @Anonymous
     public RspBase<RspMember> register( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
-                                        @RequestHeader( "dev" ) Integer dev, @RequestBody MobileLogin mobileLogin ) {
+                                        @RequestHeader( value = "dev", required = false ) Integer dev,
+                                        @RequestBody @Validated MobileLogin mobileLogin ) {
         if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
             mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
         }

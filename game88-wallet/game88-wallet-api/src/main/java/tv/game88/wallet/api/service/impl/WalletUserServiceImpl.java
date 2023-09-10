@@ -48,9 +48,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Override
     public RspBase<?> sendSmsVerifyCode( Phone phone ) {
-        if ( StringUtils.isBlank( phone.getPhone() ) ) {
-            return RspBase.businessError( "请输入你的手机号" );
-        }
         if ( ValidatorUtil.isMobile( phone.getPhone() ) ) {
             return RspBase.businessError( "手机号码不正确" );
         }
@@ -72,16 +69,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Override
     public RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String loginUrl ) {
-        if ( StringUtils.isBlank( mobileLogin.getMobile() ) ) {
-            return RspBase.businessError( "请输入手机号码" );
-        }
-        if ( mobileLogin.getMobile().length() != 11 ) {
-            return RspBase.businessError( "请输入正确的手机号" );
-        }
-        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
-            return RspBase.businessError( "请输入登陆密码" );
-        }
-
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         WalletUser oldm       = null;
         if ( walletUser == null ) {
@@ -163,9 +150,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 }
             }
         }
-        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
-            return RspBase.businessError( "请输入登陆密码" );
-        }
 
         RspBase rspBase = this.verificationPhoneCode( mobileLogin.getMobile(), mobileLogin.getCode() );
         if ( rspBase != null ) {
@@ -222,12 +206,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     private RspBase<?> verificationPhoneCode( String phone, String code ) {
-        if ( StringUtils.isBlank( phone ) ) {
-            return RspBase.businessError( "请输入手机号" );
-        }
-        if ( phone.length() != 11 ) {
-            return RspBase.businessError( "请输入正确的手机号" );
-        }
         if ( StringUtils.isBlank( code ) ) {
             return RspBase.businessError( "请输入短信验证码" );
         }
@@ -246,7 +224,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
-    public RspPayResult embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
+    public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletUser walletUser = null;
         WalletUser oldm       = null;
         if ( StringUtils.isBlank( reqEmbeddedLogin.getWalletAddress() ) ) {
@@ -269,12 +247,12 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 if ( oldm != null ) {
                     walletUser = oldm;
                 } else {
-                    return RspPayResult.businessError( "钱包地址有误" );
+                    return RspBase.businessError( "钱包地址有误" );
                 }
             }
         }
         if ( !redisUtils.lock( "memberLogin:" + reqEmbeddedLogin.getPhone(), 5 ) ) {
-            return RspPayResult.businessError( "请勿重复访问" );
+            return RspBase.businessError( "请勿重复访问" );
         }
         this.baseMapper.insert( walletUser );
         if ( oldm != null ) {
@@ -283,7 +261,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
-        return RspPayResult.ok( "成功", resultMap );
+        return RspBase.ok( "成功", resultMap );
     }
 }
 
