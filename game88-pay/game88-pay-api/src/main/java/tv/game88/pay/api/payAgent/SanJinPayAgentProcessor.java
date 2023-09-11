@@ -18,7 +18,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.pay.api.dto.RspConfigBankList;
+import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;

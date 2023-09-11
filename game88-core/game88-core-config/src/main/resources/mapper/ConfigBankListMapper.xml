@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.pay.api.mapper.ConfigBankListMapper">
-    <resultMap type="tv.game88.pay.api.entity.ConfigBankList" id="ConfigBankListResult">
+<mapper namespace="tv.game88.core.config.mapper.ConfigBankListMapper">
+    <resultMap type="tv.game88.core.config.entity.ConfigBankList" id="ConfigBankListResult">
         <result property="id" column="id" />
         <result property="bankCode" column="bank_code" />
         <result property="bankName" column="bank_name" />
@@ -15,7 +15,7 @@
         from config_bank_list
     </sql>
 
-    <select id="selectConfigBankListList" parameterType="tv.game88.pay.api.entity.ConfigBankList"
+    <select id="selectConfigBankListList" parameterType="tv.game88.core.config.entity.ConfigBankList"
             resultMap="ConfigBankListResult">
         <include refid="selectConfigBankListVo" />
         <where>

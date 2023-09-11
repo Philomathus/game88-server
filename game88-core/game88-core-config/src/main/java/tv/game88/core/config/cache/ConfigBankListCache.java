@@ -1,4 +1,4 @@
-package tv.game88.pay.api.cache;
+package tv.game88.core.config.cache;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -9,9 +9,9 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.pay.api.dto.RspConfigBankList;
-import tv.game88.pay.api.entity.ConfigBankList;
-import tv.game88.pay.api.mapper.ConfigBankListMapper;
+import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
+import tv.game88.core.config.mapper.ConfigBankListMapper;
 
 import javax.annotation.Resource;
 import java.time.Duration;

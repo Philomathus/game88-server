@@ -1,4 +1,4 @@
-package tv.game88.pay.admin.controller;
+package tv.game88.core.admin.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -9,9 +9,9 @@ import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.pay.api.cache.ConfigBankListCache;
-import tv.game88.pay.api.entity.ConfigBankList;
-import tv.game88.pay.api.service.ConfigBankListService;
+import tv.game88.core.admin.service.ConfigBankListService;
+import tv.game88.core.config.cache.ConfigBankListCache;
+import tv.game88.core.config.entity.ConfigBankList;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;

@@ -1,7 +1,7 @@
-package tv.game88.pay.api.mapper;
+package tv.game88.core.config.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tv.game88.pay.api.entity.ConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 
 import java.util.List;
 

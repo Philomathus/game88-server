@@ -9,8 +9,8 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
-import tv.game88.pay.api.cache.ConfigBankListCache;
-import tv.game88.pay.api.dto.RspConfigBankList;
+import tv.game88.core.config.cache.ConfigBankListCache;
+import tv.game88.core.config.dto.RspConfigBankList;
 
 import javax.annotation.Resource;
 import java.util.Arrays;

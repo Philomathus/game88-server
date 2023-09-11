@@ -6,9 +6,12 @@
         <result property="methodType" column="method_type" />
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
         <result property="realName" column="real_name" jdbcType="VARCHAR" />
-        <result property="account" column="account" jdbcType="VARCHAR" />
-        <result property="bankId" column="bank_id" jdbcType="INTEGER" />
-        <result property="bankAddress" column="bank_address" jdbcType="VARCHAR" />
+        <result property="bankAccount" column="bank_account" jdbcType="VARCHAR" />
+        <result property="bankId" column="bank_id" jdbcType="BIGINT" />
+        <result property="payAddrProvince" column="pay_addr_province" jdbcType="VARCHAR" />
+        <result property="payAddrCity" column="pay_addr_city" jdbcType="VARCHAR" />
+        <result property="payPicAddr" column="pay_pic_addr" jdbcType="VARCHAR" />
+        <result property="auditStatus" column="audit_status" jdbcType="TINYINT" />
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
     </resultMap>
 
@@ -17,9 +20,12 @@
                method_type,
                user_id,
                real_name,
-               account,
+               bank_account,
                bank_id,
-               bank_address,
+               pay_addr_province,
+               pay_pic_addr,
+               pay_addr_city,
+               audit_status,
                create_time
         from wallet_user_pay_method
     </sql>

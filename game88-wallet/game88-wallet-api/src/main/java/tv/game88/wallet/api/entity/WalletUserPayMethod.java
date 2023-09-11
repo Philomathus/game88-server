@@ -34,19 +34,35 @@ public class WalletUserPayMethod implements Serializable {
     private String realName;
 
     /**
-     * 支付方式账号
+     * 银行账号
      */
-    private String account;
+    private String bankAccount;
 
     /**
      * 银行ID
      */
-    private Integer bankId;
+    private Long bankId;
 
     /**
-     * 银行卡归属地
+     * 归属地-省
      */
-    private String bankAddress;
+    private String payAddrProvince;
+
+    /**
+     * 归属地-市
+     */
+    private String payAddrCity;
+
+    /**
+     * 收款码图片
+     */
+    private String payPicAddr;
+
+    /**
+     * 审核状态
+     */
+    //0 未审核 1已审核 2审核不通过
+    private  Integer auditStatus;
 
     /**
      * 绑定时间

@@ -1,7 +1,7 @@
-package tv.game88.pay.api.service;
+package tv.game88.core.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import tv.game88.pay.api.entity.ConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package tv.game88.pay.api.dto;
+package tv.game88.core.config.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
