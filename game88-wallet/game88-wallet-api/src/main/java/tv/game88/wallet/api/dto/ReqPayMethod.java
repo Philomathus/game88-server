@@ -22,7 +22,7 @@ public class ReqPayMethod {
     private String account;
 
     @Schema( title = "银行ID" )
-    private Integer bankId;
+    private Long bankId;
 
     @Schema( title = "所在地-省" )
     @NotBlank( message = "所在地-省不能为空" )
