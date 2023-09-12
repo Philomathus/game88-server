@@ -28,7 +28,23 @@ public interface WalletUserService extends IService<WalletUser> {
 
     RspBase<RspMember> getUserInfo( String userId );
 
+    RspBase<RspUserSimpleInfo> getUserSimpleInfo( String userId );
+
     RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass );
 
     List<RspLogFund> getFundDetails( String userId, ReqLogFund reqLogFund );
+
+    RspBase<?> personalTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer );
+
+    /**
+     * 校验资金密码
+     *
+     * @param rawPassword 资金密码6位数字
+     * @param walletUser  钱包用户
+     *
+     * @return 错误结果
+     */
+    RspBase validatedPasswordTimes( String rawPassword, WalletUser walletUser );
+
+    void processFundTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer );
 }

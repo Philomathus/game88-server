@@ -294,7 +294,16 @@ public class LocalDateTimeUtils {
         return converted.toLocalDateTime();
     }
 
-    public static void main( String[] args ) {
-        System.out.println( LocalDateTimeUtils.format( convertToUTC0( LocalDateTime.now() ) ) );
+    public static String secondsToTime( long seconds ) {
+        long h = seconds / 3600;            //小时
+        long m = ( seconds % 3600 ) / 60;        //分钟
+        long s = ( seconds % 3600 ) % 60;        //秒
+        if ( h > 0 ) {
+            return h + "小时" + m + "分钟" + s + "秒";
+        }
+        if ( m > 0 ) {
+            return m + "分钟" + s + "秒";
+        }
+        return s + "秒";
     }
 }

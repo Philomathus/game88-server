@@ -31,11 +31,23 @@ public class WalletUserController extends BaseController {
 
     @Operation( summary = "获取会员信息" )
     @PostMapping( "/api/getUserInfo" )
-    public RspBase<RspMember> getAccountInfo() {
+    public RspBase<RspMember> getUserInfo() {
         return walletUserService.getUserInfo( MemberSecurityUtils.getUserId() );
     }
 
-    @Operation( summary = "获取会员资金明细" )
+    @Operation( summary = "获取简单会员信息" )
+    @PostMapping( "/api/getUserSimpleInfo" )
+    public RspBase<RspUserSimpleInfo> getUserSimpleInfo() {
+        return walletUserService.getUserSimpleInfo( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "设置资金密码" )
+    @PostMapping( "/api/fundPassSet" )
+    public RspBase<?> fundPassSet( @Validated @RequestBody ReqFundPass reqFundPass ) {
+        return walletUserService.fundPassSet( MemberSecurityUtils.getUserId(), reqFundPass );
+    }
+
+    @Operation( summary = "个人账变" )
     @PostMapping( "/api/getFundDetails" )
     public RspBase<List<RspLogFund>> getFundDetails( @Validated @RequestBody ReqLogFund reqLogFund ) {
         startPage( reqLogFund );
@@ -43,9 +55,9 @@ public class WalletUserController extends BaseController {
         return getRspBasePage( fundDetails, reqLogFund );
     }
 
-    @Operation( summary = "设置资金密码" )
-    @PostMapping( "/api/fundPassSet" )
-    public RspBase<?> fundPassSet( @Validated @RequestBody ReqFundPass reqFundPass ) {
-        return walletUserService.fundPassSet( MemberSecurityUtils.getUserId(), reqFundPass );
+    @Operation( summary = "个人转账" )
+    @PostMapping( "/api/personalTransfer" )
+    public RspBase<?> personalTransfer( @Validated @RequestBody ReqPersonalTransfer reqPersonalTransfer ) {
+        return walletUserService.personalTransfer( MemberSecurityUtils.getUserId(), reqPersonalTransfer );
     }
 }

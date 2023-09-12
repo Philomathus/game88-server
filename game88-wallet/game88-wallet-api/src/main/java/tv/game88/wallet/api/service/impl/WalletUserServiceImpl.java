@@ -11,14 +11,17 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.core.utils.SmsApi;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletUser;
+import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletUserService;
@@ -27,6 +30,7 @@ import tv.game88.wallet.api.type.WalletUserFundEnum;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +59,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Resource
     private WalletUserFundLogMapper walletUserFundLogMapper;
+    @Resource
+    private WalletFundManager       walletFundManager;
 
     @Override
     public RspBase<?> sendSmsVerifyCode( Phone phone ) {
@@ -170,11 +176,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
-            if ( oldm != null ) {
-                return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
-            } else {
-                walletUser = this.newWalletUserReg( mobileLogin );
-            }
+
+            walletUser = Objects.requireNonNullElseGet( oldm, () -> this.newWalletUserReg( mobileLogin ) );
+
             this.setMemberLoginParam( mobileLogin, dev, loginUrl, walletUser );
 
             if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
@@ -185,8 +189,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             if ( oldm != null ) {
                 this.baseMapper.deleteByHistoryKey( oldm.getId() );
             }
-        } else {
-            return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
         }
 
         RspMember rspMember = new RspMember();
@@ -306,6 +308,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
+    public RspBase<RspUserSimpleInfo> getUserSimpleInfo( String userId ) {
+        return null;
+    }
+
+    @Override
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "fund_password" )
                                                                           .one();
@@ -332,8 +339,90 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             if ( byType != null ) {
                 rspLogMoney.setDes( byType.getDes() );
             }
+            rspLogMoney.setAmount( rspLogMoney.getPay().subtract( rspLogMoney.getIncome() )
+                                              .setScale( 2, RoundingMode.HALF_DOWN ) );
         }
         return logMoneyList;
+    }
+
+    @Override
+    public RspBase<?> personalTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer ) {
+        WalletUser walletUser = this.baseMapper.selectById( userId );
+        if ( walletUser == null ) {
+            return RspBase.businessError( "钱包用户不存在" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "您的用户状态异常,请联系客服" );
+        }
+        if ( walletUser.getIsVerified() < 2 ) {
+            return RspBase.businessError( "您还未实名或实名未认证" );
+        }
+
+        RspBase rspBase = this.validatedPasswordTimes( reqPersonalTransfer.getFundPass(), walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+
+        if ( walletUser.getAmount().compareTo( reqPersonalTransfer.getAmount() ) < 0 ) {
+            return RspBase.businessError( "您的余额不足" );
+        }
+
+        WalletUser toTransferUser = this.baseMapper.selectById( reqPersonalTransfer.getWalletUserAddress() );
+        if ( toTransferUser == null ) {
+            return RspBase.businessError( "对方钱包用户不存在" );
+        }
+        if ( toTransferUser.getStatus() != 1 ) {
+            return RspBase.businessError( "对方用户状态异常,请联系客服" );
+        }
+        if ( toTransferUser.getIsVerified() < 2 ) {
+            return RspBase.businessError( "对方未实名或实名未认证" );
+        }
+
+        SpringUtils.getBean( WalletUserService.class ).processFundTransfer( userId, reqPersonalTransfer );
+
+        return RspBase.ok( "转账成功" );
+    }
+
+    @Override
+    public RspBase validatedPasswordTimes( String rawPassword, WalletUser walletUser ) {
+        if ( StringUtils.isBlank( walletUser.getFundPassword() ) ) {
+            return RspBase.businessError( "请设置资金密码" );
+        }
+        String key = Constants.WALLET_PREX + "lock:fundPassword:" + walletUser.getId();
+        if ( redisUtils.exists( key ) && Long.parseLong( redisUtils.strGet( key ) ) >= 5 ) {
+            return RspBase.businessError(
+                    "资金密码错误过多，账号被锁定" + LocalDateTimeUtils.secondsToTime( redisUtils.getExpire( key ) )
+                            + ",请联系客服重置" );
+        }
+        if ( !passwordEncoder.matches( rawPassword, walletUser.getFundPassword() ) ) {
+            Long num = redisUtils.strIncrement( key );
+            redisUtils.expire( key, Duration.ofDays( 1 ) );
+            if ( num >= 5 ) {
+                return RspBase.businessError( "资金密码错误5次，账号被锁定一天,请联系客服重置" );
+            }
+            return RspBase.businessError( "资金密码错误，请重新输入" );
+        } else {
+            if ( redisUtils.exists( key ) ) {
+                redisUtils.unlink( key );
+            }
+        }
+        return null;
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void processFundTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer ) {
+        String currentOrderNo = GenerateOrderCacheUtils.me.getOrderId( "PTO", 5 );
+        String otherOrderNo   = GenerateOrderCacheUtils.me.getOrderId( "PTI", 5 );
+
+        // 扣除当前会员金额
+        walletFundManager.reduceWalletUserMoney( userId, null, reqPersonalTransfer.getAmount(),
+                WalletUserFundEnum.PERSONAL_TRANSFER_OUT,
+                "用户个人转账出账" + reqPersonalTransfer.getAmount(), currentOrderNo, otherOrderNo );
+        // 增加对方会员金额
+        walletFundManager.addWalletUserMoney( userId, null, reqPersonalTransfer.getAmount(),
+                WalletUserFundEnum.PERSONAL_TRANSFER_IN,
+                "用户个人转账入账" + reqPersonalTransfer.getAmount(), otherOrderNo, currentOrderNo );
     }
 }
 

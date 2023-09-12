@@ -35,10 +35,10 @@ public class OrderCallbackProcessTask {
         Map<Object, Object> map = redisUtils.hGetAll( key );
         long                now = LocalDateTimeUtils.localDateToTimestamp( LocalDateTime.now() );
         for ( Map.Entry<Object, Object> entry : map.entrySet() ) {
-            String              tradeNo = entry.getKey().toString();
-            String              data    = entry.getValue().toString();
+            final String        tradeNo = entry.getKey().toString();
+            final String        data    = entry.getValue().toString();
             Map<String, Object> dataMap = JsonUtil.json2Map( data );
-            int                 num     = Integer.parseInt( dataMap.get( "num" ).toString() );
+            final int           num     = Integer.parseInt( dataMap.get( "num" ).toString() );
             if ( num == 5 ) {
                 redisUtils.hRemove( key, tradeNo );
                 log.warn( "通知交易订单:{} 5次不成功,忽略回调, 回调地址:{}", tradeNo, dataMap.get( "notifyUrl" ).toString() );
@@ -51,7 +51,7 @@ public class OrderCallbackProcessTask {
             if ( !redisUtils.lock( "OrderCallback:" + tradeNo, 30 ) ) {
                 continue;
             }
-            String notifyUrl = dataMap.get( "notifyUrl" ).toString();
+            final String notifyUrl = dataMap.get( "notifyUrl" ).toString();
             scheduledExecutorService.schedule( () -> {
                 RspWalletRecord rspWalletRecord = null;
                 String          resultStr       = null;
@@ -74,12 +74,20 @@ public class OrderCallbackProcessTask {
                     log.error( "通知商户:{}回调订单:{}失败,回调地址:{},回调报错信息:{},通知数据:{}", rspWalletRecord.getMerchantId(),
                             rspWalletRecord.getOrderNo(), notifyUrl, e.getMessage(), JsonUtil.object2Json( rspWalletRecord ) );
                     resultStr = e.getMessage();
+                    update.setNotifyStatus( 2 );
                     log.error( e.getMessage(), e );
                 } finally {
+                    if ( update.getNotifyStatus() == 2 ) {
+                        dataMap.put( "num", num + 1 );
+                        dataMap.put( "time", System.currentTimeMillis() );
+                        redisUtils.hSet( key, tradeNo, JsonUtil.object2Json( dataMap ) );
+                    }
+
+                    update.setNotifyResult( resultStr );
+                    walletRecordService.updateById( update );
+
                     redisUtils.unLock( "OrderCallback:" + tradeNo );
                 }
-                update.setNotifyResult( resultStr );
-                walletRecordService.updateById( update );
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
         }
     }

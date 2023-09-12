@@ -34,17 +34,15 @@
     </sql>
 
     <select id="findLogFundList" resultType="tv.game88.wallet.api.dto.RspLogFund">
-        select user_id,
+        select
         type,
         income,
         pay,
-        total_before,
-        total,
         create_time
         from wallet_user_fund_log
         where user_id = #{userId}
-        <if test="req.enumMoney != null">
-            and type = #{req.enumMoney.type}
+        <if test="req.enumFund != null">
+            and type = #{req.enumFund.type}
         </if>
         <if test="req.enumReqTime != null">
             and create_time &gt;= #{beginDay}

@@ -164,7 +164,7 @@ public class SmsApi {
             String passwordDigestBase64Str = Base64Utils.encodeToString( md.digest() );
             return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
         } catch ( NoSuchAlgorithmException e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         return null;
     }
@@ -323,17 +323,10 @@ public class SmsApi {
         } else {
             ConfigSms configSms = serverSmsList.get( 0 );
             switch ( configSms.getProvider() ) {
-            case 0:
-                msg = this.sendSmsTencent( configSms, phone, msg );
-                break;
-            case 1:
-                msg = this.sendSmsAliyun( configSms, phone, msg );
-                break;
-            case 2:
-                msg = this.sendSmsBaidu( configSms, phone, msg );
-                break;
-            default:
-                throw new BusinessException( "不支持的短信运营商类型" );
+            case 0 -> msg = this.sendSmsTencent( configSms, phone, msg );
+            case 1 -> msg = this.sendSmsAliyun( configSms, phone, msg );
+            case 2 -> msg = this.sendSmsBaidu( configSms, phone, msg );
+            default -> throw new BusinessException( "不支持的短信运营商类型" );
             }
         }
         return msg;

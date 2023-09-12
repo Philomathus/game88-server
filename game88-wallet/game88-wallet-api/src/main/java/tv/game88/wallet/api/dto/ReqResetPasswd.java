@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ReqResetPasswd {
     @Schema( title = "旧密码" )
-    @NotBlank
+    // @NotBlank
     private String oldPasswd;
     @Schema( title = "新密码" )
     @NotBlank

@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,11 +24,11 @@ import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletRecordMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletRecordService;
+import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.api.vo.PlatformUser;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.SortedMap;
@@ -54,14 +53,14 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Resource
     private WalletUserMapper        walletUserMapper;
     @Resource
-    private PasswordEncoder         passwordEncoder;
+    private WalletUserService       walletUserService;
 
     @Override
     public RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqDepositOrder.getMerchantId() );
-        RspBase        rspPayResult   = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
-        if ( rspPayResult != null ) {
-            return rspPayResult;
+        RspBase        rspBase   = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
+        if ( rspBase != null ) {
+            return rspBase;
         }
 
         // 先保存订单,等待会员主动请求支付并扣除会员金额, 再异步处理订单回调
@@ -91,9 +90,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
-        RspBase        rspPayResult   = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
-        if ( rspPayResult != null ) {
-            return rspPayResult;
+        RspBase        rspBase   = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
+        if ( rspBase != null ) {
+            return rspBase;
         }
         if ( walletMerchant.getAmount().compareTo( reqWithdrawOrder.getAmount() ) < 0 ) {
             return RspBase.businessError( "商户余额不足:" + walletMerchant.getAmount() );
@@ -115,9 +114,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqOrderQuery.getMerchantId() );
-        RspBase        rspPayResult   = this.validated( reqOrderQuery, walletMerchant, null );
-        if ( rspPayResult != null ) {
-            return rspPayResult;
+        RspBase        rspBase   = this.validated( reqOrderQuery, walletMerchant, null );
+        if ( rspBase != null ) {
+            return rspBase;
         }
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqOrderQuery.getMerchantId() ).eq( "order_id", reqOrderQuery.getOrderNo() ) );
@@ -159,8 +158,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
             // 添加会员金额
             walletFundManager.addWalletUserMoney( reqWithdrawOrder.getWalletAddress(), reqWithdrawOrder.getMerchantId(),
-                    reqWithdrawOrder.getAmount(), WalletUserFundEnum.TRANSFER_IN,
-                    "钱包用户资金转入" + reqWithdrawOrder.getAmount(), walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
+                    reqWithdrawOrder.getAmount(), WalletUserFundEnum.WITHDRAW_IN,
+                    "用户提款收币" + reqWithdrawOrder.getAmount(), walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
         }
         this.baseMapper.insert( walletRecord );
 
@@ -283,9 +282,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( walletUser.getIsVerified() < 2 ) {
             return RspBase.businessError( "用户未实名或实名未认证" );
         }
-        RspBase rspPayResult = this.validatedPasswordTimes( reqPayDepositOrder.getP().toString(), walletUser );
-        if ( rspPayResult != null ) {
-            return rspPayResult;
+        RspBase rspBase = walletUserService.validatedPasswordTimes( reqPayDepositOrder.getP().toString(), walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
         }
         if ( walletUser.getAmount().compareTo( walletRecord.getAmount() ) < 0 ) {
             return RspBase.businessError( "用户余额不足" );
@@ -307,8 +306,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         this.baseMapper.updateById( update );
         // 扣除会员金额
         walletFundManager.reduceWalletUserMoney( walletRecord.getUserId(), walletRecord.getMerchantId(),
-                walletRecord.getAmount(), WalletUserFundEnum.TRANSFER_OUT,
-                "钱包用户资金转出" + walletRecord.getAmount(), walletRecord.getTradeNo(), walletRecord.getOrderNo() );
+                walletRecord.getAmount(), WalletUserFundEnum.DEPOSIT_OUT,
+                "用户充值出币" + walletRecord.getAmount(), walletRecord.getTradeNo(), walletRecord.getOrderNo() );
 
         // 设置redis队列,定时推送回调
         this.sendRedisCallbackTask( walletRecord.getTradeNo(), walletRecord.getNotifyUrl() );
@@ -327,25 +326,6 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         redisUtils.hSet( Constants.WALLET_PREX + "callback:orderNo", tradeNo, JsonUtil.object2Json( map ) );
     }
 
-    private RspBase validatedPasswordTimes( String rawPassword, WalletUser walletUser ) {
-        if ( StringUtils.isBlank( walletUser.getFundPassword() ) ) {
-            return RspBase.businessError( "请设置资金密码" );
-        }
-        String key = Constants.WALLET_PREX + "lock:fundPassword:" + walletUser.getId();
-        if ( !passwordEncoder.matches( rawPassword, walletUser.getFundPassword() ) ) {
-            Long num = redisUtils.strIncrement( key );
-            redisUtils.expire( key, Duration.ofMinutes( 5 ) );
-            if ( num >= 5 ) {
-                return RspBase.businessError( "资金密码错误5次，账号被锁定五分钟,请五分钟后再尝试" );
-            }
-            return RspBase.businessError( "资金密码错误，请重新输入" );
-        } else {
-            if ( redisUtils.exists( key ) ) {
-                redisUtils.unlink( key );
-            }
-        }
-        return null;
-    }
 
     @Override
     public RspWalletRecord getRspData( String tradeNo ) {

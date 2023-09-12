@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class ReqFundPass {
-    @Schema( title = "资金/提现密码", requiredMode = Schema.RequiredMode.REQUIRED )
-    @NotBlank( message = "密码不能为空" )
+    @Schema( title = "资金密码", requiredMode = Schema.RequiredMode.REQUIRED )
+    @NotBlank( message = "资金密码不能为空" )
     private String fundPass;
 }

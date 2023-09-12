@@ -32,7 +32,7 @@ public class PayMethodController extends BaseController {
     @Resource
     private ConfigBankListCache        configBankListCache;
 
-    @Operation( summary = "获取支付方式状态列表" )
+    @Operation( summary = "获取支付方式类型列表" )
     @PostMapping( "/api/getPayMethodTypes" )
     public RspBase<List<String>> getPayMethodTypes() {
         return RspBase.ok( WalletPayMethodEnum.getPayMethodTypes() );
