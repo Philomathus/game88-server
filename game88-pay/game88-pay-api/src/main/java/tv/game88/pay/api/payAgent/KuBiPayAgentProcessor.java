@@ -192,7 +192,7 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
         String sign    = DigestUtils.md5Hex( tempStr );
         dataMap.put( "sign", sign );
 
-        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( dataMap ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageForm( dataMap ), null );
 
         log.info( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
