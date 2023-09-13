@@ -54,6 +54,7 @@
         <jjwt.version>0.11.5</jjwt.version>
         <caffeine.version>3.1.8</caffeine.version>
         <telegrambots.version>6.8.0</telegrambots.version>
+        <zxing.version>3.5.2</zxing.version>
 
         <tencentcloud.vesion>3.1.617</tencentcloud.vesion>
         <aliyun.core.version>4.6.2</aliyun.core.version>
@@ -206,6 +207,13 @@
                 <groupId>org.telegram</groupId>
                 <artifactId>telegrambots</artifactId>
                 <version>${telegrambots.version}</version>
+            </dependency>
+
+            <!-- Qrcode工具 -->
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>${zxing.version}</version>
             </dependency>
 
             <!-- 百度SDK -->

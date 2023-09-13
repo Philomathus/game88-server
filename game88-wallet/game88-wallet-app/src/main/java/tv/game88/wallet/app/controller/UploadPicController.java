@@ -1,0 +1,86 @@
+package tv.game88.wallet.app.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.core.utils.OssApi;
+import tv.game88.wallet.api.util.ZXingUtil;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+
+@Controller
+@Tag( name = "图片上传接口" )
+@Log4j2
+public class UploadPicController {
+    @Resource
+    private OssApi ossApi;
+
+    @Operation( summary = "微信个人收款码上传" )
+    @PostMapping( "/upload/wxp" )
+    public RspBase<?> uploadWxp( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        String  fileName = file.getOriginalFilename();
+        File    newFile  = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        boolean isWxp    = false;
+        try {
+            String url = ZXingUtil.decodeImg( newFile );
+            if ( StringUtils.isNotBlank( url ) && url.startsWith( "wxp://" ) ) {
+                isWxp = true;
+            }
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        if ( !isWxp ) {
+            newFile.delete();
+            return RspBase.businessError( "请上传正确的微信个人收款码" );
+        }
+        RspBase<String> rspBase = ossApi.upload( file, "wallet" );
+        if ( rspBase.getData() != null ) {
+            rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );
+        }
+        return rspBase;
+    }
+
+    @Operation( summary = "支付宝个人收款码上传" )
+    @PostMapping( "/upload/alipay" )
+    public RspBase<?> uploadAlipay( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        String  fileName = file.getOriginalFilename();
+        File    newFile  = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        boolean isWxp    = false;
+        try {
+            String url = ZXingUtil.decodeImg( newFile );
+            if ( StringUtils.isNotBlank( url ) && url.startsWith( "https://qr.alipay.com/" ) ) {
+                isWxp = true;
+            }
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        if ( !isWxp ) {
+            newFile.delete();
+            return RspBase.businessError( "请上传正确的支付宝个人收款码" );
+        }
+        RspBase<String> rspBase = ossApi.upload( file, "wallet" );
+        if ( rspBase.getData() != null ) {
+            rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );
+        }
+        return rspBase;
+    }
+
+    @Operation( summary = "其它类型图片上传" )
+    @PostMapping( "/upload/other" )
+    public RspBase<?> uploadOther( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        RspBase<String> rspBase = ossApi.upload( file, "wallet" );
+        if ( rspBase.getData() != null ) {
+            rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );
+        }
+        return rspBase;
+    }
+}

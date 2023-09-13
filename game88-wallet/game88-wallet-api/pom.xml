@@ -35,6 +35,12 @@
             <artifactId>game88-core-sms</artifactId>
             <version>1.0</version>
         </dependency>
+
+        <!-- Qrcode工具 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

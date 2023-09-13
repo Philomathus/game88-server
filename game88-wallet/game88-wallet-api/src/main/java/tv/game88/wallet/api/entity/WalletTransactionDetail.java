@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import tv.game88.wallet.api.type.WalletTransEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -46,17 +47,52 @@ public class WalletTransactionDetail implements Serializable {
     /**
      * 状态
      */
-    private Integer status;
+    private WalletTransEnum status;
 
     /**
-     * 请求时间
+     * 买家确认购买时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
-    private LocalDateTime createTime;
+    private LocalDateTime buyerConfirmBuyTime;
+
+    /**
+     * 卖家确认交易时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime sellerConfirmTransTime;
+
+    /**
+     * 买家确认转账时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime buyerConfirmTransferTime;
+
+    /**
+     * 交易取消时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime cancelTime;
 
     /**
      * 交易完成时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime successTransTime;
+
+    /**
+     * 付款时间 秒
+     */
+    // 买家确认转账时间 - 卖家确认交易时间
+    private Integer transferTimeSec;
+
+    /**
+     * 放币时间 秒
+     */
+    // 交易完成时间 - 买家确认转账时间
+    private Integer receivedTimeSec;
+
+    /**
+     * 交易行为详情
+     */
+    private String remark;
 }

@@ -10,9 +10,15 @@
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
         <result property="amount" column="amount" jdbcType="DECIMAL" />
         <result property="transCertPic" column="trans_cert_pic" jdbcType="VARCHAR" />
-        <result property="status" column="status" jdbcType="INTEGER" />
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+        <result property="status" column="status" />
+        <result property="buyerConfirmBuyTime" column="buyer_confirm_buy_time" jdbcType="TIMESTAMP" />
+        <result property="sellerConfirmTransTime" column="seller_confirm_trans_time" jdbcType="TIMESTAMP" />
+        <result property="buyerConfirmTransferTime" column="buyer_confirm_transfer_time" jdbcType="TIMESTAMP" />
+        <result property="cancelTime" column="cancel_time" jdbcType="TIMESTAMP" />
         <result property="successTransTime" column="success_trans_time" jdbcType="TIMESTAMP" />
+        <result property="transferTimeSec" column="transfer_time_sec" jdbcType="INTEGER" />
+        <result property="receivedTimeSec" column="received_time_sec" jdbcType="INTEGER" />
+        <result property="remark" column="remark" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletTransactionDetailVo">
@@ -22,8 +28,14 @@
                amount,
                trans_cert_pic,
                status,
-               create_time,
-               success_trans_time
+               buyer_confirm_buy_time,
+               seller_confirm_trans_time,
+               buyer_confirm_transfer_time,
+               cancel_time,
+               success_trans_time,
+               transfer_time_sec,
+               received_time_sec,
+               remark
         from wallet_transaction_detail
     </sql>
 </mapper>
