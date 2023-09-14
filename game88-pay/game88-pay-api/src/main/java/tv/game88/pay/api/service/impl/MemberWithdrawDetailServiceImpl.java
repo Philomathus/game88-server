@@ -796,6 +796,13 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( req.getWithdrawMoney().remainder( BigDecimal.ONE ).compareTo( BigDecimal.ZERO ) != 0 ) {
             return RspBase.businessError( "提现金额必须整数" );
         }
+
+        BigDecimal introvipWithdrawLimitMoney = configEnvCacheUtil.getConfBd( "introvip_withdraw_limit_money" );
+        if ( !Objects.equals( introvipWithdrawLimitMoney, BigDecimal.ZERO )
+                && req.getWithdrawMoney().compareTo( introvipWithdrawLimitMoney ) >= 0 ) {
+            return RspBase.businessError( configEnvCacheUtil.getConf( "introvip_withdraw_limit_msg" ) );
+        }
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.withHour( configEnvCacheUtil.getConfInt( "withdraw_limit_start_hour" ) )
                                      .withMinute( configEnvCacheUtil.getConfInt( "withdraw_limit_start_minute" ) ).withSecond( 0 )
@@ -844,12 +851,13 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( i > 0 ) {
             // TODO send message to telegram ; ID: withdraw_log_telegram ; message: 您有新的提现订单,金额:{},请及时处理!
             telegramBotMessage.sendByChatId( String.format( "您有新的提现订单,金额:%s,请及时处理!", req.getWithdrawMoney() ),
-                    configEnvCacheUtil.getConf("recharge_log_telegram") );
+                    configEnvCacheUtil.getConf( "recharge_log_telegram" ) );
             return RspBase.ok( "提现申请请求成功，请耐心等待" );
         }
         return RspBase.businessError( "提现申请请求失败" );
     }
 
+    @Override
     @Transactional( rollbackFor = Exception.class )
     public String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard ) {
         MemberWithdrawDetail memberWithdrawDetail = new MemberWithdrawDetail();
