@@ -221,24 +221,24 @@ public class LotteryCacheUtils {
     }
 
     public List<RuleVo> getLotteryRule( Integer kindId ) {
-        String s = redisUtils.strGet( LOTTERY_RULE_KEY + kindId );
-        if ( StringUtils.isBlank( s ) || !redisUtils.exists( LOTTERY_RULE_KEY + kindId ) ) {
-            List<RuleVo> ruleVos = new QueryChainWrapper<>( lotteryRuleMapper )
-                    .eq( "kind", kindId )
-                    .orderByAsc( "sort" )
-                    .select( "name", "des" )
-                    .list()
-                    .stream()
-                    .map( rule -> {
-                        RuleVo ruleVo = new RuleVo();
-                        BeanUtils.copyProperties( rule, ruleVo );
-                        return ruleVo;
-                    } )
-                    .toList();
-            redisUtils.strSet( LOTTERY_RULE_KEY + kindId, JsonUtil.object2Json( ruleVos ) );
-            return ruleVos;
-        }
-        return JsonUtil.json2Array( s, new TypeReference<>() {} );
+        //        String s = redisUtils.strGet( LOTTERY_RULE_KEY + kindId );
+        //        if ( StringUtils.isBlank( s ) || !redisUtils.exists( LOTTERY_RULE_KEY + kindId ) ) {
+        List<RuleVo> ruleVos = new QueryChainWrapper<>( lotteryRuleMapper )
+                .eq( "kind", kindId )
+                .orderByAsc( "sort" )
+                .select( "name", "des" )
+                .list()
+                .stream()
+                .map( rule -> {
+                    RuleVo ruleVo = new RuleVo();
+                    BeanUtils.copyProperties( rule, ruleVo );
+                    return ruleVo;
+                } )
+                .toList();
+        redisUtils.strSet( LOTTERY_RULE_KEY + kindId, JsonUtil.object2Json( ruleVos ) );
+        return ruleVos;
+//    }
+//        return JsonUtil.json2Array( ruleVos, new TypeReference<>() {} );
     }
 
     public void clear() {
