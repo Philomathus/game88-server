@@ -52,7 +52,7 @@ public abstract class ConstantsPay {
     public static final String RG_PAY         = "rgPay";
     public static final String TO_PAY         = "toPay";
     public static final String ZHONG_XING_PAY = "zhongXingPay";
-
-    public static final String MING_FA2_PAY = "mingfa2Pay";
-    public static final String XIAO_MA_PAY         = "xiaoMaPay";
+    public static final String MING_FA2_PAY   = "mingfa2Pay";
+    public static final String XIAO_MA_PAY    = "xiaoMaPay";
+    public static final String CBI_PAY        = "cbiPay";
 }
