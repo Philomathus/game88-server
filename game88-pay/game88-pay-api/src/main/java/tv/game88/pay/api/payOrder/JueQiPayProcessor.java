@@ -29,7 +29,7 @@ import java.util.TreeMap;
 public class JueQiPayProcessor extends AbstractPay {
     @Override
     public String getName() {
-        return "星耀支付";
+        return "崛起支付";
     }
 
     @Override

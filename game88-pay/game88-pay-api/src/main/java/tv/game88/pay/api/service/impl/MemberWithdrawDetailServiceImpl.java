@@ -797,12 +797,6 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "提现金额必须整数" );
         }
 
-        BigDecimal introvipWithdrawLimitMoney = configEnvCacheUtil.getConfBd( "introvip_withdraw_limit_money" );
-        if ( !Objects.equals( introvipWithdrawLimitMoney, BigDecimal.ZERO )
-                && req.getWithdrawMoney().compareTo( introvipWithdrawLimitMoney ) >= 0 ) {
-            return RspBase.businessError( configEnvCacheUtil.getConf( "introvip_withdraw_limit_msg" ) );
-        }
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.withHour( configEnvCacheUtil.getConfInt( "withdraw_limit_start_hour" ) )
                                      .withMinute( configEnvCacheUtil.getConfInt( "withdraw_limit_start_minute" ) ).withSecond( 0 )
@@ -831,6 +825,13 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( memberCard == null ) {
             return RspBase.businessError( "提现银行卡不存在" );
         }
+
+        BigDecimal introvipWithdrawLimitMoney = configEnvCacheUtil.getConfBd( "introvip_withdraw_limit_money" );
+        if ( memberCard.getBankId() != 68L && !Objects.equals( introvipWithdrawLimitMoney, BigDecimal.ZERO )
+                && req.getWithdrawMoney().compareTo( introvipWithdrawLimitMoney ) >= 0 ) {
+            return RspBase.businessError( configEnvCacheUtil.getConf( "introvip_withdraw_limit_msg" ) );
+        }
+
         if ( !redisUtils.lock( "withdrawBank" + memberId, 5 ) ) {
             return RspBase.businessError( "处理中请稍后" );
         }
