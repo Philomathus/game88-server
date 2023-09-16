@@ -8,7 +8,6 @@ import lombok.Data;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -48,7 +47,7 @@ public class WalletTransaction implements Serializable {
     /**
      * 交易金额
      */
-    private BigDecimal amount;
+    private Long amount;
 
     /**
      * 状态

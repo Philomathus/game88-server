@@ -35,7 +35,7 @@ public class WalletTransactionDetail implements Serializable {
     private String userId;
 
     /**
-     * 请求金额
+     * 请求数量
      */
     private Long amount;
 

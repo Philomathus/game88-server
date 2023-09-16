@@ -10,7 +10,7 @@
             <result property="payMethodType" column="pay_method_type"/>
             <result property="payMethodId" column="pay_method_id" jdbcType="INTEGER"/>
             <result property="canSplit" column="can_split" jdbcType="TINYINT"/>
-            <result property="amount" column="amount" jdbcType="DECIMAL"/>
+            <result property="amount" column="amount" jdbcType="BIGINT"/>
             <result property="status" column="status" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="transEndTime" column="trans_end_time" jdbcType="TIMESTAMP"/>
