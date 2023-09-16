@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 public class WalletUserPayMethod implements Serializable {
     @TableId( type = IdType.AUTO )
-    private Integer methodId;
+    private Long methodId;
 
     /**
      * 支付类型
@@ -62,7 +62,7 @@ public class WalletUserPayMethod implements Serializable {
      * 审核状态
      */
     //0 未审核 1已审核 2审核不通过
-    private  Integer auditStatus;
+    private Integer auditStatus;
 
     /**
      * 绑定时间

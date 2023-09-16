@@ -29,6 +29,7 @@ import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.api.vo.PlatformUser;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.SortedMap;
@@ -94,7 +95,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( rspBase != null ) {
             return rspBase;
         }
-        if ( walletMerchant.getAmount().compareTo( reqWithdrawOrder.getAmount() ) < 0 ) {
+        if ( walletMerchant.getAmount().compareTo( new BigDecimal( reqWithdrawOrder.getAmount() ) ) < 0 ) {
             return RspBase.businessError( "商户余额不足:" + walletMerchant.getAmount() );
         }
 

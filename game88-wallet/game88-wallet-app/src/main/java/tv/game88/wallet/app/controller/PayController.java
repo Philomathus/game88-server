@@ -65,10 +65,11 @@ public class PayController extends BaseController {
 
     @Operation( summary = "内嵌登录接口" )
     @PostMapping( "/common/embeddedLogin" )
+    @ResponseBody
     @Anonymous
     public RspBase<?> embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) {
         RspBase<?> rspMemberRspBase = walletUserService.embeddedLogin( reqEmbeddedLogin );
-        Object       object           = rspMemberRspBase.getData();
+        Object     object           = rspMemberRspBase.getData();
         if ( object != null ) {
             Map<String, Object> resultMap = ( Map<String, Object> ) object;
 
@@ -80,6 +81,7 @@ public class PayController extends BaseController {
 
     @Operation( summary = "用户请求支付" )
     @PostMapping( "/common/payDepositOrder" )
+    @ResponseBody
     @Anonymous
     public RspBase<?> payDepositOrder( @RequestBody @Validated ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
         return walletRecordService.payDepositOrder( reqPayDepositOrder );

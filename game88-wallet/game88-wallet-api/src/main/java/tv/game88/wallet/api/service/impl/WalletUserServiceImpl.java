@@ -28,7 +28,6 @@ import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -204,9 +203,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         m.setCreditRating( 1 );
         m.setCreatedTime( LocalDateTime.now() );
         m.setLoginIp( mobileLogin.getIp() );
-        m.setAmount( BigDecimal.ZERO );
-        m.setTotalCharge( BigDecimal.ZERO );
-        m.setTotalSale( BigDecimal.ZERO );
+        m.setAmount( 0L );
+        m.setTotalCharge( 0L );
+        m.setTotalSale( 0L );
         if ( StringUtils.isNotBlank( mobileLogin.getDeviceId() ) ) {
             m.setDeviceId( mobileLogin.getDeviceId() );
         }
@@ -295,7 +294,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<RspAmount> getAmount( String userId ) {
         RspAmount rspAmount = new RspAmount();
-        rspAmount.setAmount( this.baseMapper.getUserMoney( userId ).setScale( 2, RoundingMode.HALF_DOWN ) );
+        rspAmount.setAmount( this.baseMapper.getUserMoney( userId ) );
         return RspBase.ok( rspAmount );
     }
 

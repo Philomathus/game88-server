@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -40,9 +39,9 @@ public class WalletRecord implements Serializable {
     private Integer tradeType;
 
     /**
-     * 交易金额
+     * 交易数量
      */
-    private BigDecimal amount;
+    private Long amount;
 
     /**
      * 商户订单号
@@ -69,11 +68,11 @@ public class WalletRecord implements Serializable {
     /**
      * 通知结果
      */
-    private String  notifyResult;
+    private String notifyResult;
     /**
      * 商户备注
      */
-    private String  remark;
+    private String remark;
 
     /**
      * 交易时间

@@ -10,7 +10,7 @@
         <result property="password" column="password" jdbcType="VARCHAR" />
         <result property="secretKey" column="secret_key" jdbcType="VARCHAR" />
         <result property="phone" column="phone" jdbcType="VARCHAR" />
-        <result property="amount" column="amount" jdbcType="DECIMAL" />
+        <result property="amount" column="amount" jdbcType="BIGINT" />
         <result property="fundPassword" column="fund_password" jdbcType="VARCHAR" />
         <result property="isVerified" column="is_verified" jdbcType="INTEGER" />
         <result property="verifiedTime" column="verified_time" jdbcType="TIMESTAMP" />
@@ -59,7 +59,7 @@
         from wallet_user
     </sql>
 
-    <select id="getUserMoney" resultType="java.math.BigDecimal">
+    <select id="getUserMoney" resultType="Long">
         select amount
         from wallet_user
         where id = #{userId}

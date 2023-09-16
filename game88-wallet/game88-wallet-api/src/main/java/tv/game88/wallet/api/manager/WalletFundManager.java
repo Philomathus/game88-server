@@ -39,12 +39,12 @@ public class WalletFundManager {
      * @param fundEnum 交易类型
      */
     @Transactional( rollbackFor = Exception.class )
-    public void addWalletUserMoney( String userId, Long merchantId, BigDecimal addMoney, WalletUserFundEnum fundEnum,
+    public void addWalletUserMoney( String userId, Long merchantId, Long addMoney, WalletUserFundEnum fundEnum,
                                     String mark, String businessId, String markorder ) {
         if ( fundEnum.getType() < 0 || ( !fundEnum.getIsTransaction() && merchantId == null ) ) {
             throw new BusinessException( "逻辑异常" );
         }
-        BigDecimal userBalance = walletUserMapper.getUserMoney( userId );
+        Long userBalance = walletUserMapper.getUserMoney( userId );
 
         int updateMoney;
         if ( fundEnum.getIsTransaction() ) {
@@ -63,12 +63,12 @@ public class WalletFundManager {
         log.setUserId( userId );
         log.setCreateTime( LocalDateTime.now() );
         log.setIncome( addMoney );
-        log.setPay( BigDecimal.ZERO );
+        log.setPay( 0L );
         log.setType( fundEnum.getType() );
         log.setDes( fundEnum.getDes() );
         log.setMark( mark );
         log.setTotalBefore( userBalance );
-        log.setTotal( userBalance.add( addMoney ) );
+        log.setTotal( userBalance +  addMoney );
         log.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( updateMoney <= 0 || insertLogMoney <= 0 ) {
@@ -91,12 +91,12 @@ public class WalletFundManager {
             merchantFundLog.setMerchantId( merchantId );
             merchantFundLog.setCreateTime( log.getCreateTime() );
             merchantFundLog.setIncome( BigDecimal.ZERO );
-            merchantFundLog.setPay( addMoney );
+            merchantFundLog.setPay( new BigDecimal( addMoney ) );
             merchantFundLog.setType( fundEnum.getType() );
             merchantFundLog.setDes( fundEnum.getDes() );
             merchantFundLog.setMark( mark );
             merchantFundLog.setTotalBefore( merchantBalance );
-            merchantFundLog.setTotal( merchantBalance.subtract( addMoney ) );
+            merchantFundLog.setTotal( merchantBalance.subtract( new BigDecimal( addMoney ) ) );
             merchantFundLog.setMarkorder( markorder );
             int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
             if ( insertMerchantLog <= 0 ) {
@@ -114,12 +114,12 @@ public class WalletFundManager {
      * @param mark        备注
      */
     @Transactional( rollbackFor = Exception.class )
-    public void reduceWalletUserMoney( String userId, Long merchantId, BigDecimal reduceMoney, WalletUserFundEnum fundEnum,
+    public void reduceWalletUserMoney( String userId, Long merchantId, Long reduceMoney, WalletUserFundEnum fundEnum,
                                        String mark, String businessId, String markorder ) {
         if ( fundEnum.getType() > 0 || ( !fundEnum.getIsTransaction() && merchantId == null ) ) {
             throw new BusinessException( "逻辑异常" );
         }
-        BigDecimal userMoney = walletUserMapper.getUserMoney( userId );
+        Long userMoney = walletUserMapper.getUserMoney( userId );
         //扣减金额
         int reducedMoney;
         if ( fundEnum.getIsTransaction() ) {
@@ -139,13 +139,13 @@ public class WalletFundManager {
         }
         log.setUserId( userId );
         log.setCreateTime( LocalDateTime.now() );
-        log.setIncome( BigDecimal.ZERO );
+        log.setIncome( 0L );
         log.setPay( reduceMoney );
         log.setType( fundEnum.getType() );
         log.setDes( fundEnum.getDes() );
         log.setMark( mark );
         log.setTotalBefore( userMoney );
-        log.setTotal( userMoney.subtract( reduceMoney ) );
+        log.setTotal( userMoney - reduceMoney );
         log.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( insertLogMoney <= 0 ) {
@@ -162,13 +162,13 @@ public class WalletFundManager {
             merchantFundLog.setId( log.getId() );
             merchantFundLog.setMerchantId( merchantId );
             merchantFundLog.setCreateTime( log.getCreateTime() );
-            merchantFundLog.setIncome( reduceMoney );
+            merchantFundLog.setIncome( new BigDecimal( reduceMoney ) );
             merchantFundLog.setPay( BigDecimal.ZERO );
             merchantFundLog.setType( fundEnum.getType() );
             merchantFundLog.setDes( fundEnum.getDes() );
             merchantFundLog.setMark( mark );
             merchantFundLog.setTotalBefore( merchantBalance );
-            merchantFundLog.setTotal( merchantBalance.add( reduceMoney ) );
+            merchantFundLog.setTotal( merchantBalance.add( new BigDecimal( reduceMoney ) ) );
             merchantFundLog.setMarkorder( markorder );
             int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
             if ( updateMoney <= 0 || insertMerchantLog <= 0 ) {

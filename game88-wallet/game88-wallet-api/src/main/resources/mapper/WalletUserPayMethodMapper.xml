@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.wallet.api.mapper.WalletUserPayMethodMapper">
     <resultMap id="WalletUserPayMethodResult" type="tv.game88.wallet.api.entity.WalletUserPayMethod">
-        <id property="methodId" column="method_id" jdbcType="INTEGER" />
+        <id property="methodId" column="method_id" jdbcType="BIGINT" />
         <result property="methodType" column="method_type" />
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
         <result property="realName" column="real_name" jdbcType="VARCHAR" />

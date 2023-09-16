@@ -9,10 +9,10 @@
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
         <result property="type" column="type" jdbcType="INTEGER" />
         <result property="des" column="des" jdbcType="VARCHAR" />
-        <result property="income" column="income" jdbcType="DECIMAL" />
-        <result property="pay" column="pay" jdbcType="DECIMAL" />
-        <result property="totalBefore" column="total_before" jdbcType="DECIMAL" />
-        <result property="total" column="total" jdbcType="DECIMAL" />
+        <result property="income" column="income" jdbcType="BIGINT" />
+        <result property="pay" column="pay" jdbcType="BIGINT" />
+        <result property="totalBefore" column="total_before" jdbcType="BIGINT" />
+        <result property="total" column="total" jdbcType="BIGINT" />
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
         <result property="mark" column="mark" jdbcType="VARCHAR" />
         <result property="markorder" column="markorder" jdbcType="VARCHAR" />

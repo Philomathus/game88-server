@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -42,7 +41,7 @@ public class WalletUser implements Serializable {
     /**
      * 金额
      */
-    private BigDecimal    amount;
+    private Long          amount;
     /**
      * 资金密码
      */
@@ -95,11 +94,19 @@ public class WalletUser implements Serializable {
     /**
      * 累积充值金额
      */
-    private BigDecimal    totalCharge;
+    private Long          totalCharge;
     /**
      * 累积出售金额
      */
-    private BigDecimal    totalSale;
+    private Long          totalSale;
+    /**
+     * 买单次数
+     */
+    private Long          buyOrderNum;
+    /**
+     * 卖单次数
+     */
+    private Long          sellOrderNum;
     /**
      * 手机型号
      */

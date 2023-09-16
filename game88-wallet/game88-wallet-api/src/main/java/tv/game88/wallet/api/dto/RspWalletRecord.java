@@ -3,7 +3,6 @@ package tv.game88.wallet.api.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,9 +18,9 @@ public class RspWalletRecord {
     private String merchantId;
 
     /**
-     * 交易金额
+     * 交易数量
      */
-    private BigDecimal amount;
+    private Long amount;
 
     /**
      * 商户订单号

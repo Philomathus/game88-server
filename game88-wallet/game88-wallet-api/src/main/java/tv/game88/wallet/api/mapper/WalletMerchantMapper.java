@@ -16,9 +16,9 @@ public interface WalletMerchantMapper extends BaseMapper<WalletMerchant> {
 
     BigDecimal getMerchantMoney( @Param( "merchantId" ) Long merchantId );
 
-    int reduceMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) BigDecimal reduceMoney );
+    int reduceMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) Long reduceMoney );
 
-    int addMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) BigDecimal addMoney );
+    int addMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) Long addMoney );
 }
 
 

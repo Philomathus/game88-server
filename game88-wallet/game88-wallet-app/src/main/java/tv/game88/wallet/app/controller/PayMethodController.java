@@ -3,10 +3,10 @@ package tv.game88.wallet.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @Tag( name = "支付方式接口" )
 @Log4j2
 public class PayMethodController extends BaseController {

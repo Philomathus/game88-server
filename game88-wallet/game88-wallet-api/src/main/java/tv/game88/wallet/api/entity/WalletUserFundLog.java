@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -41,22 +40,22 @@ public class WalletUserFundLog {
     /**
      * 收入
      */
-    private BigDecimal income;
+    private Long income;
 
     /**
      * 支出
      */
-    private BigDecimal pay;
+    private Long pay;
 
     /**
      * 变化前余额
      */
-    private BigDecimal totalBefore;
+    private Long totalBefore;
 
     /**
      * 变化后余额
      */
-    private BigDecimal total;
+    private Long total;
 
     /**
      * 创建时间
