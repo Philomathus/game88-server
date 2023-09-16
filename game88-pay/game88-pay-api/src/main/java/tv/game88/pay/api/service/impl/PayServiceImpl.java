@@ -83,12 +83,18 @@ public class PayServiceImpl implements PayService {
                     || platformUser.getVip() > payType.getOpenLevelMax() ) );
             payTypeList.removeIf( payType -> payType.getType() == 2 && platformUser.getStatus() == 6 );
             payTypeList.removeIf( payType -> "1".equals( deviceType ) && StringUtils.isNotBlank( payType.getDeviceType() )
-                    && !payType.getDeviceType().contains( "1" ) ); //移除ios外的支付类型
+                    && !payType
+                    .getDeviceType()
+                    .contains( "1" ) ); //移除ios外的支付类型
             payTypeList.removeIf( payType -> "2".equals( deviceType ) && StringUtils.isNotBlank( payType.getDeviceType() )
-                    && !payType.getDeviceType().contains( "2" ) ); //移除安卓外的支付类型
+                    && !payType
+                    .getDeviceType()
+                    .contains( "2" ) ); //移除安卓外的支付类型
             String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( PayType payType : payTypeList ) {
-                if ( StringUtils.isNotBlank( payType.getIconUrl() ) && !payType.getIconUrl().startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( payType.getIconUrl() ) && !payType
+                        .getIconUrl()
+                        .startsWith( "http" ) ) {
                     payType.setIconUrl( domainValue + payType.getIconUrl() );
                 }
             }
@@ -137,11 +143,14 @@ public class PayServiceImpl implements PayService {
             log.warn( "请注意保存实际金额!!!" );
             return notifyResultWays[ 1 ];
         }
-        if ( memberRechargeOnline.getRealMoney() != null
-                && memberRechargeOnline.getRealMoney().compareTo( memberRechargeOnline.getMoney() ) != 0 ) {
+        if ( memberRechargeOnline.getRealMoney() != null && memberRechargeOnline
+                .getRealMoney()
+                .compareTo( memberRechargeOnline.getMoney() ) != 0 ) {
             // 35是新火箭支付平台ID，0.85是扣除15%费率后的值，判断下单金额扣除15%费率后是否与实际金额相等，不相等拒绝回调
             if ( memberRechargeOnline.getPlatformId() == -1 ) {
-                if ( memberRechargeOnline.getMoney().multiply( new BigDecimal( "0.85" ) )
+                if ( memberRechargeOnline
+                        .getMoney()
+                        .multiply( new BigDecimal( "0.85" ) )
                         .compareTo( memberRechargeOnline.getRealMoney() ) != 0 ) {
                     log.warn( "下单金额与实际金额不符拒绝回调 - orderNo:{};money:{};subMoney:{}", memberRechargeOnline.getOrderNo(),
                             memberRechargeOnline.getMoney(), memberRechargeOnline.getRealMoney() );
@@ -155,7 +164,9 @@ public class PayServiceImpl implements PayService {
         }
 
         try {
-            SpringUtils.getBean( PayService.class ).updatePayJourStatus( memberRechargeOnline, mark );
+            SpringUtils
+                    .getBean( PayService.class )
+                    .updatePayJourStatus( memberRechargeOnline, mark );
             return notifyResultWays[ 0 ];
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -164,7 +175,7 @@ public class PayServiceImpl implements PayService {
     }
 
 
-    @Transactional ( rollbackFor = Exception.class )
+    @Transactional( rollbackFor = Exception.class )
     public void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String mark ) {
         //更新支付订单状态
         MemberRechargeOnline updatePayJour = new MemberRechargeOnline();
@@ -179,7 +190,9 @@ public class PayServiceImpl implements PayService {
             updatePayJour.setMoney( memberRechargeOnline.getMoney() );
         }
         MemberInfo memberInfo = memberInfoMapper.selectById( memberRechargeOnline.getMemberId() );
-        if ( memberInfo.getAccountCharge().compareTo( BigDecimal.ZERO ) == 0 ) {
+        if ( memberInfo
+                .getAccountCharge()
+                .compareTo( BigDecimal.ZERO ) == 0 ) {
             updatePayJour.setFirst( true );
         }
 
@@ -199,10 +212,16 @@ public class PayServiceImpl implements PayService {
 
             for ( String payPlatformRate : payFirstPlatformRates ) {
                 String[] firstPaySplit = payPlatformRate.split( "," );
-                if ( memberRechargeOnline.getPlatformId().toString().equals( firstPaySplit[ 0 ] )
-                        && memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(), memberRechargeOnline.getPlatformId() ) == 0 ) {
+                if ( memberRechargeOnline
+                        .getPlatformId()
+                        .toString()
+                        .equals( firstPaySplit[ 0 ] ) &&
+                        memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(), memberRechargeOnline.getPlatformId() )
+                                == 0 ) {
                     BigDecimal firstRate = new BigDecimal( firstPaySplit[ 1 ] );
-                    chargeGive = payJourMoney.multiply( firstRate ).setScale( 2, RoundingMode.HALF_UP );
+                    chargeGive = payJourMoney
+                            .multiply( firstRate )
+                            .setScale( 2, RoundingMode.HALF_UP );
                     log.warn( "首冲 {},{},{}", chargeGive, memberRechargeOnline.getPlatformId(), memberInfo.getId() );
                     break;
                 }
@@ -210,10 +229,17 @@ public class PayServiceImpl implements PayService {
             if ( chargeGive == null ) {
                 for ( String payPlatformRate : payNextPlatformRates ) {
                     String[] firstPaySplit = payPlatformRate.split( "," );
-                    if ( memberRechargeOnline.getPlatformId().toString().equals( firstPaySplit[ 0 ] )
-                            && memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(), memberRechargeOnline.getPlatformId() ) > 0 ) {
+                    if ( memberRechargeOnline
+                            .getPlatformId()
+                            .toString()
+                            .equals( firstPaySplit[ 0 ] ) &&
+                            memberRechargeOnlineMapper.successTodayCount( memberInfo.getId(),
+                                    memberRechargeOnline.getPlatformId() )
+                                    > 0 ) {
                         BigDecimal firstRate = new BigDecimal( firstPaySplit[ 1 ] );
-                        chargeGive = payJourMoney.multiply( firstRate ).setScale( 2, RoundingMode.HALF_UP );
+                        chargeGive = payJourMoney
+                                .multiply( firstRate )
+                                .setScale( 2, RoundingMode.HALF_UP );
                         log.warn( "每笔 {},{},{}", chargeGive, memberRechargeOnline.getPlatformId(), memberInfo.getId() );
                         break;
                     }
@@ -224,10 +250,31 @@ public class PayServiceImpl implements PayService {
         if ( chargeGive == null ) {
             PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
             if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
-                chargeGive = configEnvCacheUtil.getConfBd( "vippay_rate" ).multiply( payJourMoney )
-                        .setScale( 2, RoundingMode.HALF_UP );
+
+                String newVipPayRate = configEnvCacheUtil.getConf( "new_vippay_rate" );
+
+                if ( StringUtils.isNotBlank( newVipPayRate ) ) {
+                    String[] newVipPayRates = newVipPayRate.split( ";" );
+                    for ( String rates : newVipPayRates ) {
+                        String[]   spit   = rates.split( "," );
+                        BigDecimal amount = new BigDecimal( spit[ 0 ] );
+                        if ( payJourMoney.compareTo( amount ) >= 0 ) {
+                            chargeGive = payJourMoney
+                                    .multiply( new BigDecimal( spit[ 1 ] ) )
+                                    .setScale( 2, RoundingMode.HALF_UP );
+                        }
+
+                    }
+                } else {
+                    chargeGive = configEnvCacheUtil
+                            .getConfBd( "vippay_rate" )
+                            .multiply( payJourMoney )
+                            .setScale( 2, RoundingMode.HALF_UP );
+                }
+
             } else if ( payChannel != null && StringUtils.isNotBlank( payChannel.getDiscountBill() ) ) {
-                chargeGive = new BigDecimal( payChannel.getDiscountBill() ).multiply( payJourMoney )
+                chargeGive = new BigDecimal( payChannel.getDiscountBill() )
+                        .multiply( payJourMoney )
                         .setScale( 2, RoundingMode.HALF_UP );
             } else {
                 chargeGive = new BigDecimal( 0 );
@@ -263,7 +310,8 @@ public class PayServiceImpl implements PayService {
         if ( memberRechargeOnline.getPlatformId() == 24L ) {
             //vipPay充值活动任务
             List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                    .eq( "effect", 1 ).eq( "game_type_id", -2 ) );
+                    .eq( "effect", 1 )
+                    .eq( "game_type_id", -2 ) );
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney, confQuest );
             }
@@ -287,19 +335,21 @@ public class PayServiceImpl implements PayService {
     }
 
     @Override
-    @Transactional ( rollbackFor = Exception.class )
+    @Transactional( rollbackFor = Exception.class )
     public void payQuery10Min() throws Exception {
-        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>().eq( "status", -1 )
-                .le( "pay_time",
-                        LocalDateTimeUtils.format( LocalDateTime
-                                .now()
-                                .minusMinutes( 10 ) ) );
+        QueryWrapper<MemberRechargeOnline> queryWrapper = new QueryWrapper<MemberRechargeOnline>()
+                .eq( "status", -1 )
+                .le( "pay_time", LocalDateTimeUtils.format( LocalDateTime
+                        .now()
+                        .minusMinutes( 10 ) ) );
         List<MemberRechargeOnline> memberRechargeOnlineList = memberRechargeOnlineMapper.selectList( queryWrapper );
         for ( MemberRechargeOnline memberRechargeOnline : memberRechargeOnlineList ) {
             MemberRechargeOnline update = new MemberRechargeOnline();
             update.setStatus( 0 );
             UpdateWrapper<MemberRechargeOnline> payJourUpdateWrapper = new UpdateWrapper<>();
-            payJourUpdateWrapper.eq( "order_no", memberRechargeOnline.getOrderNo() ).eq( "status", -1 );
+            payJourUpdateWrapper
+                    .eq( "order_no", memberRechargeOnline.getOrderNo() )
+                    .eq( "status", -1 );
             memberRechargeOnlineMapper.update( update, payJourUpdateWrapper );
         }
     }
@@ -321,8 +371,11 @@ public class PayServiceImpl implements PayService {
             return RspBase.businessError( String.format( "请求订单过于频繁哦，请%s秒后再试", payIntervalExpire ) );
         }
         long payOrderNum = memberRechargeOnlineMapper.selectCount( new QueryWrapper<MemberRechargeOnline>()
-                .eq( "member_id", platformUser.getId() ).le( "status", 0 )
-                .ge( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) ) );
+                .eq( "member_id", platformUser.getId() )
+                .le( "status", 0 )
+                .ge( "pay_time", LocalDateTimeUtils.format( LocalDateTime
+                        .now()
+                        .minusMinutes( 10 ) ) ) );
         if ( payOrderNum >= configEnvCacheUtil.getConfInt( "pay_order_num_5min", 10 ) ) {
             log.warn( "您请求订单次数过多{}", platformUser.getId() );
             return RspBase.businessError( "您请求订单次数过多，请稍后重试" );
@@ -368,12 +421,18 @@ public class PayServiceImpl implements PayService {
             }
         } else {
             if ( StringUtils.isNotBlank( reqPayRecharge.getFailReason() ) ) {
-                if ( reqPayRecharge.getFailReason().startsWith( "I/O error on POST request for" ) ) {
+                if ( reqPayRecharge
+                        .getFailReason()
+                        .startsWith( "I/O error on POST request for" ) ) {
                     //超时的再下单一次
                     reqPayRecharge.setFailReason( "网络连接失败,下单超时" );
-                } else if ( reqPayRecharge.getFailReason().startsWith( "403 Forbidden" ) ) {
+                } else if ( reqPayRecharge
+                        .getFailReason()
+                        .startsWith( "403 Forbidden" ) ) {
                     reqPayRecharge.setFailReason( "支付IP未加白名单,请发给三方加白" );
-                } else if ( reqPayRecharge.getFailReason().length() > 255 ) {
+                } else if ( reqPayRecharge
+                        .getFailReason()
+                        .length() > 255 ) {
                     reqPayRecharge.setFailReason( "网络连接失败,下单报错" );
                 }
             } else {
@@ -409,10 +468,16 @@ public class PayServiceImpl implements PayService {
         // 失败数量 = 状态失败和状态待确认的数量
         int fcount = 0;
         for ( Map<String, Object> resultMap : resultList ) {
-            if ( "1".equals( resultMap.getOrDefault( "status", "" ).toString() ) ) {
-                scount += Integer.parseInt( resultMap.getOrDefault( "count", "0" ).toString() );
+            if ( "1".equals( resultMap
+                    .getOrDefault( "status", "" )
+                    .toString() ) ) {
+                scount += Integer.parseInt( resultMap
+                        .getOrDefault( "count", "0" )
+                        .toString() );
             } else {
-                fcount += Integer.parseInt( resultMap.getOrDefault( "count", "0" ).toString() );
+                fcount += Integer.parseInt( resultMap
+                        .getOrDefault( "count", "0" )
+                        .toString() );
             }
         }
         if ( ( scount + fcount ) == 0 ) { // min
