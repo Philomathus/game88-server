@@ -307,11 +307,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
-    public RspBase<RspUserSimpleInfo> getUserSimpleInfo( String userId ) {
-        return null;
-    }
-
-    @Override
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "fund_password" )
                                                                           .one();
@@ -414,14 +409,18 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         String currentOrderNo = GenerateOrderCacheUtils.me.getOrderId( "PTO", 5 );
         String otherOrderNo   = GenerateOrderCacheUtils.me.getOrderId( "PTI", 5 );
 
+        Long amount = reqPersonalTransfer.getAmount();
+
         // 扣除当前会员金额
-        walletFundManager.reduceWalletUserMoney( userId, null, reqPersonalTransfer.getAmount(),
-                WalletUserFundEnum.PERSONAL_TRANSFER_OUT,
-                "用户个人转账出账" + reqPersonalTransfer.getAmount(), currentOrderNo, otherOrderNo );
+        WalletUserFundEnum userFundEnum = WalletUserFundEnum.PERSONAL_TRANSFER_OUT;
+        String             userMark     = "用户" + userFundEnum.getDes() + amount;
+        walletFundManager.reduceWalletUserMoney( userId, null, amount, userFundEnum, userMark, currentOrderNo, otherOrderNo );
+
         // 增加对方会员金额
-        walletFundManager.addWalletUserMoney( userId, null, reqPersonalTransfer.getAmount(),
-                WalletUserFundEnum.PERSONAL_TRANSFER_IN,
-                "用户个人转账入账" + reqPersonalTransfer.getAmount(), otherOrderNo, currentOrderNo );
+        WalletUserFundEnum otherFundEnum = WalletUserFundEnum.PERSONAL_TRANSFER_IN;
+        String             otherMark     = "用户" + otherFundEnum.getDes() + amount;
+        walletFundManager.addWalletUserMoney( reqPersonalTransfer.getWalletUserAddress(), null, amount, otherFundEnum,
+                otherMark, otherOrderNo, currentOrderNo );
     }
 }
 

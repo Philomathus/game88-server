@@ -12,11 +12,13 @@ import java.util.Objects;
  */
 @Getter
 public enum WalletUserFundEnum {
+    CANCEL_ORDER_IN( 3, "撤销挂单", true ),
     PERSONAL_TRANSFER_IN( 2, "个人转账入账", false ),
     WITHDRAW_IN( 1, "提款收币", false ),
 
     DEPOSIT_OUT( -1, "充值出币", false ),
     PERSONAL_TRANSFER_OUT( -2, "个人转账出账", false ),
+    PUT_ORDER_OUT( -3, "挂单出售", true ),
     ;
 
     private final Integer type;

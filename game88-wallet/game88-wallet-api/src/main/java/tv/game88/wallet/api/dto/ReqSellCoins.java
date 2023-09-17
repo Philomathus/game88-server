@@ -15,8 +15,7 @@ public class ReqSellCoins extends ReqFundPass {
     @NotNull( message = "出售数量不能为空" )
     @Min( value = 10, message = "最低出售数量为10G币" )
     private Long       sellNum;
-    @Schema( title = "最低购买数量", requiredMode = Schema.RequiredMode.REQUIRED )
-    @NotNull( message = "最低购买数量不能为空" )
+    @Schema( title = "最低购买数量" )
     private Long       minBuyNum;
     @Schema( title = "收款方式", requiredMode = Schema.RequiredMode.REQUIRED )
     @NotNull( message = "请选择收款方式" )

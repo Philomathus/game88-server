@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,14 +29,14 @@ public class WalletTransaction implements Serializable {
     private String userId;
 
     /**
-     * 支付类型（冗余）
+     * 支付方式ID列表
      */
-    private WalletPayMethodEnum payMethodType;
+    private String payMethodIds;
 
     /**
-     * 支付方式ID
+     * 支付方式类型列表
      */
-    private Integer payMethodId;
+    private String payMethodTypes;
 
     /**
      * 是否可拆分（0 不可拆分 1 可拆分）
@@ -45,13 +44,19 @@ public class WalletTransaction implements Serializable {
     private Boolean canSplit;
 
     /**
-     * 交易金额
+     * 出售数量
      */
     private Long amount;
 
     /**
+     * 最低可购买金额
+     */
+    private Long minBuyNum;
+
+    /**
      * 状态
      */
+    // 0挂单中 1交易中 2交易成功 3取消交易
     private Integer status;
 
     /**
@@ -61,8 +66,28 @@ public class WalletTransaction implements Serializable {
     private LocalDateTime createTime;
 
     /**
-     * 交易完成时间
+     * 交易结束时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime transEndTime;
+
+    /**
+     * 30日成单数
+     */
+    private Integer successNumMonth;
+
+    /**
+     * 30日成单率
+     */
+    private String  successRateMonth;
+
+    /**
+     * 30日平均付款时间
+     */
+    private String  receivedTimeMonth;
+
+    /**
+     * 30日平均放币时间
+     */
+    private String  transferTimeMonth;
 }

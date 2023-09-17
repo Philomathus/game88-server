@@ -59,7 +59,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqDepositOrder.getMerchantId() );
-        RspBase        rspBase   = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
+        RspBase        rspBase        = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -91,7 +91,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
-        RspBase        rspBase   = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
+        RspBase        rspBase        = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -115,7 +115,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqOrderQuery.getMerchantId() );
-        RspBase        rspBase   = this.validated( reqOrderQuery, walletMerchant, null );
+        RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -158,9 +158,10 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             walletRecord.setUserId( reqWithdrawOrder.getWalletAddress() );
 
             // 添加会员金额
+            WalletUserFundEnum fundEnum = WalletUserFundEnum.WITHDRAW_IN;
+            String             mark     = "用户" + fundEnum.getDes() + reqWithdrawOrder.getAmount();
             walletFundManager.addWalletUserMoney( reqWithdrawOrder.getWalletAddress(), reqWithdrawOrder.getMerchantId(),
-                    reqWithdrawOrder.getAmount(), WalletUserFundEnum.WITHDRAW_IN,
-                    "用户提款收币" + reqWithdrawOrder.getAmount(), walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
+                    reqWithdrawOrder.getAmount(), fundEnum, mark, walletRecord.getTradeNo(), reqWithdrawOrder.getOrderNo() );
         }
         this.baseMapper.insert( walletRecord );
 
@@ -306,9 +307,10 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         update.setUpdateTime( LocalDateTime.now() );
         this.baseMapper.updateById( update );
         // 扣除会员金额
+        WalletUserFundEnum fundEnum = WalletUserFundEnum.DEPOSIT_OUT;
+        String             mark     = "用户" + fundEnum.getDes() + walletRecord.getAmount();
         walletFundManager.reduceWalletUserMoney( walletRecord.getUserId(), walletRecord.getMerchantId(),
-                walletRecord.getAmount(), WalletUserFundEnum.DEPOSIT_OUT,
-                "用户充值出币" + walletRecord.getAmount(), walletRecord.getTradeNo(), walletRecord.getOrderNo() );
+                walletRecord.getAmount(), fundEnum, mark, walletRecord.getTradeNo(), walletRecord.getOrderNo() );
 
         // 设置redis队列,定时推送回调
         this.sendRedisCallbackTask( walletRecord.getTradeNo(), walletRecord.getNotifyUrl() );

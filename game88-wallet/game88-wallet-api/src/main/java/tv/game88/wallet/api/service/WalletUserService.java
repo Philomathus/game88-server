@@ -28,8 +28,6 @@ public interface WalletUserService extends IService<WalletUser> {
 
     RspBase<RspMember> getUserInfo( String userId );
 
-    RspBase<RspUserSimpleInfo> getUserSimpleInfo( String userId );
-
     RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass );
 
     List<RspLogFund> getFundDetails( String userId, ReqLogFund reqLogFund );

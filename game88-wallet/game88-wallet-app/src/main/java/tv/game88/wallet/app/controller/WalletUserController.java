@@ -35,12 +35,6 @@ public class WalletUserController extends BaseController {
         return walletUserService.getUserInfo( MemberSecurityUtils.getUserId() );
     }
 
-    @Operation( summary = "获取简单会员信息" )
-    @PostMapping( "/api/getUserSimpleInfo" )
-    public RspBase<RspUserSimpleInfo> getUserSimpleInfo() {
-        return walletUserService.getUserSimpleInfo( MemberSecurityUtils.getUserId() );
-    }
-
     @Operation( summary = "设置资金密码" )
     @PostMapping( "/api/fundPassSet" )
     public RspBase<?> fundPassSet( @Validated @RequestBody ReqFundPass reqFundPass ) {

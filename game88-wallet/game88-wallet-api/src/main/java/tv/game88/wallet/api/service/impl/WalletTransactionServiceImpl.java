@@ -1,16 +1,34 @@
 package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.wallet.api.dto.ReqSellCoins;
+import tv.game88.wallet.api.dto.RspPayMethod2;
+import tv.game88.wallet.api.dto.RspSellOrderDetail;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
+import tv.game88.wallet.api.entity.WalletUserPayMethod;
+import tv.game88.wallet.api.manager.WalletFundManager;
+import tv.game88.wallet.api.mapper.WalletTransactionDetailMapper;
 import tv.game88.wallet.api.mapper.WalletTransactionMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
+import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletTransactionService;
+import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author meng.jun
@@ -20,10 +38,25 @@ import javax.annotation.Resource;
 @Service
 public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionMapper, WalletTransaction> implements WalletTransactionService {
     @Resource
-    private WalletUserMapper walletUserMapper;
+    private WalletUserMapper              walletUserMapper;
+    @Resource
+    private WalletUserPayMethodMapper     walletUserPayMethodMapper;
+    @Resource
+    private WalletTransactionDetailMapper walletTransactionDetailMapper;
+    @Resource
+    private WalletFundManager             walletFundManager;
 
     @Override
-    public RspBase<?> sellCoins( String userId, ReqSellCoins reqSellCoins ) {
+    public RspBase<?> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
+        if ( reqSellCoins.getCanSplit() && reqSellCoins.getMinBuyNum() == null ) {
+            return RspBase.businessError( "最低购买数量不能为空" );
+        }
+        if ( !reqSellCoins.getCanSplit() ) {
+            reqSellCoins.setMinBuyNum( null );
+        }
+        if ( reqSellCoins.getMinBuyNum() != null && reqSellCoins.getMinBuyNum() >= reqSellCoins.getSellNum() ) {
+            return RspBase.businessError( "最低出售数量不能超过或等于出售数量" );
+        }
         WalletUser walletUser = walletUserMapper.selectById( userId );
         RspBase<?> rspBase    = this.validWalletUser( walletUser );
         if ( rspBase != null ) {
@@ -33,7 +66,48 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "您的G币不足,G币数量:" + walletUser.getAmount() );
         }
 
-        return null;
+        Set<String> typeSet = walletUserPayMethodMapper.selectBatchIds( reqSellCoins.getPayMethodIds() ).stream()
+                                                       .map( pm -> pm.getMethodType().name() ).collect( Collectors.toSet() );
+
+        LocalDateTime now     = LocalDateTime.now();
+        Long          sellNum = reqSellCoins.getSellNum();
+
+        WalletTransaction walletTransaction = new WalletTransaction();
+        walletTransaction.setTransactionId( GenerateOrderCacheUtils.me.getOrderId( "JY", 6 ) );
+        walletTransaction.setUserId( userId );
+        walletTransaction.setStatus( 0 );
+        walletTransaction.setCanSplit( reqSellCoins.getCanSplit() );
+        walletTransaction.setMinBuyNum( reqSellCoins.getMinBuyNum() );
+        walletTransaction.setAmount( sellNum );
+        walletTransaction.setCreateTime( now );
+        walletTransaction.setPayMethodIds( StringUtils.join( reqSellCoins.getPayMethodIds(), "," ) );
+        walletTransaction.setPayMethodTypes( StringUtils.join( typeSet, "," ) );
+
+        LocalDateTime startTime = now.minusDays( 30 );
+
+        Long                sellerTotalCount = walletTransactionDetailMapper.countSellerTotal( userId, startTime, now );
+        Map<String, Object> sellerMap        = walletTransactionDetailMapper.sumSellerReceived( userId, startTime, now );
+        Map<String, Object> buyerMap         = walletTransactionDetailMapper.sumBuyerTransfer( userId, startTime, now );
+
+        int receivedTimeTotal  = Integer.parseInt( sellerMap.getOrDefault( "s", "0" ).toString() );
+        int sellerSuccessCount = Integer.parseInt( sellerMap.getOrDefault( "c", "0" ).toString() );
+        int transferTimeTotal  = Integer.parseInt( buyerMap.getOrDefault( "s", "0" ).toString() );
+        int buyerSuccessCount  = Integer.parseInt( buyerMap.getOrDefault( "c", "0" ).toString() );
+
+        String successRateMonth = new BigDecimal( sellerSuccessCount )
+                .divide( new BigDecimal( sellerTotalCount ), 2, RoundingMode.HALF_UP ).multiply( new BigDecimal( 100 ) )
+                .toString().concat( "%" );
+
+        long aveReceivedTime = receivedTimeTotal / sellerSuccessCount;
+        long aveTransferTime = transferTimeTotal / buyerSuccessCount;
+
+        walletTransaction.setSuccessNumMonth( sellerSuccessCount );
+        walletTransaction.setSuccessRateMonth( successRateMonth );
+        walletTransaction.setReceivedTimeMonth( LocalDateTimeUtils.secondsToTime( aveReceivedTime ) );
+        walletTransaction.setTransferTimeMonth( LocalDateTimeUtils.secondsToTime( aveTransferTime ) );
+
+        SpringUtils.getBean( WalletTransactionService.class ).saveTransAndReduceUserAmount( userId, walletTransaction, sellNum );
+        return RspBase.ok( "挂单成功" );
     }
 
     private RspBase<?> validWalletUser( WalletUser walletUser ) {
@@ -47,6 +121,95 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "用户未实名或实名未认证" );
         }
         return null;
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum ) {
+        int i = this.baseMapper.insert( walletTransaction );
+        if ( i > 0 ) {
+            // 扣除会员金额
+            WalletUserFundEnum fundEnum = WalletUserFundEnum.PUT_ORDER_OUT;
+            String             mark     = "用户" + fundEnum.getDes() + sellNum;
+            walletFundManager.reduceWalletUserMoney( userId, null, sellNum, fundEnum, mark,
+                    walletTransaction.getTransactionId(), walletTransaction.getTransactionId() );
+        }
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void updateTransAndAddUserAmount( String userId, WalletTransaction update, Long amount ) {
+        int i = this.baseMapper.updateById( update );
+        if ( i > 0 ) {
+            // 扣除会员金额
+            WalletUserFundEnum fundEnum = WalletUserFundEnum.CANCEL_ORDER_IN;
+            String             mark     = "用户" + fundEnum.getDes() + amount;
+            walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark,
+                    update.getTransactionId(), update.getTransactionId() );
+        }
+    }
+
+    @Override
+    public RspBase<RspSellOrderDetail> sellOrderDetail( String userId, String transactionId ) {
+        WalletUser walletUser = walletUserMapper.selectById( userId );
+        RspBase    rspBase    = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+        WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
+        }
+        if ( !walletTransaction.getUserId().equals( userId ) ) {
+            return RspBase.businessError( "此挂单并不属于您" );
+        }
+        RspSellOrderDetail rspSellOrderDetail = new RspSellOrderDetail();
+        BeanUtils.copyProperties( walletTransaction, rspSellOrderDetail );
+
+        String[]                  payMethodIds   = walletTransaction.getPayMethodIds().split( "," );
+        List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectBatchIds( Arrays.asList( payMethodIds ) );
+
+        Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+        for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
+            RspPayMethod2 rspPayMethod = new RspPayMethod2();
+            BeanUtils.copyProperties( userPayMethod, rspPayMethod );
+            rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
+        }
+        rspSellOrderDetail.setRspPayMethodMap( rspPayMethodMap );
+        return RspBase.ok( rspSellOrderDetail );
+    }
+
+    @Override
+    public RspBase<?> cancelSellOrder( String userId, String transactionId ) {
+        WalletUser walletUser = walletUserMapper.selectById( userId );
+        RspBase    rspBase    = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+        WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
+        }
+        if ( !walletTransaction.getUserId().equals( userId ) ) {
+            return RspBase.businessError( "此挂单并不属于您" );
+        }
+        if ( walletTransaction.getStatus() == 1 ) {
+            return RspBase.businessError( "挂单正在交易中" );
+        }
+        if ( walletTransaction.getStatus() == 2 ) {
+            return RspBase.businessError( "挂单交易已成功" );
+        }
+        if ( walletTransaction.getStatus() == 3 ) {
+            return RspBase.businessError( "挂单交易已取消" );
+        }
+        WalletTransaction update = new WalletTransaction();
+        update.setTransactionId( transactionId );
+        update.setStatus( 3 );
+        update.setTransEndTime( LocalDateTime.now() );
+
+        SpringUtils.getBean( WalletTransactionService.class )
+                   .updateTransAndAddUserAmount( userId, update, walletTransaction.getAmount() );
+        return RspBase.ok( "挂单取消成功" );
     }
 }
 

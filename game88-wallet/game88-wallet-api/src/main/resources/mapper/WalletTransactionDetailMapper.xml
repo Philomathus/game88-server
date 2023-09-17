@@ -7,7 +7,8 @@
     <resultMap id="WalletTransactionDetailResult" type="tv.game88.wallet.api.entity.WalletTransactionDetail">
         <id property="transDetailId" column="trans_detail_id" jdbcType="VARCHAR" />
         <result property="transactionId" column="transaction_id" jdbcType="VARCHAR" />
-        <result property="userId" column="user_id" jdbcType="VARCHAR" />
+        <result property="sellerId" column="seller_id" jdbcType="VARCHAR" />
+        <result property="buyerId" column="buyer_id" jdbcType="VARCHAR" />
         <result property="amount" column="amount" jdbcType="BIGINT" />
         <result property="transCertPic" column="trans_cert_pic" jdbcType="VARCHAR" />
         <result property="status" column="status" />
@@ -24,7 +25,8 @@
     <sql id="selectWalletTransactionDetailVo">
         select trans_detail_id,
                transaction_id,
-               user_id,
+               seller_id,
+               buyer_id,
                amount,
                trans_cert_pic,
                status,

@@ -30,9 +30,14 @@ public class WalletTransactionDetail implements Serializable {
     private String transactionId;
 
     /**
-     * 钱包用户ID
+     * 卖家ID
      */
-    private String userId;
+    private String sellerId;
+
+    /**
+     * 买家ID
+     */
+    private String buyerId;
 
     /**
      * 请求数量
