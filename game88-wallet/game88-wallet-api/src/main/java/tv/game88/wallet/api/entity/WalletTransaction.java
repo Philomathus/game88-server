@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -79,15 +80,18 @@ public class WalletTransaction implements Serializable {
     /**
      * 30日成单率
      */
-    private String  successRateMonth;
+    private String successRateMonth;
 
     /**
      * 30日平均付款时间
      */
-    private String  receivedTimeMonth;
+    private String receivedTimeMonth;
 
     /**
      * 30日平均放币时间
      */
-    private String  transferTimeMonth;
+    private String transferTimeMonth;
+
+    @TableField( exist = false )
+    private String payMethodType;
 }

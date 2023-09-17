@@ -5,19 +5,19 @@
 <mapper namespace="tv.game88.wallet.api.mapper.WalletTransactionMapper">
 
     <resultMap id="WalletTransactionResult" type="tv.game88.wallet.api.entity.WalletTransaction">
-            <id property="transactionId" column="transaction_id" jdbcType="VARCHAR"/>
-            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
-            <result property="payMethodIds" column="pay_method_ids" jdbcType="VARCHAR"/>
-            <result property="payMethodTypes" column="pay_method_types" jdbcType="VARCHAR"/>
-            <result property="canSplit" column="can_split" jdbcType="TINYINT"/>
-            <result property="amount" column="amount" jdbcType="BIGINT"/>
-            <result property="status" column="status" jdbcType="INTEGER"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="transEndTime" column="trans_end_time" jdbcType="TIMESTAMP"/>
-            <result property="successNumMonth" column="success_num_month" jdbcType="INTEGER"/>
-            <result property="successRateMonth" column="success_rate_month" jdbcType="VARCHAR"/>
-            <result property="receivedTimeMonth" column="received_time_month" jdbcType="VARCHAR"/>
-            <result property="transferTimeMonth" column="transfer_time_month" jdbcType="VARCHAR"/>
+        <id property="transactionId" column="transaction_id" jdbcType="VARCHAR" />
+        <result property="userId" column="user_id" jdbcType="VARCHAR" />
+        <result property="payMethodIds" column="pay_method_ids" jdbcType="VARCHAR" />
+        <result property="payMethodTypes" column="pay_method_types" jdbcType="VARCHAR" />
+        <result property="canSplit" column="can_split" jdbcType="TINYINT" />
+        <result property="amount" column="amount" jdbcType="BIGINT" />
+        <result property="status" column="`status`" jdbcType="INTEGER" />
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+        <result property="transEndTime" column="trans_end_time" jdbcType="TIMESTAMP" />
+        <result property="successNumMonth" column="success_num_month" jdbcType="INTEGER" />
+        <result property="successRateMonth" column="success_rate_month" jdbcType="VARCHAR" />
+        <result property="receivedTimeMonth" column="received_time_month" jdbcType="VARCHAR" />
+        <result property="transferTimeMonth" column="transfer_time_month" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletTransactionVo">
@@ -27,7 +27,7 @@
                pay_method_types,
                can_split,
                amount,
-               status,
+               `status`,
                create_time,
                trans_end_time,
                success_num_month,
@@ -36,4 +36,23 @@
                transfer_time_month
         from wallet_transaction
     </sql>
+
+    <select id="selectWalletTransactionList" resultType="tv.game88.wallet.api.entity.WalletTransaction">
+        <include refid="selectWalletTransactionVo" />
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="payMethodType != null">
+                and pay_method_types like concat('%', #{payMethodType}, '%')
+            </if>
+            <if test="canSplit != null">
+                and can_split = #{canSplit}
+            </if>
+            <if test="status != null">
+                and `status` = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
 </mapper>

@@ -10,6 +10,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.wallet.api.dto.ReqSellCoins;
+import tv.game88.wallet.api.dto.ReqSellOrderList;
 import tv.game88.wallet.api.dto.RspPayMethod2;
 import tv.game88.wallet.api.dto.RspSellOrderDetail;
 import tv.game88.wallet.api.entity.WalletTransaction;
@@ -144,8 +145,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             // 扣除会员金额
             WalletUserFundEnum fundEnum = WalletUserFundEnum.CANCEL_ORDER_IN;
             String             mark     = "用户" + fundEnum.getDes() + amount;
-            walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark,
-                    update.getTransactionId(), update.getTransactionId() );
+            walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark, update.getTransactionId(),
+                    update.getTransactionId() );
         }
     }
 
@@ -210,6 +211,23 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         SpringUtils.getBean( WalletTransactionService.class )
                    .updateTransAndAddUserAmount( userId, update, walletTransaction.getAmount() );
         return RspBase.ok( "挂单取消成功" );
+    }
+
+    @Override
+    public List<RspSellOrderDetail> sellOrderList( String userId, ReqSellOrderList reqSellOrderList ) {
+        reqSellOrderList.setUserId( userId );
+        WalletTransaction query = new WalletTransaction();
+        BeanUtils.copyProperties( reqSellOrderList, query );
+
+        List<WalletTransaction>  walletTransactions = this.baseMapper.selectWalletTransactionList( query );
+        List<RspSellOrderDetail> resultList         = new ArrayList<>();
+        for ( WalletTransaction transaction : walletTransactions ) {
+            RspSellOrderDetail rspSellOrderDetail = new RspSellOrderDetail();
+            BeanUtils.copyProperties( transaction, rspSellOrderDetail );
+
+            resultList.add( rspSellOrderDetail );
+        }
+        return resultList;
     }
 }
 

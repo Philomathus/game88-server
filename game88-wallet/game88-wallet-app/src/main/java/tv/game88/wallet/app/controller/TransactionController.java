@@ -11,11 +11,13 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.ReqSellCoins;
 import tv.game88.wallet.api.dto.ReqSellOrderDetail;
+import tv.game88.wallet.api.dto.ReqSellOrderList;
 import tv.game88.wallet.api.dto.RspSellOrderDetail;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @Tag( name = "挂单接口" )
@@ -40,5 +42,14 @@ public class TransactionController extends BaseController {
     @PostMapping( "/api/cancelSellOrder" )
     public RspBase<?> cancelSellOrder( @RequestBody @Validated ReqSellOrderDetail reqSellOrderDetail ) {
         return walletTransactionService.cancelSellOrder( MemberSecurityUtils.getUserId(), reqSellOrderDetail.getTransactionId() );
+    }
+
+    @Operation( summary = "我的挂单 - 挂单列表" )
+    @PostMapping( "/api/sellOrderList" )
+    public RspBase<List<RspSellOrderDetail>> sellOrderList( @RequestBody ReqSellOrderList reqSellOrderList ) {
+        startPage( reqSellOrderList );
+        List<RspSellOrderDetail> resultList = walletTransactionService.sellOrderList( MemberSecurityUtils.getUserId(),
+                reqSellOrderList );
+        return getRspBasePage( resultList, reqSellOrderList );
     }
 }
