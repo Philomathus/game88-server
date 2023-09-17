@@ -827,7 +827,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
 
         BigDecimal introvipWithdrawLimitMoney = configEnvCacheUtil.getConfBd( "introvip_withdraw_limit_money" );
-        if ( memberCard.getBankId() != 68L && !Objects.equals( introvipWithdrawLimitMoney, BigDecimal.ZERO )
+        if ( StringUtils.isNumeric( memberCard.getBankAccount().trim() )
+                && !Objects.equals( introvipWithdrawLimitMoney, BigDecimal.ZERO )
                 && req.getWithdrawMoney().compareTo( introvipWithdrawLimitMoney ) >= 0 ) {
             return RspBase.businessError( configEnvCacheUtil.getConf( "introvip_withdraw_limit_msg" ) );
         }
