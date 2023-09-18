@@ -32,6 +32,7 @@ public class GameDockMG extends AbstractGameDock {
             headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>( params, headers );
 
+            log.warn( reqJoinGame.getRecordUrl());
             Map<String, Object> resultMap = restTemplate.postForObject( reqJoinGame.getRecordUrl(), httpEntity, Map.class );
             Object              obj       = resultMap.get( "access_token" );
             String              token     = obj == null ? null : obj.toString();
@@ -87,6 +88,7 @@ public class GameDockMG extends AbstractGameDock {
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
 
+        log.warn( url + " ::: "  + reqJoinGame.getToken());
         ResponseEntity<Map> responseEntity = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
         Map                 result         = responseEntity.getBody();
         if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
