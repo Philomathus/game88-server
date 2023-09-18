@@ -131,7 +131,7 @@ public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
         PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> dataMap = new TreeMap<>();
-        dataMap.put( "MerchantId", payAgentPlatform.getId() );
+        dataMap.put( "MerchantId", payAgentChannel.getMerId() );
         dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         dataMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
 
