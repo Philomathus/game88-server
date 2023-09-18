@@ -229,7 +229,18 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
 
     @Override
     public List<RspTransCenterDetail> transCenterList( ReqTransCenterDetail reqTransCenterDetail ) {
-        return null;
+        WalletTransaction query = new WalletTransaction();
+        BeanUtils.copyProperties( reqTransCenterDetail, query );
+
+        List<WalletTransaction>  walletTransactions = this.baseMapper.selectWalletTransactionList( query );
+        List<RspTransCenterDetail> resultList         = new ArrayList<>();
+        for ( WalletTransaction transaction : walletTransactions ) {
+            RspTransCenterDetail rspSellOrderDetail = new RspTransCenterDetail();
+            BeanUtils.copyProperties( transaction, rspSellOrderDetail );
+
+            resultList.add( rspSellOrderDetail );
+        }
+        return resultList;
     }
 }
 
