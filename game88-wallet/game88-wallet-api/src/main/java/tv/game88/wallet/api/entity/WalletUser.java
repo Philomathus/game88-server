@@ -27,6 +27,10 @@ public class WalletUser implements Serializable {
      */
     private String        nickName;
     /**
+     * 用户头像
+     */
+    private String        headImg;
+    /**
      * 登录密码
      */
     private String        password;

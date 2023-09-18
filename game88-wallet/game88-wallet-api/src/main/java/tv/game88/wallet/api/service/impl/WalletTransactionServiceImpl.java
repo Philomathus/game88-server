@@ -9,10 +9,7 @@ import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
-import tv.game88.wallet.api.dto.ReqSellCoins;
-import tv.game88.wallet.api.dto.ReqSellOrderList;
-import tv.game88.wallet.api.dto.RspPayMethod2;
-import tv.game88.wallet.api.dto.RspSellOrderDetail;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
@@ -228,6 +225,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             resultList.add( rspSellOrderDetail );
         }
         return resultList;
+    }
+
+    @Override
+    public List<RspTransCenterDetail> transCenterList( ReqTransCenterDetail reqTransCenterDetail ) {
+        return null;
     }
 }
 

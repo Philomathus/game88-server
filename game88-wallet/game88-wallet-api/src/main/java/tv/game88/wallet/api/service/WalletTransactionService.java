@@ -2,9 +2,7 @@ package tv.game88.wallet.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.ReqSellCoins;
-import tv.game88.wallet.api.dto.ReqSellOrderList;
-import tv.game88.wallet.api.dto.RspSellOrderDetail;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 
 import java.util.List;
@@ -26,4 +24,6 @@ public interface WalletTransactionService extends IService<WalletTransaction> {
     RspBase<?> cancelSellOrder( String userId, String transactionId );
 
     List<RspSellOrderDetail> sellOrderList( String userId, ReqSellOrderList reqSellOrderList );
+
+    List<RspTransCenterDetail> transCenterList( ReqTransCenterDetail reqTransCenterDetail );
 }

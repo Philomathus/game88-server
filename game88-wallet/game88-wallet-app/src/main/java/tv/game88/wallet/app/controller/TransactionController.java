@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.ReqSellCoins;
-import tv.game88.wallet.api.dto.ReqSellOrderDetail;
-import tv.game88.wallet.api.dto.ReqSellOrderList;
-import tv.game88.wallet.api.dto.RspSellOrderDetail;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
@@ -51,5 +48,13 @@ public class TransactionController extends BaseController {
         List<RspSellOrderDetail> resultList = walletTransactionService.sellOrderList( MemberSecurityUtils.getUserId(),
                 reqSellOrderList );
         return getRspBasePage( resultList, reqSellOrderList );
+    }
+
+    @Operation( summary = "交易中心 - 交易中心挂单列表" )
+    @PostMapping( "/api/transCenterList" )
+    public RspBase<List<RspTransCenterDetail>> transCenterList( @RequestBody ReqTransCenterDetail reqTransCenterDetail ) {
+        startPage( reqTransCenterDetail );
+        List<RspTransCenterDetail> resultList = walletTransactionService.transCenterList( reqTransCenterDetail );
+        return getRspBasePage( resultList, reqTransCenterDetail );
     }
 }

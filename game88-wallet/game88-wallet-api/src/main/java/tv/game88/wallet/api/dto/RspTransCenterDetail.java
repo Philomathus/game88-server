@@ -1,0 +1,22 @@
+package tv.game88.wallet.api.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+@Data
+public class RspTransCenterDetail {
+    @Schema( title = "挂单编号" )
+    private String  transactionId;
+    @Schema( title = "卖家头像" )
+    private String  sellerHeadImg;
+    @Schema( title = "是否可拆分" )
+    private Boolean canSplit;
+    @Schema( title = "售卖数量" )
+    private Long    amount;
+    @Schema( title = "30日成单数" )
+    private Integer successNumMonth;
+    @Schema( title = "30日成单率" )
+    private String  successRateMonth;
+    @Schema( title = "收款方式类型", description = "英文逗号,分割" )
+    private String  payMethodTypes;
+}

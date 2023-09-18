@@ -144,6 +144,9 @@ public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageForm( dataMap ), null );
 
+        log.warn( payAgentPlatform.getName()
+                + "查询请求参数{}; 查询结果:{}", JsonUtil.object2Json( dataMap ), JsonUtil.object2Json( resultMap ) );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String return_code = resultMap.getOrDefault( "Code", "" ).toString();
             if ( "0".equals( return_code ) ) {
