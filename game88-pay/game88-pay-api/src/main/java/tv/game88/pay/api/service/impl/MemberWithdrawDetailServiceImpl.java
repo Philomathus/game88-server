@@ -862,10 +862,34 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     @Override
     @Transactional( rollbackFor = Exception.class )
     public String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard ) {
+        BigDecimal withdrawAward     = BigDecimal.ZERO;
+        BigDecimal withdrawAwardRate = null;
+        if ( memberCard.getBankId() == 68L ) {
+            String vipPayWithdrawAwardRate = configEnvCacheUtil.getConf( "vippay_withdraw_award_rate" );
+            if ( StringUtils.isNotBlank( vipPayWithdrawAwardRate ) ) {
+                String[] newVipPayRates = vipPayWithdrawAwardRate.split( ";" );
+                for ( String rates : newVipPayRates ) {
+                    String[]   spit   = rates.split( "," );
+                    BigDecimal amount = new BigDecimal( spit[ 0 ] );
+                    if ( withdrawMoney.compareTo( amount ) >= 0 ) {
+                        String[] spits = spit[ 1 ].split( "-" );
+
+                        withdrawAwardRate = RandomUtils.randomDecimalWithMax( new BigDecimal( spits[ 0 ] ),
+                                new BigDecimal( spits[ 1 ] ) );
+                        withdrawAward     = withdrawMoney.multiply( withdrawAwardRate ).setScale( 0, RoundingMode.HALF_UP );
+                    }
+
+                }
+            }
+        }
+
         MemberWithdrawDetail memberWithdrawDetail = new MemberWithdrawDetail();
         memberWithdrawDetail.setWithdrawOrderNo( GenerateOrderCacheUtils.me.getOrderId( "TX", 3 ) );
         memberWithdrawDetail.setWithdrawId( memberInfo.getId() );
-        memberWithdrawDetail.setWithdrawMoney( withdrawMoney );
+        memberWithdrawDetail.setWithdrawMoney( withdrawMoney.add( withdrawAward ) );
+        if ( withdrawAward.compareTo( BigDecimal.ZERO ) > 0 ) {
+            memberWithdrawDetail.setRemark( "vipPay提现随机奖励" + withdrawAward + ",比例:" + withdrawAwardRate.toString() );
+        }
         memberWithdrawDetail.setBankId( memberCard.getBankId() );
         memberWithdrawDetail.setBankAccount( memberCard.getBankAccount() );
         memberWithdrawDetail.setBankAddress( memberCard.getBankAddress() );

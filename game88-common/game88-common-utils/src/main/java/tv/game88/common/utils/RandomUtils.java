@@ -2,6 +2,7 @@ package tv.game88.common.utils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,19 +12,20 @@ import java.util.Map;
  */
 public class RandomUtils {
 
-    public static BigDecimal getBigDecimal(Object value ) {
+    public static BigDecimal getBigDecimal( Object value ) {
         BigDecimal ret = null;
-        if( value != null ) {
-            if( value instanceof BigDecimal ) {
-                ret = (BigDecimal) value;
-            } else if( value instanceof String ) {
-                ret = new BigDecimal( (String) value );
-            } else if( value instanceof BigInteger) {
-                ret = new BigDecimal( (BigInteger) value );
-            } else if( value instanceof Number ) {
-                ret = BigDecimal.valueOf(((Number) value).doubleValue());
+        if ( value != null ) {
+            if ( value instanceof BigDecimal ) {
+                ret = ( BigDecimal ) value;
+            } else if ( value instanceof String ) {
+                ret = new BigDecimal( ( String ) value );
+            } else if ( value instanceof BigInteger ) {
+                ret = new BigDecimal( ( BigInteger ) value );
+            } else if ( value instanceof Number ) {
+                ret = BigDecimal.valueOf( ( ( Number ) value ).doubleValue() );
             } else {
-                throw new ClassCastException("Not possible to coerce ["+value+"] from class "+value.getClass()+" into a BigDecimal.");
+                throw new ClassCastException(
+                        "Not possible to coerce [" + value + "] from class " + value.getClass() + " into a BigDecimal." );
             }
         }
         return ret;
@@ -31,17 +33,17 @@ public class RandomUtils {
 
     /**
      * 随机权重值
+     *
      * @param weightableMap
      * @param totalWeight
      * @param <T>
-     * @return
      */
-    public static <T> T randomWeight(Map<T,Integer> weightableMap, int totalWeight) {
-        int num = randomIntWithMax(1, totalWeight);
+    public static <T> T randomWeight( Map<T, Integer> weightableMap, int totalWeight ) {
+        int num = randomIntWithMax( 1, totalWeight );
         int sum = 0;
-        for(T weightable :weightableMap.keySet()) {
-            sum += weightableMap.get(weightable);
-            if (num <= sum) {
+        for ( T weightable : weightableMap.keySet() ) {
+            sum += weightableMap.get( weightable );
+            if ( num <= sum ) {
                 return weightable;
             }
         }
@@ -50,26 +52,26 @@ public class RandomUtils {
 
     /**
      * 随机权重值
+     *
      * @param weightableMap
      * @param <T>
-     * @return
      */
-    public static <T> List<T> randomWeight( int returnSize,Map<T,Integer> weightableMap,boolean isOnly) {
+    public static <T> List<T> randomWeight( int returnSize, Map<T, Integer> weightableMap, boolean isOnly ) {
         int totalWeight = 0;
-        for (int weight : weightableMap.values()) {
+        for ( int weight : weightableMap.values() ) {
             totalWeight += weight;
         }
 
         List<T> list = new ArrayList<>();
-        for(int i = 0;i<returnSize;i++){
-            if(weightableMap.size()==0){
+        for ( int i = 0; i < returnSize; i++ ) {
+            if ( weightableMap.size() == 0 ) {
                 break;
             }
-            T t=  randomWeight(weightableMap, totalWeight);
-            list.add(t);
-            if(isOnly){
-                totalWeight -= weightableMap.get(t);
-                weightableMap.remove(t);
+            T t = randomWeight( weightableMap, totalWeight );
+            list.add( t );
+            if ( isOnly ) {
+                totalWeight -= weightableMap.get( t );
+                weightableMap.remove( t );
             }
         }
         return list;
@@ -77,14 +79,28 @@ public class RandomUtils {
 
     /**
      * 返回min-max之间的随机数
+     *
      * @param min(包含)
      * @param max(包含)
-     * @return
      */
-    public static int randomIntWithMax(int min, int max){
-        if(min >= max){
+    public static int randomIntWithMax( int min, int max ) {
+        if ( min >= max ) {
             return min;
         }
-        return (int) (Math.random()*(max-min+1)+min);
+        return ( int ) ( Math.random() * ( max - min + 1 ) + min );
+    }
+
+    public static BigDecimal randomDecimalWithMax( BigDecimal min, BigDecimal max ) {
+        if ( min.compareTo( max ) >= 0 ) {
+            return min;
+        }
+        BigDecimal randomBigDecimal = min.add( BigDecimal.valueOf( Math.random() ).multiply( max.subtract( min ) ) );
+        return randomBigDecimal.setScale( 3, RoundingMode.HALF_UP );
+    }
+
+    public static void main( String[] args ) {
+        for ( int i = 0; i < 50; i++ ) {
+            System.out.println( randomDecimalWithMax( BigDecimal.valueOf( 0.01 ), BigDecimal.valueOf( 0.015 ) ) );
+        }
     }
 }
