@@ -2,6 +2,9 @@ package tv.game88.wallet.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.wallet.api.constants.ConstantsWallet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,4 +41,11 @@ public class RspBuyOrderDetail {
 
     @Schema( title = "买家收款方式" )
     private Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+
+    public String getHeadImg() {
+        if ( StringUtils.isBlank( headImg ) ) {
+            return ConstantsWallet.DEFAULT_HEAD_IMAGE_URL;
+        }
+        return ConfigDomainCacheUtil.me.getDomainOssValue() + headImg;
+    }
 }

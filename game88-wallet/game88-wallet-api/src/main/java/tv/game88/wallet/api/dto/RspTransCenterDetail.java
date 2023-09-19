@@ -11,7 +11,7 @@ public class RspTransCenterDetail {
     @Schema( title = "挂单编号" )
     private String  transactionId;
     @Schema( title = "卖家头像" )
-    private String  sellerHeadImg;
+    private String  headImg;
     @Schema( title = "是否可拆分" )
     private Boolean canSplit;
     @Schema( title = "售卖数量" )
@@ -23,10 +23,10 @@ public class RspTransCenterDetail {
     @Schema( title = "收款方式类型", description = "英文逗号,分割" )
     private String  payMethodTypes;
 
-    public String getSellerHeadImg() {
-        if ( StringUtils.isBlank( sellerHeadImg ) ) {
+    public String getHeadImg() {
+        if ( StringUtils.isBlank( headImg ) ) {
             return ConstantsWallet.DEFAULT_HEAD_IMAGE_URL;
         }
-        return ConfigDomainCacheUtil.me.getDomainOssValue() + sellerHeadImg;
+        return ConfigDomainCacheUtil.me.getDomainOssValue() + headImg;
     }
 }
