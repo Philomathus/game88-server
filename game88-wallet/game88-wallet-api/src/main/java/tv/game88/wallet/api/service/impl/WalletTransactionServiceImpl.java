@@ -232,7 +232,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
 
-        List<WalletTransaction>  walletTransactions = this.baseMapper.selectWalletTransactionList( query );
+        List<WalletTransaction>    walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspTransCenterDetail> resultList         = new ArrayList<>();
         for ( WalletTransaction transaction : walletTransactions ) {
             RspTransCenterDetail rspSellOrderDetail = new RspTransCenterDetail();

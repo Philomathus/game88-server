@@ -1,5 +1,6 @@
 package tv.game88.general.api.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Log4j2
 @Service
+@Master
 public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper, GameDataRecord> implements GameDataRecordService {
     @Resource
     private SqlSessionTemplate sqlSessionTemplate;

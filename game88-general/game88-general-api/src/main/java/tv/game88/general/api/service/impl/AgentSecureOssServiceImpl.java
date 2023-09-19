@@ -1,5 +1,6 @@
 package tv.game88.general.api.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import tv.game88.general.api.entity.AgentSecureOss;
@@ -17,6 +18,7 @@ import java.util.List;
  * @date 2021-04-05
  */
 @Service
+@Master
 public class AgentSecureOssServiceImpl extends ServiceImpl<AgentSecureOssMapper, AgentSecureOss> implements AgentSecureOssService {
     @Resource
     private AgentHostMapper      agentHostMapper;

@@ -2,6 +2,9 @@ package tv.game88.wallet.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.wallet.api.constants.ConstantsWallet;
 
 @Data
 public class RspTransCenterDetail {
@@ -19,4 +22,11 @@ public class RspTransCenterDetail {
     private String  successRateMonth;
     @Schema( title = "收款方式类型", description = "英文逗号,分割" )
     private String  payMethodTypes;
+
+    public String getSellerHeadImg() {
+        if ( StringUtils.isBlank( sellerHeadImg ) ) {
+            return ConstantsWallet.DEFAULT_HEAD_IMAGE_URL;
+        }
+        return ConfigDomainCacheUtil.me.getDomainOssValue() + sellerHeadImg;
+    }
 }

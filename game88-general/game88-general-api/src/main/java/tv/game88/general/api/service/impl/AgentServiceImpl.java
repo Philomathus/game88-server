@@ -1,5 +1,6 @@
 package tv.game88.general.api.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import tv.game88.general.api.entity.Agent;
@@ -15,6 +16,7 @@ import java.util.List;
  * @date 2021-04-16
  */
 @Service
+@Master
 public class AgentServiceImpl extends ServiceImpl<AgentMapper, Agent> implements AgentService {
     /**
      * 查询代理管理列表

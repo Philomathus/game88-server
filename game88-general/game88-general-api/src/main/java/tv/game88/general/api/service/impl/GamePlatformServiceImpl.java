@@ -1,5 +1,6 @@
 package tv.game88.general.api.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Log4j2
 @Service
+@Master
 public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, GamePlatform> implements GamePlatformService {
     /**
      * 查询游戏平台列表

@@ -1,5 +1,6 @@
 package tv.game88.general.api.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import tv.game88.general.api.dto.RspHostClient;
@@ -10,6 +11,7 @@ import tv.game88.general.api.service.AgentHostClientService;
 import java.util.List;
 
 @Service
+@Master
 public class AgentHostClientServiceImpl extends ServiceImpl<AgentHostClientMapper, AgentHostClient> implements AgentHostClientService {
 
     /**

@@ -49,6 +49,9 @@
             <if test="canSplit != null">
                 and can_split = #{canSplit}
             </if>
+            <if test="amount != null">
+                and amount = #{amount}
+            </if>
             <if test="status != null">
                 and `status` = #{status}
             </if>

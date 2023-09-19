@@ -2,6 +2,7 @@ package tv.game88.general.api.service.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.baomidou.dynamic.datasource.annotation.Master;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import tv.game88.general.api.entity.AgentSecure;
@@ -21,6 +22,7 @@ import java.util.List;
  * @date 2021-04-01
  */
 @Service
+@Master
 public class AgentSecureServiceImpl extends ServiceImpl<AgentSecureMapper, AgentSecure> implements AgentSecureService {
 
     @Resource
