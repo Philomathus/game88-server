@@ -31,14 +31,14 @@ public class TransactionController extends BaseController {
 
     @Operation( summary = "我的挂单 - 挂单详情" )
     @PostMapping( "/api/sellOrderDetail" )
-    public RspBase<RspSellOrderDetail> sellOrderDetail( @RequestBody @Validated ReqSellOrderDetail reqSellOrderDetail ) {
-        return walletTransactionService.sellOrderDetail( MemberSecurityUtils.getUserId(), reqSellOrderDetail.getTransactionId() );
+    public RspBase<RspSellOrderDetail> sellOrderDetail( @RequestBody @Validated ReqTransaction reqTransaction ) {
+        return walletTransactionService.sellOrderDetail( MemberSecurityUtils.getUserId(), reqTransaction.getTransactionId() );
     }
 
     @Operation( summary = "取消挂单" )
     @PostMapping( "/api/cancelSellOrder" )
-    public RspBase<?> cancelSellOrder( @RequestBody @Validated ReqSellOrderDetail reqSellOrderDetail ) {
-        return walletTransactionService.cancelSellOrder( MemberSecurityUtils.getUserId(), reqSellOrderDetail.getTransactionId() );
+    public RspBase<?> cancelSellOrder( @RequestBody @Validated ReqTransaction reqTransaction ) {
+        return walletTransactionService.cancelSellOrder( MemberSecurityUtils.getUserId(), reqTransaction.getTransactionId() );
     }
 
     @Operation( summary = "我的挂单 - 挂单列表" )
@@ -56,5 +56,11 @@ public class TransactionController extends BaseController {
         startPage( reqTransCenterDetail );
         List<RspTransCenterDetail> resultList = walletTransactionService.transCenterList( reqTransCenterDetail );
         return getRspBasePage( resultList, reqTransCenterDetail );
+    }
+
+    @Operation( summary = "购买G币 - 挂单详情" )
+    @PostMapping( "/api/buyOrderDetail" )
+    public RspBase<RspBuyOrderDetail> buyOrderDetail( @RequestBody @Validated ReqTransaction reqTransaction ) {
+        return walletTransactionService.buyOrderDetail( MemberSecurityUtils.getUserId(), reqTransaction.getTransactionId() );
     }
 }

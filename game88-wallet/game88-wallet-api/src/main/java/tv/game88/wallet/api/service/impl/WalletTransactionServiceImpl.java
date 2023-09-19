@@ -1,5 +1,6 @@
 package tv.game88.wallet.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -241,6 +242,55 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             resultList.add( rspSellOrderDetail );
         }
         return resultList;
+    }
+
+    @Override
+    public RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transactionId ) {
+        // 买家用户
+        WalletUser buyer   = walletUserMapper.selectById( userId );
+        RspBase    rspBase = this.validWalletUser( buyer );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+        WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
+        }
+        if ( walletTransaction.getStatus() == 2 ) {
+            return RspBase.businessError( "此挂单已售罄" );
+        }
+        if ( walletTransaction.getStatus() == 3 ) {
+            return RspBase.businessError( "挂单交易已取消" );
+        }
+        WalletUser seller = walletUserMapper.selectById( walletTransaction.getUserId() );
+
+        RspBuyOrderDetail rspBuyOrderDetail = new RspBuyOrderDetail();
+        rspBuyOrderDetail.setBuyOrderNum( seller.getBuyOrderNum() );
+        rspBuyOrderDetail.setSellOrderNum( seller.getSellOrderNum() );
+        rspBuyOrderDetail.setLevel( seller.getLevel() );
+        rspBuyOrderDetail.setHeadImg( seller.getHeadImg() );
+        rspBuyOrderDetail.setNikeName( seller.getNickName() );
+
+        rspBuyOrderDetail.setTransactionId( walletTransaction.getTransactionId() );
+        rspBuyOrderDetail.setAmount( walletTransaction.getAmount() );
+        rspBuyOrderDetail.setCanSplit( walletTransaction.getCanSplit() );
+        rspBuyOrderDetail.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
+        rspBuyOrderDetail.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
+        rspBuyOrderDetail.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
+        rspBuyOrderDetail.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
+        rspBuyOrderDetail.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
+
+        List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
+                .eq( "user_id", userId ).eq( "audit_status", 1 ).orderByDesc( "create_time" ) );
+
+        Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+        for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
+            RspPayMethod2 rspPayMethod = new RspPayMethod2();
+            BeanUtils.copyProperties( userPayMethod, rspPayMethod );
+            rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
+        }
+        rspBuyOrderDetail.setRspPayMethodMap( rspPayMethodMap );
+        return RspBase.ok( rspBuyOrderDetail );
     }
 }
 

@@ -75,9 +75,9 @@ public class WalletUser implements Serializable {
      */
     private String        idBackPic;
     /**
-     * 信用等级 (默认1级 最高5级)
+     * 用户等级
      */
-    private Integer       creditRating;
+    private Integer       level;
     /**
      * 创建时间
      */

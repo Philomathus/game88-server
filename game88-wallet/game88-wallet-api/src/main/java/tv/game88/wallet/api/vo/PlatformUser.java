@@ -14,8 +14,8 @@ public class PlatformUser {
     private Integer status;
     @Schema( title = "是否实名认证" )
     private Integer isVerified;
-    @Schema( title = "信用等级" )
-    private Integer creditRating;
+    @Schema( title = "用户等级" )
+    private Integer level;
 
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String password;

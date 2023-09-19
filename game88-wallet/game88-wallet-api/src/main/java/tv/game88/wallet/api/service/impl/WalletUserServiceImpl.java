@@ -200,7 +200,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         m.setId( GenerateOrderCacheUtils.me.getOrderIdNoTime( 36 ) );
         m.setStatus( 1 );
         m.setIsVerified( 0 );
-        m.setCreditRating( 1 );
+        m.setLevel( 1 );
         m.setCreatedTime( LocalDateTime.now() );
         m.setLoginIp( mobileLogin.getIp() );
         m.setAmount( 0L );

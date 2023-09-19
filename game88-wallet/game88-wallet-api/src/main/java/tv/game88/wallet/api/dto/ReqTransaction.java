@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class ReqSellOrderDetail {
+public class ReqTransaction {
     @Schema( title = "挂单编号" )
     @NotBlank
     private String transactionId;

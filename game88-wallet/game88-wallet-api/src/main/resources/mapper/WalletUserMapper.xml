@@ -19,7 +19,7 @@
         <result property="idNumber" column="id_number" jdbcType="VARCHAR" />
         <result property="idFrontPic" column="id_front_pic" jdbcType="VARCHAR" />
         <result property="idBackPic" column="id_back_pic" jdbcType="VARCHAR" />
-        <result property="creditRating" column="credit_rating" jdbcType="INTEGER" />
+        <result property="level" column="level" jdbcType="INTEGER" />
         <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
         <result property="status" column="status" jdbcType="INTEGER" />
         <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
@@ -47,7 +47,7 @@
                id_number,
                id_front_pic,
                id_back_pic,
-               credit_rating,
+               level,
                created_time,
                status,
                login_ip,
@@ -68,7 +68,7 @@
     </select>
 
     <select id="selectPlatformUserByUserId" resultType="tv.game88.wallet.api.vo.PlatformUser">
-        select id, nick_name, status, password, is_verified, credit_rating
+        select id, nick_name, status, password, is_verified, level
         from wallet_user
         where id = #{userId}
     </select>
