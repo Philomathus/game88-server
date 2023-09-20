@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.page.PageDomain;
+import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -39,9 +41,13 @@ public class ReportPlamComController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('admin:report-plam-com:list')" )
     @GetMapping( "/list" )
-    public Object list( ReportPlamCom reportPlamCom ) {
-        log.warn( reportPlamCom.getAgentPlatform() );
-        return reportPlamComService.selectReportPlamComList( reportPlamCom );
+    public RspBase<List<ReportPlamCom>> list( ReportPlamCom reportPlamCom ) {
+        reportPlamComService.storage( reportPlamCom );
+
+        PageDomain pageDomain = TableSupport.getPageDomain();
+        startPage( pageDomain );
+        List<ReportPlamCom> list = reportPlamComService.selectReportPlamComList( reportPlamCom );
+        return getRspBasePage( list, pageDomain );
     }
 
     /**
