@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ReqTransaction {
     @Schema( title = "挂单编号" )
-    @NotBlank
+    @NotBlank( message = "挂单编号不能为空" )
     private String transactionId;
 }

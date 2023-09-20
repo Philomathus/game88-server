@@ -888,7 +888,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         memberWithdrawDetail.setWithdrawId( memberInfo.getId() );
         memberWithdrawDetail.setWithdrawMoney( withdrawMoney.add( withdrawAward ) );
         if ( withdrawAward.compareTo( BigDecimal.ZERO ) > 0 ) {
-            memberWithdrawDetail.setRemark( "vipPay提现随机奖励" + withdrawAward + ",比例:" + withdrawAwardRate.toString() );
+            memberWithdrawDetail.setRemark(
+                    "vipPay提现" + withdrawMoney + ",随机奖励" + withdrawAward + ",比例:" + withdrawAwardRate.toString() );
         }
         memberWithdrawDetail.setBankId( memberCard.getBankId() );
         memberWithdrawDetail.setBankAccount( memberCard.getBankAccount() );

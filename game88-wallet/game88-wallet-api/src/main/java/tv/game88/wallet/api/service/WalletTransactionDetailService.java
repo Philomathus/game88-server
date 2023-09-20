@@ -1,5 +1,7 @@
 package tv.game88.wallet.api.service;
 
+import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.dto.ReqBuyCoins;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface WalletTransactionDetailService extends IService<WalletTransactionDetail> {
 
+    RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins );
+
+    void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail );
 }

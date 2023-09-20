@@ -55,6 +55,9 @@
             <if test="status != null">
                 and `status` = #{status}
             </if>
+            <if test="isTransQuery != null and isTransQuery">
+                and amount > 0
+            </if>
         </where>
         order by create_time desc
     </select>
