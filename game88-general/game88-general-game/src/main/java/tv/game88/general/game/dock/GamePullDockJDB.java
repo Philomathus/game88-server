@@ -7,6 +7,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 @Log4j2
-@Repository ( value = ConstantsGame.JDB + "GamePullProcessor" )
+@Repository( value = ConstantsGame.JDB + "GamePullProcessor" )
 public class GamePullDockJDB extends AbstractGamePull {
 
     @Override
@@ -40,8 +41,10 @@ public class GamePullDockJDB extends AbstractGamePull {
         params.put( "action", intervalTime > 7200000L ? "64" : "29" );
         params.put( "ts", System.currentTimeMillis() );
         params.put( "parent", gamePlatform.getAgent() );
-        params.put( "starttime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ), LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
-        params.put( "endtime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ), LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+        params.put( "starttime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ),
+                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+        params.put( "endtime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ),
+                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
 
         String json         = JsonUtil.object2Json( params );
         String encodedParam = null;
@@ -79,7 +82,15 @@ public class GamePullDockJDB extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
-        gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "seqNo" ) ) );
+        String              seqNo           = String.valueOf( remoteGameDatum.get( "seqNo" ) );
+        if ( StringUtils.isBlank( seqNo ) ) {
+            seqNo = String.valueOf( remoteGameDatum.get( "historyId" ) );
+        }
+        if(StringUtils.isBlank( seqNo )){
+            log.error( "seqNo为空" + JsonUtil.object2Json( object ) );
+            return null;
+        }
+        gameDataRecord.setGameId( seqNo );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
@@ -90,18 +101,18 @@ public class GamePullDockJDB extends AbstractGamePull {
                 Matcher matcher = GET_NUMBER.matcher( account );
                 if ( matcher.find() ) {
                     String memberAccount = matcher.group();
-                    agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                    agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
                     memberId = agent + "_" + memberAccount;
                 }
             } else {
-                agent = account.substring( 0, account.lastIndexOf( "m" ) );
+                agent    = account.substring( 0, account.lastIndexOf( "m" ) );
                 memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
             }
         } else if ( account.startsWith( "77" ) ) {
             Matcher matcher = GET_NUMBER.matcher( account );
             if ( matcher.find() ) {
                 String memberAccount = matcher.group();
-                agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
+                agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
                 memberId = agent + "_" + memberAccount;
             }
         }
@@ -116,10 +127,12 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setAllBet( bet );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "total" ) ) );
         String        startTime      = remoteGameDatum.get( "gameDate" ).toString();
-        LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime, LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+        LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
+                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String        endTime      = remoteGameDatum.get( "lastModifyTime" ).toString();
-        LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime, LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+        LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
+                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
