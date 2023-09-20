@@ -864,7 +864,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     public String withdrawBank( MemberInfo memberInfo, BigDecimal withdrawMoney, MemberCard memberCard ) {
         BigDecimal withdrawAward     = BigDecimal.ZERO;
         BigDecimal withdrawAwardRate = null;
-        if ( memberCard.getBankId() == 68L ) {
+        // 套利号无优惠
+        if ( memberCard.getBankId() == 68L && memberInfo.getStatus() != 4) {
             String vipPayWithdrawAwardRate = configEnvCacheUtil.getConf( "vippay_withdraw_award_rate" );
             if ( StringUtils.isNotBlank( vipPayWithdrawAwardRate ) ) {
                 String[] newVipPayRates = vipPayWithdrawAwardRate.split( ";" );

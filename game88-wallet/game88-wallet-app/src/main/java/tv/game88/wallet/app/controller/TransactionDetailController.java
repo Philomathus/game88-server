@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.ReqBuyCoins;
+import tv.game88.wallet.api.dto.ReqTransactionDetail;
+import tv.game88.wallet.api.dto.RspBuyOrderDetail;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
@@ -26,5 +28,11 @@ public class TransactionDetailController extends BaseController {
     @PostMapping( "/api/buyOrder" )
     public RspBase<?> buyOrder( @RequestBody @Validated ReqBuyCoins reqBuyCoins ) {
         return walletTransactionDetailService.buyOrder( MemberSecurityUtils.getUserId(), reqBuyCoins );
+    }
+
+    @Operation( summary = "我的买单 - 交易详情" )
+    @PostMapping( "/api/buyOrderDetail" )
+    public RspBase<RspBuyOrderDetail> buyOrderDetail( @RequestBody @Validated ReqTransactionDetail reqTransactionDetail ) {
+        return walletTransactionDetailService.buyOrderDetail( MemberSecurityUtils.getUserId(), reqTransactionDetail.getTransDetailId() );
     }
 }

@@ -45,6 +45,11 @@ public class WalletTransactionDetail implements Serializable {
     private Long amount;
 
     /**
+     * 付款方式ID
+     */
+    private Long payMethodId;
+
+    /**
      * 交易凭证
      */
     private String transCertPic;

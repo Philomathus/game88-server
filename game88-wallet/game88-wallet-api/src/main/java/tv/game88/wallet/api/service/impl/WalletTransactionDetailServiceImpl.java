@@ -1,12 +1,16 @@
 package tv.game88.wallet.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.wallet.api.dto.ReqBuyCoins;
+import tv.game88.wallet.api.dto.RspBuyOrderDetail;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -71,16 +75,34 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletTransactionDetail.setBuyerConfirmBuyTime( now );
         walletTransactionDetail.setSellerId( walletTransaction.getUserId() );
         walletTransactionDetail.setBuyerId( userId );
+        walletTransactionDetail.setPayMethodId( reqBuyCoins.getPayMethodId() );
         walletTransactionDetail.setRemark(
                 "买家" + userId + "确认购买" + reqBuyCoins.getAmount() + ",时间:" + LocalDateTimeUtils.format( now ) );
 
         SpringUtils.getBean( WalletTransactionDetailService.class ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
-        return RspBase.ok( "确认购买成功" );
+        return RspBase.ok( "确认购买成功", walletTransactionDetail.getTransDetailId() );
+    }
+
+    @Transactional( rollbackFor = Exception.class )
+    @Override
+    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
+        // 扣除挂单表金额并修改订单状态
+        boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
+                .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() ).set( "status", 1 )
+                .eq( "transaction_id", walletTransactionDetail.getTransactionId() ).le( "status", 1 )
+                .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
+        if ( update ) {
+            // 保存交易
+            this.baseMapper.insert( walletTransactionDetail );
+        } else {
+            throw new BusinessException( "购买失败,请重试" );
+        }
     }
 
     @Override
-    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
+    public RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transDetailId ) {
 
+        return null;
     }
 }
 

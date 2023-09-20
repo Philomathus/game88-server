@@ -216,7 +216,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public List<RspTransCenterDetail> transCenterList( ReqTransCenterDetail reqTransCenterDetail ) {
+    public List<RspTransCenterDetail> transSellOrderList( ReqTransCenterDetail reqTransCenterDetail ) {
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
         // 只查询金额大于0的订单
@@ -234,7 +234,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transactionId ) {
+    public RspBase<RspSellOrderDetail2> toBuySellOrderDetail( String userId, String transactionId ) {
         // 买家用户
         WalletUser buyer   = walletUserService.getById( userId );
         RspBase    rspBase = walletUserService.validWalletUser( buyer );
@@ -248,21 +248,21 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         }
         WalletUser seller = walletUserService.getById( walletTransaction.getUserId() );
 
-        RspBuyOrderDetail rspBuyOrderDetail = new RspBuyOrderDetail();
-        rspBuyOrderDetail.setBuyOrderNum( seller.getBuyOrderNum() );
-        rspBuyOrderDetail.setSellOrderNum( seller.getSellOrderNum() );
-        rspBuyOrderDetail.setLevel( seller.getLevel() );
-        rspBuyOrderDetail.setHeadImg( seller.getHeadImg() );
-        rspBuyOrderDetail.setNikeName( seller.getNickName() );
+        RspSellOrderDetail2 rspSellOrderDetail2 = new RspSellOrderDetail2();
+        rspSellOrderDetail2.setBuyOrderNum( seller.getBuyOrderNum() );
+        rspSellOrderDetail2.setSellOrderNum( seller.getSellOrderNum() );
+        rspSellOrderDetail2.setLevel( seller.getLevel() );
+        rspSellOrderDetail2.setHeadImg( seller.getHeadImg() );
+        rspSellOrderDetail2.setNikeName( seller.getNickName() );
 
-        rspBuyOrderDetail.setTransactionId( walletTransaction.getTransactionId() );
-        rspBuyOrderDetail.setAmount( walletTransaction.getAmount() );
-        rspBuyOrderDetail.setCanSplit( walletTransaction.getCanSplit() );
-        rspBuyOrderDetail.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
-        rspBuyOrderDetail.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
-        rspBuyOrderDetail.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
-        rspBuyOrderDetail.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
-        rspBuyOrderDetail.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
+        rspSellOrderDetail2.setTransactionId( walletTransaction.getTransactionId() );
+        rspSellOrderDetail2.setAmount( walletTransaction.getAmount() );
+        rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
+        rspSellOrderDetail2.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
+        rspSellOrderDetail2.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
+        rspSellOrderDetail2.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
+        rspSellOrderDetail2.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
+        rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
 
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
                 .eq( "user_id", userId ).eq( "audit_status", 1 ).orderByDesc( "create_time" ) );
@@ -273,8 +273,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
         }
-        rspBuyOrderDetail.setRspPayMethodMap( rspPayMethodMap );
-        return RspBase.ok( rspBuyOrderDetail );
+        rspSellOrderDetail2.setRspPayMethodMap( rspPayMethodMap );
+        return RspBase.ok( rspSellOrderDetail2 );
     }
 
     @Override

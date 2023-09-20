@@ -51,16 +51,16 @@ public class TransactionController extends BaseController {
     }
 
     @Operation( summary = "交易中心 - 交易中心挂单列表" )
-    @PostMapping( "/api/transCenterList" )
-    public RspBase<List<RspTransCenterDetail>> transCenterList( @RequestBody ReqTransCenterDetail reqTransCenterDetail ) {
+    @PostMapping( "/api/transSellOrderList" )
+    public RspBase<List<RspTransCenterDetail>> transSellOrderList( @RequestBody ReqTransCenterDetail reqTransCenterDetail ) {
         startPage( reqTransCenterDetail );
-        List<RspTransCenterDetail> resultList = walletTransactionService.transCenterList( reqTransCenterDetail );
+        List<RspTransCenterDetail> resultList = walletTransactionService.transSellOrderList( reqTransCenterDetail );
         return getRspBasePage( resultList, reqTransCenterDetail );
     }
 
     @Operation( summary = "购买G币 - 挂单详情" )
-    @PostMapping( "/api/buyOrderDetail" )
-    public RspBase<RspBuyOrderDetail> buyOrderDetail( @RequestBody @Validated ReqTransaction reqTransaction ) {
-        return walletTransactionService.buyOrderDetail( MemberSecurityUtils.getUserId(), reqTransaction.getTransactionId() );
+    @PostMapping( "/api/toBuySellOrderDetail" )
+    public RspBase<RspSellOrderDetail2> toBuySellOrderDetail( @RequestBody @Validated ReqTransaction reqTransaction ) {
+        return walletTransactionService.toBuySellOrderDetail( MemberSecurityUtils.getUserId(), reqTransaction.getTransactionId() );
     }
 }
