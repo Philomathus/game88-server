@@ -1,6 +1,7 @@
 package tv.game88.general.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import tv.game88.common.vo.RspBase;
 import tv.game88.general.api.dto.RspPlamGamesMonth;
 import tv.game88.general.api.entity.ReportPlamGames;
 
@@ -15,6 +16,7 @@ import java.util.List;
  */
 public interface IReportPlamGamesService extends IService<ReportPlamGames> {
 
+    void storage( ReportPlamGames reportPlamGames );
 
     /**
      * 查询【请填写功能名称】列表
@@ -23,7 +25,7 @@ public interface IReportPlamGamesService extends IService<ReportPlamGames> {
      *
      * @return 【请填写功能名称】集合
      */
-    public Object selectReportPlamGamesList( ReportPlamGames reportPlamGames );
+    public List<ReportPlamGames> selectReportPlamGamesList( ReportPlamGames reportPlamGames );
 
     ReportPlamGames countBetData( ReportPlamGames reportPlamGames );
 

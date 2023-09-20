@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.vo.RspBase;
 import tv.game88.general.api.dto.RspPlamGamesMonth;
 import tv.game88.general.api.entity.ReportPlamGames;
 import tv.game88.general.api.mapper.ReportPlamGamesMapper;
@@ -26,21 +27,37 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
     private RedisUtils redisUtil;
 
     @Override
-    public Object selectReportPlamGamesList( ReportPlamGames reportPlamGames ) {
-        Map<String, Object> resultMap = new HashMap<>();
-
+    public void storage( ReportPlamGames reportPlamGames ) {
         String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
         if ( dateNowStr.equals( reportPlamGames.getBegindate() ) ) {
             if ( !redisUtil.exists( "admin-reportPlamGames" ) ) {
-                storage( dateNowStr, reportPlamGames.getAgentPlatform() );
+
+                redisUtil.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
+
+                DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
+
+                this.baseMapper.calldataProrepPlamcom( dateNowStr, reportPlamGames.getAgentPlatform() );
+
+                DynamicDataSourceContextHolder.poll();
             }
         }
+    }
+
+    @Override
+    public List<ReportPlamGames> selectReportPlamGamesList( ReportPlamGames reportPlamGames ) {
+
+//        String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
+//        if ( dateNowStr.equals( reportPlamGames.getBegindate() ) ) {
+//            if ( !redisUtil.exists( "admin-reportPlamGames" ) ) {
+//                storage( dateNowStr, reportPlamGames.getAgentPlatform() );
+//            }
+//        }
         DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
         List<ReportPlamGames> allList = this.baseMapper.selectReportPlamGamesList( reportPlamGames );
         DynamicDataSourceContextHolder.poll();
 
-        resultMap.put( "rows", allList );
-        return resultMap;
+//        resultMap.put( "rows", allList );
+        return allList;
     }
 
     @Override
@@ -54,15 +71,15 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
     }
 
 
-    public void storage( String dateNowStr, String agentPlatform ) {
-        redisUtil.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
-
-        DynamicDataSourceContextHolder.push( "slave_" + agentPlatform );
-
-        this.baseMapper.calldataProrepPlamcom( dateNowStr, agentPlatform );
-
-        DynamicDataSourceContextHolder.poll();
-    }
+//    public void storage( String dateNowStr, String agentPlatform ) {
+//        redisUtil.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
+//
+//        DynamicDataSourceContextHolder.push( "slave_" + agentPlatform );
+//
+//        this.baseMapper.calldataProrepPlamcom( dateNowStr, agentPlatform );
+//
+//        DynamicDataSourceContextHolder.poll();
+//    }
 
     @Override
     public List<ReportPlamGames> exportPlamGamesList( ReportPlamGames reportPlamGames ) {
