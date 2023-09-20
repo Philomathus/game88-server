@@ -45,18 +45,9 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
 
     @Override
     public List<ReportPlamGames> selectReportPlamGamesList( ReportPlamGames reportPlamGames ) {
-
-//        String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
-//        if ( dateNowStr.equals( reportPlamGames.getBegindate() ) ) {
-//            if ( !redisUtil.exists( "admin-reportPlamGames" ) ) {
-//                storage( dateNowStr, reportPlamGames.getAgentPlatform() );
-//            }
-//        }
         DynamicDataSourceContextHolder.push( "slave_" + reportPlamGames.getAgentPlatform() );
         List<ReportPlamGames> allList = this.baseMapper.selectReportPlamGamesList( reportPlamGames );
         DynamicDataSourceContextHolder.poll();
-
-//        resultMap.put( "rows", allList );
         return allList;
     }
 
