@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BBIN + "GamePullProcessor" )
+@Repository( value = ConstantsGame.BBIN + "GamePullProcessor" )
 public class GamePullDockBBIN extends AbstractGamePull {
     private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", "30", "31",
             "38", "66", "93", "99" );
@@ -46,6 +46,11 @@ public class GamePullDockBBIN extends AbstractGamePull {
 
         LocalDateTime startMD = LocalDateTimeUtils.convertToMeiDong( start );
         LocalDateTime endMD   = LocalDateTimeUtils.convertToMeiDong( end );
+
+        if ( !LocalDateTimeUtils.isSameDay( startMD, endMD ) ) {
+            endMD = startMD.toLocalDate().atTime( 23, 59, 59 );
+            end = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( endMD.plusSeconds( 1 ) ) );
+        }
 
         String date      = LocalDateTimeUtils.format( startMD, LocalDateTimeUtils.YYYY_MM_DD_FORMATTER );
         String startTime = LocalDateTimeUtils.format( startMD, LocalDateTimeUtils.HH_MM_SS_FORMATTER );
@@ -68,6 +73,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         for ( List<Map<String, Object>> mapList : collect ) {
             resultList.addAll( mapList );
         }
+
         // 状态正常,无论是否有数据,从结束时间开始查询
         gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
         return resultList;
@@ -97,23 +103,21 @@ public class GamePullDockBBIN extends AbstractGamePull {
             requestMap.set( "gametype", "OTHER" );
         }
 
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getApiUrl() + "/WagersRecordBy" + wagerTypes[ 0 ] ).queryParams( requestMap )
                 .build( true );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
         if ( !CollectionUtils.isEmpty( resultMap ) && BooleanUtils.toBoolean( resultMap.getOrDefault( "result", "false" )
-                .toString() ) ) {
+                                                                                       .toString() ) ) {
             return ( List<Map<String, Object>> ) resultMap.get( "data" );
         } else {
             log.error( JsonUtil.object2Json( resultMap ) + ":::" + wagerTypes[ 0 ] );
@@ -131,18 +135,20 @@ public class GamePullDockBBIN extends AbstractGamePull {
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "WagersID" ) ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
-        String[] spl = account.split( "_" );
+        String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String   account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
+        String[] spl     = account.split( "_" );
 
         String endString;
         if ( remoteGameDatum.containsKey( "ModifiedDate" ) ) {
-            LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "ModifiedDate" ) ) );
+            LocalDateTime modifiedDate = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get(
+                    "ModifiedDate" ) ) );
             endString = LocalDateTimeUtils.format( modifiedDate );
-        } else if (remoteGameDatum.containsKey( "PayoutTime" )){
-            LocalDateTime payoutTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get( "PayoutTime" ) ) );
+        } else if ( remoteGameDatum.containsKey( "PayoutTime" ) ) {
+            LocalDateTime payoutTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( remoteGameDatum.get(
+                    "PayoutTime" ) ) );
             endString = LocalDateTimeUtils.format( payoutTime );
-        }else {
+        } else {
             log.error( JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
@@ -161,5 +167,27 @@ public class GamePullDockBBIN extends AbstractGamePull {
         gameDataRecord.setGameStartTime( endString );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTime.now() ) );
         return gameDataRecord;
+    }
+
+    public static void main( String[] args ) {
+
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( 1695268760000L );
+        LocalDateTime end = start.plusMinutes( 1 );
+
+        System.out.println(LocalDateTimeUtils.format( end ));
+
+        LocalDateTime startMD = LocalDateTimeUtils.convertToMeiDong( start );
+        LocalDateTime endMD   = LocalDateTimeUtils.convertToMeiDong( end );
+
+        System.out.println(LocalDateTimeUtils.format( startMD ));
+        System.out.println(LocalDateTimeUtils.format( endMD ));
+
+        if ( !LocalDateTimeUtils.isSameDay( startMD, endMD ) ) {
+            endMD = startMD.toLocalDate().atTime( 23, 59, 59 );
+            end = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( endMD.plusSeconds( 1 ) ) );
+
+            System.out.println(LocalDateTimeUtils.format( endMD ));
+            System.out.println(LocalDateTimeUtils.format( end ));
+        }
     }
 }
