@@ -157,7 +157,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameStartTime( endString );
-        gameDataRecord.setGameEndTime( endString );
+        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTime.now() ) );
         return gameDataRecord;
     }
 }
