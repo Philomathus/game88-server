@@ -97,6 +97,8 @@ public class GamePullDockBBIN extends AbstractGamePull {
             requestMap.set( "gametype", "OTHER" );
         }
 
+        log.warn( JsonUtil.object2Json( requestMap ) );
+
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getApiUrl() + "/WagersRecordBy" + wagerTypes[ 0 ] ).queryParams( requestMap )
                 .build( true );
