@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
@@ -119,6 +120,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + sellNum;
             walletFundManager.reduceWalletUserMoney( userId, null, sellNum, fundEnum, mark,
                     walletTransaction.getTransactionId(), walletTransaction.getTransactionId() );
+        } else {
+            throw new BusinessException( "发布挂单失败,请重试" );
         }
     }
 
@@ -132,6 +135,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + amount;
             walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark, update.getTransactionId(),
                     update.getTransactionId() );
+        } else {
+            throw new BusinessException( "取消挂单失败,请重试" );
         }
     }
 
@@ -278,7 +283,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public RspBase<?> validTransaction(WalletTransaction walletTransaction){
+    public RspBase<?> validTransaction( WalletTransaction walletTransaction ) {
         if ( walletTransaction == null ) {
             return RspBase.businessError( "此挂单不存在" );
         }

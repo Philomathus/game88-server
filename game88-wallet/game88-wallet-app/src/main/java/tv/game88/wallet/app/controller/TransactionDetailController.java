@@ -35,4 +35,6 @@ public class TransactionDetailController extends BaseController {
     public RspBase<RspBuyOrderDetail> buyOrderDetail( @RequestBody @Validated ReqTransactionDetail reqTransactionDetail ) {
         return walletTransactionDetailService.buyOrderDetail( MemberSecurityUtils.getUserId(), reqTransactionDetail.getTransDetailId() );
     }
+
+
 }

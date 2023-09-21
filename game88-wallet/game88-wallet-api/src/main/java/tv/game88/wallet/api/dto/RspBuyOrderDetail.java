@@ -2,6 +2,8 @@ package tv.game88.wallet.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
 
@@ -15,6 +17,8 @@ public class RspBuyOrderDetail {
     private WalletTransEnum     status;
     @Schema( title = "收款方式类型" )
     private WalletPayMethodEnum payMethodType;
+    @Schema( title = "交易凭证" )
+    private String              transCertPic;
 
     @Schema( title = "订单倒计时 - 秒" )
     private Long countdownSec;
@@ -23,4 +27,11 @@ public class RspBuyOrderDetail {
     private RspPayMethod2 sellerPayMethod;
     @Schema( title = "买方付款信息" )
     private RspPayMethod2 buyerPayMethod;
+
+    public String getTransCertPic() {
+        if ( StringUtils.isNotBlank( transCertPic ) ) {
+            return ConfigDomainCacheUtil.me.getDomainOssValue() + transCertPic;
+        }
+        return transCertPic;
+    }
 }

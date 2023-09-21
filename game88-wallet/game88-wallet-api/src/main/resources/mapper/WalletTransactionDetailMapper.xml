@@ -9,7 +9,8 @@
         <result property="transactionId" column="transaction_id" jdbcType="VARCHAR" />
         <result property="sellerId" column="seller_id" jdbcType="VARCHAR" />
         <result property="buyerId" column="buyer_id" jdbcType="VARCHAR" />
-        <result property="payMethodId" column="pay_method_id" jdbcType="BIGINT" />
+        <result property="buyerPayMethodId" column="buyer_pay_method_id" jdbcType="BIGINT" />
+        <result property="sellerPayMethodId" column="seller_pay_method_id" jdbcType="BIGINT" />
         <result property="amount" column="amount" jdbcType="BIGINT" />
         <result property="transCertPic" column="trans_cert_pic" jdbcType="VARCHAR" />
         <result property="status" column="status" />
@@ -28,7 +29,8 @@
                transaction_id,
                seller_id,
                buyer_id,
-               pay_method_id,
+               buyer_pay_method_id,
+               seller_pay_method_id,
                amount,
                trans_cert_pic,
                status,
