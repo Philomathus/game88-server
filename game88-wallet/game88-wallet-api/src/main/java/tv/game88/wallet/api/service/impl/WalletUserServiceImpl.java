@@ -342,17 +342,12 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> personalTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer ) {
         WalletUser walletUser = this.baseMapper.selectById( userId );
-        if ( walletUser == null ) {
-            return RspBase.businessError( "钱包用户不存在" );
-        }
-        if ( walletUser.getStatus() != 1 ) {
-            return RspBase.businessError( "您的用户状态异常,请联系客服" );
-        }
-        if ( walletUser.getIsVerified() < 2 ) {
-            return RspBase.businessError( "您还未实名或实名未认证" );
+        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
         }
 
-        RspBase rspBase = this.validatedPasswordTimes( reqPersonalTransfer.getFundPass(), walletUser );
+        rspBase = this.validatedPasswordTimes( reqPersonalTransfer.getFundPass(), walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -421,6 +416,20 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         String             otherMark     = "用户" + otherFundEnum.getDes() + amount;
         walletFundManager.addWalletUserMoney( reqPersonalTransfer.getWalletUserAddress(), null, amount, otherFundEnum,
                 otherMark, otherOrderNo, currentOrderNo );
+    }
+
+    @Override
+    public RspBase<?> validWalletUser( WalletUser walletUser ) {
+        if ( walletUser == null ) {
+            return RspBase.businessError( "钱包用户不存在" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
+        }
+        if ( walletUser.getIsVerified() < 2 ) {
+            return RspBase.businessError( "用户未实名或实名未认证" );
+        }
+        return null;
     }
 }
 

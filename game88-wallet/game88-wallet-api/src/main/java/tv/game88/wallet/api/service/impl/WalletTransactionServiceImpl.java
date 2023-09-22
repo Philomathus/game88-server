@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
@@ -17,9 +18,9 @@ import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletTransactionDetailMapper;
 import tv.game88.wallet.api.mapper.WalletTransactionMapper;
-import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletTransactionService;
+import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 @Service
 public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionMapper, WalletTransaction> implements WalletTransactionService {
     @Resource
-    private WalletUserMapper              walletUserMapper;
+    private WalletUserService             walletUserService;
     @Resource
     private WalletUserPayMethodMapper     walletUserPayMethodMapper;
     @Resource
@@ -56,8 +57,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( reqSellCoins.getMinBuyNum() != null && reqSellCoins.getMinBuyNum() >= reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "最低出售数量不能超过或等于出售数量" );
         }
-        WalletUser walletUser = walletUserMapper.selectById( userId );
-        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        WalletUser walletUser = walletUserService.getById( userId );
+        RspBase<?> rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -109,19 +110,6 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         return RspBase.ok( "挂单成功" );
     }
 
-    private RspBase<?> validWalletUser( WalletUser walletUser ) {
-        if ( walletUser == null ) {
-            return RspBase.businessError( "钱包用户不存在" );
-        }
-        if ( walletUser.getStatus() != 1 ) {
-            return RspBase.businessError( "用户状态异常,请联系客服" );
-        }
-        if ( walletUser.getIsVerified() < 2 ) {
-            return RspBase.businessError( "用户未实名或实名未认证" );
-        }
-        return null;
-    }
-
     @Transactional( rollbackFor = Exception.class )
     @Override
     public void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum ) {
@@ -132,6 +120,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + sellNum;
             walletFundManager.reduceWalletUserMoney( userId, null, sellNum, fundEnum, mark,
                     walletTransaction.getTransactionId(), walletTransaction.getTransactionId() );
+        } else {
+            throw new BusinessException( "发布挂单失败,请重试" );
         }
     }
 
@@ -145,13 +135,15 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + amount;
             walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark, update.getTransactionId(),
                     update.getTransactionId() );
+        } else {
+            throw new BusinessException( "取消挂单失败,请重试" );
         }
     }
 
     @Override
     public RspBase<RspSellOrderDetail> sellOrderDetail( String userId, String transactionId ) {
-        WalletUser walletUser = walletUserMapper.selectById( userId );
-        RspBase    rspBase    = this.validWalletUser( walletUser );
+        WalletUser walletUser = walletUserService.getById( userId );
+        RspBase    rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -180,8 +172,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
 
     @Override
     public RspBase<?> cancelSellOrder( String userId, String transactionId ) {
-        WalletUser walletUser = walletUserMapper.selectById( userId );
-        RspBase    rspBase    = this.validWalletUser( walletUser );
+        WalletUser walletUser = walletUserService.getById( userId );
+        RspBase    rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -229,9 +221,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public List<RspTransCenterDetail> transCenterList( ReqTransCenterDetail reqTransCenterDetail ) {
+    public List<RspTransCenterDetail> transSellOrderList( ReqTransCenterDetail reqTransCenterDetail ) {
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
+        // 只查询金额大于0的订单
+        query.setIsTransQuery( true );
 
         List<WalletTransaction>    walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspTransCenterDetail> resultList         = new ArrayList<>();
@@ -245,40 +239,35 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transactionId ) {
+    public RspBase<RspSellOrderDetail2> toBuySellOrderDetail( String userId, String transactionId ) {
         // 买家用户
-        WalletUser buyer   = walletUserMapper.selectById( userId );
-        RspBase    rspBase = this.validWalletUser( buyer );
+        WalletUser buyer   = walletUserService.getById( userId );
+        RspBase    rspBase = walletUserService.validWalletUser( buyer );
         if ( rspBase != null ) {
             return rspBase;
         }
         WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
-        if ( walletTransaction == null ) {
-            return RspBase.businessError( "此挂单不存在" );
+        rspBase = this.validTransaction( walletTransaction );
+        if ( rspBase != null ) {
+            return rspBase;
         }
-        if ( walletTransaction.getStatus() == 2 ) {
-            return RspBase.businessError( "此挂单已售罄" );
-        }
-        if ( walletTransaction.getStatus() == 3 ) {
-            return RspBase.businessError( "挂单交易已取消" );
-        }
-        WalletUser seller = walletUserMapper.selectById( walletTransaction.getUserId() );
+        WalletUser seller = walletUserService.getById( walletTransaction.getUserId() );
 
-        RspBuyOrderDetail rspBuyOrderDetail = new RspBuyOrderDetail();
-        rspBuyOrderDetail.setBuyOrderNum( seller.getBuyOrderNum() );
-        rspBuyOrderDetail.setSellOrderNum( seller.getSellOrderNum() );
-        rspBuyOrderDetail.setLevel( seller.getLevel() );
-        rspBuyOrderDetail.setHeadImg( seller.getHeadImg() );
-        rspBuyOrderDetail.setNikeName( seller.getNickName() );
+        RspSellOrderDetail2 rspSellOrderDetail2 = new RspSellOrderDetail2();
+        rspSellOrderDetail2.setBuyOrderNum( seller.getBuyOrderNum() );
+        rspSellOrderDetail2.setSellOrderNum( seller.getSellOrderNum() );
+        rspSellOrderDetail2.setLevel( seller.getLevel() );
+        rspSellOrderDetail2.setHeadImg( seller.getHeadImg() );
+        rspSellOrderDetail2.setNikeName( seller.getNickName() );
 
-        rspBuyOrderDetail.setTransactionId( walletTransaction.getTransactionId() );
-        rspBuyOrderDetail.setAmount( walletTransaction.getAmount() );
-        rspBuyOrderDetail.setCanSplit( walletTransaction.getCanSplit() );
-        rspBuyOrderDetail.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
-        rspBuyOrderDetail.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
-        rspBuyOrderDetail.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
-        rspBuyOrderDetail.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
-        rspBuyOrderDetail.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
+        rspSellOrderDetail2.setTransactionId( walletTransaction.getTransactionId() );
+        rspSellOrderDetail2.setAmount( walletTransaction.getAmount() );
+        rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
+        rspSellOrderDetail2.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
+        rspSellOrderDetail2.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
+        rspSellOrderDetail2.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
+        rspSellOrderDetail2.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
+        rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
 
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
                 .eq( "user_id", userId ).eq( "audit_status", 1 ).orderByDesc( "create_time" ) );
@@ -289,8 +278,22 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
         }
-        rspBuyOrderDetail.setRspPayMethodMap( rspPayMethodMap );
-        return RspBase.ok( rspBuyOrderDetail );
+        rspSellOrderDetail2.setRspPayMethodMap( rspPayMethodMap );
+        return RspBase.ok( rspSellOrderDetail2 );
+    }
+
+    @Override
+    public RspBase<?> validTransaction( WalletTransaction walletTransaction ) {
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
+        }
+        if ( walletTransaction.getStatus() == 2 || walletTransaction.getAmount() <= 0 ) {
+            return RspBase.businessError( "此挂单已售罄" );
+        }
+        if ( walletTransaction.getStatus() == 3 ) {
+            return RspBase.businessError( "挂单交易已取消" );
+        }
+        return null;
     }
 }
 

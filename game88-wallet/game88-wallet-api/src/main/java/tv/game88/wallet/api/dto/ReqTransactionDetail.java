@@ -6,8 +6,8 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class ReqTransaction {
-    @Schema( title = "挂单编号" )
-    @NotBlank( message = "挂单编号不能为空" )
-    private String transactionId;
+public class ReqTransactionDetail {
+    @Schema( title = "买单编号" )
+    @NotBlank( message = "买单编号不能为空" )
+    private String transDetailId;
 }

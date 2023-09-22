@@ -94,4 +94,7 @@ public class WalletTransaction implements Serializable {
 
     @TableField( exist = false )
     private String payMethodType;
+
+    @TableField( exist = false )
+    private Boolean isTransQuery;
 }
