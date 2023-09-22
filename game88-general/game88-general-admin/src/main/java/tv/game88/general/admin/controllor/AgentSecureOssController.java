@@ -26,7 +26,7 @@ import java.util.List;
  * @date 2021-04-05
  */
 @RestController
-@RequestMapping( "/agent/agentSecureOss" )
+@RequestMapping( "/agent/secureOss" )
 public class AgentSecureOssController extends BaseController {
     @Resource
     private AgentSecureOssService agentSecureOssService;
@@ -34,7 +34,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 查询代理域名oss列表
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:list')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:list')" )
     @GetMapping( "/list" )
     public RspBase<List<AgentSecureOss>> list( AgentSecureOss agentSecureOss ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -46,7 +46,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 查询代理域名agent列表
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:list')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:list')" )
     @GetMapping( "/getAgentList" )
     public Object getAgentList() {
         return agentSecureOssService.getAgentList();
@@ -55,7 +55,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 导出代理域名oss列表
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:export')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:export')" )
     @Log( title = "代理域名oss", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public void export( AgentSecureOss agentSecureOss, HttpServletResponse response ) {
@@ -66,7 +66,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 获取代理域名oss详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:query')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<AgentSecureOss> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( agentSecureOssService.getById( id ) );
@@ -75,7 +75,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 新增代理域名oss
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:add')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:add')" )
     @Log( title = "代理域名oss", businessType = BusinessType.INSERT )
     @PostMapping
     public RspBase<?> add( @RequestBody AgentSecureOss agentSecureOss ) {
@@ -87,7 +87,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 修改代理域名oss
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:edit')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:edit')" )
     @Log( title = "代理域名oss", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody AgentSecureOss agentSecureOss ) {
@@ -99,7 +99,7 @@ public class AgentSecureOssController extends BaseController {
     /**
      * 删除代理域名oss
      */
-    @PreAuthorize( "@ss.hasPermi('agent:agentSecureOss:remove')" )
+    @PreAuthorize( "@ss.hasPermi('agent:secureOss:remove')" )
     @Log( title = "代理域名oss", businessType = BusinessType.DELETE )
     @DeleteMapping( "/{ids}" )
     public RspBase<?> remove( @PathVariable Long[] ids ) {

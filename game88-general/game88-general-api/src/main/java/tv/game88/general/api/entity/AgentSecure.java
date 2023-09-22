@@ -1,6 +1,7 @@
 package tv.game88.general.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -32,6 +33,9 @@ public class AgentSecure extends BaseEntity {
 
     /** 加密url */
     private String secureUrls;
+
+    @TableField(exist = false)
+    private String remark;
 
     @Override
     public String toString() {
