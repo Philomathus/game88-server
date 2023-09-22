@@ -2,7 +2,9 @@ package tv.game88.general.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -62,6 +64,10 @@ public class AgentSecureOss extends BaseEntity {
      */
     @Excel( name = "文件存储" )
     private String bucket;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    private String remark;
 
     @Override
     public String toString() {
