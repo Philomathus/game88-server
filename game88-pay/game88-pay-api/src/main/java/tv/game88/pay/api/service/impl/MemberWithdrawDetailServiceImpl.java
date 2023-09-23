@@ -865,7 +865,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         BigDecimal withdrawAward     = BigDecimal.ZERO;
         BigDecimal withdrawAwardRate = null;
         // 套利号无优惠
-        if ( memberCard.getBankId() == 68L && memberInfo.getStatus() != 4) {
+        if ( memberCard.getBankId() == 68L && memberInfo.getStatus() != 4 ) {
             String vipPayWithdrawAwardRate = configEnvCacheUtil.getConf( "vippay_withdraw_award_rate" );
             if ( StringUtils.isNotBlank( vipPayWithdrawAwardRate ) ) {
                 String[] newVipPayRates = vipPayWithdrawAwardRate.split( ";" );
@@ -891,12 +891,14 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( withdrawAward.compareTo( BigDecimal.ZERO ) > 0 ) {
             memberWithdrawDetail.setRemark(
                     "vipPay提现" + withdrawMoney + ",随机奖励" + withdrawAward + ",比例:" + withdrawAwardRate.toString() );
+            memberWithdrawDetail.setRealBankAddress( withdrawAward.toString() );
+        } else {
+            memberWithdrawDetail.setRealBankAddress( memberCard.getRealBankAddress() );
         }
         memberWithdrawDetail.setBankId( memberCard.getBankId() );
         memberWithdrawDetail.setBankAccount( memberCard.getBankAccount() );
         memberWithdrawDetail.setBankAddress( memberCard.getBankAddress() );
         memberWithdrawDetail.setBankUserName( memberCard.getRealName() );
-        memberWithdrawDetail.setRealBankAddress( memberCard.getRealBankAddress() );
         memberWithdrawDetail.setStatus( 0 );
         memberWithdrawDetail.setCreateTime( LocalDateTime.now() );
         memberWithdrawDetail.setUpdateTime( memberWithdrawDetail.getCreateTime() );

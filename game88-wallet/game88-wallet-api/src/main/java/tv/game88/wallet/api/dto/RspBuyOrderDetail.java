@@ -19,6 +19,10 @@ public class RspBuyOrderDetail {
     private WalletPayMethodEnum payMethodType;
     @Schema( title = "交易凭证" )
     private String              transCertPic;
+    @Schema( title = "卖家ID" )
+    private String              sellerId;
+    @Schema( title = "买家ID" )
+    private String              buyerId;
 
     @Schema( title = "订单倒计时 - 秒" )
     private Long countdownSec;
