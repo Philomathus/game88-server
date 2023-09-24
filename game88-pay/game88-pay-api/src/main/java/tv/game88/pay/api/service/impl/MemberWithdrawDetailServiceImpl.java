@@ -343,8 +343,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             MemberWithdrawDetailService detailService = SpringUtils.getBean( MemberWithdrawDetailService.class );
 
             String mark = "操作人:" + userName + " ip:" + ServletUtil.getIp();
-            detailService.refusedUpdateProcess( update, mark, memberWithdrawLog.getWithdrawId(),
-                    memberWithdrawLog.getWithdrawMoney() );
+            detailService.refusedUpdateProcess( update, mark, memberWithdrawLog );
         } else {
             return RspBase.businessError(
                     "会员ID为" + memberWithdrawLog.getWithdrawId() + "该笔订单状态" + memberWithdrawLog.getStatus()
@@ -356,14 +355,19 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void refusedUpdateProcess( MemberWithdrawDetail update, String mark, String withdrawId, BigDecimal withdrawMoney ) {
+    public void refusedUpdateProcess( MemberWithdrawDetail update, String mark, MemberWithdrawDetail memberWithdrawDetail ) {
         int i = this.baseMapper.updateById( update );
         if ( i <= 0 ) {
             throw new BusinessException( "回退失败" );
         }
+        BigDecimal withdrawMoney = memberWithdrawDetail.getWithdrawMoney();
+        if ( memberWithdrawDetail.getBankId() == 68L && StringUtils.isNotBlank( memberWithdrawDetail.getRealBankAddress() ) ) {
+            withdrawMoney = withdrawMoney.subtract( new BigDecimal( memberWithdrawDetail.getRealBankAddress() ) );
+        }
         //回退提现金额
-        memberMoneyManager.addMemberMoney( withdrawId, withdrawMoney, EnumMoney.BOHUI, BigDecimal.ONE, mark,
-                update.getWithdrawOrderNo() + "bohui", update.getWithdrawOrderNo() + "bohui" );
+        String businessId = memberWithdrawDetail.getWithdrawOrderNo() + "bohui";
+        memberMoneyManager.addMemberMoney( memberWithdrawDetail.getWithdrawId(), withdrawMoney, EnumMoney.BOHUI, BigDecimal.ONE
+                , mark, businessId, businessId );
     }
 
     @Override
@@ -395,8 +399,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 update.setStatus( 2 );//审核不通过
                 update.setOpName( userName );
                 update.setUpdateTime( LocalDateTime.now() );
-                detailService.refusedUpdateProcess( update, mark, withdrawDetail.getWithdrawId(),
-                        withdrawDetail.getWithdrawMoney() );
+                detailService.refusedUpdateProcess( update, mark, withdrawDetail );
             } else {
                 return RspBase.businessError(
                         "会员ID为" + withdrawDetail.getWithdrawId() + "该笔订单状态" + withdrawDetail.getStatus()

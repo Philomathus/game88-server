@@ -79,7 +79,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             return RspBase.businessError( "挂单余额不足" );
         }
 
-
         WalletTransactionDetail walletTransactionDetail = new WalletTransactionDetail();
         walletTransactionDetail.setTransDetailId( GenerateOrderCacheUtils.me.getOrderId( "BUY", 5 ) );
         walletTransactionDetail.setTransactionId( reqBuyCoins.getTransactionId() );
