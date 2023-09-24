@@ -17,6 +17,7 @@
         <result property="buyerConfirmBuyTime" column="buyer_confirm_buy_time" jdbcType="TIMESTAMP" />
         <result property="sellerConfirmTransTime" column="seller_confirm_trans_time" jdbcType="TIMESTAMP" />
         <result property="buyerConfirmTransferTime" column="buyer_confirm_transfer_time" jdbcType="TIMESTAMP" />
+        <result property="sellerNotReceivedTime" column="seller_not_received_time" jdbcType="TIMESTAMP" />
         <result property="cancelTime" column="cancel_time" jdbcType="TIMESTAMP" />
         <result property="successTransTime" column="success_trans_time" jdbcType="TIMESTAMP" />
         <result property="transferTimeSec" column="transfer_time_sec" jdbcType="INTEGER" />
@@ -37,6 +38,7 @@
                buyer_confirm_buy_time,
                seller_confirm_trans_time,
                buyer_confirm_transfer_time,
+               seller_not_received_time,
                cancel_time,
                success_trans_time,
                transfer_time_sec,

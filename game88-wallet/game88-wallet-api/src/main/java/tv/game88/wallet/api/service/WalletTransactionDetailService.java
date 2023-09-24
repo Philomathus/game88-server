@@ -33,4 +33,6 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
     RspBase<?> sellerConfirmTransfer( String userId, String transDetailId );
 
     RspBase<?> sellerNotReceived( String userId, String transDetailId );
+
+    void updateTransDetailOrAddUserAmount( WalletTransactionDetail update, WalletTransactionDetail walletTransactionDetail );
 }

@@ -83,6 +83,12 @@ public class WalletTransactionDetail implements Serializable {
     private LocalDateTime buyerConfirmTransferTime;
 
     /**
+     * 卖家未收到转账时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime sellerNotReceivedTime;
+
+    /**
      * 交易取消时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
