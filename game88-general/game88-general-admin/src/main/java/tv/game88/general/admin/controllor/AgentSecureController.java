@@ -91,7 +91,7 @@ public class AgentSecureController extends BaseController {
     @Log( title = "测试域名加密", businessType = BusinessType.INSERT )
     @PostMapping( "testUrl" )
     public RspBase<?> testUrl( @RequestBody AgentSecure agentSecure ) throws Exception {
-        return RspBase.ok( RSACoder.decryptByPrivateKey( agentSecure.getUrls(), agentSecure.getPrivatekey() ) );
+        return RspBase.ok( RSACoder.decryptByPrivateKey( agentSecure.getSecureUrls(), agentSecure.getPrivatekey() ) );
     }
 
     /**
