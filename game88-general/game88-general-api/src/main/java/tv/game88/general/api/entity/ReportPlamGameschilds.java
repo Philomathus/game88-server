@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * 游戏投注报表子表对象 report_plam_gameschilds
@@ -74,7 +74,7 @@ public class ReportPlamGameschilds extends BaseEntity {
     /** 日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "日期", width = 30, databaseFormat = "yyyy-MM-dd")
-    private Date begindate;
+    private LocalDate begindate;
 
     private String agentPlatform;
 
