@@ -59,7 +59,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqDepositOrder.getMerchantId() );
-        RspBase        rspBase        = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
+        RspBase rspBase = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress(),
+                reqDepositOrder.getOrderNo() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -84,14 +85,15 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         String sign = AESCoder.encryptByKey( JsonUtil.object2Json( resultMap ), AESCoder.secretKey + t );
 
         rspWalletRecord.setPayUrl(
-                configEnvCacheUtil.getConf( "pay_host_url" ) + "/common/toDepositOrder?s=" + sign + "&t=" + t );
+                configEnvCacheUtil.getConf( "pay_host_url" ) + "/api/common/toDepositOrder?s=" + sign + "&t=" + t );
         return RspBase.ok( rspWalletRecord );
     }
 
     @Override
     public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
-        RspBase        rspBase        = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
+        RspBase rspBase = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress(),
+                reqWithdrawOrder.getOrderNo() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -115,7 +117,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqOrderQuery.getMerchantId() );
-        RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null );
+        RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null, reqOrderQuery.getOrderNo() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -171,24 +173,27 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         }
     }
 
-    private RspBase validated( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, String walletAddress ) {
+    @Override
+    public RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress, String orderNo ) {
         if ( walletMerchant == null ) {
             return RspBase.businessError( "商户不存在" );
         }
         if ( walletMerchant.getStatus() == 0 ) {
             return RspBase.businessError( "此商户已封禁,请联系客服" );
         }
-        Map<String, Object> reqquestMap = JsonUtil.object2Map( reqOrderBase );
+        Map<String, Object> reqquestMap = JsonUtil.object2Map( obj );
         String              sign        = reqquestMap.remove( "sign" ).toString();
 
         if ( !sign.equalsIgnoreCase( this.sign( reqquestMap, walletMerchant ) ) ) {
             return RspBase.businessError( "验签失败!" );
         }
 
-        QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>()
-                .eq( "merchant_id", reqOrderBase.getMerchantId() ).eq( "order_no", reqOrderBase.getOrderNo() );
-        if ( this.baseMapper.exists( queryWrapper ) ) {
-            return RspBase.businessError( "订单号" + reqOrderBase.getOrderNo() + "重复" );
+        if ( StringUtils.isNotBlank( orderNo ) ) {
+            QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>().eq( "merchant_id", walletMerchant.getId() )
+                                                                                      .eq( "order_no", orderNo );
+            if ( this.baseMapper.exists( queryWrapper ) ) {
+                return RspBase.businessError( "订单号" + orderNo + "重复" );
+            }
         }
         if ( StringUtils.isNotBlank( walletAddress ) ) {
             PlatformUser platformUser = walletUserMapper.selectPlatformUserByUserId( walletAddress );

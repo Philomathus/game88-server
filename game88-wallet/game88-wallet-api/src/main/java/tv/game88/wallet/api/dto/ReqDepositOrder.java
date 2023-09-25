@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull;
 public class ReqDepositOrder extends ReqOrderBase {
     @NotBlank( message = "用户的钱包地址不能为空" )
     private String walletAddress;
-    @NotNull( message = "金币数量不能为空" )
-    @Min( 1 )
+    @NotNull( message = "G币数量不能为空" )
+    @Min( 10 )
     private Long   amount;
 
     private String notifyUrl;

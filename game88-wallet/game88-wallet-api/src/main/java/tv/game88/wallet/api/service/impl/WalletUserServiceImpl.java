@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,11 +20,14 @@ import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.utils.SmsApi;
+import tv.game88.wallet.api.cache.WalletMerchantCacheUtil;
 import tv.game88.wallet.api.dto.*;
+import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
+import tv.game88.wallet.api.service.WalletRecordService;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
@@ -44,22 +48,27 @@ import java.util.Objects;
 @Service
 public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletUser> implements WalletUserService {
     @Resource
-    private SmsPhoneCacheUtil     smsPhoneCacheUtil;
+    private SmsPhoneCacheUtil       smsPhoneCacheUtil;
     @Resource
-    private SmsApi                smsApi;
+    private SmsApi                  smsApi;
     @Resource
-    private RedisUtils            redisUtils;
+    private RedisUtils              redisUtils;
     @Resource
-    private ConfigEnvCacheUtil    configEnvCacheUtil;
+    private ConfigEnvCacheUtil      configEnvCacheUtil;
     @Resource
-    private AuthenticationManager authenticationManager;
+    private WalletMerchantCacheUtil walletMerchantCacheUtil;
     @Resource
-    private PasswordEncoder       passwordEncoder;
+    private AuthenticationManager   authenticationManager;
+    @Resource
+    private PasswordEncoder         passwordEncoder;
 
     @Resource
     private WalletUserFundLogMapper walletUserFundLogMapper;
     @Resource
     private WalletFundManager       walletFundManager;
+    @Resource
+    @Lazy
+    private WalletRecordService     walletRecordService;
 
     @Override
     public RspBase<?> sendSmsVerifyCode( Phone phone ) {
@@ -236,6 +245,12 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
+        WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
+        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress(),
+                null );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
         WalletUser walletUser = null;
         WalletUser oldm       = null;
         if ( StringUtils.isBlank( reqEmbeddedLogin.getWalletAddress() ) ) {
@@ -272,6 +287,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
+        resultMap.put( "walletAddress", walletUser.getId() );
+        resultMap.put( "realName", walletUser.getRealName() );
+        resultMap.put( "balance", walletUser.getAmount() );
         return RspBase.ok( "成功", resultMap );
     }
 

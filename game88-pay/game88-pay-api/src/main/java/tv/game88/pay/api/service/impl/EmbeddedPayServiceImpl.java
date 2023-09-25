@@ -22,13 +22,14 @@ import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.mapper.MemberCardMapper;
+import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqVipPayDeposit;
 import tv.game88.pay.api.dto.RspVipPayLogin;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
 import tv.game88.pay.api.entity.PayPlatform;
 import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
-import tv.game88.pay.api.service.VipPayService;
+import tv.game88.pay.api.service.EmbeddedPayService;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
@@ -42,11 +43,13 @@ import java.util.TreeMap;
 
 @Service
 @Log4j2
-public class VipPayServiceImpl implements VipPayService {
+public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     @Resource
     private MemberCardMapper           memberCardMapper;
     @Resource
     private MemberRechargeOnlineMapper memberRechargeOnlineMapper;
+    @Resource
+    private MemberInfoMapper           memberInfoMapper;
     @Resource
     private RestTemplate               restTemplate;
     @Resource
@@ -58,7 +61,9 @@ public class VipPayServiceImpl implements VipPayService {
     private String profile;
 
     private static final Long VIPPAY_BANK_ID         = 68L;
+    private static final Long UPAY_BANK_ID           = 116L;
     private static final Long VIPPAY_PAY_PLATFORM_ID = 24L;
+    private static final Long UPAY_PAY_PLATFORM_ID   = 50L;
 
     @Override
     public RspBase<RspVipPayLogin> vipPayLogin( String memberId ) {
@@ -219,5 +224,149 @@ public class VipPayServiceImpl implements VipPayService {
             }
         }
         return RspBase.businessError( "访问vipPay支付中心失败,请重试或者联系客服" );
+    }
+
+    @Override
+    public RspBase<RspVipPayLogin> uPayLogin( String memberId ) {
+        // 116是UPay的银行ID
+        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
+                                                                           .eq( "bank_id", UPAY_BANK_ID ).one();
+        // 50是vipPay支付平台ID
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( UPAY_PAY_PLATFORM_ID );
+        String      userPhone   = memberInfoMapper.getUserPhone( memberId );
+        if ( StringUtils.isBlank( userPhone ) ) {
+            return RspBase.businessError( "请绑定手机后登录" );
+        }
+
+        Map<String, Object> reqMap = new TreeMap<>();
+        reqMap.put( "merchantId", payPlatform.getMerId() );
+        reqMap.put( "phone", userPhone );
+        if ( memberCard != null ) {
+            reqMap.put( "walletAddress", memberCard.getBankAccount().trim() );
+        }
+        String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( reqMap, httpHeaders );
+
+        Map<String, Object> resultMap = restTemplate.execute( payPlatform.getPayUrl()
+                + "/api/common/embeddedLogin", HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+        log.info( "UPay登录信息:{}", JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String code = resultMap.getOrDefault( "code", "" ).toString();
+            if ( "200".equals( code ) ) {
+                Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+                String              token  = result.getOrDefault( "token", "" ).toString();
+                if ( StringUtils.isNotBlank( token ) ) {
+                    String     walletAddress = result.getOrDefault( "walletAddress", "" ).toString();
+                    String     realName      = result.getOrDefault( "realName", "" ).toString();
+                    BigDecimal balance       = new BigDecimal( result.getOrDefault( "balance", "0" ).toString() );
+
+                    if ( StringUtils.isNotBlank( walletAddress ) ) {
+                        if ( memberCard == null ) {
+                            MemberCard newInsert = new MemberCard();
+                            newInsert.setBankId( UPAY_BANK_ID );
+                            newInsert.setMemberId( memberId );
+                            newInsert.setBankAccount( walletAddress );
+                            newInsert.setCreateTime( LocalDateTime.now() );
+                            if ( StringUtils.isNotBlank( realName ) ) {
+                                newInsert.setRealName( realName );
+                            }
+                            memberCardMapper.insert( newInsert );
+                        } else if ( StringUtils.isNotBlank( realName ) ) {
+                            MemberCard update = new MemberCard();
+                            update.setId( memberCard.getId() );
+                            update.setRealName( realName );
+                            memberCardMapper.updateById( update );
+                        }
+                    }
+                    RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();
+                    rspVipPayLogin.setBalance( balance );
+                    rspVipPayLogin.setWalletAddress( walletAddress );
+                    rspVipPayLogin.setToken( token );
+                    return RspBase.ok( rspVipPayLogin );
+                }
+            } else {
+                return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
+            }
+        }
+        log.error( "UPay登录失败 - 会员:{} - 钱包地址:{} - 结果:{}", memberId, reqMap.get( "walletAddress" ),
+                JsonUtil.object2Json( resultMap ) );
+        return RspBase.businessError( "UPay登录失败,请重试" );
+    }
+
+    @Override
+    public RspBase<?> uPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) {
+        if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
+            return RspBase.businessError( "充值金额最低10" );
+        }
+        MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
+                                                                           .eq( "bank_id", UPAY_BANK_ID ).one();
+        if ( memberCard == null ) {
+            return RspBase.businessError( "未注册vipPay,请登录后重试" );
+        }
+        String orderId = GenerateOrderCacheUtils.me.getOrderId( "P", 2 );
+        // 先保存 MemberRechargeOnline
+        MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
+        memberRechargeOnline.setOrderNo( orderId );
+        memberRechargeOnline.setMemberId( memberId );
+        memberRechargeOnline.setPlatformId( UPAY_PAY_PLATFORM_ID );
+        memberRechargeOnline.setMoney( reqVipPayDeposit.getAmount() );
+        memberRechargeOnline.setFirst( false );
+        memberRechargeOnline.setPayTime( LocalDateTime.now() );
+        memberRechargeOnline.setStatus( -1 );
+        memberRechargeOnline.setRate( configEnvCacheUtil.getConfBd( "upay_platform_rate" ) );
+        memberRechargeOnline.setUpdateTime( memberRechargeOnline.getPayTime() );
+        int i = memberRechargeOnlineMapper.insert( memberRechargeOnline );
+        if ( i <= 0 ) {
+            return RspBase.businessError( "新建充值订单失败,请重试" );
+        }
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( UPAY_PAY_PLATFORM_ID );
+
+        Map<String, Object> reqMap = new TreeMap<>();
+        reqMap.put( "merchantId", payPlatform.getMerId() );
+        reqMap.put( "orderNo", orderId );
+        reqMap.put( "amount", reqVipPayDeposit.getAmount() );
+        reqMap.put( "walletAddress", memberCard.getBankAccount().trim() );
+        reqMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
+        String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( reqMap, httpHeaders );
+
+        Map<String, Object> resultMap = restTemplate.execute( payPlatform.getPayUrl()
+                + "/api/common/depositOrder", HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
+
+        log.warn( "memberId:{} walletAddr:{} result:{}", memberId, memberCard.getBankAccount(),
+                JsonUtil.object2Json( resultMap ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+                Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
+                if ( !CollectionUtils.isEmpty( result ) ) {
+                    return RspBase.ok( "请求成功,请前往UPay支付中心确认", result.getOrDefault( "payUrl", "" ).toString() );
+                }
+            } else {
+                return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
+            }
+        }
+        return RspBase.businessError( "访问UPay支付中心失败,请重试或者联系客服" );
     }
 }
