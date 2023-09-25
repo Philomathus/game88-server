@@ -361,7 +361,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             throw new BusinessException( "回退失败" );
         }
         BigDecimal withdrawMoney = memberWithdrawDetail.getWithdrawMoney();
-        if ( memberWithdrawDetail.getBankId() == 68L && StringUtils.isNotBlank( memberWithdrawDetail.getRealBankAddress() ) ) {
+        if ( memberWithdrawDetail.getBankId() == 68L && StringUtils.isNotBlank( memberWithdrawDetail.getRealBankAddress() )
+                && StringUtils.isNumeric( memberWithdrawDetail.getRealBankAddress() ) ) {
             withdrawMoney = withdrawMoney.subtract( new BigDecimal( memberWithdrawDetail.getRealBankAddress() ) );
         }
         //回退提现金额
