@@ -1,3 +1,5 @@
+server:
+  port: 18860
 spring:
   datasource:
     url: jdbc:mysql://8.210.10.193:3306/wallet?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
@@ -7,7 +9,7 @@ spring:
     host: 8.210.10.193
     port: 6379
     password: EvYsN39ViArDumx4pWyH
-    database: 3
+    database: 4
 
 #mybatis-plus:
   #configuration:

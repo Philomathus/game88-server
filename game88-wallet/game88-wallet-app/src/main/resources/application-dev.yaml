@@ -7,7 +7,7 @@ spring:
     host: 8.210.10.193
     port: 6379
     password: EvYsN39ViArDumx4pWyH
-    database: 3
+    database: 4
 
 springdoc:
   api-docs:

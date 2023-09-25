@@ -6,7 +6,7 @@ server:
     buffer-size: 1024
     direct-buffers: true
   shutdown: graceful
-  port: 18860
+  port: 18862
   max-http-header-size: 65536
 spring:
   profiles:
