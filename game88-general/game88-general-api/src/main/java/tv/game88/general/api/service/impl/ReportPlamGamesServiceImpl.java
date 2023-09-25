@@ -60,17 +60,7 @@ public class ReportPlamGamesServiceImpl extends ServiceImpl<ReportPlamGamesMappe
         DynamicDataSourceContextHolder.poll();
         return reportPlamGames1;
     }
-
-
-//    public void storage( String dateNowStr, String agentPlatform ) {
-//        redisUtil.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
-//
-//        DynamicDataSourceContextHolder.push( "slave_" + agentPlatform );
-//
-//        this.baseMapper.calldataProrepPlamcom( dateNowStr, agentPlatform );
-//
-//        DynamicDataSourceContextHolder.poll();
-//    }
+    
 
     @Override
     public List<ReportPlamGames> exportPlamGamesList( ReportPlamGames reportPlamGames ) {
