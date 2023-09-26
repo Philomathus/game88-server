@@ -24,6 +24,7 @@ import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.pay.api.cache.PayCacheUtil;
+import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.ReqVipPayDeposit;
 import tv.game88.pay.api.dto.RspVipPayLogin;
 import tv.game88.pay.api.entity.MemberRechargeOnline;
@@ -60,18 +61,13 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     @Value( "${spring.profiles.active}" )
     private String profile;
 
-    private static final Long VIPPAY_BANK_ID         = 68L;
-    private static final Long UPAY_BANK_ID           = 116L;
-    private static final Long VIPPAY_PAY_PLATFORM_ID = 24L;
-    private static final Long UPAY_PAY_PLATFORM_ID   = 50L;
-
     @Override
     public RspBase<RspVipPayLogin> vipPayLogin( String memberId ) {
         // 68是vipPay的银行ID
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
-                                                                           .eq( "bank_id", VIPPAY_BANK_ID ).one();
+                                                                           .eq( "bank_id", ConstantsPay.VIPPAY_BANK_ID ).one();
         // 24是vipPay支付平台ID
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform( VIPPAY_PAY_PLATFORM_ID );
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.VIPPAY_PAY_PLATFORM_ID );
 
         Map<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "merchantNo", payPlatform.getMerId() );
@@ -119,7 +115,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     if ( StringUtils.isNotBlank( walletAddress ) ) {
                         if ( memberCard == null ) {
                             MemberCard newInsert = new MemberCard();
-                            newInsert.setBankId( VIPPAY_BANK_ID );
+                            newInsert.setBankId( ConstantsPay.VIPPAY_BANK_ID );
                             newInsert.setMemberId( memberId );
                             newInsert.setBankAccount( walletAddress );
                             newInsert.setCreateTime( LocalDateTime.now() );
@@ -162,7 +158,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
             return RspBase.businessError( "充值金额最低10" );
         }
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
-                                                                           .eq( "bank_id", VIPPAY_BANK_ID ).one();
+                                                                           .eq( "bank_id", ConstantsPay.VIPPAY_BANK_ID ).one();
         if ( memberCard == null ) {
             return RspBase.businessError( "未注册vipPay,请登录后重试" );
         }
@@ -171,7 +167,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
         memberRechargeOnline.setOrderNo( orderId );
         memberRechargeOnline.setMemberId( memberId );
-        memberRechargeOnline.setPlatformId( VIPPAY_PAY_PLATFORM_ID );
+        memberRechargeOnline.setPlatformId( ConstantsPay.VIPPAY_PAY_PLATFORM_ID );
         memberRechargeOnline.setMoney( reqVipPayDeposit.getAmount() );
         memberRechargeOnline.setFirst( false );
         memberRechargeOnline.setPayTime( LocalDateTime.now() );
@@ -182,7 +178,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         if ( i <= 0 ) {
             return RspBase.businessError( "新建充值订单失败,请重试" );
         }
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform( VIPPAY_PAY_PLATFORM_ID );
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.VIPPAY_PAY_PLATFORM_ID );
 
         Map<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "merchantNo", payPlatform.getMerId() );
@@ -230,9 +226,9 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     public RspBase<RspVipPayLogin> uPayLogin( String memberId ) {
         // 116是UPay的银行ID
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
-                                                                           .eq( "bank_id", UPAY_BANK_ID ).one();
+                                                                           .eq( "bank_id", ConstantsPay.UPAY_BANK_ID ).one();
         // 50是vipPay支付平台ID
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform( UPAY_PAY_PLATFORM_ID );
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.UPAY_PAY_PLATFORM_ID );
         String      userPhone   = memberInfoMapper.getUserPhone( memberId );
         if ( StringUtils.isBlank( userPhone ) ) {
             return RspBase.businessError( "请绑定手机后登录" );
@@ -274,7 +270,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     if ( StringUtils.isNotBlank( walletAddress ) ) {
                         if ( memberCard == null ) {
                             MemberCard newInsert = new MemberCard();
-                            newInsert.setBankId( UPAY_BANK_ID );
+                            newInsert.setBankId( ConstantsPay.UPAY_BANK_ID );
                             newInsert.setMemberId( memberId );
                             newInsert.setBankAccount( walletAddress );
                             newInsert.setCreateTime( LocalDateTime.now() );
@@ -310,7 +306,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
             return RspBase.businessError( "充值金额最低10" );
         }
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
-                                                                           .eq( "bank_id", UPAY_BANK_ID ).one();
+                                                                           .eq( "bank_id", ConstantsPay.UPAY_BANK_ID ).one();
         if ( memberCard == null ) {
             return RspBase.businessError( "未注册vipPay,请登录后重试" );
         }
@@ -319,7 +315,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
         memberRechargeOnline.setOrderNo( orderId );
         memberRechargeOnline.setMemberId( memberId );
-        memberRechargeOnline.setPlatformId( UPAY_PAY_PLATFORM_ID );
+        memberRechargeOnline.setPlatformId( ConstantsPay.UPAY_PAY_PLATFORM_ID );
         memberRechargeOnline.setMoney( reqVipPayDeposit.getAmount() );
         memberRechargeOnline.setFirst( false );
         memberRechargeOnline.setPayTime( LocalDateTime.now() );
@@ -330,7 +326,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         if ( i <= 0 ) {
             return RspBase.businessError( "新建充值订单失败,请重试" );
         }
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform( UPAY_PAY_PLATFORM_ID );
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.UPAY_PAY_PLATFORM_ID );
 
         Map<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "merchantId", payPlatform.getMerId() );

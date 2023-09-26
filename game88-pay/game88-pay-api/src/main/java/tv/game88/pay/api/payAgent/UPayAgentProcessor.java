@@ -25,25 +25,25 @@ import java.io.Reader;
 import java.math.RoundingMode;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.VIPPAY + ConstantsPayAgent.PROCESSOR )
+@Repository( value = ConstantsPayAgent.UPAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
-public class VipPayAgentProcessor extends AbstractPayAgent {
+public class UPayAgentProcessor extends AbstractPayAgent {
     @Override
     public String getName() {
-        return "vipPay";
+        return "UPay";
     }
 
     @Override
     public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
                              PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
-        if ( !Objects.equals( withdrawDetail.getBankId(), ConstantsPay.VIPPAY_BANK_ID ) ) {
+        if ( !Objects.equals( withdrawDetail.getBankId(), ConstantsPay.UPAY_BANK_ID ) ) {
             payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             log.warn( "此代付无法支持的银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
             throw new BusinessException( "此代付无法支持的银行类型：" + withdrawDetail.getBankId() );
         }
         SortedMap<String, Object> bodyMap = new TreeMap<>();
-        bodyMap.put( "merchantNo", payAgentChannel.getMerId() );
-        bodyMap.put( "withdrawNo", withdrawDetail.getWithdrawOrderNo() );
+        bodyMap.put( "merchantId", payAgentChannel.getMerId() );
+        bodyMap.put( "orderNo", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
         bodyMap.put( "walletAddress", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
@@ -78,7 +78,7 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
-                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
                 if ( !CollectionUtils.isEmpty( dataMap ) ) {
                     log.info( payAgentPlatform.getName() + "订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                     int status = Integer.parseInt( dataMap.getOrDefault( "status", "0" ).toString() );
@@ -144,7 +144,7 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
         PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> params = new TreeMap<>();
-        params.put( "merchantNo", payAgentChannel.getMerId() );
+        params.put( "merchantId", payAgentChannel.getMerId() );
         params.put( "orderNo", withdrawDetail.getWithdrawOrderNo() );
 
         String tempStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
@@ -154,7 +154,7 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
 
         log.info( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
-            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( dataMap ) ) {
                 int orderState = Integer.parseInt( resultMap.getOrDefault( "status", 0 ).toString() );
                 // status 4代付中5代付失败6代付成功
@@ -164,7 +164,7 @@ public class VipPayAgentProcessor extends AbstractPayAgent {
                     case 0 -> 5;
                     default -> 4;
                 };
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status);
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
             }
             return resultMap.getOrDefault( "msg", "" ).toString();
         }

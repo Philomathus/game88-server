@@ -23,6 +23,7 @@ import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.pay.api.base.BasePayAgent;
 import tv.game88.pay.api.base.PayAgentProcessorFactoryUtil;
+import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.*;
 import tv.game88.pay.api.entity.*;
 import tv.game88.pay.api.mapper.*;
@@ -361,7 +362,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             throw new BusinessException( "回退失败" );
         }
         BigDecimal withdrawMoney = memberWithdrawDetail.getWithdrawMoney();
-        if ( memberWithdrawDetail.getBankId() == 68L && StringUtils.isNotBlank( memberWithdrawDetail.getRealBankAddress() )
+        if ( Objects.equals( memberWithdrawDetail.getBankId(), ConstantsPay.VIPPAY_BANK_ID )
+                && StringUtils.isNotBlank( memberWithdrawDetail.getRealBankAddress() )
                 && StringUtils.isNumeric( memberWithdrawDetail.getRealBankAddress() ) ) {
             withdrawMoney = withdrawMoney.subtract( new BigDecimal( memberWithdrawDetail.getRealBankAddress() ) );
         }
@@ -869,7 +871,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         BigDecimal withdrawAward     = BigDecimal.ZERO;
         BigDecimal withdrawAwardRate = null;
         // 套利号无优惠
-        if ( memberCard.getBankId() == 68L && memberInfo.getStatus() != 4 ) {
+        if ( Objects.equals( memberCard.getBankId(), ConstantsPay.VIPPAY_BANK_ID ) && memberInfo.getStatus() != 4 ) {
             String vipPayWithdrawAwardRate = configEnvCacheUtil.getConf( "vippay_withdraw_award_rate" );
             if ( StringUtils.isNotBlank( vipPayWithdrawAwardRate ) ) {
                 String[] newVipPayRates = vipPayWithdrawAwardRate.split( ";" );

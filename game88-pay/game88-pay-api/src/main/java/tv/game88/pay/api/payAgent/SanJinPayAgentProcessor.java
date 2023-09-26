@@ -208,13 +208,12 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
                 if ( "0".equals( code ) && !CollectionUtils.isEmpty( dataMap ) ) {
                     String state = dataMap.getOrDefault( "trade_status", "" ).toString();
                     // status 4代付中 5代付失败 6代付成功
-                    int status = 4;
-                    if ( "TRADE_SUCCESS".equals( state ) ) {
-                        status = 6;
-                    } else if ( "TRADE_FAIL".equals( state ) ) {
-                        status = 5;
-                    }
-                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status, 0 );
+                    int status = switch ( state ) {
+                        case "TRADE_SUCCESS" -> 6;
+                        case "TRADE_FAIL" -> 5;
+                        default -> 4;
+                    };
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 }
                 return resultMap.getOrDefault( "msg", "" ).toString();
             }

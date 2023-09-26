@@ -199,8 +199,7 @@ public class ToPayAgentProcessor extends AbstractPayAgent {
                     } else {
                         status = 5;
                     }
-                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                            Integer.parseInt( statusCode ) );
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 }
                 return resultMap.getOrDefault( "msg", "" ).toString();
             }
