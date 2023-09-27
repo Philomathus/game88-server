@@ -20,7 +20,3 @@ public interface WalletMerchantMapper extends BaseMapper<WalletMerchant> {
 
     int addMoney( @Param( "merchantId" ) Long merchantId, @Param( "money" ) Long addMoney );
 }
-
-
-
-
