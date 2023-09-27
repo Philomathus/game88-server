@@ -449,6 +449,29 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         return null;
     }
+
+    @Override
+    public RspBase<?> verifyIdCard( String userId, ReqVerifyIdCard reqVerifyIdCard ) {
+        WalletUser walletUser = this.baseMapper.selectById( userId );
+        if ( walletUser == null ) {
+            return RspBase.businessError( "钱包用户不存在" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
+        }
+        if ( ValidatorUtil.isIDCard( reqVerifyIdCard.getIdCardNumber() ) ) {
+            return RspBase.businessError( "请输入正确的身份证号码" );
+        }
+        WalletUser update = new WalletUser();
+        update.setId( userId );
+        update.setIsVerified( 1 );
+        update.setIdNumber( reqVerifyIdCard.getIdCardNumber() );
+        update.setRealName( reqVerifyIdCard.getRealName() );
+        update.setIdFrontPic( reqVerifyIdCard.getIdFrontPic() );
+        update.setIdBackPic( reqVerifyIdCard.getIdBackPic() );
+        int i = this.baseMapper.updateById( update );
+        return i > 0 ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
+    }
 }
 
 

@@ -54,4 +54,10 @@ public class WalletUserController extends BaseController {
     public RspBase<?> personalTransfer( @Validated @RequestBody ReqPersonalTransfer reqPersonalTransfer ) {
         return walletUserService.personalTransfer( MemberSecurityUtils.getUserId(), reqPersonalTransfer );
     }
+
+    @Operation( summary = "上传验证身份信息" )
+    @PostMapping( "/api/verifyIdCard" )
+    public RspBase<?> verifyIdCard( @Validated @RequestBody ReqVerifyIdCard reqVerifyIdCard ) {
+        return walletUserService.verifyIdCard( MemberSecurityUtils.getUserId(), reqVerifyIdCard );
+    }
 }
