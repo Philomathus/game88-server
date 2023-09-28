@@ -1,10 +1,11 @@
 package tv.game88.wallet.api.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import tv.game88.wallet.api.entity.WalletMerchant;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author meng.jun
@@ -13,6 +14,14 @@ import java.math.BigDecimal;
  * @Entity tv.game88.wallet.api.entity.WalletMerchant
  */
 public interface WalletMerchantMapper extends BaseMapper<WalletMerchant> {
+    /**
+     * 查询钱包商户列表
+     *
+     * @param walletMerchant 钱包商户
+     *
+     * @return 钱包商户集合
+     */
+    public List<WalletMerchant> selectWalletMerchantList( WalletMerchant walletMerchant );
 
     BigDecimal getMerchantMoney( @Param( "merchantId" ) Long merchantId );
 
