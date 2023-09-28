@@ -56,7 +56,6 @@ public class GamePullDockMG extends AbstractGamePull {
             return text;
         } );
 
-        log.warn( resultStr );
         if ( StringUtils.isNotBlank( resultStr ) ) {
             List<Object> resultMap = JsonUtil.json2Array( resultStr, new TypeReference<>() {} );
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
