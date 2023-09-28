@@ -134,9 +134,7 @@ public class CBiPayAgentProcessor extends AbstractPayAgent {
             int                 status    = Integer.parseInt( payParams.getOrDefault( "status", "1" ).toString() );
             if ( status == 2 || status == 3 ) {
                 int orderStatus = status == 2 ? 6 : 5;
-                int orderState  = status == 2 ? 1 : 2;
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), orderStatus,
-                        orderState );
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), orderStatus );
             }
             return resultMap.getOrDefault( "message", "" ).toString();
         }

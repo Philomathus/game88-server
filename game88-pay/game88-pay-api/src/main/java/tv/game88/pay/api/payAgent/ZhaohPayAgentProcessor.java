@@ -73,7 +73,7 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            String dataStr = resultMap.getOrDefault( "data", "" ).toString();
+            String              dataStr    = resultMap.getOrDefault( "data", "" ).toString();
             Map<String, Object> resDataMap = JsonUtil.json2Map( RSACoder.decryptByPublicKey( dataStr, publicKey ) );
             log.warn( "解密数据:" + JsonUtil.object2Json( resDataMap ) );
             if ( "0".equals( resDataMap.getOrDefault( "code", "" ).toString() ) ) {
@@ -245,24 +245,12 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
                     int orderStatus = Integer.parseInt( data.getOrDefault( "status", 0 ).toString() );
                     // status 4代付中5代付失败6代付成功
                     // orderState (0=处理中，1=成功，2=失败)
-                    int status;
-                    int orderState;
-                    switch ( orderStatus ) {
-                    case 2 -> {
-                        status     = 6;
-                        orderState = 1;
-                    }
-                    case 3 -> {
-                        status     = 5;
-                        orderState = 2;
-                    }
-                    default -> {
-                        status     = 4;
-                        orderState = 0;
-                    }
-                    }
-                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                            orderState );
+                    int status = switch ( orderStatus ) {
+                        case 2 -> 6;
+                        case 3 -> 5;
+                        default -> 4;
+                    };
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 }
             }
             return resultMap.getOrDefault( "message", "" ).toString();

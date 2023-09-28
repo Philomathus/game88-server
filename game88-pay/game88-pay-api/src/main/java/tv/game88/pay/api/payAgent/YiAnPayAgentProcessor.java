@@ -152,17 +152,12 @@ public class YiAnPayAgentProcessor extends AbstractPayAgent {
             if ( "100".equals( trade_state ) || "0".equals( trade_state ) || "-90".equals( trade_state ) ) {
                 // status 4代付中 5代付失败 6代付成功
                 // trade_state  100成功 -90失败 0 處理中,需繼續查詢
-                int status      = 4;
-                int orderStatus = 0;
-                if ( "100".equals( trade_state ) ) {
-                    status      = 6;
-                    orderStatus = 1;
-                } else if ( "-90".equals( trade_state ) ) {
-                    status      = 5;
-                    orderStatus = 2;
-                }
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                        orderStatus );
+                int status = switch ( trade_state ) {
+                    case "100" -> 6;
+                    case "-90" -> 5;
+                    default -> 4;
+                };
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
             }
             return resultMap.getOrDefault( "Message", "" ).toString();
         }

@@ -26,7 +26,7 @@ import java.io.Reader;
 import java.math.RoundingMode;
 import java.util.*;
 
-@Repository ( value = ConstantsPayAgent.JQ_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.JQ_PAY + "PayAgentProcessor" )
 @Log4j2
 public class JqPayAgentProcessor extends AbstractPayAgent {
     @Override
@@ -67,13 +67,13 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
         try {
             resultMap = restTemplate.execute( payAgentPlatform.getOrderUrl(), HttpMethod.POST,
                     restTemplate.httpEntityCallback( httpEntity ), response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    } );
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             reqPayAgent.setFailReason( payAgentPlatform.getName() + "下单报错原因:" + e );
@@ -87,8 +87,7 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            if ( "success".equals( resultMap.getOrDefault( "message", "" ).toString() )
-                    && resultMap.get( "data" ) != null ) {
+            if ( "success".equals( resultMap.getOrDefault( "message", "" ).toString() ) && resultMap.get( "data" ) != null ) {
                 log.info( payAgentPlatform.getName() + "订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
@@ -131,7 +130,8 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
 
             String status = dataMap.getOrDefault( "status", "" ).toString();
             payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap.getOrDefault( "order_no", "" )
-                    .toString(), payAgentChannel, "OK_ORDER".equals( status ) );
+                                                                                    .toString(), payAgentChannel,
+                    "OK_ORDER".equals( status ) );
 
             log.info( payAgentPlatform.getName()
                     + "订单号:{},回调状态:{},", withdrawOrderId, "OK_ORDER".equals( status ) ? "成功" : "失败" );
@@ -171,13 +171,13 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
         try {
             resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
                     restTemplate.httpEntityCallback( httpEntity ), response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    } );
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
             log.info( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 String              success    = resultMap.getOrDefault( "message", "" ).toString();
@@ -185,17 +185,12 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
                 if ( "success".equals( success ) && !CollectionUtils.isEmpty( dataResMap ) ) {
                     String refCode = dataResMap.getOrDefault( "status", "" ).toString();
                     // status 4代付中 5代付失败 6代付成功
-                    // refCode 1成功 2失败 3处理中 4待处理
-                    int status     = 4;
-                    int orderState = 0;
-                    if ( "OK_ORDER".equals( refCode ) ) {
-                        status = 6;
-                        orderState = 1;
-                    } else if ( "CLOSE_ORDER".equals( refCode ) ) {
-                        status = 5;
-                        orderState = 2;
-                    }
-                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status, orderState );
+                    int status = switch ( refCode ) {
+                        case "OK_ORDER" -> 6;
+                        case "CLOSE_ORDER" -> 5;
+                        default -> 4;
+                    };
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 }
                 return resultMap.getOrDefault( "message", "" ).toString();
             }

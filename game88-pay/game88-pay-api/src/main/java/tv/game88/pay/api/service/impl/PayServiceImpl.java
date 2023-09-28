@@ -24,6 +24,7 @@ import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
 import tv.game88.pay.api.cache.PayCacheUtil;
+import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.ReqPayRecharge;
 import tv.game88.pay.api.dto.RspPayChannel;
 import tv.game88.pay.api.entity.*;
@@ -249,7 +250,7 @@ public class PayServiceImpl implements PayService {
 
         if ( chargeGive == null ) {
             PayChannel payChannel = payCacheUtil.getPayChannel( memberRechargeOnline.getChannelId() );
-            if ( memberRechargeOnline.getPlatformId() == 24L ) { // 24 是vipPay
+            if ( Objects.equals( memberRechargeOnline.getPlatformId(), ConstantsPay.VIPPAY_PAY_PLATFORM_ID ) ) { // 24 是vipPay
 
                 String newVipPayRate = configEnvCacheUtil.getConf( "new_vippay_rate" );
 
@@ -307,7 +308,7 @@ public class PayServiceImpl implements PayService {
         //新增佣金记录
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeOnline.getMoney() );
 
-        if ( memberRechargeOnline.getPlatformId() == 24L ) {
+        if ( Objects.equals( memberRechargeOnline.getPlatformId(), ConstantsPay.VIPPAY_PAY_PLATFORM_ID ) ) {
             //vipPay充值活动任务
             List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
                     .eq( "effect", 1 )
