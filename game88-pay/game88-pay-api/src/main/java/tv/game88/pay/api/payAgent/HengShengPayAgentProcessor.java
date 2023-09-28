@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository ( value = ConstantsPayAgent.HENG_SHENG_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.HENG_SHENG_PAY + "PayAgentProcessor" )
 @Log4j2
 public class HengShengPayAgentProcessor extends AbstractPayAgent {
 
@@ -113,10 +113,11 @@ public class HengShengPayAgentProcessor extends AbstractPayAgent {
             }
 
             payAgentService.processOrderPay( withdrawDetail, payAgentLog, "", payAgentChannel, "1".equals( status ) );
-            log.info( payAgentPlatform.getName() + "订单号:{},回调状态:{},", merchantOrderNo, "1".equals( status ) ? "成功" : "失败" );
+            log.info( payAgentPlatform.getName()
+                    + "订单号:{},回调状态:{},", merchantOrderNo, "1".equals( status ) ? "成功" : "失败" );
             return "success";
         }
-        log.warn( payAgentChannel.getName() + "验签失败");
+        log.warn( payAgentChannel.getName() + "验签失败" );
         return "fail";
     }
 
@@ -136,7 +137,8 @@ public class HengShengPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "merchantId", payAgentChannel.getMerId() );
         dataMap.put( "version", "1.0.0" );
         dataMap.put( "merchantOrderNo", withdrawDetail.getWithdrawOrderNo() );
-        dataMap.put( "submitTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        dataMap.put( "submitTime", LocalDateTimeUtils.format( LocalDateTime.now(),
+                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
 
         String tempStr        = this.assemblyUrl( dataMap );
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
@@ -152,34 +154,26 @@ public class HengShengPayAgentProcessor extends AbstractPayAgent {
         try {
             resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
                     restTemplate.httpEntityCallback( httpEntity ), response -> {
-                        InputStream bodyStream = response.getBody();
-                        String      text;
-                        try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                            text = IOUtils.toString( reader );
-                        }
-                        return JsonUtil.json2Map( text );
-                    } );
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
             log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 //  statusCode
                 //  1-成功，2-失败，3-处理中，4-订单不存在 5-审核拒绝
                 String statusCode = resultMap.getOrDefault( "status", "" ).toString();
-
-                if ( "0".equals( statusCode ) || "1".equals( statusCode ) || "2".equals( statusCode ) ) {
-                    //  4代付中 5代付失败 6代付成功
-                    int status      = 4;
-                    int orderStatus = 0;
-                    if ( "1".equals( statusCode ) ) {
-                        status = 6;
-                        orderStatus = 1;
-                    } else {
-                        status = 5;
-                        orderStatus = 2;
-                    }
-                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                            orderStatus );
-                }
+                //  4代付中 5代付失败 6代付成功
+                int status = switch ( statusCode ) {
+                    case "1" -> 6;
+                    case "3" -> 4;
+                    default -> 5;
+                };
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 return resultMap.getOrDefault( "msg", "" ).toString();
             }
 

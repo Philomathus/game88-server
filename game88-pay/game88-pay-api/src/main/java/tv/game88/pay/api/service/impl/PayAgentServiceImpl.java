@@ -170,7 +170,7 @@ public class PayAgentServiceImpl implements PayAgentService {
 
         reqPayAgent.setCurrentTime( LocalDateTime.now() );
         PayAgentService payAgentService = SpringUtils.getBean( PayAgentService.class );
-        payAgentService.processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4, 0 );
+        payAgentService.processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4);
         BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
         if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, reqPayAgent ) ) {
             return RspBase.ok( "代付订单提交成功" );
@@ -191,7 +191,7 @@ public class PayAgentServiceImpl implements PayAgentService {
         }
 
         List<PayAgentLog> payAgentLogList = payAgentLogMapper.selectBatchIds( reqPayAgent.getWithdrawOrderNos() );
-        if ( payAgentLogList.size() > 0 ) {
+        if ( !payAgentLogList.isEmpty() ) {
             return RspBase.businessError( "被选中的订单已有代付记录" );
         }
         if ( !redisUtil.lock( "payAgent" + userName, 10 ) ) {
@@ -245,7 +245,7 @@ public class PayAgentServiceImpl implements PayAgentService {
             newReqPayAgent.setCurrentTime( LocalDateTime.now() );
             newReqPayAgent.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
             try {
-                payAgentService.processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4, 0 );
+                payAgentService.processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4 );
 
                 if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, newReqPayAgent ) ) {
                     sucessNum++;
@@ -264,7 +264,7 @@ public class PayAgentServiceImpl implements PayAgentService {
     @Override
     @Transactional ( rollbackFor = Exception.class )
     public void processOrder( PayAgentChannel payAgentChannel, MemberWithdrawDetail memberWithdrawLog, LocalDateTime now,
-                              int status, int orderState ) {
+                              int status ) {
         MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
         PayAgentLog          payAgentLog = payAgentLogMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
         if ( !( withdrawLog.getStatus() == 1 || withdrawLog.getStatus() == 4 ) ) {

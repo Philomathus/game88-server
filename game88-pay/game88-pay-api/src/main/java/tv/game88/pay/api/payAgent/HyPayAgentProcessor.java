@@ -162,17 +162,12 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
                         || "4".equals( trade_state ) ) {
                     // status 4代付中 5代付失败 6代付成功
                     // trade_state  1等待处理 2准备打款,3已打款,4已拒绝 處理中,需繼續查詢
-                    int status      = 4;
-                    int orderStatus = 0;
-                    if ( "3".equals( trade_state ) ) {
-                        status      = 6;
-                        orderStatus = 1;
-                    } else if ( "4".equals( trade_state ) ) {
-                        status      = 5;
-                        orderStatus = 2;
-                    }
-                    payAgentService.processOrder( payAgentChannel, withdrawLog, withdrawLog.getUpdateTime(), status,
-                            orderStatus );
+                    int status = switch ( trade_state ) {
+                        case "3" -> 6;
+                        case "4" -> 5;
+                        default -> 4;
+                    };
+                    payAgentService.processOrder( payAgentChannel, withdrawLog, withdrawLog.getUpdateTime(), status );
                 }
             }
             return errorMessage;

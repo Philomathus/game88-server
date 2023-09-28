@@ -200,15 +200,12 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
                 int orderState = Integer.parseInt( resultMap.getOrDefault( "orderStatus", 0 ).toString() );
                 // status 4代付中5代付失败6代付成功
                 // orderState (0待处理，1处理中，2处理成功，3处理失败,4未知)
-                int status = 4;
-                switch ( orderState ) {
-                case 2 -> status = 6;
-                case 3 -> status = 5;
-                default -> {
-                }
-                }
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                        orderState );
+                int status = switch ( orderState ) {
+                    case 2 -> 6;
+                    case 3 -> 5;
+                    default -> 4;
+                };
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
             }
             return resultMap.getOrDefault( "msg", "" ).toString();
         }

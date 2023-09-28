@@ -40,7 +40,7 @@ public class PayController extends BaseController {
         return walletRecordService.payOrder( reqDepositOrder );
     }
 
-    @Operation( summary = "下发下单接口" )
+    @Operation( summary = "代付下单接口" )
     @PostMapping( "/common/withdrawOrder" )
     @ResponseBody
     @Anonymous
@@ -48,7 +48,7 @@ public class PayController extends BaseController {
         return walletRecordService.withdrawOrder( reqWithdrawOrder );
     }
 
-    @Operation( summary = "支付（下发）订单查询" )
+    @Operation( summary = "支付(代付)订单查询" )
     @PostMapping( "/common/orderQuery" )
     @ResponseBody
     @Anonymous

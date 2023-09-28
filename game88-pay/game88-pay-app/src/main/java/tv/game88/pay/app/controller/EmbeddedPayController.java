@@ -12,26 +12,38 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.pay.api.dto.ReqVipPayDeposit;
 import tv.game88.pay.api.dto.RspVipPayLogin;
-import tv.game88.pay.api.service.VipPayService;
+import tv.game88.pay.api.service.EmbeddedPayService;
 
 import javax.annotation.Resource;
 
 @RestController
-@Tag( name = "vipPay登录注册以及充值" )
+@Tag( name = "内嵌支付登录注册以及充值" )
 @Log4j2
-public class VipPayController extends BaseController {
+public class EmbeddedPayController extends BaseController {
     @Resource
-    private VipPayService vipPayService;
+    private EmbeddedPayService embeddedPayService;
 
     @Operation( summary = "vipPay登录注册" )
     @PostMapping( "/vipPayLogin" )
     public RspBase<RspVipPayLogin> vipPayLogin() {
-        return vipPayService.vipPayLogin( MemberSecurityUtils.getUserId() );
+        return embeddedPayService.vipPayLogin( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "vipPay扣款并充值平台" )
     @PostMapping( "/vipPayDeposit" )
     public RspBase<?> vipPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
-        return vipPayService.vipPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
+        return embeddedPayService.vipPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "UPay登录注册" )
+    @PostMapping( "/uPayLogin" )
+    public RspBase<RspVipPayLogin> uPayLogin() {
+        return embeddedPayService.uPayLogin( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "UPay扣款并充值平台" )
+    @PostMapping( "/uPayDeposit" )
+    public RspBase<?> uPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
+        return embeddedPayService.uPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
 }

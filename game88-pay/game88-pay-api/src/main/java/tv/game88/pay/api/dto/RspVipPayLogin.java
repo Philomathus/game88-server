@@ -13,4 +13,6 @@ public class RspVipPayLogin {
     private String     walletAddress;
     @Schema( title = "vipPay余额" )
     private BigDecimal balance;
+    @Schema( title = "token" )
+    private String     token;
 }

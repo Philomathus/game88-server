@@ -22,6 +22,8 @@ public interface WalletRecordService extends IService<WalletRecord> {
 
     void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType );
 
+    RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress, String orderNo );
+
     ModelAndView toDepositOrder( String s, long t ) throws Exception;
 
     RspBase<?> payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;

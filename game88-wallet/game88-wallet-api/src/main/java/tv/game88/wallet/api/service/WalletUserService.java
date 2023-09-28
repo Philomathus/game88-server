@@ -47,4 +47,6 @@ public interface WalletUserService extends IService<WalletUser> {
     void processFundTransfer( String userId, ReqPersonalTransfer reqPersonalTransfer );
 
     RspBase<?> validWalletUser( WalletUser walletUser );
+
+    RspBase<?> verifyIdCard( String userId, ReqVerifyIdCard reqVerifyIdCard );
 }

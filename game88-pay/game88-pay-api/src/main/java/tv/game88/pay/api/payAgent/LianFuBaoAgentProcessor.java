@@ -128,7 +128,7 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
             log.error( "已有代付记录 - merOrderNo:{}", merOrderNo );
             return "success";
         }
-        PayAgentLog payAgentLog = payAgentLogMapper.selectById( merOrderNo );
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( merOrderNo );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
@@ -284,9 +284,7 @@ public class LianFuBaoAgentProcessor extends AbstractPayAgent {
                     case 2 -> 5;
                     default -> 4;
                 };
-                log.warn( "orderState:{}", orderState );
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                        orderState );
+                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
             }
             return resultMap.getOrDefault( "message", "" ).toString();
         }

@@ -83,7 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectDbTableList" parameterType="tv.game88.admin.system.entity.GenTable" resultMap="GenTableResult">
 		select table_name, table_comment, create_time, update_time, table_schema from information_schema.tables
-		where table_schema = '8800' and table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'sys_gen_%'
+		where table_schema = (select database()) and table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'sys_gen_%'
 		AND table_name NOT IN (select table_name from sys_gen_table)
 		<if test="tableName != null and tableName != ''">
 			AND lower(table_name) like lower(concat('%', #{tableName}, '%'))
@@ -104,7 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectDbTableListByNames" resultMap="GenTableResult">
 		select table_name, table_comment, create_time, update_time, table_schema from information_schema.tables
-		where table_schema = '8800' and table_name NOT LIKE 'qrtz_%' and table_name NOT LIKE 'sys_gen_%' and table_name in
+		where table_schema = (select database()) and table_name NOT LIKE 'qrtz_%' and table_name NOT LIKE 'sys_gen_%' and table_name in
 	    <foreach collection="array" item="name" open="(" separator="," close=")">
  			#{name}
         </foreach>
@@ -112,7 +112,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
 		select table_name, table_comment, create_time, update_time, table_schema from information_schema.tables
-		where table_schema = '8800' and table_comment <![CDATA[ <> ]]> ''
+		where table_schema = (select database()) and table_comment <![CDATA[ <> ]]> ''
 		and table_name = #{tableName}
 	</select>
 

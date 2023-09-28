@@ -18,17 +18,16 @@ public interface PayAgentService {
     /**
      * 代付订单记录处理
      *
-     * @param withdrawDetail 代付日志
+     * @param withdrawDetail   代付日志
      * @param payAgentLog
-     * @param orderNo 三方订单号
+     * @param orderNo          三方订单号
      * @param payAgentPlatform
      * @param isSuccess
      */
     void processOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentLog payAgentLog, String orderNo,
                           PayAgentChannel payAgentPlatform, boolean isSuccess );
 
-    void processOrder( PayAgentChannel payAgentPlatform, MemberWithdrawDetail withdrawDetail, LocalDateTime now, int status,
-                       int orderState );
+    void processOrder( PayAgentChannel payAgentPlatform, MemberWithdrawDetail withdrawDetail, LocalDateTime now, int status );
 
     void callBackOrder( MemberWithdrawDetail withdrawDetail, String channelName );
 }

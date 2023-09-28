@@ -42,11 +42,8 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
         Map<String, String> dataMap      = new TreeMap<>();
         dataMap.put( "client_num", payAgentChannel.getMerId() );
         dataMap.put( "order_num", withdrawDetail.getWithdrawOrderNo() );
-        dataMap.put( "amount", withdrawDetail
-                .getWithdrawMoney()
-                .multiply( new BigDecimal( 100 ) )
-                .setScale( 0, RoundingMode.HALF_EVEN )
-                .toString() );
+        dataMap.put( "amount", withdrawDetail.getWithdrawMoney().multiply( new BigDecimal( 100 ) )
+                                             .setScale( 0, RoundingMode.HALF_EVEN ).toString() );
         dataMap.put( "bank_account_name", withdrawDetail.getBankUserName().trim() );
         dataMap.put( "bank_account_no", withdrawDetail.getBankAccount().trim() );
         dataMap.put( "bank_code", bankCodeType.name() );
@@ -262,8 +259,7 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             String     bankAccountNo = requestMap.remove( "bankAccountNo" ).toString();
             String     clientCode    = requestMap.get( "clientCode" ).toString();
             if ( amount.compareTo( memberWithdrawDetail.getWithdrawMoney() ) != 0 || !bankAccountNo.equals( memberWithdrawDetail
-                    .getBankAccount()
-                    .trim() ) || !clientCode.equals( payAgentChannel.getMerId() ) ) {
+                    .getBankAccount().trim() ) || !clientCode.equals( payAgentChannel.getMerId() ) ) {
                 resultMap.put( "msg", "订单不匹配" );
                 return resultMap;
             }
@@ -328,18 +324,12 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
                         String remit_state_code = jsonObject.getOrDefault( "remit_state_code", "" );
                         // status 4代付中5代付失败6代付成功
                         // orderState (0=处理中，1=成功，2=失败)
-                        int status     = 4;
-                        int orderState = 0;
-                        if ( "SUCCESS".equals( remit_state_code ) ) {
-                            status     = 6;
-                            orderState = 1;
-                        }
-                        if ( "FAILED".equals( remit_state_code ) ) {
-                            status     = 5;
-                            orderState = 2;
-                        }
-                        payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status,
-                                orderState );
+                        int status = switch ( remit_state_code ) {
+                            case "SUCCESS" -> 6;
+                            case "FAILED" -> 5;
+                            default -> 4;
+                        };
+                        payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                     }
                 }
                 return jsonObject.getOrDefault( "msg", "" );
