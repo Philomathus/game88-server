@@ -43,6 +43,21 @@
         from wallet_merchant
     </sql>
 
+    <select id="selectWalletMerchantList" parameterType="tv.game88.wallet.api.entity.WalletMerchant"
+            resultMap="WalletMerchantResult">
+        <include refid="selectWalletMerchantVo" />
+        <where>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="account != null  and account != ''">and account = #{account}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="email != null  and email != ''">and email = #{email}</if>
+            <if test="phone != null  and phone != ''">and phone = #{phone}</if>
+            <if test="loginIp != null  and loginIp != ''">and login_ip = #{loginIp}</if>
+            <if test="remark != null  and remark != ''">and remark = #{remark}</if>
+        </where>
+    </select>
+
     <select id="getMerchantMoney" resultType="java.math.BigDecimal">
         select amount
         from wallet_merchant
