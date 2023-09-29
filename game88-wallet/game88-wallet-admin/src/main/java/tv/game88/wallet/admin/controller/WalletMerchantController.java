@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -64,7 +65,8 @@ public class WalletMerchantController extends BaseController {
         walletMerchant.setCreatedTime( LocalDateTime.now() );
         walletMerchant.setAmount( BigDecimal.ZERO );
         walletMerchant.setFrozenAmount( BigDecimal.ZERO );
-        walletMerchant.setMd5Key( DigestUtils.md5Hex( System.currentTimeMillis() + RandomStringUtils.randomAlphabetic( 2 ) ) );
+        String md5Key = DigestUtils.md5Hex( System.currentTimeMillis() + RandomStringUtils.randomAlphabetic( 2 ) );
+        walletMerchant.setMd5Key( AESCoder.encrypt( md5Key ) );
         // 初始密码123456
         walletMerchant.setPassword( passwordEncoder.encode( "a123456" ) );
         walletMerchant.setStatus( 1 );
