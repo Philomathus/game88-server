@@ -63,6 +63,7 @@ public class WalletMerchantController extends BaseController {
     @PostMapping
     public RspBase<?> add( @RequestBody WalletMerchant walletMerchant ) {
         walletMerchant.setCreatedTime( LocalDateTime.now() );
+        walletMerchant.setUpdatedTime( walletMerchant.getCreatedTime() );
         walletMerchant.setAmount( BigDecimal.ZERO );
         walletMerchant.setFrozenAmount( BigDecimal.ZERO );
         String md5Key = DigestUtils.md5Hex( System.currentTimeMillis() + RandomStringUtils.randomAlphabetic( 2 ) );
