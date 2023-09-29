@@ -1,7 +1,12 @@
 package tv.game88.general.game.dock;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.*;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
@@ -15,10 +20,12 @@ import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,18 +47,24 @@ public class GamePullDockMG extends AbstractGamePull {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( headers );
 
-        ResponseEntity<ArrayList> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, ArrayList.class );
+        String resultStr = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return text;
+        } );
 
-        // log.warn( url + "::" + JsonUtil.object2Json( responseGameResult.getBody() ) );
-        if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
-            List<Object> resultMap = ( List<Object> ) responseGameResult.getBody();
+        if ( StringUtils.isNotBlank( resultStr ) ) {
+            List<Object> resultMap = JsonUtil.json2Array( resultStr, new TypeReference<>() {} );
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 Map obj = ( Map ) resultMap.get( resultMap.size() - 1 );
                 gamePlatform.setVersionValue( obj.get( "betUID" ).toString() );
 
                 return resultMap;
             } else {
-                log.warn( url + "::" + JsonUtil.object2Json( responseGameResult ) );
+                log.warn( url + "::" + resultStr );
             }
         }
         return null;
