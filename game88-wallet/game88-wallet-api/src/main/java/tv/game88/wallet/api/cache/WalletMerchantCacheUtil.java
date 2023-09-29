@@ -50,7 +50,7 @@ public class WalletMerchantCacheUtil {
         if ( walletMerchant == null ) {
             return;
         }
-        redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, JsonUtil.object2Map( walletMerchant ) );
+        redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, JsonUtil.object2MapStr( walletMerchant ) );
     }
 
     public void clearWalletMerchantCache( Long walletMerchantId ) {
