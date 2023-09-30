@@ -52,9 +52,7 @@ public class WalletMerchantCacheUtil {
         }
 
         Map<String, String> map = JsonUtil.object2MapStr( walletMerchant );
-        map.remove( "password" );
-        map.remove( "secretKey" );
-        map.remove( "md5Key" );
+        log.warn( JsonUtil.object2Json( map ) );
         redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, map );
     }
 
