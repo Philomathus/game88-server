@@ -265,7 +265,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                 if ( StringUtils.isNotBlank( token ) ) {
                     String     walletAddress = result.getOrDefault( "walletAddress", "" ).toString();
                     String     realName      = result.getOrDefault( "realName", "" ).toString();
-                    BigDecimal balance       = new BigDecimal( result.getOrDefault( "balance", "0" ).toString() );
+                    BigDecimal balance       = new BigDecimal( ( Long ) result.getOrDefault( "balance", 0 ) );
 
                     if ( StringUtils.isNotBlank( walletAddress ) ) {
                         if ( memberCard == null ) {
