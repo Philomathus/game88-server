@@ -51,13 +51,7 @@ public class WalletMerchantCacheUtil {
             return;
         }
 
-        Map<String, String> map = JsonUtil.object2MapStr( walletMerchant );
-        for ( Map.Entry<String, String> e : map.entrySet() ) {
-            if ( e.getValue() == null ) {
-                e.setValue( "" );
-            }
-        }
-        redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, map );
+        redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, JsonUtil.object2MapStr( walletMerchant ) );
     }
 
     public void clearWalletMerchantCache( Long walletMerchantId ) {

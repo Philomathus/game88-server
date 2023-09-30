@@ -248,7 +248,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( reqMap, httpHeaders );
 
         Map<String, Object> resultMap = restTemplate.execute( payPlatform.getPayUrl()
-                + "/api/common/embeddedLogin", HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+                + "/common/embeddedLogin", HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {

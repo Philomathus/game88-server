@@ -112,7 +112,7 @@ public class MemberTokenManager {
             this.delToken( loginUser.getUserId() );
             Duration duration = Duration.ofDays( expireTime );
             redisUtil.strSet( Constants.MEMBER_LOGIN_USER + loginUser.getUserId(), token, duration );
-            redisUtil.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, JsonUtil.object2Map( loginUser ) );
+            redisUtil.hMSet( Constants.MEMBER_LOGIN_TOKEN + token, JsonUtil.object2MapStr( loginUser ) );
             redisUtil.expire( Constants.MEMBER_LOGIN_TOKEN + token, duration );
         }
     }

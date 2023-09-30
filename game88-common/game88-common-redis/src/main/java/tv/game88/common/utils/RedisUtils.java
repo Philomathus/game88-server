@@ -430,6 +430,11 @@ public class RedisUtils {
      * 批量添加 hash 的键值对 有则覆盖,没有则添加
      */
     public void hMSet( String key, Map<String, String> map ) {
+        for ( Map.Entry<String, String> e : map.entrySet() ) {
+            if ( e.getValue() == null ) {
+                e.setValue( "" );
+            }
+        }
         stringRedisTemplate.opsForHash().putAll( key, map );
     }
 

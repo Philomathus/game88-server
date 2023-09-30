@@ -73,7 +73,7 @@ public class PayController extends BaseController {
         if ( object != null ) {
             Map<String, Object> resultMap = ( Map<String, Object> ) object;
 
-            String token = memberTokenManager.setRspMemberToken( ( PlatformUser ) resultMap.get( "userIfo" ), null );
+            String token = memberTokenManager.setRspMemberToken( ( PlatformUser ) resultMap.get( "userInfo" ), null );
             resultMap.put( "token", token );
         }
         return rspMemberRspBase;
