@@ -263,6 +263,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 } else {
                     walletUser = this.newWalletUserReg( new MobileLogin() );
                     walletUser.setPhone( reqEmbeddedLogin.getPhone() );
+
+                    this.baseMapper.insert( walletUser );
                 }
             }
         } else {
@@ -273,16 +275,16 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 if ( oldm != null ) {
                     walletUser = oldm;
                 } else {
-                    return RspBase.businessError( "钱包地址有误" );
+                    return RspBase.businessError( "钱包地址不存在" );
                 }
             }
         }
         if ( !redisUtils.lock( "memberLogin:" + reqEmbeddedLogin.getPhone(), 5 ) ) {
             return RspBase.businessError( "请勿重复访问" );
         }
-        this.baseMapper.insert( walletUser );
         if ( oldm != null ) {
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
+            this.baseMapper.insert( walletUser );
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
