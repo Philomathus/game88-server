@@ -104,7 +104,7 @@
     <select id="findMemberHistoryByMobile" resultType="tv.game88.wallet.api.entity.WalletUser">
         select *
         from wallet_user_history
-        where phone = #{phone}
+        where phone = #{mobile}
         limit 1
     </select>
 
