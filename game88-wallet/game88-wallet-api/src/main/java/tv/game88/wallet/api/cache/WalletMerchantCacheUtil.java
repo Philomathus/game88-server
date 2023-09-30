@@ -50,6 +50,7 @@ public class WalletMerchantCacheUtil {
         if ( walletMerchant == null ) {
             return;
         }
+        log.warn( JsonUtil.object2MapStr( walletMerchant ) );
         redisUtils.hMSet( WALLET_MERCHANT_KEY + walletMerchantId, JsonUtil.object2MapStr( walletMerchant ) );
     }
 
