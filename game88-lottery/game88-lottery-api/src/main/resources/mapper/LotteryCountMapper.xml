@@ -38,7 +38,7 @@
         FROM lottery_count
         where issue = #{issue}
           and lottery_id = #{lotteryId}
-        GROUP BY bet_info
+        GROUP BY bet_info, agent
     </select>
 
     <insert id="insertBatch">
