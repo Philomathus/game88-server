@@ -75,10 +75,10 @@ public class ReportPlamGamesController extends BaseController {
         } else {
             reportPlamGames.setAgentPlatformLive( reportPlamGames.getAgentPlatform() + "_live" );
         }
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        startPage( pageDomain );
+//        PageDomain pageDomain = TableSupport.buildPageRequest();
+//        startPage( pageDomain );
         List<RspPlamGamesMonth> list = reportPlamGamesService.selectReportPlamGamesListMonth( reportPlamGames );
-        return getRspBasePage( list, pageDomain );
+        return getRspBasePage( list );
     }
 
     @GetMapping( value = "/countBet" )
