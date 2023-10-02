@@ -8,6 +8,7 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 import tv.game88.wallet.api.constants.ConstantsWallet;
+import tv.game88.wallet.api.service.WalletTransactionDetailService;
 
 import javax.annotation.Resource;
 
@@ -16,6 +17,9 @@ import javax.annotation.Resource;
 public class RedisKeyExpirationListener extends KeyExpirationEventMessageListener {
     @Resource
     private RedisProperties redisProperties;
+
+    @Resource
+    private WalletTransactionDetailService walletTransactionDetailService;
 
     public RedisKeyExpirationListener( RedisMessageListenerContainer listenerContainer ) {
         super( listenerContainer );
@@ -37,14 +41,23 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
     public void onMessage( Message message, byte[] pattern ) {
         String expiredKey = message.toString();
         log.info( "过期消息KEY ::: {}", expiredKey );
-        if ( expiredKey.startsWith( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER ) ) {
 
-        }
-        if ( expiredKey.startsWith( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER ) ) {
-
-        }
-        if ( expiredKey.startsWith( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER ) ) {
-
+        try {
+            // 处理订单超时
+            if ( expiredKey.startsWith( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER ) ) {
+                String transDetailId = expiredKey.replaceFirst( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER, "" );
+                walletTransactionDetailService.processBuyerConfirmBuyTimeout( transDetailId );
+            }
+            if ( expiredKey.startsWith( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER ) ) {
+                String transDetailId = expiredKey.replaceFirst( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER, "" );
+                walletTransactionDetailService.processSellerConfirmTransTimeout( transDetailId );
+            }
+            if ( expiredKey.startsWith( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER ) ) {
+                String transDetailId = expiredKey.replaceFirst( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER, "" );
+                walletTransactionDetailService.processBuyerConfirmTransferTimeout( transDetailId );
+            }
+        } catch ( Exception e ) {
+            log.error( "处理交易订单失败:{}", e.getMessage(), e );
         }
     }
 }

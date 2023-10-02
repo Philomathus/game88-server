@@ -114,7 +114,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         // TODO 通知消息给卖家
 
-        // TODO 卖家订单倒计时 5分钟后取消订单
+        // 卖家订单倒计时 5分钟后取消订单
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
                 + walletTransactionDetail.getTransDetailId(), "1", Duration.ofMinutes( 5 ) );
 
@@ -204,7 +204,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             // TODO 消息通知买家
 
-            // TODO 买家订单倒计时 20分钟 用于转账
+            // 买家订单倒计时 20分钟 用于转账
             redisUtils.strSet( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId, "1", Duration.ofMinutes( 20 ) );
 
             return RspBase.ok( "确认交易成功" );
@@ -310,7 +310,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             // TODO 消息通知卖家
 
-            // TODO 卖家 订单倒计时 30分钟 用于确认是否收到转账
+            // 卖家 订单倒计时 30分钟 用于确认是否收到转账
             redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId, "1", Duration.ofMinutes( 30 ) );
 
             return RspBase.ok( "确认转账成功" );
@@ -454,6 +454,21 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             return RspBase.ok( "确认未收到转账" );
         }
         return RspBase.businessError( "确认未收到转账失败,请重试" );
+    }
+
+    @Override
+    public void processBuyerConfirmBuyTimeout( String transDetailId ) {
+
+    }
+
+    @Override
+    public void processSellerConfirmTransTimeout( String transDetailId ) {
+
+    }
+
+    @Override
+    public void processBuyerConfirmTransferTimeout( String transDetailId ) {
+
     }
 }
 
