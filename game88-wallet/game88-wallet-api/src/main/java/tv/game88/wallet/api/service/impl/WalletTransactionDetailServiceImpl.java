@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
+import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.ReqBuyCoins;
 import tv.game88.wallet.api.dto.ReqBuyerConfirmTransfer;
 import tv.game88.wallet.api.dto.RspBuyOrderDetail;
@@ -30,6 +32,7 @@ import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +53,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
     @Resource
     private WalletFundManager walletFundManager;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     @Override
     public RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins ) {
@@ -108,6 +114,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         // TODO 通知消息给卖家
 
+        // TODO 卖家订单倒计时 5分钟后取消订单
+        redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
+                + walletTransactionDetail.getTransDetailId(), "1", Duration.ofMinutes( 5 ) );
+
         return RspBase.ok( "确认购买成功", walletTransactionDetail.getTransDetailId() );
     }
 
@@ -160,7 +170,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setBuyerPayMethod( rspSellerPayMethod );
 
-        // TODO 订单倒计时
+        // TODO 计算订单倒计时
 
         return RspBase.ok( rspBuyOrderDetail );
     }
@@ -193,6 +203,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
             // TODO 消息通知买家
+
+            // TODO 买家订单倒计时 20分钟 用于转账
+            redisUtils.strSet( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId, "1", Duration.ofMinutes( 20 ) );
 
             return RspBase.ok( "确认交易成功" );
         }
@@ -247,6 +260,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( update && i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
+                    .eq( WalletTransactionDetail::getSellerId, walletTransactionDetail.getSellerId() )
                     .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY,
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )
@@ -273,8 +287,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
      */
     @Override
     public RspBase<?> buyerConfirmTransfer( String userId, ReqBuyerConfirmTransfer reqBuyerConfirmTransfer ) {
-        WalletTransactionDetail walletTransactionDetail =
-                this.baseMapper.selectById( reqBuyerConfirmTransfer.getTransDetailId() );
+        String                  transDetailId           = reqBuyerConfirmTransfer.getTransDetailId();
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
         if ( walletTransactionDetail == null ) {
             return RspBase.businessError( "交易订单不存在" );
         }
@@ -285,7 +299,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             return RspBase.businessError( "买单状态有误,无法确认转账,请刷新订单后重试" );
         }
         WalletTransactionDetail update = new WalletTransactionDetail();
-        update.setTransDetailId( reqBuyerConfirmTransfer.getTransDetailId() );
+        update.setTransDetailId( transDetailId );
         update.setStatus( WalletTransEnum.BUYER_CONFIRM_TRANSFER );
         LocalDateTime now = LocalDateTime.now();
         update.setBuyerConfirmTransferTime( now );
@@ -295,6 +309,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
             // TODO 消息通知卖家
+
+            // TODO 卖家 订单倒计时 30分钟 用于确认是否收到转账
+            redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId, "1", Duration.ofMinutes( 30 ) );
 
             return RspBase.ok( "确认转账成功" );
         }
@@ -382,6 +399,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
+                    .eq( WalletTransactionDetail::getSellerId, walletTransactionDetail.getSellerId() )
                     .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY,
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )

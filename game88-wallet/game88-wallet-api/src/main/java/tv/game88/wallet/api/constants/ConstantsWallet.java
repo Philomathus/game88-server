@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.constants;
 
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.core.config.constants.Constants;
 
 /**
  * wallet常量
@@ -9,4 +10,8 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
  */
 public abstract class ConstantsWallet {
     public static final String DEFAULT_HEAD_IMAGE_URL = ConfigDomainCacheUtil.me.getDomainOssValue() + "/avatar/user-img.jpeg";
+
+    public static final String BUYER_CONFIRM_BUY_ORDER      = Constants.WALLET_PREX + "timeout:buyerConfirmBuyOrder:";
+    public static final String SELLER_CONFIRM_TRANS_ORDER   = Constants.WALLET_PREX + "timeout:sellerConfirmTransOrder:";
+    public static final String BUYER_CONFIRM_TRANSFER_ORDER = Constants.WALLET_PREX + "timeout:buyerConfirmTransferOrder:";
 }
