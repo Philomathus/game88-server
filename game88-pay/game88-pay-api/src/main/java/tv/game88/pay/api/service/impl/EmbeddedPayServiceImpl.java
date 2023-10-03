@@ -264,6 +264,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                 String              token  = result.getOrDefault( "token", "" ).toString();
                 if ( StringUtils.isNotBlank( token ) ) {
                     String     walletAddress = result.getOrDefault( "walletAddress", "" ).toString();
+                    String     url           = result.getOrDefault( "url", "" ).toString();
                     Object     realNameObj   = result.get( "realName" );
                     String     realName      = realNameObj == null ? "" : realNameObj.toString();
                     Object     balanceObj    = result.get( "balance" );
@@ -288,6 +289,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                         }
                     }
                     RspVipPayLogin rspVipPayLogin = new RspVipPayLogin();
+                    rspVipPayLogin.setUrl( url );
                     rspVipPayLogin.setBalance( balance );
                     rspVipPayLogin.setWalletAddress( walletAddress );
                     rspVipPayLogin.setToken( token );
