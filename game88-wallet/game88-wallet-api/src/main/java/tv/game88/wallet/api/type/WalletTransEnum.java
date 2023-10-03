@@ -9,9 +9,6 @@ public enum WalletTransEnum {
     BUYER_CANCEL,
     // 卖家取消订单
     SELLER_CANCEL,
-    // 系统取消订单
-    SYSTEM_CANCEL,
-
 
     // 首次详情订单生成时状态
     // 买家确定购买

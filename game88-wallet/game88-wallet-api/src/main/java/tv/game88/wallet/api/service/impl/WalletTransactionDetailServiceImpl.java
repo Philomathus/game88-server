@@ -402,7 +402,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                                                   WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
-                .eq( WalletTransactionDetail::getStatus, WalletTransEnum.SELLER_CONFIRM_TRANSFER )
+                .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
                 .eq( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
         // 给买家加币
         WalletUserFundEnum fundEnum = WalletUserFundEnum.TRANSACTION_ORDER_IN;
@@ -473,23 +473,87 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     /**
-     * 若状态未变
+     * 若状态未变,则卖家取消订单
      *
-     * @param transDetailId
+     * @param transDetailId 交易订单号
      */
     @Override
     public void processBuyerConfirmBuyTimeout( String transDetailId ) {
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+        if ( walletTransactionDetail == null ) {
+            return;
+        }
+        if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_BUY ) {
+            return;
+        }
+        WalletTransactionDetail update = new WalletTransactionDetail();
+        update.setStatus( WalletTransEnum.SELLER_CANCEL );
+        LocalDateTime now = LocalDateTime.now();
+        update.setCancelTime( now );
+        String remark =
+                "\n卖家" + walletTransactionDetail.getSellerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
+        update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
+        SpringUtils.getBean( WalletTransactionDetailService.class )
+                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        // TODO 消息通知卖家和买家
     }
 
+    /**
+     * 若状态未变,则买家取消订单
+     *
+     * @param transDetailId 交易订单号
+     */
     @Override
     public void processSellerConfirmTransTimeout( String transDetailId ) {
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+        if ( walletTransactionDetail == null ) {
+            return;
+        }
+        if ( walletTransactionDetail.getStatus() != WalletTransEnum.SELLER_CONFIRM_TRANS ) {
+            return;
+        }
+        WalletTransactionDetail update = new WalletTransactionDetail();
+        update.setStatus( WalletTransEnum.BUYER_CANCEL );
+        LocalDateTime now = LocalDateTime.now();
+        update.setCancelTime( now );
+        String remark = "\n买家" + walletTransactionDetail.getBuyerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
+        update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
+        SpringUtils.getBean( WalletTransactionDetailService.class )
+                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        // TODO 消息通知卖家和买家
     }
 
+    /**
+     * 若状态未变,则卖家放币给买家
+     *
+     * @param transDetailId 交易订单号
+     */
     @Override
     public void processBuyerConfirmTransferTimeout( String transDetailId ) {
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+        if ( walletTransactionDetail == null ) {
+            return;
+        }
+        if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_TRANSFER ) {
+            return;
+        }
+        // 修改订单状态并给买家加币
+        WalletTransactionDetail update = new WalletTransactionDetail();
+        update.setStatus( WalletTransEnum.SYSTEM_CONFIRM_TRANSFER );
+        LocalDateTime now = LocalDateTime.now();
+        update.setSuccessTransTime( now );
+        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间未操作,系统确认转币,时间:"
+                + LocalDateTimeUtils.format( now );
+        update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
+        SpringUtils.getBean( WalletTransactionDetailService.class )
+                   .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+
+        // TODO 通知消息给买家和卖家
     }
 }
 
