@@ -35,7 +35,7 @@ public class ThreadPoolConfig {
     private static void printException( Runnable r, Throwable t ) {
         if ( t == null && r instanceof Future<?> ) {
             try {
-                Future<?> future = (Future<?>) r;
+                Future<?> future = ( Future<?> ) r;
                 if ( future.isDone() ) {
                     future.get();
                 }
@@ -69,8 +69,8 @@ public class ThreadPoolConfig {
      */
     @Bean( name = "scheduledExecutorService" )
     protected ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor( corePoolSize, new BasicThreadFactory.Builder()
-                .namingPattern( "schedule-pool-%d" ).daemon( true ).build() ) {
+        return new ScheduledThreadPoolExecutor( corePoolSize, new BasicThreadFactory.Builder().namingPattern( "schedule-pool-%d" )
+                                                                                              .daemon( true ).build() ) {
             @Override
             protected void afterExecute( Runnable r, Throwable t ) {
                 super.afterExecute( r, t );
@@ -86,4 +86,19 @@ public class ThreadPoolConfig {
         poolFactory.setParallelism( maxPoolSize );
         return poolFactory;
     }
+
+    /*
+    // JDK 21 将启用虚拟线程,可优化线程提供性能
+    @Bean
+    public AsyncTaskExecutor applicationTaskExecutor() {
+        return new TaskExecutorAdapter( Executors.newVirtualThreadPerTaskExecutor() );
+    }
+
+    @Bean
+    public UndertowDeploymentInfoCustomizer protocolHandlerVirtualThreadExecutorCustomizer() {
+        return deploymentInfo -> {
+            deploymentInfo.setExecutor( Executors.newVirtualThreadPerTaskExecutor() );
+            deploymentInfo.setAsyncExecutor( Executors.newVirtualThreadPerTaskExecutor() );
+        };
+    }*/
 }

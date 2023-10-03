@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.cache.SmsPhoneCacheUtil;
@@ -288,6 +289,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put( "url", ConfigDomainCacheUtil.me.getDomainOssValue() );
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
         resultMap.put( "walletAddress", walletUser.getId() );
         resultMap.put( "realName", walletUser.getRealName() );
