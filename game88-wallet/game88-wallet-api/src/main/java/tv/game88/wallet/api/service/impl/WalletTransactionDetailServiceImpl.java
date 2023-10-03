@@ -397,6 +397,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         return RspBase.ok( "确认转币成功", walletTransactionDetail.getTransDetailId() );
     }
 
+    @Transactional( rollbackFor = Exception.class )
     @Override
     public void updateTransDetailOrAddUserAmount( WalletTransactionDetail updateTransactionDetail,
                                                   WalletTransactionDetail walletTransactionDetail ) {
