@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Pager</title>
+    <title>UPay支付</title>
     <style>
         @import url(https://db.onlinewebfonts.com/c/dd4320757ff990fa3d23662f08aa6f3a?family=Central+W01+Bold);
         
@@ -220,7 +220,7 @@
     <span>VIPPay</span>
 </header>
 <main>
-    <div id="title" class="title">XXPAY</div>
+    <div id="title" class="title">UPay</div>
     <div class="main-container">
         <div class="first">
             <div class="info">订单编号:</div>
@@ -237,7 +237,7 @@
             </div>
         </div>
         <div class="second">
-            <div class="labelName">您的XxPay余额:</div>
+            <div class="labelName">您的UPay余额:</div>
             <div class="labelAmount">${userMoney} G币</div>
         </div>
         <div class="third">
@@ -249,7 +249,7 @@
         <div class="fourth">
             温馨提示:
             <br />
-            如您是首次使用XxPay,遭未设置資金密码,
+            如您是首次使用UPay,遭未设置資金密码,
             <br>
             请使用钱包管理,完善個人資料後設置。
         </div>
@@ -334,7 +334,7 @@
 
             // Initialize a new XMLHttpRequest
             const xhr = new XMLHttpRequest();
-            const url = `${urlObject.protocol}//${urlObject.hostname}/common/payDepositOrder`;
+            const url = urlObject.protocol + '//' + urlObject.hostname + '/common/payDepositOrder';
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
