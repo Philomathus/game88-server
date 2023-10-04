@@ -8,14 +8,14 @@
     <title>One Pager</title>
     <style>
         @import url(https://db.onlinewebfonts.com/c/dd4320757ff990fa3d23662f08aa6f3a?family=Central+W01+Bold);
-
+        
         *,
         *::after,
         *::before {
             margin: 0;
             padding: 0;
         }
-
+        
         header {
             height: 3rem;
             background: white;
@@ -26,22 +26,22 @@
             box-sizing: border-box;
             display: none;
         }
-
+        
         header span {
             width: 100%;
             text-align: center;
         }
-
+        
         body,
         html {
             width: 100%;
             height: 100%;
         }
-
+        
         body {
             overflow-x: hidden;
         }
-
+        
         main {
             background: linear-gradient(to top, #3cb8f6, #844efe);
             width: 100%;
@@ -52,7 +52,7 @@
             flex-direction: column;
             font-family: Arial, Helvetica, sans-serif;
         }
-
+        
         .title {
             color: #fff;
             width: 100%;
@@ -60,7 +60,7 @@
             text-align: center;
             font-weight: 600;
         }
-
+        
         .main-container {
             width: 90%;
             background: white;
@@ -70,7 +70,7 @@
             border-radius: 0.5rem;
             align-items: center;
         }
-
+        
         .first {
             text-align: center;
             font-weight: 700;
@@ -78,17 +78,17 @@
             width: 94%;
             padding-bottom: 0.5rem;
         }
-
+        
         .info {
             margin-top: 1rem;
         }
-
+        
         .purpleInfo {
             margin-block: 1rem 1.5rem;
             color: #844efe;
             font-weight: 500;
         }
-
+        
         .amountContainer {
             font-size: 1.7rem;
             color: #844efe;
@@ -97,12 +97,12 @@
             justify-content: center;
             gap: 1rem;
         }
-
+        
         .amountContainer img {
             width: 1.5rem;
             height: 1.5rem;
         }
-
+        
         .second {
             width: 94%;
             display: flex;
@@ -114,7 +114,7 @@
             box-sizing: border-box;
             border-bottom: solid 0.1rem #00000010;
         }
-
+        
         .third {
             width: 94%;
             display: flex;
@@ -127,26 +127,26 @@
             box-sizing: border-box;
             border-bottom: solid 0.1rem #00000010;
         }
-
+        
         .third input {
             padding: 0.5rem;
             border-radius: 0.2rem;
             border: 0.09rem solid #00000045;
-
+            
         }
-
+        
         .third input:focus {
             outline: none;
-
+            
         }
-
+        
         .fourth {
             margin-top: 0.7rem;
             font-size: 0.8rem;
             color: #844efe;
-
+            
         }
-
+        
         .button {
             width: 13rem;
             height: 3rem;
@@ -159,44 +159,44 @@
             align-items: center;
             justify-content: center;
         }
-
-
+        
+        
         @media screen and (max-width: 500px) {
             .second {
                 font-size: 0.9rem;
             }
-
+            
             .third {
                 font-size: 0.9rem;
                 width: 100%;
                 flex-shrink: 1;
             }
-
+            
             .labelName {
                 text-align: left;
             }
-
+            
             .fourth {
                 width: 20rem;
                 flex-shrink: 1;
             }
         }
-
+        
         @media screen and (max-width: 360px) {
             .fourth {
                 width: 10rem;
                 flex-shrink: 1;
             }
-
+            
             .third input {
                 width: 6rem;
             }
-
+            
             .button {
                 width: 10rem;
             }
         }
-
+        
         .logoBank {
             font-family: "Central W01 Bold";
             color: white;
@@ -207,7 +207,7 @@
             justify-content: center;
             background: #f5b410;
             border-radius: 2rem;
-
+            
             margin-top: -.2rem;
         }
     </style>
@@ -220,11 +220,11 @@
     <span>VIPPay</span>
 </header>
 <main>
-    <div id="title" class="title">UPAY</div>
+    <div id="title" class="title">XXPAY</div>
     <div class="main-container">
         <div class="first">
             <div class="info">订单编号:</div>
-
+            
             <div class="code">${orderNo}</div>
             <div class="purpleInfo">充值金额</div>
             <div class="amountContainer">
@@ -237,22 +237,21 @@
             </div>
         </div>
         <div class="second">
-            <div class="labelName">您的UPay余额:</div>
+            <div class="labelName">您的XxPay余额:</div>
             <div class="labelAmount">${userMoney} G币</div>
         </div>
         <div class="third">
             <div class="label">您的钱包资金密码:</div>
             <label>
-                <input type="tel" pattern="[0-9]*" style="-webkit-text-security:disc"
-                       onkeyup="value=value.replace(/[^\d]/g,'')" placeholder="输入密码">
+                <input type="password" />
             </label>
         </div>
         <div class="fourth">
             温馨提示:
-            <br/>
-            如您是首次使用UPay,或者未设置資金密码,
+            <br />
+            如您是首次使用XxPay,遭未设置資金密码,
             <br>
-            请使用钱包管理,完善個人資料后设置。
+            请使用钱包管理,完善個人資料後設置。
         </div>
         <div id="submitButton" class="button">
             确定
@@ -260,11 +259,10 @@
     </div>
 </main>
 <script>
-
+    
 </script>
 
 <script>
-
     // Initialize an empty object for the request body
     const requestBody = {};
 
@@ -277,9 +275,9 @@
     requestBody.t = (new URLSearchParams(urlObject.search)).get('t');
 
     // Target the password input field
-    const passwordInput = document.querySelector('.third input[type="tel"]');
+    const passwordInput = document.querySelector('.third input[type="password"]');
     let passwordValue = ""; // To store the password
-
+    
     // Listen for changes in the password input field
     passwordInput.addEventListener('input', function (event) {
         passwordValue = event.target.value;
@@ -287,41 +285,41 @@
 
     // let title = document.getElementById('title')
     // title.innerHTML = urlObject
+    
+        function showModal(message) {
+            // Create the outer modal div
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
 
-    function showModal(message) {
-        // Create the outer modal div
-        const modal = document.createElement('div');
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        modal.style.display = 'flex';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
+            // Create the inner white container div
+            const container = document.createElement('div');
+            container.style.backgroundColor = 'white';
+            container.style.padding = '20px';
+            container.style.borderRadius = '10px';
+            container.style.color = 'black';
 
-        // Create the inner white container div
-        const container = document.createElement('div');
-        container.style.backgroundColor = 'white';
-        container.style.padding = '20px';
-        container.style.borderRadius = '10px';
-        container.style.color = 'black';
+            // Add the message to the container
+            container.innerHTML = "<p>"+message+"</p>";
 
-        // Add the message to the container
-        container.innerHTML = `<p>${message}</p>`;
+            // Append the container to the modal
+            modal.appendChild(container);
 
-        // Append the container to the modal
-        modal.appendChild(container);
+            // Append the modal to the body
+            document.body.appendChild(modal);
 
-        // Append the modal to the body
-        document.body.appendChild(modal);
-
-        // Click to close the modal
-        modal.addEventListener('click', function () {
-            document.body.removeChild(modal);
-        });
-    }
+            // Click to close the modal
+            modal.addEventListener('click', function () {
+                document.body.removeChild(modal);
+            });
+        }
 
     // Add event listener to the submit button
     const submitButton = document.getElementById('submitButton');
@@ -329,7 +327,7 @@
         // Validate the password
         if (passwordValue.trim() === "") {
             // Show the modal with an error message for empty password
-            showModal("请输入您的钱包资金密码");
+            showModal("Password cannot be empty.");
         } else if (/^\d{6}$/.test(passwordValue)) {
             // Update the password in the request body
             requestBody.p = passwordValue;
@@ -342,12 +340,12 @@
 
             // Event handler for successful response
             xhr.onload = function () {
-                if (xhr.code === 200) {
+                if (xhr.status === 200) {
                     // Show a static success message in a modal
-                    showModal("支付成功");
+                    showModal("Successful.");
                 } else {
                     // Show a static failure message in a modal
-                    showModal(xhr.msg);
+                    showModal("Failed.");
                 }
             };
 
@@ -361,13 +359,10 @@
             xhr.send(JSON.stringify(requestBody));
         } else {
             // Show the modal with an error message for invalid password
-            showModal("资金密码必须是6位数字");
+            showModal("Password must be a 6-digit number.");
         }
     });
 
-    setTimeout(function () {
-        passwordInput.focus()
-    }, 100)
 </script>
 </body>
 
