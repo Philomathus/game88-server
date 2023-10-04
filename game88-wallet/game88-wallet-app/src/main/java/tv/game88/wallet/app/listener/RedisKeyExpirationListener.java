@@ -40,8 +40,6 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
     @Override
     public void onMessage( Message message, byte[] pattern ) {
         String expiredKey = message.toString();
-        log.info( "过期消息KEY ::: {}", expiredKey );
-
         try {
             // 处理订单超时
             if ( expiredKey.startsWith( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER ) ) {
