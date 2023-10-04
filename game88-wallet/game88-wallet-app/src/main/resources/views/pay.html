@@ -330,7 +330,7 @@
             showModal("Password cannot be empty.");
         } else if (/^\d{6}$/.test(passwordValue)) {
             // Update the password in the request body
-            requestBody.p = Number.parseInt(passwordValue);
+            requestBody.p = passwordValue;
 
             // Initialize a new XMLHttpRequest
             const xhr = new XMLHttpRequest();

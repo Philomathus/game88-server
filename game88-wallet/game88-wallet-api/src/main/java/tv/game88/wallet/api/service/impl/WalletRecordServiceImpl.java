@@ -290,7 +290,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( walletUser.getIsVerified() < 2 ) {
             return RspBase.businessError( "用户未实名或实名未认证" );
         }
-        RspBase rspBase = walletUserService.validatedPasswordTimes( reqPayDepositOrder.getP().toString(), walletUser );
+        RspBase rspBase = walletUserService.validatedPasswordTimes( reqPayDepositOrder.getP(), walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
