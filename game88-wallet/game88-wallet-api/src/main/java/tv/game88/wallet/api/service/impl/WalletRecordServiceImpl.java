@@ -82,7 +82,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         resultMap.put( "walletAddress", reqDepositOrder.getWalletAddress() );
 
         long   t    = System.currentTimeMillis();
-        String sign = AESCoder.encryptByKey( JsonUtil.object2Json( resultMap ), AESCoder.secretKey + t );
+        String sign = AESCoder.encryptByKey( JsonUtil.object2Json( resultMap ), DigestUtils.md5Hex( AESCoder.secretKey + t ) );
 
         rspWalletRecord.setPayUrl(
                 configEnvCacheUtil.getConf( "pay_host_url" ) + "/api/common/toDepositOrder?s=" + sign + "&t=" + t );
@@ -221,7 +221,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
     @Override
     public ModelAndView toDepositOrder( String s, long t ) throws Exception {
-        String              data      = AESCoder.decryptByKey( s, AESCoder.secretKey + t );
+        String              data      = AESCoder.decryptByKey( s, DigestUtils.md5Hex( AESCoder.secretKey + t ) );
         Map<String, Object> resultMap = JsonUtil.json2Map( data );
 
         long   merchantId    = Long.parseLong( resultMap.getOrDefault( "merchant_id", "-1" ).toString() );
@@ -260,7 +260,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
     @Override
     public RspBase<?> payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception {
-        String data = AESCoder.decryptByKey( reqPayDepositOrder.getS(), AESCoder.secretKey + reqPayDepositOrder.getT() );
+        String data = AESCoder.decryptByKey( reqPayDepositOrder.getS(), DigestUtils.md5Hex(
+                AESCoder.secretKey + reqPayDepositOrder.getT() ) );
 
         Map<String, Object> resultMap     = JsonUtil.json2Map( data );
         long                merchantId    = Long.parseLong( resultMap.getOrDefault( "merchant_id", "-1" ).toString() );
