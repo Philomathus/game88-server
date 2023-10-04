@@ -340,12 +340,35 @@
 
             // Event handler for successful response
             xhr.onload = function () {
+                // Case 3: Check if HTTP status is 200
                 if (xhr.status === 200) {
-                    // Show a static success message in a modal
-                    showModal("Successful.");
-                } else {
-                    // Show a static failure message in a modal
-                    showModal("Failed.");
+                    // Parse the custom API response
+                    const customResponse = JSON.parse(xhr.responseText);
+
+                    // Sub-case 1: Custom API response code is 200
+                    if (customResponse.code === 200) {
+                        showModal(customResponse.msg);
+                    }
+                    // Sub-case 2: Custom API response code is 401
+                    else if (customResponse.code === 401) {
+                        showModal(customResponse.msg);
+                    }
+                    // Sub-case 3: Custom API response code is 500
+                    else if (customResponse.code === 500) {
+                        showModal(customResponse.msg);
+                    }
+                    // Sub-case 4: Other custom API response codes
+                    else {
+                        showModal(customResponse.msg || "Unknown error.");
+                    }
+                }
+                // Case 4: Check if HTTP status is 500
+                else if (xhr.status === 500) {
+                    showModal("A network error occurred.");
+                }
+                // Case 5: Other HTTP status codes
+                else {
+                    showModal("Unknown server error.");
                 }
             };
 
