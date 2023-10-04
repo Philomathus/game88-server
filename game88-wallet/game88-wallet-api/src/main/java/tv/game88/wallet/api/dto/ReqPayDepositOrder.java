@@ -13,8 +13,8 @@ public class ReqPayDepositOrder {
     private String s;
     @NotNull
     private Long   t;
-    @Min( 6 )
-    @Max( 6 )
+    @Min( 5 )
+    @Max( 7 )
     @NotNull
     private Long   p;
 }
