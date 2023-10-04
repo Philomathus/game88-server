@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 @Data
 public class ReqPayMethod {
@@ -37,7 +34,6 @@ public class ReqPayMethod {
 
     @Schema( title = "资金密码" )
     @NotNull( message = "资金密码不能为空" )
-    @Max( 6 )
-    @Min( 6 )
-    private Integer fundPassword;
+    @Size( min = 6, max = 6 )
+    private Long fundPassword;
 }

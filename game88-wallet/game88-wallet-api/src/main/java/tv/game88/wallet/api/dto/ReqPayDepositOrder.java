@@ -2,10 +2,9 @@ package tv.game88.wallet.api.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 public class ReqPayDepositOrder {
@@ -13,8 +12,7 @@ public class ReqPayDepositOrder {
     private String s;
     @NotNull
     private Long   t;
-    @Min( 5 )
-    @Max( 7 )
+    @Size( min = 6, max = 6 )
     @NotNull
     private Long   p;
 }
