@@ -82,7 +82,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         resultMap.put( "walletAddress", reqDepositOrder.getWalletAddress() );
 
         long   t    = System.currentTimeMillis();
-        String sign = AESCoder.encryptByKey( JsonUtil.object2Json( resultMap ), DigestUtils.md5Hex( AESCoder.secretKey + t ) );
+        String sign = AESCoder.encryptByKeyUrl( JsonUtil.object2Json( resultMap ), DigestUtils.md5Hex( AESCoder.secretKey + t ) );
 
         rspWalletRecord.setPayUrl(
                 configEnvCacheUtil.getConf( "pay_host_url" ) + "/api/common/toDepositOrder?s=" + sign + "&t=" + t );
