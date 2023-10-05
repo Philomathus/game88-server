@@ -3,9 +3,8 @@ package tv.game88.wallet.api.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
+import tv.game88.wallet.api.type.WalletMessageEnum;
 
 import java.io.Serial;
 
@@ -50,16 +49,5 @@ public class WalletMessage extends BaseEntity {
     /**
      * 消息类型
      */
-    private String type;
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE ).append( "id", getId() ).append( "title", getTitle() )
-                                                                          .append( "content", getContent() )
-                                                                          .append( "receiverUserId", getReceiverUserId() )
-                                                                          .append( "isRead", getIsRead() )
-                                                                          .append( "createTime", getCreateTime() )
-                                                                          .append( "createBy", getCreateBy() )
-                                                                          .append( "type", getType() ).toString();
-    }
+    private WalletMessageEnum type;
 }
