@@ -81,7 +81,7 @@ public class MemberInfoHistoryController extends BaseController {
      * 获取用户线上充值历史金额
      */
     @PreAuthorize( "@ss.hasPermi('member:infoHistory:query')" )
-    @GetMapping( value = "/getHistoryRecharge/{memberId}" )
+    @GetMapping( value = "/getHistoryRecharge/{id}" )
     public RspBase<BigDecimal> getHistoryRecharge( @PathVariable( "id" ) String id ) {
         return RspBase.ok( memberInfoHistoryService.getHistoryRecharge( id ) );
     }

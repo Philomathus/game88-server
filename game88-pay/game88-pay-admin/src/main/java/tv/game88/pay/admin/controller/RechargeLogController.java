@@ -1,7 +1,6 @@
 package tv.game88.pay.admin.controller;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +15,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.pay.api.entity.RechargeLog;
 import tv.game88.pay.api.service.RechargeLogService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
 @RequestMapping("/pay/rechargeLog")
 public class RechargeLogController extends BaseController {
 
-    @Autowired
+    @Resource
     private RechargeLogService rechargeLogService;
 
     /**

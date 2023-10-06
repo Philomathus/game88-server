@@ -1,6 +1,7 @@
 package tv.game88.core.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -27,6 +28,7 @@ import java.util.List;
  *
  * @author MengJun
  */
+@Log4j2
 @RestController
 @RequestMapping( "/config/env" )
 public class ConfigEnvironmentController extends BaseController {
@@ -141,7 +143,7 @@ public class ConfigEnvironmentController extends BaseController {
             }
             return RspBase.ok( "操作成功" );
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
             return RspBase.businessError( "操作失败" );
         }
 

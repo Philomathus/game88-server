@@ -85,7 +85,7 @@ public class OssApi {
             try {
                 bytes = FileUtils.readFileToByteArray( newFile );
             } catch ( IOException e ) {
-                e.printStackTrace();
+                log.error( e.getMessage(), e );
             }
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength( bytes.length );

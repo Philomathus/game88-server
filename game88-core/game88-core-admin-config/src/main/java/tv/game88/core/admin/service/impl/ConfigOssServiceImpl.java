@@ -40,7 +40,7 @@ public class ConfigOssServiceImpl implements ConfigOssService {
         List<ConfigOss> configOssList = configOssMapper.selectConfigOssList(configOss);
 
         if (hideAccess) {
-            configOssList.stream().forEach((r) -> {
+            configOssList.forEach(( r) -> {
                         r.setAccessKey("");
                         r.setAccessSecret("");
                     }

@@ -9,6 +9,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
 import tv.game88.core.member.enums.EnumMoney;
@@ -141,7 +142,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
     @Override
     public List<HistoryResult> selectResultWaite( String lotteryAgent, Integer lotteryId ) {
         List<HistoryResult> list = baseMapper.selectResultWaite( lotteryAgent, lotteryId );
-        if ( list.size() == 0 ) {
+        if ( list.isEmpty() ) {
             return list;
         }
         List<LotteryHistory> upList = new ArrayList<>();
@@ -153,7 +154,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
             h.setAnalyse( r.getAnalyse() );
             upList.add( h );
         }
-        this.updateBatchById( upList );
+        SpringUtils.getBean( LotteryHistoryService.class ).updateBatchById( upList );
         log.error( "lotteryId:{} - 抓奖 - {}", lotteryId, JsonUtil.object2Json( list ) );
         return list;
     }

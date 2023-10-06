@@ -76,4 +76,9 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         }
         return RspBase.ok( "设置已读成功" );
     }
+
+    @Override
+    public RspBase<Boolean> isNewMessage( String userId ) {
+        return RspBase.ok( redisUtils.exists( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId ) );
+    }
 }

@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.io.Serial;
 import java.time.LocalDateTime;
 
 /**
@@ -22,9 +21,6 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode( callSuper = false )
 public class MemberVipGift {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     /**
      * 会员ID
      */

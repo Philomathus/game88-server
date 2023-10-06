@@ -79,7 +79,7 @@ public class ServletUtil {
             response.setCharacterEncoding( "utf-8" );
             response.getWriter().print( string );
         } catch ( IOException e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
     }
 
@@ -116,28 +116,28 @@ public class ServletUtil {
      */
     public static String getIp( HttpServletRequest request ) {
         String ip = request.getHeader( "cf-pseudo-ipv4" );
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "client-ip" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "cf-connecting-ip" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "ali-cdn-real-ip" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "x-real-ip" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "x-forwarded-for" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "HTTP_CLIENT_IP" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "wl-proxy-client-ip" );
         }
-        if ( ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase( ip ) ) {
+        if ( ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase( ip ) ) {
             ip = request.getHeader( "X-NoProxy-IP" );
         }
         if ( ip != null && ip.contains( "," ) ) {
@@ -208,7 +208,7 @@ public class ServletUtil {
      * @return byte 字节
      */
     public static byte[] textToNumericFormatV4( String text ) {
-        if ( text.length() == 0 ) {
+        if ( text.isEmpty() ) {
             return null;
         }
         byte[]   bytes    = new byte[ 4 ];

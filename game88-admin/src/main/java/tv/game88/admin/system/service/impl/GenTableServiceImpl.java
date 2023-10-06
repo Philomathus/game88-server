@@ -287,7 +287,7 @@ public class GenTableServiceImpl implements IGenTableService {
         List<String>         tableColumnNames = tableColumns
                 .stream()
                 .map( GenTableColumn::getColumnName )
-                .collect( Collectors.toList() );
+                .toList();
 
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName( tableName );
         if ( CollectionUtils.isEmpty( dbTableColumns ) ) {
@@ -296,7 +296,7 @@ public class GenTableServiceImpl implements IGenTableService {
         List<String> dbTableColumnNames = dbTableColumns
                 .stream()
                 .map( GenTableColumn::getColumnName )
-                .collect( Collectors.toList() );
+                .toList();
 
         dbTableColumns.forEach( column -> {
             if ( !tableColumnNames.contains( column.getColumnName() ) ) {
@@ -449,7 +449,7 @@ public class GenTableServiceImpl implements IGenTableService {
             genTable.setTreeCode( treeCode );
             genTable.setTreeParentCode( treeParentCode );
             genTable.setTreeName( treeName );
-            genTable.setParentMenuId( Long.valueOf( parentMenuId ) );
+            genTable.setParentMenuId( ( long ) parentMenuId );
             genTable.setParentMenuName( parentMenuName );
         }
     }

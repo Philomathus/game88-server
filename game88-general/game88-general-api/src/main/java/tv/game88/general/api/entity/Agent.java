@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
@@ -14,6 +15,7 @@ import tv.game88.common.vo.BaseEntity;
  * @author 77tv
  * @date 2021-04-16
  */
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class Agent extends BaseEntity {
     /** 代理key */

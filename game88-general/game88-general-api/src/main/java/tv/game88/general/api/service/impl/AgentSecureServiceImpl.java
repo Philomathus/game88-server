@@ -71,7 +71,7 @@ public class AgentSecureServiceImpl extends ServiceImpl<AgentSecureMapper, Agent
                         uploadOss( new FileInputStream( newFile ), fileKey, secureOss );
                         newFile.delete();
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        log.error( e.getMessage(), e );
                     }
                 }
             }

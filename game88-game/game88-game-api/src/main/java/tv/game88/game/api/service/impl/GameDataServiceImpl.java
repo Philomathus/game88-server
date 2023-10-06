@@ -204,7 +204,7 @@ public class GameDataServiceImpl implements GameDataService {
                 }
 
             } catch ( Exception e ) {
-                e.printStackTrace();
+                log.error( e.getMessage(), e );
             }
 
         }

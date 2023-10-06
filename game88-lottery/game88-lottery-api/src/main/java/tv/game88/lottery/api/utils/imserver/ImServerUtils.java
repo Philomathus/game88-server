@@ -85,7 +85,7 @@ public class ImServerUtils {
         try {
             Thread.sleep( 999L );
         } catch ( InterruptedException ex ) {
-            ex.printStackTrace();
+            log.error( ex.getMessage(), ex );
         }
         retryNum--;
         return this.sendGroupMessage( groupId, messageMap, retryNum );

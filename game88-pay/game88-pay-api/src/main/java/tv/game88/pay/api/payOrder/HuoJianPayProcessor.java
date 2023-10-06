@@ -88,7 +88,7 @@ public class HuoJianPayProcessor extends AbstractPay {
         try {
             sign = HMACSHA256( signStr, AESCoder.decrypt( payPlatform.getSignMd5() ) );
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         params.put( "sign", sign );
 
@@ -165,7 +165,7 @@ public class HuoJianPayProcessor extends AbstractPay {
         try {
             rel = HMACSHA256( signStr, AESCoder.decrypt( payPlatform.getSignMd5() ) );
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + rel );

@@ -2,6 +2,7 @@ package tv.game88.general.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  * @author 77tv
  * @date 2021-01-26
  */
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class ReportPlamGames extends BaseEntity implements Serializable  {
 	private static final long serialVersionUID = 1L;

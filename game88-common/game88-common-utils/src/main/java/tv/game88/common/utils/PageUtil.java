@@ -34,29 +34,29 @@ public class PageUtil implements Serializable {
 		return subList;
 	}
 
-	public static List<List<?>> pageList( List list, int pagesize ) {
+	public static List<List<?>> pageList( List<?> list, int pageSize ) {
 
-		List<List<?>> resultList=new ArrayList<List<?>>();
+		List<List<?>> resultList=new ArrayList<>();
 
-		int totalcount = list.size();
+		int totalCount = list.size();
 		int pagecount  = 0;
-		int m          = totalcount % pagesize;
+		int m          = totalCount % pageSize;
 		if ( m > 0 ) {
-			pagecount = totalcount / pagesize + 1;
+			pagecount = totalCount / pageSize + 1;
 		} else {
-			pagecount = totalcount / pagesize;
+			pagecount = totalCount / pageSize;
 		}
 
 		for ( int i = 1; i <= pagecount; i++ ) {
 			if ( m == 0 ) {
-				List<?> subList = list.subList( ( i - 1 ) * pagesize, pagesize * ( i ) );
+				List<?> subList = list.subList( ( i - 1 ) * pageSize, pageSize * ( i ) );
 				resultList.add( subList );
 			} else {
 				if ( i == pagecount ) {
-					List<?> subList = list.subList( ( i - 1 ) * pagesize, totalcount );
+					List<?> subList = list.subList( ( i - 1 ) * pageSize, totalCount );
 					resultList.add( subList );
 				} else {
-					List<?> subList = list.subList( ( i - 1 ) * pagesize, pagesize * ( i ) );
+					List<?> subList = list.subList( ( i - 1 ) * pageSize, pageSize * ( i ) );
 					resultList.add( subList );
 				}
 			}

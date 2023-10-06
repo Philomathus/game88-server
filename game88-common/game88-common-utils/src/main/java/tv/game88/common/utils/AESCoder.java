@@ -1,5 +1,6 @@
 package tv.game88.common.utils;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
@@ -15,6 +16,7 @@ import java.security.SecureRandom;
 /**
  * AES加密解密工具
  */
+@Log4j2
 public class AESCoder {
     public static final String secretKey   = "$bV;_N#if5:[`^@npoU|><+9!Sj*)Be7";
     public static final String AES         = "AES";
@@ -63,7 +65,7 @@ public class AESCoder {
             // 将加密后的字节数组转为字符串返回
             return Base64Utils.encodeToString( bytes );
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
 
         // 如果有错就返回 null
@@ -89,7 +91,7 @@ public class AESCoder {
             // 将解密后的字节数组转成 UTF-8 编码的字符串返回
             return new String( result, charsetName );
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
 
         // 如果有错就返回 null

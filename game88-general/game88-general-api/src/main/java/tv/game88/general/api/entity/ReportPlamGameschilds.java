@@ -3,6 +3,7 @@ package tv.game88.general.api.entity;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
  * @author 77tv
  * @date 2021-02-20
  */
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class ReportPlamGameschilds extends BaseEntity {
     private static final long serialVersionUID = 1L;

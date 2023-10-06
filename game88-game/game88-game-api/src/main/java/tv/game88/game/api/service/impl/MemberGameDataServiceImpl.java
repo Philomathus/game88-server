@@ -196,7 +196,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 .findMemCleanPlatformLists( memberId.substring( memberId.length() - 1 ), memberId ).stream()
                 .collect( Collectors.toMap( RspCleanPlatform::getId, Function.identity() ) );
         // 无可洗码注单 返回
-        if ( willCleanPlatforms.size() == 0 ) {
+        if ( willCleanPlatforms.isEmpty() ) {
             return;
         }
         // 本次洗码日志容器

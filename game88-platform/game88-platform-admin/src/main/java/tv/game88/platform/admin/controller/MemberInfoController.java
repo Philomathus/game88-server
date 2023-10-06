@@ -235,13 +235,13 @@ public class MemberInfoController extends BaseController {
      */
     @PostMapping( value = "/updateMobile/{memberId}" )
     @Log( title = "更新会员手机号", businessType = BusinessType.UPDATE )
-    public RspBase<?> updateMobile( @PathVariable String memberId,@RequestBody Map map  ) throws Exception {
+    public RspBase<?> updateMobile( @PathVariable String memberId, @RequestBody Map map ) throws Exception {
         String newMobile      = ( String ) map.get( "newMobile" );
-        String phone      = ( String ) map.get( "oldMobile" );
-        int googleAuthCode = Integer.parseInt( ( java.lang.String ) map.get( "googleAuthCode" ) );
+        String phone          = ( String ) map.get( "oldMobile" );
+        int    googleAuthCode = Integer.parseInt( ( java.lang.String ) map.get( "googleAuthCode" ) );
 
         SecurityUtils.verifyMFACode( googleAuthCode );
-        return memberInfoService.updateMobile( phone,newMobile, memberId );
+        return memberInfoService.updateMobile( phone, newMobile, memberId );
     }
 
     /**
@@ -255,7 +255,7 @@ public class MemberInfoController extends BaseController {
         for ( MemberCard memberCard : list ) {
             memberCard.setOldBankAccount( memberCard.getBankAccount() );
             memberCard.setOldBankId( memberCard.getBankId() );
-            memberCard.setOldRealName(  memberCard.getRealName());
+            memberCard.setOldRealName( memberCard.getRealName() );
         }
         return getRspBasePage( list, pageDomain );
     }
@@ -400,7 +400,7 @@ public class MemberInfoController extends BaseController {
                                .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
-            e.getMessage();
+            log.error( e.getMessage(), e );
         }
         userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
         String userIds = String.valueOf( userId );
@@ -476,7 +476,7 @@ public class MemberInfoController extends BaseController {
                                .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
-            e.getMessage();
+            log.error( e.getMessage(), e );
         }
         userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
         String userIds = String.valueOf( userId );
@@ -491,7 +491,7 @@ public class MemberInfoController extends BaseController {
      * 出款状态
      */
     @Log( title = "激活状态", businessType = BusinessType.EFFECT )
-    @PutMapping( "/changeWithdrawStatus/{id}/{withdrawStatus}")
+    @PutMapping( "/changeWithdrawStatus/{id}/{withdrawStatus}" )
     public RspBase<?> changeWithdrawStatus( @PathVariable String id, @PathVariable Boolean withdrawStatus ) {
         MemberInfo memberInfo = new MemberInfo();
         memberInfo.setId( String.valueOf( id ) );
@@ -502,11 +502,10 @@ public class MemberInfoController extends BaseController {
 
     @Log( title = "修改总打码和VIP等级", businessType = BusinessType.UPDATE )
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:editCode')" )
-    @PutMapping("/updateCodeTotal")
+    @PutMapping( "/updateCodeTotal" )
     public RspBase<?> updateCodeTotal( @RequestBody MemberInfo memberInfo ) {
-        return RspBase.ok(memberInfoService.updateCodeTotalVipLevel( memberInfo ));
+        return RspBase.ok( memberInfoService.updateCodeTotalVipLevel( memberInfo ) );
     }
-
 
 
 }

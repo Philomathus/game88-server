@@ -203,7 +203,7 @@ public class LotteryServiceImpl implements LotteryService {
     @Override
     public RspBase<RspBet> bet( ReqBet reqBet, PlatformUser platformUser ) {
         LocalDateTime now = LocalDateTime.now();
-        if ( reqBet.getLotteryId() == 2001 && now.withSecond( 60 - Constants.BACCARAT_BEGIN_BET_TIME ).compareTo( now ) < 0 ) {
+        if ( reqBet.getLotteryId() == 2001 && now.withSecond( 60 - Constants.BACCARAT_BEGIN_BET_TIME ).isBefore( now ) ) {
             return RspBase.businessError( "此时百家乐停止下注时间" );
         }
         List<LotteryGameVo> games = LotteryCacheUtils.me.getMethodGames( reqBet.getMethodId() );

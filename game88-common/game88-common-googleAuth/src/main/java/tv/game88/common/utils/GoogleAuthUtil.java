@@ -1,6 +1,7 @@
 package tv.game88.common.utils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 
@@ -11,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
 
+@Log4j2
 public class GoogleAuthUtil {
 
     private static final GoogleAuthenticator GOOGLE_AUTHENTICATOR = new GoogleAuthenticator();
@@ -56,7 +58,7 @@ public class GoogleAuthUtil {
             Base64 base64 = new Base64();
             return base64.encodeToString( buffer );
         } catch ( IOException e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         return null;
     }

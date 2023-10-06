@@ -2,9 +2,11 @@ package tv.game88.core.lottery.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class RspBetRecord extends RspLotteryHistory {
     @Schema( title = "ID" )

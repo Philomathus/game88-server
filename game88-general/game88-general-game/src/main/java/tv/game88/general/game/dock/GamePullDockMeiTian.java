@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
+@Repository( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
 public class GamePullDockMeiTian extends AbstractGamePull {
     private final String QUERY_RECORD_2 = "/services/dg/player/queryMerchantGameRecord2";
 
@@ -27,11 +27,8 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         rawData.put( "recordID", gamePlatform.getVersionValue() );
         String rawDataStr = JsonUtil.object2Json( rawData );
 
-        String url = new StringBuilder( gamePlatform.getApiUrl() + QUERY_RECORD_2 )
-                .append( "/" )
-                .append( gamePlatform.getAgent() )
-                .append( "/" )
-                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) ).toString();
+        String url = gamePlatform.getApiUrl() + QUERY_RECORD_2 + "/" + gamePlatform.getAgent() + "/"
+                + Base64Utils.encodeToString( rawDataStr.getBytes() );
 
         Map<String, Object> resultMap = restTemplate.postForObject( url, null, Map.class );
 

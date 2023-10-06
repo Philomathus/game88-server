@@ -1426,15 +1426,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public RspBase updatePhones( ReqSmallFeatures req ) {
+    public RspBase<?> updatePhones( ReqSmallFeatures req ) {
         if ( org.springframework.util.StringUtils.hasText( req.getPhones() )
                 && org.springframework.util.StringUtils.hasText( req.getPassword() ) ) {
             if ( req.getPhones().contains( "\n" ) ) {
                 try {
                     String[]      phones = req.getPhones().split( "\n" );
                     StringBuilder phone  = new StringBuilder();
-                    for ( int i = 0; i < phones.length; i++ ) {
-                        phone.append( "\"" ).append( phones[ i ] ).append( "\"" ).append( "," );
+                    for ( String s : phones ) {
+                        phone.append( "\"" ).append( s ).append( "\"" ).append( "," );
                     }
                     phone = new StringBuilder( phone.substring( 0, phone.length() - 1 ) );
                     req.setPhones( phone.toString() );
@@ -1457,8 +1457,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 try {
                     String[]      userIds = req.getUserIds().split( "\n" );
                     StringBuilder userId  = new StringBuilder();
-                    for ( int i = 0; i < userIds.length; i++ ) {
-                        userId.append( "\"" ).append( userIds[ i ] ).append( "\"" ).append( "," );
+                    for ( String id : userIds ) {
+                        userId.append( "\"" ).append( id ).append( "\"" ).append( "," );
                     }
                     userId = new StringBuilder( userId.substring( 0, userId.length() - 1 ) );
                     req.setUserIds( userId.toString() );
@@ -1487,9 +1487,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 try {
                     userIds = req.getMemberIds().split( "\n" );
                     StringBuilder userId = new StringBuilder();
-                    for ( int i = 0; i < userIds.length; i++ ) {
-                        userId.append( "\"" ).append( userIds[ i ] ).append( "\"" ).append( "," ).append( req.getMoney() )
-                              .append( "," ).append( req.getMoney() ).append( "),(" );
+                    for ( String id : userIds ) {
+                        userId.append( "\"" ).append( id ).append( "\"" ).append( "," ).append( req.getMoney() ).append( "," )
+                              .append( req.getMoney() ).append( "),(" );
                     }
                     userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
                     req.setUserIds( userId.toString() );

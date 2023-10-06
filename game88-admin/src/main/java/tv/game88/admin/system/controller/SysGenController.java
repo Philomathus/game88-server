@@ -80,9 +80,9 @@ public class SysGenController extends BaseController {
      * 查询数据表字段列表
      */
     @PreAuthorize( "@ss.hasPermi('tool:gen:list')" )
-    @GetMapping( value = "/column/{talbleId}" )
-    public RspBase<List<GenTableColumn>> columnList( Long tableId ) {
-        List<GenTableColumn> list     = genTableColumnService.selectGenTableColumnListByTableId( tableId );
+    @GetMapping( value = "/column/{tableId}" )
+    public RspBase<List<GenTableColumn>> columnList( @PathVariable Long tableId ) {
+        List<GenTableColumn>          list    = genTableColumnService.selectGenTableColumnListByTableId( tableId );
         RspBase<List<GenTableColumn>> rspBase = RspBase.ok( list );
         rspBase.setTotal( ( long ) list.size() );
         return rspBase;

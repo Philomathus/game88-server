@@ -12,8 +12,6 @@ import lombok.Data;
  */
 @Data
 public class ConfigEnvironment {
-    private static final long serialVersionUID = 1L;
-
     /**
      * 参数标题
      */

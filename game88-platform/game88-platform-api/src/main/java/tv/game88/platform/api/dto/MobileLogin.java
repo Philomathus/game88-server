@@ -2,9 +2,11 @@ package tv.game88.platform.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class MobileLogin extends MobileBind {
     @Schema( title = "邀请码" )

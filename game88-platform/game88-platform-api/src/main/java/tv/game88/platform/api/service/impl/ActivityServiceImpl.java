@@ -139,7 +139,7 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityQuestInfo> lists = questInfos
                     .stream()
                     .filter( activityQuestInfo -> Objects.equals( activityQuestInfo.getTypeId(), typeId ) )
-                    .collect( Collectors.toList() );
+                    .toList();
             String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
             if ( !CollectionUtils.isEmpty( lists ) ) {
                 for ( ActivityQuestInfo activityQuestInfo : lists ) {

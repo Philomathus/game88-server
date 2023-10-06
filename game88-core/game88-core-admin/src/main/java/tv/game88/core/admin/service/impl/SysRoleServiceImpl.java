@@ -201,14 +201,14 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int insertRoleMenu( SysRole role ) {
         int rows = 1;
         // 新增用户与角色管理
-        List<SysRoleMenu> list = new ArrayList<SysRoleMenu>();
+        List<SysRoleMenu> list = new ArrayList<>();
         for ( Long menuId : role.getMenuIds() ) {
             SysRoleMenu rm = new SysRoleMenu();
             rm.setRoleId( role.getRoleId() );
             rm.setMenuId( menuId );
             list.add( rm );
         }
-        if ( list.size() > 0 ) {
+        if ( !list.isEmpty() ) {
             rows = roleMenuMapper.batchRoleMenu( list );
         }
         return rows;

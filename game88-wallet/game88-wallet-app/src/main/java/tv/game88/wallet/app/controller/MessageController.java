@@ -32,4 +32,10 @@ public class MessageController {
     public RspBase<?> setMessageRead( @RequestBody Long messageId ) {
         return walletMessageService.setMessageRead( MemberSecurityUtils.getUserId(), messageId );
     }
+
+    @Operation( summary = "是否有新消息", description = "需要循环读取此接口,判断是否需要重新请求<获取站内信息列表>" )
+    @PostMapping( "/api/isNewMessage" )
+    public RspBase<Boolean> isNewMessage() {
+        return walletMessageService.isNewMessage( MemberSecurityUtils.getUserId() );
+    }
 }

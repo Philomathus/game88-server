@@ -46,7 +46,7 @@ public class ToPayProcessor extends AbstractPay {
                 params.put( "notifyurl", URLEncoder.encode( notifyurl, "utf-8" ) );
                 params.put( "returnurl", URLEncoder.encode( returnurl, "utf-8" ) );
             } catch ( UnsupportedEncodingException e ) {
-                e.printStackTrace();
+                log.error( e.getMessage(), e );
             }
             String signStr =
                     params.get( "mid" ) + params.get( "uid" ) + params.get( "oid" ) + params.get( "ts" ) + params.get( "amount" )
@@ -67,7 +67,7 @@ public class ToPayProcessor extends AbstractPay {
         try {
             reqMap.put( "notifyurl", URLEncoder.encode( notifyurl, "utf-8" ) );
         } catch ( UnsupportedEncodingException e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         String tempStr = reqMap.get( "recvid" ).toString() + reqMap.get( "orderid" ) + reqMap.get( "amount" )
                 + AESCoder.decrypt( payPlatform.getSignMd5() );

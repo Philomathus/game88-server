@@ -64,7 +64,7 @@ public class RandomUtils {
 
         List<T> list = new ArrayList<>();
         for ( int i = 0; i < returnSize; i++ ) {
-            if ( weightableMap.size() == 0 ) {
+            if ( weightableMap.isEmpty() ) {
                 break;
             }
             T t = randomWeight( weightableMap, totalWeight );

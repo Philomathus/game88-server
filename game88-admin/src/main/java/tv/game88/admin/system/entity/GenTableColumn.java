@@ -7,6 +7,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.BaseEntity;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serial;
 
 /**
  * 代码生成业务字段表 gen_table_column
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotBlank;
  */
 @TableName( "sys_gen_table_column" )
 public class GenTableColumn extends BaseEntity {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**

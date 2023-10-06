@@ -159,7 +159,7 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             }
             return data.toString();
         } catch ( Exception e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         return null;
     }

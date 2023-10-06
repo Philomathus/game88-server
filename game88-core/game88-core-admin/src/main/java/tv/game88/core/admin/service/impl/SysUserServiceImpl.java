@@ -243,14 +243,14 @@ public class SysUserServiceImpl implements ISysUserService {
         Long[] roles = user.getRoleIds();
         if ( StringUtils.isNotNull( roles ) ) {
             // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>();
+            List<SysUserRole> list = new ArrayList<>();
             for ( Long roleId : roles ) {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId( user.getUserId() );
                 ur.setRoleId( roleId );
                 list.add( ur );
             }
-            if ( list.size() > 0 ) {
+            if ( !list.isEmpty() ) {
                 userRoleMapper.batchUserRole( list );
             }
         }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import tv.game88.common.vo.BaseEntity;
@@ -16,6 +17,7 @@ import tv.game88.common.vo.BaseEntity;
  * @author 77tv
  * @date 2021-04-05
  */
+@EqualsAndHashCode( callSuper = true )
 @Data
 public class AgentSecureOss extends BaseEntity {
     private static final long serialVersionUID = 1L;

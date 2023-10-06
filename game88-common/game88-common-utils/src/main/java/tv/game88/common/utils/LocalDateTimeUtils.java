@@ -161,7 +161,7 @@ public class LocalDateTimeUtils {
     public static boolean isSameWeek( LocalDateTime one, LocalDateTime two ) {
         LocalDate oneLocalDate = one.with( DayOfWeek.MONDAY ).toLocalDate();
         LocalDate twoLocalDate = two.with( DayOfWeek.MONDAY ).toLocalDate();
-        return oneLocalDate.compareTo( twoLocalDate ) == 0;
+        return oneLocalDate.isEqual( twoLocalDate );
     }
 
     /**
@@ -173,7 +173,7 @@ public class LocalDateTimeUtils {
     public static boolean isSameMonth( LocalDateTime one, LocalDateTime two ) {
         LocalDate oneLocalDate = LocalDate.of( one.getYear(), one.getMonth(), 1 );
         LocalDate twoLocalDate = LocalDate.of( two.getYear(), two.getMonth(), 1 );
-        return oneLocalDate.compareTo( twoLocalDate ) == 0;
+        return oneLocalDate.isEqual( twoLocalDate );
     }
 
     /**
@@ -183,7 +183,7 @@ public class LocalDateTimeUtils {
      * @param two
      */
     public static boolean isSameDay( LocalDateTime one, LocalDateTime two ) {
-        return one.toLocalDate().compareTo( two.toLocalDate() ) == 0;
+        return one.toLocalDate().isEqual( two.toLocalDate() );
     }
 
     /**

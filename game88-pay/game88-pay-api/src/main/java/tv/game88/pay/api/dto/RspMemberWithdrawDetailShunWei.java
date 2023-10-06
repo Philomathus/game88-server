@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 public class RspMemberWithdrawDetailShunWei {
-    private static final long serialVersionUID = 1L;
-
     /**
      * 提现银行
      */

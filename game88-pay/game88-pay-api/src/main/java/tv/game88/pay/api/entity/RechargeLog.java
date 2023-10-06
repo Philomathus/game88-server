@@ -16,8 +16,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 @Data
 public class RechargeLog {
-    private static final long serialVersionUID = 1L;
-
     /**
      * 会员ID memberId
      */

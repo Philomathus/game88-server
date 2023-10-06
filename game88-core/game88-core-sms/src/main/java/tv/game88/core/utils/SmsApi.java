@@ -114,9 +114,7 @@ public class SmsApi {
         params.put( "signature", configSms.getName() );
 
         StringBuilder sb = new StringBuilder();
-        params.forEach( ( k, v ) -> {
-            sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) ).append( "&" );
-        } );
+        params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) ).append( "&" ) );
         String body = sb.substring( 0, sb.length() - 1 );
 
         //请求Headers中的X-WSSE参数值

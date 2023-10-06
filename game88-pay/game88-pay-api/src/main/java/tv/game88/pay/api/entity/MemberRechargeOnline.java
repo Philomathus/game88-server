@@ -97,15 +97,11 @@ public class MemberRechargeOnline {
     }
 
     public String getStatusStr() {
-        switch (status) {
-            case 1:
-                return "成功";
-            case 0:
-                return "失败";
-            case -1:
-                return "待确认";
-            default:
-                return StringUtils.EMPTY;
-        }
+        return switch ( status ) {
+            case 1 -> "成功";
+            case 0 -> "失败";
+            case -1 -> "待确认";
+            default -> StringUtils.EMPTY;
+        };
     }
 }

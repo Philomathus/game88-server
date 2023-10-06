@@ -151,8 +151,7 @@ public class RequestLogAspect {
                 Object value = paramValues[i];
 
                 //如果是文件对象
-                if (value instanceof MultipartFile) {
-                    MultipartFile file = (MultipartFile) value;
+                if ( value instanceof MultipartFile file ) {
                     value = file.getOriginalFilename();  //获取文件名
                 }
 
@@ -178,7 +177,7 @@ public class RequestLogAspect {
             try {
                 sw.close();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                log.error( e.getMessage(), e );
             }
         }
         return sw.getBuffer().toString().replaceAll("\\$" , "T");

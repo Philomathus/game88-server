@@ -9,8 +9,6 @@ import java.util.List;
  * @author MengJun
  */
 public class TreeEntity {
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * 父菜单名称
 	 */
