@@ -69,8 +69,8 @@ public class PayMethodController extends BaseController {
         return walletUserPayMethodService.unBindPayMethod( MemberSecurityUtils.getUserId(), payMethodId );
     }
 
-    @Operation( summary = "获取支付方式列表" )
-    @PostMapping( "/api/getPayMethod" )
+    @Operation( summary = "分组获取支付方式列表" )
+    @PostMapping( "/api/getPayMethodGroup" )
     public RspBase<Map<String, List<RspPayMethod>>> getPayMethod() {
         return walletUserPayMethodService.getPayMethod( MemberSecurityUtils.getUserId() );
     }
