@@ -1,6 +1,5 @@
 package tv.game88.wallet.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -32,9 +31,10 @@ public class RspMember {
     @Schema( title = "累积出售金额" )
     private BigDecimal totalSale;
 
-    @Schema( title = "登录密码", hidden = true )
-    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
-    private String password;
+    @Schema( title = "是否有登录密码" )
+    private Boolean havaPassword;
+    @Schema( title = "是否有资金密码" )
+    private Boolean havaFundPassword;
 
     public String getPhone() {
         if ( StringUtils.isNotBlank( phone ) ) {
