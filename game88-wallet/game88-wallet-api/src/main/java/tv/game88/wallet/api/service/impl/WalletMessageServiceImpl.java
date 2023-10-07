@@ -3,6 +3,7 @@ package tv.game88.wallet.api.service.impl;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
@@ -12,8 +13,10 @@ import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.type.WalletMessageEnum;
+import tv.game88.wallet.api.type.WalletTransEnum;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,5 +86,22 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
     @Override
     public RspBase<Boolean> isNewMessage( String userId ) {
         return RspBase.ok( redisUtils.exists( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId ) );
+    }
+
+    @Async
+    @Override
+    public void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum ) {
+        WalletMessage walletMessage = new WalletMessage();
+        walletMessage.setIsRead( false );
+        walletMessage.setType( WalletMessageEnum.personal );
+        walletMessage.setTitle( "您有新的交易订单" );
+        String content = String.format( "尊敬的用户！您的挂单（单号：%s）有买家发起交易请求，请尽快前往＂我的挂单＂进行处理", transDetailId );
+        walletMessage.setContent( content );
+        walletMessage.setReceiverUserId( receiverUserId );
+
+        this.baseMapper.insert( walletMessage );
+
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + receiverUserId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
     }
 }

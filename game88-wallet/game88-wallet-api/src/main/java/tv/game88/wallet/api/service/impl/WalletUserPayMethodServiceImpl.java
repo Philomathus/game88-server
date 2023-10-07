@@ -146,4 +146,10 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         }
         return RspBase.ok( "获取成功", resultMap );
     }
+
+    @Override
+    public RspBase<Boolean> havePayMethod( String userId ) {
+        return RspBase.ok( this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "user_id", userId )
+                                                                                          .eq( "audit_status", 1 ) ) );
+    }
 }
