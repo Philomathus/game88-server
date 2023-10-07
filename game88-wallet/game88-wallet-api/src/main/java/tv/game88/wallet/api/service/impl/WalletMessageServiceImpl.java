@@ -44,6 +44,9 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         List<WalletMessage> list = new QueryChainWrapper<>( this.baseMapper ).eq( "receiver_user_id", userId ).or()
                                                                              .eq( "type", WalletMessageEnum.system )
                                                                              .orderByDesc( "create_time" ).list();
+        if ( !list.isEmpty() ) {
+            redisUtils.unlink( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId );
+        }
         return list.stream().map( hn -> {
             if ( hn.getType() == WalletMessageEnum.system ) {
                 hn.setIsRead( redisUtils.sIsMember( ConstantsWallet.MESSAGE_SYSTEM_IS_READ + hn.getId(), userId ) );

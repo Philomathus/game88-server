@@ -9,6 +9,8 @@ import tv.game88.core.config.constants.Constants;
  * @author mengJun
  */
 public abstract class ConstantsWallet {
+    public static final String REDIS_DEFAULT_VALUE = "1";
+
     public static final String DEFAULT_HEAD_IMAGE_URL = ConfigDomainCacheUtil.me.getDomainOssValue() + "/avatar/user-img.jpeg";
 
     public static final String BUYER_CONFIRM_BUY_ORDER      = Constants.WALLET_PREX + "timeout:buyerConfirmBuyOrder:";

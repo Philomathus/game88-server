@@ -55,7 +55,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
                 return RspBase.businessError( "请输入银行卡号" );
             }
-            if ( ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
+            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
                 return RspBase.businessError( "请输入正确的银行卡号" );
             }
             reqPayMethod.setRealName( walletUser.getRealName() );

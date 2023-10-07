@@ -18,16 +18,15 @@ import tv.game88.wallet.api.dto.ReqBuyCoins;
 import tv.game88.wallet.api.dto.ReqBuyerConfirmTransfer;
 import tv.game88.wallet.api.dto.RspBuyOrderDetail;
 import tv.game88.wallet.api.dto.RspPayMethod2;
-import tv.game88.wallet.api.entity.WalletTransaction;
-import tv.game88.wallet.api.entity.WalletTransactionDetail;
-import tv.game88.wallet.api.entity.WalletUser;
-import tv.game88.wallet.api.entity.WalletUserPayMethod;
+import tv.game88.wallet.api.entity.*;
 import tv.game88.wallet.api.manager.WalletFundManager;
+import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.mapper.WalletTransactionDetailMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.type.WalletMessageEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
@@ -50,6 +49,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     private WalletTransactionService  walletTransactionService;
     @Resource
     private WalletUserPayMethodMapper walletUserPayMethodMapper;
+    @Resource
+    private WalletMessageMapper       walletMessageMapper;
 
     @Resource
     private WalletFundManager walletFundManager;
@@ -85,6 +86,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             return RspBase.businessError( "挂单余额不足" );
         }
 
+        String sellerId = walletTransaction.getUserId();
+
         WalletTransactionDetail walletTransactionDetail = new WalletTransactionDetail();
         walletTransactionDetail.setTransDetailId( GenerateOrderCacheUtils.me.getOrderId( "BUY", 5 ) );
         walletTransactionDetail.setTransactionId( reqBuyCoins.getTransactionId() );
@@ -92,7 +95,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletTransactionDetail.setStatus( WalletTransEnum.BUYER_CONFIRM_BUY );
         LocalDateTime now = LocalDateTime.now();
         walletTransactionDetail.setBuyerConfirmBuyTime( now );
-        walletTransactionDetail.setSellerId( walletTransaction.getUserId() );
+        walletTransactionDetail.setSellerId( sellerId );
         walletTransactionDetail.setBuyerId( userId );
         walletTransactionDetail.setBuyerPayMethodId( reqBuyCoins.getPayMethodId() );
 
@@ -112,13 +115,28 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         SpringUtils.getBean( WalletTransactionDetailService.class ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
 
-        // TODO 通知消息给卖家
-
         // 卖家订单倒计时 5分钟后取消订单
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
-                + walletTransactionDetail.getTransDetailId(), "1", Duration.ofMinutes( 5 ) );
+                + walletTransactionDetail.getTransDetailId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
+
+        // TODO 通知消息给卖家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + sellerId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
+        this.saveWalletMessage( sellerId, walletTransactionDetail.getTransDetailId() );
 
         return RspBase.ok( "确认购买成功", walletTransactionDetail.getTransDetailId() );
+    }
+
+    private void saveWalletMessage( String receiverUserId, String transDetailId ) {
+        WalletMessage walletMessage = new WalletMessage();
+        walletMessage.setIsRead( false );
+        walletMessage.setType( WalletMessageEnum.personal );
+        walletMessage.setTitle( "您有新的交易订单" );
+        String content = String.format( "尊敬的用户！您的挂单（单号：%s）有买家发起交易请求，请尽快前往＂我的挂单＂进行处理", transDetailId );
+        walletMessage.setContent( content );
+        walletMessage.setReceiverUserId( receiverUserId );
+
+        walletMessageMapper.insert( walletMessage );
     }
 
     @Transactional( rollbackFor = Exception.class )
@@ -170,7 +188,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setBuyerPayMethod( rspSellerPayMethod );
 
-        // TODO 计算订单倒计时
+        // 计算订单倒计时
+        if ( redisUtils.exists( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) ) {
+            rspBuyOrderDetail.setCountdownSec( redisUtils.getExpire( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) );
+        }
 
         return RspBase.ok( rspBuyOrderDetail );
     }
@@ -206,9 +227,12 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
             // 买家订单倒计时 20分钟 用于转账
-            redisUtils.strSet( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId, "1", Duration.ofMinutes( 20 ) );
+            redisUtils.strSet( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER
+                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 20 ) );
 
             // TODO 消息通知买家
+            redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                    + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
             return RspBase.ok( "确认交易成功" );
         }
@@ -244,6 +268,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // TODO 消息通知买家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
         return RspBase.ok( "确认取消交易成功", walletTransactionDetail.getTransDetailId() );
     }
@@ -315,9 +341,12 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             redisUtils.unlink( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId );
 
             // 卖家 订单倒计时 30分钟 用于确认是否收到转账
-            redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId, "1", Duration.ofMinutes( 30 ) );
+            redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER
+                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 30 ) );
 
             // TODO 消息通知卖家
+            redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                    + walletTransactionDetail.getSellerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
             return RspBase.ok( "确认转账成功" );
         }
@@ -356,6 +385,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         redisUtils.unlink( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId );
 
         // TODO 消息通知卖家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getSellerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
         return RspBase.ok( "确认取消交易成功", walletTransactionDetail.getTransDetailId() );
     }
@@ -393,6 +424,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
         // TODO 通知消息给买家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
         return RspBase.ok( "确认转币成功", walletTransactionDetail.getTransDetailId() );
     }
@@ -467,6 +500,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
             // TODO 消息通知买家
+            redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                    + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
 
             return RspBase.ok( "确认未收到转账" );
         }
@@ -499,6 +534,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // TODO 消息通知卖家和买家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getSellerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
     }
 
     /**
@@ -526,6 +565,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // TODO 消息通知卖家和买家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getSellerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
     }
 
     /**
@@ -555,6 +598,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
 
         // TODO 通知消息给买家和卖家
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getSellerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
+        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
+                + walletTransactionDetail.getBuyerId(), ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
     }
 }
 
