@@ -9,6 +9,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.GoogleAuthUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -18,8 +19,8 @@ import tv.game88.wallet.api.service.WalletMerchantService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 钱包商户Controller
@@ -68,30 +69,34 @@ public class WalletMerchantController extends BaseController {
         walletMerchant.setFrozenAmount( BigDecimal.ZERO );
         String md5Key = DigestUtils.md5Hex( System.currentTimeMillis() + RandomStringUtils.randomAlphabetic( 2 ) );
         walletMerchant.setMd5Key( AESCoder.encrypt( md5Key ) );
-        // 初始密码123456
+        // 初始密码a123456
         walletMerchant.setPassword( passwordEncoder.encode( "a123456" ) );
         walletMerchant.setStatus( 1 );
         return toResult( walletMerchantService.save( walletMerchant ) );
     }
 
-    /**
-     * 修改钱包商户
-     */
-    @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:edit')" )
-    @Log( title = "钱包商户", businessType = BusinessType.UPDATE )
-    @PutMapping
-    public RspBase<?> edit( @RequestBody WalletMerchant walletMerchant ) {
-        walletMerchant.setUpdatedTime( LocalDateTime.now() );
-        return toResult( walletMerchantService.updateById( walletMerchant ) );
-    }
+    // TODO 添加商户余额, 需校验管理员MFA密钥
+
+    // TODO 扣除商户余额
+
+    // TODO 重置商户MD5密钥
+
+    // TODO 重置商户登录密码
+
+    // TODO 修改商户状态
 
     /**
-     * 删除钱包商户
+     * 获取MFA验证码二维码
      */
-    @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:remove')" )
-    @Log( title = "钱包商户", businessType = BusinessType.DELETE )
-    @DeleteMapping( "/{ids}" )
-    public RspBase<?> remove( @PathVariable Long[] ids ) {
-        return toResult( walletMerchantService.removeByIds( Arrays.asList( ids ) ) );
+    @GetMapping( "getOtpSecretQrcode" )
+    public RspBase<Map<String, String>> getOtpSecretQrcode( String name ) {
+        String secretKey    = GoogleAuthUtil.createSecretKey();
+        String qrBarcodeUrl = GoogleAuthUtil.getQRBarcodeURL( name, "UPay管理后台", secretKey );
+        return RspBase.ok( Map.of( "secretKey", secretKey, "qrBarcodeBase",
+                GoogleAuthUtil.tranUrlToBase64String( qrBarcodeUrl ) ) );
     }
+
+    // TODO 重置商户MFA秘钥
+
+    // TODO 商户绑定MFA密钥
 }
