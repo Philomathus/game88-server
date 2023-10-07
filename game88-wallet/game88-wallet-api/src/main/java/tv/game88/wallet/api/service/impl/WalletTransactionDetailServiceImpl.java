@@ -121,12 +121,11 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         SpringUtils.getBean( WalletTransactionDetailService.class ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
 
         // 卖家订单倒计时 5分钟后取消订单
-
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
                 + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
 
         // 通知消息给卖家
-        walletMessageService.saveWalletMessage( sellerId, transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( sellerId, transactionId, walletTransEnum, true );
 
         return RspBase.ok( "确认购买成功", transDetailId );
     }
@@ -232,7 +231,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 20 ) );
 
             // 消息通知买家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
 
             return RspBase.ok( "确认交易成功" );
         }
@@ -270,7 +269,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
 
         return RspBase.ok( "确认取消交易成功", transDetailId );
     }
@@ -347,7 +346,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 30 ) );
 
             // 消息通知卖家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum );
+            walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
 
             return RspBase.ok( "确认转账成功" );
         }
@@ -388,7 +387,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         redisUtils.unlink( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId );
 
         // 消息通知卖家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
 
         return RspBase.ok( "确认取消交易成功", walletTransactionDetail.getTransDetailId() );
     }
@@ -428,7 +427,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
         // 通知消息给买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
 
         return RspBase.ok( "确认转币成功", transDetailId );
     }
@@ -504,7 +503,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
             // 消息通知买家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
 
             return RspBase.ok( "确认未收到转账" );
         }
@@ -539,8 +538,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知卖家和买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
     }
 
     /**
@@ -570,8 +569,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知卖家和买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
     }
 
     /**
@@ -602,8 +601,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                    .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
 
         // 通知消息给买家和卖家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
     }
 }
 

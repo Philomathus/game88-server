@@ -1,12 +1,11 @@
 package tv.game88.wallet.api.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import tv.game88.common.vo.BaseEntity;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 
-import java.io.Serial;
+import java.time.LocalDateTime;
 
 /**
  * 站内信对象 wallet_message
@@ -15,10 +14,7 @@ import java.io.Serial;
  */
 @TableName( "wallet_message" )
 @Data
-@EqualsAndHashCode( callSuper = true )
-public class WalletMessage extends BaseEntity {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class WalletMessage {
 
     /**
      * 系统编号
@@ -50,4 +46,15 @@ public class WalletMessage extends BaseEntity {
      * 消息类型
      */
     private WalletMessageEnum type;
+
+    /**
+     * 创建者
+     */
+    private String createBy;
+
+    /**
+     * 创建时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime createTime;
 }

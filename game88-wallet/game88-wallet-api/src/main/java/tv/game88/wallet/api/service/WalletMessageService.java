@@ -27,7 +27,9 @@ public interface WalletMessageService extends IService<WalletMessage> {
 
     RspBase<?> setMessageRead( String userId, Long messageId );
 
+    RspBase<?> setAllMessageRead( String userId );
+
     RspBase<Boolean> isNewMessage( String userId );
 
-    void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum );
+    void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum, boolean isSeller );
 }

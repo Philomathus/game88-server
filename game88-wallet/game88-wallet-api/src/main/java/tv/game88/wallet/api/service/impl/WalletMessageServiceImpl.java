@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.service.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -17,6 +18,7 @@ import tv.game88.wallet.api.type.WalletTransEnum;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,9 +46,12 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
 
     @Override
     public List<RspMessage> getMessageList( String userId ) {
-        List<WalletMessage> list = new QueryChainWrapper<>( this.baseMapper ).eq( "receiver_user_id", userId ).or()
-                                                                             .eq( "type", WalletMessageEnum.system )
-                                                                             .orderByDesc( "create_time" ).list();
+        List<WalletMessage> list = new LambdaQueryChainWrapper<>( this.baseMapper ).eq( WalletMessage::getReceiverUserId, userId )
+                                                                                   .or()
+                                                                                   .eq( WalletMessage::getType,
+                                                                                           WalletMessageEnum.system )
+                                                                                   .orderByDesc( WalletMessage::getCreateTime )
+                                                                                   .list();
         if ( !list.isEmpty() ) {
             redisUtils.unlink( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId );
         }
@@ -84,21 +89,82 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
     }
 
     @Override
+    public RspBase<?> setAllMessageRead( String userId ) {
+        List<WalletMessage> list = new LambdaQueryChainWrapper<>( this.baseMapper )
+                .eq( WalletMessage::getType, WalletMessageEnum.system ).list();
+        list.forEach( wm -> {
+            redisUtils.sAdd( ConstantsWallet.MESSAGE_SYSTEM_IS_READ + wm.getId(), userId );
+        } );
+        this.update( new LambdaUpdateWrapper<WalletMessage>().set( WalletMessage::getIsRead, true )
+                                                             .eq( WalletMessage::getReceiverUserId, userId )
+                                                             .eq( WalletMessage::getIsRead, false ) );
+        return RspBase.ok();
+    }
+
+    @Override
     public RspBase<Boolean> isNewMessage( String userId ) {
         return RspBase.ok( redisUtils.exists( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId ) );
     }
 
     @Async
     @Override
-    public void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum ) {
+    public void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum,
+                                   boolean isSeller ) {
+        String titleText  = "";
+        String actionText = "";
+        String orderText  = "";
+
+        switch ( walletTransEnum ) {
+        case BUYER_CONFIRM_BUY -> {
+            titleText  = "您有新的交易订单";
+            orderText  = "挂单";
+            actionText = "有买家发起交易请求，请前往＂我的" + orderText + "＂进行处理或查看";
+        }
+        case SELLER_CONFIRM_TRANS -> {
+            titleText  = "卖家确认交易";
+            orderText  = "订单";
+            actionText = "经卖家确认可交易，请前往＂我的" + orderText + "＂进行下一步处理";
+        }
+        case SELLER_CANCEL -> {
+            titleText  = "卖家取消交易";
+            orderText  = "订单";
+            actionText = "已被卖家取消交易，请前往＂" + orderText + "＂查看";
+        }
+        case BUYER_CONFIRM_TRANSFER -> {
+            titleText  = "买家确认转账";
+            orderText  = "订单";
+            actionText = "已被买家确认已转账，请前往＂我的" + orderText + "＂进行处理";
+        }
+        case BUYER_CANCEL -> {
+            titleText  = "买家取消交易";
+            orderText  = "订单";
+            actionText = "已被买家取消交易，请前往＂我的" + orderText + "＂查看";
+        }
+        case SELLER_CONFIRM_TRANSFER -> {
+            titleText  = "卖家确认转币";
+            orderText  = "订单";
+            actionText = "经卖家确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
+        case SELLER_NOT_RECEIVED -> {
+            titleText  = "卖家未收到转账";
+            orderText  = "订单";
+            actionText = "已确认转币，但卖家确认长时间未收到转账，此单已转由平台管理员确认，您可以联系客服提供更加充足的凭证。";
+        }
+        case SYSTEM_CONFIRM_TRANSFER -> {
+            titleText  = "系统确认转币";
+            orderText  = "订单";
+            actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
+        }
+
         WalletMessage walletMessage = new WalletMessage();
         walletMessage.setIsRead( false );
         walletMessage.setType( WalletMessageEnum.personal );
-        walletMessage.setTitle( "您有新的交易订单" );
-        String content = String.format( "尊敬的用户！您的挂单（单号：%s）有买家发起交易请求，请尽快前往＂我的挂单＂进行处理", transDetailId );
+        walletMessage.setTitle( titleText );
+        String content = String.format( "尊敬的用户！您的%s（单号：%s）%s", orderText, transDetailId, actionText );
         walletMessage.setContent( content );
         walletMessage.setReceiverUserId( receiverUserId );
-
+        walletMessage.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( walletMessage );
 
         redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT

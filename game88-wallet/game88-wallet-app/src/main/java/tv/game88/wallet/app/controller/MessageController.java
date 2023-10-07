@@ -33,6 +33,12 @@ public class MessageController {
         return walletMessageService.setMessageRead( MemberSecurityUtils.getUserId(), messageId );
     }
 
+    @Operation( summary = "一键已读" )
+    @PostMapping( "/api/setAllMessageRead" )
+    public RspBase<?> setMessageRead() {
+        return walletMessageService.setAllMessageRead( MemberSecurityUtils.getUserId() );
+    }
+
     @Operation( summary = "是否有新消息", description = "需要循环读取此接口,判断是否需要重新请求<获取站内信息列表>" )
     @PostMapping( "/api/isNewMessage" )
     public RspBase<Boolean> isNewMessage() {
