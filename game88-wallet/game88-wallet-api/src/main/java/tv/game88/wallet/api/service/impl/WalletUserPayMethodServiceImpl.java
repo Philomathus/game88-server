@@ -148,7 +148,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
     }
 
     @Override
-    public RspBase<Boolean> havePayMethod( String userId ) {
+    public RspBase<Boolean> hasPayMethod( String userId ) {
         return RspBase.ok( this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "user_id", userId )
                                                                                           .eq( "audit_status", 1 ) ) );
     }

@@ -32,9 +32,9 @@ public class RspMember {
     private BigDecimal totalSale;
 
     @Schema( title = "是否有登录密码" )
-    private Boolean havaPassword;
+    private Boolean hasPassword;
     @Schema( title = "是否有资金密码" )
-    private Boolean havaFundPassword;
+    private Boolean hasFundPassword;
 
     public String getPhone() {
         if ( StringUtils.isNotBlank( phone ) ) {

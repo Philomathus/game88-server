@@ -52,9 +52,9 @@ public class PayMethodController extends BaseController {
     }
 
     @Operation( summary = "是否有支付方式" )
-    @PostMapping( "/api/havePayMethod" )
-    public RspBase<Boolean> havePayMethod() {
-        return walletUserPayMethodService.havePayMethod( MemberSecurityUtils.getUserId() );
+    @PostMapping( "/api/hasPayMethod" )
+    public RspBase<Boolean> hasPayMethod() {
+        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "绑定新支付方式" )

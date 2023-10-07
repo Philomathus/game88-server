@@ -325,8 +325,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         RspMember  rspMember  = new RspMember();
         BeanUtils.copyProperties( walletUser, rspMember );
 
-        rspMember.setHavaPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
-        rspMember.setHavaPassword( StringUtils.isNotBlank( walletUser.getFundPassword() ) );
+        rspMember.setHasPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
+        rspMember.setHasFundPassword( StringUtils.isNotBlank( walletUser.getFundPassword() ) );
         return RspBase.ok( rspMember );
     }
 
