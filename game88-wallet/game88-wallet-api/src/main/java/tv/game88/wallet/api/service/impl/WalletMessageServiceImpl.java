@@ -20,7 +20,6 @@ import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 站内信Service业务层处理
@@ -46,12 +45,12 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
 
     @Override
     public List<RspMessage> getMessageList( String userId ) {
-        List<WalletMessage> list = new LambdaQueryChainWrapper<>( this.baseMapper ).eq( WalletMessage::getReceiverUserId, userId )
-                                                                                   .or()
-                                                                                   .eq( WalletMessage::getType,
-                                                                                           WalletMessageEnum.system )
-                                                                                   .orderByDesc( WalletMessage::getCreateTime )
-                                                                                   .list();
+        List<WalletMessage> list = new LambdaQueryChainWrapper<>( this.baseMapper )
+                .eq( WalletMessage::getReceiverUserId, userId )
+                .or()
+                .eq( WalletMessage::getType, WalletMessageEnum.system )
+                .orderByDesc( WalletMessage::getCreateTime )
+                .list();
         if ( !list.isEmpty() ) {
             redisUtils.unlink( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId );
         }
@@ -62,7 +61,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             RspMessage rsp = new RspMessage();
             BeanUtils.copyProperties( hn, rsp );
             return rsp;
-        } ).collect( Collectors.toList() );
+        } ).toList();
     }
 
     @Override
@@ -90,14 +89,14 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
 
     @Override
     public RspBase<?> setAllMessageRead( String userId ) {
-        List<WalletMessage> list = new LambdaQueryChainWrapper<>( this.baseMapper )
-                .eq( WalletMessage::getType, WalletMessageEnum.system ).list();
-        list.forEach( wm -> {
-            redisUtils.sAdd( ConstantsWallet.MESSAGE_SYSTEM_IS_READ + wm.getId(), userId );
-        } );
-        this.update( new LambdaUpdateWrapper<WalletMessage>().set( WalletMessage::getIsRead, true )
-                                                             .eq( WalletMessage::getReceiverUserId, userId )
-                                                             .eq( WalletMessage::getIsRead, false ) );
+        new LambdaQueryChainWrapper<>( this.baseMapper )
+                .eq( WalletMessage::getType, WalletMessageEnum.system )
+                .list()
+                .forEach( wm -> redisUtils.sAdd( ConstantsWallet.MESSAGE_SYSTEM_IS_READ + wm.getId(), userId ) );
+        this.update( new LambdaUpdateWrapper<WalletMessage>()
+                .set( WalletMessage::getIsRead, true )
+                .eq( WalletMessage::getReceiverUserId, userId )
+                .eq( WalletMessage::getIsRead, false ) );
         return RspBase.ok();
     }
 
@@ -110,9 +109,9 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
     @Override
     public void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum,
                                    boolean isSeller ) {
-        String titleText  = "";
-        String actionText = "";
-        String orderText  = "";
+        String titleText;
+        String actionText;
+        String orderText;
 
         switch ( walletTransEnum ) {
         case BUYER_CONFIRM_BUY -> {
@@ -154,6 +153,11 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             titleText  = "系统确认转币";
             orderText  = "订单";
             actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
+        default -> {
+            titleText  = "标题";
+            orderText  = "订单";
+            actionText = "";
         }
         }
 

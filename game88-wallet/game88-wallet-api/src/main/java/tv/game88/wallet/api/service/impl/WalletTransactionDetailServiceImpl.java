@@ -105,7 +105,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletTransactionDetail.setBuyerPayMethodId( reqBuyCoins.getPayMethodId() );
 
         List<WalletUserPayMethod> sPayMethods = walletUserPayMethodMapper.selectBatchIds( Arrays.asList( walletTransaction
-                .getPayMethodIds().split( "," ) ) );
+                .getPayMethodIds()
+                .split( "," ) ) );
         for ( WalletUserPayMethod sPayMethod : sPayMethods ) {
             if ( sPayMethod.getMethodType() == bPayMethod.getMethodType() ) {
                 walletTransactionDetail.setSellerPayMethodId( sPayMethod.getMethodId() );
@@ -135,8 +136,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
-                .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() ).set( "status", 1 )
-                .eq( "transaction_id", walletTransactionDetail.getTransactionId() ).le( "status", 1 )
+                .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
+                .set( "status", 1 )
+                .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
+                .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
         // 保存交易
         int i = this.baseMapper.insert( walletTransactionDetail );
@@ -265,8 +268,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n卖家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知买家
         walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
@@ -285,7 +289,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 回退挂单金额
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
-                .eq( "transaction_id", walletTransactionDetail.getTransactionId() ).eq( "status", 1 ) );
+                .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
+                .eq( "status", 1 ) );
         if ( update && i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
@@ -380,8 +385,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 取消超时订单
         redisUtils.unlink( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId );
@@ -420,8 +426,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n卖家" + userId + "确认转币,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
 
         // 取消超时订单
         redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
@@ -534,8 +541,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 "\n卖家" + walletTransactionDetail.getSellerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知卖家和买家
         walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
@@ -565,8 +573,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + walletTransactionDetail.getBuyerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
 
         // 消息通知卖家和买家
         walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
@@ -597,8 +606,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class )
-                   .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+        SpringUtils
+                .getBean( WalletTransactionDetailService.class )
+                .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
 
         // 通知消息给买家和卖家
         walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );

@@ -66,8 +66,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "您的G币不足,G币数量:" + walletUser.getAmount() );
         }
 
-        Set<String> typeSet = walletUserPayMethodMapper.selectBatchIds( reqSellCoins.getPayMethodIds() ).stream()
-                                                       .map( pm -> pm.getMethodType().name() ).collect( Collectors.toSet() );
+        Set<String> typeSet = walletUserPayMethodMapper
+                .selectBatchIds( reqSellCoins.getPayMethodIds() )
+                .stream()
+                .map( pm -> pm.getMethodType().name() )
+                .collect( Collectors.toSet() );
 
         LocalDateTime now     = LocalDateTime.now();
         Long          sellNum = reqSellCoins.getSellNum();
@@ -95,8 +98,10 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         int buyerSuccessCount  = Integer.parseInt( buyerMap.getOrDefault( "c", "0" ).toString() );
 
         String successRateMonth = new BigDecimal( sellerSuccessCount )
-                .divide( new BigDecimal( sellerTotalCount ), 2, RoundingMode.HALF_UP ).multiply( new BigDecimal( 100 ) )
-                .toString().concat( "%" );
+                .divide( new BigDecimal( sellerTotalCount ), 2, RoundingMode.HALF_UP )
+                .multiply( new BigDecimal( 100 ) )
+                .toString()
+                .concat( "%" );
 
         long aveReceivedTime = receivedTimeTotal / sellerSuccessCount;
         long aveTransferTime = transferTimeTotal / buyerSuccessCount;
@@ -198,8 +203,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         update.setStatus( 3 );
         update.setTransEndTime( LocalDateTime.now() );
 
-        SpringUtils.getBean( WalletTransactionService.class )
-                   .updateTransAndAddUserAmount( userId, update, walletTransaction.getAmount() );
+        SpringUtils
+                .getBean( WalletTransactionService.class )
+                .updateTransAndAddUserAmount( userId, update, walletTransaction.getAmount() );
         return RspBase.ok( "挂单取消成功" );
     }
 
@@ -259,7 +265,6 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setLevel( seller.getLevel() );
         rspSellOrderDetail2.setHeadImg( seller.getHeadImg() );
         rspSellOrderDetail2.setNikeName( seller.getNickName() );
-
         rspSellOrderDetail2.setTransactionId( walletTransaction.getTransactionId() );
         rspSellOrderDetail2.setAmount( walletTransaction.getAmount() );
         rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
@@ -270,7 +275,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
 
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
-                .eq( "user_id", userId ).eq( "audit_status", 1 ).orderByDesc( "create_time" ) );
+                .eq( "user_id", userId )
+                .eq( "audit_status", 1 )
+                .orderByDesc( "create_time" ) );
 
         Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {

@@ -1,6 +1,6 @@
 package tv.game88.wallet.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -108,8 +108,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
     @Override
     public RspBase<Map<String, List<RspPayMethod>>> getPayMethod( String userId ) {
-        List<WalletUserPayMethod> walletUserPayMethods = this.baseMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
-                .eq( "user_id", userId ).eq( "audit_status", 1 ) );
+        List<WalletUserPayMethod> walletUserPayMethods = this.baseMapper.selectList( new LambdaQueryWrapper<WalletUserPayMethod>()
+                .eq( WalletUserPayMethod::getUserId, userId )
+                .eq( WalletUserPayMethod::getAuditStatus, 1 ) );
 
         Map<String, List<RspPayMethod>> resultMap = new LinkedHashMap<>();
         if ( !CollectionUtils.isEmpty( walletUserPayMethods ) ) {
@@ -124,8 +125,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
                         rspPayMethod.setRealName( userPayMethod.getRealName() );
                         rspPayMethod.setAccount( userPayMethod.getBankAccount() );
 
-                        if ( StringUtils.isNotBlank( userPayMethod.getPayPicAddr() ) && !userPayMethod.getPayPicAddr()
-                                                                                                      .startsWith( "http" ) ) {
+                        if ( StringUtils.isNotBlank( userPayMethod.getPayPicAddr() ) && !userPayMethod
+                                .getPayPicAddr()
+                                .startsWith( "http" ) ) {
                             rspPayMethod.setPayPicAddr( domainOssValue + userPayMethod.getPayPicAddr() );
                         } else {
                             rspPayMethod.setPayPicAddr( userPayMethod.getPayPicAddr() );
@@ -133,8 +135,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
                         for ( RspConfigBankList rspConfigBank : effectList ) {
                             if ( Objects.equals( rspConfigBank.getId(), userPayMethod.getBankId() ) ) {
                                 rspPayMethod.setBankName( rspConfigBank.getBankName() );
-                                if ( StringUtils.isNotBlank( rspConfigBank.getBankIcon() ) && !rspConfigBank.getBankIcon()
-                                                                                                            .startsWith( "http" ) ) {
+                                if ( StringUtils.isNotBlank( rspConfigBank.getBankIcon() ) && !rspConfigBank
+                                        .getBankIcon()
+                                        .startsWith( "http" ) ) {
                                     rspPayMethod.setBankIcon( domainOssValue + rspConfigBank.getBankIcon() );
                                 }
                             }
@@ -149,7 +152,8 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
     @Override
     public RspBase<Boolean> hasPayMethod( String userId ) {
-        return RspBase.ok( this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "user_id", userId )
-                                                                                          .eq( "audit_status", 1 ) ) );
+        return RspBase.ok( this.baseMapper.exists( new LambdaQueryWrapper<WalletUserPayMethod>()
+                .eq( WalletUserPayMethod::getUserId, userId )
+                .eq( WalletUserPayMethod::getAuditStatus, 1 ) ) );
     }
 }

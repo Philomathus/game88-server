@@ -332,8 +332,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Override
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
-        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "fund_password" )
-                                                                          .one();
+        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", userId )
+                .select( "id", "fund_password" )
+                .one();
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
@@ -357,8 +359,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             if ( byType != null ) {
                 rspLogMoney.setDes( byType.getDes() );
             }
-            rspLogMoney.setAmount( rspLogMoney.getPay().subtract( rspLogMoney.getIncome() )
-                                              .setScale( 2, RoundingMode.HALF_DOWN ) );
+            rspLogMoney.setAmount( rspLogMoney
+                    .getPay()
+                    .subtract( rspLogMoney.getIncome() )
+                    .setScale( 2, RoundingMode.HALF_DOWN ) );
         }
         return logMoneyList;
     }
