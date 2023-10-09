@@ -230,8 +230,6 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     public List<RspTransCenterDetail> transSellOrderList( ReqTransCenterDetail reqTransCenterDetail ) {
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
-        // 只查询金额大于0的订单
-        query.setIsTransQuery( true );
 
         List<WalletTransaction>    walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspTransCenterDetail> resultList         = new ArrayList<>();

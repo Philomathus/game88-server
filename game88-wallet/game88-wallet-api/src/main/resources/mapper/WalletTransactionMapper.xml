@@ -49,14 +49,16 @@
             <if test="canSplit != null">
                 and can_split = #{canSplit}
             </if>
-            <if test="amount != null">
-                and amount = #{amount}
-            </if>
+            <choose>
+                <when test="minAmount != null and maxAmount != null">
+                    and amount BETWEEN #{minAmount} AND #{maxAmount}
+                </when>
+                <otherwise>
+                    and amount > 0
+                </otherwise>
+            </choose>
             <if test="status != null">
                 and `status` = #{status}
-            </if>
-            <if test="isTransQuery != null and isTransQuery">
-                and amount > 0
             </if>
         </where>
         order by create_time desc

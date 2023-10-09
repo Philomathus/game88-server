@@ -93,8 +93,9 @@ public class WalletTransaction implements Serializable {
     private String transferTimeMonth;
 
     @TableField( exist = false )
-    private String payMethodType;
-
+    private String  payMethodType;
     @TableField( exist = false )
-    private Boolean isTransQuery;
+    private Long    minAmount;
+    @TableField( exist = false )
+    private Long    maxAmount;
 }

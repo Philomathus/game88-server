@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import tv.game88.common.page.PageDomain;
 
+import javax.validation.constraints.Min;
+
 @EqualsAndHashCode( callSuper = true )
 @Data
 public class ReqTransCenterDetail extends PageDomain {
@@ -12,6 +14,10 @@ public class ReqTransCenterDetail extends PageDomain {
     private String  payMethodType;
     @Schema( title = "是否可拆分" )
     private Boolean canSplit;
-    @Schema( title = "售卖数量" )
-    private Long    amount;
+    @Schema( title = "最小售卖数量" )
+    @Min( 1 )
+    private Long    minAmount;
+    @Schema( title = "最大售卖数量" )
+    @Min( 1 )
+    private Long    maxAmount;
 }
