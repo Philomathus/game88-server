@@ -32,6 +32,7 @@ import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -323,6 +324,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<RspMember> getUserInfo( String userId ) {
         WalletUser walletUser = this.baseMapper.selectById( userId );
         RspMember  rspMember  = new RspMember();
+        rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
         return RspBase.ok( rspMember );
     }
