@@ -47,7 +47,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     private WalletFundManager             walletFundManager;
 
     @Override
-    public RspBase<?> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
+    public RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
         if ( reqSellCoins.getCanSplit() && reqSellCoins.getMinBuyNum() == null ) {
             return RspBase.businessError( "最低购买数量不能为空" );
         }
@@ -58,7 +58,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "最低出售数量不能超过或等于出售数量" );
         }
         WalletUser walletUser = walletUserService.getById( userId );
-        RspBase<?> rspBase    = walletUserService.validWalletUser( walletUser );
+        RspBase    rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -112,7 +112,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         walletTransaction.setTransferTimeMonth( LocalDateTimeUtils.secondsToTime( aveTransferTime ) );
 
         SpringUtils.getBean( WalletTransactionService.class ).saveTransAndReduceUserAmount( userId, walletTransaction, sellNum );
-        return RspBase.ok( "挂单成功" );
+        return RspBase.ok( "挂单成功", walletTransaction.getTransactionId() );
     }
 
     @Transactional( rollbackFor = Exception.class )
