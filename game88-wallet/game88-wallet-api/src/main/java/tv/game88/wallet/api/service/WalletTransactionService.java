@@ -13,7 +13,7 @@ import java.util.List;
  * @createDate 2023-08-21 17:27:31
  */
 public interface WalletTransactionService extends IService<WalletTransaction> {
-    RspBase<?> sellOrder( String userId, ReqSellCoins reqSellCoins );
+    RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins );
 
     void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum );
 

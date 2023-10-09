@@ -326,13 +326,18 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         RspMember  rspMember  = new RspMember();
         rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
+
+        rspMember.setHasPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
+        rspMember.setHasFundPassword( StringUtils.isNotBlank( walletUser.getFundPassword() ) );
         return RspBase.ok( rspMember );
     }
 
     @Override
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
-        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "fund_password" )
-                                                                          .one();
+        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "id", userId )
+                .select( "id", "fund_password" )
+                .one();
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
@@ -356,8 +361,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             if ( byType != null ) {
                 rspLogMoney.setDes( byType.getDes() );
             }
-            rspLogMoney.setAmount( rspLogMoney.getPay().subtract( rspLogMoney.getIncome() )
-                                              .setScale( 2, RoundingMode.HALF_DOWN ) );
+            rspLogMoney.setAmount( rspLogMoney
+                    .getPay()
+                    .subtract( rspLogMoney.getIncome() )
+                    .setScale( 2, RoundingMode.HALF_DOWN ) );
         }
         return logMoneyList;
     }

@@ -150,9 +150,13 @@ public class UPayAgentProcessor extends AbstractPayAgent {
         String tempStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         params.put( "sign", DigestUtils.md5Hex( tempStr ).toUpperCase() );
 
-        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( params ), null );
+        log.info( payAgentPlatform.getName()
+                + "查询请求参数 - orderNo:{},request:{}", withdrawDetail.getWithdrawOrderNo(), JsonUtil.object2Json( params ) );
 
-        log.info( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
+        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageJson( params ), null );
+
+        log.info( payAgentPlatform.getName()
+                + "查询结果 - orderNo:{},result:{}", withdrawDetail.getWithdrawOrderNo(), JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( dataMap ) ) {

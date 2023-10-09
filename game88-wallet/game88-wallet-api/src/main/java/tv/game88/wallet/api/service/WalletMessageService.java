@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
+import tv.game88.wallet.api.type.WalletTransEnum;
 
 import java.util.List;
 
@@ -26,5 +27,9 @@ public interface WalletMessageService extends IService<WalletMessage> {
 
     RspBase<?> setMessageRead( String userId, Long messageId );
 
+    RspBase<?> setAllMessageRead( String userId );
+
     RspBase<Boolean> isNewMessage( String userId );
+
+    void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum, boolean isSeller );
 }

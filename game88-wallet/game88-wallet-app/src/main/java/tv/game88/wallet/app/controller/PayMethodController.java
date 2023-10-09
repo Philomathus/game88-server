@@ -41,14 +41,20 @@ public class PayMethodController extends BaseController {
     @Operation( summary = "获取银行字典列表" )
     @PostMapping( "/api/getBankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
-        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
-        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
+        String                  domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspConfigBankList bankList : effectList ) {
             if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
                 bankList.setBankIcon( domainValue + bankList.getBankIcon() );
             }
         }
         return RspBase.ok( effectList );
+    }
+
+    @Operation( summary = "是否有支付方式" )
+    @PostMapping( "/api/hasPayMethod" )
+    public RspBase<Boolean> hasPayMethod() {
+        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "绑定新支付方式" )
@@ -63,9 +69,9 @@ public class PayMethodController extends BaseController {
         return walletUserPayMethodService.unBindPayMethod( MemberSecurityUtils.getUserId(), payMethodId );
     }
 
-    @Operation( summary = "获取支付方式列表" )
-    @PostMapping( "/api/getPayMethod" )
-    public RspBase<Map<String, List<RspPayMethod>>> getPayMethod( ) {
+    @Operation( summary = "分组获取支付方式列表" )
+    @PostMapping( "/api/getPayMethodGroup" )
+    public RspBase<Map<String, List<RspPayMethod>>> getPayMethod() {
         return walletUserPayMethodService.getPayMethod( MemberSecurityUtils.getUserId() );
     }
 }
