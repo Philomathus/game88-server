@@ -3,6 +3,7 @@ package tv.game88.wallet.app.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,9 @@ import tv.game88.wallet.api.util.ZXingUtil;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 @Tag( name = "图片上传接口" )
@@ -27,9 +31,12 @@ public class UploadPicController {
     @Operation( summary = "微信个人收款码上传" )
     @PostMapping( "/api/uploadWxp" )
     public RspBase<?> uploadWxp( @RequestParam( "file" ) MultipartFile file ) throws IOException {
-        String  fileName = file.getOriginalFilename();
-        File    newFile  = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
-        boolean isWxp    = false;
+        String      fileName      = file.getOriginalFilename();
+        InputStream inputStream   = file.getInputStream();
+        File        newFile       = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        Path        newFileToPath = newFile.toPath();
+        IOUtils.copy( inputStream, Files.newOutputStream( newFileToPath ) );
+        boolean isWxp = false;
         try {
             String url = ZXingUtil.decodeImg( newFile );
             if ( StringUtils.isNotBlank( url ) && url.startsWith( "wxp://" ) ) {
@@ -52,9 +59,12 @@ public class UploadPicController {
     @Operation( summary = "支付宝个人收款码上传" )
     @PostMapping( "/api/uploadAlipay" )
     public RspBase<?> uploadAlipay( @RequestParam( "file" ) MultipartFile file ) throws IOException {
-        String  fileName = file.getOriginalFilename();
-        File    newFile  = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
-        boolean isWxp    = false;
+        String      fileName      = file.getOriginalFilename();
+        InputStream inputStream   = file.getInputStream();
+        File        newFile       = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        Path        newFileToPath = newFile.toPath();
+        IOUtils.copy( inputStream, Files.newOutputStream( newFileToPath ) );
+        boolean isWxp = false;
         try {
             String url = ZXingUtil.decodeImg( newFile );
             if ( StringUtils.isNotBlank( url ) && url.startsWith( "https://qr.alipay.com/" ) ) {
