@@ -97,7 +97,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         int transferTimeTotal  = Integer.parseInt( buyerMap.getOrDefault( "s", "0" ).toString() );
         int buyerSuccessCount  = Integer.parseInt( buyerMap.getOrDefault( "c", "0" ).toString() );
 
-        String successRateMonth = new BigDecimal( sellerSuccessCount )
+        String successRateMonth = sellerTotalCount == 0 ? "0.0%" : new BigDecimal( sellerSuccessCount )
                 .divide( new BigDecimal( sellerTotalCount ), 2, RoundingMode.HALF_UP )
                 .multiply( new BigDecimal( 100 ) )
                 .toString()
