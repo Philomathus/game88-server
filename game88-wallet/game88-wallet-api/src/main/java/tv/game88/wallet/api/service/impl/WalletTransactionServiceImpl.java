@@ -103,8 +103,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .toString()
                 .concat( "%" );
 
-        long aveReceivedTime = receivedTimeTotal / sellerSuccessCount;
-        long aveTransferTime = transferTimeTotal / buyerSuccessCount;
+        long aveReceivedTime = sellerSuccessCount == 0 ? 0 : receivedTimeTotal / sellerSuccessCount;
+        long aveTransferTime = buyerSuccessCount == 0 ? 0 : transferTimeTotal / buyerSuccessCount;
 
         walletTransaction.setSuccessNumMonth( sellerSuccessCount );
         walletTransaction.setSuccessRateMonth( successRateMonth );
