@@ -23,7 +23,7 @@ spring:
           username: admin
           password: djkteCbsupY3RCDkPDPS
         slave_7705:
-          url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7704_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+          url: jdbc:mysql://back01.cluster-ro-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7705_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
           username: admin
           password: djkteCbsupY3RCDkPDPS
         slave_7706:
