@@ -104,7 +104,7 @@ public class ReportMoneyinfo implements Serializable {
 
     private String agentPlatform;
 
-    @JsonIgnore
+    @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
 
     public BigDecimal getPaymentAmount() {
