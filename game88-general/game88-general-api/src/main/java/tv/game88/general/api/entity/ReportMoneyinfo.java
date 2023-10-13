@@ -1,6 +1,7 @@
 package tv.game88.general.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -112,6 +113,13 @@ public class ReportMoneyinfo implements Serializable {
 
     public BigDecimal getOutMoney() {
         return outMoney == null ? BigDecimal.ZERO : outMoney;
+    }
+
+    public Map<String,Object> getParams(){
+        if(params ==null){
+            return new HashMap<>();
+        }
+        return params;
     }
 
     @Override
