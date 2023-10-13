@@ -60,7 +60,6 @@
                 AND date_format(reptime,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
             </if>
             order by reptime desc
-
         </where>
     </select>
 
