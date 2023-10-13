@@ -54,8 +54,6 @@
         <include refid="selectReportMoneyinfoVo" />
         <where>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            </if>
-            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
                 AND date_format(reptime,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
