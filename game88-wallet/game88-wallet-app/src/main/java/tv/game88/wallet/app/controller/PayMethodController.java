@@ -1,6 +1,7 @@
 package tv.game88.wallet.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.validation.annotation.Validated;
@@ -63,10 +64,12 @@ public class PayMethodController extends BaseController {
         return walletUserPayMethodService.bindNewPayMethod( MemberSecurityUtils.getUserId(), reqPayMethod );
     }
 
+    public record ReqPayMethodId(@Schema( title = "支付方式ID" ) int payMethodId) {}
+
     @Operation( summary = "解绑支付方式" )
     @PostMapping( "/api/unBindPayMethod" )
-    public RspBase<?> unBindPayMethod( @RequestBody int payMethodId ) {
-        return walletUserPayMethodService.unBindPayMethod( MemberSecurityUtils.getUserId(), payMethodId );
+    public RspBase<?> unBindPayMethod( @RequestBody ReqPayMethodId req ) {
+        return walletUserPayMethodService.unBindPayMethod( MemberSecurityUtils.getUserId(), req.payMethodId() );
     }
 
     @Operation( summary = "分组获取支付方式列表" )
