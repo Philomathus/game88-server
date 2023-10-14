@@ -79,7 +79,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( bPayMethod == null ) {
             return RspBase.businessError( "您的支付方式不存在" );
         }
-        if ( bPayMethod.getAuditStatus() != null ) {
+        if ( bPayMethod.getAuditStatus() != 1 ) {
             return RspBase.businessError( "您的支付方式未审核或审核不通过,请选择其它支付方式" );
         }
         if ( !walletTransaction.getPayMethodTypes().contains( bPayMethod.getMethodType().name() ) ) {
