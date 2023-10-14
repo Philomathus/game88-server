@@ -48,7 +48,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             return RspBase.businessError( "用户未实名或实名未认证" );
         }
         if ( walletUser.getFundPassword() == null ) {
-            return RspBase.businessError( "必须输入基金密码" );
+            return RspBase.businessError( "必须设置资金密码才能绑定支付方式" );
         }
         switch ( reqPayMethod.getMethodType() ) {
         case CREDIT_CARD -> {
