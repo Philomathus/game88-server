@@ -138,8 +138,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             // 扣除会员金额
             WalletUserFundEnum fundEnum = WalletUserFundEnum.CANCEL_ORDER_IN;
             String             mark     = "用户" + fundEnum.getDes() + amount;
-            walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark, update.getTransactionId(),
-                    update.getTransactionId() );
+            walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark,
+                    update.getTransactionId() + "QuXiao", update.getTransactionId() );
         } else {
             throw new BusinessException( "取消挂单失败,请重试" );
         }
