@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class RspPayMethod2 {
+    @Schema( title = "支付方式ID" )
+    private Long   methodId;
     @Schema( title = "银行名称" )
     private String bankName;
     @Schema( title = "开户所在地 - 省" )
