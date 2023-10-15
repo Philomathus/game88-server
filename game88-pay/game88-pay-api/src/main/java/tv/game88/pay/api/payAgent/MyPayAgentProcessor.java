@@ -160,15 +160,15 @@ public class MyPayAgentProcessor extends AbstractPayAgent {
             } );
             log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
-            if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( !CollectionUtils.isEmpty( resultMap ) && resultMap.containsKey( "status" ) ) {
                 //  statusCode
-                //  1-成功，2-失败，3-处理中，4-订单不存在 5-审核拒绝
+                //  1-成功，2-失败，0-处理中
                 String statusCode = resultMap.getOrDefault( "status", "" ).toString();
                 //  4代付中 5代付失败 6代付成功
                 int status = switch ( statusCode ) {
                     case "1" -> 6;
-                    case "3" -> 4;
-                    default -> 5;
+                    case "2" -> 5;
+                    default -> 4;
                 };
                 payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 return resultMap.getOrDefault( "msg", "" ).toString();
