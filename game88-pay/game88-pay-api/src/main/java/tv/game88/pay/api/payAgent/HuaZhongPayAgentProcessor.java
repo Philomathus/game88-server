@@ -130,8 +130,8 @@ public class HuaZhongPayAgentProcessor extends AbstractPayAgent {
     @Override
     public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
         MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentLog.getChannelId() );
         PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
+        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
 
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "merchantId", payAgentChannel.getMerId() );
@@ -163,7 +163,7 @@ public class HuaZhongPayAgentProcessor extends AbstractPayAgent {
             } );
             log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
-            if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( !CollectionUtils.isEmpty( resultMap ) && resultMap.containsKey( "status" ) ) {
                 //  statusCode
                 //  1-成功，2-失败，3-处理中，4-订单不存在 5-审核拒绝
                 String statusCode = resultMap.getOrDefault( "status", "" ).toString();
