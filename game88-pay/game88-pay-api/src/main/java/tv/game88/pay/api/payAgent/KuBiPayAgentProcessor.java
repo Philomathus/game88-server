@@ -175,11 +175,9 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-        Map<String, Object>  dataMap          = new LinkedHashMap<>();
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
+        Map<String, Object> dataMap = new LinkedHashMap<>();
         dataMap.put( "cmd", "transferquery" );
         dataMap.put( "ver", "1.2" );
         dataMap.put( "mchId", payAgentChannel.getMerId() );

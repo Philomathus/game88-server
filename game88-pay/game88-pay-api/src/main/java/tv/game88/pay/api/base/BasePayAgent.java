@@ -3,7 +3,6 @@ package tv.game88.pay.api.base;
 import tv.game88.pay.api.dto.ReqPayAgent;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
-import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 
 import java.util.Map;
@@ -48,5 +47,6 @@ public interface BasePayAgent {
     /**
      * 代付查询
      */
-    String queryOrderPay( PayAgentLog payAgentLog ) throws Exception;
+    String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                          PayAgentPlatform payAgentPlatform ) throws Exception;
 }

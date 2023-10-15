@@ -82,11 +82,11 @@ public class ToPayAgentProcessor extends AbstractPayAgent {
             if ( "1".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
                 Map         data        = JsonUtil.json2Map( resultMap.getOrDefault( "data", "" ).toString() );
                 String      id          = data.getOrDefault( "id", "" ).toString();
-                PayAgentLog payAgentLog = payAgentLogMapper.selectById( withdrawDetail.getWithdrawOrderNo() );
                 PayAgentLog update      = new PayAgentLog();
-                update.setWithdrawOrderNo( payAgentLog.getWithdrawOrderNo() );
+                update.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
                 update.setAgentOrderNo( id );
                 payAgentLogMapper.updateById( update );
+
                 log.info( payAgentPlatform.getName() + "订单提交成功 - listResult:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
@@ -156,19 +156,16 @@ public class ToPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity( null, httpHeaders );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( null, httpHeaders );
 
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl() + "?id="
-                    + payAgentLog.getAgentOrderNo(), HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
+                    + withdrawDetail.getPayAgentOrderNo(), HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
                 InputStream bodyStream = response.getBody();
                 String      text;
                 try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -177,7 +174,7 @@ public class ToPayAgentProcessor extends AbstractPayAgent {
                 return JsonUtil.json2Map( text );
             } );
             log.info( payAgentPlatform.getName()
-                    + "查询结果 - 订单号:{} - result:{}", payAgentLog.getWithdrawOrderNo(), JsonUtil.object2Json( resultMap ) );
+                    + "查询结果 - 订单号:{} - result:{}", withdrawDetail.getWithdrawOrderNo(), JsonUtil.object2Json( resultMap ) );
 
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 String code = resultMap.getOrDefault( "code", "" ).toString();

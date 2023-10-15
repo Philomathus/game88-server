@@ -70,9 +70,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
-        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId )
-                                                                           .select( "code_will", "code_now", "account_now" )
-                                                                           .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "code_will", "code_now", "account_now" )
+                .one();
         return this.getRspWithdrawDetail( memberInfo.getCodeWill(), memberInfo.getCodeNow(), memberInfo.getAccountNow() );
     }
 
@@ -110,7 +111,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             for ( MemberWithdrawDetail me : withdrawDetails ) {
                 //入款人姓名不为空，并且入款人不包含提现人，整条数据标红警告
                 if ( StringUtils.isNotBlank( me.getBankUserName() ) && Strings.isNotBlank( me.getRechargeUserName() ) && !me
-                        .getRechargeUserName().contains( me.getBankUserName() ) ) {
+                        .getRechargeUserName()
+                        .contains( me.getBankUserName() ) ) {
                     me.setRechargeUserNameStatus( 1 );//等于1,数据警告
                 } else {
                     me.setRechargeUserNameStatus( 0 );
@@ -118,11 +120,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 memberIds.add( me.getWithdrawId() );
                 me.setMultipleCode( multipleCode );
             }
-            List<MemberInfo> memberInfoList = memberInfoMapper.selectList( new QueryWrapper<MemberInfo>().in( "id", memberIds )
-                                                                                                         .select( "id", "status"
-                                                                                                                 ,
-                                                                                                                 "register_time"
-                                                                                                         ) );
+            List<MemberInfo> memberInfoList = memberInfoMapper.selectList( new QueryWrapper<MemberInfo>()
+                    .in( "id", memberIds )
+                    .select( "id", "status", "register_time" ) );
             LocalDateTime date = LocalDateTime.now().minusHours( 48 );
             for ( MemberWithdrawDetail me : withdrawDetails ) {
                 for ( MemberInfo st : memberInfoList ) {
@@ -491,10 +491,12 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             log.warn( "代付平台未找到 - platformId:{}", payAgentChannel.getPlatformId() );
             return RspBase.businessError( "代付平台未找到" );
         }
-        BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
-        String       msg          = null;
+        MemberWithdrawDetail withdrawDetail = this.baseMapper.selectById( payAgentLog.getWithdrawOrderNo() );
+        BasePayAgent         basePayAgent   = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
+        String               msg            = null;
         try {
-            msg = basePayAgent.queryOrderPay( payAgentLog );
+            withdrawDetail.setPayAgentOrderNo( payAgentLog.getAgentOrderNo() );
+            msg = basePayAgent.queryOrderPay( withdrawDetail, payAgentChannel, payAgentPlatform );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
@@ -740,8 +742,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public RspBase<?> memberWithdrawPassIsOpen( String memberId ) {
-        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId ).select( "id", "withdrawal_pass" )
-                                                                           .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "id", "withdrawal_pass" )
+                .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }
@@ -750,8 +754,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     @Override
     public RspBase<?> memberWithdrawPassSet( String memberId, ReqBoxPass boxPass ) {
-        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper ).eq( "id", memberId ).select( "id", "withdrawal_pass" )
-                                                                           .one();
+        MemberInfo memberInfo = new QueryChainWrapper<>( memberInfoMapper )
+                .eq( "id", memberId )
+                .select( "id", "withdrawal_pass" )
+                .one();
         if ( memberInfo == null ) {
             return RspBase.businessError( "会员不存在" );
         }
@@ -804,9 +810,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startTime = now.withHour( configEnvCacheUtil.getConfInt( "withdraw_limit_start_hour" ) )
-                                     .withMinute( configEnvCacheUtil.getConfInt( "withdraw_limit_start_minute" ) ).withSecond( 0 )
-                                     .withNano( 0 );
+        LocalDateTime startTime = now
+                .withHour( configEnvCacheUtil.getConfInt( "withdraw_limit_start_hour" ) )
+                .withMinute( configEnvCacheUtil.getConfInt( "withdraw_limit_start_minute" ) )
+                .withSecond( 0 )
+                .withNano( 0 );
         LocalDateTime endTime = now.withHour( 23 ).withMinute( 59 ).withSecond( 59 ).withNano( 999999999 );
 
         BigDecimal withdrawLimitMoney = configEnvCacheUtil.getConfBd( "withdraw_limit_money" );
@@ -817,12 +825,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         //每日提现次数
         int withdraw_times = configEnvCacheUtil.getConfInt( "withdraw_times_day" );
         if ( withdraw_times > 0 ) {
-            long times = this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>().eq( "withdraw_id", memberId )
-                                                                                              .ge( "create_time",
-                                                                                                      LocalDateTimeUtils.getStartOfToday() )
-                                                                                              .in( "status", 3, 6 )
-                                                                                              .eq( "withdraw_money",
-                                                                                                      req.getWithdrawMoney() ) );
+            long times = this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
+                    .eq( "withdraw_id", memberId )
+                    .ge( "create_time", LocalDateTimeUtils.getStartOfToday() )
+                    .in( "status", 3, 6 )
+                    .eq( "withdraw_money", req.getWithdrawMoney() ) );
             if ( times >= withdraw_times ) {
                 return RspBase.businessError( "今日提现次数超过限制，请您改日申请提现" );
             }
@@ -842,8 +849,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( !redisUtils.lock( "withdrawBank" + memberId, 5 ) ) {
             return RspBase.businessError( "处理中请稍后" );
         }
-        String withdrawOrderNo = SpringUtils.getBean( MemberWithdrawDetailService.class )
-                                            .withdrawBank( memberInfo, req.getWithdrawMoney(), memberCard );
+        String withdrawOrderNo = SpringUtils
+                .getBean( MemberWithdrawDetailService.class )
+                .withdrawBank( memberInfo, req.getWithdrawMoney(), memberCard );
         MemberWithdrawDetail update = new MemberWithdrawDetail();
         update.setWithdrawOrderNo( withdrawOrderNo );
         //出款金额汇总
@@ -908,18 +916,26 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         memberWithdrawDetail.setStatus( 0 );
         memberWithdrawDetail.setCreateTime( LocalDateTime.now() );
         memberWithdrawDetail.setUpdateTime( memberWithdrawDetail.getCreateTime() );
-        memberWithdrawDetail.setFirst(
-                this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>().eq( "withdraw_id", memberInfo.getId() )
-                                                                                     .in( "status", 3, 6 ) ) <= 0 );
+        memberWithdrawDetail.setFirst( this.baseMapper.selectCount( new QueryWrapper<MemberWithdrawDetail>()
+                .eq( "withdraw_id", memberInfo.getId() )
+                .in( "status", 3, 6 ) ) <= 0 );
 
         memberWithdrawDetail.setBankRechargeNum( new QueryChainWrapper<>( memberRechargeBankMapper )
-                .eq( "member_id", memberInfo.getId() ).eq( "status", 3 ).ge( "create_time", LocalDateTimeUtils.getStartOfToday() )
+                .eq( "member_id", memberInfo.getId() )
+                .eq( "status", 3 )
+                .ge( "create_time", LocalDateTimeUtils.getStartOfToday() )
                 .count() );
         List<MemberRechargeBank> memberRechargeBanks = new QueryChainWrapper<>( memberRechargeBankMapper )
-                .eq( "member_id", memberInfo.getId() ).eq( "status", 3 ).ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
-                .select( "recharge_real_name" ).list();
-        List<String> rechargeRealNames = memberRechargeBanks.stream().map( MemberRechargeBank::getRechargeRealName ).distinct()
-                                                            .toList();
+                .eq( "member_id", memberInfo.getId() )
+                .eq( "status", 3 )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .select( "recharge_real_name" )
+                .list();
+        List<String> rechargeRealNames = memberRechargeBanks
+                .stream()
+                .map( MemberRechargeBank::getRechargeRealName )
+                .distinct()
+                .toList();
         memberWithdrawDetail.setRechargeUserName( StringUtils.join( rechargeRealNames.toArray(), "," ) );
         BigDecimal code_total   = memberInfo.getCodeTotal();//累计有效投注
         BigDecimal code_account = memberInfo.getCodeNow();//打码账户
@@ -1005,10 +1021,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         case 7 -> detail.setRemark( "提现成功，请联系客服" );
         case 2, 5 -> {
             detail.setColor( "#FF0E0E" );
-            detail.setRemark( "提现失败" + (
-                    detail.getStatus() == 2 && StringUtils.isNotBlank( detail.getRemark() ) && !detail.getRemark()
-                                                                                                      .contains( "锁定" ) ?
-                            ":" + detail.getRemark() : "" ) );
+            detail.setRemark( "提现失败" + ( detail.getStatus() == 2 && StringUtils.isNotBlank( detail.getRemark() ) && !detail
+                    .getRemark()
+                    .contains( "锁定" ) ? ":" + detail.getRemark() : "" ) );
         }
         }
     }

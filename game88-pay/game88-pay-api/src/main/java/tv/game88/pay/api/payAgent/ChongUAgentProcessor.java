@@ -126,11 +126,8 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "MerchantId", payAgentPlatform.getId() );
         dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );

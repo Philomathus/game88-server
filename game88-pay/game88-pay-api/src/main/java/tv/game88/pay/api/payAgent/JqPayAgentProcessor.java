@@ -129,9 +129,9 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
             }
 
             String status = dataMap.getOrDefault( "status", "" ).toString();
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap.getOrDefault( "order_no", "" )
-                                                                                    .toString(), payAgentChannel,
-                    "OK_ORDER".equals( status ) );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap
+                    .getOrDefault( "order_no", "" )
+                    .toString(), payAgentChannel, "OK_ORDER".equals( status ) );
 
             log.info( payAgentPlatform.getName()
                     + "订单号:{},回调状态:{},", withdrawOrderId, "OK_ORDER".equals( status ) ? "成功" : "失败" );
@@ -147,11 +147,8 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "outTradeNo", withdrawDetail.getWithdrawOrderNo() );
         dataMap.put( "merchId", payAgentChannel.getMerId() );

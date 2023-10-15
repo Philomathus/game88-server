@@ -114,9 +114,9 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
                 log.error( "已有代付记录 - merOrderNo:{}", merchantOrderId );
                 return "OK";
             }
-            payAgentService.processOrderPay( withdrawLog, payAgentLog, requestMap.getOrDefault( "systemOrderId", "" )
-                                                                                 .toString(), payAgentChannel,
-                    "3".equals( status ) );
+            payAgentService.processOrderPay( withdrawLog, payAgentLog, requestMap
+                    .getOrDefault( "systemOrderId", "" )
+                    .toString(), payAgentChannel, "3".equals( status ) );
             return "OK";
         }
 
@@ -130,16 +130,12 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) {
-
-        MemberWithdrawDetail withdrawLog      = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentLog.getChannelId() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) {
         Map<String, Object> dataMap = new LinkedHashMap<>();
         dataMap.put( "merchantId", payAgentPlatform.getId() );
-        dataMap.put( "merchantOrderId", withdrawLog.getWithdrawOrderNo() );
-        dataMap.put( "orderAmount", withdrawLog.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
+        dataMap.put( "merchantOrderId", withdrawDetail.getWithdrawOrderNo() );
+        dataMap.put( "orderAmount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String tempStr = this.assemblyUrl( dataMap ) + signMd5;
@@ -167,11 +163,11 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
                         case "4" -> 5;
                         default -> 4;
                     };
-                    payAgentService.processOrder( payAgentChannel, withdrawLog, withdrawLog.getUpdateTime(), status );
+                    payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
                 }
             }
             return errorMessage;
         }
-        return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawLog.getWithdrawOrderNo();
+        return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawDetail.getWithdrawOrderNo();
     }
 }

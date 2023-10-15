@@ -110,9 +110,9 @@ public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
                 return "SUCCESS";
             }
 
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap.getOrDefault( "WithdrawOrderId", "" )
-                                                                                    .toString(), payAgentChannel,
-                    "100".equals( status ) );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap
+                    .getOrDefault( "WithdrawOrderId", "" )
+                    .toString(), payAgentChannel, "100".equals( status ) );
             log.info(
                     payAgentPlatform.getName() + "订单号:{},回调状态:{},", order_num, "100".equals( status ) ? "成功" : "失败" );
             return "SUCCESS";
@@ -128,11 +128,8 @@ public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> paramsMap = new TreeMap<>();
         paramsMap.put( "MerchantId", payAgentChannel.getMerId() );
         paramsMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );

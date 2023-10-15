@@ -79,8 +79,9 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
             if ( "0".equals( resDataMap.getOrDefault( "code", "" ).toString() ) ) {
                 Map<String, Object> data = JsonUtil.json2Map( resDataMap.getOrDefault( "data", "" ).toString() );
                 if ( "SUCCESS".equals( data.getOrDefault( "result", "" ) ) ) {
-                    log.info( payAgentPlatform.getName() + "订单提交成功 - result:{}", resDataMap.getOrDefault( "data", "" )
-                                                                                                 .toString() );
+                    log.info( payAgentPlatform.getName() + "订单提交成功 - result:{}", resDataMap
+                            .getOrDefault( "data", "" )
+                            .toString() );
                     return true;
                 }
             }
@@ -207,11 +208,8 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "merchantNo", withdrawDetail.getWithdrawOrderNo() );
         params.put( "merchantCode", payAgentChannel.getMerId() );

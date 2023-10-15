@@ -42,8 +42,11 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
         Map<String, String> dataMap      = new TreeMap<>();
         dataMap.put( "client_num", payAgentChannel.getMerId() );
         dataMap.put( "order_num", withdrawDetail.getWithdrawOrderNo() );
-        dataMap.put( "amount", withdrawDetail.getWithdrawMoney().multiply( new BigDecimal( 100 ) )
-                                             .setScale( 0, RoundingMode.HALF_EVEN ).toString() );
+        dataMap.put( "amount", withdrawDetail
+                .getWithdrawMoney()
+                .multiply( new BigDecimal( 100 ) )
+                .setScale( 0, RoundingMode.HALF_EVEN )
+                .toString() );
         dataMap.put( "bank_account_name", withdrawDetail.getBankUserName().trim() );
         dataMap.put( "bank_account_no", withdrawDetail.getBankAccount().trim() );
         dataMap.put( "bank_code", bankCodeType.name() );
@@ -259,7 +262,8 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
             String     bankAccountNo = requestMap.remove( "bankAccountNo" ).toString();
             String     clientCode    = requestMap.get( "clientCode" ).toString();
             if ( amount.compareTo( memberWithdrawDetail.getWithdrawMoney() ) != 0 || !bankAccountNo.equals( memberWithdrawDetail
-                    .getBankAccount().trim() ) || !clientCode.equals( payAgentChannel.getMerId() ) ) {
+                    .getBankAccount()
+                    .trim() ) || !clientCode.equals( payAgentChannel.getMerId() ) ) {
                 resultMap.put( "msg", "订单不匹配" );
                 return resultMap;
             }
@@ -274,11 +278,8 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
     }
 
     @Override
-    public String queryOrderPay( PayAgentLog payAgentLog ) throws Exception {
-        MemberWithdrawDetail withdrawDetail   = withdrawDetailMapper.selectById( payAgentLog.getWithdrawOrderNo() );
-        PayAgentChannel      payAgentChannel  = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-        PayAgentPlatform     payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
-
+    public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, String> dataMap = new TreeMap<>();
         dataMap.put( "client_num", payAgentChannel.getMerId() );
         dataMap.put( "order_num", withdrawDetail.getWithdrawOrderNo() );
