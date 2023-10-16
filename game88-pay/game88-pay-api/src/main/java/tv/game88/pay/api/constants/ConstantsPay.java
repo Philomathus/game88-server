@@ -61,4 +61,5 @@ public abstract class ConstantsPay {
     public static final String XIAO_MA_PAY    = "xiaoMaPay";
     public static final String JUE_QI_PAY     = "jueQiPay";
     public static final String CBI_PAY        = "cbiPay";
+    public static final String BAXI_PAY        = "baxiPay";
 }
