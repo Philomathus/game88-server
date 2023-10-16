@@ -23,6 +23,9 @@ public class RspTransCenterDetail {
     @Schema( title = "收款方式类型", description = "英文逗号,分割" )
     private String  payMethodTypes;
 
+    @Schema( title = "status", description = "status" )
+    private Integer status;
+
     public String getHeadImg() {
         if ( StringUtils.isBlank( headImg ) ) {
             return ConstantsWallet.DEFAULT_HEAD_IMAGE_URL;
