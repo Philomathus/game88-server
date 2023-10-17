@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -93,9 +94,9 @@ public class WalletTransaction implements Serializable {
     private String transferTimeMonth;
 
     @TableField( exist = false )
-    private String  payMethodType;
+    private WalletPayMethodEnum payMethodType;
     @TableField( exist = false )
-    private Long    minAmount;
+    private Long                minAmount;
     @TableField( exist = false )
-    private Long    maxAmount;
+    private Long                maxAmount;
 }
