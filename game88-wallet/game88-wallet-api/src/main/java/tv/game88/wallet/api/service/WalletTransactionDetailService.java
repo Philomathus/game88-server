@@ -1,11 +1,11 @@
 package tv.game88.wallet.api.service;
 
-import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.ReqBuyCoins;
-import tv.game88.wallet.api.dto.ReqBuyerConfirmTransfer;
-import tv.game88.wallet.api.dto.RspBuyOrderDetail;
-import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
+import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.dto.*;
+import tv.game88.wallet.api.entity.WalletTransactionDetail;
+
+import java.util.List;
 
 /**
  * @author meng.jun
@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @createDate 2023-08-21 17:31:44
  */
 public interface WalletTransactionDetailService extends IService<WalletTransactionDetail> {
+
+    List<RspTransDetail> transDetailList( String userId, ReqTransDetailList req );
 
     RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins );
 

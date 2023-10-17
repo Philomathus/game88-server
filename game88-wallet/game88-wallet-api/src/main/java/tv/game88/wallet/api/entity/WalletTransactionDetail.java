@@ -1,14 +1,17 @@
 package tv.game88.wallet.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import tv.game88.wallet.api.type.WalletTransEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 钱包交易明细表
@@ -65,6 +68,12 @@ public class WalletTransactionDetail implements Serializable {
     private WalletTransEnum status;
 
     /**
+     * 交易时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime time;
+
+    /**
      * 买家确认购买时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
@@ -116,4 +125,11 @@ public class WalletTransactionDetail implements Serializable {
      * 交易行为详情
      */
     private String remark;
+
+    @TableField( exist = false )
+    @JsonIgnore
+    private String                buySellId;
+    @TableField( exist = false )
+    @JsonIgnore
+    private List<WalletTransEnum> statusList;
 }

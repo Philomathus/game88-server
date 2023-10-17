@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
@@ -14,10 +15,7 @@ import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.wallet.api.constants.ConstantsWallet;
-import tv.game88.wallet.api.dto.ReqBuyCoins;
-import tv.game88.wallet.api.dto.ReqBuyerConfirmTransfer;
-import tv.game88.wallet.api.dto.RspBuyOrderDetail;
-import tv.game88.wallet.api.dto.RspPayMethod2;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -29,12 +27,14 @@ import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.type.EnumTransDetail;
 import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,6 +59,36 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Override
+    public List<RspTransDetail> transDetailList( String userId, ReqTransDetailList req ) {
+        WalletTransactionDetail query = new WalletTransactionDetail();
+        if ( req.getType() != null ) {
+            if ( req.getType() == EnumTransDetail.buy ) {
+                query.setBuyerId( userId );
+            } else {
+                query.setSellerId( userId );
+            }
+        } else {
+            query.setBuySellId( userId );
+        }
+        if ( !CollectionUtils.isEmpty( req.getTransType() ) ) {
+            query.setStatusList( req.getTransType() );
+        }
+        List<WalletTransactionDetail> walletTransactionDetails = this.baseMapper.selectWalletTransactionDetailList( query );
+        List<RspTransDetail>          resultList               = new ArrayList<>();
+        for ( WalletTransactionDetail walletTransactionDetail : walletTransactionDetails ) {
+            RspTransDetail rspTransDetail = new RspTransDetail();
+            rspTransDetail.setTransDetailId( walletTransactionDetail.getTransDetailId() );
+            rspTransDetail.setAmount( walletTransactionDetail.getAmount() );
+            rspTransDetail.setStatus( walletTransactionDetail.getStatus() );
+            rspTransDetail.setTime( walletTransactionDetail.getTime() );
+            rspTransDetail.setType( userId.equals( walletTransactionDetail.getSellerId() ) ? EnumTransDetail.sell :
+                    EnumTransDetail.buy );
+            resultList.add( rspTransDetail );
+        }
+        return resultList;
+    }
 
     @Override
     public RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins ) {
@@ -100,6 +130,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletTransactionDetail.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         walletTransactionDetail.setBuyerConfirmBuyTime( now );
+        walletTransactionDetail.setTime( now );
         walletTransactionDetail.setSellerId( sellerId );
         walletTransactionDetail.setBuyerId( userId );
         walletTransactionDetail.setBuyerPayMethodId( reqBuyCoins.getPayMethodId() );
@@ -222,6 +253,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setSellerConfirmTransTime( now );
+        update.setTime( now );
         String remark = "\n卖家" + userId + "确认交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
         int i = this.baseMapper.updateById( update );
@@ -265,6 +297,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setCancelTime( now );
+        update.setTime( now );
         String remark = "\n卖家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -338,6 +371,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setBuyerConfirmTransferTime( now );
+        update.setTime( now );
         update.setTransCertPic( reqBuyerConfirmTransfer.getTransCertPic() );
         String remark = "\n买家" + userId + "确认转账,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
@@ -382,6 +416,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setCancelTime( now );
+        update.setTime( now );
         String remark = "\n买家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -423,6 +458,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setSuccessTransTime( now );
+        update.setTime( now );
         String remark = "\n卖家" + userId + "确认转币,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -502,6 +538,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setSellerNotReceivedTime( now );
+        update.setTime( now );
         String remark = "\n卖家" + userId + "未收到转账,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
         int i = this.baseMapper.updateById( update );
@@ -537,6 +574,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setCancelTime( now );
+        update.setTime( now );
         String remark =
                 "\n卖家" + walletTransactionDetail.getSellerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
@@ -570,6 +608,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setCancelTime( now );
+        update.setTime( now );
         String remark = "\n买家" + walletTransactionDetail.getBuyerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -602,6 +641,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setSuccessTransTime( now );
+        update.setTime( now );
         String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间未操作,系统确认转币,时间:"
                 + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );

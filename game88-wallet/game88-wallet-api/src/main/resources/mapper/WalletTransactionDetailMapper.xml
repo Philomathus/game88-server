@@ -14,6 +14,7 @@
         <result property="amount" column="amount" jdbcType="BIGINT" />
         <result property="transCertPic" column="trans_cert_pic" jdbcType="VARCHAR" />
         <result property="status" column="status" />
+        <result property="time" column="time" jdbcType="TIMESTAMP" />
         <result property="buyerConfirmBuyTime" column="buyer_confirm_buy_time" jdbcType="TIMESTAMP" />
         <result property="sellerConfirmTransTime" column="seller_confirm_trans_time" jdbcType="TIMESTAMP" />
         <result property="buyerConfirmTransferTime" column="buyer_confirm_transfer_time" jdbcType="TIMESTAMP" />
@@ -35,6 +36,7 @@
                amount,
                trans_cert_pic,
                status,
+               `time`,
                buyer_confirm_buy_time,
                seller_confirm_trans_time,
                buyer_confirm_transfer_time,
@@ -46,4 +48,27 @@
                remark
         from wallet_transaction_detail
     </sql>
+
+    <select id="selectWalletTransactionDetailList" parameterType="tv.game88.wallet.api.entity.WalletTransactionDetail"
+            resultMap="WalletTransactionDetailResult">
+        <include refid="selectWalletTransactionDetailVo" />
+        <where>
+            <if test="transactionId != null  and transactionId != ''">and transaction_id = #{transactionId}</if>
+            <if test="sellerId != null  and sellerId != ''">and seller_id = #{sellerId}</if>
+            <if test="buyerId != null  and buyerId != ''">and buyer_id = #{buyerId}</if>
+            <if test="amount != null ">and amount = #{amount}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+
+            <if test="buySellId != null and buySellId != ''">
+                and (buyer_id = #{buySellId} or seller_id = #{buySellId})
+            </if>
+            <if test="statusList != null">
+                and `status` in
+                <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+        order by `time` desc
+    </select>
 </mapper>
