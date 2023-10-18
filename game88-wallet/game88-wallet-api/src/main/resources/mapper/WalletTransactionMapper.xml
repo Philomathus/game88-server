@@ -47,8 +47,8 @@
                 and pay_method_types like concat('%', #{payMethodType}, '%')
             </if>
             <if test="payMethodTypeList != null">
-                <foreach item="paymentMethod" collection="payMethodTypeList">
-                    or pay_method_types like concat('%', #{paymentMethod}, '%')
+                <foreach item="paymentMethod" collection="payMethodTypeList" open="and (" separator="or" close=")">
+                    pay_method_types like concat('%', #{paymentMethod}, '%')
                 </foreach>
             </if>
             <if test="canSplit != null">
