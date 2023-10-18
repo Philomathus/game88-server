@@ -97,6 +97,8 @@ public class WalletTransaction implements Serializable {
     @TableField( exist = false )
     private WalletPayMethodEnum payMethodType;
     @TableField( exist = false )
+    private List<WalletPayMethodEnum> payMethodTypeList;
+    @TableField( exist = false )
     private Long                minAmount;
     @TableField( exist = false )
     private Long                maxAmount;
