@@ -251,9 +251,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return rspBase;
         }
         WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
-        rspBase = this.validTransaction( walletTransaction );
-        if ( rspBase != null ) {
-            return rspBase;
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
         }
         WalletUser seller = walletUserService.getById( walletTransaction.getUserId() );
 
