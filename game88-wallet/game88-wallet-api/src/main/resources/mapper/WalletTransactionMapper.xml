@@ -66,6 +66,9 @@
                     #{status}
                 </foreach>
             </if>
+            <if test="unUserId != null">
+                and user_id <![CDATA[ <> ]]> #{userId}
+            </if>
         </where>
         order by create_time desc
     </select>

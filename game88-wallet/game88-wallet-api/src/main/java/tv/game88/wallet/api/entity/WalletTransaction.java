@@ -102,4 +102,6 @@ public class WalletTransaction implements Serializable {
     private Long                maxAmount;
     @TableField( exist = false )
     private List<Integer>       statusList;
+    @TableField( exist = false )
+    private String       unUserId;
 }
