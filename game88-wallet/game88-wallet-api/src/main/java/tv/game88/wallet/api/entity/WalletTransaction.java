@@ -10,6 +10,7 @@ import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 钱包交易表
@@ -99,4 +100,6 @@ public class WalletTransaction implements Serializable {
     private Long                minAmount;
     @TableField( exist = false )
     private Long                maxAmount;
+    @TableField( exist = false )
+    private List<Integer>       statusList;
 }

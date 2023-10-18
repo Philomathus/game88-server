@@ -231,6 +231,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
 
+        query.setStatusList( Arrays.asList( 0, 1 ) );
+
         List<WalletTransaction>    walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspTransCenterDetail> resultList         = new ArrayList<>();
         for ( WalletTransaction transaction : walletTransactions ) {

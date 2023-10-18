@@ -60,6 +60,12 @@
             <if test="status != null">
                 and `status` = #{status}
             </if>
+            <if test="statusList != null">
+                and `status` in
+                <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
         </where>
         order by create_time desc
     </select>
