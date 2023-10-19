@@ -41,7 +41,7 @@ public class SseStreamService {
             SseEmitter.SseEventBuilder event = SseEmitter.event()
                     .name(message.getMessageType().toString())
                     .id(receiverId)
-                    .data(message, MediaType.APPLICATION_JSON)
+                    .data(message.getData(), MediaType.APPLICATION_JSON)
                     .reconnectTime(1000);
             sendMessage(emitter, event);
         }
