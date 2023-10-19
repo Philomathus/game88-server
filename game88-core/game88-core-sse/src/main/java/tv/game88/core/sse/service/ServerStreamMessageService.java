@@ -16,15 +16,14 @@ public class ServerStreamMessageService {
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     public void sendMessage(SseEmitter emitter, String receiverId, SimpleProtocolMessage<?> message ) {
-        if(emitter == null || receiverId == null) {
-            throw new RuntimeException("Invalid params - emitter: " + emitter + ", receiver: " + receiverId);
+        if(emitter != null && receiverId != null) {
+            SseEmitter.SseEventBuilder event = SseEmitter.event()
+                    .name( message.getMessageType().toString() )
+                    .id( receiverId )
+                    .data( message, MediaType.APPLICATION_JSON )
+                    .reconnectTime( 1000 );
+            sendMessage( emitter, event );
         }
-        SseEmitter.SseEventBuilder event = SseEmitter.event()
-                .name( message.getMessageType().toString() )
-                .id( receiverId )
-                .data( message, MediaType.APPLICATION_JSON )
-                .reconnectTime( 1000 );
-        sendMessage( emitter, event );
     }
 
     private void sendMessage( SseEmitter emitter, SseEmitter.SseEventBuilder event ) {
