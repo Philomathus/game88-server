@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.MobileLogin;
-import tv.game88.wallet.api.dto.Phone;
-import tv.game88.wallet.api.dto.ReqResetPasswd;
-import tv.game88.wallet.api.dto.RspMember;
+import tv.game88.wallet.api.constants.ReqConstant;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.app.manager.MemberTokenManager;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
@@ -57,6 +55,12 @@ public class LoginController extends BaseController {
         RspBase<RspMember> rspMemberRspBase = walletUserService.register( mobileLogin, dev, loginUrl );
         memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
         return rspMemberRspBase;
+    }
+
+    @Operation( summary = "设置登录密码", description = "要设置登录密码要密码和确认密码，需要登录到token" )
+    @PostMapping("/setPassword")
+    public RspBase<?> setPassword( @RequestBody ReqConstant.ReqSetPasswd reqSetPasswd ){
+        return  walletUserService.setPassword( MemberSecurityUtils.getUserId() , reqSetPasswd );
     }
 
     @Operation( summary = "重置登录密码", description = "根据旧密码重置登录密码,需要登录token" )
