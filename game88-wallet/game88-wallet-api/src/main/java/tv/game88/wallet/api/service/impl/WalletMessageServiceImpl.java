@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.sse.model.SimpleProtocolMessage;
+import tv.game88.core.sse.service.ServerStreamMessageService;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
@@ -15,11 +17,14 @@ import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
+import tv.game88.wallet.api.vo.TransDetailStreamMessage;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static tv.game88.core.sse.constant.SseConstants.USER_ID_EMITTERS;
+import static tv.game88.core.sse.model.StreamMessageType.NOTIFICATION;
 
 /**
  * 站内信Service业务层处理
@@ -30,6 +35,8 @@ import java.util.List;
 public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, WalletMessage> implements WalletMessageService {
     @Resource
     private RedisUtils redisUtils;
+    @Resource
+    private ServerStreamMessageService serverStreamMessageService;
 
     /**
      * 查询站内信列表
@@ -171,7 +178,13 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         walletMessage.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( walletMessage );
 
-        redisUtils.strSet( ConstantsWallet.MESSAGE_PERSONAL_PROMPT
-                + receiverUserId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 1 ) );
+        serverStreamMessageService.sendMessage(USER_ID_EMITTERS.get(receiverUserId), receiverUserId,
+                SimpleProtocolMessage.<TransDetailStreamMessage>builder().
+                        messageType(NOTIFICATION)
+                        .data(TransDetailStreamMessage.builder()
+                                        .transDetailId(transDetailId)
+                                        .walletTransEnum(walletTransEnum)
+                                        .build())
+                        .build());
     }
 }
