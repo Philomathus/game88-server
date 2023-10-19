@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.sse.model.SimpleProtocolMessage;
-import tv.game88.core.sse.service.ServerStreamMessageService;
+import tv.game88.core.sse.service.SseStreamService;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
@@ -36,7 +36,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
     @Resource
     private RedisUtils redisUtils;
     @Resource
-    private ServerStreamMessageService serverStreamMessageService;
+    private SseStreamService sseStreamService;
 
     /**
      * 查询站内信列表
@@ -178,7 +178,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         walletMessage.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( walletMessage );
 
-        serverStreamMessageService.sendMessage(USER_ID_EMITTERS.get(receiverUserId), receiverUserId,
+        sseStreamService.sendMessage(USER_ID_EMITTERS.get(receiverUserId), receiverUserId,
                 SimpleProtocolMessage.<TransDetailStreamMessage>builder().
                         messageType(NOTIFICATION)
                         .data(TransDetailStreamMessage.builder()
