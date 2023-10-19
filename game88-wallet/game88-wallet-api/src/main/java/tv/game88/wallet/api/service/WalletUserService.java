@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletUser;
 
@@ -49,4 +50,8 @@ public interface WalletUserService extends IService<WalletUser> {
     RspBase<?> validWalletUser( WalletUser walletUser );
 
     RspBase<?> verifyIdCard( String userId, ReqVerifyIdCard reqVerifyIdCard );
+
+    RspBase<?> setPassword( String userId, ReqConstant.ReqSetPasswd reqSetPasswd );
+
+    RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd );
 }

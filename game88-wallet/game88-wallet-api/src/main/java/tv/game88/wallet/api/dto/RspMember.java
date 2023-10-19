@@ -35,6 +35,8 @@ public class RspMember {
     private Boolean hasPassword;
     @Schema( title = "是否有资金密码" )
     private Boolean hasFundPassword;
+    @Schema( title = "用户头像" )
+    private String        headImg;
 
     public String getPhone() {
         if ( StringUtils.isNotBlank( phone ) ) {
