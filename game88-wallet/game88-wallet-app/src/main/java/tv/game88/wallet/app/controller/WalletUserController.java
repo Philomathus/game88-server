@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
@@ -39,6 +40,12 @@ public class WalletUserController extends BaseController {
     @PostMapping( "/api/fundPassSet" )
     public RspBase<?> fundPassSet( @Validated @RequestBody ReqFundPass reqFundPass ) {
         return walletUserService.fundPassSet( MemberSecurityUtils.getUserId(), reqFundPass );
+    }
+
+    @Operation(summary = "重置基金密码")
+    @PostMapping( "/api/fundPassReset" )
+    public RspBase<?> funPassReset( @RequestBody ReqConstant.ReqResetFundPasswd reqResetFundPasswd ){
+        return walletUserService.resetFunPassword( MemberSecurityUtils.getUserId() , reqResetFundPasswd );
     }
 
     @Operation( summary = "个人账变" )
