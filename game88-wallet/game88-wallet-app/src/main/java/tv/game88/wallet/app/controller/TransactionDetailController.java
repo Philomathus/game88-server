@@ -9,14 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.dto.ReqBuyCoins;
-import tv.game88.wallet.api.dto.ReqBuyerConfirmTransfer;
-import tv.game88.wallet.api.dto.ReqTransactionDetail;
-import tv.game88.wallet.api.dto.RspBuyOrderDetail;
+import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @Tag( name = "交易接口" )
@@ -24,6 +22,14 @@ import javax.annotation.Resource;
 public class TransactionDetailController extends BaseController {
     @Resource
     private WalletTransactionDetailService walletTransactionDetailService;
+
+    @Operation( summary = "交易记录 - 我的订单" )
+    @PostMapping( "/api/transDetailList" )
+    public RspBase<List<RspTransDetail>> transDetailList( @RequestBody ReqTransDetailList req ) {
+        startPage( req );
+        List<RspTransDetail> resultList = walletTransactionDetailService.transDetailList( MemberSecurityUtils.getUserId(), req );
+        return getRspBasePage( resultList, req );
+    }
 
     @Operation( summary = "购买G币" )
     @PostMapping( "/api/buyOrder" )

@@ -25,7 +25,7 @@ public interface WalletTransactionService extends IService<WalletTransaction> {
 
     List<RspSellOrderDetail> sellOrderList( String userId, ReqSellOrderList reqSellOrderList );
 
-    List<RspTransCenterDetail> transSellOrderList( ReqTransCenterDetail reqTransCenterDetail );
+    List<RspTransCenterDetail> transSellOrderList( String userId, ReqTransCenterDetail reqTransCenterDetail );
 
     RspBase<RspSellOrderDetail2> toBuySellOrderDetail( String userId, String transactionId );
 

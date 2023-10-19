@@ -1,6 +1,7 @@
 package tv.game88.wallet.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +28,12 @@ public class MessageController {
         return RspBase.ok( walletMessageService.getMessageList( MemberSecurityUtils.getUserId() ) );
     }
 
+    public record reqMessageId(@Schema( title = "消息ID" ) Long messageId) {}
+
     @Operation( summary = "设置消息已读" )
     @PostMapping( "/api/setMessageRead" )
-    public RspBase<?> setMessageRead( @RequestBody Long messageId ) {
-        return walletMessageService.setMessageRead( MemberSecurityUtils.getUserId(), messageId );
+    public RspBase<?> setMessageRead( @RequestBody reqMessageId req ) {
+        return walletMessageService.setMessageRead( MemberSecurityUtils.getUserId(), req.messageId() );
     }
 
     @Operation( summary = "一键已读" )

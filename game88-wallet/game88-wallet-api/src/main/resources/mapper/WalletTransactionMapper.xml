@@ -46,6 +46,11 @@
             <if test="payMethodType != null">
                 and pay_method_types like concat('%', #{payMethodType}, '%')
             </if>
+            <if test="payMethodTypeList != null">
+                <foreach item="paymentMethod" collection="payMethodTypeList" open="and (" separator="or" close=")">
+                    pay_method_types like concat('%', #{paymentMethod}, '%')
+                </foreach>
+            </if>
             <if test="canSplit != null">
                 and can_split = #{canSplit}
             </if>
@@ -59,6 +64,15 @@
             </choose>
             <if test="status != null">
                 and `status` = #{status}
+            </if>
+            <if test="statusList != null">
+                and `status` in
+                <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="unUserId != null">
+                and user_id <![CDATA[ <> ]]> #{unUserId}
             </if>
         </where>
         order by create_time desc

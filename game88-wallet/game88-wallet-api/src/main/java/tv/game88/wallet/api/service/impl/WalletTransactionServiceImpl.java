@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.SpringUtils;
@@ -21,6 +22,7 @@ import tv.game88.wallet.api.mapper.WalletTransactionMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
@@ -214,6 +216,10 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         reqSellOrderList.setUserId( userId );
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqSellOrderList, query );
+        if(CollectionUtils.isEmpty(reqSellOrderList.getPayMethodType())) {
+            reqSellOrderList.setPayMethodType(List.of(WalletPayMethodEnum.values()));
+        }
+        query.setPayMethodTypeList( reqSellOrderList.getPayMethodType() );
 
         List<WalletTransaction>  walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspSellOrderDetail> resultList         = new ArrayList<>();
@@ -227,9 +233,15 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     }
 
     @Override
-    public List<RspTransCenterDetail> transSellOrderList( ReqTransCenterDetail reqTransCenterDetail ) {
+    public List<RspTransCenterDetail> transSellOrderList( String userId, ReqTransCenterDetail reqTransCenterDetail ) {
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
+        if(CollectionUtils.isEmpty(reqTransCenterDetail.getPayMethodType())) {
+            reqTransCenterDetail.setPayMethodType(List.of(WalletPayMethodEnum.values()));
+        }
+        query.setPayMethodTypeList( reqTransCenterDetail.getPayMethodType() );
+        query.setStatusList( Arrays.asList( 0, 1 ) );
+        query.setUnUserId( userId );
 
         List<WalletTransaction>    walletTransactions = this.baseMapper.selectWalletTransactionList( query );
         List<RspTransCenterDetail> resultList         = new ArrayList<>();
@@ -251,9 +263,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return rspBase;
         }
         WalletTransaction walletTransaction = this.baseMapper.selectById( transactionId );
-        rspBase = this.validTransaction( walletTransaction );
-        if ( rspBase != null ) {
-            return rspBase;
+        if ( walletTransaction == null ) {
+            return RspBase.businessError( "此挂单不存在" );
         }
         WalletUser seller = walletUserService.getById( walletTransaction.getUserId() );
 

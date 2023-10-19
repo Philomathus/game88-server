@@ -1,11 +1,12 @@
 package tv.game88.wallet.api.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +16,15 @@ import java.util.Map;
  * @Entity tv.game88.wallet.api.entity.WalletTransactionDetail
  */
 public interface WalletTransactionDetailMapper extends BaseMapper<WalletTransactionDetail> {
+    /**
+     * 查询钱包交易列表
+     *
+     * @param walletTransactionDetail 钱包交易
+     *
+     * @return 钱包交易集合
+     */
+    public List<WalletTransactionDetail> selectWalletTransactionDetailList( WalletTransactionDetail walletTransactionDetail );
+
     @Select( "select count(1) from wallet_transaction_detail where seller_id = #{sellerId} and buyer_confirm_buy_time >= "
             + "#{startTime} and buyer_confirm_buy_time <= #{endTime} and status <> 'BUYER_CANCEL';" )
     Long countSellerTotal( @Param( "sellerId" ) String sellerId, @Param( "startTime" ) LocalDateTime startTime, @Param(
