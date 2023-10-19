@@ -39,6 +39,9 @@ public class RspSellOrderDetail2 {
     @Schema( title = "卖家收款方式类型", description = "英文逗号,分割" )
     private String  payMethodTypes;
 
+    @Schema( title = "信用等级" )
+    private Integer    creditRating;
+
     @Schema( title = "买家收款方式" )
     private Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
 

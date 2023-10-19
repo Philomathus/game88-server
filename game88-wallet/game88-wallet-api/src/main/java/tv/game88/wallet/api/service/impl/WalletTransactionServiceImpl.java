@@ -282,6 +282,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
         rspSellOrderDetail2.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
         rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
+        rspSellOrderDetail2.setCreditRating( 5 );
 
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
                 .eq( "user_id", userId )
