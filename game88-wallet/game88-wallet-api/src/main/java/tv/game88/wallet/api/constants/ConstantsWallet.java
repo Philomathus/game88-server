@@ -19,4 +19,6 @@ public abstract class ConstantsWallet {
 
     public static final String MESSAGE_SYSTEM_IS_READ  = Constants.WALLET_PREX + "message:systemRead:";
     public static final String MESSAGE_PERSONAL_PROMPT = Constants.WALLET_PREX + "message:personalPrompt:";
+
+    public static final String USER_ID_EMITTERS_KEY  = Constants.WALLET_PREX + "emitters";
 }
