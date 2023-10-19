@@ -46,7 +46,7 @@ public class WalletUserController extends BaseController {
     @PostMapping( "/api/fundPassReset" )
     public RspBase<?> funPassReset( @RequestBody ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         return walletUserService.resetFunPassword( MemberSecurityUtils.getUserId(), reqResetFundPasswd );
-    }
+
     }
 
     @Operation( summary = "个人账变" )
