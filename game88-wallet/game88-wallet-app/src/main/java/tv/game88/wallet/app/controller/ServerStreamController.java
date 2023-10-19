@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import tv.game88.core.sse.service.SseStreamService;
+import tv.game88.wallet.api.sse.SseStreamService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 
@@ -21,6 +21,6 @@ public class ServerStreamController {
 
     @GetMapping( value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE )
     public SseEmitter streamSubscribe() {
-        return sseStreamService.createEmitter(MemberSecurityUtils.getUserId());
+        return sseStreamService.createEmitter( MemberSecurityUtils.getUserId() );
     }
 }

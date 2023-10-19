@@ -27,7 +27,6 @@
         <module>game88-core-telegramBot</module>
         <module>game88-core-game</module>
         <module>game88-core-sms</module>
-        <module>game88-core-sse</module>
     </modules>
 
     <build>

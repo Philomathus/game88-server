@@ -1,4 +1,4 @@
-package tv.game88.core.sse.model;
+package tv.game88.wallet.api.sse.model;
 
 import lombok.Builder;
 import lombok.Value;
@@ -7,5 +7,5 @@ import lombok.Value;
 @Builder
 public class SimpleProtocolMessage<T> {
     StreamMessageType messageType;
-    T data;
+    T                 data;
 }
