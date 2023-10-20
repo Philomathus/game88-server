@@ -4,8 +4,11 @@ package tv.game88.pay.api.payOrder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.RSACoder;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
 import tv.game88.pay.api.dto.ReqPayRecharge;
@@ -50,7 +53,13 @@ public class BaxiPayProcessor extends AbstractPay {
         params.put( "nonceStr", UUID.randomUUID().toString().replace( "-", "" ) );
         String signTemp = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
-        signTemp = buildRSASignByPrivateKey( signTemp, payPlatform.getSignPrivateKey() );
+        try {
+            log.info( signTemp );
+            log.info( signTemp );
+            signTemp = RSACoder.encryptByPrivateKey( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        }
         params.put( "sign", signTemp );
 
         log.info(  params );
@@ -81,7 +90,11 @@ public class BaxiPayProcessor extends AbstractPay {
 
         String signTemp = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
-        signTemp = buildRSASignByPrivateKey( signTemp, payPlatform.getSignPrivateKey() );
+        try {
+            signTemp = RSACoder.encryptByPrivateKey( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
+        }
         params.put( "sign", signTemp );
         log.warn( JsonUtil.object2Json( params ) );
 
@@ -125,9 +138,13 @@ public class BaxiPayProcessor extends AbstractPay {
         String signTemp = this.assemblyUrl( sortedMap ) + "&key=" + payPlatform.getSignMd5();
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
 
-        if ( !buildRSAverifyByPublicKey( signTemp, payPlatform.getSignPublicKey(), sign ) ) {
-            log.warn( "验签失败" );
-            return "fail";
+        try {
+            if ( !RSACoder.verifySha256Rsa( signTemp, AESCoder.decrypt( payPlatform.getSignPublicKey() ), sign ) ) {
+                log.warn( "验签失败" );
+                return "fail";
+            }
+        } catch ( Exception e ) {
+            throw new RuntimeException( e );
         }
 
         PayChannel payChannel = payCacheUtil.getPayChannel(memberRechargeOnline.getChannelId());
