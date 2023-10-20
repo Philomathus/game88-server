@@ -29,8 +29,7 @@ public class SseStreamService {
         }
         SseEmitter emitter = new SseEmitter( -1L );
         Function<String, Runnable> removeEmitter = id -> () -> {
-            redisTemplate.convertAndSend(
-                    ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, String.valueOf( emitter.hashCode() ) );
+            redisTemplate.convertAndSend( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, new Object() );
         };
 
         emitter.onCompletion( removeEmitter.apply( memberId ) );

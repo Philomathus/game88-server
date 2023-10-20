@@ -60,11 +60,9 @@ public class SubRedisMessageListener implements MessageListener {
 
         if ( messageChannel.startsWith( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL ) ) {
             String userId = messageChannel.replaceFirst( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL, "" );
-            String s = new String( message.getBody() );
             if ( StringUtils.isBlank( userId ) ) {
                 return;
             }
-
             ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( userId );
         }
     }
