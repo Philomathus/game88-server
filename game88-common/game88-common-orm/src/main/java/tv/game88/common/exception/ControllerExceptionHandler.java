@@ -1,5 +1,6 @@
 package tv.game88.common.exception;
 
+import io.undertow.server.handlers.form.MultiPartParserDefinition;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,8 @@ public abstract class ControllerExceptionHandler {
             return RspBase.sessionError( e.getMessage() );
         } else if ( e instanceof NumberFormatException ) {
             return new RspBase<>( 1, "数据格式校验失败" );
+        } else if ( e instanceof MultiPartParserDefinition.FileTooLargeException ) {
+            return RspBase.businessError( "文件上传过大,请缩小图片尺寸" );
         } else if ( e instanceof BusinessException ) {
             log.error( e.getMessage(), e );
             return RspBase.businessError( e.getMessage() );
@@ -47,9 +50,9 @@ public abstract class ControllerExceptionHandler {
             return RspBase.businessError( "你的用户所属角色没有操作权限" );
         } else {
             HttpServletRequest request = ServletUtil.getHttpServletRequest();
-            log.error( "异常请求url:{}, IP:{}, msg:{}, dev:{}", request.getRequestURL()
-                                                                       .toString(), ServletUtil.getIp( request ),
-                    e.getMessage(), request.getHeader( "dev" ), e );
+            log.error( "异常请求url:{}, IP:{}, msg:{}, dev:{}", request
+                    .getRequestURL()
+                    .toString(), ServletUtil.getIp( request ), e.getMessage(), request.getHeader( "dev" ), e );
             return RspBase.businessError( "系统错误,请联系值班技术" );
         }
     }
