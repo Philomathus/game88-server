@@ -47,7 +47,7 @@ public class WalletFundManager {
         Long userBalance = walletUserMapper.getUserMoney( userId );
 
         int updateMoney;
-        if ( fundEnum.getIsTransaction() ) {
+        if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
@@ -122,7 +122,7 @@ public class WalletFundManager {
         Long userMoney = walletUserMapper.getUserMoney( userId );
         //扣减金额
         int reducedMoney;
-        if ( fundEnum.getIsTransaction() ) {
+        if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_OUT ) {
             reducedMoney = walletUserMapper.reduceSaleMoney( userId, reduceMoney );
         } else {
             reducedMoney = walletUserMapper.reduceMoney( userId, reduceMoney );
