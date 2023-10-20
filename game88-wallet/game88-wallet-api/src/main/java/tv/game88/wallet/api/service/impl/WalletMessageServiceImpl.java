@@ -4,17 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
-import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.service.WalletMessageService;
-import tv.game88.wallet.api.sse.SseStreamService;
+import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.vo.TransDetailStreamMessage;
@@ -33,9 +33,9 @@ import static tv.game88.wallet.api.sse.model.StreamMessageType.NOTIFICATION;
 @Service
 public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, WalletMessage> implements WalletMessageService {
     @Resource
-    private RedisUtils       redisUtils;
+    private RedisUtils                    redisUtils;
     @Resource
-    private SseStreamService sseStreamService;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 查询站内信列表
@@ -177,7 +177,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         walletMessage.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( walletMessage );
 
-        sseStreamService.sendMessage( receiverUserId, SimpleProtocolMessage
+        redisTemplate.convertAndSend( ConstantsWallet.MESSAGE_CHANNEL + receiverUserId, SimpleProtocolMessage
                 .<TransDetailStreamMessage>builder()
                 .messageType( NOTIFICATION )
                 .data( TransDetailStreamMessage

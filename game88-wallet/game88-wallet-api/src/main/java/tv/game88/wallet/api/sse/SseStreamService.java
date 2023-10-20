@@ -6,22 +6,20 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.function.Function;
 
-import static tv.game88.wallet.api.constants.ConstantsWallet.USER_ID_EMITTERS_KEY;
 import static tv.game88.wallet.api.sse.model.StreamMessageType.CONNECTION;
 
 @Service
 @RequiredArgsConstructor
 public class SseStreamService {
-
     @Resource
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
+    public  ThreadPoolTaskExecutor        threadPoolTaskExecutor;
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -30,34 +28,32 @@ public class SseStreamService {
             throw new RuntimeException( "No member id received" );
         }
         SseEmitter                 emitter       = new SseEmitter( -1L );
-        Function<String, Runnable> removeEmitter = id -> () -> redisTemplate.opsForHash().delete( USER_ID_EMITTERS_KEY, id );
+        Function<String, Runnable> removeEmitter = id -> () -> ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( id );
 
         emitter.onCompletion( removeEmitter.apply( memberId ) );
         emitter.onTimeout( removeEmitter.apply( memberId ) );
 
-        redisTemplate.opsForHash().put( USER_ID_EMITTERS_KEY, memberId, emitter );
-        sendMessage( memberId, SimpleProtocolMessage
+        ConstantsWallet.MEMBER_SSEEMITTER_MAP.put( memberId, emitter );
+
+        SimpleProtocolMessage<String> message = SimpleProtocolMessage
                 .<String>builder()
                 .messageType( CONNECTION )
                 .data( "Connection successful" )
-                .build() );
+                .build();
+        SseEmitter.SseEventBuilder event = SseEmitter
+                .event()
+                .name( message.getMessageType().toString() )
+                .id( memberId )
+                .data( message.getData(), MediaType.APPLICATION_JSON )
+                .reconnectTime( 1000 );
+        sendMessage( emitter, event );
         return emitter;
     }
 
-    public void sendMessage( String receiverId, SimpleProtocolMessage<?> message ) {
-        SseEmitter emitter = ( SseEmitter ) redisTemplate.opsForHash().get( USER_ID_EMITTERS_KEY, receiverId );
-        if ( emitter != null ) {
-            SseEmitter.SseEventBuilder event = SseEmitter
-                    .event()
-                    .name( message.getMessageType().toString() )
-                    .id( receiverId )
-                    .data( message.getData(), MediaType.APPLICATION_JSON )
-                    .reconnectTime( 1000 );
-            sendMessage( emitter, event );
+    public void sendMessage( SseEmitter emitter, SseEmitter.SseEventBuilder event ) {
+        if ( emitter == null ) {
+            return;
         }
-    }
-
-    private void sendMessage( SseEmitter emitter, SseEmitter.SseEventBuilder event ) {
         threadPoolTaskExecutor.execute( () -> {
             try {
                 emitter.send( event );

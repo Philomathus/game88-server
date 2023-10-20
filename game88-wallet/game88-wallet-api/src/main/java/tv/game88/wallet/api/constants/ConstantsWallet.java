@@ -1,7 +1,11 @@
 package tv.game88.wallet.api.constants;
 
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.constants.Constants;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * wallet常量
@@ -20,5 +24,7 @@ public abstract class ConstantsWallet {
     public static final String MESSAGE_SYSTEM_IS_READ  = Constants.WALLET_PREX + "message:systemRead:";
     public static final String MESSAGE_PERSONAL_PROMPT = Constants.WALLET_PREX + "message:personalPrompt:";
 
-    public static final String USER_ID_EMITTERS_KEY  = Constants.WALLET_PREX + "emitters";
+    public static final String MESSAGE_CHANNEL = Constants.WALLET_PREX + "messageChannel:";
+
+    public static Map<String, SseEmitter> MEMBER_SSEEMITTER_MAP = new ConcurrentHashMap<>();
 }
