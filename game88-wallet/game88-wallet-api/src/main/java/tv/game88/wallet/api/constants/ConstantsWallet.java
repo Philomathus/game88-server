@@ -24,7 +24,8 @@ public abstract class ConstantsWallet {
     public static final String MESSAGE_SYSTEM_IS_READ  = Constants.WALLET_PREX + "message:systemRead:";
     public static final String MESSAGE_PERSONAL_PROMPT = Constants.WALLET_PREX + "message:personalPrompt:";
 
-    public static final String MESSAGE_CHANNEL = Constants.WALLET_PREX + "messageChannel:";
+    public static final String MESSAGE_CHANNEL                   = Constants.WALLET_PREX + "messageChannel:";
+    public static final String MESSAGE_SSEEMITTER_REMOVE_CHANNEL = Constants.WALLET_PREX + "messageSseEmitterRemoveChannel:";
 
     public static Map<String, SseEmitter> MEMBER_SSEEMITTER_MAP = new ConcurrentHashMap<>();
 }

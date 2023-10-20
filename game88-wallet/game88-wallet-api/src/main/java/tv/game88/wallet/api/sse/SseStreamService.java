@@ -27,8 +27,11 @@ public class SseStreamService {
         if ( memberId == null ) {
             throw new RuntimeException( "No member id received" );
         }
-        SseEmitter                 emitter       = new SseEmitter( -1L );
-        Function<String, Runnable> removeEmitter = id -> () -> ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( id );
+        SseEmitter emitter = new SseEmitter( -1L );
+        Function<String, Runnable> removeEmitter = id -> () -> {
+            redisTemplate.convertAndSend(
+                    ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, String.valueOf( emitter.hashCode() ) );
+        };
 
         emitter.onCompletion( removeEmitter.apply( memberId ) );
         emitter.onTimeout( removeEmitter.apply( memberId ) );

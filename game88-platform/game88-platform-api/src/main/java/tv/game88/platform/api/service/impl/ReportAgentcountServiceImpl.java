@@ -53,7 +53,7 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
                 Duration      between = Duration.between( time, LocalDateTime.now() );
 
                 if ( between.toSeconds() > 1200 ) {
-                    return RspBase.businessError( "请重新生成" + beginTime + "数据" );
+                    return RspBase.businessError( "请重新生成" + beginTime + "数据:" + s );
                 }
             } else {
                 //昨天的数据，判断数量是否相等

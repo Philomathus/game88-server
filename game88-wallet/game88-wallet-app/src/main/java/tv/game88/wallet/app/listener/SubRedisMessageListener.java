@@ -29,21 +29,21 @@ public class SubRedisMessageListener implements MessageListener {
 
     @Override
     public void onMessage( Message message, byte[] pattern ) {
-        SimpleProtocolMessage<TransDetailStreamMessage> simpleProtocolMessage = null;
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream( message.getBody() );
-            ObjectInputStream    ois  = new ObjectInputStream( bais );
-
-            simpleProtocolMessage = ( SimpleProtocolMessage<TransDetailStreamMessage> ) ois.readObject();
-        } catch ( IOException | ClassNotFoundException e ) {
-            throw new RuntimeException( e );
-        }
-        if ( simpleProtocolMessage == null ) {
-            return;
-        }
-
         String messageChannel = new String( message.getChannel() );
         if ( messageChannel.startsWith( ConstantsWallet.MESSAGE_CHANNEL ) ) {
+            SimpleProtocolMessage<TransDetailStreamMessage> simpleProtocolMessage = null;
+            try {
+                ByteArrayInputStream bais = new ByteArrayInputStream( message.getBody() );
+                ObjectInputStream    ois  = new ObjectInputStream( bais );
+
+                simpleProtocolMessage = ( SimpleProtocolMessage<TransDetailStreamMessage> ) ois.readObject();
+            } catch ( IOException | ClassNotFoundException e ) {
+                log.error( e.getMessage(), e );
+            }
+            if ( simpleProtocolMessage == null ) {
+                return;
+            }
+
             String userId = messageChannel.replaceFirst( ConstantsWallet.MESSAGE_CHANNEL, "" );
             if ( StringUtils.isBlank( userId ) ) {
                 return;
@@ -56,6 +56,16 @@ public class SubRedisMessageListener implements MessageListener {
                     .data( simpleProtocolMessage.getData(), MediaType.APPLICATION_JSON )
                     .reconnectTime( 1000 );
             sseStreamService.sendMessage( sseEmitter, event );
+        }
+
+        if ( messageChannel.startsWith( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL ) ) {
+            String userId = messageChannel.replaceFirst( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL, "" );
+            String s = new String( message.getBody() );
+            if ( StringUtils.isBlank( userId ) ) {
+                return;
+            }
+
+            ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( userId );
         }
     }
 }
