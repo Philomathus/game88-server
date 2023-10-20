@@ -51,7 +51,7 @@ public class BaxiPayProcessor extends AbstractPay {
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ));
         params.put( "nonceStr", UUID.randomUUID().toString().replace( "-", "" ) );
-        String signTemp = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signTemp = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
         try {
             log.info( signTemp );
@@ -88,7 +88,7 @@ public class BaxiPayProcessor extends AbstractPay {
         params.put( "orderId", orderNo );
         params.put( "nonceStr", UUID.randomUUID().toString().replace( "-", "" ) );
 
-        String signTemp = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signTemp = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
         try {
             signTemp = RSACoder.encryptByPrivateKey( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
@@ -135,7 +135,7 @@ public class BaxiPayProcessor extends AbstractPay {
 
         SortedMap<String, Object> sortedMap      = new TreeMap<>( requestMap );
         sortedMap.remove( "sign" );
-        String signTemp = this.assemblyUrl( sortedMap ) + "&key=" + payPlatform.getSignMd5();
+        String signTemp = this.assemblyUrl( sortedMap ) + "&key=" + AESCoder.decrypt(payPlatform.getSignMd5());
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
 
         try {
