@@ -9,6 +9,8 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.app.listener.SubRedisMessageListener;
 
+import java.util.Arrays;
+
 /**
  * @author meng.jun
  */
@@ -21,7 +23,9 @@ public class RedisSubConfig {
                                                                         SubRedisMessageListener subRedisMessageListener ) {
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
         listenerContainer.setConnectionFactory( redisConnectionFactory );
-        listenerContainer.addMessageListener( subRedisMessageListener, new PatternTopic( ConstantsWallet.MESSAGE_CHANNEL ) );
+        listenerContainer.addMessageListener( subRedisMessageListener,
+                Arrays.asList( new PatternTopic( ConstantsWallet.MESSAGE_CHANNEL ),
+                        new PatternTopic( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL ) ) );
         return listenerContainer;
     }
 }
