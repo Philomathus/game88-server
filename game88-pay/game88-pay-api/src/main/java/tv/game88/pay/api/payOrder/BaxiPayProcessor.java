@@ -53,6 +53,7 @@ public class BaxiPayProcessor extends AbstractPay {
         signTemp = buildRSASignByPrivateKey( signTemp, payPlatform.getSignPrivateKey() );
         params.put( "sign", signTemp );
 
+        log.info(  params );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
