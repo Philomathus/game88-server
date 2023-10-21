@@ -63,6 +63,8 @@ public class GamePullDockWali extends AbstractGamePull {
                                                                   params + unixTimeSeconds + gamePlatform.getMd5() ) )
                                                           .build( true );
 
+        log.warn( uriComponents.toUriString() );
+
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
