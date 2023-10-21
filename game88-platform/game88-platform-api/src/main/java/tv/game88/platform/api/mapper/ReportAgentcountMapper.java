@@ -37,4 +37,6 @@ public interface ReportAgentcountMapper {
     int rmemberInfoCounts( @Param( "startTime" ) String startTime, @Param( "endTime" ) String endTime );
 
     String rmemberInfoLately();
+
+    String memberInfoLately();
 }

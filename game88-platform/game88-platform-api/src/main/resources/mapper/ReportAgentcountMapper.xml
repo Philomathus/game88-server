@@ -83,7 +83,7 @@
         from member_info
         where register_time >= #{startTime}
           and register_time &lt;= #{endTime}
-          and inviter_code > 0
+          and inviter_code > '0'
     </select>
 
     <select id="rmemberInfoCounts" resultType="java.lang.Integer">
@@ -91,12 +91,18 @@
         from r_member_info
         where reg_time >= #{startTime}
           and reg_time &lt;= #{endTime}
-          and inviter_code > 0
+          and inviter_code > '0'
     </select>
 
     <select id="rmemberInfoLately" resultType="java.lang.String">
         select max(reg_time)
         from r_member_info
+    </select>
+
+    <select id="memberInfoLately" resultType="java.lang.String">
+        select max(register_time)
+        from member_info
+        where inviter_code > '0'
     </select>
 
 </mapper>

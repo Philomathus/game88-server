@@ -48,12 +48,15 @@ public class ReportAgentcountServiceImpl implements ReportAgentcountService {
             if ( today.equals( beginTime ) ) {
                 //如果是当天，校验是否是一个小时之前的数据
                 String s = reportAgentcountMapper.rmemberInfoLately();
-
+                if(StringUtils.isBlank( s )){
+                    return RspBase.businessError("请重新生成" + beginTime + "数据1");
+                }
+                String l = reportAgentcountMapper.memberInfoLately();
                 LocalDateTime time    = LocalDateTimeUtils.parseLocalDateTime( s );
                 Duration      between = Duration.between( time, LocalDateTime.now() );
 
-                if ( between.toSeconds() > 1200 ) {
-                    return RspBase.businessError( "请重新生成" + beginTime + "数据:" + s );
+                if ( between.toSeconds() > 1200 && !s.equals( l ) ) {
+                    return RspBase.businessError( "请重新生成" + beginTime + "数据2");
                 }
             } else {
                 //昨天的数据，判断数量是否相等
