@@ -49,7 +49,7 @@ public class BaxiPayProcessor extends AbstractPay {
         String signTemp = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
         try {
-            signTemp = RSACoder.encryptByPrivateKey( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
+            signTemp = RSACoder.signSha256Rsa( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
         } catch ( Exception e ) {
             throw new RuntimeException( e );
         }
@@ -86,7 +86,7 @@ public class BaxiPayProcessor extends AbstractPay {
         String signTemp = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
         try {
-            signTemp = RSACoder.encryptByPrivateKey( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
+            signTemp = RSACoder.signSha256Rsa( signTemp, AESCoder.decrypt( payPlatform.getSignPrivateKey() ) );
         } catch ( Exception e ) {
             throw new RuntimeException( e );
         }
