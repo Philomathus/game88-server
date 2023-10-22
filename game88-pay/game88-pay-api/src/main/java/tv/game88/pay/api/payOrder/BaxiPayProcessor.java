@@ -103,9 +103,7 @@ public class BaxiPayProcessor extends AbstractPay {
             if ( code == 1 ) {
                 Map<String, String> dataMap = ( Map<String, String> ) resultMap.get( "data" );
                 String              status  = dataMap.getOrDefault( "status", "" );
-                if ( "1".equals( status ) ) {
-                    return true;
-                }
+                return "1".equals( status );
             }
         }
         return false;
@@ -155,7 +153,7 @@ public class BaxiPayProcessor extends AbstractPay {
         BigDecimal amount     = new BigDecimal( requestMap.getOrDefault( "orderAmt", 0 ).toString() );
         String     sysOrderId = requestMap.getOrDefault( "sysOrderId", "" ).toString();
         int        status     = Integer.parseInt( requestMap.getOrDefault( "status", -1 ).toString() );
-        if ( ( status == 1 ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
+        if ( status == 1 && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
             // 实际金额注入,这里单位是分，所以要除以100
             memberRechargeOnline.setRealMoney( amount.setScale( 2, RoundingMode.HALF_UP ) );
             memberRechargeOnline.setUpperOrderNo( sysOrderId );
