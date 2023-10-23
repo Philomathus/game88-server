@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Value;
 import tv.game88.wallet.api.type.WalletTransEnum;
 
+import java.io.Serializable;
+
 @Value
 @Builder
-public class TransDetailStreamMessage {
+public class TransDetailStreamMessage implements Serializable {
     String transDetailId;
     WalletTransEnum walletTransEnum;
 }
