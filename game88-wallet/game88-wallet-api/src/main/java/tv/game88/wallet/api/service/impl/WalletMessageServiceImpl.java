@@ -180,9 +180,9 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         redisTemplate.convertAndSend( ConstantsWallet.MESSAGE_CHANNEL + receiverUserId, SimpleProtocolMessage
                 .<TransDetailStreamMessage>builder()
                 .messageType( NOTIFICATION )
-                .data( TransDetailStreamMessage
-                        .builder()
+                .data( TransDetailStreamMessage.builder()
                         .transDetailId( transDetailId )
+                        .isSeller(isSeller)
                         .walletTransEnum( walletTransEnum )
                         .build() )
                 .build() );
