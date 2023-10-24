@@ -157,7 +157,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
 
         // 通知消息给卖家
-        walletMessageService.saveWalletMessage( sellerId, transactionId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( sellerId, transDetailId, walletTransEnum, true );
 
         return RspBase.ok( "确认购买成功", transDetailId );
     }
@@ -204,6 +204,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         rspBuyOrderDetail.setPayMethodType( bPayMethod.getMethodType() );
         rspBuyOrderDetail.setBuyerId( walletTransactionDetail.getBuyerId() );
         rspBuyOrderDetail.setSellerId( walletTransactionDetail.getSellerId() );
+
 
         RspPayMethod2 rspBuyerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( bPayMethod, rspBuyerPayMethod );
