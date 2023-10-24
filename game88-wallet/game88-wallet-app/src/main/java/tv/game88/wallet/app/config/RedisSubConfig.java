@@ -24,8 +24,8 @@ public class RedisSubConfig {
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
         listenerContainer.setConnectionFactory( redisConnectionFactory );
         listenerContainer.addMessageListener( subRedisMessageListener,
-                Arrays.asList( new PatternTopic( ConstantsWallet.MESSAGE_CHANNEL ),
-                        new PatternTopic( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL ) ) );
+                Arrays.asList( new PatternTopic( ConstantsWallet.MESSAGE_CHANNEL + "*" ),
+                        new PatternTopic( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + "*" ) ) );
         return listenerContainer;
     }
 }
