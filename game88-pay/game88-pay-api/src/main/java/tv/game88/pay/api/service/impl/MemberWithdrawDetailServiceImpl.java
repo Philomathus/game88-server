@@ -128,7 +128,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 for ( MemberInfo st : memberInfoList ) {
                     if ( me.getWithdrawId().equals( st.getId() ) ) {
                         me.setMemberStatus( st.getStatus() );
-                        if ( st.getRegisterTime().compareTo( date ) > 0 ) {
+                        if ( st.getRegisterTime().isAfter( date ) ) {
                             me.setRegisterColor( 1 );
                         }
                     }
@@ -298,7 +298,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         withdrawReports.add( withdrawReportt );
 
         //游戏
-        if ( rspMemberInfo12 != null && rspMemberInfo12.size() != 0 ) {
+        if ( rspMemberInfo12 != null && !rspMemberInfo12.isEmpty() ) {
             for ( RspMemberInfoWithdraw rs : rspMemberInfo12 ) {
                 RspWithdrawReport withdrawReportTwo = new RspWithdrawReport();
                 withdrawReportTwo.setClass_twoname( rs.getClassTwoname() );
@@ -379,7 +379,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "请勿重复提交" );
         }
         List<MemberWithdrawDetail> withdrawLogList = this.baseMapper.selectBatchIds( req.getIds() );
-        if ( withdrawLogList == null || withdrawLogList.size() == 0 ) {
+        if ( withdrawLogList == null || withdrawLogList.isEmpty() ) {
             return RspBase.businessError( "订单已被处理,请刷新界面" );
         }
         MemberWithdrawDetailService detailService = SpringUtils.getBean( MemberWithdrawDetailService.class );
