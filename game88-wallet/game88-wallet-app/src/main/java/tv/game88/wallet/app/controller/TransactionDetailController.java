@@ -40,7 +40,8 @@ public class TransactionDetailController extends BaseController {
     @Operation( summary = "我的买单 - 交易详情" )
     @PostMapping( "/api/buyOrderDetail" )
     public RspBase<RspBuyOrderDetail> buyOrderDetail( @RequestBody @Validated ReqTransactionDetail reqTransactionDetail ) {
-        return walletTransactionDetailService.buyOrderDetail( reqTransactionDetail.getTransDetailId() );
+        return walletTransactionDetailService.buyOrderDetail( MemberSecurityUtils.getUserId(),
+                reqTransactionDetail.getTransDetailId() );
     }
 
     @Operation( summary = "卖家确认交易" )

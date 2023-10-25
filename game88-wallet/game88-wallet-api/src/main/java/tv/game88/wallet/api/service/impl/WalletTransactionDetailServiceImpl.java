@@ -32,11 +32,14 @@ import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author meng.jun
@@ -180,7 +183,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Override
-    public RspBase<RspBuyOrderDetail> buyOrderDetail( String transDetailId ) {
+    public RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transDetailId ) {
         WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
         if ( walletTransactionDetail == null ) {
             return RspBase.businessError( "交易订单不存在" );
@@ -224,6 +227,45 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( redisUtils.exists( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId ) ) {
             rspBuyOrderDetail.setCountdownSec( redisUtils.getExpire(
                     ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId ) );
+        }
+
+        if ( userId.equals( walletTransactionDetail.getSellerId() )
+                && walletTransactionDetail.getStatus() == WalletTransEnum.BUYER_CONFIRM_BUY ) {
+            LocalDateTime now       = LocalDateTime.now();
+            LocalDateTime startTime = now.minusDays( 30 );
+
+            Long sellerTotalCount = this.baseMapper.countSellerTotal( walletTransactionDetail.getBuyerId(), startTime, now );
+
+            Map<String, Object> sellerMap = this.baseMapper.sumSellerReceived( walletTransactionDetail.getBuyerId(), startTime,
+                    now );
+            Map<String, Object> buyerMap = this.baseMapper.sumBuyerTransfer( walletTransactionDetail.getBuyerId(), startTime,
+                    now );
+
+            int receivedTimeTotal  = Integer.parseInt( sellerMap.getOrDefault( "s", "0" ).toString() );
+            int sellerSuccessCount = Integer.parseInt( sellerMap.getOrDefault( "c", "0" ).toString() );
+            int transferTimeTotal  = Integer.parseInt( buyerMap.getOrDefault( "s", "0" ).toString() );
+            int buyerSuccessCount  = Integer.parseInt( buyerMap.getOrDefault( "c", "0" ).toString() );
+
+            String successRateMonth = sellerTotalCount == 0 ? "0.0%" : new BigDecimal( sellerSuccessCount )
+                    .divide( new BigDecimal( sellerTotalCount ), 2, RoundingMode.HALF_UP )
+                    .multiply( new BigDecimal( 100 ) )
+                    .toString()
+                    .concat( "%" );
+
+            long aveReceivedTime = sellerSuccessCount == 0 ? 0 : receivedTimeTotal / sellerSuccessCount;
+            long aveTransferTime = buyerSuccessCount == 0 ? 0 : transferTimeTotal / buyerSuccessCount;
+
+            RspCreditInfo creditInfo = new RspCreditInfo();
+
+            creditInfo.setSuccessNumMonth( sellerSuccessCount );
+            creditInfo.setSuccessRateMonth( successRateMonth );
+            creditInfo.setReceivedTimeMonth( LocalDateTimeUtils.secondsToTime( aveReceivedTime ) );
+            creditInfo.setTransferTimeMonth( LocalDateTimeUtils.secondsToTime( aveTransferTime ) );
+
+            WalletUser seller = walletUserService.getById( walletTransactionDetail.getBuyerId() );
+            creditInfo.setBuyOrderNum( seller.getBuyOrderNum() );
+            creditInfo.setSellOrderNum( seller.getSellOrderNum() );
+            rspBuyOrderDetail.setCreditInfo( creditInfo );
         }
 
         return RspBase.ok( rspBuyOrderDetail );
@@ -375,6 +417,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setTransCertPic( reqBuyerConfirmTransfer.getTransCertPic() );
         String remark = "\n买家" + userId + "确认转账,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
+        long intervalTime = LocalDateTimeUtils.getIntervalTime( walletTransactionDetail.getSellerConfirmTransTime(), now );
+        update.setTransferTimeSec( ( int ) ( intervalTime / 1000 ) );
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
             // 取消超时订单
@@ -461,6 +505,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setTime( now );
         String remark = "\n卖家" + userId + "确认转币,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
+        long intervalTime = LocalDateTimeUtils.getIntervalTime( walletTransactionDetail.getBuyerConfirmTransferTime(), now );
+        update.setReceivedTimeSec( ( int ) ( intervalTime / 1000 ) );
 
         SpringUtils
                 .getBean( WalletTransactionDetailService.class )

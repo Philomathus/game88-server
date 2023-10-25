@@ -32,6 +32,9 @@ public class RspBuyOrderDetail {
     @Schema( title = "买方付款信息" )
     private RspPayMethod2 buyerPayMethod;
 
+    @Schema( title = "买方信用信息" )
+    private RspCreditInfo creditInfo;
+
     public String getTransCertPic() {
         if ( StringUtils.isNotBlank( transCertPic ) ) {
             return ConfigDomainCacheUtil.me.getDomainOssValue() + transCertPic;
