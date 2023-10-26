@@ -215,7 +215,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         RspPayMethod2 rspSellerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
-        rspBuyOrderDetail.setBuyerPayMethod( rspSellerPayMethod );
+        rspBuyOrderDetail.setSellerPayMethod( rspSellerPayMethod );
 
         // 计算订单倒计时
         if ( redisUtils.exists( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) ) {
