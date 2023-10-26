@@ -534,7 +534,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
         WalletUser update = new WalletUser();
         update.setId( userId );
-        update.setFundPassword(  reqResetFundPasswd.fundNewPass() );
+        update.setFundPassword( passwordEncoder.encode( reqResetFundPasswd.fundNewPass() )  );
 
         return this.baseMapper.updateById( update  ) > 0 ? RspBase.ok():RspBase.businessError( "申请身份认证异常，请稍后再试" );
     }
