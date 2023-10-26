@@ -56,7 +56,7 @@ public class TransactionController extends BaseController {
         startPage( reqTransCenterDetail );
         List<RspTransCenterDetail> resultList = walletTransactionService.transSellOrderList( MemberSecurityUtils.getUserId(),
                 reqTransCenterDetail );
-        return getRspBasePage( resultList, reqTransCenterDetail );
+        return getRspBasePage( resultList );
     }
 
     @Operation( summary = "购买G币 - 挂单详情" )
