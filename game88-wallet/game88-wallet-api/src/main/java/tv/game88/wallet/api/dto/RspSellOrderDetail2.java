@@ -28,6 +28,12 @@ public class RspSellOrderDetail2 {
     private Long    amount;
     @Schema( title = "是否可拆分" )
     private Boolean canSplit;
+    /**
+     * 最低可购买金额
+     */
+    @Schema( title = "最小购买量" )
+    private Long minBuyNum;
+
     @Schema( title = "30日成单数" )
     private Integer successNumMonth;
     @Schema( title = "30日成单率" )

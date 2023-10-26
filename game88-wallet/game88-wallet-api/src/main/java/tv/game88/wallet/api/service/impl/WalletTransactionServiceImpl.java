@@ -276,13 +276,16 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setNikeName( seller.getNickName() );
         rspSellOrderDetail2.setTransactionId( walletTransaction.getTransactionId() );
         rspSellOrderDetail2.setAmount( walletTransaction.getAmount() );
-        rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
         rspSellOrderDetail2.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
         rspSellOrderDetail2.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
         rspSellOrderDetail2.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
         rspSellOrderDetail2.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
         rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
         rspSellOrderDetail2.setCreditRating( 5 );
+        rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
+        if( walletTransaction.getCanSplit() ){
+            rspSellOrderDetail2.setMinBuyNum( walletTransaction.getMinBuyNum() );
+        }
 
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectList( new QueryWrapper<WalletUserPayMethod>()
                 .eq( "user_id", userId )
