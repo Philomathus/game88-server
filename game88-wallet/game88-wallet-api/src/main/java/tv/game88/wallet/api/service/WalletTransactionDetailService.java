@@ -20,7 +20,7 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
 
     void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail );
 
-    RspBase<RspBuyOrderDetail> buyOrderDetail( String transDetailId );
+    RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transDetailId );
 
     RspBase<?> sellerConfirmTrans( String userId, String transDetailId );
 

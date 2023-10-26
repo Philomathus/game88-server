@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.NEWWORLD + "GamePullProcessor" )
+@Repository( value = ConstantsGame.NEWWORLD + "GamePullProcessor" )
 public class GamePullDockNewWorld extends AbstractGamePull {
 
     @Override
@@ -70,21 +70,21 @@ public class GamePullDockNewWorld extends AbstractGamePull {
                 .build( true );
 
         // log.warn( uriComponents.toUriString() );
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
-                response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
         // log.warn( uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d    = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             String              code = d.getOrDefault( "code", "-1" ).toString();
-            if ( !CollectionUtils.isEmpty( d ) && ( "0".equals( code ) || "204".equals( code ) ) ) {
+            if ( !CollectionUtils.isEmpty( d ) && ( "0".equals( code ) || "204".equals( code ) || "16".equals( code ) ) ) {
                 gamePlatform.setVersionValue( String.valueOf( endTime ) );
 
                 Map<String, Object> list = ( Map<String, Object> ) d.getOrDefault( "contents", new HashMap<>() );
@@ -107,7 +107,8 @@ public class GamePullDockNewWorld extends AbstractGamePull {
                     return resultList;
                 }
             } else {
-                log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::"
+                        + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;

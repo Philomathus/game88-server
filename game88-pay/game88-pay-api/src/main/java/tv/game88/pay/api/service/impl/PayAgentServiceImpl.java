@@ -186,7 +186,7 @@ public class PayAgentServiceImpl implements PayAgentService {
 
     @Override
     public RspBase<?> payAgentOrders( ReqPayAgent reqPayAgent, String userName ) {
-        if ( CollectionUtils.isEmpty( reqPayAgent.getWithdrawOrderNos() ) || reqPayAgent.getWithdrawOrderNos().size() == 0 ) {
+        if ( CollectionUtils.isEmpty( reqPayAgent.getWithdrawOrderNos() ) ) {
             return RspBase.businessError( "请选择需要代付的订单" );
         }
         if ( reqPayAgent.getPayAgentChannelId() == null ) {
