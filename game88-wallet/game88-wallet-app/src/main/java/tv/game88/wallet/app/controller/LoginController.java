@@ -58,7 +58,7 @@ public class LoginController extends BaseController {
     }
 
     @Operation( summary = "设置登录密码", description = "要设置登录密码要密码和确认密码，需要登录到token" )
-    @PostMapping("/setPassword")
+    @PostMapping("/api/setPassword")
     public RspBase<?> setPassword( @RequestBody ReqConstant.ReqSetPasswd reqSetPasswd ){
         return  walletUserService.setPassword( MemberSecurityUtils.getUserId() , reqSetPasswd );
     }
