@@ -207,7 +207,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         rspBuyOrderDetail.setPayMethodType( bPayMethod.getMethodType() );
         rspBuyOrderDetail.setBuyerId( walletTransactionDetail.getBuyerId() );
         rspBuyOrderDetail.setSellerId( walletTransactionDetail.getSellerId() );
-
+        rspBuyOrderDetail.setTransStartTime( walletTransactionDetail.getBuyerConfirmBuyTime() );
 
         RspPayMethod2 rspBuyerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( bPayMethod, rspBuyerPayMethod );

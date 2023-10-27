@@ -1,11 +1,14 @@
 package tv.game88.wallet.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
+
+import java.time.LocalDateTime;
 
 @Data
 public class RspBuyOrderDetail {
@@ -34,6 +37,10 @@ public class RspBuyOrderDetail {
 
     @Schema( title = "买方信用信息" )
     private RspCreditInfo creditInfo;
+
+    @Schema( title = "事务开始时间" )
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
+    private LocalDateTime transStartTime;
 
     public String getTransCertPic() {
         if ( StringUtils.isNotBlank( transCertPic ) ) {
