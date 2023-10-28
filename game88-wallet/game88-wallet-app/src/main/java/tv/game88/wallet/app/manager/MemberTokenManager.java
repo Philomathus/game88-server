@@ -62,10 +62,10 @@ public class MemberTokenManager {
      */
     public String setRspMemberToken( PlatformUser platformUser, String ip ) {
         if ( platformUser != null ) {
-            String token = this.refreshLoginUserCache( platformUser.getId() );
+            /*String token = this.refreshLoginUserCache( platformUser.getId() );
             if ( StringUtils.isNotBlank( token ) ) {
                 return token;
-            }
+            }*/
             MemberLoginUser loginUser = new MemberLoginUser( platformUser );
             loginUser.setLoginTime( LocalDateTime.now() );
             loginUser.setLoginIp( ip );
