@@ -38,6 +38,7 @@ public abstract class ControllerExceptionHandler {
         if ( e instanceof SessionExpireException || e instanceof NotLoginException ) {
             return RspBase.sessionError( e.getMessage() );
         } else if ( e instanceof NumberFormatException ) {
+            log.error( e.getMessage(), e );
             return new RspBase<>( 1, "数据格式校验失败" );
         } else if ( e instanceof MultiPartParserDefinition.FileTooLargeException ) {
             return RspBase.businessError( "文件上传过大,请缩小图片尺寸" );
