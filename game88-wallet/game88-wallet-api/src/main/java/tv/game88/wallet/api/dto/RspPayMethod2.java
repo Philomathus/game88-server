@@ -14,7 +14,7 @@ public class RspPayMethod2 {
     @Schema( title = "开户所在地 - 市" )
     private String payAddrCity;
     @Schema( title = "银行卡号或支付宝账号" )
-    private String account;
+    private String bankAccount;
     @Schema( title = "真实姓名" )
     private String realName;
     @Schema( title = "收款码图片地址" )
