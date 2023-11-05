@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletUserService;
+import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import javax.annotation.Resource;
@@ -42,7 +44,7 @@ public class WalletUserController extends BaseController {
         return walletUserService.fundPassSet( MemberSecurityUtils.getUserId(), reqFundPass );
     }
 
-    @Operation(summary = "重置基金密码")
+    @Operation( summary = "重置基金密码" )
     @PostMapping( "/api/fundPassReset" )
     public RspBase<?> funPassReset( @RequestBody ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         return walletUserService.resetFunPassword( MemberSecurityUtils.getUserId(), reqResetFundPasswd );
@@ -55,6 +57,13 @@ public class WalletUserController extends BaseController {
         startPage( reqLogFund );
         List<RspLogFund> fundDetails = walletUserService.getFundDetails( MemberSecurityUtils.getUserId(), reqLogFund );
         return getRspBasePage( fundDetails, reqLogFund );
+    }
+
+    @Operation( summary = "资金枚举类型" )
+    @PostMapping( "/api/getFundEnumTypes" )
+    @Anonymous
+    public RspBase<List<RspFundEnumType>> getFundEnumTypes() {
+        return RspBase.ok( WalletUserFundEnum.getFundEnumType() );
     }
 
     @Operation( summary = "个人转账" )

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
@@ -91,6 +92,7 @@ public class MemberInfoController extends BaseController {
 
     @Operation( summary = "获取交易状态列表" )
     @PostMapping( "/getTradeTypes" )
+    @Anonymous
     public RspBase<List<RspConfigTradeType>> getTradeTypes() {
         return RspBase.ok( EnumMoney.getTradeTypes() );
     }

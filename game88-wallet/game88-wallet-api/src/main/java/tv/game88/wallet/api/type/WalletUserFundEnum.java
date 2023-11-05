@@ -1,8 +1,13 @@
 package tv.game88.wallet.api.type;
 
 import lombok.Getter;
+import tv.game88.wallet.api.dto.RspFundEnumType;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 交易类型 type>0  为入金 type>0&&type<100  为充值
@@ -39,5 +44,15 @@ public enum WalletUserFundEnum {
             }
         }
         return null;
+    }
+
+    public static List<RspFundEnumType> getFundEnumType() {
+        return Arrays.stream( WalletUserFundEnum.values() ).map( m -> {
+            RspFundEnumType tradeType = new RspFundEnumType();
+            tradeType.setName( m.name() );
+            tradeType.setType( m.getType() );
+            tradeType.setDes( m.getDes() );
+            return tradeType;
+        } ).sorted( Comparator.comparing( RspFundEnumType::getType ) ).collect( Collectors.toList() );
     }
 }
