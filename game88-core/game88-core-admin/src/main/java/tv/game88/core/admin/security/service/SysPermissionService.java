@@ -6,7 +6,7 @@ import tv.game88.core.admin.service.ISysMenuService;
 import tv.game88.core.admin.service.ISysRoleService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashSet;
 import java.util.Set;
 

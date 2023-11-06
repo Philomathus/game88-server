@@ -10,9 +10,9 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.session.manager.MemberTokenManager;
 import tv.game88.core.session.vo.MemberLoginUser;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 自定义退出处理类 返回成功

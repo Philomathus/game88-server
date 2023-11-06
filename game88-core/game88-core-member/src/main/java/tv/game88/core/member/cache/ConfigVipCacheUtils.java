@@ -7,7 +7,7 @@ import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.entity.ConfigVip;
 import tv.game88.core.member.mapper.ConfigVipMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;

@@ -9,7 +9,7 @@ import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

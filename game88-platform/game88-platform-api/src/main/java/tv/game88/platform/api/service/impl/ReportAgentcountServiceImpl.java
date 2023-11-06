@@ -10,7 +10,7 @@ import tv.game88.platform.api.entity.ReportAgentcount;
 import tv.game88.platform.api.mapper.ReportAgentcountMapper;
 import tv.game88.platform.api.service.ReportAgentcountService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

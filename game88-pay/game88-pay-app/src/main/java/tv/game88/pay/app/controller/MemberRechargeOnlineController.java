@@ -18,7 +18,7 @@ import tv.game88.pay.api.dto.RspPayChannel;
 import tv.game88.pay.api.entity.PayType;
 import tv.game88.pay.api.service.PayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

@@ -11,7 +11,7 @@ import tv.game88.core.config.entity.ConfigSms;
 import tv.game88.core.config.mapper.ConfigSmsMapper;
 import tv.game88.core.utils.SmsApi;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

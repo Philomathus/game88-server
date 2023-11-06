@@ -19,7 +19,7 @@ import tv.game88.general.api.service.GameDataRecordService;
 import tv.game88.general.game.base.BaseGamePull;
 import tv.game88.general.game.base.GamePullDockFactoryUtil;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

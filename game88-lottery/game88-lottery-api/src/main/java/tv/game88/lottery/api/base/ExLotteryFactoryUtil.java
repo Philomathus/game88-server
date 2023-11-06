@@ -3,7 +3,7 @@ package tv.game88.lottery.api.base;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Component
 public class ExLotteryFactoryUtil {

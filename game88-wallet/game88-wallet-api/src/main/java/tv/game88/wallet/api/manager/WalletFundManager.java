@@ -15,7 +15,7 @@ import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

@@ -16,8 +16,8 @@ import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayChannel;
 import tv.game88.pay.api.service.PayChannelService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;

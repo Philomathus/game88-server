@@ -1,7 +1,6 @@
 package tv.game88.common.utils;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -12,6 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * AES加密解密工具
@@ -63,7 +63,7 @@ public class AESCoder {
             // 单部分加密结束, 重置Cipher, 获取加密内容的字节数组(这里要设置为UTF-8)防止解密为乱码
             byte[] bytes = cipher.doFinal( content.getBytes( charsetName ) );
             // 将加密后的字节数组转为字符串返回
-            return Base64Utils.encodeToString( bytes );
+            return Base64.getEncoder().encodeToString( bytes );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
@@ -81,7 +81,7 @@ public class AESCoder {
     private static String AESDecode( String content, String password ) {
         try {
             // 将加密并编码后的内容解码成字节数组
-            byte[] bytes = Base64Utils.decodeFromString( content );
+            byte[] bytes = Base64.getDecoder().decode( content );
             // 这里指定了算法为AES
             Cipher cipher = Cipher.getInstance( AES );
             // 基于解密模式和密钥初始化Cipher
@@ -122,7 +122,7 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64Utils.encodeToString( encrypted );// 此处使用BASE64做转码
+        return Base64.getEncoder().encodeToString( encrypted );// 此处使用BASE64做转码
     }
 
     public static String encryptByKeyUrl( String value, String key ) throws Exception {
@@ -131,7 +131,7 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        String base64    = Base64Utils.encodeToString( encrypted );// 此处使用BASE64做转码
+        String base64    = Base64.getEncoder().encodeToString( encrypted );// 此处使用BASE64做转码
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
@@ -145,15 +145,15 @@ public class AESCoder {
         }
         byte[] plaintext = new byte[plainTextLength];
         System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), AES);
-        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
+        SecretKeySpec   keySpec = new SecretKeySpec(key.getBytes(), AES);
+        IvParameterSpec ivSpec  = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
         byte[] encrypted = cipher.doFinal(plaintext);
-        return Base64Utils.encodeToUrlSafeString( encrypted );
+        return Base64.getUrlEncoder().encodeToString( encrypted );
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
-        byte[]        encrypted1 = Base64Utils.decodeFromString( content );
+        byte[]        encrypted1 = Base64.getDecoder().decode( content );
         byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
         SecretKeySpec skeySpec   = new SecretKeySpec( raw, AES );
         Cipher        cipher     = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
@@ -208,7 +208,7 @@ public class AESCoder {
         ecipher.init( Cipher.ENCRYPT_MODE, key );
         byte[] data           = str.getBytes( StandardCharsets.UTF_8 );
         byte[] encryptedArray = ecipher.doFinal( data );
-        return Base64Utils.encodeToString( encryptedArray );
+        return Base64.getEncoder().encodeToString( encryptedArray );
     }
 
     private static byte[] getMd5( String keyString ) throws Exception {

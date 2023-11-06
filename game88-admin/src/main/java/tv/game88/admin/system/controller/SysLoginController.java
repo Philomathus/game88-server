@@ -23,7 +23,7 @@ import tv.game88.core.admin.vo.LoginBody;
 import tv.game88.core.admin.vo.LoginUser;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

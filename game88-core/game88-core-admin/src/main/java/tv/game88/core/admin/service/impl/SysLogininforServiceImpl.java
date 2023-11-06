@@ -5,7 +5,7 @@ import tv.game88.core.admin.mapper.SysLogininforMapper;
 import tv.game88.core.admin.service.ISysLogininforService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

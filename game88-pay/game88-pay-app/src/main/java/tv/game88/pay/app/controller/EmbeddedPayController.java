@@ -14,7 +14,7 @@ import tv.game88.pay.api.dto.ReqVipPayDeposit;
 import tv.game88.pay.api.dto.RspVipPayLogin;
 import tv.game88.pay.api.service.EmbeddedPayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @RestController
 @Tag( name = "内嵌支付登录注册以及充值" )

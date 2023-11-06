@@ -1,18 +1,13 @@
 package tv.game88.common.config;
 
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -20,94 +15,77 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Configuration
 public class RestTemplateConfig {
-    private static int getMaxCpuCore() {
-        return Runtime.getRuntime().availableProcessors();
-    }
 
+    @Bean
+    @Lazy
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate( clientHttpRequestFactory() );
+        //设置字符集
+        setCharset( restTemplate );
+        return restTemplate;
+    }
 
     @Bean( "restUploadTemplate" )
     @Lazy
-    public RestTemplate uploadTemplate( RestTemplateBuilder builder ) throws Exception {
-        RestTemplate restTemplate = builder.build();
-        restTemplate.setRequestFactory( clientHttpUploadRequestFactory() );
-        // 使用 utf-8 编码集的 conver 替换默认的 conver（默认的 string conver 的编码集为"ISO-8859-1"）
-        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-        messageConverters.removeIf( converter -> converter instanceof StringHttpMessageConverter );
-        messageConverters.add( new StringHttpMessageConverter( StandardCharsets.UTF_8 ) );
-        //messageConverters.add( new StringHttpMessageConverter( Charset.forName("gbk")) );
-
+    public RestTemplate uploadTemplate() {
+        RestTemplate restTemplate = new RestTemplate( clientUploadHttpRequestFactory() );
+        //设置字符集
+        setCharset( restTemplate );
         return restTemplate;
     }
 
-    @Bean
-    @Lazy
-    public RestTemplate restTemplate( RestTemplateBuilder builder ) throws Exception {
-        RestTemplate restTemplate = builder.build();
-        restTemplate.setRequestFactory( clientHttpRequestFactory() );
-        // 使用 utf-8 编码集的 conver 替换默认的 conver（默认的 string conver 的编码集为"ISO-8859-1"）
+    //设置字符集为UTF-8, 解决乱码问题
+    private void setCharset( RestTemplate restTemplate ) {
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-        messageConverters.removeIf( converter -> converter instanceof StringHttpMessageConverter );
-        messageConverters.add( new StringHttpMessageConverter( StandardCharsets.UTF_8 ) );
-        //messageConverters.add( new StringHttpMessageConverter( Charset.forName("gbk")) );
-
-        return restTemplate;
+        for ( HttpMessageConverter<?> messageConverter : messageConverters ) {
+            if ( messageConverter instanceof StringHttpMessageConverter ) {
+                ( ( StringHttpMessageConverter ) messageConverter ).setDefaultCharset( StandardCharsets.UTF_8 );
+            }
+        }
     }
 
-    @Bean
-    public HttpClientConnectionManager poolingConnectionManager() throws Exception {
-        PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
-        poolingConnectionManager.setMaxTotal( 520 ); // 连接池最大连接数
-        //poolingConnectionManager.setDefaultMaxPerRoute(100); // 每个主机的并发
-        poolingConnectionManager.setDefaultMaxPerRoute( 2 * getMaxCpuCore() );// // 单路由的并发数
-        return poolingConnectionManager;
+    public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
+        try {
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient( getHttpClient() );
+            requestFactory.setConnectionRequestTimeout( 15000 );
+            requestFactory.setConnectTimeout( 10000 );
+            return requestFactory;
+        } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
+            throw new RuntimeException( e );
+        }
     }
 
-    @Bean
-    public HttpClientBuilder httpClientBuilder() throws Exception {
-        TrustStrategy acceptingTrustStrategy = ( x509Certificates, authType ) -> true;
-        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, acceptingTrustStrategy ).build();
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory( sslContext,
-                new NoopHostnameVerifier() );
-
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        httpClientBuilder.setSSLSocketFactory( connectionSocketFactory );
-        //设置HTTP连接管理器
-        httpClientBuilder.setConnectionManager( poolingConnectionManager() );
-        // 重试次数3次，并开启
-        //httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3,true));
-        // 保持长链接配置，keep-alive
-        httpClientBuilder.setKeepAliveStrategy( new DefaultConnectionKeepAliveStrategy() );
-
-        return httpClientBuilder;
+    public HttpComponentsClientHttpRequestFactory clientUploadHttpRequestFactory() {
+        try {
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient( getHttpClient() );
+            requestFactory.setConnectionRequestTimeout( 60000 );
+            requestFactory.setConnectTimeout( 60000 );
+            return requestFactory;
+        } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
+            throw new RuntimeException( e );
+        }
     }
 
-    @Bean
-    public ClientHttpRequestFactory clientHttpRequestFactory() throws Exception {
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        clientHttpRequestFactory.setHttpClient( httpClientBuilder().build() );
-        clientHttpRequestFactory.setConnectTimeout( 150000 ); // 连接超时，毫秒
-        clientHttpRequestFactory.setReadTimeout( 150000 ); // 读写超时，毫秒
-        //clientHttpRequestFactory.setBufferRequestBody(false);//是否使用缓存流
-        // 连接池不够用时候等待时间长度设置
-        clientHttpRequestFactory.setConnectionRequestTimeout( 3000 );
-        return clientHttpRequestFactory;
-    }
+    private CloseableHttpClient getHttpClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
 
-    @Bean
-    public ClientHttpRequestFactory clientHttpUploadRequestFactory() throws Exception {
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        clientHttpRequestFactory.setHttpClient( httpClientBuilder().build() );
-        clientHttpRequestFactory.setConnectTimeout( 600000 ); // 连接超时，毫秒
-        clientHttpRequestFactory.setReadTimeout( 600000 ); // 读写超时，毫秒
-        //clientHttpRequestFactory.setBufferRequestBody(false);//是否使用缓存流
-        // 连接池不够用时候等待时间长度设置
-        clientHttpRequestFactory.setConnectionRequestTimeout( 3000 );
-        return clientHttpRequestFactory;
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
+        return HttpClients
+                .custom()
+                .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
+                        .create()
+                        .setSSLSocketFactory( socketFactory )
+                        .build() )
+                .build();
     }
-
 }
  

@@ -16,7 +16,7 @@ import tv.game88.lottery.api.dto.ReqBet;
 import tv.game88.lottery.api.dto.RspBet;
 import tv.game88.lottery.api.service.LotteryBetService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

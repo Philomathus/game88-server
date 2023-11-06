@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @EqualsAndHashCode( callSuper = true )
 @Data

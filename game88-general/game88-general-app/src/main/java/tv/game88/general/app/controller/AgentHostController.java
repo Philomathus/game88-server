@@ -12,7 +12,7 @@ import tv.game88.general.api.dto.RspHostClient;
 import tv.game88.general.api.service.AgentHostClientService;
 import tv.game88.general.api.service.AgentHostService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 
 @Log4j2

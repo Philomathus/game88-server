@@ -9,7 +9,7 @@ import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.general.api.dto.ReqGameDataRecord;
 import tv.game88.general.api.service.GameDataRecordService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Log4j2

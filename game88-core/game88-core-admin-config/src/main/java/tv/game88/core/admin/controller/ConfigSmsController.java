@@ -10,7 +10,7 @@ import tv.game88.core.admin.service.ConfigSmsService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigSms;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

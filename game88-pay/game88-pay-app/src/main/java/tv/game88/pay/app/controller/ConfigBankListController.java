@@ -12,7 +12,7 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.dto.RspConfigBankList;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 

@@ -22,8 +22,8 @@ import tv.game88.core.session.vo.MemberLoginUser;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController

@@ -1,7 +1,6 @@
 package tv.game88.pay.api.utils;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.util.Base64Utils;
 import tv.game88.common.utils.JsonUtil;
 
 import javax.crypto.Mac;
@@ -29,14 +28,14 @@ public class BankAddressUtil {
 		Key    sKey    = new SecretKeySpec( secretKey.getBytes( StandardCharsets.UTF_8 ), mac.getAlgorithm() );
 		mac.init( sKey );
 		byte[] hash = mac.doFinal( signStr.getBytes( StandardCharsets.UTF_8 ) );
-		String sig  = Base64Utils.encodeToString( hash );
+		String sig  = Base64.getEncoder().encodeToString( hash );
 		return "hmac id=\"" + secretId + "\", algorithm=\"hmac-sha1\", headers=\"x-date x-source\", signature=\"" + sig + "\"";
 	}
 
 	public static String urlencode( Map<?, ?> map ) throws UnsupportedEncodingException {
 		StringBuilder sb = new StringBuilder();
 		for ( Map.Entry<?, ?> entry : map.entrySet() ) {
-			if ( sb.length() > 0 ) {
+			if ( !sb.isEmpty() ) {
 				sb.append( "&" );
 			}
 			sb.append( String.format( "%s=%s",

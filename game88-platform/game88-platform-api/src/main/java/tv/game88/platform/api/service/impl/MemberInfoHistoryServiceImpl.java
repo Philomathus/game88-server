@@ -11,7 +11,7 @@ import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoHistoryMapper;
 import tv.game88.platform.api.service.MemberInfoHistoryService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Callable;

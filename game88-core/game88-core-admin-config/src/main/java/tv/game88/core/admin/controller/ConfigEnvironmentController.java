@@ -18,8 +18,8 @@ import tv.game88.core.admin.mapper.SysDictDataMapper;
 import tv.game88.core.admin.service.ConfigEnvironmentService;
 import tv.game88.core.config.entity.ConfigEnvironment;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 

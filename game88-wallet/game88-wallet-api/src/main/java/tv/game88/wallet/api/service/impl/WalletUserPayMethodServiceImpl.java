@@ -19,7 +19,7 @@ import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 

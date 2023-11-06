@@ -10,11 +10,11 @@ import tv.game88.core.session.manager.MemberTokenManager;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.core.session.vo.MemberLoginUser;
 
-import javax.annotation.Resource;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**

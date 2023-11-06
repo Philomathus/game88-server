@@ -10,7 +10,7 @@ import tv.game88.lottery.api.dto.RspLotteryInfo;
 import tv.game88.lottery.api.service.LotteryHistoryService;
 import tv.game88.lottery.api.utils.LotteryUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

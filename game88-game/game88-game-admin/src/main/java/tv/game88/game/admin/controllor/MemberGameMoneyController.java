@@ -11,7 +11,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.game.api.entity.MemberGameMoney;
 import tv.game88.game.api.service.MemberGameMoneyService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

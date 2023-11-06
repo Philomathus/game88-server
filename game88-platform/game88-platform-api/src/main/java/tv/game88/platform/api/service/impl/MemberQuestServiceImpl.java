@@ -1,11 +1,11 @@
 package tv.game88.platform.api.service.impl;
 
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import tv.game88.core.quest.entity.MemberQuest;
 import tv.game88.core.quest.mapper.MemberQuestMapper;
 import tv.game88.platform.api.service.MemberQuestService;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

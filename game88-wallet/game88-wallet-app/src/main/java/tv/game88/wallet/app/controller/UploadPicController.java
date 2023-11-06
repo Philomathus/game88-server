@@ -14,7 +14,7 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.utils.OssApi;
 import tv.game88.wallet.api.util.ZXingUtil;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

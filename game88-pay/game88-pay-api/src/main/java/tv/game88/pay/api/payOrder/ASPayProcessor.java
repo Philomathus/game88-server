@@ -39,7 +39,7 @@ public class ASPayProcessor extends AbstractPay {
         params.put( "pay_bankcode", payChannel.getChannelCode().trim() );
         params.put( "pay_notifyurl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "pay_callbackurl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
-        params.put( "pay_amount", reqPayRecharge.getMoney().setScale( 0, BigDecimal.ROUND_HALF_UP ).toString() );
+        params.put( "pay_amount", reqPayRecharge.getMoney().setScale( 0, RoundingMode.HALF_UP ).toString() );
         String sign = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         params.put( "pay_md5sign", DigestUtils.md5Hex( sign ).toUpperCase() );
         params.put( "pay_productname", "pay_productname" );

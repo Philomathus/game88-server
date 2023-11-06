@@ -14,8 +14,8 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.platform.api.entity.LogCommission;
 import tv.game88.platform.api.service.CommissionRecordsService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

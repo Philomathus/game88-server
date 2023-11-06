@@ -13,7 +13,7 @@ import tv.game88.pay.api.mapper.PayChannelMapper;
 import tv.game88.pay.api.mapper.PayChannelMoneyMapper;
 import tv.game88.pay.api.service.PayChannelService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;

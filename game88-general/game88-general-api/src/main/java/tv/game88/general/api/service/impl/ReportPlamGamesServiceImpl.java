@@ -12,7 +12,7 @@ import tv.game88.general.api.entity.ReportPlamGames;
 import tv.game88.general.api.mapper.ReportPlamGamesMapper;
 import tv.game88.general.api.service.IReportPlamGamesService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

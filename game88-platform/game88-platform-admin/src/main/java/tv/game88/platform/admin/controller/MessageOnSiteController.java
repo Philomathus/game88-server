@@ -16,8 +16,8 @@ import tv.game88.platform.api.entity.MessageOnSite;
 import tv.game88.platform.api.service.MemberInfoService;
 import tv.game88.platform.api.service.MessageOnSiteService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.*;
 

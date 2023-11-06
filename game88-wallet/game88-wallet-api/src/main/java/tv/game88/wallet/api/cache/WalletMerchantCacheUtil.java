@@ -8,7 +8,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.mapper.WalletMerchantMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 @Component

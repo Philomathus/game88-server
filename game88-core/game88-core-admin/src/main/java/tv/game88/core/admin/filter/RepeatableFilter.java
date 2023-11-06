@@ -3,8 +3,8 @@ package tv.game88.core.admin.filter;
 import tv.game88.common.utils.StringUtils;
 import org.springframework.http.MediaType;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**

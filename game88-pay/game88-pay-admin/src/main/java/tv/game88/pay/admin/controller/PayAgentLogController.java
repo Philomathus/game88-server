@@ -15,8 +15,8 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.service.PayAgentLogService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

@@ -5,11 +5,12 @@ spring:
     url: jdbc:mysql://8.210.10.193:3306/wallet?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
     username: root
     password: f:e=h>EVUH,!N7zS&J`9
-  redis:
-    host: 8.210.10.193
-    port: 6379
-    password: EvYsN39ViArDumx4pWyH
-    database: 4
+  data:
+    redis:
+      host: 8.210.10.193
+      port: 6379
+      password: EvYsN39ViArDumx4pWyH
+      database: 4
 
 #mybatis-plus:
   #configuration:

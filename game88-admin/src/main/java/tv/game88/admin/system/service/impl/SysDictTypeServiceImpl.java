@@ -12,7 +12,7 @@ import tv.game88.core.admin.entity.SysDictType;
 import tv.game88.core.admin.mapper.SysDictDataMapper;
 import tv.game88.core.admin.mapper.SysDictTypeMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

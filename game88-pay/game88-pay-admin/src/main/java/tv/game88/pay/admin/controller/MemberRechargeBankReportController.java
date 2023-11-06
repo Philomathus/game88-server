@@ -15,8 +15,8 @@ import tv.game88.pay.api.dto.ReqMemberRechargeBank;
 import tv.game88.pay.api.dto.RspRechargeBankReport;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 

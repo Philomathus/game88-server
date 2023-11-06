@@ -16,7 +16,7 @@ import tv.game88.general.api.entity.ReportPlamCom;
 import tv.game88.general.api.mapper.ReportPlamComMapper;
 import tv.game88.general.api.service.IReportPlamComService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;

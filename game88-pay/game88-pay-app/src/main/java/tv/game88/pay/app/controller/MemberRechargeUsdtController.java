@@ -15,7 +15,7 @@ import tv.game88.pay.api.dto.RspPayRechargeUsdt;
 import tv.game88.pay.api.service.MemberRechargeUsdtService;
 import tv.game88.pay.api.service.PayRechargeUsdtService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

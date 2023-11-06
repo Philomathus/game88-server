@@ -102,6 +102,7 @@ spring:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77cp_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-  redis:
-    host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
-    port: 6379
+  data:
+    redis:
+      host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
+      port: 6379

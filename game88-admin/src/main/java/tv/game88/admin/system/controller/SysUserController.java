@@ -29,8 +29,8 @@ import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -11,7 +11,7 @@ import tv.game88.wallet.api.dto.RspWalletRecord;
 import tv.game88.wallet.api.entity.WalletRecord;
 import tv.game88.wallet.api.service.WalletRecordService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;

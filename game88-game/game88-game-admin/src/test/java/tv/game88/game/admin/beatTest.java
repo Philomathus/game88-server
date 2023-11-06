@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.game.api.service.GameDataService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;

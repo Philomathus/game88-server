@@ -5,7 +5,7 @@ import tv.game88.platform.api.entity.SpeakIpBlackList;
 import tv.game88.platform.api.mapper.SpeakIpBlackListMapper;
 import tv.game88.platform.api.service.SpeakIpBlackListService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

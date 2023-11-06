@@ -107,7 +107,7 @@ public class ReportMoneyinfoServiceImpl extends ServiceImpl<ReportMoneyinfoMappe
     }
 
     private void setSelectTime( String dateNowStr, ReportMoneyinfo reportMoneyinfo ) {
-        if ( null == reportMoneyinfo.getParams() || reportMoneyinfo.getParams().size() == 0
+        if ( null == reportMoneyinfo.getParams() || reportMoneyinfo.getParams().isEmpty()
                 || reportMoneyinfo.getParams().get( "beginTime" ) == "" ) {
             log.info( "我进来了" );
             HashMap m = new HashMap<>();

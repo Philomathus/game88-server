@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.general.api.service.GameDataRecordService;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 @Log4j2
 @Component

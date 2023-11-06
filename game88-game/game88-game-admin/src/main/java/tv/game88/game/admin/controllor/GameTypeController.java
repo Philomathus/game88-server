@@ -15,7 +15,7 @@ import tv.game88.game.api.dto.RspGame;
 import tv.game88.game.api.entity.GameType;
 import tv.game88.game.api.service.GameTypeService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

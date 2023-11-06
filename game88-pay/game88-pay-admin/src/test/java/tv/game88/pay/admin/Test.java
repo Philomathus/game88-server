@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.mapper.MemberCardMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Log4j2
 @SpringBootTest( classes = { Game88PayAdminApplication.class } )// 指定启动类

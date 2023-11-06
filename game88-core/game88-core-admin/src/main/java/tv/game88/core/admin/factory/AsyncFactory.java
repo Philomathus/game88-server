@@ -1,5 +1,7 @@
 package tv.game88.core.admin.factory;
 
+import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.SpringUtils;
@@ -8,9 +10,7 @@ import tv.game88.core.admin.entity.SysLogininfor;
 import tv.game88.core.admin.entity.SysOperLog;
 import tv.game88.core.admin.service.ISysLogininforService;
 import tv.game88.core.admin.service.ISysOperLogService;
-import eu.bitwalker.useragentutils.UserAgent;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.TimerTask;
 
 /**
@@ -26,7 +26,6 @@ public class AsyncFactory {
      * @param username 用户名
      * @param status   状态
      * @param message  消息
-     * @param args     列表
      *
      * @return 任务task
      */

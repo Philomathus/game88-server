@@ -9,7 +9,7 @@ import tv.game88.pay.api.entity.RechargeLog;
 import tv.game88.pay.api.mapper.RechargeLogMapper;
 import tv.game88.pay.api.service.RechargeLogService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 

@@ -24,7 +24,7 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.utils.SecurityUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;

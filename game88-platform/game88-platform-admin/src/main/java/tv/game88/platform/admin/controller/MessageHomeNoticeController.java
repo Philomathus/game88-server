@@ -14,8 +14,8 @@ import tv.game88.platform.api.cache.MessageCacheUtil;
 import tv.game88.platform.api.entity.MessageHomeNotice;
 import tv.game88.platform.api.service.MessageHomeNoticeService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

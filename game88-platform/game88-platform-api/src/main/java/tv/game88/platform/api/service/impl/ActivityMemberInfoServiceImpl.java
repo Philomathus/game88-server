@@ -5,7 +5,7 @@ import tv.game88.platform.api.entity.ActivityMemberInfo;
 import tv.game88.platform.api.mapper.ActivityMemberInfoMapper;
 import tv.game88.platform.api.service.ActivityMemberInfoService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 

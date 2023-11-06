@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import tv.game88.common.page.PageDomain;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 
 @EqualsAndHashCode( callSuper = true )

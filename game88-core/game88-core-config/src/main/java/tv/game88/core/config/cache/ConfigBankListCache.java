@@ -13,7 +13,7 @@ import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.core.config.mapper.ConfigBankListMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;

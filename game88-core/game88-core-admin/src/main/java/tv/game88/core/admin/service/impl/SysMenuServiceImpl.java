@@ -14,7 +14,7 @@ import tv.game88.core.admin.vo.RouterVo;
 import tv.game88.core.admin.vo.TreeSelect;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 

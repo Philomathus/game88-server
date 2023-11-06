@@ -27,7 +27,7 @@ import tv.game88.platform.api.entity.ActivityQuestType;
 import tv.game88.platform.api.entity.ActivityType;
 import tv.game88.platform.api.service.ActivityService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;

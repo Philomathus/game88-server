@@ -15,12 +15,6 @@
     <description>88棋牌服务公共库 - 导出Excel工具封装</description>
 
     <dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- excel工具 -->
         <dependency>
             <groupId>cn.afterturn</groupId>

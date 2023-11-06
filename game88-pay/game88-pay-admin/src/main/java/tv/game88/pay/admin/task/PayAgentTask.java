@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.pay.api.service.PayAgentService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Log4j2
 @Component

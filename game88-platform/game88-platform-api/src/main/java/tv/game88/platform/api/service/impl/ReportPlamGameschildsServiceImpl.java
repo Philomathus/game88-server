@@ -1,11 +1,11 @@
 package tv.game88.platform.api.service.impl;
 
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import tv.game88.platform.api.entity.ReportPlamGameschilds;
 import tv.game88.platform.api.mapper.ReportPlamGameschildsMapper;
 import tv.game88.platform.api.service.ReportPlamGameschildsService;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

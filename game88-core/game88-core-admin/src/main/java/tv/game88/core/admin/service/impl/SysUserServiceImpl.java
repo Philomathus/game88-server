@@ -16,7 +16,7 @@ import tv.game88.core.admin.mapper.SysUserRoleMapper;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysUserService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 

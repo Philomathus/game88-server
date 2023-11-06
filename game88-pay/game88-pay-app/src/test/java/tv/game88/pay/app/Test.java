@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @SpringBootTest
 public class Test {

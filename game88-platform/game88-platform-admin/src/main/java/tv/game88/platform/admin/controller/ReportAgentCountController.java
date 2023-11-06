@@ -15,9 +15,9 @@ import tv.game88.platform.api.dto.ReportPlamHome;
 import tv.game88.platform.api.entity.ReportAgentcount;
 import tv.game88.platform.api.service.ReportAgentcountService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.HashMap;

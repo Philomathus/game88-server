@@ -10,7 +10,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.pay.api.entity.*;
 import tv.game88.pay.api.mapper.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.List;

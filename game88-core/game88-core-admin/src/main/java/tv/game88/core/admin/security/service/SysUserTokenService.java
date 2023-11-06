@@ -5,6 +5,8 @@ import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +19,8 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.vo.LoginUser;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class SysUserTokenService {
     @Resource
     private RedisUtils redisUtil;
 
-    private static Key KEY_SECRET;
+    private static SecretKey KEY_SECRET;
 
     @Value( "${token.secret}" )
     private void setKeySecret( String secret ) {
@@ -53,11 +53,11 @@ public class SysUserTokenService {
 
     public static void main( String[] args ) throws Exception {
         //SecretKey secretKey = Keys.secretKeyFor( SignatureAlgorithm.HS512);
-        //System.out.println(Base64Utils.encodeToString( secretKey.getEncoded() ));
+        //System.out.println(Base64.getEncoder().encodeToString( secretKey.getEncoded() ));
 
         //KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS512);
-        //System.out.println("公钥:" + Base64Utils.encodeToString( keyPair.getPublic().getEncoded() ));
-        //System.out.println("私钥:" + Base64Utils.encodeToString( keyPair.getPrivate().getEncoded() ));
+        //System.out.println("公钥:" + Base64.getEncoder().encodeToString( keyPair.getPublic().getEncoded() ));
+        //System.out.println("私钥:" + Base64.getEncoder().encodeToString( keyPair.getPrivate().getEncoded() ));
     }
 
     /**
@@ -148,7 +148,7 @@ public class SysUserTokenService {
      * @return 令牌
      */
     private String createToken( Map<String, Object> claims ) {
-        return Jwts.builder().setClaims( claims ).signWith( KEY_SECRET ).compact();
+        return Jwts.builder().claims( claims ).signWith( KEY_SECRET ).compact();
     }
 
     /**
@@ -160,7 +160,7 @@ public class SysUserTokenService {
      */
     private Claims parseToken( String token ) {
         try {
-            return Jwts.parserBuilder().setSigningKey( KEY_SECRET ).build().parseClaimsJws( token ).getBody();
+            return Jwts.parser().decryptWith( KEY_SECRET ).build().parseSignedClaims( token ).getPayload();
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }

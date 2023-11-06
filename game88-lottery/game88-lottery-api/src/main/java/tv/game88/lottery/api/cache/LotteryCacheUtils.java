@@ -14,8 +14,8 @@ import tv.game88.lottery.api.entity.LotteryTemp;
 import tv.game88.lottery.api.mapper.*;
 import tv.game88.lottery.api.utils.LotteryUtils;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;

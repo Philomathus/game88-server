@@ -28,7 +28,7 @@ import tv.game88.core.config.cache.ConfigOssCacheUtil;
 import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

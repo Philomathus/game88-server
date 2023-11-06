@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.BaseEntity;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serial;
 
 /**

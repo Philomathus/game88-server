@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 
 /**

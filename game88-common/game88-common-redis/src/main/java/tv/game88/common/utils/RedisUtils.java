@@ -7,6 +7,8 @@ import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.connection.zset.Aggregate;
+import org.springframework.data.redis.connection.zset.Weights;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.domain.geo.BoundingBox;
 import org.springframework.data.redis.domain.geo.GeoReference;
@@ -1253,7 +1255,7 @@ public class RedisUtils {
     /**
      * 返回value区间内的元素个数，按value字典排序
      */
-    public Long zLexCount( String key, RedisZSetCommands.Range range ) {
+    public Long zLexCount( String key, Range<String> range ) {
         return stringRedisTemplate.opsForZSet().lexCount( key, range );
     }
 
@@ -1350,7 +1352,7 @@ public class RedisUtils {
     /**
      * 删除指定范围的成员,其中成员Value按( 字典排序从小到大 )
      */
-    public Long zRemoveRangeByLex( String key, RedisZSetCommands.Range range ) {
+    public Long zRemoveRangeByLex( String key, Range<String> range ) {
         return stringRedisTemplate.opsForZSet().removeRangeByLex( key, range );
     }
 
@@ -1448,7 +1450,7 @@ public class RedisUtils {
      * @since Redis Version: 6.2
      */
     public Set<ZSetOperations.TypedTuple<String>> zIntersectWithScores( String key, Collection<String> otherKeys,
-                                                                        RedisZSetCommands.Aggregate aggregate ) {
+                                                                        Aggregate aggregate ) {
         return stringRedisTemplate.opsForZSet().intersectWithScores( key, otherKeys, aggregate );
     }
 
@@ -1458,8 +1460,7 @@ public class RedisUtils {
      * @since Redis Version: 6.2
      */
     public Set<ZSetOperations.TypedTuple<String>> zIntersectWithScores( String key, Collection<String> otherKeys,
-                                                                        RedisZSetCommands.Aggregate aggregate,
-                                                                        RedisZSetCommands.Weights weights ) {
+                                                                        Aggregate aggregate, Weights weights ) {
         return stringRedisTemplate.opsForZSet().intersectWithScores( key, otherKeys, aggregate, weights );
     }
 
@@ -1486,8 +1487,7 @@ public class RedisUtils {
      *
      * @since Redis Version: 6.2
      */
-    public Long zIntersectAndStore( String key, Collection<String> otherKeys, String destKey,
-                                    RedisZSetCommands.Aggregate aggregate ) {
+    public Long zIntersectAndStore( String key, Collection<String> otherKeys, String destKey, Aggregate aggregate ) {
         return stringRedisTemplate.opsForZSet().intersectAndStore( key, otherKeys, destKey, aggregate );
     }
 
@@ -1496,8 +1496,8 @@ public class RedisUtils {
      *
      * @since Redis Version: 6.2
      */
-    public Long zIntersectAndStore( String key, Collection<String> otherKeys, String destKey,
-                                    RedisZSetCommands.Aggregate aggregate, RedisZSetCommands.Weights weights ) {
+    public Long zIntersectAndStore( String key, Collection<String> otherKeys, String destKey, Aggregate aggregate,
+                                    Weights weights ) {
         return stringRedisTemplate.opsForZSet().intersectAndStore( key, otherKeys, destKey, aggregate, weights );
     }
 
@@ -1543,7 +1543,7 @@ public class RedisUtils {
      * @since Redis Version: 6.2
      */
     public Set<ZSetOperations.TypedTuple<String>> zUnionWithScores( String key, Collection<String> otherKeys,
-                                                                    RedisZSetCommands.Aggregate aggregate ) {
+                                                                    Aggregate aggregate ) {
         return stringRedisTemplate.opsForZSet().unionWithScores( key, otherKeys, aggregate );
     }
 
@@ -1553,8 +1553,7 @@ public class RedisUtils {
      * @since Redis Version: 6.2
      */
     public Set<ZSetOperations.TypedTuple<String>> zUnionWithScores( String key, Collection<String> otherKeys,
-                                                                    RedisZSetCommands.Aggregate aggregate,
-                                                                    RedisZSetCommands.Weights weights ) {
+                                                                    Aggregate aggregate, Weights weights ) {
         return stringRedisTemplate.opsForZSet().unionWithScores( key, otherKeys, aggregate, weights );
     }
 
@@ -1575,16 +1574,14 @@ public class RedisUtils {
     /**
      * 将多个Zset内的并集值和分数放入destKey中
      */
-    public Long zUnionAndStore( String key, Collection<String> otherKeys, String destKey,
-                                RedisZSetCommands.Aggregate aggregate ) {
+    public Long zUnionAndStore( String key, Collection<String> otherKeys, String destKey, Aggregate aggregate ) {
         return stringRedisTemplate.opsForZSet().unionAndStore( key, otherKeys, destKey, aggregate );
     }
 
     /**
      * 将多个Zset内的并集值和分数放入destKey中
      */
-    public Long zUnionAndStore( String key, Collection<String> otherKeys, String destKey, RedisZSetCommands.Aggregate aggregate
-            , RedisZSetCommands.Weights weights ) {
+    public Long zUnionAndStore( String key, Collection<String> otherKeys, String destKey, Aggregate aggregate, Weights weights ) {
         return stringRedisTemplate.opsForZSet().unionAndStore( key, otherKeys, destKey, aggregate, weights );
     }
 
@@ -1850,7 +1847,7 @@ public class RedisUtils {
         return stringRedisTemplate.opsForStream().range( key, range );
     }
 
-    public List<MapRecord<String, Object, Object>> streamRange( String key, Range<String> range, RedisZSetCommands.Limit limit ) {
+    public List<MapRecord<String, Object, Object>> streamRange( String key, Range<String> range, Limit limit ) {
         return stringRedisTemplate.opsForStream().range( key, range, limit );
     }
 
@@ -1858,8 +1855,7 @@ public class RedisUtils {
         return stringRedisTemplate.opsForStream().range( targetType, key, range );
     }
 
-    public <V> List<ObjectRecord<String, V>> streamRange( Class<V> targetType, String key, Range<String> range,
-                                                          RedisZSetCommands.Limit limit ) {
+    public <V> List<ObjectRecord<String, V>> streamRange( Class<V> targetType, String key, Range<String> range, Limit limit ) {
         return stringRedisTemplate.opsForStream().range( targetType, key, range, limit );
     }
 
@@ -1911,8 +1907,7 @@ public class RedisUtils {
         return stringRedisTemplate.opsForStream().reverseRange( key, range );
     }
 
-    public List<MapRecord<String, Object, Object>> streamReverseRange( String key, Range<String> range,
-                                                                       RedisZSetCommands.Limit limit ) {
+    public List<MapRecord<String, Object, Object>> streamReverseRange( String key, Range<String> range, Limit limit ) {
         return stringRedisTemplate.opsForStream().reverseRange( key, range, limit );
     }
 
@@ -1921,7 +1916,7 @@ public class RedisUtils {
     }
 
     public <V> List<ObjectRecord<String, V>> streamReverseRange( Class<V> targetType, String key, Range<String> range,
-                                                                 RedisZSetCommands.Limit limit ) {
+                                                                 Limit limit ) {
         return stringRedisTemplate.opsForStream().reverseRange( targetType, key, range, limit );
     }
 

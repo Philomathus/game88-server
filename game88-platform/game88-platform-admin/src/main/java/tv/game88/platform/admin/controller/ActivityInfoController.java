@@ -14,8 +14,8 @@ import tv.game88.platform.api.cache.ActivityCacheUtil;
 import tv.game88.platform.api.entity.ActivityInfo;
 import tv.game88.platform.api.service.ActivityInfoService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

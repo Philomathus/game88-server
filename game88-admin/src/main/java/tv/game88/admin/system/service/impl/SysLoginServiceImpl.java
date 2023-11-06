@@ -19,7 +19,7 @@ import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.vo.LoginBody;
 import tv.game88.core.admin.vo.LoginUser;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**

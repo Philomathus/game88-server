@@ -55,7 +55,7 @@ import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -460,7 +460,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         try {
             resultMap = restTemplate.postForObject( configEnvCacheUtil.getConf( "163action_check_url" ), httpEntity, Map.class );
         } catch ( RestClientException e ) {
-            e.printStackTrace();
+            log.error( e.getMessage(), e );
         }
         log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {

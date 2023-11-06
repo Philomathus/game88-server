@@ -7,8 +7,8 @@ import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 
 /**

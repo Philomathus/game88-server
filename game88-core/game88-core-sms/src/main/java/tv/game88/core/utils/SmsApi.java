@@ -18,6 +18,7 @@ import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
@@ -25,7 +26,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
@@ -38,13 +38,13 @@ import tv.game88.core.config.mapper.ConfigSmsMapper;
 import tv.game88.core.entity.ConfigSmsFaillog;
 import tv.game88.core.mapper.ConfigSmsFaillogMapper;
 
-import javax.annotation.Resource;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +159,7 @@ public class SmsApi {
             String            nonce             = IdWorker.get32UUID();
             MessageDigest     md                = MessageDigest.getInstance( "SHA-256" );
             md.update( ( nonce + time + appSecret ).getBytes() );
-            String passwordDigestBase64Str = Base64Utils.encodeToString( md.digest() );
+            String passwordDigestBase64Str = Base64.getEncoder().encodeToString( md.digest() );
             return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
         } catch ( NoSuchAlgorithmException e ) {
             log.error( e.getMessage(), e );
@@ -204,16 +204,13 @@ public class SmsApi {
             errorLog( rspCode, rspMessage, phone, smsName, subname );
             log.warn( "短信发送失败:{}", JsonUtil.object2Json( res ) );
 
-            if ( "LimitExceeded.PhoneNumberDailyLimit".equals( rspCode ) ) {
-                throw new BusinessException( "今日发送短信过多，请明日重试" );
-            } else if ( "FailedOperation.PhoneNumberOnBlacklist".equals( rspCode )
-                    || "FailedOperation.PhoneNumberInBlacklist".equals( rspCode ) ) {
-                throw new BusinessException( "您的号码在黑名单库中，请联系客服" );
-            } else if ( "insufficient balance in SMS package".equals( rspCode )
-                    || "FailedOperation.InsufficientBalanceInSmsPackage".equals( rspCode ) ) {
-                throw new BusinessException( "短信包中的余额不足" );
-            } else {
-                throw new BusinessException( "发送短信失败，请联系客服" );
+            switch ( rspCode ) {
+            case "LimitExceeded.PhoneNumberDailyLimit" -> throw new BusinessException( "今日发送短信过多，请明日重试" );
+            case "FailedOperation.PhoneNumberOnBlacklist", "FailedOperation.PhoneNumberInBlacklist" ->
+                    throw new BusinessException( "您的号码在黑名单库中，请联系客服" );
+            case "insufficient balance in SMS package", "FailedOperation.InsufficientBalanceInSmsPackage" ->
+                    throw new BusinessException( "短信包中的余额不足" );
+            case null, default -> throw new BusinessException( "发送短信失败，请联系客服" );
             }
         }
 

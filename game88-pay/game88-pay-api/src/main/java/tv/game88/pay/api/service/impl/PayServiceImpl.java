@@ -31,7 +31,7 @@ import tv.game88.pay.api.entity.*;
 import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.PayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;

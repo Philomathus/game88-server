@@ -33,10 +33,10 @@ public class XmlUtil {
         newDoc.appendChild( element );
 
         DOMSource domSource = new DOMSource(newDoc);
-        StringWriter stringWriter = new StringWriter();
-        StreamResult streamResult = new StreamResult(stringWriter);
+        StringWriter       stringWriter       = new StringWriter();
+        StreamResult       streamResult       = new StreamResult(stringWriter);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+        Transformer        transformer        = transformerFactory.newTransformer();
         transformer.transform(domSource, streamResult);
         return stringWriter.toString();
     }

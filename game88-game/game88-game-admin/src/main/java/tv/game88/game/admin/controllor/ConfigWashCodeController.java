@@ -13,8 +13,8 @@ import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.service.ConfigWashCodeService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 

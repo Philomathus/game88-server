@@ -16,7 +16,7 @@ import tv.game88.pay.api.mapper.PayPlatformMapper;
 import tv.game88.pay.api.service.MemberRechargeOnlineService;
 import tv.game88.pay.api.service.PayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

@@ -17,7 +17,7 @@ import tv.game88.platform.api.dto.ReqMemberRecommend;
 import tv.game88.platform.api.dto.RspDetailCommission;
 import tv.game88.platform.api.service.RecommendService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

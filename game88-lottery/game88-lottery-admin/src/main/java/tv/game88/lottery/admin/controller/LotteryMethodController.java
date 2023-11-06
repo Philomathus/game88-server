@@ -11,7 +11,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.lottery.api.entity.LotteryMethod;
 import tv.game88.lottery.api.service.LotteryMethodService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

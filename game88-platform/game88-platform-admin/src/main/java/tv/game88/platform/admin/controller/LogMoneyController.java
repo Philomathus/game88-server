@@ -16,8 +16,8 @@ import tv.game88.core.member.entity.LogMoney;
 import tv.game88.core.member.enums.EnumMoney;
 import tv.game88.platform.api.service.LogMoneyService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

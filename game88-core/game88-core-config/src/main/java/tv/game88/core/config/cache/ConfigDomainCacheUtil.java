@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.entity.ConfigOss;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 @Component
 public class ConfigDomainCacheUtil {

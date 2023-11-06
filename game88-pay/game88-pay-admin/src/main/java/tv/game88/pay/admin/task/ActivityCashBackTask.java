@@ -13,7 +13,7 @@ import tv.game88.pay.api.entity.MemberRechargeBank;
 import tv.game88.pay.api.mapper.ActivityCashBackMapper;
 import tv.game88.pay.api.mapper.MemberRechargeBankMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;

@@ -2,7 +2,7 @@ package tv.game88.common.utils;
 
 import lombok.extern.log4j.Log4j2;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

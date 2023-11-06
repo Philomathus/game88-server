@@ -3,8 +3,8 @@ package tv.game88.wallet.api.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @EqualsAndHashCode( callSuper = true )
 @Data

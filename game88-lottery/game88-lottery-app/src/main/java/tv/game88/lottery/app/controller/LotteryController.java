@@ -15,7 +15,7 @@ import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.lottery.api.dto.*;
 import tv.game88.lottery.api.service.LotteryService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

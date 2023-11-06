@@ -11,7 +11,7 @@ import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.vo.PlatformUser;
 import tv.game88.wallet.app.vo.MemberLoginUser;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 用户验证处理

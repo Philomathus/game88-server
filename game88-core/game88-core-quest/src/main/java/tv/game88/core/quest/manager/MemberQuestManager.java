@@ -6,7 +6,7 @@ import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.entity.MemberQuest;
 import tv.game88.core.quest.mapper.MemberQuestMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 
 @Service

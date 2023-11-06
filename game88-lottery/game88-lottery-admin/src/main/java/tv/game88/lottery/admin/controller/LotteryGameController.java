@@ -11,7 +11,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.lottery.api.entity.LotteryGame;
 import tv.game88.lottery.api.service.LotteryGameService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

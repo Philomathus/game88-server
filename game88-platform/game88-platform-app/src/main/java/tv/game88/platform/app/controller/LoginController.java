@@ -19,7 +19,7 @@ import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.platform.api.dto.*;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @RestController
 @Tag( name = "登录和初始化接口" )

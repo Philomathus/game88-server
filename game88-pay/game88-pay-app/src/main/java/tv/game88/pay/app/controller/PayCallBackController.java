@@ -17,7 +17,7 @@ import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 import tv.game88.pay.api.service.PayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;

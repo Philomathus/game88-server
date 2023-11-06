@@ -15,8 +15,8 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.platform.api.entity.ActivityMemberInfo;
 import tv.game88.platform.api.service.ActivityMemberInfoService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 

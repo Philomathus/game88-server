@@ -17,7 +17,7 @@ import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.app.manager.MemberTokenManager;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @RestController
 @Tag( name = "登录和初始化接口" )

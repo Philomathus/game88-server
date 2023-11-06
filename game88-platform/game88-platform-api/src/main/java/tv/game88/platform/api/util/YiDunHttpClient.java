@@ -1,5 +1,6 @@
 package tv.game88.platform.api.util;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.http.Consts;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -19,6 +20,7 @@ import java.util.Map;
 /**
  * @version 2022-03-21
  */
+@Log4j2
 public class YiDunHttpClient {
 
     /**
@@ -77,7 +79,7 @@ public class YiDunHttpClient {
                     response.close();
                 } catch (IOException e) {
                     // log
-                    e.printStackTrace();
+                    log.error( e.getMessage(), e );
                 }
             }
         }

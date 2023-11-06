@@ -13,7 +13,7 @@ import tv.game88.game.api.entity.MemberGameMoney;
 import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.MemberGameMoneyService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

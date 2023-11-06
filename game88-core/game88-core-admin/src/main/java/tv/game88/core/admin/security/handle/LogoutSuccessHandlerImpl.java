@@ -13,9 +13,9 @@ import tv.game88.core.admin.manager.AsyncManager;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.vo.LoginUser;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 自定义退出处理类 返回成功

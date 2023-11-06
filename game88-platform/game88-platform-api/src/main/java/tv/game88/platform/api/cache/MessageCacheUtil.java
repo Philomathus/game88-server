@@ -14,7 +14,7 @@ import tv.game88.platform.api.mapper.MessageCommonProblemMapper;
 import tv.game88.platform.api.mapper.MessageHomeNoticeMapper;
 import tv.game88.platform.api.mapper.MessageOnSiteMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +53,7 @@ public class MessageCacheUtil {
                         return rsp;
                     } )
                     .collect( Collectors.toList() );
-            if ( result.size() > 0 ) {
+            if ( !result.isEmpty() ) {
                 if ( redisUtils.lock( HOME_NOTICE, 3 ) ) {
                     redisUtils.lRightPushAll( HOME_NOTICE, result
                             .stream()
@@ -85,7 +85,7 @@ public class MessageCacheUtil {
                         return rsp;
                     } )
                     .collect( Collectors.toList() );
-            if ( result.size() > 0 ) {
+            if ( !result.isEmpty() ) {
                 if ( redisUtils.lock( COMMON_PROBLEM, 3 ) ) {
                     redisUtils.lRightPushAll( COMMON_PROBLEM, result
                             .stream()

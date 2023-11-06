@@ -16,8 +16,8 @@ import tv.game88.platform.api.dto.RspPlamGamesMonth;
 import tv.game88.platform.api.entity.ReportPlamGames;
 import tv.game88.platform.api.service.ReportPlamGamesService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

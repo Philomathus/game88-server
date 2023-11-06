@@ -14,7 +14,7 @@ import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.platform.api.mapper.ActivityQuestTypeMapper;
 import tv.game88.platform.api.mapper.ActivityTypeMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +48,7 @@ public class ActivityCacheUtil {
         if ( exists == null || !exists ) {
             List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).eq( "effect", 1 )
                                                                                             .orderByAsc( "sort" ).list();
-            if ( activityInfos.size() > 0 ) {
+            if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_INFO_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos.stream().map( JsonUtil::object2Json )
                                                                              .collect( Collectors.toList() ) );
@@ -69,7 +69,7 @@ public class ActivityCacheUtil {
         Boolean exists = redisUtil.exists( ACTIVITY_TYPE_KEY );
         if ( exists == null || !exists ) {
             List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).orderByAsc( "sort" ).list();
-            if ( activityInfos.size() > 0 ) {
+            if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_TYPE_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_TYPE_KEY, activityInfos.stream().map( JsonUtil::object2Json )
                                                                              .collect( Collectors.toList() ) );
@@ -92,7 +92,7 @@ public class ActivityCacheUtil {
             List<ActivityQuestInfo> activityQuestInfos = new QueryChainWrapper<>( activityQuestInfoMapper ).eq( "effect", 1 )
                                                                                                            .orderByAsc( "sort" )
                                                                                                            .list();
-            if ( activityQuestInfos.size() > 0 ) {
+            if ( !activityQuestInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_QUEST_INFO_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_QUEST_INFO_KEY, activityQuestInfos.stream().map( JsonUtil::object2Json )
                                                                                         .collect( Collectors.toList() ) );
@@ -114,7 +114,7 @@ public class ActivityCacheUtil {
         if ( exists == null || !exists ) {
             List<ActivityQuestType> activityQuestTypes = new QueryChainWrapper<>( activityQuestTypeMapper ).orderByAsc( "sort" )
                                                                                                            .list();
-            if ( activityQuestTypes.size() > 0 ) {
+            if ( !activityQuestTypes.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_QUEST_TYPE_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_QUEST_TYPE_KEY, activityQuestTypes.stream().map( JsonUtil::object2Json )
                                                                                         .collect( Collectors.toList() ) );
@@ -134,7 +134,7 @@ public class ActivityCacheUtil {
         Boolean exists = redisUtil.exists( ACTIVITY_INFO_KEY );
         if ( exists == null || !exists ) {
             List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).list();
-            if ( activityInfos.size() > 0 ) {
+            if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_INFO_KEY, 3 ) ) {
                     redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos.stream().map( JsonUtil::object2Json )
                                                                              .collect( Collectors.toList() ) );

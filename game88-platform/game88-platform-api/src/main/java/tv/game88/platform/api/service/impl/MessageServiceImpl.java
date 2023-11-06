@@ -10,7 +10,7 @@ import tv.game88.platform.api.dto.RspMessageHomeNotice;
 import tv.game88.platform.api.dto.RspMessageOnSite;
 import tv.game88.platform.api.service.MessageService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Log4j2

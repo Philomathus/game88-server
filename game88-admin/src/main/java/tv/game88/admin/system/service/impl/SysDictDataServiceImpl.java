@@ -6,7 +6,7 @@ import tv.game88.core.admin.cache.DictUtils;
 import tv.game88.core.admin.entity.SysDictData;
 import tv.game88.core.admin.mapper.SysDictDataMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

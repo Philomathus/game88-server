@@ -15,8 +15,8 @@ import tv.game88.core.member.dto.RspMember;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.vo.MemberLoginUser;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;

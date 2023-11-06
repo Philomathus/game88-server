@@ -9,7 +9,7 @@ import tv.game88.core.member.entity.MemberRecommend;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.mapper.MemberRecommendMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;

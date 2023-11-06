@@ -11,7 +11,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.platform.api.entity.ReportPlamGameschilds;
 import tv.game88.platform.api.service.ReportPlamGameschildsService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

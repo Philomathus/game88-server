@@ -12,7 +12,7 @@ import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.platform.api.service.MemberBcodeService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;

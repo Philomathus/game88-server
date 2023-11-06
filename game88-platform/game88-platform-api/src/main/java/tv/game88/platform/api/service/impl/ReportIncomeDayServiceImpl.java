@@ -5,7 +5,7 @@ import tv.game88.platform.api.entity.ReportIncomeDay;
 import tv.game88.platform.api.mapper.ReportIncomeDayMapper;
 import tv.game88.platform.api.service.ReportIncomeDayService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @Service

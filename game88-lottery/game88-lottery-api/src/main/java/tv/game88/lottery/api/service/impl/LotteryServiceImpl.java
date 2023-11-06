@@ -31,7 +31,7 @@ import tv.game88.lottery.api.service.LotteryService;
 import tv.game88.lottery.api.utils.LotteryUtils;
 import tv.game88.lottery.api.utils.imserver.ImServerUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -207,7 +207,7 @@ public class LotteryServiceImpl implements LotteryService {
             return RspBase.businessError( "此时百家乐停止下注时间" );
         }
         List<LotteryGameVo> games = LotteryCacheUtils.me.getMethodGames( reqBet.getMethodId() );
-        if ( games == null || games.size() == 0 ) {
+        if ( games == null || games.isEmpty() ) {
             log.error( "投注信息有误methodId:{}", reqBet.getMethodId() );
             return RspBase.businessError( "投注信息有误!" );
         }
@@ -627,7 +627,7 @@ public class LotteryServiceImpl implements LotteryService {
         String[] officialCode = result.getCode().split( " " );
         //查询所有下注
         List<LotteryBet> betList = lotteryBetMapper.selectLotteryWaiteList( issue, lotteryId );
-        if ( betList.size() == 0 ) {
+        if ( betList.isEmpty() ) {
             return;
         }
 

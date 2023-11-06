@@ -12,7 +12,7 @@ import tv.game88.wallet.api.sse.SseStreamService;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 import tv.game88.wallet.api.vo.TransDetailStreamMessage;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;

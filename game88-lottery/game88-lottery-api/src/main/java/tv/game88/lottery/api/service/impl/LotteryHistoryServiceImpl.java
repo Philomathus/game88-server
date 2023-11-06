@@ -24,7 +24,7 @@ import tv.game88.lottery.api.mapper.LotteryTempMapper;
 import tv.game88.lottery.api.service.LotteryHistoryService;
 import tv.game88.lottery.api.utils.imserver.ImServerUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

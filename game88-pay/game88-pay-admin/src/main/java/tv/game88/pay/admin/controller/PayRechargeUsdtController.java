@@ -13,8 +13,8 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.pay.api.entity.PayRechargeUsdt;
 import tv.game88.pay.api.service.PayRechargeUsdtService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

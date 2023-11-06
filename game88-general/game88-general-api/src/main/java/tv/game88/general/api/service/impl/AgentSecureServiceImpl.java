@@ -11,7 +11,7 @@ import tv.game88.general.api.mapper.AgentSecureMapper;
 import tv.game88.general.api.mapper.AgentSecureOssMapper;
 import tv.game88.general.api.service.AgentSecureService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.*;
 import java.util.List;
 

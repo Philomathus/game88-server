@@ -15,7 +15,7 @@ import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

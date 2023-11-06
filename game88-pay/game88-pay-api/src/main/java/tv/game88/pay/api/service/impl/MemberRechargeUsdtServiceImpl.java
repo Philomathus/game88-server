@@ -27,7 +27,7 @@ import tv.game88.pay.api.mapper.MemberRechargeUsdtMapper;
 import tv.game88.pay.api.mapper.PayRechargeUsdtMapper;
 import tv.game88.pay.api.service.MemberRechargeUsdtService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;

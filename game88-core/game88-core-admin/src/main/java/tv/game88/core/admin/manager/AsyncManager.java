@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.SpringUtils;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

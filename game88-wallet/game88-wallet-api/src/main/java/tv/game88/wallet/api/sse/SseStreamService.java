@@ -9,7 +9,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
+
 import java.io.IOException;
 import java.util.function.Function;
 
@@ -27,10 +28,9 @@ public class SseStreamService {
         if ( memberId == null ) {
             throw new RuntimeException( "No member id received" );
         }
-        SseEmitter emitter = new SseEmitter( -1L );
-        Function<String, Runnable> removeEmitter = id -> () -> {
-            redisTemplate.convertAndSend( ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, new Object() );
-        };
+        SseEmitter                 emitter       = new SseEmitter( -1L );
+        Function<String, Runnable> removeEmitter = id -> () -> redisTemplate.convertAndSend(
+                ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, new Object() );
 
         emitter.onCompletion( removeEmitter.apply( memberId ) );
         emitter.onTimeout( removeEmitter.apply( memberId ) );

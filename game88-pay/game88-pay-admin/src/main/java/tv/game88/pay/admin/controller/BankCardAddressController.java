@@ -11,7 +11,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.pay.api.entity.BankCardAddress;
 import tv.game88.pay.api.service.BankCardAddressService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 

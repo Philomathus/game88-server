@@ -21,8 +21,8 @@ import tv.game88.pay.api.mapper.PayAgentLogMapper;
 import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
 import tv.game88.pay.api.service.PayAgentService;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;

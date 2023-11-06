@@ -15,7 +15,7 @@ import tv.game88.game.api.dto.RspGame;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.service.GameInfoService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

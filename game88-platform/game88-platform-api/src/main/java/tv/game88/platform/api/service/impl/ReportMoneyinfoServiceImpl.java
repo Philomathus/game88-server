@@ -7,7 +7,7 @@ import tv.game88.platform.api.entity.ReportMoneyinfo;
 import tv.game88.platform.api.mapper.ReportMoneyinfoMapper;
 import tv.game88.platform.api.service.ReportMoneyinfoService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

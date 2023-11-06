@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 @Log4j2

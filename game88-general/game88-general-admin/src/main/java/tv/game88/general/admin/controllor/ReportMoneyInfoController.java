@@ -13,8 +13,8 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.general.api.entity.ReportMoneyinfo;
 import tv.game88.general.api.service.IReportMoneyinfoService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.List;
 

@@ -9,7 +9,7 @@ import tv.game88.platform.api.entity.ReportPlamCom;
 import tv.game88.platform.api.mapper.ReportPlamComMapper;
 import tv.game88.platform.api.service.ReportPlamComService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;

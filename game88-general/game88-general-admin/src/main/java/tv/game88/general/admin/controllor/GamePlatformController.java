@@ -16,7 +16,7 @@ import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.service.GamePlatformService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;

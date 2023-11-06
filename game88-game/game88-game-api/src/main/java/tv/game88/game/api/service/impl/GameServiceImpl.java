@@ -1,6 +1,7 @@
 package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,7 @@ import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -44,8 +45,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 @Log4j2
 @Service
@@ -448,7 +447,7 @@ public class GameServiceImpl implements GameService {
             boolean isOps = ops.equals( data.getOperator_player_session() );
             if ( isOt && isKey && isOps ) {
                 Map<String, String> successMap = Map.of( "player_name", data.getCustom_parameter(), "currency", "CNY" );
-                return createResponse( SC_OK, successMap, null );
+                return createResponse( HttpServletResponse.SC_OK, successMap, null );
             } else {
                 return createResponse( 1034, null, Map.of( "code", "400", "message", "One of required fields not equal" ) );
             }

@@ -17,7 +17,7 @@ import tv.game88.game.api.dto.RspWashCodeInfo;
 import tv.game88.game.api.service.MemberGameDataService;
 import tv.game88.core.game.type.EnumGameCategory;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

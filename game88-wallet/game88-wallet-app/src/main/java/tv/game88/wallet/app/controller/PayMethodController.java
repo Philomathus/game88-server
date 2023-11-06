@@ -20,7 +20,7 @@ import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 

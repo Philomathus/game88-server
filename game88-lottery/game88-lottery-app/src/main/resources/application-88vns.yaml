@@ -3,9 +3,10 @@ spring:
     url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/88ky2?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
     username: admin
     password: dRmBstReqberz!14Xm#
-  redis:
-    host: ky88vns2-001.zczoyz.0001.ape1.cache.amazonaws.com
-    port: 6379
+  data:
+    redis:
+      host: ky88vns2-001.zczoyz.0001.ape1.cache.amazonaws.com
+      port: 6379
 
 ## 彩票奖池代理
 lotteryCenter : 88vns

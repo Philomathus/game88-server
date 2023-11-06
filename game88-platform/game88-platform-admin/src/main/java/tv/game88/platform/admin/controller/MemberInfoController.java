@@ -27,9 +27,9 @@ import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;

@@ -23,7 +23,7 @@ import tv.game88.platform.api.entity.LogCommission;
 import tv.game88.platform.api.mapper.LogCommissionMapper;
 import tv.game88.platform.api.service.RecommendService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;

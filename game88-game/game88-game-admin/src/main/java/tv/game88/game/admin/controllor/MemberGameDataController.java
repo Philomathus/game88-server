@@ -16,8 +16,8 @@ import tv.game88.game.api.dto.ReqMemberGameData;
 import tv.game88.game.api.entity.MemberGameData;
 import tv.game88.game.api.service.MemberGameDataService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**

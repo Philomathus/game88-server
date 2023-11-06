@@ -26,7 +26,7 @@ import tv.game88.pay.api.mapper.PayAgentLogMapper;
 import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
 import tv.game88.pay.api.service.PayAgentService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;

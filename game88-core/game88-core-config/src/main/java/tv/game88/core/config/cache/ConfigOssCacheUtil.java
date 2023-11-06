@@ -8,7 +8,7 @@ import tv.game88.core.config.constants.Constants;
 import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * @author mengJun

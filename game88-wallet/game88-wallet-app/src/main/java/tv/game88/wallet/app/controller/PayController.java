@@ -17,7 +17,7 @@ import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.vo.PlatformUser;
 import tv.game88.wallet.app.manager.MemberTokenManager;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 
 @Controller

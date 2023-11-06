@@ -1,14 +1,18 @@
 package tv.game88.wallet.app.config;
 
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,15 +31,14 @@ import tv.game88.wallet.app.security.filter.MemberAuthenticationTokenFilter;
 import tv.game88.wallet.app.security.handle.MemberAuthenticationEntryPointHandle;
 import tv.game88.wallet.app.security.handle.MemberLogoutSuccessHandle;
 
-import javax.annotation.Resource;
-
 /**
  * spring security配置
  *
  * @author MengJun
  */
-@EnableGlobalMethodSecurity( prePostEnabled = true, securedEnabled = true )
-public class MemberSecurityConfig implements WebSecurityCustomizer {
+@Configuration
+@EnableMethodSecurity( securedEnabled = true, jsr250Enabled = true )
+public class MemberSecurityConfig {
     /**
      * 自定义用户认证逻辑
      */
@@ -67,12 +70,6 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
     @Resource
     private PermitAllUrlProperties               permitAllUrl;
 
-    @Override
-    public void customize( WebSecurity webSecurity ) {
-        // 配置允许双斜杠
-        webSecurity.httpFirewall( allowUrlEncodedSlashHttpFirewall() );
-    }
-
     /**
      * anyRequest          |   匹配所有请求路径
      * access              |   SpringEl表达式结果为true时可以访问
@@ -90,38 +87,45 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
      */
     @Bean
     public SecurityFilterChain securityFilterChain( HttpSecurity httpSecurity ) throws Exception {
-        // 注解标记允许匿名访问的url
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
-                httpSecurity.authorizeRequests();
-        permitAllUrl.getUrls().forEach( url -> registry.antMatchers( url ).permitAll() );
-
         httpSecurity
                 // CSRF禁用，因为不使用session
-                .csrf().disable()
+                .csrf( AbstractHttpConfigurer::disable )
                 // 认证失败处理类
-                .exceptionHandling().authenticationEntryPoint( unauthorizedHandler ).and()
+                .exceptionHandling( configurer -> configurer.authenticationEntryPoint( unauthorizedHandler ) )
                 // 基于token，所以不需要session
-                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
+                .sessionManagement( configurer -> configurer.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) )
+                .headers( customizer -> customizer.frameOptions( HeadersConfigurer.FrameOptionsConfig::disable ).disable() )
+                .logout( customizer -> customizer.logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler ) )
+                // 添加JWT filter
+                .addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class )
+                // 添加CORS filter
+                .addFilterBefore( corsFilter, MemberAuthenticationTokenFilter.class )
+                .addFilterBefore( corsFilter, LogoutFilter.class )
                 // 过滤请求
-                .authorizeRequests().antMatchers( HttpMethod.GET, // Swagger的资源路径需要允许访问
-                        "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
-                // actuator 健康检查
-                .antMatchers( "/actuator/**" ).anonymous()
-                // 除上面外的所有请求全部需要鉴权认证
-                .anyRequest().authenticated().and().headers().frameOptions().disable();
-        httpSecurity.logout().logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler );
-        // 添加token有效性校验 filter
-        httpSecurity.addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class );
-        // 添加CORS filter
-        httpSecurity.addFilterBefore( corsFilter, MemberAuthenticationTokenFilter.class );
-        httpSecurity.addFilterBefore( corsFilter, LogoutFilter.class );
+                .authorizeHttpRequests( customizer -> {
+                    // 注解标记允许匿名访问的url
+                    permitAllUrl.getUrls().forEach( url -> customizer.requestMatchers( url ).permitAll() );
+                    customizer
+                            .requestMatchers( HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
+                            // actuator 健康检查
+                            .requestMatchers( "/actuator/**" ).anonymous()
+                            // 除上面外的所有请求全部需要鉴权认证
+                            .anyRequest().authenticated();
+                } );
         return httpSecurity.build();
     }
 
     @Bean
-    public AuthenticationManager authManager( HttpSecurity httpSecurity ) throws Exception {
-        return httpSecurity.getSharedObject( AuthenticationManagerBuilder.class ).userDetailsService( userDetailsService )
-                           .passwordEncoder( getPasswordEncoder() ).and().build();
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService( userDetailsService );
+        authProvider.setPasswordEncoder( getPasswordEncoder() );
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authManager( AuthenticationConfiguration config ) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean( name = "myPasswordEncoder" )
@@ -131,6 +135,12 @@ public class MemberSecurityConfig implements WebSecurityCustomizer {
         BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         delPasswordEncoder.setDefaultPasswordEncoderForMatches( bcryptPasswordEncoder );
         return delPasswordEncoder;
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        // 配置允许双斜杠
+        return ( webSecurity ) -> webSecurity.httpFirewall( allowUrlEncodedSlashHttpFirewall() );
     }
 
     @Bean

@@ -40,7 +40,7 @@ import tv.game88.pay.api.service.MemberRechargeBankService;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
 import tv.game88.pay.api.utils.BankAddressUtil;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -216,7 +216,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         List<MemberCard> resultList = new QueryChainWrapper<>( memberCardMapper ).eq( "member_id", memberId )
                                                                                  .isNotNull( "real_name" )
                                                                                  .orderByAsc( "create_time" ).list();
-        if ( resultList.size() > 0 ) {
+        if ( !resultList.isEmpty() ) {
             if ( !resultList.get( 0 ).getRealName().equals( reqMemberCard.getRealName() ) ) {
                 return RspBase.businessError( "姓名必须与首次绑定的一致" );
             }

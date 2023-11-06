@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Component
 @Log4j2

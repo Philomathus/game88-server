@@ -5,23 +5,19 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.core.game.constants.ConstantsGame;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Repository( value = ConstantsGame.MEITIAN + "GameProcessor" )
@@ -60,7 +56,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, String>             resultMap   = restTemplate.postForObject( url.toString(), httpEntity, Map.class );
@@ -99,7 +95,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
 
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
@@ -138,7 +134,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;
@@ -176,7 +172,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64Utils.encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;

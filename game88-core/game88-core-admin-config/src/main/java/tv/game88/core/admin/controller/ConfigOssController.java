@@ -11,7 +11,7 @@ import tv.game88.core.admin.service.ConfigOssService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigOss;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 

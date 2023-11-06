@@ -12,7 +12,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.game.api.dto.RspGameMoney;
 import tv.game88.game.api.service.GameService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

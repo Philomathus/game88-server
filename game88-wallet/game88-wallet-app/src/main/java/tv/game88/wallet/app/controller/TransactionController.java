@@ -13,7 +13,7 @@ import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController

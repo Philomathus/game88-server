@@ -15,7 +15,7 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.mapper.GameDataRecordMapper;
 import tv.game88.general.api.service.GameDataRecordService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

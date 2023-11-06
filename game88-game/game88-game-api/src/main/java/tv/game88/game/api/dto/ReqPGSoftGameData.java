@@ -2,7 +2,7 @@ package tv.game88.game.api.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.StringJoiner;
 
 @Data

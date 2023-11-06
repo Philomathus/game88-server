@@ -5,8 +5,8 @@ import lombok.Data;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.utils.StringUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data

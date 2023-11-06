@@ -12,7 +12,7 @@ import tv.game88.core.admin.enums.UserStatus;
 import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.vo.LoginUser;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 用户验证处理

@@ -12,8 +12,8 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.lottery.api.entity.LotteryRule;
 import tv.game88.lottery.api.service.LotteryRuleService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 

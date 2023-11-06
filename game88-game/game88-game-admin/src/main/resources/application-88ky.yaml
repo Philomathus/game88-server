@@ -10,7 +10,8 @@ spring:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: dRmBstReqberz!14Xm#
-  redis:
-    host: ky88.zczoyz.ng.0001.ape1.cache.amazonaws.com
-    port: 6379
+  data:
+    redis:
+      host: ky88.zczoyz.ng.0001.ape1.cache.amazonaws.com
+      port: 6379
 

@@ -10,11 +10,12 @@ spring:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/general?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: dRmBstReqberz!14Xm#
-  redis:
-    host: 8.210.10.193
-    port: 6379
-    password: EvYsN39ViArDumx4pWyH
-    database: 2
+  data:
+    redis:
+      host: 8.210.10.193
+      port: 6379
+      password: EvYsN39ViArDumx4pWyH
+      database: 2
 
 mybatis-plus:
   configuration:

@@ -1,10 +1,9 @@
 package tv.game88.common.utils;
 
-import org.springframework.util.Base64Utils;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class DesCoder {
     //数字签名，密钥算法
@@ -19,7 +18,7 @@ public class DesCoder {
         Cipher cipher = Cipher.getInstance( SIGNATURE_ALGORITHM_DES );
         cipher.init( Cipher.ENCRYPT_MODE, new SecretKeySpec( key.getBytes( StandardCharsets.UTF_8 ), KEY_ALGORITHM ) );
         byte[] bytes = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64Utils.encodeToString( bytes );
+        return Base64.getEncoder().encodeToString( bytes );
     }
 
     public static String decrypt( String value, String key ) throws Exception {

@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import tv.game88.core.game.type.EnumGameCategory;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Component
 public class GamePullDockFactoryUtil {

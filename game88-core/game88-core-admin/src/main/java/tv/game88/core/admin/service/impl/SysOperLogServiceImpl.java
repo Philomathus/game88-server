@@ -5,7 +5,7 @@ import tv.game88.core.admin.mapper.SysOperLogMapper;
 import tv.game88.core.admin.service.ISysOperLogService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 

@@ -6,7 +6,7 @@ import tv.game88.admin.system.service.IGenTableColumnService;
 import tv.game88.common.utils.Convert;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

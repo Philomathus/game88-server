@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import tv.game88.common.page.PageDomain;
 import tv.game88.pay.api.type.WithdrawRechargeType;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @EqualsAndHashCode( callSuper = true )
 @Data

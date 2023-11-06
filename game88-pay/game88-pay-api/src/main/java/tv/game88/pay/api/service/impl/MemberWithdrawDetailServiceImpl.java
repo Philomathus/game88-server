@@ -30,7 +30,7 @@ import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
 import tv.game88.pay.api.type.WithdrawRechargeType;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;

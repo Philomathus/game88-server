@@ -16,7 +16,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.service.WalletMerchantService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

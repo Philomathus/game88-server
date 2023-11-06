@@ -7,7 +7,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.lottery.api.service.LotteryService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 派奖逻辑

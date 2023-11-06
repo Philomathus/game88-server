@@ -9,7 +9,7 @@ import tv.game88.lottery.api.cache.LotteryCacheUtils;
 import tv.game88.lottery.api.dto.RspLotteryInfo;
 import tv.game88.lottery.api.service.LotteryService;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * 开奖逻辑
