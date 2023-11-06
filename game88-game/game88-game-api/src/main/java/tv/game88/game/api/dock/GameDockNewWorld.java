@@ -221,6 +221,7 @@ public class GameDockNewWorld extends AbstractGameDock {
             }
             return JsonUtil.json2Map( text );
         } );
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "dataStr", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
