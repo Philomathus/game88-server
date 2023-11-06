@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 
 /**
@@ -26,23 +27,23 @@ import java.util.List;
 @RestController
 @RequestMapping( "/monitor/logininfor" )
 public class SysLogininforController extends BaseController {
-	@Resource
-	private ISysLogininforService logininforService;
+    @Resource
+    private ISysLogininforService logininforService;
 
-	@PreAuthorize( "@ss.hasPermi('monitor:logininfor:list')" )
-	@GetMapping( "/list" )
-	public RspBase<List<SysLogininfor>> list( SysLogininfor logininfor ) {
-		PageDomain pageDomain = TableSupport.buildPageRequest();
+    @PreAuthorize( "@ss.hasPermi('monitor:logininfor:list')" )
+    @GetMapping( "/list" )
+    public RspBase<List<SysLogininfor>> list( SysLogininfor logininfor ) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-		List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
-		return getRspBasePage( list, pageDomain );
-	}
+        List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
+        return getRspBasePage( list, pageDomain );
+    }
 
-	@Log( title = "登录日志", businessType = BusinessType.EXPORT )
-	@PreAuthorize( "@ss.hasPermi('monitor:logininfor:export')" )
-	@GetMapping( "/export" )
-	public void export( SysLogininfor logininfor, HttpServletResponse response ) {
-		List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
-		ExportExcelUtil.exportExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
-	}
+    @Log( title = "登录日志", businessType = BusinessType.EXPORT )
+    @PreAuthorize( "@ss.hasPermi('monitor:logininfor:export')" )
+    @GetMapping( "/export" )
+    public void export( SysLogininfor logininfor, HttpServletResponse response ) {
+        List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
+        ExportExcelUtil.exportExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
+    }
 }

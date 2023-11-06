@@ -31,6 +31,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +87,10 @@ public class SysUserController extends BaseController {
         ImmutableMap.Builder<String, Object> resultMapBuilder = ImmutableMap.builder();
         resultMapBuilder.put( "code", HttpStatus.SUCCESS );
         List<SysRole> roles = roleService.selectRoleAll();
-        resultMapBuilder.put( "roles", SysUser.isAdmin( userId ) ? roles : roles.stream().filter( r -> !r.isAdmin() )
-                                                                                .collect( Collectors.toList() ) );
+        resultMapBuilder.put( "roles", SysUser.isAdmin( userId ) ? roles : roles
+                .stream()
+                .filter( r -> !r.isAdmin() )
+                .collect( Collectors.toList() ) );
         if ( StringUtils.isNotNull( userId ) ) {
             resultMapBuilder.put( "data", userService.selectUserById( userId ) );
             resultMapBuilder.put( "roleIds", roleService.selectRoleListByUserId( userId ) );

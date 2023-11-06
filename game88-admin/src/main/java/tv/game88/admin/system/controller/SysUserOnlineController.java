@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,23 +44,27 @@ public class SysUserOnlineController extends BaseController {
     public RspBase<List<LoginUser>> list( String userName ) {
         Set<LoginUser> loginUserList = stringRedisTemplate.execute( ( RedisCallback<Set<LoginUser>> ) connection -> {
             Set<LoginUser> binaryKeys = new HashSet<>();
-            Cursor<byte[]> cursor = connection.scan( ScanOptions.scanOptions().match( AdminConstants.SYS_LOGIN_TOKEN + "*" )
-                                                                .count( 100 ).build() );
+            Cursor<byte[]> cursor = connection.scan( ScanOptions
+                    .scanOptions()
+                    .match( AdminConstants.SYS_LOGIN_TOKEN + "*" )
+                    .count( 100 )
+                    .build() );
             while ( cursor.hasNext() ) {
                 Map<byte[], byte[]> map = connection.hashCommands().hGetAll( cursor.next() );
-                Map<String, String> stringMap = map.entrySet().stream()
-                                                   .collect( Collectors.toMap( k -> new String( k.getKey() ),
-                                                           v -> new String( v.getValue() ) ) );
+                Map<String, String> stringMap = map
+                        .entrySet()
+                        .stream()
+                        .collect( Collectors.toMap( k -> new String( k.getKey() ), v -> new String( v.getValue() ) ) );
                 binaryKeys.add( JsonUtil.map2Object( stringMap, LoginUser.class ) );
             }
             return binaryKeys;
         } );
         ArrayList<LoginUser> userOnlineList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty( loginUserList )) {
+        if ( !CollectionUtils.isEmpty( loginUserList ) ) {
             loginUserList.forEach( user -> {
                 user.setUserStr( null );
-                if (StringUtils.isNotBlank( userName )) {
-                    if (StringUtils.equals( userName, user.getUsername() )) {
+                if ( StringUtils.isNotBlank( userName ) ) {
+                    if ( StringUtils.equals( userName, user.getUsername() ) ) {
                         userOnlineList.add( user );
                     }
                 } else {
