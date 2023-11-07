@@ -148,7 +148,7 @@ public class SysUserTokenService {
      * @return 令牌
      */
     private String createToken( Map<String, Object> claims ) {
-        return Jwts.builder().setClaims( claims ).signWith( KEY_SECRET ).compact();
+        return Jwts.builder().claims( claims ).signWith( KEY_SECRET ).compact();
     }
 
     /**
@@ -160,7 +160,7 @@ public class SysUserTokenService {
      */
     private Claims parseToken( String token ) {
         try {
-            return Jwts.parserBuilder().setSigningKey( KEY_SECRET ).build().parseClaimsJws( token ).getBody();
+            return Jwts.parser().verifyWith( KEY_SECRET ).build().parseSignedClaims( token ).getPayload();
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
