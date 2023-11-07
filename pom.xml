@@ -52,7 +52,7 @@
         <easypoi.version>4.4.0</easypoi.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <jjwt.version>0.12.3</jjwt.version>
+        <jjwt.version>0.11.5</jjwt.version>
         <caffeine.version>3.1.8</caffeine.version>
         <telegrambots.version>6.8.0</telegrambots.version>
         <zxing.version>3.5.2</zxing.version>
