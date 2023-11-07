@@ -108,7 +108,7 @@ public class SecurityConfig {
                     customizer
                             // 对于登录login 允许匿名访问
                             .requestMatchers( "/login" ).anonymous()
-                            .requestMatchers( HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js" ).permitAll()
+                            .requestMatchers( HttpMethod.GET, "/**.html", "/**.html", "/**.css", "/**.js" ).permitAll()
                             .requestMatchers( "/doc.html" ).anonymous()
                             .requestMatchers( "/swagger-resources/**" ).anonymous()
                             .requestMatchers( "/webjars/**" ).anonymous()
