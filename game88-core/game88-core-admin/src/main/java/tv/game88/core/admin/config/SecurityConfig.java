@@ -90,17 +90,8 @@ public class SecurityConfig {
         httpSecurity
                 // CSRF禁用，因为不使用session
                 .csrf( AbstractHttpConfigurer::disable )
-                // 认证失败处理类
-                .exceptionHandling( configurer -> configurer.authenticationEntryPoint( unauthorizedHandler ) )
                 // 基于token，所以不需要session
                 .sessionManagement( configurer -> configurer.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) )
-                .headers( customizer -> customizer.frameOptions( HeadersConfigurer.FrameOptionsConfig::disable ).disable() )
-                .logout( customizer -> customizer.logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler ) )
-                // 添加JWT filter
-                .addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class )
-                // 添加CORS filter
-                .addFilterBefore( corsFilter, JwtAuthenticationTokenFilter.class )
-                .addFilterBefore( corsFilter, LogoutFilter.class )
                 // 过滤请求
                 .authorizeHttpRequests( customizer -> {
                     // 注解标记允许匿名访问的url
@@ -116,7 +107,18 @@ public class SecurityConfig {
                             .requestMatchers( "/actuator/**" ).anonymous()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();
-                } );
+                } )
+                .headers( customizer -> customizer.frameOptions( HeadersConfigurer.FrameOptionsConfig::disable ).disable() )
+                .logout( customizer -> customizer.logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler ) )
+                // 认证失败处理类
+                .exceptionHandling( configurer -> configurer.authenticationEntryPoint( unauthorizedHandler ) )
+                // 添加JWT filter
+                .addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class )
+                // 添加CORS filter
+                .addFilterBefore( corsFilter, JwtAuthenticationTokenFilter.class )
+                .addFilterBefore( corsFilter, LogoutFilter.class );
+
+
         return httpSecurity.build();
     }
 
