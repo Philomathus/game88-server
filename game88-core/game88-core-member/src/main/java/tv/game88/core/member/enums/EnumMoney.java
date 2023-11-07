@@ -45,9 +45,9 @@ public enum EnumMoney {
     LOTTERY_BET( -104, "彩票投注", false ),
     PLATFORM( -1, "平台资金切换", false );
 
-    private Integer type;
-    private String  des;
-    private Boolean bcode;
+    private final Integer type;
+    private final String  des;
+    private final Boolean bcode;
 
     EnumMoney( Integer type, String des, Boolean bcode ) {
         this.type  = type;

@@ -119,7 +119,7 @@ public class ShunDaPayProcessor extends AbstractPay {
             if ( "success".equals( result ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 String     amount        = requestMap.getOrDefault( "amount", "" ).toString();
                 BigDecimal userPayAmount = new BigDecimal( amount );
-                BigDecimal money         = userPayAmount.divide( BigDecimal.valueOf( 100 ) ).setScale( 2, RoundingMode.HALF_UP );
+                BigDecimal money         = userPayAmount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP );
                 memberRechargeOnline.setRealMoney( money );
                 String orderNo = ( String ) requestMap.getOrDefault( "orderId", "" );
                 memberRechargeOnline.setUpperOrderNo( orderNo );

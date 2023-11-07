@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,7 +55,6 @@ import tv.game88.platform.api.mapper.MemberVipGiftMapper;
 import tv.game88.platform.api.mapper.MobileLimitMapper;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import jakarta.annotation.Resource;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -99,8 +98,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private LogMoneyMapper         logMoneyMapper;
     @Resource
     private MobileLimitMapper      mobileLimitMapper;
-    @Resource
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Resource
     private MemberInfoMapper       memberInfoMapper;
 
@@ -620,7 +617,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );
             return;
         }
-        threadPoolTaskExecutor.execute( () -> {
+        Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
             Map<String, Object> params = new HashMap<>();
             params.put( "channel_id", mobileLogin.getChannelCode() );
             params.put( "invitation_code", mobileLogin.getInviterCode() );

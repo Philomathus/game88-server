@@ -1,17 +1,16 @@
 package tv.game88.wallet.api.sse;
 
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 
-import jakarta.annotation.Resource;
-
 import java.io.IOException;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import static tv.game88.wallet.api.sse.model.StreamMessageType.CONNECTION;
@@ -20,15 +19,13 @@ import static tv.game88.wallet.api.sse.model.StreamMessageType.CONNECTION;
 @RequiredArgsConstructor
 public class SseStreamService {
     @Resource
-    public  ThreadPoolTaskExecutor        threadPoolTaskExecutor;
-    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     public SseEmitter createEmitter( String memberId ) {
         if ( memberId == null ) {
             throw new RuntimeException( "No member id received" );
         }
-        SseEmitter                 emitter       = new SseEmitter( -1L );
+        SseEmitter emitter = new SseEmitter( -1L );
         Function<String, Runnable> removeEmitter = id -> () -> redisTemplate.convertAndSend(
                 ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, new Object() );
 
@@ -56,7 +53,7 @@ public class SseStreamService {
         if ( emitter == null ) {
             return;
         }
-        threadPoolTaskExecutor.execute( () -> {
+        Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
             try {
                 emitter.send( event );
             } catch ( IOException ex ) {

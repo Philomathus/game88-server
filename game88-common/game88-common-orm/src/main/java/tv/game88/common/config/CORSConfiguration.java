@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -20,7 +19,7 @@ public class CORSConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers( ResourceHandlerRegistry registry ) {
-        /** swagger配置 */
+        // swagger配置
         registry.addResourceHandler( "/swagger-ui/**" ).addResourceLocations( "classpath:/META-INF/resources/" );
         registry.addResourceHandler( "/webjars/**" ).addResourceLocations( "classpath:/META-INF/resources/webjars/" );
     }
@@ -54,7 +53,7 @@ public class CORSConfiguration implements WebMvcConfigurer {
                 new StdScalarDeserializer<String>( String.class ) {
             @Override
             public String deserialize( JsonParser jsonParser, DeserializationContext ctx ) throws IOException {
-                return StringUtils.trimWhitespace( jsonParser.getValueAsString() );
+                return jsonParser.getValueAsString().strip();
             }
         } );
     }

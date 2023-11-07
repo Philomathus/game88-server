@@ -91,7 +91,7 @@ public class ZXingUtil {
         int           height  = matrixImage.getHeight();
         int           width   = matrixImage.getWidth();
         //纯logo图片
-        g2.drawImage( logoImg, width * 2 / 5, height * 2 / 5, width * 1 / 5, height * 1 / 5, null );
+        g2.drawImage( logoImg, width * 2 / 5, height * 2 / 5, width / 5, height / 5, null );
 
         //产生一个 画 白色圆角正方形的 画笔
         BasicStroke stroke = new BasicStroke( 5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
@@ -99,7 +99,7 @@ public class ZXingUtil {
         g2.setStroke( stroke );
         //创建一个正方形
         RoundRectangle2D.Float round = new RoundRectangle2D.Float(
-                width * 2 / 5, height * 2 / 5, width * 1 / 5, height * 1 / 5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+                width * 2 / 5, height * 2 / 5, width / 5, height / 5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
         g2.setColor( Color.WHITE );
         g2.draw( round );
 
@@ -109,7 +109,7 @@ public class ZXingUtil {
         //创建一个正方形
         RoundRectangle2D.Float round2 = new RoundRectangle2D.Float(
                 width * 2 / 5 + 2,
-                height * 2 / 5 + 2, width * 1 / 5 - 4, height * 1 / 5 - 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+                height * 2 / 5 + 2, width / 5 - 4, height / 5 - 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
         //        Color color = new Color(128,128,128) ;
         g2.setColor( Color.GRAY );
         g2.draw( round2 );

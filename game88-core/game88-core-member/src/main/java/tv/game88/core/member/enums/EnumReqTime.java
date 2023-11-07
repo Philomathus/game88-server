@@ -11,8 +11,8 @@ public enum EnumReqTime {
     month(3,"一个月内"),
     ;
 
-    private int type ;
-    private String des;
+    private final int type ;
+    private final String des;
 
 
     EnumReqTime( int type, String des ) {

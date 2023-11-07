@@ -87,7 +87,7 @@ public abstract class AbstractPay implements BasePay {
     protected boolean diffPayTime12Hour( LocalDateTime payTime, String merOrderNo ) {
         // 计算当前时间与下单时间相差的小时数
         // 超过48小时拒绝回调，可人工补单
-        if ( LocalDateTime.now().minusHours( 48 ).compareTo( payTime ) > 0 ) {
+        if ( LocalDateTime.now().minusHours( 48 ).isAfter( payTime ) ) {
             log.warn( "超过48小时拒绝回调 - orderNo:{};payTime:{}", merOrderNo, payTime );
             return true;
         }

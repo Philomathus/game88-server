@@ -1,7 +1,7 @@
 package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.utils.StringUtils;
@@ -13,19 +13,17 @@ import tv.game88.pay.api.mapper.PayChannelMapper;
 import tv.game88.pay.api.mapper.PayChannelMoneyMapper;
 import tv.game88.pay.api.service.PayChannelService;
 
-import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 @Service
 public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChannel> implements PayChannelService {
     @Resource
-    private PayChannelMoneyMapper  payChannelMoneyMapper;
+    private PayChannelMoneyMapper payChannelMoneyMapper;
     @Resource
-    private PayCacheUtil           payCacheUtil;
-    @Resource
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private PayCacheUtil          payCacheUtil;
 
     @Override
     public List<PayChannel> selectPayChannelList( PayChannel payChannel ) {
@@ -34,7 +32,7 @@ public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChan
             if ( me.getEffect() ) {
                 String successRate = payCacheUtil.getPayChannelSuccessRate( me.getId() );
                 if ( successRate == null ) {
-                    threadPoolTaskExecutor.execute( () -> {
+                    Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
                         if ( payCacheUtil.setPayChannelSuccessRateLock( me.getId() ) ) {
                             payCacheUtil.setPayChannelSuccessRate( me.getId(), this.baseMapper.successRate( me.getId() ) );
                             payCacheUtil.delPayChannelSuccessRateLock( me.getId() );

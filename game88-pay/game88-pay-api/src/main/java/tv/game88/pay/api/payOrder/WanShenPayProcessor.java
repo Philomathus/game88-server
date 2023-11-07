@@ -87,7 +87,7 @@ public class WanShenPayProcessor extends AbstractPay {
                 String payamount = resultMap.getOrDefault( "payamount", "" ).toString();
                 String status    = resultMap.getOrDefault( "orderstatus", "0" ).toString();
                 if ( "1".equals( status ) || "4".equals( status ) ) {
-                    BigDecimal amount = new BigDecimal( payamount ).divide( BigDecimal.valueOf( 100 ) );
+                    BigDecimal amount = new BigDecimal( payamount ).divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP );
                     memberRechargeOnline.setRealMoney( amount.setScale( 2, RoundingMode.HALF_UP ) );
                     return true;
                 }

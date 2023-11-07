@@ -18,7 +18,7 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.MEITIAN + "GamePullProcessor" )
 public class GamePullDockMeiTian extends AbstractGamePull {
-    private final String QUERY_RECORD_2 = "/services/dg/player/queryMerchantGameRecord2";
+    private static final String QUERY_RECORD_2 = "/services/dg/player/queryMerchantGameRecord2";
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {

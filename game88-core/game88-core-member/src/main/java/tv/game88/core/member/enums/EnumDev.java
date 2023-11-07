@@ -8,8 +8,8 @@ public enum EnumDev {
     IOS(1,"IOS"),
     Android(2,"安卓"),
     ;
-    private int type ;
-    private String des;
+    private final int type ;
+    private final String des;
 
     public int getType() {
         return type;
