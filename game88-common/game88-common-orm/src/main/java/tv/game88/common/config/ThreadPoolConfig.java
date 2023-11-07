@@ -51,8 +51,8 @@ public class ThreadPoolConfig {
     /**
      * 执行周期性或定时任务
      */
-    @Bean( name = "scheduledExecutorService" )
-    protected ScheduledExecutorService scheduledExecutorService() {
+    @Bean
+    public ScheduledExecutorService scheduledExecutorService() {
         return new ScheduledThreadPoolExecutor( corePoolSize, new BasicThreadFactory.Builder()
                 .wrappedFactory( Thread.ofVirtual().factory() )
                 .namingPattern( "schedule-pool-%d" )

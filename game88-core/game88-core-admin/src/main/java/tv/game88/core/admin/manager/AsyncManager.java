@@ -22,7 +22,7 @@ public class AsyncManager {
 	 * 异步操作任务调度线程池
 	 */
 	@Resource
-	private ScheduledExecutorService executor;
+	private ScheduledExecutorService scheduledExecutorService;
 
 	/**
 	 * 单例模式
@@ -43,7 +43,7 @@ public class AsyncManager {
 		/**
 		 * 操作延迟10毫秒
 		 */
-		executor.schedule( task, 10, TimeUnit.MILLISECONDS );
+		scheduledExecutorService.schedule( task, 10, TimeUnit.MILLISECONDS );
 	}
 
 	/**
@@ -51,17 +51,17 @@ public class AsyncManager {
 	 */
 	@PreDestroy
 	public void shutdown() {
-		if ( !executor.isShutdown() ) {
-			executor.shutdown();
+		if ( !scheduledExecutorService.isShutdown() ) {
+			scheduledExecutorService.shutdown();
 			try {
-				if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
-					executor.shutdownNow();
-					if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+				if ( !scheduledExecutorService.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+					scheduledExecutorService.shutdownNow();
+					if ( !scheduledExecutorService.awaitTermination( 120, TimeUnit.SECONDS ) ) {
 						log.warn( "Pool did not terminate" );
 					}
 				}
 			} catch ( InterruptedException ie ) {
-				executor.shutdownNow();
+				scheduledExecutorService.shutdownNow();
 				Thread.currentThread().interrupt();
 			}
 		}
