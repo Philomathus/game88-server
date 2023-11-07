@@ -1,9 +1,9 @@
 package tv.game88.core.admin.manager;
 
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import tv.game88.common.utils.SpringUtils;
 
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,8 +21,7 @@ public class AsyncManager {
 	/**
 	 * 异步操作任务调度线程池
 	 */
-	@Resource
-	private ScheduledExecutorService scheduledExecutorService;
+	private final ScheduledExecutorService executor = SpringUtils.getBean( "scheduledExecutorService" );
 
 	/**
 	 * 单例模式
@@ -43,7 +42,7 @@ public class AsyncManager {
 		/**
 		 * 操作延迟10毫秒
 		 */
-		scheduledExecutorService.schedule( task, 10, TimeUnit.MILLISECONDS );
+		executor.schedule( task, 10, TimeUnit.MILLISECONDS );
 	}
 
 	/**
@@ -51,17 +50,17 @@ public class AsyncManager {
 	 */
 	@PreDestroy
 	public void shutdown() {
-		if ( !scheduledExecutorService.isShutdown() ) {
-			scheduledExecutorService.shutdown();
+		if ( !executor.isShutdown() ) {
+			executor.shutdown();
 			try {
-				if ( !scheduledExecutorService.awaitTermination( 120, TimeUnit.SECONDS ) ) {
-					scheduledExecutorService.shutdownNow();
-					if ( !scheduledExecutorService.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+				if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
+					executor.shutdownNow();
+					if ( !executor.awaitTermination( 120, TimeUnit.SECONDS ) ) {
 						log.warn( "Pool did not terminate" );
 					}
 				}
 			} catch ( InterruptedException ie ) {
-				scheduledExecutorService.shutdownNow();
+				executor.shutdownNow();
 				Thread.currentThread().interrupt();
 			}
 		}
