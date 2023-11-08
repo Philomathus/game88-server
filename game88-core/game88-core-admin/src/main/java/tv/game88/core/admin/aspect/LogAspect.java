@@ -171,7 +171,7 @@ public class LogAspect {
 	 */
 	private String argsArrayToString( Object[] paramsArray ) {
 		StringBuilder params = new StringBuilder();
-		if ( paramsArray != null && paramsArray.length > 0 ) {
+		if ( paramsArray != null ) {
 			for ( Object o : paramsArray ) {
 				if ( !isFilterObject( o ) ) {
 					params.append( JsonUtil.object2Json( o ) ).append( " " );
