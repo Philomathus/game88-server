@@ -20,8 +20,11 @@ public class JsonUtil {
     }
 
     public static ObjectMapper getObjectMapper() {
-        return JsonMapper.builder().addModule( new JavaTimeModule() )
-                         .configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false ).build();
+        return JsonMapper
+                .builder()
+                .addModule( new JavaTimeModule() )
+                .configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false )
+                .build();
     }
 
     public static JavaType getJavaType( String className ) {

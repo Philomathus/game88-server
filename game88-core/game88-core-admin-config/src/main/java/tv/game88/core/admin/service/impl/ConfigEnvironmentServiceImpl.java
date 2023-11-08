@@ -10,6 +10,7 @@ import tv.game88.core.config.entity.ConfigEnvironment;
 import tv.game88.core.config.mapper.ConfigEnvironmentMapper;
 
 import jakarta.annotation.Resource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class ConfigEnvironmentServiceImpl implements ConfigEnvironmentService {
     @Override
     public ConfigEnvironment selectConfigEnvironmentById( String envCode ) {
         ConfigEnvironment configEnvironment = configEnvironmentMapper.selectById( envCode );
-        if(configEnvironment !=null){
+        if ( configEnvironment != null ) {
             if ( StringUtils.isNotBlank( configEnvironment.getEnvValue() ) && configEnvironment
                     .getEnvValue()
                     .startsWith( "${domain.oss}" ) ) {

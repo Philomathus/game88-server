@@ -41,11 +41,11 @@ public class ActivityMemberInfo {
     private String[] selectDate;
     private Boolean  isTwoPw;
 
-    @TableField(exist = false)
-    private Map<String , Object> params = new HashMap<>();
+    @TableField( exist = false )
+    private Map<String, Object> params = new HashMap<>();
 
-    public Map<String,Object> getParams(){
-        if(params ==null){
+    public Map<String, Object> getParams() {
+        if ( params == null ) {
             return new HashMap<>();
         }
         return params;

@@ -17,6 +17,7 @@ import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysUserService;
 
 import jakarta.annotation.Resource;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,9 @@ import java.util.List;
 public class SysUserServiceImpl implements ISysUserService {
 
     @Resource
-    private SysUserMapper     userMapper;
+    private SysUserMapper       userMapper;
     @Resource
-    private SysRoleMapper     roleMapper;
+    private SysRoleMapper       roleMapper;
     @Resource
     private SysUserRoleMapper   userRoleMapper;
     @Resource

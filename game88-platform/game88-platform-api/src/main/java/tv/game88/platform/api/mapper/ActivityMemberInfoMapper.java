@@ -19,7 +19,7 @@ public interface ActivityMemberInfoMapper {
      *
      * @return 会员推广管理
      */
-    public ActivityMemberInfo selectActivityMemberInfoById( String id );
+    ActivityMemberInfo selectActivityMemberInfoById( String id );
 
     /**
      * 查询会员推广管理列表
@@ -28,7 +28,7 @@ public interface ActivityMemberInfoMapper {
      *
      * @return 会员推广管理集合
      */
-    public List<ActivityMemberInfo> selectActivityMemberInfoList( ActivityMemberInfo activityMemberInfo );
+    List<ActivityMemberInfo> selectActivityMemberInfoList( ActivityMemberInfo activityMemberInfo );
 
     List<Map> selectIpList( ActivityMemberInfo activityMemberInfo );
 }

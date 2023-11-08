@@ -52,7 +52,7 @@ public class LoginUser implements UserDetails {
     /**
      * 用户信息
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private SysUser user;
 
     private String userStr;
@@ -64,29 +64,29 @@ public class LoginUser implements UserDetails {
     public LoginUser() {
     }
 
-    public LoginUser(SysUser user) {
-        this.setUser(user);
+    public LoginUser( SysUser user ) {
+        this.setUser( user );
     }
 
     public String getUserId() {
-        if (user != null) {
+        if ( user != null ) {
             this.userId = user.getUserId() + "";
         }
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId( String userId ) {
         this.userId = userId;
     }
 
     public String getNickName() {
-        if (user != null) {
+        if ( user != null ) {
             this.nickName = user.getNickName();
         }
         return nickName;
     }
 
-    public void setNickName(String nickName) {
+    public void setNickName( String nickName ) {
         this.nickName = nickName;
     }
 
@@ -94,9 +94,9 @@ public class LoginUser implements UserDetails {
         return user;
     }
 
-    public void setUser(SysUser user) {
-        if (user != null) {
-            this.userStr = JsonUtil.object2Json(user);
+    public void setUser( SysUser user ) {
+        if ( user != null ) {
+            this.userStr = JsonUtil.object2Json( user );
         }
         this.user = user;
     }
@@ -105,9 +105,9 @@ public class LoginUser implements UserDetails {
         return userStr;
     }
 
-    public void setUserStr(String userStr) {
-        if (StringUtils.isNotBlank(userStr)) {
-            this.user = JsonUtil.json2Object(userStr, SysUser.class);
+    public void setUserStr( String userStr ) {
+        if ( StringUtils.isNotBlank( userStr ) ) {
+            this.user = JsonUtil.json2Object( userStr, SysUser.class );
         }
         this.userStr = userStr;
     }
@@ -116,11 +116,11 @@ public class LoginUser implements UserDetails {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken( String token ) {
         this.token = token;
     }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -134,7 +134,7 @@ public class LoginUser implements UserDetails {
     /**
      * 账户是否未过期,过期无法验证
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -142,10 +142,8 @@ public class LoginUser implements UserDetails {
 
     /**
      * 指定用户是否解锁,锁定的用户无法进行身份验证
-     *
-     * @return
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public boolean isAccountNonLocked() {
         return true;
@@ -153,10 +151,8 @@ public class LoginUser implements UserDetails {
 
     /**
      * 指示是否已过期的用户的凭据(密码),过期的凭据防止认证
-     *
-     * @return
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -164,10 +160,8 @@ public class LoginUser implements UserDetails {
 
     /**
      * 是否可用 ,禁用的用户不能身份验证
-     *
-     * @return
      */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public boolean isEnabled() {
         return true;
@@ -177,7 +171,7 @@ public class LoginUser implements UserDetails {
         return loginTime;
     }
 
-    public void setLoginTime(LocalDateTime loginTime) {
+    public void setLoginTime( LocalDateTime loginTime ) {
         this.loginTime = loginTime;
     }
 
@@ -185,7 +179,7 @@ public class LoginUser implements UserDetails {
         return ipaddr;
     }
 
-    public void setIpaddr(String ipaddr) {
+    public void setIpaddr( String ipaddr ) {
         this.ipaddr = ipaddr;
     }
 
@@ -193,7 +187,7 @@ public class LoginUser implements UserDetails {
         return browser;
     }
 
-    public void setBrowser(String browser) {
+    public void setBrowser( String browser ) {
         this.browser = browser;
     }
 
@@ -201,11 +195,11 @@ public class LoginUser implements UserDetails {
         return os;
     }
 
-    public void setOs(String os) {
+    public void setOs( String os ) {
         this.os = os;
     }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

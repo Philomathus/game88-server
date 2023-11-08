@@ -13,5 +13,5 @@ public interface ActivityTypeMapper extends BaseMapper<ActivityType> {
      *
      * @return 活动类型集合
      */
-    public List<ActivityType> selectActivityTypeList( ActivityType activityType );
+    List<ActivityType> selectActivityTypeList( ActivityType activityType );
 }

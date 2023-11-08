@@ -15,6 +15,7 @@ import tv.game88.platform.api.mapper.ActivityQuestTypeMapper;
 import tv.game88.platform.api.mapper.ActivityTypeMapper;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,12 +47,16 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_INFO_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).eq( "effect", 1 )
-                                                                                            .orderByAsc( "sort" ).list();
+            List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper )
+                    .eq( "effect", 1 )
+                    .orderByAsc( "sort" )
+                    .list();
             if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_INFO_KEY, 3 ) ) {
-                    redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos.stream().map( JsonUtil::object2Json )
-                                                                             .collect( Collectors.toList() ) );
+                    redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos
+                            .stream()
+                            .map( JsonUtil::object2Json )
+                            .collect( Collectors.toList() ) );
                     redisUtil.unLock( ACTIVITY_INFO_KEY );
                 }
             }
@@ -71,8 +76,10 @@ public class ActivityCacheUtil {
             List<ActivityType> activityInfos = new QueryChainWrapper<>( activityTypeMapper ).orderByAsc( "sort" ).list();
             if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_TYPE_KEY, 3 ) ) {
-                    redisUtil.lRightPushAll( ACTIVITY_TYPE_KEY, activityInfos.stream().map( JsonUtil::object2Json )
-                                                                             .collect( Collectors.toList() ) );
+                    redisUtil.lRightPushAll( ACTIVITY_TYPE_KEY, activityInfos
+                            .stream()
+                            .map( JsonUtil::object2Json )
+                            .collect( Collectors.toList() ) );
                     redisUtil.unLock( ACTIVITY_TYPE_KEY );
                 }
             }
@@ -89,13 +96,16 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_QUEST_INFO_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityQuestInfo> activityQuestInfos = new QueryChainWrapper<>( activityQuestInfoMapper ).eq( "effect", 1 )
-                                                                                                           .orderByAsc( "sort" )
-                                                                                                           .list();
+            List<ActivityQuestInfo> activityQuestInfos = new QueryChainWrapper<>( activityQuestInfoMapper )
+                    .eq( "effect", 1 )
+                    .orderByAsc( "sort" )
+                    .list();
             if ( !activityQuestInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_QUEST_INFO_KEY, 3 ) ) {
-                    redisUtil.lRightPushAll( ACTIVITY_QUEST_INFO_KEY, activityQuestInfos.stream().map( JsonUtil::object2Json )
-                                                                                        .collect( Collectors.toList() ) );
+                    redisUtil.lRightPushAll( ACTIVITY_QUEST_INFO_KEY, activityQuestInfos
+                            .stream()
+                            .map( JsonUtil::object2Json )
+                            .collect( Collectors.toList() ) );
                     redisUtil.unLock( ACTIVITY_QUEST_INFO_KEY );
                 }
             }
@@ -112,12 +122,15 @@ public class ActivityCacheUtil {
         //判断是否有缓存
         Boolean exists = redisUtil.exists( ACTIVITY_QUEST_TYPE_KEY );
         if ( exists == null || !exists ) {
-            List<ActivityQuestType> activityQuestTypes = new QueryChainWrapper<>( activityQuestTypeMapper ).orderByAsc( "sort" )
-                                                                                                           .list();
+            List<ActivityQuestType> activityQuestTypes = new QueryChainWrapper<>( activityQuestTypeMapper )
+                    .orderByAsc( "sort" )
+                    .list();
             if ( !activityQuestTypes.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_QUEST_TYPE_KEY, 3 ) ) {
-                    redisUtil.lRightPushAll( ACTIVITY_QUEST_TYPE_KEY, activityQuestTypes.stream().map( JsonUtil::object2Json )
-                                                                                        .collect( Collectors.toList() ) );
+                    redisUtil.lRightPushAll( ACTIVITY_QUEST_TYPE_KEY, activityQuestTypes
+                            .stream()
+                            .map( JsonUtil::object2Json )
+                            .collect( Collectors.toList() ) );
                     redisUtil.unLock( ACTIVITY_QUEST_TYPE_KEY );
                 }
             }
@@ -136,8 +149,10 @@ public class ActivityCacheUtil {
             List<ActivityInfo> activityInfos = new QueryChainWrapper<>( activityInfoMapper ).list();
             if ( !activityInfos.isEmpty() ) {
                 if ( redisUtil.lock( ACTIVITY_INFO_KEY, 3 ) ) {
-                    redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos.stream().map( JsonUtil::object2Json )
-                                                                             .collect( Collectors.toList() ) );
+                    redisUtil.lRightPushAll( ACTIVITY_INFO_KEY, activityInfos
+                            .stream()
+                            .map( JsonUtil::object2Json )
+                            .collect( Collectors.toList() ) );
                     redisUtil.unLock( ACTIVITY_INFO_KEY );
                 }
             }

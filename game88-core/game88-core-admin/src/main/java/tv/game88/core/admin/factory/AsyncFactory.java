@@ -29,7 +29,7 @@ public class AsyncFactory {
      *
      * @return 任务task
      */
-    public static TimerTask recordLogininfor( final String username, final String status, final String message) {
+    public static TimerTask recordLogininfor( final String username, final String status, final String message ) {
         HttpServletRequest request   = ServletUtil.getHttpServletRequest();
         final UserAgent    userAgent = UserAgent.parseUserAgentString( request.getHeader( "User-Agent" ) );
         final String       ip        = ServletUtil.getIp( request );

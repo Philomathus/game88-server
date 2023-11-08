@@ -12,6 +12,7 @@ import tv.game88.core.config.mapper.ConfigSmsMapper;
 import tv.game88.core.utils.SmsApi;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ConfigSmsServiceImpl implements ConfigSmsService {
         List<Long>      idList    = Arrays.asList( ids );
         List<ConfigSms> configSms = configSmsMapper.selectBatchIds( idList );
         for ( ConfigSms configSm : configSms ) {
-            if ( BooleanUtils.isTrue(configSm.getEffect()) ) {
+            if ( BooleanUtils.isTrue( configSm.getEffect() ) ) {
                 configSmsCacheUtil.clearCache( configSm.getId() );
             }
         }

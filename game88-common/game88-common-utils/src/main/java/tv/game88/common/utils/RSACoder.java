@@ -50,8 +50,8 @@ public class RSACoder {
     public static String encryptByPublicKeyHex( String data, String key ) throws Exception {
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( key ) );
         KeyFactory         keyFactory  = KeyFactory.getInstance( KEY_ALGORITHM );
-        PublicKey pubKey = keyFactory.generatePublic( x509KeySpec );
-        Cipher    cipher = Cipher.getInstance( keyFactory.getAlgorithm() );
+        PublicKey          pubKey      = keyFactory.generatePublic( x509KeySpec );
+        Cipher             cipher      = Cipher.getInstance( keyFactory.getAlgorithm() );
         cipher.init( Cipher.ENCRYPT_MODE, pubKey );
         return new BigInteger( 1, cipher.doFinal( data.getBytes( StandardCharsets.UTF_8 ) ) ).toString( 16 );
     }
@@ -121,7 +121,8 @@ public class RSACoder {
     /**
      * 分段加解密
      */
-    private static byte[] cipherDoFinal( Cipher cipher, byte[] decryptData, int segmentSize ) throws IllegalBlockSizeException, BadPaddingException, IOException {
+    private static byte[] cipherDoFinal( Cipher cipher, byte[] decryptData, int segmentSize ) throws IllegalBlockSizeException,
+            BadPaddingException, IOException {
         if ( segmentSize <= 0 ) {
             throw new RuntimeException( "分段大小必须大于0" );
         }

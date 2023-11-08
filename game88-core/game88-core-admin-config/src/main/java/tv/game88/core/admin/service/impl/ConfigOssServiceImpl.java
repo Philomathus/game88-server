@@ -10,6 +10,7 @@ import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
 
 import jakarta.annotation.Resource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
 public class ConfigOssServiceImpl implements ConfigOssService {
 
     @Resource
-    private ConfigOssMapper configOssMapper;
+    private ConfigOssMapper    configOssMapper;
     @Resource
     private ConfigOssCacheUtil configOssCacheUtil;
 
@@ -32,19 +33,19 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      * select all ConfigOss service implementation
      *
      * @param configOss oss文件存储服务配置
+     *
      * @return oss文件存储服务配置集合
      */
 
     @Override
-    public List<ConfigOss> selectConfigOssList(ConfigOss configOss, boolean hideAccess) {
-        List<ConfigOss> configOssList = configOssMapper.selectConfigOssList(configOss);
+    public List<ConfigOss> selectConfigOssList( ConfigOss configOss, boolean hideAccess ) {
+        List<ConfigOss> configOssList = configOssMapper.selectConfigOssList( configOss );
 
-        if (hideAccess) {
-            configOssList.forEach(( r) -> {
-                        r.setAccessKey("");
-                        r.setAccessSecret("");
-                    }
-            );
+        if ( hideAccess ) {
+            configOssList.forEach( ( r ) -> {
+                r.setAccessKey( "" );
+                r.setAccessSecret( "" );
+            } );
         }
 
         return configOssList;
@@ -56,11 +57,12 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      * select configOss By Id service implementation
      *
      * @param id oss
+     *
      * @return 结果
      */
     @Override
-    public ConfigOss selectConfigOssById(Long id) {
-        return configOssMapper.selectById(id);
+    public ConfigOss selectConfigOssById( Long id ) {
+        return configOssMapper.selectById( id );
     }
 
     /**
@@ -68,11 +70,12 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      * insert Oss config service implementation
      *
      * @param configOss oss文件存储服务配置
+     *
      * @return 结果
      */
     @Override
-    public int insertConfigOss(ConfigOss configOss) {
-        return configOssMapper.insert(configOss);
+    public int insertConfigOss( ConfigOss configOss ) {
+        return configOssMapper.insert( configOss );
     }
 
     /**
@@ -80,12 +83,13 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      * Modify the service configuration service implementation
      *
      * @param configOss oss文件存储服务配置
+     *
      * @return 结果
      */
     @Override
-    public int updateConfigOss(ConfigOss configOss) {
-        int i = configOssMapper.updateById(configOss);
-        if (i > 0) {
+    public int updateConfigOss( ConfigOss configOss ) {
+        int i = configOssMapper.updateById( configOss );
+        if ( i > 0 ) {
             configOssCacheUtil.clear();
             ConfigDomainCacheUtil.me.clearDomainOss();
         }
@@ -97,28 +101,29 @@ public class ConfigOssServiceImpl implements ConfigOssService {
      * delete configOss by Ids service implementation
      *
      * @param ids 需要删除的oss文件存储服务配置ID
+     *
      * @return 结果
      */
     @Override
-    public int deleteConfigOssByIds(Long[] ids) {
-        return configOssMapper.deleteBatchIds(Arrays.asList(ids));
+    public int deleteConfigOssByIds( Long[] ids ) {
+        return configOssMapper.deleteBatchIds( Arrays.asList( ids ) );
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional( rollbackFor = Exception.class )
     @Override
-    public int effect(long id) {
-        List<ConfigOss> configOssList = configOssMapper.selectConfigOssList(null);
-        for (ConfigOss configOss : configOssList) {
+    public int effect( long id ) {
+        List<ConfigOss> configOssList = configOssMapper.selectConfigOssList( null );
+        for ( ConfigOss configOss : configOssList ) {
             ConfigOss update = new ConfigOss();
-            update.setId(configOss.getId());
-            update.setEffect(false);
-            configOssMapper.updateById(update);
+            update.setId( configOss.getId() );
+            update.setEffect( false );
+            configOssMapper.updateById( update );
         }
         ConfigOss update = new ConfigOss();
-        update.setId(id);
-        update.setEffect(true);
-        int i = configOssMapper.updateById(update);
-        if (i > 0) {
+        update.setId( id );
+        update.setEffect( true );
+        int i = configOssMapper.updateById( update );
+        if ( i > 0 ) {
             configOssCacheUtil.clear();
             ConfigDomainCacheUtil.me.clearDomainOss();
         }

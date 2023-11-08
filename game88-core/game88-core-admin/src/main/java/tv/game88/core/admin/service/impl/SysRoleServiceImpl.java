@@ -17,6 +17,7 @@ import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.service.ISysRoleService;
 
 import jakarta.annotation.Resource;
+
 import java.util.*;
 
 /**
@@ -27,9 +28,9 @@ import java.util.*;
 @Service
 public class SysRoleServiceImpl implements ISysRoleService {
     @Resource
-    private SysRoleMapper     roleMapper;
+    private SysRoleMapper       roleMapper;
     @Resource
-    private SysRoleMenuMapper roleMenuMapper;
+    private SysRoleMenuMapper   roleMenuMapper;
     @Resource
     private SysUserRoleMapper   userRoleMapper;
     @Resource
@@ -39,6 +40,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 根据条件分页查询角色数据
      *
      * @param role 角色信息
+     *
      * @return 角色数据集合信息
      */
     @Override
@@ -51,6 +53,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 根据用户ID查询权限
      *
      * @param userId 用户ID
+     *
      * @return 权限列表
      */
     @Override
@@ -79,6 +82,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 根据用户ID获取角色选择框列表
      *
      * @param userId 用户ID
+     *
      * @return 选中角色ID列表
      */
     @Override
@@ -90,6 +94,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 通过角色ID查询角色
      *
      * @param roleId 角色ID
+     *
      * @return 角色对象信息
      */
     @Override
@@ -101,6 +106,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 校验角色名称是否唯一
      *
      * @param role 角色信息
+     *
      * @return 结果
      */
     @Override
@@ -117,6 +123,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 校验角色权限是否唯一
      *
      * @param role 角色信息
+     *
      * @return 结果
      */
     @Override
@@ -145,6 +152,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 通过角色ID查询角色使用数量
      *
      * @param roleId 角色ID
+     *
      * @return 结果
      */
     @Override
@@ -156,6 +164,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 新增保存角色信息
      *
      * @param role 角色信息
+     *
      * @return 结果
      */
     @Override
@@ -170,6 +179,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 修改保存角色信息
      *
      * @param role 角色信息
+     *
      * @return 结果
      */
     @Override
@@ -186,6 +196,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 修改角色状态
      *
      * @param role 角色信息
+     *
      * @return 结果
      */
     @Override
@@ -218,6 +229,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 通过角色ID删除角色
      *
      * @param roleId 角色ID
+     *
      * @return 结果
      */
     @Override
@@ -232,6 +244,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      * 批量删除角色信息
      *
      * @param roleIds 需要删除的角色ID
+     *
      * @return 结果
      */
     @Override

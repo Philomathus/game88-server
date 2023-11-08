@@ -12,6 +12,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.entity.ConfigOss;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,8 +39,9 @@ public class ConfigOssController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('config:oss:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<ConfigOss>> list( @RequestHeader(name="hideAccess", required = false) boolean hideAccess, ConfigOss configOss ) {
-        List<ConfigOss> list = configOssService.selectConfigOssList( configOss , hideAccess );
+    public RspBase<List<ConfigOss>> list( @RequestHeader( name = "hideAccess", required = false ) boolean hideAccess,
+                                          ConfigOss configOss ) {
+        List<ConfigOss> list = configOssService.selectConfigOssList( configOss, hideAccess );
         return RspBase.ok( list );
     }
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class LogCommission {
     @Schema( title = "系统编号" )
-    @TableId(type = IdType.AUTO)
+    @TableId( type = IdType.AUTO )
     private Long          id;
     @Schema( title = "会员ID" )
     private String        memberId;
