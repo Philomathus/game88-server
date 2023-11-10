@@ -3,13 +3,13 @@ package tv.game88.core.admin.config;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -37,7 +37,8 @@ import tv.game88.core.admin.security.handle.LogoutSuccessHandlerImpl;
  * @author MengJun
  */
 @Configuration
-@EnableMethodSecurity( securedEnabled = true, jsr250Enabled = true )
+@EnableWebSecurity
+@EnableMethodSecurity( securedEnabled = true )
 public class SecurityConfig {
     /**
      * 自定义用户认证逻辑
@@ -99,11 +100,6 @@ public class SecurityConfig {
                     customizer
                             // 对于登录login 允许匿名访问
                             .requestMatchers( "/login" ).anonymous()
-                            .requestMatchers( HttpMethod.GET, "/**.html", "/**.html", "/**.css", "/**.js" ).permitAll()
-                            .requestMatchers( "/doc.html" ).anonymous()
-                            .requestMatchers( "/swagger-resources/**" ).anonymous()
-                            .requestMatchers( "/webjars/**" ).anonymous()
-                            .requestMatchers( "/*/api-docs" ).anonymous()
                             .requestMatchers( "/actuator/**" ).anonymous()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();

@@ -3,7 +3,6 @@ package tv.game88.core.session.config;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,7 +38,7 @@ import tv.game88.core.session.security.handle.MemberLogoutSuccessHandle;
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity( securedEnabled = true, jsr250Enabled = true )
+@EnableMethodSecurity( securedEnabled = true )
 public class MemberSecurityConfig {
     /**
      * 自定义用户认证逻辑
@@ -94,29 +93,27 @@ public class MemberSecurityConfig {
                 .csrf( AbstractHttpConfigurer::disable )
                 // 基于token，所以不需要session
                 .sessionManagement( configurer -> configurer.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) )
+                // 认证失败处理类
+                .exceptionHandling( configurer -> configurer.authenticationEntryPoint( unauthorizedHandler ) )
                 // 过滤请求
                 .authorizeHttpRequests( customizer -> {
                     // 注解标记允许匿名访问的url
                     permitAllUrl.getUrls().forEach( url -> customizer.requestMatchers( url ).permitAll() );
                     customizer
-                            .requestMatchers( HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
                             // 支付代付回调 允许匿名访问
-                            .requestMatchers( HttpMethod.GET, "/pay/orderRedirect/**" ).anonymous()
-                            .requestMatchers( HttpMethod.POST,"/pay/callBack/**" ).anonymous()
-                            .requestMatchers( HttpMethod.GET, "/pay/callBack/**" ).anonymous()
-                            .requestMatchers( HttpMethod.POST,"/pay/agentCallBack/**" ).anonymous()
-                            .requestMatchers( HttpMethod.GET, "/pay/agentCallBack/**" ).anonymous()
-                            .requestMatchers( HttpMethod.POST,"/pay/agentReverseCheck/**" ).anonymous()
-                            .requestMatchers( HttpMethod.GET, "/pay/agentReverseCheck/**" ).anonymous()
+                            .requestMatchers( "/pay/orderRedirect/**" ).anonymous()
+                            .requestMatchers( "/pay/callBack/**" ).anonymous()
+                            .requestMatchers( "/pay/agentCallBack/**" ).anonymous()
+                            .requestMatchers("/pay/agentReverseCheck/**" ).anonymous()
                             // actuator 健康检查
                             .requestMatchers( "/actuator/**" ).anonymous()
+                            // swagger
+                            .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**", "/*.html", "/*.ico" ).anonymous()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();
                 } )
                 .headers( customizer -> customizer.frameOptions( HeadersConfigurer.FrameOptionsConfig::disable ).disable() )
                 .logout( customizer -> customizer.logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler ) )
-                // 认证失败处理类
-                .exceptionHandling( configurer -> configurer.authenticationEntryPoint( unauthorizedHandler ) )
                 // 添加JWT filter
                 .addFilterBefore( authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class )
                 // 添加CORS filter

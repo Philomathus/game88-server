@@ -27,9 +27,6 @@ public class SwaggerAutoConfiguration {
 
     @Bean
     public OpenAPI springOpenAPI() {
-        return new OpenAPI()
-                .info(swaggerProperties.buildApiInfo());
+        return new OpenAPI().info( swaggerProperties.buildApiInfo() );
     }
-
-
 }
