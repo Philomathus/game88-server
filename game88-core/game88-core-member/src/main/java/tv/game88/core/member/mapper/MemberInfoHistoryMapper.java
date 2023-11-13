@@ -24,8 +24,6 @@ public interface MemberInfoHistoryMapper extends  BaseMapper<MemberInfoHistory> 
 
     void deleteByHistoryKey( @Param( "userId" ) String userId );
 
-    String selectMaxMemberCode();
-
     MemberInfoHistory findMemberByDeviceId( @Param( "deviceId" ) String deviceId );
 
     MemberInfoHistory findMemberHistoryByDeviceId( @Param( "deviceId" ) String deviceId );

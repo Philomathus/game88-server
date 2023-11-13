@@ -190,8 +190,10 @@
     </delete>
 
     <select id="selectMaxMemberCode" resultType="java.lang.String">
-        select IFNULL(max(id), 0)
+        select IFNULL(id, 0)
         from member_info
+        order by register_time desc
+        limit 1
     </select>
 
     <select id="findMemberByDeviceId" resultType="tv.game88.core.member.entity.MemberInfo">

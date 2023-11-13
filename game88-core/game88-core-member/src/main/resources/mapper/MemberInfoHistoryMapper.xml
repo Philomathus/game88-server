@@ -168,10 +168,6 @@
 		delete from member_info_history where id = #{userId}
 	</delete>
 
-	<select id="selectMaxMemberCode" resultType="java.lang.String">
-		select IFNULL(max(id), 0) from member_info_history
-	</select>
-
 	<select id="findMemberByDeviceId" resultType="tv.game88.core.member.entity.MemberInfoHistory">
 		select * from member_info_history where device_id = #{deviceId} limit 1
 	</select>

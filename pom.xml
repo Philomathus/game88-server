@@ -69,6 +69,11 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-help-plugin.verion>3.4.0</maven-help-plugin.verion>
         <maven-surefire-plugin.verion>3.2.1</maven-surefire-plugin.verion>
+
+        <snakeyaml.version>2.0</snakeyaml.version>
+        <guava.version>32.1.3-jre</guava.version>
+        <org.json.verion>20231013</org.json.verion>
+        <bouncycastle.version>1.70</bouncycastle.version>
     </properties>
 
     <dependencyManagement>
@@ -372,6 +377,11 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <dependency>
