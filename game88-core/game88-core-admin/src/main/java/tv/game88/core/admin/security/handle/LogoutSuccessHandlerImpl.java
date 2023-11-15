@@ -35,7 +35,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
             // 删除用户缓存记录
             sysUserTokenService.delToken( loginUser.getUser().getUserId() );
             // 记录用户退出日志
-            AsyncFactory.me().recordLogininfor( loginUser.getUsername(), AdminConstants.LOGOUT, "退出成功" );
+            AsyncFactory.me.recordLogininfor( loginUser.getUsername(), AdminConstants.LOGOUT, "退出成功" );
         }
         ServletUtil.renderString( response, JsonUtil.object2Json( RspBase.ok( "退出成功" ) ) );
     }

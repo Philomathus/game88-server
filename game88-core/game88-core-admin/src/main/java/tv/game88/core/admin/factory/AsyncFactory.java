@@ -1,6 +1,7 @@
 package tv.game88.core.admin.factory;
 
 import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @Component
 public class AsyncFactory {
-    private static final AsyncFactory ME = new AsyncFactory();
+    public static AsyncFactory me;
 
     @Resource
     private ScheduledExecutorService scheduledExecutorService;
@@ -33,14 +34,9 @@ public class AsyncFactory {
     @Resource
     private SysOperLogMapper    sysOperLogMapper;
 
-    /**
-     * 单例模式
-     */
-    private AsyncFactory() {
-    }
-
-    public static AsyncFactory me() {
-        return ME;
+    @PostConstruct
+    void init() {
+        me = this;
     }
 
     /**
