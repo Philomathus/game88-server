@@ -13,8 +13,8 @@ import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.core.game.constants.ConstantsGame;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
 
@@ -156,23 +156,13 @@ public class GameDockJDB extends AbstractGameDock {
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            switch ( resultMap.get( "status" ).toString() ) {
-            case "0000" -> {
+            if ( resultMap.get( "status" ).toString().equals( "0000" ) ) {
                 List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data",
                         new ArrayList<>() );
                 if ( !CollectionUtils.isEmpty( dataMapList ) ) {
                     Map<String, Object> dataMap = dataMapList.get( 0 );
                     return new BigDecimal( dataMap.getOrDefault( "balance", "0" ).toString() );
                 }
-            }
-            case "6901" -> {
-                try {
-                    Thread.sleep( Duration.ofSeconds( 2 ) );
-                } catch ( InterruptedException e ) {
-                    log.error( e.getMessage(), e );
-                }
-                throw new RuntimeException( "会员正在游戏中" );
-            }
             }
         }
         return BigDecimal.ZERO;
@@ -257,9 +247,21 @@ public class GameDockJDB extends AbstractGameDock {
         String des = isDeposit ? "上" : "下";
         log.info( reqJoinGame.getGameCategory().getDes() + des
                 + "分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) && "0000".equals( resultMap.getOrDefault( "status", "" ).toString() )
-                && reqJoinGame.getOrderId().equals( resultMap.getOrDefault( "serialNo", "" ).toString() ) ) {
-            return;
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            String status = resultMap.getOrDefault( "status", "" ).toString();
+            if ( "0000".equals( status ) && reqJoinGame
+                    .getOrderId()
+                    .equals( resultMap.getOrDefault( "serialNo", "" ).toString() ) ) {
+                return;
+            }
+            if ( "6901".equals( status ) ) {
+                try {
+                    Thread.sleep( Duration.ofSeconds( 2 ) );
+                } catch ( InterruptedException e ) {
+                    log.error( e.getMessage(), e );
+                }
+                throw new RuntimeException( "会员正在游戏中" );
+            }
         }
         throw new GameTransferException( String.format( "%s%s分异常 - %s分失败或数据为空", reqJoinGame
                 .getGameCategory()
