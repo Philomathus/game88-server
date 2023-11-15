@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 
 @Log4j2
@@ -154,19 +155,30 @@ public class GameDockJDB extends AbstractGameDock {
                 reqJoinGame.getLinecode() );
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) && "0000".equals( resultMap.get( "status" ).toString() ) ) {
-            List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data",
-                    new ArrayList<>() );
-            if ( !CollectionUtils.isEmpty( dataMapList ) ) {
-                Map<String, Object> dataMap = dataMapList.get( 0 );
-                return new BigDecimal( dataMap.getOrDefault( "balance", "0" ).toString() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            switch ( resultMap.get( "status" ).toString() ) {
+            case "0000" -> {
+                List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data",
+                        new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( dataMapList ) ) {
+                    Map<String, Object> dataMap = dataMapList.get( 0 );
+                    return new BigDecimal( dataMap.getOrDefault( "balance", "0" ).toString() );
+                }
+            }
+            case "6901" -> {
+                try {
+                    Thread.sleep( Duration.ofSeconds( 2 ) );
+                } catch ( InterruptedException e ) {
+                    log.error( e.getMessage(), e );
+                }
+                throw new RuntimeException( "会员正在游戏中" );
+            }
             }
         }
         return BigDecimal.ZERO;
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
         Map<String, Object> params = new HashMap<>();
         params.put( "action", 55 );
@@ -249,7 +261,8 @@ public class GameDockJDB extends AbstractGameDock {
                 && reqJoinGame.getOrderId().equals( resultMap.getOrDefault( "serialNo", "" ).toString() ) ) {
             return;
         }
-        throw new GameTransferException( String.format( "%s%s分异常 - %s分失败或数据为空", reqJoinGame.getGameCategory()
-                                                                                                      .getDes(), des, des ) );
+        throw new GameTransferException( String.format( "%s%s分异常 - %s分失败或数据为空", reqJoinGame
+                .getGameCategory()
+                .getDes(), des, des ) );
     }
 }

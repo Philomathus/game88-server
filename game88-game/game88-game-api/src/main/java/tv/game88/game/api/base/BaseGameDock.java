@@ -14,7 +14,8 @@ public interface BaseGameDock {
      *
      * @param reqJoinGame 游戏参数
      */
-    @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = Exception.class, noRetryFor = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay =
+            500 ) )
     void getToken( ReqJoinGame reqJoinGame );
 
     /**
@@ -22,17 +23,17 @@ public interface BaseGameDock {
      *
      * @param reqJoinGame 游戏参数
      */
-    @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = Exception.class, noRetryFor = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay =
+            500 ) )
     void createAccount( ReqJoinGame reqJoinGame );
 
     /**
      * 获取游戏链接
      *
      * @param reqJoinGame 游戏参数
-     *
-     * @return 游戏链接地址
      */
-    @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = Exception.class, noRetryFor = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay =
+            500 ) )
     void getJoinGameUrl( ReqJoinGame reqJoinGame );
 
     /**
@@ -46,8 +47,6 @@ public interface BaseGameDock {
      * 游戏下分
      *
      * @param reqJoinGame 游戏参数
-     *
-     * @return 下分金额
      */
     void withdrawal( ReqJoinGame reqJoinGame );
 
@@ -58,7 +57,8 @@ public interface BaseGameDock {
      *
      * @return 游戏内余额
      */
-    @Retryable( value = Exception.class, exclude = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = Exception.class, noRetryFor = BusinessException.class, maxAttempts = 3, backoff = @Backoff( delay =
+            500 ) )
     BigDecimal queryBalance( ReqJoinGame reqJoinGame );
 
     /**
@@ -68,8 +68,8 @@ public interface BaseGameDock {
      *
      * @return 是否存在转账记录
      */
-    @Retryable( value = { Exception.class, HttpServerErrorException.class }, exclude = BusinessException.class, maxAttempts = 5
-            , backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = { Exception.class, HttpServerErrorException.class }, noRetryFor = BusinessException.class,
+            maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
     boolean queryTransfer( ReqJoinGame reqJoinGame );
 
     //List<Map<String, Object>> queryBetRecord();

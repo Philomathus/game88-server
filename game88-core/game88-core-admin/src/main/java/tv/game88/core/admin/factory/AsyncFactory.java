@@ -26,6 +26,11 @@ import java.util.concurrent.TimeUnit;
 public class AsyncFactory {
     public static AsyncFactory me;
 
+    @PostConstruct
+    void init() {
+        me = this;
+    }
+
     @Resource
     private ScheduledExecutorService scheduledExecutorService;
 
@@ -33,11 +38,6 @@ public class AsyncFactory {
     private SysLogininforMapper sysLogininforMapper;
     @Resource
     private SysOperLogMapper    sysOperLogMapper;
-
-    @PostConstruct
-    void init() {
-        me = this;
-    }
 
     /**
      * 记录登录信息
