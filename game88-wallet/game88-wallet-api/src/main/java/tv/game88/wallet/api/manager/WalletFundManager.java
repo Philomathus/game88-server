@@ -16,6 +16,7 @@ import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -39,8 +40,8 @@ public class WalletFundManager {
      * @param fundEnum 交易类型
      */
     @Transactional( rollbackFor = Exception.class )
-    public void addWalletUserMoney( String userId, Long merchantId, Long addMoney, WalletUserFundEnum fundEnum,
-                                    String mark, String businessId, String markorder ) {
+    public void addWalletUserMoney( String userId, Long merchantId, Long addMoney, WalletUserFundEnum fundEnum, String mark,
+                                    String businessId, String markorder ) {
         if ( fundEnum.getType() < 0 || ( !fundEnum.getIsTransaction() && merchantId == null ) ) {
             throw new BusinessException( "逻辑异常" );
         }
@@ -68,40 +69,15 @@ public class WalletFundManager {
         log.setDes( fundEnum.getDes() );
         log.setMark( mark );
         log.setTotalBefore( userBalance );
-        log.setTotal( userBalance +  addMoney );
+        log.setTotal( userBalance + addMoney );
         log.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( updateMoney <= 0 || insertLogMoney <= 0 ) {
-            throw new BusinessException( "资金日志记入失败,请重试" );
+            throw new BusinessException( "会员资金日志记入失败,请重试" );
         }
         // 用户加钱,商户减钱
         if ( !fundEnum.getIsTransaction() ) {
-            //扣减金额
-            int reducedMoney = walletMerchantMapper.reduceMoney( merchantId, addMoney );
-
-            if ( reducedMoney <= 0 ) {
-                throw new NoMoneyException( "商户余额不足" );
-            }
-
-            BigDecimal merchantBalance = walletMerchantMapper.getMerchantMoney( merchantId );
-
-            //日志
-            WalletMerchantFundLog merchantFundLog = new WalletMerchantFundLog();
-            merchantFundLog.setId( log.getId() );
-            merchantFundLog.setMerchantId( merchantId );
-            merchantFundLog.setCreateTime( log.getCreateTime() );
-            merchantFundLog.setIncome( BigDecimal.ZERO );
-            merchantFundLog.setPay( new BigDecimal( addMoney ) );
-            merchantFundLog.setType( fundEnum.getType() );
-            merchantFundLog.setDes( fundEnum.getDes() );
-            merchantFundLog.setMark( mark );
-            merchantFundLog.setTotalBefore( merchantBalance );
-            merchantFundLog.setTotal( merchantBalance.subtract( new BigDecimal( addMoney ) ) );
-            merchantFundLog.setMarkorder( markorder );
-            int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
-            if ( insertMerchantLog <= 0 ) {
-                throw new BusinessException( "资金日志记入失败,请重试" );
-            }
+            this.reduceWalletMerchantMoney( merchantId, addMoney, fundEnum, mark, log.getId(), markorder, log.getCreateTime() );
         }
     }
 
@@ -149,31 +125,82 @@ public class WalletFundManager {
         log.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( log );
         if ( insertLogMoney <= 0 ) {
-            throw new BusinessException( "资金日志记入失败,请重试" );
+            throw new BusinessException( "会员资金日志记入失败,请重试" );
         }
         // 用户减钱,商户加钱
         if ( !fundEnum.getIsTransaction() ) {
-            BigDecimal merchantBalance = walletMerchantMapper.getMerchantMoney( merchantId );
+            this.addWalletMerchantMoney( merchantId, reduceMoney, fundEnum, mark, log.getId(), markorder, log.getCreateTime() );
+        }
+    }
 
-            int updateMoney = walletMerchantMapper.addMoney( merchantId, reduceMoney );
+    /**
+     * 商户加钱
+     *
+     * @param merchantId 商户ID
+     * @param addMoney   增加的部分
+     * @param fundEnum   交易类型
+     */
+    @Transactional( rollbackFor = Exception.class )
+    public void addWalletMerchantMoney( Long merchantId, Long addMoney, WalletUserFundEnum fundEnum, String mark,
+                                        String businessId, String markorder, LocalDateTime createTime ) {
+        BigDecimal merchantBalance = walletMerchantMapper.getMerchantMoney( merchantId );
 
-            //日志
-            WalletMerchantFundLog merchantFundLog = new WalletMerchantFundLog();
-            merchantFundLog.setId( log.getId() );
-            merchantFundLog.setMerchantId( merchantId );
-            merchantFundLog.setCreateTime( log.getCreateTime() );
-            merchantFundLog.setIncome( new BigDecimal( reduceMoney ) );
-            merchantFundLog.setPay( BigDecimal.ZERO );
-            merchantFundLog.setType( fundEnum.getType() );
-            merchantFundLog.setDes( fundEnum.getDes() );
-            merchantFundLog.setMark( mark );
-            merchantFundLog.setTotalBefore( merchantBalance );
-            merchantFundLog.setTotal( merchantBalance.add( new BigDecimal( reduceMoney ) ) );
-            merchantFundLog.setMarkorder( markorder );
-            int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
-            if ( updateMoney <= 0 || insertMerchantLog <= 0 ) {
-                throw new BusinessException( "资金日志记入失败,请重试" );
-            }
+        int updateMoney = walletMerchantMapper.addMoney( merchantId, addMoney );
+
+        //日志
+        WalletMerchantFundLog merchantFundLog = new WalletMerchantFundLog();
+        merchantFundLog.setId( businessId );
+        merchantFundLog.setMerchantId( merchantId );
+        merchantFundLog.setCreateTime( createTime );
+        merchantFundLog.setIncome( new BigDecimal( addMoney ) );
+        merchantFundLog.setPay( BigDecimal.ZERO );
+        merchantFundLog.setType( fundEnum.getType() );
+        merchantFundLog.setDes( fundEnum.getDes() );
+        merchantFundLog.setMark( mark );
+        merchantFundLog.setTotalBefore( merchantBalance );
+        merchantFundLog.setTotal( merchantBalance.add( new BigDecimal( addMoney ) ) );
+        merchantFundLog.setMarkorder( markorder );
+        int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
+        if ( updateMoney <= 0 || insertMerchantLog <= 0 ) {
+            throw new BusinessException( "商户资金日志记入失败,请重试" );
+        }
+    }
+
+    /**
+     * 商户资金扣减
+     *
+     * @param merchantId  商户ID
+     * @param reduceMoney 扣减金额
+     * @param fundEnum    交易类型
+     */
+    @Transactional( rollbackFor = Exception.class )
+    public void reduceWalletMerchantMoney( Long merchantId, Long reduceMoney, WalletUserFundEnum fundEnum, String mark,
+                                           String businessId, String markorder, LocalDateTime createTime ) {
+        //扣减金额
+        int reducedMoney = walletMerchantMapper.reduceMoney( merchantId, reduceMoney );
+
+        if ( reducedMoney <= 0 ) {
+            throw new NoMoneyException( "商户余额不足" );
+        }
+
+        BigDecimal merchantBalance = walletMerchantMapper.getMerchantMoney( merchantId );
+
+        //日志
+        WalletMerchantFundLog merchantFundLog = new WalletMerchantFundLog();
+        merchantFundLog.setId( businessId );
+        merchantFundLog.setMerchantId( merchantId );
+        merchantFundLog.setCreateTime( createTime );
+        merchantFundLog.setIncome( BigDecimal.ZERO );
+        merchantFundLog.setPay( new BigDecimal( reduceMoney ) );
+        merchantFundLog.setType( fundEnum.getType() );
+        merchantFundLog.setDes( fundEnum.getDes() );
+        merchantFundLog.setMark( mark );
+        merchantFundLog.setTotalBefore( merchantBalance );
+        merchantFundLog.setTotal( merchantBalance.subtract( new BigDecimal( reduceMoney ) ) );
+        merchantFundLog.setMarkorder( markorder );
+        int insertMerchantLog = walletMerchantFundLogMapper.insert( merchantFundLog );
+        if ( insertMerchantLog <= 0 ) {
+            throw new BusinessException( "商户资金日志记入失败,请重试" );
         }
     }
 }

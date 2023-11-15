@@ -1,6 +1,8 @@
 package tv.game88.wallet.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.entity.WalletMerchant;
 
 import java.util.List;
@@ -18,5 +20,9 @@ public interface WalletMerchantService extends IService<WalletMerchant> {
      *
      * @return 钱包商户集合
      */
-    public List<WalletMerchant> selectWalletMerchantList( WalletMerchant walletMerchant );
+    List<WalletMerchant> selectWalletMerchantList( WalletMerchant walletMerchant );
+
+    RspBase<?> addScore( String ip, String username, ReqConstant.ReqMerchantAddScore req );
+
+    RspBase<?> reduceScore( String ip, String username, ReqConstant.ReqMerchantAddScore req );
 }

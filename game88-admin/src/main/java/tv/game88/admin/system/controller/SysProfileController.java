@@ -14,7 +14,7 @@ import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.security.service.SysUserTokenService;
-import tv.game88.core.admin.service.ISysUserService;
+import tv.game88.admin.system.service.ISysUserService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
 

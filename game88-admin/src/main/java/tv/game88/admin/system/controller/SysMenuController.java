@@ -13,13 +13,14 @@ import tv.game88.core.admin.constant.AdminConstants;
 import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysMenu;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.service.ISysMenuService;
+import tv.game88.admin.system.service.ISysMenuService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
 import tv.game88.core.admin.vo.TreeSelect;
 
 import jakarta.annotation.Resource;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +41,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('system:menu:list')" )
     @GetMapping( "/list" )
     public RspBase<List<SysMenu>> list( SysMenu menu ) {
-        LoginUser     loginUser = SecurityUtils.getLoginUser();
-        Long          userId    = loginUser.getUser().getUserId();
-        List<SysMenu> menus     = menuService.selectMenuList( menu, userId );
+        List<SysMenu> menus = menuService.selectMenuList( menu, SecurityUtils.getUserId() );
         return RspBase.ok( menus );
     }
 
@@ -52,7 +51,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('system:menu:query')" )
     @GetMapping( value = "/{menuId}" )
     public RspBase<SysMenu> getInfo( @PathVariable Long menuId ) {
-        return RspBase.ok( menuService.selectMenuById( menuId ) );
+        return RspBase.ok( menuService.getById( menuId ) );
     }
 
     /**
@@ -91,7 +90,8 @@ public class SysMenuController extends BaseController {
             return RspBase.businessError( "新增菜单" + menu.getMenuName() + "失败，地址必须以http(s)://开头" );
         }
         menu.setCreateBy( SecurityUtils.getUsername() );
-        return toResult( menuService.insertMenu( menu ) );
+        menu.setCreateTime( LocalDateTime.now() );
+        return toResult( menuService.save( menu ) );
     }
 
     /**
@@ -110,7 +110,8 @@ public class SysMenuController extends BaseController {
             return RspBase.businessError( "修改菜单" + menu.getMenuName() + "失败，上级菜单不能选择自己" );
         }
         menu.setUpdateBy( SecurityUtils.getUsername() );
-        return toResult( menuService.updateMenu( menu ) );
+        menu.setUpdateTime( LocalDateTime.now() );
+        return toResult( menuService.updateById( menu ) );
     }
 
     /**
@@ -126,6 +127,6 @@ public class SysMenuController extends BaseController {
         if ( menuService.checkMenuExistRole( menuId ) ) {
             return RspBase.businessError( "菜单已分配,不允许删除" );
         }
-        return toResult( menuService.deleteMenuById( menuId ) );
+        return toResult( menuService.removeById( menuId ) );
     }
 }

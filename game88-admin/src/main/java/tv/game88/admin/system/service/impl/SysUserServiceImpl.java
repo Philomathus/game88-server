@@ -1,5 +1,6 @@
-package tv.game88.core.admin.service.impl;
+package tv.game88.admin.system.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,11 @@ import tv.game88.core.admin.mapper.SysRoleMapper;
 import tv.game88.core.admin.mapper.SysUserMapper;
 import tv.game88.core.admin.mapper.SysUserRoleMapper;
 import tv.game88.core.admin.security.service.SysUserTokenService;
-import tv.game88.core.admin.service.ISysUserService;
+import tv.game88.admin.system.service.ISysUserService;
 
 import jakarta.annotation.Resource;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +30,8 @@ import java.util.List;
  */
 @Log4j2
 @Service
-public class SysUserServiceImpl implements ISysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
-    @Resource
-    private SysUserMapper       userMapper;
     @Resource
     private SysRoleMapper       roleMapper;
     @Resource
@@ -49,19 +49,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     @DataScope( userAlias = "u" )
     public List<SysUser> selectUserList( SysUser user ) {
-        return userMapper.selectUserList( user );
-    }
-
-    /**
-     * 通过用户名查询用户
-     *
-     * @param userName 用户名
-     *
-     * @return 用户对象信息
-     */
-    @Override
-    public SysUser selectUserByUserName( String userName ) {
-        return userMapper.selectUserByUserName( userName );
+        return this.baseMapper.selectUserList( user );
     }
 
     /**
@@ -73,12 +61,12 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public SysUser selectUserById( Long userId ) {
-        return userMapper.selectUserById( userId );
+        return this.baseMapper.selectUserById( userId );
     }
 
     @Override
     public SysUser selectOtpSecretByUserName( String userName ) {
-        return userMapper.selectOtpSecretByUserName( userName );
+        return this.baseMapper.selectOtpSecretByUserName( userName );
     }
 
     /**
@@ -110,7 +98,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public String checkUserNameUnique( String userName ) {
-        int count = userMapper.checkUserNameUnique( userName );
+        int count = this.baseMapper.checkUserNameUnique( userName );
         if ( count > 0 ) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -140,8 +128,9 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     @Transactional( rollbackFor = Exception.class )
     public int insertUser( SysUser user ) {
+        user.setCreateTime( LocalDateTime.now() );
         // 新增用户信息
-        int rows = userMapper.insertUser( user );
+        int rows = this.baseMapper.insertUser( user );
         // 新增用户与角色管理
         insertUserRole( user );
         return rows;
@@ -162,7 +151,7 @@ public class SysUserServiceImpl implements ISysUserService {
         userRoleMapper.deleteUserRoleByUserId( userId );
         // 新增用户与角色管理
         insertUserRole( user );
-        int i = userMapper.updateUser( user );
+        int i = this.baseMapper.updateUser( user );
         sysUserTokenService.delToken( userId );
 
         return i;
@@ -177,7 +166,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public int updateUserStatus( SysUser user ) {
-        return userMapper.updateUser( user );
+        return this.baseMapper.updateUser( user );
     }
 
     /**
@@ -189,25 +178,12 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public int updateUserProfile( SysUser user ) {
-        return userMapper.updateUser( user );
-    }
-
-    /**
-     * 修改用户头像
-     *
-     * @param userName 用户名
-     * @param avatar   头像地址
-     *
-     * @return 结果
-     */
-    @Override
-    public boolean updateUserAvatar( String userName, String avatar ) {
-        return userMapper.updateUserAvatar( userName, avatar ) > 0;
+        return this.baseMapper.updateUser( user );
     }
 
     @Override
     public boolean updateUserLoginTime( SysUser user ) {
-        return userMapper.updateUserLoginTime( user ) > 0;
+        return this.baseMapper.updateUserLoginTime( user ) > 0;
     }
 
     /**
@@ -219,7 +195,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public int resetPwd( SysUser user ) {
-        return userMapper.updateUser( user );
+        return this.baseMapper.updateUser( user );
     }
 
     /**
@@ -232,7 +208,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public int resetUserPwd( String userName, String password ) {
-        return userMapper.resetUserPwd( userName, password );
+        return this.baseMapper.resetUserPwd( userName, password );
     }
 
     /**
@@ -258,21 +234,6 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     /**
-     * 通过用户ID删除用户
-     *
-     * @param userId 用户ID
-     *
-     * @return 结果
-     */
-    @Override
-    @Transactional( rollbackFor = Exception.class )
-    public int deleteUserById( Long userId ) {
-        // 删除用户与角色关联
-        userRoleMapper.deleteUserRoleByUserId( userId );
-        return userMapper.deleteUserById( userId );
-    }
-
-    /**
      * 批量删除用户信息
      *
      * @param userIds 需要删除的用户ID
@@ -287,7 +248,7 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole( userIds );
-        return userMapper.deleteUserByIds( userIds );
+        return this.baseMapper.deleteUserByIds( userIds );
     }
 
 }

@@ -17,13 +17,13 @@ import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
-import tv.game88.wallet.api.vo.TransDetailStreamMessage;
+import tv.game88.wallet.api.sse.model.TransDetailStreamMessage;
 
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static tv.game88.wallet.api.sse.model.StreamMessageType.NOTIFICATION;
+import static tv.game88.wallet.api.type.StreamMessageType.NOTIFICATION;
 
 /**
  * 站内信Service业务层处理

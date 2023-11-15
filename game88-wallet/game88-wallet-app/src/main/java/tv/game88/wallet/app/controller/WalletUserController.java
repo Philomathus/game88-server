@@ -17,6 +17,7 @@ import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 
 @RestController
@@ -46,7 +47,7 @@ public class WalletUserController extends BaseController {
 
     @Operation( summary = "重置基金密码" )
     @PostMapping( "/api/fundPassReset" )
-    public RspBase<?> funPassReset( @RequestBody ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
+    public RspBase<?> funPassReset( @Validated @RequestBody ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         return walletUserService.resetFunPassword( MemberSecurityUtils.getUserId(), reqResetFundPasswd );
 
     }

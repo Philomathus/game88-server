@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.SecureRandom;
 
@@ -43,7 +44,7 @@ public class GoogleAuthUtil {
 
     public static String tranUrlToBase64String( String url ) {
         try {
-            URL               urlImg            = new URL( url );
+            URL               urlImg            = URI.create( url ).toURL();
             HttpURLConnection httpURLConnection = ( HttpURLConnection ) urlImg.openConnection();
             httpURLConnection.addRequestProperty( "User-Agent", "Mozilla / 4.76" );
             InputStream is = httpURLConnection.getInputStream();

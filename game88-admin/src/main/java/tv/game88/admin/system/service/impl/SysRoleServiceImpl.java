@@ -1,5 +1,7 @@
-package tv.game88.core.admin.service.impl;
+package tv.game88.admin.system.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tv.game88.common.exception.BusinessException;
@@ -14,10 +16,9 @@ import tv.game88.core.admin.mapper.SysRoleMapper;
 import tv.game88.core.admin.mapper.SysRoleMenuMapper;
 import tv.game88.core.admin.mapper.SysUserRoleMapper;
 import tv.game88.core.admin.security.service.SysUserTokenService;
-import tv.game88.core.admin.service.ISysRoleService;
+import tv.game88.admin.system.service.ISysRoleService;
 
-import jakarta.annotation.Resource;
-
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -26,9 +27,7 @@ import java.util.*;
  * @author MengJun
  */
 @Service
-public class SysRoleServiceImpl implements ISysRoleService {
-    @Resource
-    private SysRoleMapper       roleMapper;
+public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService {
     @Resource
     private SysRoleMenuMapper   roleMenuMapper;
     @Resource
@@ -46,7 +45,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     @DataScope( userAlias = "u" )
     public List<SysRole> selectRoleList( SysRole role ) {
-        return roleMapper.selectRoleList( role );
+        return this.baseMapper.selectRoleList( role );
     }
 
     /**
@@ -58,7 +57,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public Set<String> selectRolePermissionByUserId( Long userId ) {
-        List<SysRole> perms    = roleMapper.selectRolePermissionByUserId( userId );
+        List<SysRole> perms    = this.baseMapper.selectRolePermissionByUserId( userId );
         Set<String>   permsSet = new HashSet<>();
         for ( SysRole perm : perms ) {
             if ( Objects.nonNull( perm ) ) {
@@ -87,7 +86,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public List<Integer> selectRoleListByUserId( Long userId ) {
-        return roleMapper.selectRoleListByUserId( userId );
+        return this.baseMapper.selectRoleListByUserId( userId );
     }
 
     /**
@@ -99,7 +98,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public SysRole selectRoleById( Long roleId ) {
-        return roleMapper.selectRoleById( roleId );
+        return this.baseMapper.selectRoleById( roleId );
     }
 
     /**
@@ -112,7 +111,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public String checkRoleNameUnique( SysRole role ) {
         long    roleId = StringUtils.isNull( role.getRoleId() ) ? -1L : role.getRoleId();
-        SysRole info   = roleMapper.checkRoleNameUnique( role.getRoleName() );
+        SysRole info   = this.baseMapper.checkRoleNameUnique( role.getRoleName() );
         if ( StringUtils.isNotNull( info ) && info.getRoleId() != roleId ) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -129,7 +128,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public String checkRoleKeyUnique( SysRole role ) {
         long    roleId = StringUtils.isNull( role.getRoleId() ) ? -1L : role.getRoleId();
-        SysRole info   = roleMapper.checkRoleKeyUnique( role.getRoleKey() );
+        SysRole info   = this.baseMapper.checkRoleKeyUnique( role.getRoleKey() );
         if ( StringUtils.isNotNull( info ) && info.getRoleId() != roleId ) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -170,8 +169,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     @Transactional
     public int insertRole( SysRole role ) {
+        role.setCreateTime( LocalDateTime.now() );
         // 新增角色信息
-        roleMapper.insertRole( role );
+        this.baseMapper.insert( role );
         return insertRoleMenu( role );
     }
 
@@ -185,8 +185,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     @Transactional
     public int updateRole( SysRole role ) {
+        role.setUpdateTime( LocalDateTime.now() );
         // 修改角色信息
-        roleMapper.updateRole( role );
+        this.baseMapper.updateById( role );
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId( role.getRoleId() );
         return insertRoleMenu( role );
@@ -201,7 +202,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public int updateRoleStatus( SysRole role ) {
-        return roleMapper.updateRole( role );
+        role.setUpdateTime( LocalDateTime.now() );
+        return this.baseMapper.updateById( role );
     }
 
     /**
@@ -237,7 +239,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public int deleteRoleById( Long roleId ) {
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId( roleId );
-        return roleMapper.deleteRoleById( roleId );
+        return this.baseMapper.deleteRoleById( roleId );
     }
 
     /**
@@ -259,7 +261,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         }
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenu( roleIds );
-        return roleMapper.deleteRoleByIds( roleIds );
+        return this.baseMapper.deleteRoleByIds( roleIds );
     }
 
     @Override

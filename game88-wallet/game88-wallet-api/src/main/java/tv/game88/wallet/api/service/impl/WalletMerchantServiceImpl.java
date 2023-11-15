@@ -1,8 +1,13 @@
 package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.entity.WalletMerchant;
+import tv.game88.wallet.api.manager.WalletFundManager;
 import tv.game88.wallet.api.mapper.WalletMerchantMapper;
 import tv.game88.wallet.api.service.WalletMerchantService;
 
@@ -15,6 +20,11 @@ import java.util.List;
  */
 @Service
 public class WalletMerchantServiceImpl extends ServiceImpl<WalletMerchantMapper, WalletMerchant> implements WalletMerchantService {
+    @Resource
+    private RedisUtils        redisUtils;
+    @Resource
+    private WalletFundManager walletFundManager;
+
     /**
      * 查询钱包商户列表
      *
@@ -25,6 +35,24 @@ public class WalletMerchantServiceImpl extends ServiceImpl<WalletMerchantMapper,
     @Override
     public List<WalletMerchant> selectWalletMerchantList( WalletMerchant walletMerchant ) {
         return this.baseMapper.selectWalletMerchantList( walletMerchant );
+    }
+
+    @Override
+    public RspBase<?> addScore( String ip, String username, ReqConstant.ReqMerchantAddScore req ) {
+        if ( !redisUtils.lock( "merchantAddScore" + req.merchantId(), 15 ) ) {
+            return RspBase.businessError( "请勿重复提交" );
+        }
+        //walletFundManager.addWalletMerchantMoney(  );
+        return null;
+    }
+
+    @Override
+    public RspBase<?> reduceScore( String ip, String username, ReqConstant.ReqMerchantAddScore req ) {
+        if ( !redisUtils.lock( "merchantReduceScore" + req.merchantId(), 15 ) ) {
+            return RspBase.businessError( "请勿重复提交" );
+        }
+        //walletFundManager.reduceWalletMerchantMoney(  );
+        return null;
     }
 }
 

@@ -12,7 +12,7 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.service.ISysRoleService;
+import tv.game88.admin.system.service.ISysRoleService;
 import tv.game88.core.admin.utils.SecurityUtils;
 
 import jakarta.annotation.Resource;

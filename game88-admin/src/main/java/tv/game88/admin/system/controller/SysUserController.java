@@ -19,19 +19,21 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.KeyConstants;
+import tv.game88.core.admin.constant.RecordConstants;
 import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.mapper.SysUserMapper;
-import tv.game88.core.admin.service.ISysRoleService;
-import tv.game88.core.admin.service.ISysUserService;
+import tv.game88.admin.system.service.ISysRoleService;
+import tv.game88.admin.system.service.ISysUserService;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +151,7 @@ public class SysUserController extends BaseController {
         SysUser user = new SysUser( userResetPwdReq.getUserId() );
         user.setPassword( passwordEncoder.encode( userResetPwdReq.getPassword() ) );
         user.setUpdateBy( SecurityUtils.getUsername() );
+        user.setUpdateTime( LocalDateTime.now() );
         return toResult( userService.resetPwd( user ) );
     }
 
@@ -183,12 +186,12 @@ public class SysUserController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('system:user:resetOtp')" )
     @DeleteMapping( "resetUserOtpSecret" )
     @Log( title = "重置用户MFA秘钥", businessType = BusinessType.DELETE )
-    public RspBase<?> resetUserOtpSecret( Long userId, int otpAuthCode ) throws Exception {
-        SecurityUtils.verifyMFACode( otpAuthCode );
-        SysUser sysUser = new SysUser( userId );
+    public RspBase<?> resetUserOtpSecret( @RequestBody RecordConstants.ReqResetUserOtpSecret req ) throws Exception {
+        SecurityUtils.verifyMFACode( req.otpAuthCode() );
+        SysUser sysUser = new SysUser( req.userId() );
         sysUser.setOtpSecret( null );
         sysUserMapper.updateOtpSecret( sysUser );
-        sysUserTokenService.delToken( userId );
+        sysUserTokenService.delToken( req.userId() );
         return RspBase.ok();
     }
 
@@ -197,12 +200,9 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('system:user:resetOtp')" )
     @PostMapping( "boundOtpSecret" )
-    public RspBase<?> boundOtpSecret( @RequestBody Map<String, Object> requestMap ) throws Exception {
-        int    otpAuthCode = Integer.parseInt( requestMap.getOrDefault( "otpAuthCode", 0 ).toString() );
-        String otpAuthKey  = requestMap.getOrDefault( "otpAuthKey", "" ).toString();
-        String otpAuthName = requestMap.getOrDefault( "otpAuthName", "" ).toString();
-        if ( GoogleAuthUtil.verifyCode( otpAuthKey, otpAuthCode ) ) {
-            SysUser sysUser = userService.selectOtpSecretByUserName( otpAuthName );
+    public RspBase<?> boundOtpSecret( @RequestBody RecordConstants.ReqBoundOtpSecret req ) throws Exception {
+        if ( GoogleAuthUtil.verifyCode( req.otpAuthKey(), req.otpAuthCode() ) ) {
+            SysUser sysUser = userService.selectOtpSecretByUserName( req.otpAuthName() );
             if ( sysUser == null ) {
                 return RspBase.businessError( "获取用户账户异常" );
             }
@@ -210,7 +210,7 @@ public class SysUserController extends BaseController {
             if ( StringUtils.isNotBlank( sysUser.getOtpSecret() ) ) {
                 return RspBase.businessError( "该账户已绑定谷MFA验证器，请勿重复绑定" );
             }
-            sysUser.setOtpSecret( RSACoder.encryptByPublicKey( otpAuthKey, KeyConstants.GOOGLE_AUTH_PUBLIC_KEY ) );
+            sysUser.setOtpSecret( RSACoder.encryptByPublicKey( req.otpAuthKey(), KeyConstants.GOOGLE_AUTH_PUBLIC_KEY ) );
             sysUserMapper.updateOtpSecret( sysUser );
             return RspBase.ok();
         }

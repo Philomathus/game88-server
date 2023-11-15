@@ -1,4 +1,4 @@
-package tv.game88.wallet.api.sse;
+package tv.game88.wallet.app.see;
 
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
-import static tv.game88.wallet.api.sse.model.StreamMessageType.CONNECTION;
+import static tv.game88.wallet.api.type.StreamMessageType.CONNECTION;
 
 @Service
 @RequiredArgsConstructor

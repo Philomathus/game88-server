@@ -17,7 +17,7 @@ import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysMenu;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.security.service.SysPermissionService;
-import tv.game88.core.admin.service.ISysMenuService;
+import tv.game88.admin.system.service.ISysMenuService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginBody;
 import tv.game88.core.admin.vo.LoginUser;

@@ -7,7 +7,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.entity.SysOperLog;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.service.ISysOperLogService;
+import tv.game88.admin.system.service.ISysOperLogService;
 import tv.game88.common.base.BaseController;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

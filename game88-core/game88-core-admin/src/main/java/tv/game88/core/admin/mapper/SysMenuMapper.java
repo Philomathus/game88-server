@@ -21,21 +21,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
 	public List<SysMenu> selectMenuList( SysMenu menu );
 
 	/**
-	 * 根据用户所有权限
-	 *
-	 * @return 权限列表
-	 */
-	public List<String> selectMenuPerms();
-
-	/**
-	 * 根据用户查询系统菜单列表
-	 *
-	 * @param menu 菜单信息
-	 * @return 菜单列表
-	 */
-	public List<SysMenu> selectMenuListByUserId( SysMenu menu );
-
-	/**
 	 * 根据用户ID查询权限
 	 *
 	 * @param userId 用户ID
@@ -67,46 +52,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
 	 */
 	public List<Integer> selectMenuListByRoleId( @Param( "roleId" ) Long roleId,
 												 @Param( "menuCheckStrictly" ) boolean menuCheckStrictly );
-
-	/**
-	 * 根据菜单ID查询信息
-	 *
-	 * @param menuId 菜单ID
-	 * @return 菜单信息
-	 */
-	public SysMenu selectMenuById( Long menuId );
-
-	/**
-	 * 是否存在菜单子节点
-	 *
-	 * @param menuId 菜单ID
-	 * @return 结果
-	 */
-	public int hasChildByMenuId( Long menuId );
-
-	/**
-	 * 新增菜单信息
-	 *
-	 * @param menu 菜单信息
-	 * @return 结果
-	 */
-	public int insertMenu( SysMenu menu );
-
-	/**
-	 * 修改菜单信息
-	 *
-	 * @param menu 菜单信息
-	 * @return 结果
-	 */
-	public int updateMenu( SysMenu menu );
-
-	/**
-	 * 删除菜单管理信息
-	 *
-	 * @param menuId 菜单ID
-	 * @return 结果
-	 */
-	public int deleteMenuById( Long menuId );
 
 	/**
 	 * 校验菜单名称是否唯一
