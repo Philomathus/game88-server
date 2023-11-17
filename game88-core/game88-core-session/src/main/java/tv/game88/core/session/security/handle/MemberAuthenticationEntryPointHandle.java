@@ -9,6 +9,8 @@ import tv.game88.common.vo.RspBase;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -18,6 +20,7 @@ import java.io.Serializable;
  */
 @Component
 public class MemberAuthenticationEntryPointHandle implements AuthenticationEntryPoint, Serializable {
+    @Serial
     private static final long serialVersionUID = -897071841347577606L;
 
     @Override

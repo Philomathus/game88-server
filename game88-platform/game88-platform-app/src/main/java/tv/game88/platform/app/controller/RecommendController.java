@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
+import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.dto.RspMemberRecommend;
 import tv.game88.core.member.dto.RspMyRecommend;
@@ -57,6 +58,7 @@ public class RecommendController extends BaseController {
 
     @Operation( summary = "推广说明" )
     @PostMapping( "/getRecommendDesc" )
+    @Anonymous
     public RspBase<List<ConfigRecommend>> getRecommendDesc() {
         return RspBase.ok( recommendService.getRecommendDesc() );
     }
