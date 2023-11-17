@@ -123,4 +123,5 @@ public interface ISysUserService extends IService<SysUser> {
 	 */
 	public int deleteUserByIds( Long[] userIds );
 
+    void updateOtpSecret( SysUser sysUser );
 }

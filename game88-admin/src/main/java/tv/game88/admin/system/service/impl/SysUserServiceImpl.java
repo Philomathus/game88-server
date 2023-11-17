@@ -251,4 +251,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return this.baseMapper.deleteUserByIds( userIds );
     }
 
+    @Override
+    public void updateOtpSecret( SysUser sysUser ) {
+        this.baseMapper.updateOtpSecret( sysUser );
+    }
 }

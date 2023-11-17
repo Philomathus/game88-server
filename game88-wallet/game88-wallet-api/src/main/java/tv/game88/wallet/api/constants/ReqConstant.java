@@ -18,7 +18,7 @@ public class ReqConstant {
 
     public record ReqMerchantAddScore(Long merchantId, Integer googleAuthCode, BigDecimal score) {}
 
-    public record ReqResetMerchantOtpSecret(
+    public record ReqMerchantOtpCode(
             @Schema( title = "商户号", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "商户ID不能为空" ) Long merchantId,
             @Schema( title = "MFA验证码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "MFA验证码不能为空" ) Integer otpAuthCode) {}
 
@@ -26,4 +26,9 @@ public class ReqConstant {
             @Schema( title = "商户号", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "商户ID不能为空" ) Long merchantId,
             @Schema( title = "MFA验证码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "MFA验证码不能为空" ) Integer otpAuthCode,
             @Schema( title = "MFA密钥", requiredMode = Schema.RequiredMode.REQUIRED ) @NotBlank( message = "MFA密钥不能为空" ) String otpAuthKey) {}
+
+    public record ReqMerchantChangeStatus(
+            @Schema( title = "商户号", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "商户ID不能为空" ) Long merchantId,
+            @Schema( title = "MFA验证码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "MFA验证码不能为空" ) Integer otpAuthCode,
+            @Schema( title = "状态", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "状态不能为空" ) Integer status) {}
 }

@@ -101,11 +101,61 @@ public class WalletMerchantController extends BaseController {
         return walletMerchantService.reduceScore( ServletUtil.getIp(), SecurityUtils.getUsername(), req );
     }
 
-    // TODO 重置商户MD5密钥
+    /**
+     * 重置商户MD5密钥
+     */
+    @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:resetPwd')" )
+    @DeleteMapping( "resetMd5key" )
+    @Log( title = "重置商户MD5密钥", businessType = BusinessType.DELETE )
+    public RspBase<?> resetMd5key( @Validated @RequestBody ReqConstant.ReqMerchantOtpCode req ) throws Exception {
+        SecurityUtils.verifyMFACode( req.otpAuthCode() );
+        String md5Key = DigestUtils.md5Hex( System.currentTimeMillis() + RandomStringUtils.randomAlphabetic( 2 ) );
+        boolean update = walletMerchantService
+                .lambdaUpdate()
+                .set( WalletMerchant::getMd5Key, AESCoder.encrypt( md5Key ) )
+                .set( WalletMerchant::getUpdatedTime, LocalDateTime.now() )
+                .eq( WalletMerchant::getId, req.merchantId() )
+                .update();
+        return toResult( update );
+    }
 
-    // TODO 重置商户登录密码
+    /**
+     * 重置商户登录密码
+     */
+    @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:resetPwd')" )
+    @DeleteMapping( "resetPassword" )
+    @Log( title = "重置商户登录密码", businessType = BusinessType.DELETE )
+    public RspBase<?> resetPassword( @Validated @RequestBody ReqConstant.ReqMerchantOtpCode req ) throws Exception {
+        SecurityUtils.verifyMFACode( req.otpAuthCode() );
+        // 初始密码a123456
+        boolean update = walletMerchantService
+                .lambdaUpdate()
+                .set( WalletMerchant::getPassword, passwordEncoder.encode( "a123456" ) )
+                .set( WalletMerchant::getUpdatedTime, LocalDateTime.now() )
+                .eq( WalletMerchant::getId, req.merchantId() )
+                .update();
+        return toResult( update );
+    }
 
-    // TODO 修改商户状态
+    /**
+     * 修改商户状态
+     */
+    @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:edit')" )
+    @Log( title = "修改商户状态", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeStatus" )
+    public RspBase<?> changeStatus( @Validated @RequestBody ReqConstant.ReqMerchantChangeStatus req ) throws Exception {
+        SecurityUtils.verifyMFACode( req.otpAuthCode() );
+        boolean update = walletMerchantService
+                .lambdaUpdate()
+                .set( WalletMerchant::getStatus, req.status() )
+                .set( WalletMerchant::getUpdatedTime, LocalDateTime.now() )
+                .eq( WalletMerchant::getId, req.merchantId() )
+                .update();
+        if ( update && req.status() == 0 ) {
+            // TODO 需要清空商户登录token walletMerchantTokenService.delToken( req.merchantId() );
+        }
+        return toResult( update );
+    }
 
     /**
      * 获取MFA验证码二维码
@@ -124,13 +174,18 @@ public class WalletMerchantController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:walletMerchant:resetOtp')" )
     @DeleteMapping( "resetOtpSecret" )
     @Log( title = "重置用户MFA秘钥", businessType = BusinessType.DELETE )
-    public RspBase<?> resetOtpSecret( @Validated @RequestBody ReqConstant.ReqResetMerchantOtpSecret req ) throws Exception {
+    public RspBase<?> resetOtpSecret( @Validated @RequestBody ReqConstant.ReqMerchantOtpCode req ) throws Exception {
         SecurityUtils.verifyMFACode( req.otpAuthCode() );
-        WalletMerchant walletMerchant = new WalletMerchant();
-        walletMerchant.setId( req.merchantId() );
-        walletMerchant.setSecretKey( null );
-        // TODO 需要清空商户登录token walletMerchantTokenService.delToken( req.merchantId() );
-        return toResult( walletMerchantService.updateById( walletMerchant ) );
+        boolean update = walletMerchantService
+                .lambdaUpdate()
+                .set( WalletMerchant::getSecretKey, null )
+                .set( WalletMerchant::getUpdatedTime, LocalDateTime.now() )
+                .eq( WalletMerchant::getId, req.merchantId() )
+                .update();
+        if ( update ) {
+            // TODO 需要清空商户登录token walletMerchantTokenService.delToken( req.merchantId() );
+        }
+        return toResult( update );
     }
 
     /**
@@ -147,11 +202,11 @@ public class WalletMerchantController extends BaseController {
             if ( walletMerchant == null ) {
                 return RspBase.businessError( "商户不存在" );
             }
-            //当用户是重置OTP密钥
             if ( StringUtils.isNotBlank( walletMerchant.getSecretKey() ) ) {
                 return RspBase.businessError( "该商户已绑定谷MFA验证器，请勿重复绑定" );
             }
             walletMerchant.setSecretKey( RSACoder.encryptByPublicKey( req.otpAuthKey(), KeyConstants.GOOGLE_AUTH_PUBLIC_KEY ) );
+            walletMerchant.setUpdatedTime( LocalDateTime.now() );
             return toResult( walletMerchantService.updateById( walletMerchant ) );
         }
         return RspBase.businessError( "MFA验证码不正确，请检查" );

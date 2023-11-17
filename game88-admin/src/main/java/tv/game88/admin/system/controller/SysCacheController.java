@@ -27,11 +27,11 @@ public class SysCacheController {
 
     @PreAuthorize( "@ss.hasPermi('monitor:cache:list')" )
     @GetMapping()
-    public RspBase<Map<String, Object>> getInfo() throws Exception {
+    public RspBase<Map<String, Object>> getInfo() {
         Properties info = ( Properties ) stringRedisTemplate.execute( ( RedisCallback<Object> ) RedisServerCommands::info );
-        Properties commandStats =
-				( Properties ) stringRedisTemplate.execute( ( RedisCallback<Object> ) connection -> connection.info(
-						"commandstats" ) );
+        Properties commandStats = ( Properties ) stringRedisTemplate.execute( ( RedisCallback<Object> ) connection -> connection
+                .serverCommands()
+                .info( "commandstats" ) );
         Object dbSize = stringRedisTemplate.execute( ( RedisCallback<Object> ) RedisServerCommands::dbSize );
 
         Map<String, Object> result = new HashMap<>( 3 );

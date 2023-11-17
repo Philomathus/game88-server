@@ -1,12 +1,16 @@
 package tv.game88.admin.system.controller;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.admin.system.entity.req.UserResetPwdReq;
+import tv.game88.admin.system.service.ISysRoleService;
+import tv.game88.admin.system.service.ISysUserService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.exception.BusinessException;
@@ -24,14 +28,8 @@ import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.core.admin.mapper.SysUserMapper;
-import tv.game88.admin.system.service.ISysRoleService;
-import tv.game88.admin.system.service.ISysUserService;
 import tv.game88.core.admin.security.service.SysUserTokenService;
 import tv.game88.core.admin.utils.SecurityUtils;
-
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -55,10 +53,9 @@ public class SysUserController extends BaseController {
     private ISysRoleService     roleService;
     @Resource
     private SysUserTokenService sysUserTokenService;
-    @Resource
-    private SysUserMapper       sysUserMapper;
+
     @Value( "${spring.profiles.active}" )
-    private String              profile;
+    private String profile;
 
     /**
      * 获取用户列表
@@ -190,7 +187,7 @@ public class SysUserController extends BaseController {
         SecurityUtils.verifyMFACode( req.otpAuthCode() );
         SysUser sysUser = new SysUser( req.userId() );
         sysUser.setOtpSecret( null );
-        sysUserMapper.updateOtpSecret( sysUser );
+        userService.updateOtpSecret( sysUser );
         sysUserTokenService.delToken( req.userId() );
         return RspBase.ok();
     }
@@ -211,7 +208,7 @@ public class SysUserController extends BaseController {
                 return RspBase.businessError( "该账户已绑定谷MFA验证器，请勿重复绑定" );
             }
             sysUser.setOtpSecret( RSACoder.encryptByPublicKey( req.otpAuthKey(), KeyConstants.GOOGLE_AUTH_PUBLIC_KEY ) );
-            sysUserMapper.updateOtpSecret( sysUser );
+            userService.updateOtpSecret( sysUser );
             return RspBase.ok();
         }
         return RspBase.businessError( "MFA验证码不正确，请检查" );
