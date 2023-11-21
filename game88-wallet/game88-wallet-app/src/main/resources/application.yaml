@@ -87,7 +87,7 @@ pagehelper:
 # token配置
 token:
   # 令牌有效期（默认1天）
-  expireTime: 7
+  expireTime: 3
 
 swagger:
   title: Game88 Wallet App Swagger 3 Api Documentation
