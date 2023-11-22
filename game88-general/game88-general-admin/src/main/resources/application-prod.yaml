@@ -102,6 +102,10 @@ spring:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77cp_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
+        slave_77baby:
+          url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77baby_main?useUnicode=true&allowMultiQueries=true
+          username: admin
+          password: dRmBstReqberz!14Xm#
   data:
     redis:
       host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
