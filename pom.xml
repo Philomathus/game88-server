@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.0</version>
         <relativePath />
     </parent>
 
@@ -36,13 +36,13 @@
         <spring.boot.version>${project.parent.version}</spring.boot.version>
 
         <mysql-connector-java.version>8.2.0</mysql-connector-java.version>
-        <mybatis-spring-boot-starter.version>3.0.2</mybatis-spring-boot-starter.version>
+        <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper.starter.version>2.0.0</pagehelper.starter.version>
         <mybatis-plus.version>3.5.4.1</mybatis-plus.version>
         <dynamic.datasource.version>4.2.0</dynamic.datasource.version>
 
         <springdoc.version>2.2.0</springdoc.version>
-        <swagger-annotation.version>2.2.15</swagger-annotation.version>
+        <swagger-annotation.version>2.2.19</swagger-annotation.version>
         <commons-lang3.version>3.13.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.15.0</commons-io.version>
@@ -57,13 +57,13 @@
         <telegrambots.version>6.8.0</telegrambots.version>
         <zxing.version>3.5.2</zxing.version>
 
-        <tencentcloud.vesion>3.1.898</tencentcloud.vesion>
+        <tencentcloud.vesion>3.1.914</tencentcloud.vesion>
         <aliyun.core.version>4.6.4</aliyun.core.version>
         <aliyun.oss.version>3.17.2</aliyun.oss.version>
         <aliyun.sts.version>3.1.2</aliyun.sts.version>
         <aliyun.dysmsapi.version>2.2.1</aliyun.dysmsapi.version>
-        <baidubce.version>0.10.285</baidubce.version>
-        <amazon.s3.version>1.12.581</amazon.s3.version>
+        <baidubce.version>0.10.288</baidubce.version>
+        <amazon.s3.version>1.12.595</amazon.s3.version>
 
         <!-- plugin -->
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>

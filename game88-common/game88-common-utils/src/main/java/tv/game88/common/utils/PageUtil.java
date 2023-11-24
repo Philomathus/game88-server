@@ -1,11 +1,13 @@
 package tv.game88.common.utils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PageUtil implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	public static <T> List<T> pageBySubList( List<T> list, int pagesize, int currentPage ) {
