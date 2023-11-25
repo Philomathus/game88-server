@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -39,7 +40,7 @@ public class CXXMPayProcessor extends AbstractPay {
         //        params.put( "clientIp", reqPayRecharge.getRealIp() );
         //        params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
 
-        String signStr = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.info( signStr );
         params.put( "sign", DigestUtils.md5Hex( signStr ).toUpperCase() );
 
@@ -66,7 +67,7 @@ public class CXXMPayProcessor extends AbstractPay {
         params.put( "userCode", payPlatform.getMerId() );
         params.put( "orderId", memberRechargeOnline.getOrderNo() );
 
-        String sign = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         sign = DigestUtils.md5Hex( sign ).toUpperCase();
         params.put( "sign", sign );
         log.warn( JsonUtil.object2Json( params ) );
@@ -109,7 +110,7 @@ public class CXXMPayProcessor extends AbstractPay {
         requestMap.remove( "errMsg" );
 
         SortedMap<String, Object> bodyMap  = new TreeMap<>( requestMap );
-        String                    signTemp = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String                    signTemp = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String mySign = DigestUtils.md5Hex( signTemp ).toUpperCase();
 
         String status = requestMap.getOrDefault( "orderStatus", "1" ).toString();
