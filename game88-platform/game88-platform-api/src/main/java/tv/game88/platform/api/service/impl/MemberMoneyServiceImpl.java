@@ -19,6 +19,7 @@ import tv.game88.core.member.mapper.MemberMoneyMapper;
 import tv.game88.platform.api.service.MemberMoneyService;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -35,15 +36,15 @@ import java.util.List;
 public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, MemberMoney> implements MemberMoneyService {
 
     @Resource
-    private MemberMoneyMapper memberMoneyMapper;
+    private MemberMoneyMapper  memberMoneyMapper;
     @Resource
-    private MemberInfoMapper memberInfoMapper;
+    private MemberInfoMapper   memberInfoMapper;
     @Resource
     private MemberMoneyManager memberMoneyManager;
     @Resource
-    private LogMoneyMapper logMoneyMapper;
+    private LogMoneyMapper     logMoneyMapper;
     @Resource
-    private RedisUtils redisUtils;
+    private RedisUtils         redisUtils;
 
     private static final String LOCK_KEY = "initStarSend";
 
@@ -51,11 +52,12 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
      * 查询派送彩金暂存表列表
      *
      * @param memberMoney 派送彩金暂存表
+     *
      * @return 派送彩金暂存表
      */
     @Override
-    public List<MemberMoney> selectAllMemberMoneyList(MemberMoney memberMoney) {
-        return memberMoneyMapper.selectMemberMoneyList(memberMoney);
+    public List<MemberMoney> selectAllMemberMoneyList( MemberMoney memberMoney ) {
+        return memberMoneyMapper.selectMemberMoneyList( memberMoney );
     }
 
     /**
@@ -75,78 +77,75 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
     }
 
     @Override
-    public RspBase<?> starSend(MemberMoney memberMoney, String adminName) {
+    public RspBase<?> starSend( MemberMoney memberMoney, String adminName ) {
         String key = memberMoney.getMoneydes();
-        if (!lockUnlock(key, true)) {
-            throw new BusinessException("请勿重复提交");
+        if ( !lockUnlock( key, true ) ) {
+            throw new BusinessException( "请勿重复提交" );
         }
-        List<MemberMoney> memberMoneyList = memberMoneyMapper.selectMemberMoneyList(new MemberMoney());
+        List<MemberMoney> memberMoneyList = memberMoneyMapper.selectMemberMoneyList( new MemberMoney() );
 
-        log.info("STARSEND: List size - {}", memberMoneyList.size());
-        if (memberMoneyList.size() > 0) {
-            BigDecimal deliveryLimit = new BigDecimal(10000);
+        log.info( "STARSEND: List size - {}", memberMoneyList.size() );
+        if ( !memberMoneyList.isEmpty() ) {
+            BigDecimal deliveryLimit = new BigDecimal( 10000 );
 
-            MemberMoneyService memberMoneyService = SpringUtils.getBean( MemberMoneyService.class );
-            memberMoneyList.forEach(memberData -> {
-                if (memberData.getMoney().compareTo(deliveryLimit) >= 0) {
-                    throw new BusinessException(String.format("会员%s派送金额超过一万, 派送金额:%s",
-                            memberData.getId(), memberData.getMoney()));
+            memberMoneyList.forEach( memberData -> {
+                if ( memberData.getMoney().compareTo( deliveryLimit ) >= 0 ) {
+                    throw new BusinessException( String.format( "会员%s派送金额超过一万, 派送金额:%s", memberData.getId(),
+                            memberData.getMoney() ) );
                 }
-                MemberInfo memberInfo = getMemberInfo(memberData.getId(), key);
-                log.info("STARSEND: Processing memberMoney ID: {}, memberInfo nickName: {}",
-                        memberData.getId(), memberInfo.getNickName());
-                memberMoneyService.processMoney(memberData, memberInfo, adminName, key);
-            });
+                MemberInfo memberInfo = getMemberInfo( memberData.getId(), key );
+                log.info( "STARSEND: Processing memberMoney ID: {}, memberInfo nickName: {}", memberData.getId(),
+                        memberInfo.getNickName() );
+                SpringUtils.getAopProxy( this ).processMoney( memberData, memberInfo, adminName, key );
+            } );
         } else {
-            lockUnlock(key, false);
-            throw new BusinessException("请先上传有数据的excel");
+            lockUnlock( key, false );
+            throw new BusinessException( "请先上传有数据的excel" );
         }
         memberInfoMapper.clearMemberMoney();
-        lockUnlock(key, false);
-        return RspBase.ok("success");
+        lockUnlock( key, false );
+        return RspBase.ok( "success" );
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional( rollbackFor = Exception.class )
     public void processMoney( MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes ) {
-        String startOfToday = LocalDateTimeUtils.format(LocalDateTimeUtils.getStartOfToday());
-        String today = LocalDateTimeUtils.format(LocalDate.now());
-        String userId = memberMoney.getId();
-        BigDecimal money = memberMoney.getMoney();
-        String markOrder = "CJ" + today + memberMoney.getId() + "_" +
-                money.setScale(0, RoundingMode.HALF_UP) + moneyDes;
+        String     startOfToday = LocalDateTimeUtils.format( LocalDateTimeUtils.getStartOfToday() );
+        String     today        = LocalDateTimeUtils.format( LocalDate.now() );
+        String     userId       = memberMoney.getId();
+        BigDecimal money        = memberMoney.getMoney();
+        String markOrder = "CJ" + today + memberMoney.getId() + "_" + money.setScale( 0, RoundingMode.HALF_UP ) + moneyDes;
         List<LogMoney> markList;
 
-        if (money.compareTo(BigDecimal.ZERO) > 0) {
-            markList = logMoneyMapper.findMark(userId, markOrder, money, null,
-                    userId.substring(userId.length() - 1), startOfToday);
+        if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
+            markList = logMoneyMapper.findMark( userId, markOrder, money, null, userId.substring(
+                    userId.length() - 1 ), startOfToday );
         } else {
-            markList = logMoneyMapper.findMark(userId, markOrder, null, money.negate(),
-                    userId.substring(userId.length() - 1), startOfToday);
+            markList = logMoneyMapper.findMark( userId, markOrder, null, money.negate(), userId.substring(
+                    userId.length() - 1 ), startOfToday );
         }
-        if (markList.size() > 0) {
-            lockUnlock(moneyDes, false);
+        if ( !markList.isEmpty() ) {
+            lockUnlock( moneyDes, false );
             throw new BusinessException(
                     "派送失败.请查看此笔金额是否今日已经入款过.如否请输入其他入款备注." + "会员id:" + userId + "入款金额" + money
-                            + "入款备注" + moneyDes);
+                            + "入款备注" + moneyDes );
         }
-        memberMoneyManager.addMemberMoneyStarSend(memberMoney, memberInfo, markOrder, adminName, moneyDes);
+        memberMoneyManager.addMemberMoneyStarSend( memberMoney, memberInfo, markOrder, adminName, moneyDes );
     }
 
-    private MemberInfo getMemberInfo(String id, String key) {
-        MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById(id);
-        if (memberInfo == null) {
-            lockUnlock(key, false);
-            throw new BusinessException("会员id不存在:" + id);
+    private MemberInfo getMemberInfo( String id, String key ) {
+        MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById( id );
+        if ( memberInfo == null ) {
+            lockUnlock( key, false );
+            throw new BusinessException( "会员id不存在:" + id );
         }
         return memberInfo;
     }
 
-    private boolean lockUnlock(String key, boolean lock) {
-        if (lock) {
-            return redisUtils.lock(LOCK_KEY + key, 50);
+    private boolean lockUnlock( String key, boolean lock ) {
+        if ( lock ) {
+            return redisUtils.lock( LOCK_KEY + key, 50 );
         } else {
-            return redisUtils.unLock(LOCK_KEY + key);
+            return redisUtils.unLock( LOCK_KEY + key );
         }
     }
 }

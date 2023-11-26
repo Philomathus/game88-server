@@ -172,8 +172,7 @@ public class PayAgentServiceImpl implements PayAgentService {
         }
 
         reqPayAgent.setCurrentTime( LocalDateTime.now() );
-        PayAgentService payAgentService = SpringUtils.getBean( PayAgentService.class );
-        payAgentService.processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4 );
+        SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4 );
         BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
         if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, reqPayAgent ) ) {
             return RspBase.ok( "代付订单提交成功" );
@@ -226,7 +225,6 @@ public class PayAgentServiceImpl implements PayAgentService {
 
         Map<String, String> failReasonList  = new TreeMap<>();
         int                 sucessNum       = 0;
-        PayAgentService     payAgentService = SpringUtils.getBean( PayAgentService.class );
         for ( MemberWithdrawDetail withdrawLog : withdrawLogs ) {
             long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
                     .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
@@ -248,7 +246,7 @@ public class PayAgentServiceImpl implements PayAgentService {
             newReqPayAgent.setCurrentTime( LocalDateTime.now() );
             newReqPayAgent.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
             try {
-                payAgentService.processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4 );
+                SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4 );
 
                 if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, newReqPayAgent ) ) {
                     sucessNum++;

@@ -32,6 +32,7 @@ import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.PayService;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -157,14 +158,13 @@ public class PayServiceImpl implements PayService {
         }
 
         try {
-            SpringUtils.getBean( PayService.class ).updatePayJourStatus( memberRechargeOnline, mark );
+            SpringUtils.getAopProxy( this ).updatePayJourStatus( memberRechargeOnline, mark );
             return notifyResultWays[ 0 ];
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             return notifyResultWays[ 1 ];
         }
     }
-
 
     @Transactional( rollbackFor = Exception.class )
     public void updatePayJourStatus( MemberRechargeOnline memberRechargeOnline, String mark ) {

@@ -1,5 +1,7 @@
 package tv.game88.pay.api.base;
 
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.IOUtils;
@@ -12,8 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
-import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.ConfigBankListCache;
+import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqPayAgent;
 import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
@@ -21,8 +23,6 @@ import tv.game88.pay.api.mapper.PayAgentLogMapper;
 import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
 import tv.game88.pay.api.service.PayAgentService;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;

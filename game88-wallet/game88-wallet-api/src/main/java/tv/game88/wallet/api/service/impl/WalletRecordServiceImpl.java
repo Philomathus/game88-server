@@ -66,7 +66,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         }
 
         // 先保存订单,等待会员主动请求支付并扣除会员金额, 再异步处理订单回调
-        SpringUtils.getBean( WalletRecordService.class ).saveOrderAndSendTask( reqDepositOrder, walletMerchant, 1 );
+        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqDepositOrder, walletMerchant, 1 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqDepositOrder.getMerchantId() ).eq( "order_no", reqDepositOrder.getOrderNo() ) );
@@ -102,7 +102,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         }
 
         // 先保存订单并添加会员金额, 再异步处理订单回调
-        SpringUtils.getBean( WalletRecordService.class ).saveOrderAndSendTask( reqWithdrawOrder, walletMerchant, 2 );
+        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqWithdrawOrder, walletMerchant, 2 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqWithdrawOrder.getMerchantId() ).eq( "order_no", reqWithdrawOrder.getOrderNo() ) );
@@ -135,7 +135,6 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Transactional( rollbackFor = Exception.class )
-    @Override
     public void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType ) {
         WalletRecord walletRecord = new WalletRecord();
         walletRecord.setTradeNo( GenerateOrderCacheUtils.me.getOrderIdNoTime( 32 ) );
@@ -298,13 +297,12 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             return RspBase.businessError( "用户余额不足" );
         }
         // 修改用户支付订单状态并扣除会员金额,然后异步通知支付回调
-        SpringUtils.getBean( WalletRecordService.class ).updateOrderAndSendTask( walletRecord );
+        SpringUtils.getAopProxy( this ).updateOrderAndSendTask( walletRecord );
 
         return RspBase.ok( "支付成功", null );
     }
 
     @Transactional( rollbackFor = Exception.class )
-    @Override
     public void updateOrderAndSendTask( WalletRecord walletRecord ) {
         WalletRecord update = new WalletRecord();
         update.setTradeNo( walletRecord.getTradeNo() );
