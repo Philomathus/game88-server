@@ -9,6 +9,9 @@ server:
   port: 18811
   max-http-request-header-size: 64KB
 spring:
+  threads:
+    virtual:
+      enabled: true
   profiles:
     active: 8800
   application:

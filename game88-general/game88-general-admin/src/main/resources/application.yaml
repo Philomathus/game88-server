@@ -9,6 +9,9 @@ server:
   port: 18852
   max-http-request-header-size: 64KB
 spring:
+  threads:
+    virtual:
+      enabled: true
   profiles:
     active: dev
   application:
