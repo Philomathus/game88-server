@@ -103,11 +103,14 @@ public class RestTemplateConfig {
         return HttpClients
                 .custom()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
-                        .create().setSSLSocketFactory( socketFactory ).build() )
+                        .create()
+                        .setSSLSocketFactory( socketFactory )
+                        .build() )
                 .build();
     }
 
-    private CloseableHttpClient getHttpClientNoRedirect() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    private CloseableHttpClient getHttpClientNoRedirect() throws NoSuchAlgorithmException, KeyStoreException,
+            KeyManagementException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
 
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
@@ -115,7 +118,9 @@ public class RestTemplateConfig {
                 .custom()
                 .disableRedirectHandling()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
-                        .create().setSSLSocketFactory( socketFactory ).build() )
+                        .create()
+                        .setSSLSocketFactory( socketFactory )
+                        .build() )
                 .build();
     }
 }
