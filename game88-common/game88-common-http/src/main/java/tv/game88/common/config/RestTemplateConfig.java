@@ -79,7 +79,9 @@ public class RestTemplateConfig {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
 
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
-        return HttpClients.custom()
+        return HttpClients
+                .custom()
+                .disableRedirectHandling()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
                         .create().setSSLSocketFactory( socketFactory ).build() )
                 .build();
