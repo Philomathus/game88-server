@@ -98,8 +98,47 @@ public class SmsApi {
             case 1 -> this.sendSmsAliyun( configSms, phone, code );
             case 2 -> this.sendSmsBaidu( configSms, phone, code );
             case 3 -> this.sendSmsHuawei( configSms, phone, code );
+            case 4 -> this.sendSmsYunJi( configSms, phone, code );
             default -> throw new BusinessException( "not found provider" );
         };
+    }
+
+    private String sendSmsYunJi( ConfigSms configSms, String phone, String code ) {
+        Map<String, Object> body = new HashMap<>();
+        body.put( "accessKey", configSms.getAppKey() );
+        body.put( "accessSecret", configSms.getAppAccess() );
+        body.put( "classificationSecret", configSms.getClassificationKey() );
+        body.put( "signCode", configSms.getSignature() );
+        body.put( "templateCode", configSms.getTemplate() );
+        body.put( "phone", phone );
+
+        // 变量参数用map存
+        Map<String, String> params = new HashMap<>();
+        // 验证码参数示例
+        params.put( "code", code );
+        body.put( "params", params );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( body, httpHeaders );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.postForObject( configSms.getEndpoint(), httpEntity, Map.class );
+            if ( !CollectionUtils.isEmpty( resultMap ) ) {
+                Map<String, Object> businessData = ( Map<String, Object> ) resultMap.get( "BusinessData" );
+                if ( !CollectionUtils.isEmpty( businessData ) ) {
+                    String rspCode = businessData.getOrDefault( "code", "0" ).toString();
+                    if ( "10000".equals( rspCode ) ) {
+                        return code;
+                    }
+                }
+            }
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        log.warn( "云极短信发送失败:{}", JsonUtil.object2Json( resultMap ) );
+        throw new BusinessException( "短信发送失败,请联系客服" );
     }
 
     private String sendSmsHuawei( ConfigSms configSms, String phone, String code ) {

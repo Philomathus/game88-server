@@ -58,6 +58,7 @@ public class ConfigSms {
      * 节点
      */
     private String        endpoint;
+    private String        classificationKey;
     /**
      * 更新时间
      */
