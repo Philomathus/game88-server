@@ -41,6 +41,15 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
+    @Bean( "restNoRedirectTemplate" )
+    @Lazy
+    public RestTemplate noRedirectTemplate() {
+        RestTemplate restTemplate = new RestTemplate( clientNoRedirectHttpRequestFactory() );
+        //设置字符集
+        setCharset( restTemplate );
+        return restTemplate;
+    }
+
     //设置字符集为UTF-8, 解决乱码问题
     private void setCharset( RestTemplate restTemplate ) {
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
@@ -75,7 +84,30 @@ public class RestTemplateConfig {
         }
     }
 
+    public HttpComponentsClientHttpRequestFactory clientNoRedirectHttpRequestFactory() {
+        try {
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient( getHttpClientNoRedirect() );
+            requestFactory.setConnectionRequestTimeout( 15000 );
+            requestFactory.setConnectTimeout( 10000 );
+            return requestFactory;
+        } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
+            throw new RuntimeException( e );
+        }
+    }
+
     private CloseableHttpClient getHttpClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
+
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
+        return HttpClients
+                .custom()
+                .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
+                        .create().setSSLSocketFactory( socketFactory ).build() )
+                .build();
+    }
+
+    private CloseableHttpClient getHttpClientNoRedirect() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
 
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
