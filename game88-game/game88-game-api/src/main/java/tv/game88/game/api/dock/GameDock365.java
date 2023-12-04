@@ -79,12 +79,11 @@ public class GameDock365 extends AbstractGameDock {
 
         log.warn( url + "         " + JsonUtil.object2Json( params ) );
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity( url, requestEntity, String.class );
-        URI location = responseEntity.getHeaders().getLocation();
-        reqJoinGame.setGameUrl( location == null ? null : location.toString() );
+        URI uri = restTemplate.postForLocation( url, requestEntity );
+        reqJoinGame.setGameUrl( uri == null ? null : uri.toString() );
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( responseEntity ), reqJoinGame.getGameMemberId() );
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( params ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }

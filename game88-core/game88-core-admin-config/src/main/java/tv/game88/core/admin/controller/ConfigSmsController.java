@@ -61,7 +61,6 @@ public class ConfigSmsController extends BaseController {
         return toResult( configSmsService.insertConfigSms( configSms ) );
     }
 
-
     /**
      * 修改短信配置配置
      * * Modify SMS config controller
@@ -74,7 +73,6 @@ public class ConfigSmsController extends BaseController {
         configSms.setUpdateTime( LocalDateTime.now() );
         return toResult( configSmsService.updateConfigOSms( configSms ) );
     }
-
 
     /**
      * 删除 SMS 配置配置
