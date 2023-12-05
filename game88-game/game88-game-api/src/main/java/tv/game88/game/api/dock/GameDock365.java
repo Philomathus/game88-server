@@ -2,7 +2,9 @@ package tv.game88.game.api.dock;
 
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,8 +14,8 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.core.game.constants.ConstantsGame;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
 

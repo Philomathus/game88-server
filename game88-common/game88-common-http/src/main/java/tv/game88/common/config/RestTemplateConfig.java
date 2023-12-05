@@ -60,7 +60,7 @@ public class RestTemplateConfig {
         }
     }
 
-    public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
+    private HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClient() );
@@ -72,7 +72,7 @@ public class RestTemplateConfig {
         }
     }
 
-    public HttpComponentsClientHttpRequestFactory clientUploadHttpRequestFactory() {
+    private HttpComponentsClientHttpRequestFactory clientUploadHttpRequestFactory() {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClient() );
@@ -84,7 +84,7 @@ public class RestTemplateConfig {
         }
     }
 
-    public HttpComponentsClientHttpRequestFactory clientNoRedirectHttpRequestFactory() {
+    private HttpComponentsClientHttpRequestFactory clientNoRedirectHttpRequestFactory() {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClientNoRedirect() );
@@ -104,6 +104,7 @@ public class RestTemplateConfig {
                 .custom()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
                         .create()
+                        .setMaxConnTotal( 500 )
                         .setSSLSocketFactory( socketFactory )
                         .build() )
                 .build();
