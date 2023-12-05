@@ -99,4 +99,11 @@ public class RandomUtils {
             System.out.println( randomDecimalWithMax( BigDecimal.valueOf( 0.01 ), BigDecimal.valueOf( 0.015 ) ) );
         }
     }
+
+    public static BigDecimal randomBigDecimalWithMax( BigDecimal min, BigDecimal max ) {
+        if ( min.compareTo( max ) > 0 ) {
+            return min;
+        }
+        return min.add( BigDecimal.valueOf( Math.random() ).multiply( max.subtract( min ) ) );
+    }
 }
