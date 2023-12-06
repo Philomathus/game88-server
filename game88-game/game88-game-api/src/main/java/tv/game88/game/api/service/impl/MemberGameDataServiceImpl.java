@@ -447,12 +447,14 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
             Set<String>  kindIds     = sumProfitKinds.stream().map( MemberGameData::getKindId ).collect( Collectors.toSet() );
             // 排除 热门游戏/老棋牌游戏/老电子游戏
             List<GameInfo> gameInfos = new QueryChainWrapper<>( gameInfoMapper )
+                    .select( "platform_id", "kind_id", "type_id" )
                     .in( "platform_id", platformIds )
                     .in( "kind_id", kindIds )
                     .notIn( "type_id", 1, 2, 4 )
+                    .groupBy( "platform_id", "kind_id", "type_id" )
                     .list();
 
-            List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
+            List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).in( "id", platformIds ).list();
             Map<Long, String> gamePlatformIdMap = gamePlatforms
                     .stream()
                     .collect( Collectors.toMap( GamePlatform::getId, GamePlatform::getName ) );
@@ -474,11 +476,11 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             }
                         } else {
                             String platformName = gamePlatformIdMap.get( memberGameData.getPlatformId().longValue() );
-                            if ( "棋牌".contains( platformName ) ) {
+                            if ( "棋牌" .contains( platformName ) ) {
                                 gameTypeId = 8L;
-                            } else if ( "电子".contains( platformName ) ) {
+                            } else if ( "电子" .contains( platformName ) ) {
                                 gameTypeId = 9L;
-                            } else if ( "视讯".contains( platformName ) ) {
+                            } else if ( "视讯" .contains( platformName ) ) {
                                 gameTypeId = 7L;
                             } else {
                                 log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
