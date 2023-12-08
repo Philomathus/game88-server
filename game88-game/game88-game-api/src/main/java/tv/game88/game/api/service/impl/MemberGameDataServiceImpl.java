@@ -463,8 +463,7 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                 for ( GameInfo gameInfo : gameInfos ) {
                     if ( memberGameData.getPlatformId() == gameInfo.getPlatformId().intValue() && (
                             memberGameData.getKindId().equals( gameInfo.getKindId() ) || gameInfo
-                                    .getKindId()
-                                    .endsWith( "-" + memberGameData.getKindId() ) ) ) {
+                                    .getKindId().endsWith( "-" + memberGameData.getKindId() ) ) ) {
                         Long       gameTypeId = gameInfo.getTypeId();
                         BigDecimal cellScore  = new BigDecimal( memberGameData.getCellScore() );
                         if ( gameTypeId != null ) {
@@ -476,11 +475,11 @@ public class MemberGameDataServiceImpl extends ServiceImpl<MemberGameDataMapper,
                             }
                         } else {
                             String platformName = gamePlatformIdMap.get( memberGameData.getPlatformId().longValue() );
-                            if ( "棋牌" .contains( platformName ) ) {
+                            if ( "棋牌".contains( platformName ) ) {
                                 gameTypeId = 8L;
-                            } else if ( "电子" .contains( platformName ) ) {
+                            } else if ( "电子".contains( platformName ) ) {
                                 gameTypeId = 9L;
-                            } else if ( "视讯" .contains( platformName ) ) {
+                            } else if ( "视讯".contains( platformName ) ) {
                                 gameTypeId = 7L;
                             } else {
                                 log.error( "未知的游戏信息 platformId:{};kindId:{}", memberGameData.getPlatformId(),
