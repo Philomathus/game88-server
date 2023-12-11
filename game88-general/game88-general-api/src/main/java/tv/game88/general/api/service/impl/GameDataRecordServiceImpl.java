@@ -46,8 +46,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         int                  i       = 0;
         int                  num     = 0;
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-            LocalDateTime gameEndTime = LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
-            String        day         = LocalDateTimeUtils.format( gameEndTime, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
+            String        day         = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER );
             if ( mapper.findCount( gameDataRecord.getId(), TABLE_PREFIX + day ) > 0 ) {
                 continue;
             }
