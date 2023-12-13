@@ -131,7 +131,7 @@ public class ReportMoneyinfo implements Serializable {
     @Excel( name = "usdt人数" )
     private Long       usdtRenshu;
     @Excel( name = "usdt金额" )
-    private BigDecimal usetJine;
+    private BigDecimal usdtJine;
 
     private BigDecimal paymentAmount;//入款总额
     private BigDecimal outMoney;//出款总额
