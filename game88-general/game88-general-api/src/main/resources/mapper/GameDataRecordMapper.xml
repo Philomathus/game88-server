@@ -16,6 +16,7 @@
         <result column="cell_score" property="cellScore" />
         <result column="profit" property="profit" />
         <result column="revenue" property="revenue" />
+        <result column="currency" property="currency" />
         <result column="game_start_time" property="gameStartTime" />
         <result column="game_end_time" property="gameEndTime" />
         <result column="detail" property="detail" />
@@ -36,6 +37,7 @@
                cell_score,
                profit,
                revenue,
+               currency,
                game_start_time,
                game_end_time,
                detail
@@ -62,19 +64,19 @@
 
     <insert id="insertByTableName">
         insert into ${tableName}
-        (id, agent, game_agent, platform_id,
-         game_id, game_round, account, kind_id,
-         table_id, chair_id, all_bet, cell_score,
-         profit, revenue, game_start_time, game_end_time, detail)
+        (id, agent, game_agent, platform_id, game_id, game_round, account, kind_id,
+         table_id, chair_id, all_bet, cell_score, profit, revenue, currency, game_start_time, game_end_time, detail)
         values (#{data.id}, #{data.agent}, #{data.gameAgent},
                 #{data.platformId}, #{data.gameId}, #{data.gameRound},
                 #{data.account}, #{data.kindId}, #{data.tableId},
                 #{data.chairId}, #{data.allBet}, #{data.cellScore},
-                #{data.profit}, #{data.revenue}, #{data.gameStartTime},
+                #{data.profit}, #{data.revenue}, #{data.currency}, #{data.gameStartTime},
                 #{data.gameEndTime}, #{data.detail})
     </insert>
 
     <select id="findCount" resultType="java.lang.Long">
-        select count(1) from ${tableName} where id = #{id}
+        select count(1)
+        from ${tableName}
+        where id = #{id}
     </select>
 </mapper>

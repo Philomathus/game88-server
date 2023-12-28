@@ -27,7 +27,7 @@ public class LocalDateTimeUtils {
     public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
 
     public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH" + ":mm:ss.SSS'Z'" );
+            "yyyy-MM-dd'T'HH:mm:ssXXX" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
 

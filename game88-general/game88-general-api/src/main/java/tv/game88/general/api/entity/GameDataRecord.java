@@ -73,6 +73,10 @@ public class GameDataRecord {
      */
     private String revenue;
     /**
+     * 货币
+     */
+    private String currency;
+    /**
      * 游戏开始时间
      */
     private String gameStartTime;

@@ -21,7 +21,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>com.baomidou</groupId>
-                    <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+                    <artifactId>dynamic-datasource-spring</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.aliyun.oss</groupId>

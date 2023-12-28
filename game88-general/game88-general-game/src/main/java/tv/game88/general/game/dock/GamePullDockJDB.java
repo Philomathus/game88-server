@@ -86,7 +86,7 @@ public class GamePullDockJDB extends AbstractGamePull {
         if ( StringUtils.isBlank( seqNo ) ) {
             seqNo = String.valueOf( remoteGameDatum.get( "historyId" ) );
         }
-        if(StringUtils.isBlank( seqNo )){
+        if ( StringUtils.isBlank( seqNo ) ) {
             log.error( "seqNo为空" + JsonUtil.object2Json( object ) );
             return null;
         }
@@ -96,7 +96,7 @@ public class GamePullDockJDB extends AbstractGamePull {
         String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
         String agent    = null;
         String memberId = null;
-        if ( account.startsWith( "88" ) ) {
+        if ( account.startsWith( "88" ) || account.startsWith( "99" ) ) {
             if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
                 Matcher matcher = GET_NUMBER.matcher( account );
                 if ( matcher.find() ) {
@@ -116,7 +116,7 @@ public class GamePullDockJDB extends AbstractGamePull {
                 memberId = agent + "_" + memberAccount;
             }
         }
-        if ( agent == null || memberId == null ) {
+        if ( agent == null ) {
             return null;
         }
         gameDataRecord.setAccount( memberId );
@@ -126,16 +126,17 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "total" ) ) );
-        String        startTime      = remoteGameDatum.get( "gameDate" ).toString();
+        String startTime = remoteGameDatum.get( "gameDate" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
                 LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
-        String        endTime      = remoteGameDatum.get( "lastModifyTime" ).toString();
+        String endTime = remoteGameDatum.get( "lastModifyTime" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
                 LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+        gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         return gameDataRecord;
     }
 }
