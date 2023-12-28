@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.T1 + "GamePullProcessor" )
+@Repository( value = ConstantsGame.PG_SOFT + "GamePullProcessor" )
 public class GamePullDockPGSoft extends AbstractGamePull {
 
     @Override

@@ -49,7 +49,7 @@ public class GamePullDockPP extends AbstractGamePull {
             return text;
         } );
         if ( StringUtils.isNotBlank( resultStr ) ) {
-            
+
         }
         return null;
     }
