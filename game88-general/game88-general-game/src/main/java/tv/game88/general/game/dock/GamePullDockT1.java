@@ -52,8 +52,8 @@ public class GamePullDockT1 extends AbstractGamePull {
         params.put( "merchant_code", gamePlatform.getAgent() );
         params.put( "from", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "to", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
         params.put( "time_type", "2" );
+        params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
 
         String              url       = this.getURL( gamePlatform.getApiUrl(), "chain/query_game_history" );
         Map<String, Object> resultMap = execute( url, HttpMethod.GET, params );
@@ -107,6 +107,8 @@ public class GamePullDockT1 extends AbstractGamePull {
             params.put( "secure_key", gamePlatform.getMd5() );
             params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
 
+            log.warn( JsonUtil.object2Json( params ) );
+
             final String              url       = this.getURL( gamePlatform.getApiUrl(), "generate_token" );
             final Map<String, Object> resultMap = execute( url, HttpMethod.POST, params );
 
@@ -153,7 +155,8 @@ public class GamePullDockT1 extends AbstractGamePull {
     private static String generateSecureKey( Map<String, ?> params, String des ) {
         StringBuilder sb = new StringBuilder();
         params.values().stream().filter( v -> v instanceof String && !( ( String ) v ).isEmpty() ).forEach( sb::append );
-        return DigestUtils.sha1Hex( sb.toString().concat( des ) );
+        String concat = sb.toString().concat( des );
+        return DigestUtils.sha1Hex( concat );
     }
 
     private String getURL( final String apiURL, final String endpoint ) {
