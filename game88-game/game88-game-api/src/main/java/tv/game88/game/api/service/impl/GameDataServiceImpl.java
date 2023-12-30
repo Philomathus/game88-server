@@ -33,6 +33,7 @@ import tv.game88.game.api.mapper.MemberGameDataMapper;
 import tv.game88.game.api.service.GameDataService;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -75,13 +76,9 @@ public class GameDataServiceImpl implements GameDataService {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
 
-        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream()
-                                                                 .collect( Collectors.toMap( GamePlatform::getId,
-                                                                         Function.identity() ) );
-
-        /*List<RspGameDataLog> rspGameDataLogs = gameService.remoteDataGrab( start, end, account,
-                gameCategory != null ? Collections.singletonList( gamePlatformMap.get( gameCategory ).getId()
-                                                                                 .intValue() ) : null );*/
+        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms
+                .stream()
+                .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
 
         String day = end.substring( 0, 10 ).replace( "-", "" );
         List<GameDataRecord> gameDataRecords = gameDataRecordMapper.selectGameDataRecordAgentList(
@@ -126,8 +123,9 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
 
-            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() ).multiply( gamePlatform.getRateBeat() )
-                                                                                .setScale( 4, RoundingMode.HALF_UP );
+            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() )
+                    .multiply( gamePlatform.getRateBeat() )
+                    .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
 
@@ -148,8 +146,11 @@ public class GameDataServiceImpl implements GameDataService {
         }
         log.warn( "彩票拉取注单数量" + list.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-        GamePlatform gamePlatform = gamePlatforms.stream().filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
-                                                 .findFirst().get();
+        GamePlatform gamePlatform = gamePlatforms
+                .stream()
+                .filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
+                .findFirst()
+                .get();
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -278,8 +279,12 @@ public class GameDataServiceImpl implements GameDataService {
 
         }
 
-        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
-                                                        .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
+        List<ConfigVip> configVips = configVipCacheUtils
+                .getConfigVipMap()
+                .values()
+                .stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
+                .toList();
         for ( String userId : willCodeMap.keySet() ) {
             memberMoneyManager.checkAndUpdateVip( userId, configVips );
         }
@@ -288,7 +293,8 @@ public class GameDataServiceImpl implements GameDataService {
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
         List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                .eq( "effect", 1 ).gt( "game_type_id", 0 ) );
+                .eq( "effect", 1 )
+                .gt( "game_type_id", 0 ) );
 
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
@@ -306,8 +312,9 @@ public class GameDataServiceImpl implements GameDataService {
                         continue;
                     }
                     if ( Objects.equals( data.getPlatformId(), rspGameInfo.getPlatformId() ) && (
-                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId().endsWith(
-                                    "-" + data.getKindId() ) ) ) {
+                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo
+                                    .getKindId()
+                                    .endsWith( "-" + data.getKindId() ) ) ) {
                         y = true;
                         break;
                     }

@@ -119,7 +119,7 @@ public class GamePullDockT1 extends AbstractGamePull {
                     if ( StringUtils.isBlank( token ) ) {
                         throw new BusinessException( "获取token失败" );
                     }
-                    redisUtils.strSet( Constants.GAME_TOKEN_PREX + gamePlatform.getId(), token, Duration.ofMinutes( 119 ) );
+                    redisUtils.strSet( Constants.GAME_TOKEN_PREX + gamePlatform.getId(), token, Duration.ofMinutes( 110 ) );
                     return token;
                 }
             }
