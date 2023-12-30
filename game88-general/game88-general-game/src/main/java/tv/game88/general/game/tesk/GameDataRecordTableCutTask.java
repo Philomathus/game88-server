@@ -3,7 +3,9 @@ package tv.game88.general.game.tesk;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.service.GameDataRecordService;
 
 import jakarta.annotation.PostConstruct;
@@ -24,7 +26,7 @@ public class GameDataRecordTableCutTask {
         if ( !redisUtils.lock( this.getClass().getSimpleName(), 30 ) ) {
             return;
         }
-        log.info( "开始执行游戏注单数据表建表任务" );
+        log.info( "开始执行游戏注单数据表建表任务" + JsonUtil.object2Json( EnumGameCategory.getGameCategorys() ) );
         gameDataRecordService.cutTable( 5 );
     }
 }
