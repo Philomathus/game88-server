@@ -20,4 +20,6 @@ public interface GamePlatformMapper extends BaseMapper<GamePlatform> {
      * @return 游戏平台集合
      */
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform );
+
+    List<GamePlatform> selectGamePlatformAndVersionList();
 }
