@@ -16,6 +16,7 @@ import tv.game88.general.api.mapper.GameDataRecordMapper;
 import tv.game88.general.api.service.GameDataRecordService;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         int                  i       = 0;
         int                  num     = 0;
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-            String        day         = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER );
+            String day = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER );
             if ( mapper.findCount( gameDataRecord.getId(), TABLE_PREFIX + day ) > 0 ) {
                 continue;
             }
@@ -63,7 +64,8 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         }
         session.close();
 
-        log.info( "{}注单数据开始存库,预存数据条数:{};实际存储数据条数:{}", gamePlatform.getName(), gameDataRecords.size(), num );
+        log.info( "{}注单数据开始存库,预存数据条数:{};实际存储数据条数:{}",
+                gamePlatform.getName() + "-" + gamePlatform.getId(), gameDataRecords.size(), num );
     }
 
     @Override
@@ -78,7 +80,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         gameDataRecord.setGameStartTime( req.getStartTime() );
         gameDataRecord.setGameEndTime( req.getEndTime() );
         List<GameDataRecord> gameDataRecords = this.baseMapper.selectGameDataRecordList( gameDataRecord, TABLE_PREFIX + day );
-        List<RspGameDataLog> resultList = new ArrayList<>();
+        List<RspGameDataLog> resultList      = new ArrayList<>();
         for ( GameDataRecord dataRecord : gameDataRecords ) {
             RspGameDataLog rspGameDataLog = new RspGameDataLog();
             rspGameDataLog.setGame_id( dataRecord.getGameId() );
