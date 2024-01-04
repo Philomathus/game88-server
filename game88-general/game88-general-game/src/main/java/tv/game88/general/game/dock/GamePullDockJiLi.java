@@ -83,7 +83,7 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "WagersId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "Account" ) );
+        String account = String.valueOf( remoteGameDatum.get( "Account" ) ).toUpperCase();
         String agent   = account.split( "_" )[ 0 ];
         gameDataRecord.setAccount( account );
         gameDataRecord.setAgent( agent );
