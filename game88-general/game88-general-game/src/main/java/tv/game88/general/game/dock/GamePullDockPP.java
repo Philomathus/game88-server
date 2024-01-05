@@ -33,11 +33,13 @@ public class GamePullDockPP extends AbstractGamePull {
         params.put( "dataType", "RNG" );
         params.put( "options", "addBonusBetWin" );
 
-        final String url         = gamePlatform.getApiUrl() + "/DataFeeds/gamerounds/finished/";
+        final String url         = gamePlatform.getApiUrl() + "/IntegrationService/v3/DataFeeds/gamerounds/finished/";
         HttpHeaders  httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         httpHeaders.setCacheControl( "no-cache" );
-        HttpEntity<String> requestEntity = new HttpEntity<>( keyValStringFormat( params ), httpHeaders );
+        String             s             = keyValStringFormat( params );
+        HttpEntity<String> requestEntity = new HttpEntity<>( s, httpHeaders );
+        log.warn( url + ":::" + s );
 
         String resultStr = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ),
                 response -> {
@@ -48,6 +50,7 @@ public class GamePullDockPP extends AbstractGamePull {
             }
             return text;
         } );
+        log.warn( resultStr );
         if ( StringUtils.isNotBlank( resultStr ) ) {
 
         }
