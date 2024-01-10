@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.platform.api.mapper.ReportMemberStatisticsMapper">
+
+    <select id="getTotalRecharge" resultType="java.math.BigDecimal">
+        SELECT ifnull(SUM(a.money), 0.0) total_recharge
+        FROM (
+            SELECT p.member_id, p.money
+            FROM member_recharge_online p
+            WHERE p.status = 1
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(p.pay_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+        UNION ALL
+            SELECT m.member_id, m.recharge_money money
+            FROM member_recharge_bank m
+            WHERE m.status = 3
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(m.create_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+        UNION ALL
+            SELECT u.member_id, u.recharge_money money
+            FROM member_recharge_usdt u
+            WHERE u.status = 3
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(u.create_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+        ) as a
+        inner join member_info as mi on mi.id = a.member_id
+        <if test="req.channelCode != null">
+            where mi.inviter_code in (SELECT inviter_code from member_info where inviter_code = #{req.channelCode})
+        </if>
+        group by mi.inviter_code
+    </select>
+    <select id="getTotalWithdrawal" resultType="java.math.BigDecimal">
+        select ifnull(sum(withdraw_money), 0.0) as total_withdrawal from member_withdraw_detail
+        <where>
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+            <if test="req.channelCode != null">
+                and withdraw_id in (SELECT id from member_info where inviter_code = #{req.channelCode})
+            </if>
+        </where>
+        group by withdraw_id
+    </select>
+    <select id="getUserBalance" resultType="java.math.BigDecimal">
+        select ifnull(sum(account_now), 0.0) from member_info
+        <where>
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(register_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+            <if test="req.channelCode != null">
+                and inviter_code = #{req.channelCode}
+            </if>
+        </where>
+    </select>
+    <select id="getTotalRegistration" resultType="java.lang.Long">
+        select count(id) total_registration from member_info
+        <where>
+            <if test="req.inclusive_date != null">
+                and DATE_FORMAT(register_time, '%Y-%m-%d') = #{req.inclusive_date}
+            </if>
+            <if test="req.channelCode != null">
+                and inviter_code = #{req.channelCode}
+            </if>
+        </where>
+    </select>
+</mapper>
