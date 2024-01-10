@@ -2,11 +2,12 @@ package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -18,7 +19,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Log4j2
 @Repository( value = ConstantsGame.PP + "GamePullProcessor" )
@@ -26,23 +26,21 @@ public class GamePullDockPP extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        Map<String, Object> params = new TreeMap<>();
-        params.put( "login", gamePlatform.getAgent() );
-        params.put( "password", gamePlatform.getMd5() );
-        params.put( "timepoint", gamePlatform.getVersionValue() );
-        params.put( "dataType", "RNG" );
-        params.put( "options", "addBonusBetWin" );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "login", gamePlatform.getAgent() );
+        params.add( "password", gamePlatform.getMd5() );
+        params.add( "timepoint", gamePlatform.getVersionValue() );
+        params.add( "dataType", "RNG" );
+        params.add( "options", "addBonusBetWin" );
 
-        final String url         = gamePlatform.getApiUrl() + "/IntegrationService/v3/DataFeeds/gamerounds/finished/";
-        HttpHeaders  httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
-        httpHeaders.setCacheControl( "no-cache" );
-        String             s             = keyValStringFormat( params );
-        HttpEntity<String> requestEntity = new HttpEntity<>( s, httpHeaders );
-        log.warn( url + ":::" + s );
+        final String url = gamePlatform.getApiUrl() + "/IntegrationService/v3/DataFeeds/gamerounds/finished/";
 
-        String resultStr = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ),
-                response -> {
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( params ).build( true );
+
+        log.warn( uriComponents.toUriString() );
+
+        String resultStr = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null )
+                , response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -52,7 +50,7 @@ public class GamePullDockPP extends AbstractGamePull {
         } );
         log.warn( resultStr );
         if ( StringUtils.isNotBlank( resultStr ) ) {
-
+            
         }
         return null;
     }
