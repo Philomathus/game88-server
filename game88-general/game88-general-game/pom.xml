@@ -40,8 +40,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
         </dependency>
     </dependencies>
 </project>
