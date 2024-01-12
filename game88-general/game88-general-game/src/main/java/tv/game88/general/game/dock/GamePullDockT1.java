@@ -84,10 +84,10 @@ public class GamePullDockT1 extends AbstractGamePull {
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
-        String        startTime      = remoteGameDatum.get( "bet_time" ).toString();
+        String        startTime      = remoteGameDatum.get( "bet_time" ).toString() + "000";
         LocalDateTime startTimeLocal = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( startTime ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
-        String        endTime      = remoteGameDatum.get( "payout_time" ).toString();
+        String        endTime      = remoteGameDatum.get( "payout_time" ).toString() + "000";
         LocalDateTime endTimeLocal = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
