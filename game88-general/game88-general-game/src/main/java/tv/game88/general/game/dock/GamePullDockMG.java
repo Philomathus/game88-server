@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.MG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.MG + "GamePullProcessor" )
 public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -47,7 +47,8 @@ public class GamePullDockMG extends AbstractGamePull {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( headers );
 
-        String resultStr = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ), response -> {
+        String resultStr = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( requestEntity ),
+                response -> {
             InputStream bodyStream = response.getBody();
             String      text;
             try ( Reader reader = new InputStreamReader( bodyStream ) ) {
@@ -72,6 +73,9 @@ public class GamePullDockMG extends AbstractGamePull {
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
+        if ( gamePlatform.getId() == 43 ) {
+            log.warn( JsonUtil.object2Json( object ) );
+        }
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
@@ -88,8 +92,10 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         String payoutAmount = String.valueOf( remoteGameDatum.get( "payoutAmount" ) );
-        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ).subtract( betAmountDeci )
-                .setScale( 2, RoundingMode.HALF_UP ).toString();
+        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount )
+                .subtract( betAmountDeci )
+                .setScale( 2, RoundingMode.HALF_UP )
+                .toString();
         gameDataRecord.setProfit( profit );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
