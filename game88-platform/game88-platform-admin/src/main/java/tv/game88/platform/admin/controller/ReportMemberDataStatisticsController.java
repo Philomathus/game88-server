@@ -39,4 +39,14 @@ public class ReportMemberDataStatisticsController extends BaseController {
         return RspEntity.ok( reportMemberStatisticsService.getTotalRegistration(req) );
     }
 
+    @PostMapping( "/dailyFirstRechargeCount" )
+    public RspEntity<Long> getDailyFirstRechargeCount(@RequestBody ReqReportMemberStatistics req) {
+        return RspEntity.ok( reportMemberStatisticsService.getDailyFirstRechargeCount(req) );
+    }
+
+    @PostMapping( "/dailyRechargeCount" )
+    public RspEntity<Long> getDailyRechargeCount(@RequestBody ReqReportMemberStatistics req) {
+        return RspEntity.ok( reportMemberStatisticsService.getDailyRechargeCount(req) );
+    }
+
 }

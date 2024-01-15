@@ -14,4 +14,7 @@ public interface ReportMemberStatisticsService {
 
     Long getTotalRegistration( ReqReportMemberStatistics req );
 
+     Long getDailyRechargeCount( ReqReportMemberStatistics req );
+
+    Long getDailyFirstRechargeCount( ReqReportMemberStatistics req );
 }
