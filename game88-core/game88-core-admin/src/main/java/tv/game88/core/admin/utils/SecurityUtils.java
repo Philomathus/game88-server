@@ -31,6 +31,18 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取用户账户ID
+     **/
+    public static Long getUserId() {
+        try {
+            String userId = getLoginUser().getUserId();
+            return Long.parseLong( userId );
+        } catch ( Exception e ) {
+            throw new BusinessException( "获取用户账户ID异常", HttpStatus.UNAUTHORIZED );
+        }
+    }
+
+    /**
      * 获取用户
      **/
     public static LoginUser getLoginUser() {

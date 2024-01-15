@@ -16,6 +16,7 @@
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
         <result property="updateTime" column="update_time" />
+        <result property="versionValue" column="version_value" />
     </resultMap>
 
     <sql id="selectGamePlatformVo">
@@ -74,5 +75,12 @@
                 and update_time = #{updateTime}
             </if>
         </where>
+    </select>
+
+    <select id="selectGamePlatformAndVersionList" resultMap="GamePlatformResult">
+        select p.*, v.version_value
+        from game_record_version v
+                 LEFT JOIN game_platform p on v.platform_id = p.id
+        where p.effect = 1
     </select>
 </mapper>

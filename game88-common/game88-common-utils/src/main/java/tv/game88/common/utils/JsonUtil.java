@@ -148,7 +148,7 @@ public class JsonUtil {
             try {
                 return getObjectMapper().convertValue( obj, new TypeReference<>() {} );
             } catch ( Exception e ) {
-                log.error( obj.toString() + "转化为Map对象失败" + e.getMessage(), e.getMessage() );
+                log.error( obj + "转化为Map对象失败" + e.getMessage(), e.getMessage() );
             }
         }
         return null;

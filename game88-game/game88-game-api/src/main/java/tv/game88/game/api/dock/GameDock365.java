@@ -1,17 +1,21 @@
 package tv.game88.game.api.dock;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.core.game.constants.ConstantsGame;
+import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.game.api.dto.ReqJoinGame;
 import tv.game88.game.api.exception.GameTransferException;
 
@@ -25,6 +29,9 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.GAMING_365 + "GameProcessor" )
 public class GameDock365 extends AbstractGameDock {
+    @Resource( name = "restNoRedirectTemplate" )
+    private RestTemplate restNoRedirectTemplate;
+
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
         String key = Constants.GAME_TOKEN_PREX + reqJoinGame.getPlatformId() + ":" + reqJoinGame.getGameMemberId();
@@ -79,12 +86,11 @@ public class GameDock365 extends AbstractGameDock {
 
         log.warn( url + "         " + JsonUtil.object2Json( params ) );
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity( url, requestEntity, String.class );
-        URI location = responseEntity.getHeaders().getLocation();
-        reqJoinGame.setGameUrl( location == null ? null : location.toString() );
+        URI uri = restNoRedirectTemplate.postForLocation( url, requestEntity );
+        reqJoinGame.setGameUrl( uri == null ? null : uri.toString() );
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( responseEntity ), reqJoinGame.getGameMemberId() );
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( params ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }

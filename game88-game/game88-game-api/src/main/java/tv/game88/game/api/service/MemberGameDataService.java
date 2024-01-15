@@ -4,14 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.entity.GameWashCodeLog;
-import tv.game88.game.api.entity.LogCleanCodeInfo;
 import tv.game88.game.api.entity.MemberGameData;
-import tv.game88.game.api.dto.RspWashCodeInfo;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 会员游戏注单数据Service接口
@@ -29,9 +25,6 @@ public interface MemberGameDataService extends IService<MemberGameData> {
     RspBase<RspCleanCodeInfo> cleanCodeDetail( String memberId );
 
     RspBase<RspCleanCodeInfo> cleanCode( String memberId );
-
-    public void opCleanCode( String memberId, RspCleanCodeResult restlt, Collection<LogCleanCodeInfo> logCleanCodeInfos,
-                             String cleanId, LocalDateTime ntime );
 
     List<RspCleanCodeLog> cleanCodeLogs( String memberId );
 

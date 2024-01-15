@@ -221,4 +221,22 @@ public class AESCoder {
         return rawKey;
     }
 
+    public static String encryptByKeyIv7Padding( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS7Padding", "BC" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.getDecoder().decode( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.getDecoder().decode( AESIV ) );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
+        cipher.init( Cipher.ENCRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( content.getBytes( StandardCharsets.UTF_8 ) );
+        return new String( Base64.getEncoder().encode( encrypted ) );
+    }
+
+
+    public static String decryptByKeyIv7Padding( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS7Padding", "BC" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.getDecoder().decode( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.getDecoder().decode( AESIV ) );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( Base64.getDecoder().decode( content ) );
+        return new String( encrypted, StandardCharsets.UTF_8 );
+    }
 }

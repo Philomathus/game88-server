@@ -38,6 +38,11 @@ public enum EnumGameCategory {
     RICH88( ConstantsGame.RICH88, "Rich88电子" ),
     PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
     SHABA( ConstantsGame.SHABA, "沙巴体育" ),
+
+    T1( ConstantsGame.T1, "T1" ),
+    PP( ConstantsGame.PP, "pp" ),
+    CG( ConstantsGame.CG, "cg" ),
+    JILI( ConstantsGame.JILI, "jiLi" ),
     ;
 
     private final String type;

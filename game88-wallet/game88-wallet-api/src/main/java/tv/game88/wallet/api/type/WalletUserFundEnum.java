@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
 
 /**
  * 交易类型 type>0  为入金 type>0&&type<100  为充值
- * <p>
- * <p>
- * type<0  为消费
  */
 @Getter
 public enum WalletUserFundEnum {

@@ -62,10 +62,8 @@
 
     <insert id="insertByTableName">
         insert into ${tableName}
-        (id, agent, game_agent, platform_id,
-         game_id, game_round, account, kind_id,
-         table_id, chair_id, all_bet, cell_score,
-         profit, revenue, game_start_time, game_end_time, detail)
+        (id, agent, game_agent, platform_id, game_id, game_round, account, kind_id,
+         table_id, chair_id, all_bet, cell_score, profit, revenue,  game_start_time, game_end_time, detail)
         values (#{data.id}, #{data.agent}, #{data.gameAgent},
                 #{data.platformId}, #{data.gameId}, #{data.gameRound},
                 #{data.account}, #{data.kindId}, #{data.tableId},
@@ -75,6 +73,8 @@
     </insert>
 
     <select id="findCount" resultType="java.lang.Long">
-        select count(1) from ${tableName} where id = #{id}
+        select count(1)
+        from ${tableName}
+        where id = #{id}
     </select>
 </mapper>

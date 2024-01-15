@@ -12,14 +12,6 @@ import java.util.List;
  */
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 	/**
-	 * 查询菜单使用数量
-	 *
-	 * @param menuId 菜单ID
-	 * @return 结果
-	 */
-	public int checkMenuExistRole( Long menuId );
-
-	/**
 	 * 通过角色ID删除角色和菜单关联
 	 *
 	 * @param roleId 角色ID

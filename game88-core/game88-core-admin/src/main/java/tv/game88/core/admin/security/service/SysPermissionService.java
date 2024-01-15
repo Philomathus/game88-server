@@ -1,13 +1,17 @@
 package tv.game88.core.admin.security.service;
 
 import com.google.common.collect.Sets;
-import tv.game88.core.admin.entity.SysUser;
-import tv.game88.core.admin.service.ISysMenuService;
-import tv.game88.core.admin.service.ISysRoleService;
-import org.springframework.stereotype.Component;
-
 import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import tv.game88.core.admin.entity.SysRole;
+import tv.game88.core.admin.entity.SysUser;
+import tv.game88.core.admin.mapper.SysMenuMapper;
+import tv.game88.core.admin.mapper.SysRoleMapper;
+
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,10 +22,10 @@ import java.util.Set;
 @Component
 public class SysPermissionService {
     @Resource
-    private ISysRoleService roleService;
+    private SysRoleMapper   sysRoleMapper;
 
     @Resource
-    private ISysMenuService menuService;
+    private SysMenuMapper   sysMenuMapper;
 
     /**
      * 获取角色数据权限
@@ -36,7 +40,12 @@ public class SysPermissionService {
         if ( user.isAdmin() ) {
             roles.add( "admin" );
         } else {
-            roles.addAll( roleService.selectRolePermissionByUserId( user.getUserId() ) );
+            List<SysRole> perms    = sysRoleMapper.selectRolePermissionByUserId( user.getUserId() );
+            Set<String>   permsSet = new HashSet<>();
+            for ( SysRole perm : perms ) {
+                permsSet.addAll( Arrays.asList( perm.getRoleKey().trim().split( "," ) ) );
+            }
+            roles.addAll( permsSet );
         }
         return roles;
     }
@@ -53,7 +62,14 @@ public class SysPermissionService {
         if ( user.isAdmin() ) {
             user.setPermissions( Sets.newHashSet( "*:*:*" ) );
         } else {
-            user.setPermissions( menuService.selectMenuPermsByUserId( user.getUserId() ) );
+            List<String> perms    = sysMenuMapper.selectMenuPermsByUserId( user.getUserId() );
+            Set<String>  permsSet = new HashSet<>();
+            for ( String perm : perms ) {
+                if ( StringUtils.isNotBlank( perm ) ) {
+                    permsSet.addAll( Arrays.asList( perm.trim().split( "," ) ) );
+                }
+            }
+            user.setPermissions( permsSet );
         }
     }
 }

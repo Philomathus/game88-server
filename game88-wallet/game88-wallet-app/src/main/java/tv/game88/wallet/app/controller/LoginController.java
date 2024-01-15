@@ -58,14 +58,14 @@ public class LoginController extends BaseController {
     }
 
     @Operation( summary = "设置登录密码", description = "要设置登录密码要密码和确认密码，需要登录到token" )
-    @PostMapping("/api/setPassword")
-    public RspBase<?> setPassword( @RequestBody ReqConstant.ReqSetPasswd reqSetPasswd ){
-        return  walletUserService.setPassword( MemberSecurityUtils.getUserId() , reqSetPasswd );
+    @PostMapping( "/api/setPassword" )
+    public RspBase<?> setPassword( @Validated @RequestBody ReqConstant.ReqSetPasswd reqSetPasswd ) {
+        return walletUserService.setPassword( MemberSecurityUtils.getUserId(), reqSetPasswd );
     }
 
     @Operation( summary = "重置登录密码", description = "根据旧密码重置登录密码,需要登录token" )
     @PostMapping( "/api/resetPasswd" )
-    public RspBase<?> resetPasswd( @RequestBody @Validated ReqResetPasswd reqResetPasswd ) {
+    public RspBase<?> resetPasswd( @Validated @RequestBody ReqResetPasswd reqResetPasswd ) {
         return walletUserService.resetPasswd( reqResetPasswd, MemberSecurityUtils.getUserId() );
     }
 }

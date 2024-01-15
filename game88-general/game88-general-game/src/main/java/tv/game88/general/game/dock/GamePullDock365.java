@@ -11,11 +11,15 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Repository ( value = ConstantsGame.GAMING_365 + "GamePullProcessor" )
 public class GamePullDock365 extends AbstractGamePull {
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );

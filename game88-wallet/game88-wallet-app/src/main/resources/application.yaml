@@ -9,6 +9,9 @@ server:
   port: 18862
   max-http-request-header-size: 64KB
 spring:
+  threads:
+    virtual:
+      enabled: true
   profiles:
     active: dev
   application:
@@ -87,7 +90,7 @@ pagehelper:
 # token配置
 token:
   # 令牌有效期（默认1天）
-  expireTime: 7
+  expireTime: 3
 
 swagger:
   title: Game88 Wallet App Swagger 3 Api Documentation
@@ -102,34 +105,15 @@ management:
   endpoint:
     health:
       enabled: true
-      show-details: when_authorized
-    beans:
-      enabled: false
+      show-details: WHEN_AUTHORIZED
     info:
-      enabled: false
-    conditions:
-      enabled: false
-    shutdown:
-      enabled: false
-    configprops:
-      enabled: false
-    auditevents:
-      enabled: false
-    caches:
-      enabled: false
-    env:
-      enabled: false
-    metrics:
-      enabled: false
-    scheduledtasks:
-      enabled: false
-    mappings:
-      enabled: false
-    loggers:
-      enabled: false
-    integrationgraph:
-      enabled: false
-    heapdump:
-      enabled: false
-    threaddump:
-      enabled: false
+      enabled: true
+      cache:
+        time-to-live: 10m
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  info:
+    java:
+      enabled: true

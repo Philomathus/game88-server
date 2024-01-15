@@ -14,6 +14,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.general.api.entity.GamePlatform;
 
 import jakarta.annotation.Resource;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -28,7 +29,7 @@ import java.util.regex.Pattern;
 
 @Log4j2
 public abstract class AbstractGamePull implements BaseGamePull {
-    @Resource
+    @Resource( name = "restUploadTemplate" )
     protected RestTemplate restTemplate;
     @Resource
     protected ForkJoinPool forkJoinPool;
@@ -36,7 +37,7 @@ public abstract class AbstractGamePull implements BaseGamePull {
     @Resource
     protected RedisUtils redisUtils;
 
-    protected static final Pattern GET_NUMBER = Pattern.compile("\\d+$");
+    protected static final Pattern GET_NUMBER = Pattern.compile( "\\d+$" );
 
     protected String createRecordId( GamePlatform info, String tarId ) {
         return String.valueOf( info.getId() ).concat( "-" ).concat( tarId );
@@ -109,10 +110,10 @@ public abstract class AbstractGamePull implements BaseGamePull {
     }
 
     protected Map<String, Object> sendGetMap( String url ) {
-        return sendGetMap( url , null );
+        return sendGetMap( url, null );
     }
 
-    protected Map<String, Object> sendGetMap( String url , HttpEntity<?> httpEntity) {
+    protected Map<String, Object> sendGetMap( String url, HttpEntity<?> httpEntity ) {
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
@@ -166,8 +167,8 @@ public abstract class AbstractGamePull implements BaseGamePull {
     protected static Object getFieldValueByName( String fieldName, Object o ) {
         try {
             String firstLetter = fieldName.substring( 0, 1 ).toUpperCase();
-            String getter = "get" + firstLetter + fieldName.substring( 1 );
-            Method method = o.getClass().getMethod( getter );
+            String getter      = "get" + firstLetter + fieldName.substring( 1 );
+            Method method      = o.getClass().getMethod( getter );
             return method.invoke( o );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );

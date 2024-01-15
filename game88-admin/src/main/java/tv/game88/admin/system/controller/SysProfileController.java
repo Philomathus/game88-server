@@ -1,8 +1,10 @@
 package tv.game88.admin.system.controller;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import tv.game88.admin.system.service.ISysUserService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.utils.JsonUtil;
@@ -14,11 +16,8 @@ import tv.game88.core.admin.constant.KeyConstants;
 import tv.game88.core.admin.entity.SysUser;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.security.service.SysUserTokenService;
-import tv.game88.core.admin.service.ISysUserService;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.admin.vo.LoginUser;
-
-import jakarta.annotation.Resource;
 
 import java.util.Map;
 

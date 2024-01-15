@@ -27,8 +27,9 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         rawData.put( "recordID", gamePlatform.getVersionValue() );
         String rawDataStr = JsonUtil.object2Json( rawData );
 
-        String url = gamePlatform.getApiUrl() + QUERY_RECORD_2 + "/" + gamePlatform.getAgent() + "/"
-                + Base64.getEncoder().encodeToString( rawDataStr.getBytes() );
+        String url = gamePlatform.getApiUrl() + QUERY_RECORD_2 + "/" + gamePlatform.getAgent() + "/" + Base64
+                .getEncoder()
+                .encodeToString( rawDataStr.getBytes() );
 
         Map<String, Object> resultMap = restTemplate.postForObject( url, null, Map.class );
 

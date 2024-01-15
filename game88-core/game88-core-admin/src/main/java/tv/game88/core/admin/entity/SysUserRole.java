@@ -3,6 +3,7 @@ package tv.game88.core.admin.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  *
  * @author MengJun
  */
+@Data
 @TableName( "sys_user_role" )
 public class SysUserRole {
 	/**
@@ -23,22 +25,6 @@ public class SysUserRole {
 	 * 角色ID
 	 */
 	private Long roleId;
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId( Long userId ) {
-		this.userId = userId;
-	}
-
-	public Long getRoleId() {
-		return roleId;
-	}
-
-	public void setRoleId( Long roleId ) {
-		this.roleId = roleId;
-	}
 
 	@Override
 	public String toString() {

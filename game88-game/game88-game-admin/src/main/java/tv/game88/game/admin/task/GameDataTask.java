@@ -1,14 +1,13 @@
 package tv.game88.game.admin.task;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.game.api.service.GameDataService;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
@@ -22,7 +21,6 @@ public class GameDataTask {
     @Resource
     private GameDataService gameDataService;
 
-    @Async
     @Scheduled( cron = "0/30 * * * * ?")
     public void runTask() {
         if ( !redisUtils.lock( "GameDataTask", 29 ) ) {

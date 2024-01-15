@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.wallet.api.constants.ConstantsWallet;
-import tv.game88.wallet.api.sse.SseStreamService;
+import tv.game88.wallet.app.see.SseStreamService;
 import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
-import tv.game88.wallet.api.vo.TransDetailStreamMessage;
+import tv.game88.wallet.api.sse.model.TransDetailStreamMessage;
 
 import jakarta.annotation.Resource;
 import java.io.ByteArrayInputStream;

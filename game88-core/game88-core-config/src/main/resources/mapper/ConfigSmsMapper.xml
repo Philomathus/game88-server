@@ -16,6 +16,7 @@
 		<result property="identify" column="identify"/>
 		<result property="effect" column="effect"/>
 		<result property="endpoint" column="endpoint"/>
+		<result property="classificationKey" column="classification_key"/>
 		<result property="updateTime" column="update_time"/>
 		<result property="createTime" column="create_time"/>
 		<result property="updateBy" column="update_by"/>
@@ -35,6 +36,7 @@
 			   identify,
 			   effect,
 			   endpoint,
+			   classification_key,
 		       update_time,
 			   create_time,
 			   update_by,

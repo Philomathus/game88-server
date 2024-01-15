@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 @Repository( value = ConstantsGame.BBIN + "GamePullProcessor" )
 public class GamePullDockBBIN extends AbstractGamePull {
     private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", "30", "31",
-            "38", "66", "93", "99" );
+            "38", "66", /*"93",*/ "99" );
     private static final String       WAGERS_RECORD_KEY8 = "SNjv90Bz";
 
     @Override

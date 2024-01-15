@@ -2,7 +2,6 @@ package tv.game88.core.config.cache;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -14,7 +13,7 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.core.config.mapper.ConfigBankListMapper;
 
 import jakarta.annotation.Resource;
-import java.time.Duration;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -25,23 +24,17 @@ import java.util.stream.Collectors;
 public class ConfigBankListCache {
     private static final String CONFIG_BANKLIST_CACHE = Constants.CONFIG_PREX + "bankList";
 
-    private static final Cache<String, List<RspConfigBankList>> LOCAL_CACHE = Caffeine.newBuilder()
-            // 设置最后一次写入或访问后经过固定时间过期
-            .expireAfterWrite( Duration.ofSeconds( 10 ) )
-            // 初始的缓存空间大小
-            .initialCapacity( 1 )
-            // 缓存的最大条数
-            .maximumSize( 1 )
-            // 构建
-            .build();
-
     @Resource
     private ConfigBankListMapper configBankListMapper;
+
     @Resource
-    private RedisUtils           redisUtils;
+    private RedisUtils redisUtils;
+
+    @Resource
+    private Cache<String, List<RspConfigBankList>> cache;
 
     public List<RspConfigBankList> getEffectList() {
-        List<RspConfigBankList> localCacheIfPresent = LOCAL_CACHE.getIfPresent( CONFIG_BANKLIST_CACHE );
+        List<RspConfigBankList> localCacheIfPresent = cache.getIfPresent( CONFIG_BANKLIST_CACHE );
         if ( CollectionUtils.isEmpty( localCacheIfPresent ) ) {
             exists();
             List<RspConfigBankList> rspConfigBankLists = redisUtils
@@ -51,7 +44,7 @@ public class ConfigBankListCache {
                     .map( obj -> JsonUtil.json2Object( obj.toString(), RspConfigBankList.class ) )
                     .sorted( Comparator.comparing( o -> o.getSort() ) )
                     .collect( Collectors.toList() );
-            LOCAL_CACHE.put( CONFIG_BANKLIST_CACHE, rspConfigBankLists );
+            cache.put( CONFIG_BANKLIST_CACHE, rspConfigBankLists );
             return rspConfigBankLists;
         }
         return localCacheIfPresent;

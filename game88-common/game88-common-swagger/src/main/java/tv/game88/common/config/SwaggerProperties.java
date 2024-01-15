@@ -16,13 +16,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Setter
 @Getter
-@ToString(callSuper = true)
+@ToString( callSuper = true )
 @ConfigurationProperties(
         // 配置属性前缀
         prefix = "swagger",
         //忽略无效字段
-        ignoreInvalidFields = true
-)
+        ignoreInvalidFields = true )
 public class SwaggerProperties {
 
 

@@ -19,6 +19,12 @@
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

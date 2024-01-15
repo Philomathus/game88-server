@@ -1,6 +1,6 @@
 package tv.game88.general.game.tesk;
 
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +19,6 @@ import tv.game88.general.api.service.GameDataRecordService;
 import tv.game88.general.game.base.BaseGamePull;
 import tv.game88.general.game.base.GamePullDockFactoryUtil;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,33 +43,28 @@ public class RemoteGameDataRecordTask {
 
     @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
-        List<GamePlatform> gamePlatformList = new QueryChainWrapper<>( gamePlatformMapper ).eq( "effect", 1 ).list();
+        List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
-            if ( gameRecordVersion == null ) {
-                continue;
-            }
             if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 30 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                if ( StringUtils.isNumeric( gameRecordVersion.getVersionValue() )
-                        && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
+                String name         = gamePlatform.getName() + "-" + gamePlatform.getId();
+                String versionValue = gamePlatform.getVersionValue();
+                if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
                         && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
-                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gameRecordVersion.getVersionValue() ) );
+                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
 
-                    log.info( "开始执行{}注单拉取程序, 开始时间:{}", gamePlatform.getName(), LocalDateTimeUtils.format( versionTime ) );
+                    log.info( "开始执行{}注单拉取程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
                 } else {
-                    log.info( "开始执行{}注单拉取程序, 开始版本:{}", gamePlatform.getName(), gameRecordVersion.getVersionValue() );
+                    log.info( "开始执行{}注单拉取程序, 开始版本:{}", name, versionValue );
                 }
-
-                gamePlatform.setVersionValue( gameRecordVersion.getVersionValue() );
 
                 BaseGamePull baseGamePull = gamePullDockFactoryUtil.createGamePullProcessor( gamePlatform.getGameCategory() );
                 try {
                     List<Object> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
                     if ( !CollectionUtils.isEmpty( remoteGameData ) ) {
-                        log.info( "{}拉取数据成功, 条数:{}", gamePlatform.getName(), remoteGameData.size() );
+                        log.info( "{}拉取数据成功, 条数:{}", name, remoteGameData.size() );
                         List<GameDataRecord> gameDataRecords = new ArrayList<>();
                         for ( Object remoteGameDatum : remoteGameData ) {
                             GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
@@ -92,13 +86,16 @@ public class RemoteGameDataRecordTask {
                                 }
                             }
                             if ( localDateTime != null ) {
-                                gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( localDateTime ) ) );
+                                gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp(
+                                localDateTime ) ) );
                             }
                         }*/
                     }
-                    if ( !StringUtils.equals( gamePlatform.getVersionValue(), gameRecordVersion.getVersionValue() ) ) {
-                        gameRecordVersion.setVersionValue( gamePlatform.getVersionValue() );
-                        gameRecordVersionMapper.updateById( gameRecordVersion );
+                    if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
+                        GameRecordVersion update = new GameRecordVersion();
+                        update.setPlatformId( gamePlatform.getId() );
+                        update.setVersionValue( gamePlatform.getVersionValue() );
+                        gameRecordVersionMapper.updateById( update );
                     }
                 } catch ( Exception e ) {
                     log.error( e.getMessage(), e );

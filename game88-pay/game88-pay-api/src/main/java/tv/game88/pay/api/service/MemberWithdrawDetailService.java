@@ -25,8 +25,6 @@ public interface MemberWithdrawDetailService extends IService<MemberWithdrawDeta
 
     RspBase<List<RspWithdrawReport>> withdrawReport( String id );
 
-    public void refusedUpdateProcess( MemberWithdrawDetail update, String mark, MemberWithdrawDetail memberWithdrawLog );
-
     RspBase<?> refused( ReqMemberWithdrawDetail req, String userName );
 
     RspBase<?> refuseds( ReqMemberWithdrawDetail req, String userName );

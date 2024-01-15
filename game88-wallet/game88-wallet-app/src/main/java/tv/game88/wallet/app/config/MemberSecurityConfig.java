@@ -3,7 +3,6 @@ package tv.game88.wallet.app.config;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,7 +36,7 @@ import tv.game88.wallet.app.security.handle.MemberLogoutSuccessHandle;
  * @author MengJun
  */
 @Configuration
-@EnableMethodSecurity( securedEnabled = true, jsr250Enabled = true )
+@EnableMethodSecurity( securedEnabled = true )
 public class MemberSecurityConfig {
     /**
      * 自定义用户认证逻辑
@@ -97,7 +96,7 @@ public class MemberSecurityConfig {
                     // 注解标记允许匿名访问的url
                     permitAllUrl.getUrls().forEach( url -> customizer.requestMatchers( url ).permitAll() );
                     customizer
-                            .requestMatchers( HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**" ).permitAll()
+                            .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**", "/*.html", "/*.ico" ).anonymous()
                             // actuator 健康检查
                             .requestMatchers( "/actuator/**" ).anonymous()
                             // 除上面外的所有请求全部需要鉴权认证

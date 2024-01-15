@@ -20,15 +20,11 @@ public interface WalletRecordService extends IService<WalletRecord> {
 
     RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery );
 
-    void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType );
-
     RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress, String orderNo );
 
     ModelAndView toDepositOrder( String s, long t ) throws Exception;
 
     RspBase<?> payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
-
-    void updateOrderAndSendTask( WalletRecord walletRecord );
 
     RspWalletRecord getRspData( String tradeNo );
 }

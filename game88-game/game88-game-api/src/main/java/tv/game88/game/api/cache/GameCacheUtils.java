@@ -21,6 +21,7 @@ import tv.game88.game.api.mapper.GameTypeMapper;
 import tv.game88.core.game.type.EnumGameCategory;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class GameCacheUtils {
     public static final String GAME_PLATFORM_KEY              = Constants.GAME_PREX + "platform:";
     public static final String GAME_INFO_KEY                  = Constants.GAME_PREX + "info:";
     public static final String GAME_INFO_LIST_KEY             = Constants.GAME_PREX + "infoList:";
-    public static final String GAME_INFO_LIST_ALL_KEY             = Constants.GAME_PREX + "infoListAll:";
+    public static final String GAME_INFO_LIST_ALL_KEY         = Constants.GAME_PREX + "infoListAll:";
     public static final String GAME_INFO_S_KEY                = Constants.GAME_PREX + "infos:";
     public static final String GAME_WASH_CODE_CONFIG_LIST_KEY = Constants.GAME_PREX + "washCodeConfigList";
 
@@ -48,12 +49,17 @@ public class GameCacheUtils {
 
     public List<RspGameType> getEffectTypeList() {
         if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
-            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper ).eq( "effect", 1 ).orderByAsc( "sort" ).list()
-                                                                                   .stream().map( gameType -> {
+            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper )
+                    .eq( "effect", 1 )
+                    .orderByAsc( "sort" )
+                    .list()
+                    .stream()
+                    .map( gameType -> {
                         RspGameType rspGameType = new RspGameType();
                         BeanUtils.copyProperties( gameType, rspGameType );
                         return rspGameType;
-                    } ).collect( Collectors.toList() );
+                    } )
+                    .collect( Collectors.toList() );
             if ( !CollectionUtils.isEmpty( gameTypes ) ) {
                 redisUtils.strSet( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
             }

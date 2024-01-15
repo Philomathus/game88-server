@@ -41,6 +41,15 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
+    @Bean( "restNoRedirectTemplate" )
+    @Lazy
+    public RestTemplate noRedirectTemplate() {
+        RestTemplate restTemplate = new RestTemplate( clientNoRedirectHttpRequestFactory() );
+        //设置字符集
+        setCharset( restTemplate );
+        return restTemplate;
+    }
+
     //设置字符集为UTF-8, 解决乱码问题
     private void setCharset( RestTemplate restTemplate ) {
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
@@ -51,7 +60,7 @@ public class RestTemplateConfig {
         }
     }
 
-    public HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
+    private HttpComponentsClientHttpRequestFactory clientHttpRequestFactory() {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClient() );
@@ -63,12 +72,24 @@ public class RestTemplateConfig {
         }
     }
 
-    public HttpComponentsClientHttpRequestFactory clientUploadHttpRequestFactory() {
+    private HttpComponentsClientHttpRequestFactory clientUploadHttpRequestFactory() {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClient() );
             requestFactory.setConnectionRequestTimeout( 60000 );
             requestFactory.setConnectTimeout( 60000 );
+            return requestFactory;
+        } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
+            throw new RuntimeException( e );
+        }
+    }
+
+    private HttpComponentsClientHttpRequestFactory clientNoRedirectHttpRequestFactory() {
+        try {
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient( getHttpClientNoRedirect() );
+            requestFactory.setConnectionRequestTimeout( 15000 );
+            requestFactory.setConnectTimeout( 10000 );
             return requestFactory;
         } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
             throw new RuntimeException( e );
@@ -81,6 +102,22 @@ public class RestTemplateConfig {
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
         return HttpClients
                 .custom()
+                .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
+                        .create()
+                        .setMaxConnTotal( 500 )
+                        .setSSLSocketFactory( socketFactory )
+                        .build() )
+                .build();
+    }
+
+    private CloseableHttpClient getHttpClientNoRedirect() throws NoSuchAlgorithmException, KeyStoreException,
+            KeyManagementException {
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial( null, ( x509Certificates, s ) -> true ).build();
+
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory( sslContext );
+        return HttpClients
+                .custom()
+                .disableRedirectHandling()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
                         .create()
                         .setSSLSocketFactory( socketFactory )

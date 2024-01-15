@@ -31,6 +31,7 @@ import tv.game88.pay.api.service.MemberWithdrawDetailService;
 import tv.game88.pay.api.type.WithdrawRechargeType;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -341,10 +342,8 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             update.setOpName( userName );
             update.setUpdateTime( LocalDateTime.now() );
 
-            MemberWithdrawDetailService detailService = SpringUtils.getBean( MemberWithdrawDetailService.class );
-
             String mark = "操作人:" + userName + " ip:" + ServletUtil.getIp();
-            detailService.refusedUpdateProcess( update, mark, memberWithdrawLog );
+            SpringUtils.getAopProxy( this ).refusedUpdateProcess( update, mark, memberWithdrawLog );
         } else {
             return RspBase.businessError(
                     "会员ID为" + memberWithdrawLog.getWithdrawId() + "该笔订单状态" + memberWithdrawLog.getStatus()
@@ -382,7 +381,6 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( withdrawLogList == null || withdrawLogList.isEmpty() ) {
             return RspBase.businessError( "订单已被处理,请刷新界面" );
         }
-        MemberWithdrawDetailService detailService = SpringUtils.getBean( MemberWithdrawDetailService.class );
         String                      mark          = "操作人:" + userName + " ip:" + ServletUtil.getIp();
         for ( MemberWithdrawDetail withdrawDetail : withdrawLogList ) {
             if ( withdrawDetail == null ) {
@@ -402,7 +400,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 update.setStatus( 2 );//审核不通过
                 update.setOpName( userName );
                 update.setUpdateTime( LocalDateTime.now() );
-                detailService.refusedUpdateProcess( update, mark, withdrawDetail );
+                SpringUtils.getAopProxy( this ).refusedUpdateProcess( update, mark, withdrawDetail );
             } else {
                 return RspBase.businessError(
                         "会员ID为" + withdrawDetail.getWithdrawId() + "该笔订单状态" + withdrawDetail.getStatus()
