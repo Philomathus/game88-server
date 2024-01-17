@@ -26,8 +26,10 @@ public class LocalDateTimeUtils {
 
     public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
 
-    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm:ssXXX" );
+    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH"
+            + ":mm:ssXXX" );
+
+    public static final DateTimeFormatter RFC3339_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
 
@@ -253,6 +255,12 @@ public class LocalDateTimeUtils {
         return converted.toLocalDateTime();
     }
 
+    public static LocalDateTime convertToUTC7( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+7" ) );
+        return converted.toLocalDateTime();
+    }
+
     /**
      * UTC+0时间转换成当地时区时间
      *
@@ -263,6 +271,13 @@ public class LocalDateTimeUtils {
     public static LocalDateTime convertUTC0ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
         LocalDateTime localDateTime = LocalDateTime.parse( time, dateTimeFormatter );
         ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "UTC+0" ) );
+        ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
+        return converted.toLocalDateTime();
+    }
+
+    public static LocalDateTime convertUTC7ToDefault( String time, DateTimeFormatter dateTimeFormatter ) {
+        LocalDateTime localDateTime = LocalDateTime.parse( time, dateTimeFormatter );
+        ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "UTC+7" ) );
         ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
     }
