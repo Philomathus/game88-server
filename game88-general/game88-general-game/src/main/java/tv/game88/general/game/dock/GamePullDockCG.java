@@ -30,6 +30,8 @@ import java.util.Map;
 @Repository( value = ConstantsGame.CG + "GamePullProcessor" )
 public class GamePullDockCG extends AbstractGamePull {
 
+    private static final BigDecimal RATE = new BigDecimal( 1 );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
@@ -97,11 +99,12 @@ public class GamePullDockCG extends AbstractGamePull {
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
 
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "ValidBet" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "BetMoney" ) ) );
-        String     payoffAmount = String.valueOf( remoteGameDatum.get( "MoneyWin" ) );
-        BigDecimal profit       = new BigDecimal( payoffAmount ).subtract( new BigDecimal( gameDataRecord.getCellScore() ) );
-        gameDataRecord.setProfit( profit.toString() );
+        BigDecimal validBet = new BigDecimal( String.valueOf( remoteGameDatum.get( "ValidBet" ) ) ).multiply( RATE );
+        gameDataRecord.setCellScore( validBet.toString() );
+        BigDecimal betMoney = new BigDecimal( String.valueOf( remoteGameDatum.get( "BetMoney" ) ) ).multiply( RATE );
+        gameDataRecord.setAllBet( betMoney.toString() );
+        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "MoneyWin" ) ) ).multiply( RATE );
+        gameDataRecord.setProfit( payoffAmount.subtract( validBet ).toString() );
         return gameDataRecord;
     }
 
