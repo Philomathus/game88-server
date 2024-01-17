@@ -30,7 +30,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.CG + "GamePullProcessor" )
 public class GamePullDockCG extends AbstractGamePull {
 
-    private static final BigDecimal RATE = new BigDecimal( 1 );
+    private static final BigDecimal RATE = new BigDecimal( 1000 );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
