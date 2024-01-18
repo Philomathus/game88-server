@@ -46,4 +46,16 @@ public class ReportMemberStatisticsServiceImpl implements ReportMemberStatistics
             reqReportMemberStatistics.setInclusive_date( LocalDateTimeUtils.format( LocalDate.now() ) );
         }
     }
+
+    @Override
+    public Long getDailyRechargeCount( ReqReportMemberStatistics req ) {
+        setDefaults(req);
+        return reportMemberStatisticsMapper.getDailyRechargeCount(req) ;
+    }
+
+    @Override
+    public Long getDailyFirstRechargeCount( ReqReportMemberStatistics req ) {
+        setDefaults(req);
+        return reportMemberStatisticsMapper.getDailyFirstRechargeCount(req) ;
+    }
 }
