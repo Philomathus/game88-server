@@ -8,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -28,21 +30,20 @@ public class GamePullDockPGSoft extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "operator_token", gamePlatform.getDes() );
-        params.put( "secret_key", gamePlatform.getMd5() );
-        params.put( "count", "5000" );
-        params.put( "bet_type", "1" );
-        params.put( "row_version", gamePlatform.getVersionValue() );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "operator_token", gamePlatform.getDes() );
+        params.add( "secret_key", gamePlatform.getMd5() );
+        params.add( "count", "5000" );
+        params.add( "bet_type", "1" );
+        params.add( "row_version", gamePlatform.getVersionValue() );
 
-        String url           = gamePlatform.getApiUrl() + "/external-datagrabber/Bet/v4/GetHistory?trace_id=" + UUID.randomUUID();
-        String assemblyParam = assemblyUrl( params );
+        String url = gamePlatform.getApiUrl() + "/external-datagrabber/Bet/v4/GetHistory?trace_id=" + UUID.randomUUID();
 
-        log.warn( url + " ::: " + assemblyParam );
+        log.warn( url + " ::: " + JsonUtil.object2Json( params ) );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
-        HttpEntity<String> requestEntity = new HttpEntity<>( assemblyParam, httpHeaders );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
@@ -53,6 +54,9 @@ public class GamePullDockPGSoft extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
+
+        log.warn( JsonUtil.object2Json( resultMap ) );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             List<Object> dataList = ( List<Object> ) resultMap.getOrDefault( "data", Collections.EMPTY_LIST );
             if ( !CollectionUtils.isEmpty( dataList ) ) {
