@@ -38,7 +38,7 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         String url           = gamePlatform.getApiUrl() + "/external-datagrabber/Bet/v4/GetHistory?trace_id=" + UUID.randomUUID();
         String assemblyParam = assemblyUrl( params );
 
-        log.warn( url + ":::" + assemblyParam );
+        log.warn( url + " ::: " + assemblyParam );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
@@ -60,7 +60,9 @@ public class GamePullDockPGSoft extends AbstractGamePull {
                 gamePlatform.setVersionValue( obj.get( "rowVersion" ).toString() );
                 return dataList;
             }
-            log.warn( url + "::" + JsonUtil.object2Json( resultMap ) );
+            if ( resultMap.get( "error" ) != null ) {
+                log.warn( JsonUtil.object2Json( resultMap ) );
+            }
         }
         return null;
     }
@@ -72,10 +74,9 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account  = String.valueOf( remoteGameDatum.get( "playerName" ) ).toLowerCase();
-        String agent    = account.substring( 0, account.lastIndexOf( "m" ) );
-        String memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
-        gameDataRecord.setAccount( memberId );
+        String account = String.valueOf( remoteGameDatum.get( "playerName" ) );
+        String agent   = account.split( "_" )[ 0 ];
+        gameDataRecord.setAccount( account );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
@@ -85,7 +86,7 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         String        startTime = remoteGameDatum.get( "betTime" ).toString();
         LocalDateTime start     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( startTime ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( start ) );
-        String        endTime = remoteGameDatum.get( "rowVersion" ).toString();
+        String        endTime = remoteGameDatum.get( "betEndTime" ).toString();
         LocalDateTime end     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( end ) );
 
