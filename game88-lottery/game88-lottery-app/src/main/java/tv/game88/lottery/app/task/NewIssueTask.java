@@ -32,9 +32,12 @@ public class NewIssueTask {
         log.warn( "开始开新期" );
         LocalDateTime now = LocalDateTime.now();
         for ( RspLotteryInfo lotteryInfo : LotteryCacheUtils.me.getRspLotteryInfo() ) {
+            if ( now.getMinute() % lotteryInfo.getCycle() != 0 ) {
+                continue;
+            }
             // 默认新开10期
             for ( int i = 0; i <= 9; i++ ) {
-                LocalDateTime time  = now.plusMinutes( i );
+                LocalDateTime time  = now.plusMinutes( ( long ) i * lotteryInfo.getCycle() );
                 String        issue = LotteryUtils.getLotteryIssue( lotteryInfo.getCycle(), time );
                 try {
                     lotteryHistoryService.newIssue( lotteryInfo, issue, time, i );

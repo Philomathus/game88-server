@@ -16,6 +16,7 @@ import tv.game88.lottery.api.utils.LotteryUtils;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +32,16 @@ public class LotteryCacheUtils {
         me = this;
     }
 
-    private static final String LOTTERY_INFO_KEY   = Constants.LOTTERY_PREX + "info";
-    private static final String LOTTERY_METHOD_KEY = Constants.LOTTERY_PREX + "method";
-    private static final String LOTTERY_ODDS_KEY   = Constants.LOTTERY_PREX + "odds:";
+    public static final String LOTTERY_INFO_KEY   = Constants.LOTTERY_PREX + "info";
+    public static final String LOTTERY_METHOD_KEY = Constants.LOTTERY_PREX + "method";
+    public static final String LOTTERY_ODDS_KEY   = Constants.LOTTERY_PREX + "odds:";
 
-    private static final String LOTTERY_TEMP_KEY = Constants.LOTTERY_PREX + "temp:";
-    private static final String LOTTERY_RULE_KEY = Constants.LOTTERY_PREX + "rule:";
+    public static final String LOTTERY_TEMP_KEY = Constants.LOTTERY_PREX + "temp:";
+    public static final String LOTTERY_RULE_KEY = Constants.LOTTERY_PREX + "rule:";
 
-    private static final String LOTTERY_INFO_BASE_KEY   = Constants.LOTTERY_PREX + "infoBase";
-    private static final String LOTTERY_KIND_METHOD_KEY = Constants.LOTTERY_PREX + "kindMethod";
-    private static final String LOTTERY_METHOD_GAME_KEY = Constants.LOTTERY_PREX + "methodGame";
+    public static final String LOTTERY_INFO_BASE_KEY   = Constants.LOTTERY_PREX + "infoBase";
+    public static final String LOTTERY_KIND_METHOD_KEY = Constants.LOTTERY_PREX + "kindMethod";
+    public static final String LOTTERY_METHOD_GAME_KEY = Constants.LOTTERY_PREX + "methodGame";
 
 
     @Resource
@@ -237,8 +238,8 @@ public class LotteryCacheUtils {
                 .toList();
         redisUtils.strSet( LOTTERY_RULE_KEY + kindId, JsonUtil.object2Json( ruleVos ) );
         return ruleVos;
-//    }
-//        return JsonUtil.json2Array( ruleVos, new TypeReference<>() {} );
+        //    }
+        //        return JsonUtil.json2Array( ruleVos, new TypeReference<>() {} );
     }
 
     public void clear() {

@@ -55,7 +55,7 @@ public class LotteryHistoryServiceImpl extends ServiceImpl<LotteryHistoryMapper,
     @Override
     public void newIssue( RspLotteryInfo lotteryInfo, String issue, LocalDateTime time, int i ) {
         String        issueId = issue + "-" + lotteryInfo.getId();
-        LocalDateTime ktimes  = time.plusMinutes( 1 ).withSecond( 0 );
+        LocalDateTime ktimes  = time.plusMinutes( lotteryInfo.getCycle() ).withSecond( 0 ).withNano( 0 );
         if ( new QueryChainWrapper<>( this.baseMapper ).eq( "id", issueId ).count() <= 0 ) {
             LotteryHistory history = new LotteryHistory();
             history.setId( issueId );
