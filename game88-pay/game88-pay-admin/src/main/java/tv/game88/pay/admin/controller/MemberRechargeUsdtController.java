@@ -77,6 +77,7 @@ public class MemberRechargeUsdtController extends BaseController {
      * 锁定USDT充值信息
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
+    @Log( title = "锁定USDT充值信息", businessType = BusinessType.UPDATE )
     @GetMapping( value = "/lock/{orderNo}" )
     public RspBase<?> lock( @PathVariable( "orderNo" ) String orderNo ) {
         return memberRechargeUsdtService.lock( orderNo, SecurityUtils.getUsername() );
@@ -86,6 +87,7 @@ public class MemberRechargeUsdtController extends BaseController {
      * 解锁USDT充值信息
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
+    @Log( title = "解锁USDT充值信息", businessType = BusinessType.UPDATE )
     @GetMapping( value = "/unLock/{orderNo}" )
     public RspBase<?> unLock( @PathVariable( "orderNo" ) String orderNo ) {
         LoginUser     loginUser = SecurityUtils.getLoginUser();

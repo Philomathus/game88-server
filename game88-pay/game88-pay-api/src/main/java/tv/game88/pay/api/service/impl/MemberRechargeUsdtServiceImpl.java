@@ -84,6 +84,10 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
      */
     @Override
     public RspBase<?> lock( String orderNo, String userName ) {
+        MemberRechargeUsdt memberRechargeUsdt = this.baseMapper.selectById( orderNo );
+        if ( memberRechargeUsdt.getStatus() != 1 ) {
+            return RspBase.businessError( "订单状态有误,请刷新数据" );
+        }
         MemberRechargeUsdt update = new MemberRechargeUsdt();
         update.setRechargeOrderNo( orderNo );
         update.setOpName( userName );
@@ -103,6 +107,9 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
     @Override
     public RspBase<?> unLock( String orderNo, String userName, boolean contains ) {
         MemberRechargeUsdt memberRechargeUsdt = this.baseMapper.selectById( orderNo );
+        if ( memberRechargeUsdt.getStatus() != 0 ) {
+            return RspBase.businessError( "订单状态有误,请刷新数据" );
+        }
         if ( !contains ) {
             if ( StringUtils.hasText( memberRechargeUsdt.getOpName() ) && !userName.equals( memberRechargeUsdt.getOpName() ) ) {
                 return RspBase.businessError( "该订单只能由" + memberRechargeUsdt.getOpName() + "处理" );
