@@ -99,7 +99,6 @@ public class LunarAnimalOddsTask {
             }
         }
 
-        redisUtils.unlink( LotteryCacheUtils.LOTTERY_METHOD_GAME_KEY );
-        LotteryCacheUtils.me.getMethodGames( null );
+        LotteryCacheUtils.me.clear();
     }
 }
