@@ -33,7 +33,7 @@ public class GamePullDockPP extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        LocalDateTime start        = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是当前的时间,跳过
         if ( LocalDateTime.now().isBefore( start ) ) {
             return null;
@@ -69,8 +69,8 @@ public class GamePullDockPP extends AbstractGamePull {
                 return null;
             } else {
                 String time = firstLine.split( "=" )[ 1 ];
-                // 将GMT+0的时间戳转换成本地时间并存储
-                gamePlatform.setVersionValue( time );
+                long   l    = Long.parseLong( time ) - 1000; // 减去一秒,避免某些单没拉回
+                gamePlatform.setVersionValue( String.valueOf( l ) );
             }
             //删除第一行数据
             resultStr = resultStr.substring( index + 1 );
