@@ -60,6 +60,9 @@ public class GamePullDockPP extends AbstractGamePull {
             }
             return text;
         } );
+        if ( "1706502720000".equals( gamePlatform.getVersionValue() ) ) {
+            log.warn( resultStr );
+        }
         if ( StringUtils.isNotBlank( resultStr ) ) {
             //找到第一个换行符的位置
             int index = resultStr.indexOf( "\n" );
