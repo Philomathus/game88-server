@@ -37,7 +37,7 @@ public class GameDockCQ9 extends AbstractGameDock {
         if ( redisUtils.exists( key ) ) {
             String token = redisUtils.strGet( key );
             reqJoinGame.setToken( token );
-            redisUtils.expire( key, Duration.ofDays( 1 ) );
+            // redisUtils.expire( key, Duration.ofDays( 1 ) );
         } else {
             String              url    = reqJoinGame.getApiUrl() + "/gameboy/player/login";
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
