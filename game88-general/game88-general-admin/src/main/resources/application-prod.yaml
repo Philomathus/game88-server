@@ -106,6 +106,14 @@ spring:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77baby_main?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
+        slave_77jz:
+          url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77jz_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+          username: admin
+          password: dRmBstReqberz!14Xm#
+        slave_77mj:
+          url: jdbc:mysql://sevenall.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77mj_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+          username: admin
+          password: dRmBstReqberz!14Xm#
   data:
     redis:
       host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
