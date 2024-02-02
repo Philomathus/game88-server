@@ -12,8 +12,10 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
+import tv.game88.general.api.entity.GameRecordFixVersion;
 import tv.game88.general.api.entity.GameRecordVersion;
 import tv.game88.general.api.mapper.GamePlatformMapper;
+import tv.game88.general.api.mapper.GameRecordFixVersionMapper;
 import tv.game88.general.api.mapper.GameRecordVersionMapper;
 import tv.game88.general.api.service.GameDataRecordService;
 import tv.game88.general.game.base.BaseGamePull;
@@ -29,23 +31,25 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RemoteGameDataRecordTask {
     @Resource
-    private RedisUtils               redisUtils;
+    private RedisUtils                 redisUtils;
     @Resource
-    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService   scheduledExecutorService;
     @Resource
-    private GamePullDockFactoryUtil  gamePullDockFactoryUtil;
+    private GamePullDockFactoryUtil    gamePullDockFactoryUtil;
     @Resource
-    private GamePlatformMapper       gamePlatformMapper;
+    private GamePlatformMapper         gamePlatformMapper;
     @Resource
-    private GameRecordVersionMapper  gameRecordVersionMapper;
+    private GameRecordVersionMapper    gameRecordVersionMapper;
     @Resource
-    private GameDataRecordService    gameDataRecordService;
+    private GameRecordFixVersionMapper gameRecordFixVersionMapper;
+    @Resource
+    private GameDataRecordService      gameDataRecordService;
 
     @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( this.getClass().getSimpleName() + ":" + gamePlatform.getId(), 30 ) ) {
+            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 30 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
@@ -60,37 +64,8 @@ public class RemoteGameDataRecordTask {
                     log.info( "开始执行{}注单拉取程序, 开始版本:{}", name, versionValue );
                 }
 
-                BaseGamePull baseGamePull = gamePullDockFactoryUtil.createGamePullProcessor( gamePlatform.getGameCategory() );
                 try {
-                    List<Object> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
-                    if ( !CollectionUtils.isEmpty( remoteGameData ) ) {
-                        log.info( "{}拉取数据成功, 条数:{}", name, remoteGameData.size() );
-                        List<GameDataRecord> gameDataRecords = new ArrayList<>();
-                        for ( Object remoteGameDatum : remoteGameData ) {
-                            GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
-                            if ( gameDataRecord != null ) {
-                                gameDataRecords.add( gameDataRecord );
-                            }
-                        }
-                        gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
-
-                        /*if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
-                                && gamePlatform.getGameCategory() != EnumGameCategory.FG
-                                && gamePlatform.getGameCategory() != EnumGameCategory.AG ) {
-                            LocalDateTime localDateTime = null;
-                            for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-                                LocalDateTime gameEndTime =
-                                        LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() );
-                                if ( localDateTime == null || gameEndTime.isAfter( localDateTime ) ) {
-                                    localDateTime = gameEndTime;
-                                }
-                            }
-                            if ( localDateTime != null ) {
-                                gameRecordVersion.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp(
-                                localDateTime ) ) );
-                            }
-                        }*/
-                    }
+                    this.gamePullAndInsert( gamePlatform, name );
                     if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
                         GameRecordVersion update = new GameRecordVersion();
                         update.setPlatformId( gamePlatform.getId() );
@@ -99,9 +74,67 @@ public class RemoteGameDataRecordTask {
                     }
                 } catch ( Exception e ) {
                     log.error( e.getMessage(), e );
-                    redisUtils.unLock( this.getClass().getSimpleName() + ":" + gamePlatform.getId() );
+                    redisUtils.unLock( "remoteGameDataRecord:" + gamePlatform.getId() );
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
+        }
+    }
+
+    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    public void remoteGameDataRecordFix() {
+        List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionFixList();
+        for ( GamePlatform gamePlatform : gamePlatformList ) {
+            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 30 ) ) {
+                continue;
+            }
+            scheduledExecutorService.schedule( () -> {
+                String name         = gamePlatform.getName() + "-" + gamePlatform.getId();
+                String versionValue = gamePlatform.getVersionValue();
+                if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
+                        && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
+                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
+
+                    log.info( "开始执行{}补单程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
+                } else {
+                    log.info( "开始执行{}补单程序, 开始版本:{}", name, versionValue );
+                }
+
+                try {
+                    this.gamePullAndInsert( gamePlatform, name );
+                    if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
+                        GameRecordFixVersion update = new GameRecordFixVersion();
+                        update.setPlatformId( gamePlatform.getId() );
+                        update.setVersionValue( gamePlatform.getVersionValue() );
+                        gameRecordFixVersionMapper.updateById( update );
+                    }
+                    // 如果补单程序
+                    GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
+                    if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
+                            - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
+                        gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                    }
+                } catch ( Exception e ) {
+                    log.error( e.getMessage(), e );
+                    redisUtils.unLock( "remoteGameDataRecordFix:" + gamePlatform.getId() );
+                }
+            }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
+        }
+    }
+
+
+    private void gamePullAndInsert( GamePlatform gamePlatform, String name ) {
+        BaseGamePull baseGamePull   = gamePullDockFactoryUtil.createGamePullProcessor( gamePlatform.getGameCategory() );
+        List<Object> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
+        if ( !CollectionUtils.isEmpty( remoteGameData ) ) {
+            log.info( "{}拉取数据成功, 条数:{}", name, remoteGameData.size() );
+            List<GameDataRecord> gameDataRecords = new ArrayList<>();
+            for ( Object remoteGameDatum : remoteGameData ) {
+                GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
+                if ( gameDataRecord != null ) {
+                    gameDataRecords.add( gameDataRecord );
+                }
+            }
+            gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
         }
     }
 }

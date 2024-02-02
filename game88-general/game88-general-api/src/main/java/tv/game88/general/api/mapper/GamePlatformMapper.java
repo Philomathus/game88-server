@@ -22,4 +22,6 @@ public interface GamePlatformMapper extends BaseMapper<GamePlatform> {
     public List<GamePlatform> selectGamePlatformList( GamePlatform gamePlatform );
 
     List<GamePlatform> selectGamePlatformAndVersionList();
+
+    List<GamePlatform> selectGamePlatformAndVersionFixList();
 }

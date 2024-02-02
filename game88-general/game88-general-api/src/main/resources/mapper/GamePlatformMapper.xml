@@ -83,4 +83,11 @@
                  LEFT JOIN game_platform p on v.platform_id = p.id
         where p.effect = 1
     </select>
+
+    <select id="selectGamePlatformAndVersionFixList" resultMap="GamePlatformResult">
+        select p.*, v.version_value
+        from game_record_fix_version v
+                 LEFT JOIN game_platform p on v.platform_id = p.id
+        where p.effect = 1
+    </select>
 </mapper>
