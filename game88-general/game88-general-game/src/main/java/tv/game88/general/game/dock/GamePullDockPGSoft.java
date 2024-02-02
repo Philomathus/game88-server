@@ -28,6 +28,8 @@ import java.util.*;
 @Repository( value = ConstantsGame.PG_SOFT + "GamePullProcessor" )
 public class GamePullDockPGSoft extends AbstractGamePull {
 
+    private static final BigDecimal RATE = new BigDecimal( 1000 );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -96,11 +98,11 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         LocalDateTime end     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( end ) );
 
-        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) );
+        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( RATE );
         gameDataRecord.setAllBet( betAmount.toString() );
         gameDataRecord.setCellScore( gameDataRecord.getAllBet() );
-        String payoffAmount = String.valueOf( remoteGameDatum.get( "winAmount" ) );
-        gameDataRecord.setProfit( new BigDecimal( payoffAmount ).subtract( betAmount ).toString() );
+        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ).multiply( RATE );
+        gameDataRecord.setProfit( payoffAmount.subtract( betAmount ).toString() );
         return gameDataRecord;
     }
 }
