@@ -33,9 +33,10 @@ public class GamePullDockPP extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
-        // 如果不是当前的时间,跳过
-        if ( LocalDateTime.now().isBefore( start ) ) {
+        long          gamePlatformVersion = Long.parseLong( gamePlatform.getVersionValue() );
+        LocalDateTime start               = LocalDateTimeUtils.getDateTimeFromTimestamp( gamePlatformVersion );
+        // 如果不是5分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 5 ) ) ) {
             return null;
         }
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -60,9 +61,6 @@ public class GamePullDockPP extends AbstractGamePull {
             }
             return text;
         } );
-        if ( "1706502720000".equals( gamePlatform.getVersionValue() ) ) {
-            log.warn( resultStr );
-        }
         if ( StringUtils.isNotBlank( resultStr ) ) {
             //找到第一个换行符的位置
             int index = resultStr.indexOf( "\n" );
@@ -71,9 +69,13 @@ public class GamePullDockPP extends AbstractGamePull {
             if ( StringUtils.isBlank( firstLine ) && !firstLine.contains( "=" ) ) {
                 return null;
             } else {
-                String time = firstLine.split( "=" )[ 1 ];
+                // 不使用PP提供的时间戳去拉单
+                /*String time = firstLine.split( "=" )[ 1 ];
                 long   l    = Long.parseLong( time ) - 1000; // 减去一秒,避免某些单没拉回
-                gamePlatform.setVersionValue( String.valueOf( l ) );
+                gamePlatform.setVersionValue( String.valueOf( l ) );*/
+
+                // 加一分钟,每分钟拉一次单
+                gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 60000 ) );
             }
             //删除第一行数据
             resultStr = resultStr.substring( index + 1 );
