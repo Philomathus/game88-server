@@ -73,9 +73,6 @@ public class GamePullDockMG extends AbstractGamePull {
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
-        if ( gamePlatform.getId() == 43 ) {
-            log.warn( JsonUtil.object2Json( object ) );
-        }
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
