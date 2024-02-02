@@ -66,6 +66,8 @@ public class GamePullDockPGSoft extends AbstractGamePull {
             }
             if ( resultMap.get( "error" ) != null ) {
                 log.warn( JsonUtil.object2Json( resultMap ) );
+            } else {
+                gamePlatform.setVersionValue( String.valueOf( Long.parseLong( gamePlatform.getVersionValue() ) + 60000 ) );
             }
         }
         return null;
