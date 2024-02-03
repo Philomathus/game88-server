@@ -107,6 +107,9 @@ public class GamePullDockPP extends AbstractGamePull {
         }
         //删除第一行数据
         resultStr = resultStr.substring( index + 1 );
+        if ( StringUtils.isBlank( resultStr ) ) {
+            return new ArrayList<>();
+        }
         try {
             CSVReader csvReader = new CSVReader( new StringReader( resultStr ) );
             // 读取所有记录
