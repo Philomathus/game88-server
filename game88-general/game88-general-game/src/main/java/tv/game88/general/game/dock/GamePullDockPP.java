@@ -39,73 +39,21 @@ public class GamePullDockPP extends AbstractGamePull {
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 5 ) ) ) {
             return null;
         }
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add( "login", gamePlatform.getAgent() );
-        params.add( "password", gamePlatform.getMd5() );
-        // 将本地的时间戳转换成GMT+0
-        params.add( "timepoint", gamePlatform.getVersionValue() );
-        params.add( "dataType", "RNG" );
-
-        final String url = gamePlatform.getApiUrl() + "/IntegrationService/v3/DataFeeds/gamerounds/finished/";
-
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( params ).build( true );
-
-        log.warn( uriComponents.toUriString() );
-
-        String resultStr = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null )
-                , response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return text;
-        } );
-        if ( StringUtils.isNotBlank( resultStr ) ) {
-            //找到第一个换行符的位置
-            int index = resultStr.indexOf( "\n" );
-            //取出第一行数据
-            String firstLine = resultStr.substring( 0, index );
-            if ( StringUtils.isBlank( firstLine ) && !firstLine.contains( "=" ) ) {
-                return null;
-            } else {
-                // 不使用PP提供的时间戳去拉单
-                /*String time = firstLine.split( "=" )[ 1 ];
-                long   l    = Long.parseLong( time ) - 1000; // 减去一秒,避免某些单没拉回
-                gamePlatform.setVersionValue( String.valueOf( l ) );*/
-
-                // 加一分钟,每分钟拉一次单
-                gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 60000 ) );
-            }
-            //删除第一行数据
-            resultStr = resultStr.substring( index + 1 );
-
-            try {
-                CSVReader csvReader = new CSVReader( new StringReader( resultStr ) );
-                // 读取所有记录
-                List<String[]> records = csvReader.readAll();
-
-                // 获取 CSV 文件的头部信息
-                String[] headers = records.getFirst();
-
-                // 初始化 List<Map> 用于存储转换后的数据
-                List<Object> dataList = new ArrayList<>();
-
-                // 遍历 CSV 记录并转换为 Map
-                for ( int i = 1; i < records.size(); i++ ) {
-                    String[]            record    = records.get( i );
-                    Map<String, String> recordMap = new HashMap<>();
-                    for ( int j = 0; j < headers.length; j++ ) {
-                        recordMap.put( headers[ j ], record[ j ] );
-                    }
-                    dataList.add( recordMap );
-                }
-                return dataList;
-            } catch ( Exception e ) {
-                log.error( e.getMessage(), e );
-            }
+        List<Object> resultDataList    = new ArrayList<>();
+        String       firstTimeResult   = this.execute( gamePlatform, gamePlatformVersion );
+        List<Object> firstTimeDataList = this.getDataList( firstTimeResult );
+        if ( firstTimeDataList != null ) {
+            resultDataList.addAll( firstTimeDataList );
+            // 加1分钟,每1分钟拉一次单
+            gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 60000 ) );
         }
-        return null;
+        // 加11分钟再拉一次,避免漏单
+        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 660000 );
+        List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
+        if ( secondTimeDataList != null ) {
+            resultDataList.addAll( secondTimeDataList );
+        }
+        return resultDataList;
     }
 
     @Override
@@ -147,5 +95,67 @@ public class GamePullDockPP extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
+    }
+
+    private List<Object> getDataList( String resultStr ) {
+        //找到第一个换行符的位置
+        int index = resultStr.indexOf( "\n" );
+        //取出第一行数据
+        String firstLine = resultStr.substring( 0, index );
+        if ( StringUtils.isBlank( firstLine ) && !firstLine.contains( "=" ) ) {
+            return new ArrayList<>();
+        }
+        //删除第一行数据
+        resultStr = resultStr.substring( index + 1 );
+        try {
+            CSVReader csvReader = new CSVReader( new StringReader( resultStr ) );
+            // 读取所有记录
+            List<String[]> records = csvReader.readAll();
+
+            // 获取 CSV 文件的头部信息
+            String[] headers = records.getFirst();
+
+            // 初始化 List<Map> 用于存储转换后的数据
+            List<Object> dataList = new ArrayList<>();
+
+            // 遍历 CSV 记录并转换为 Map
+            for ( int i = 1; i < records.size(); i++ ) {
+                String[]            record    = records.get( i );
+                Map<String, String> recordMap = new HashMap<>();
+                for ( int j = 0; j < headers.length; j++ ) {
+                    recordMap.put( headers[ j ], record[ j ] );
+                }
+                dataList.add( recordMap );
+            }
+            return dataList;
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        return null;
+    }
+
+    private String execute( GamePlatform gamePlatform, long timepoint ) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "login", gamePlatform.getAgent() );
+        params.add( "password", gamePlatform.getMd5() );
+        params.add( "timepoint", timepoint + "" );
+        params.add( "dataType", "RNG" );
+
+        final String url = gamePlatform.getApiUrl() + "/IntegrationService/v3/DataFeeds/gamerounds/finished/";
+
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( url ).queryParams( params ).build( true );
+
+        log.warn( uriComponents.toUriString() );
+
+        String resultStr = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null )
+                , response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return text;
+        } );
+        return resultStr;
     }
 }
