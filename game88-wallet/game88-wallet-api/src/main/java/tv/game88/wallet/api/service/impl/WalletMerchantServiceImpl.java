@@ -51,7 +51,7 @@ public class WalletMerchantServiceImpl extends ServiceImpl<WalletMerchantMapper,
         if ( !redisUtils.lock( "merchantReduceScore" + req.merchantId(), 15 ) ) {
             return RspBase.businessError( "请勿重复提交" );
         }
-        //walletFundManager.reduceWalletMerchantMoney(  );
+       // walletFundManager.reduceWalletMerchantMoney(  );
         return null;
     }
 }
