@@ -94,7 +94,7 @@ public class GamePullDockCG extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         String startTime = remoteGameDatum.get( "LogTime" ).toString();
-        LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC7ToDefault( startTime,
+        LocalDateTime startTimeLocal = LocalDateTimeUtils.parseLocalDateTime( startTime,
                 DateTimeFormatter.ISO_OFFSET_DATE_TIME );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
