@@ -11,7 +11,9 @@
         sum(gamecell)       as gamecell,
         sum(gamebet)        as gamebet,
         sum(gameprofit)     as gameprofit,
-        CONCAT(ROUND(convert(sum(gameprofit),decimal(10,2)) / convert(sum(gamecell),decimal(10,2)) * 100,2),'%') as bili,
+        <!--        CONCAT(ROUND(convert(sum(gameprofit),decimal(10,2)) / convert(sum(gamecell),decimal(10,2)) * 100,2),'%') as-->
+        <!--        bili,-->
+        CONCAT(ROUND(sum(gameprofit)/sum(gamecell)*100,2),'%') as bili
         <choose>
             <when test="endDate != null">
                 CONCAT( #{begindate}, ' - ', #{endDate} ) as begindate
