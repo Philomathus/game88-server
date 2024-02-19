@@ -275,7 +275,8 @@
         l.bank_name bankName,
         w.`status`,
         w.remark,
-        w.bank_account bankAccount
+        w.bank_account bankAccount,
+        w.bank_address bankAddress
         from member_withdraw_detail w
         left join config_bank_list l on l.id = w.bank_id
         where w.withdraw_id = #{memberId}

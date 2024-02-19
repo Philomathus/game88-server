@@ -962,7 +962,17 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         };
         for ( RspWithdrawRechargeDetail detail : resultList ) {
             switch ( type ) {
-            case withdraw -> this.setWithdrawColor( detail );
+            case withdraw -> {
+                this.setWithdrawColor( detail );
+                if ( detail.getBankName().contains( "usdt" ) || detail.getBankName().contains( "USDT" ) ) {
+                    if ( StringUtils.isNotBlank( detail.getBankAddress() ) && detail.getBankAddress().contains( ":" ) ) {
+                        String[] split = detail.getBankAddress().split( ":" );
+                        detail.setBankAddress( "提现汇率:" + split[ 0 ] + ";提现个数:" + split[ 1 ] );
+                    }
+                } else {
+                    detail.setBankAddress( "" );
+                }
+            }
             case rechargeBank, rechargeUsdt -> this.setRechargeBankColor( detail );
             case rechargeOnline -> this.setRechargeOnlineColor( detail );
             }

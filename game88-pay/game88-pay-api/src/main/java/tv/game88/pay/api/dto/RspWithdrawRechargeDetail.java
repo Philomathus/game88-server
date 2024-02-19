@@ -26,6 +26,8 @@ public class RspWithdrawRechargeDetail {
     @Schema( title = "银行账户" )
     private String bankAccount;
 
+    private String bankAddress;
+
     public String getBankAccount() {
         if ( StringUtils.isNotBlank( bankAccount ) ) {
             return "******" + bankAccount.substring( bankAccount.length() - 4 );
