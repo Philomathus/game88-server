@@ -3,6 +3,7 @@ package tv.game88.wallet.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -48,6 +49,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     @Resource
     private WalletFundManager             walletFundManager;
 
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
         if ( reqSellCoins.getCanSplit() && reqSellCoins.getMinBuyNum() == null ) {
@@ -66,6 +70,10 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         }
         if ( walletUser.getAmount() < reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "您的G币不足,G币数量:" + walletUser.getAmount() );
+        }
+
+        if( !passwordEncoder.matches( reqSellCoins.getFundPass() , walletUser.getFundPassword() )){
+            return RspBase.businessError( "密码不匹配" );
         }
 
         Set<String> typeSet = walletUserPayMethodMapper
