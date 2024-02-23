@@ -54,13 +54,14 @@ public class OssApi {
         String       fileName        = file.getOriginalFilename();
         String       extension       = FilenameUtils.getExtension( fileName );
         InputStream  inputStream     = file.getInputStream();
-        File         newFile         = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        String       rFileName       = DigestUtils.md5Hex( inputStream );
+        String       newFileName     = rFileName + "." + extension;
+        File         newFile         = new File( System.getProperty( "java.io.tmpdir" ) + newFileName );
         Path         newFileToPath   = newFile.toPath();
         OutputStream newOutputStream = Files.newOutputStream( newFileToPath );
         IOUtils.copy( inputStream, newOutputStream );
-        InputStream newInputStream = Files.newInputStream( newFileToPath );
-        String      rFileName      = DigestUtils.md5Hex( newInputStream );
-        String      fileKey        = "88lm/" + path + "/" + rFileName + "." + extension;
+
+        String fileKey = "88lm/" + path + "/" + newFileName;
         String url = switch ( configOss.getProvider() ) {
             case 0 -> this.uploadAliyun( configOss, fileKey, newFile );
             case 1 -> this.uploadAmazon( configOss, fileKey, newFile );
@@ -71,12 +72,12 @@ public class OssApi {
             }
         };
         newFile.delete();
-        IOUtils.closeQuietly( inputStream, newInputStream, newOutputStream );
+        IOUtils.closeQuietly( inputStream, newOutputStream );
         if ( StringUtils.isBlank( url ) ) {
             return RspBase.businessError( "上传失败,请联系技术人员" );
         }
         RspBase<String> rspBase = RspBase.ok( "上传成功", url );
-        rspBase.setOtherData( rFileName + "." + extension );
+        rspBase.setOtherData( newFileName );
         return rspBase;
     }
 

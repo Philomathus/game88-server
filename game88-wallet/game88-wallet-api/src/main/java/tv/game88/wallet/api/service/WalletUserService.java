@@ -15,6 +15,15 @@ import java.util.List;
  */
 public interface WalletUserService extends IService<WalletUser> {
 
+    /**
+     * 查询钱包用户列表
+     *
+     * @param walletUser 钱包用户
+     *
+     * @return 钱包用户集合
+     */
+    List<WalletUser> selectWalletUserList( WalletUser walletUser );
+
     RspBase<?> sendSmsVerifyCode( Phone phone );
 
     RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String loginUrl );

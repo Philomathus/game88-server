@@ -61,6 +61,20 @@
         from wallet_user
     </sql>
 
+    <select id="selectWalletUserList" parameterType="tv.game88.wallet.api.entity.WalletUser" resultMap="WalletUserResult">
+        <include refid="selectWalletUserVo"/>
+        <where>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+            <if test="idNumber != null  and idNumber != ''"> and id_number = #{idNumber}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="loginIp != null  and loginIp != ''"> and login_ip = #{loginIp}</if>
+            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
+            <if test="loginDevice != null "> and login_device = #{loginDevice}</if>
+        </where>
+    </select>
+
     <select id="getUserMoney" resultType="Long">
         select amount
         from wallet_user

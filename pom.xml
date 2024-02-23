@@ -37,7 +37,7 @@
 
         <mysql-connector-java.version>8.3.0</mysql-connector-java.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
-        <pagehelper.starter.version>2.0.0</pagehelper.starter.version>
+        <pagehelper.starter.version>2.1.0</pagehelper.starter.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <dynamic.datasource.version>4.3.0</dynamic.datasource.version>
 
@@ -49,22 +49,22 @@
         <commons-compress.version>1.25.0</commons-compress.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <opencsv.version>5.9</opencsv.version>
-        <httpclient5.version>5.3</httpclient5.version>
+        <httpclient5.version>5.3.1</httpclient5.version>
         <easypoi.version>4.4.0</easypoi.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bitwalker.version>1.21</bitwalker.version>
         <jjwt.version>0.12.3</jjwt.version>
         <caffeine.version>3.1.8</caffeine.version>
-        <telegrambots.version>6.9.0</telegrambots.version>
-        <zxing.version>3.5.2</zxing.version>
+        <telegrambots.version>6.9.7.1</telegrambots.version>
+        <zxing.version>3.5.3</zxing.version>
 
-        <tencentcloud.vesion>3.1.914</tencentcloud.vesion>
+        <tencentcloud.vesion>3.1.967</tencentcloud.vesion>
         <aliyun.core.version>4.6.4</aliyun.core.version>
-        <aliyun.oss.version>3.17.2</aliyun.oss.version>
+        <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <aliyun.sts.version>3.1.2</aliyun.sts.version>
         <aliyun.dysmsapi.version>2.2.1</aliyun.dysmsapi.version>
-        <baidubce.version>0.10.288</baidubce.version>
-        <amazon.s3.version>1.12.595</amazon.s3.version>
+        <baidubce.version>0.10.297</baidubce.version>
+        <amazon.s3.version>1.12.664</amazon.s3.version>
 
         <!-- plugin -->
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
@@ -73,7 +73,7 @@
 
         <snakeyaml.version>2.2</snakeyaml.version>
         <guava.version>33.0.0-jre</guava.version>
-        <org.json.verion>20231013</org.json.verion>
+        <org.json.verion>20240205</org.json.verion>
         <bouncycastle.version>1.77</bouncycastle.version>
     </properties>
 

@@ -33,6 +33,7 @@ import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -71,6 +72,18 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Resource
     @Lazy
     private WalletRecordService     walletRecordService;
+
+    /**
+     * 查询钱包用户列表
+     *
+     * @param walletUser 钱包用户
+     *
+     * @return 钱包用户
+     */
+    @Override
+    public List<WalletUser> selectWalletUserList( WalletUser walletUser ) {
+        return this.baseMapper.selectWalletUserList( walletUser );
+    }
 
     @Override
     public RspBase<?> sendSmsVerifyCode( Phone phone ) {
@@ -488,28 +501,26 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
     @Override
     public RspBase<?> setPassword( String userId, ReqConstant.ReqSetPasswd reqSetPasswd ) {
-        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
-                .eq( "id", userId )
-                .select( "id","password" )
-                .one();
+        WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper ).eq( "id", userId ).select( "id", "password" ).one();
 
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
-        if( StringUtils.isNotBlank( walletUser.getPassword() ) ){
+        if ( StringUtils.isNotBlank( walletUser.getPassword() ) ) {
             return RspBase.businessError( "钱包用户密码已经存在。如果你忘记了，请重新设置!" );
         }
-        if( passwordEncoder.matches( reqSetPasswd.password(), walletUser.getPassword() ) ){
+        if ( passwordEncoder.matches( reqSetPasswd.password(), walletUser.getPassword() ) ) {
             return RspBase.businessError( "密码不能与已有密码相同!" );
         }
-        if( !reqSetPasswd.password().equals( reqSetPasswd.confirmPassword() )){
+        if ( !reqSetPasswd.password().equals( reqSetPasswd.confirmPassword() ) ) {
             return RspBase.businessError( "密码和确认密码必须匹配!" );
         }
 
         WalletUser updateUser = new WalletUser();
         updateUser.setId( userId );
-        updateUser.setPassword( passwordEncoder.encode( reqSetPasswd.password() )  );
-        return this.baseMapper.updateById( updateUser ) > 0 ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
+        updateUser.setPassword( passwordEncoder.encode( reqSetPasswd.password() ) );
+        return this.baseMapper.updateById( updateUser )
+                > 0 ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
     }
 
     @Override
@@ -525,18 +536,18 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( StringUtils.isBlank( walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "资金密码不存在,请设置您的资金密码!" );
         }
-        if( !passwordEncoder.matches( reqResetFundPasswd.fundOldPass() , walletUser.getFundPassword() ) ){
+        if ( !passwordEncoder.matches( reqResetFundPasswd.fundOldPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "你以前的基金密码不匹配!" );
         }
-        if( passwordEncoder.matches( reqResetFundPasswd.fundNewPass() , walletUser.getFundPassword() ) ){
+        if ( passwordEncoder.matches( reqResetFundPasswd.fundNewPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不能与已有密码相同!" );
         }
 
         WalletUser update = new WalletUser();
         update.setId( userId );
-        update.setFundPassword( passwordEncoder.encode( reqResetFundPasswd.fundNewPass() )  );
+        update.setFundPassword( passwordEncoder.encode( reqResetFundPasswd.fundNewPass() ) );
 
-        return this.baseMapper.updateById( update  ) > 0 ? RspBase.ok():RspBase.businessError( "申请身份认证异常，请稍后再试" );
+        return this.baseMapper.updateById( update ) > 0 ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
     }
 }
 
