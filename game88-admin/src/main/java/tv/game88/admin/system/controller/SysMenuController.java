@@ -91,7 +91,7 @@ public class SysMenuController extends BaseController {
         }
         menu.setCreateBy( SecurityUtils.getUsername() );
         menu.setCreateTime( LocalDateTime.now() );
-        return toResult( menuService.save( menu ) );
+        return toResult( menuService.insertMenu( menu ) );
     }
 
     /**
@@ -111,7 +111,7 @@ public class SysMenuController extends BaseController {
         }
         menu.setUpdateBy( SecurityUtils.getUsername() );
         menu.setUpdateTime( LocalDateTime.now() );
-        return toResult( menuService.updateById( menu ) );
+        return toResult( menuService.updateMenu( menu ) );
     }
 
     /**

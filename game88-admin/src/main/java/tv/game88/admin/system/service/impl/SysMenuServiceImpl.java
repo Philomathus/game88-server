@@ -211,6 +211,30 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
+     * 新增保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    @Override
+    public int insertMenu( SysMenu menu ) {
+        return this.baseMapper.insertMenu( menu );
+    }
+
+    /**
+     * 修改保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    @Override
+    public int updateMenu( SysMenu menu ) {
+        return this.baseMapper.updateMenu( menu );
+    }
+
+    /**
      * 校验菜单名称是否唯一
      *
      * @param menu 菜单信息

@@ -67,6 +67,24 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
     public SysMenu selectMenuById( Long menuId );
 
     /**
+     * 新增菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    public int insertMenu( SysMenu menu );
+
+    /**
+     * 修改菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    public int updateMenu( SysMenu menu );
+
+    /**
      * 校验菜单名称是否唯一
      *
      * @param menuName 菜单名称
