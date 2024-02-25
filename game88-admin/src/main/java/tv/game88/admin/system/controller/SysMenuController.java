@@ -51,7 +51,7 @@ public class SysMenuController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('system:menu:query')" )
     @GetMapping( value = "/{menuId}" )
     public RspBase<SysMenu> getInfo( @PathVariable Long menuId ) {
-        return RspBase.ok( menuService.getById( menuId ) );
+        return RspBase.ok( menuService.selectMenuById( menuId ) );
     }
 
     /**

@@ -175,6 +175,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
+     * 根据菜单ID查询信息
+     *
+     * @param menuId 菜单ID
+     *
+     * @return 菜单信息
+     */
+    @Override
+    public SysMenu selectMenuById( Long menuId ) {
+        return this.baseMapper.selectMenuById( menuId );
+    }
+
+    /**
      * 是否存在菜单子节点
      *
      * @param menuId 菜单ID
