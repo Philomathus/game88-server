@@ -15,6 +15,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
+import tv.game88.core.config.mapper.ConfigBankListMapper;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -54,6 +56,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private ConfigBankListCache configBankListCache;
 
     @Override
     public RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
@@ -304,9 +309,16 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .orderByDesc( "create_time" ) );
 
         Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+        List<RspConfigBankList>    configBankList      = configBankListCache.getEffectList();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
+
+            for ( RspConfigBankList rspConfigBank : configBankList ) {
+                if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
+                    rspPayMethod.setBankName( rspConfigBank.getBankName() );
+                }
+            }
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
         }
         rspSellOrderDetail2.setRspPayMethodMap( rspPayMethodMap );
