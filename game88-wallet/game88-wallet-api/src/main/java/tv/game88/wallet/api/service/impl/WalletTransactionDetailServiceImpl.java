@@ -171,7 +171,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
-                .set( "status", 1 )
+                .set( "status", 0 )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
                 .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
@@ -535,6 +535,16 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String             mark     = "用户" + fundEnum.getDes() + walletTransactionDetail.getAmount();
         walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, walletTransactionDetail.getAmount(),
                 fundEnum, mark, walletTransactionDetail.getTransDetailId(), walletTransactionDetail.getTransDetailId() );
+
+        WalletUser buyer = walletUserService.getById( walletTransactionDetail.getBuyerId() );
+        WalletUser seller = walletUserService.getById( walletTransactionDetail.getSellerId() );
+
+        buyer.setBuyOrderNum( buyer.getBuyOrderNum() + 1 );
+        seller.setSellOrderNum( buyer.getSellOrderNum() + 1 );
+
+        walletUserService.updateById( buyer );
+        walletUserService.updateById( seller );
+
         if ( i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
