@@ -54,12 +54,13 @@ public class OssApi {
         String       fileName        = file.getOriginalFilename();
         String       extension       = FilenameUtils.getExtension( fileName );
         InputStream  inputStream     = file.getInputStream();
-        String       rFileName       = DigestUtils.md5Hex( inputStream );
-        String       newFileName     = rFileName + "." + extension;
-        File         newFile         = new File( System.getProperty( "java.io.tmpdir" ) + newFileName );
+        File         newFile         = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
         Path         newFileToPath   = newFile.toPath();
         OutputStream newOutputStream = Files.newOutputStream( newFileToPath );
         IOUtils.copy( inputStream, newOutputStream );
+        InputStream newInputStream = Files.newInputStream( newFileToPath );
+        String      rFileName      = DigestUtils.md5Hex( newInputStream );
+        String      newFileName    = rFileName + "." + extension;
 
         String fileKey = "88lm/" + path + "/" + newFileName;
         String url = switch ( configOss.getProvider() ) {
@@ -72,7 +73,7 @@ public class OssApi {
             }
         };
         newFile.delete();
-        IOUtils.closeQuietly( inputStream, newOutputStream );
+        IOUtils.closeQuietly( inputStream, newInputStream, newOutputStream );
         if ( StringUtils.isBlank( url ) ) {
             return RspBase.businessError( "上传失败,请联系技术人员" );
         }
