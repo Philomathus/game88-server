@@ -171,7 +171,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
-                .set( "status", 0 )
+                .set( "status", 1 )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
                 .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
@@ -366,7 +366,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
-                .eq( "status", 1 ) );
+//                .eq( "status", 1 )
+        );
         if ( update && i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
