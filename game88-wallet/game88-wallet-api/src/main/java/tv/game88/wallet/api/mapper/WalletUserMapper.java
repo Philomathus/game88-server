@@ -43,6 +43,9 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     WalletUser findMemberHistoryById( @Param( "id" ) String walletAddress );
 
     String getUserPasswd( String userId );
+
+    void addBuyerTransactionTime( @Param( "id" ) String id );
+    void addSellerTransactionTime( @Param( "id" ) String id );
 }
 
 

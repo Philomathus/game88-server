@@ -73,6 +73,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Lazy
     private WalletRecordService     walletRecordService;
 
+    @Resource
+    private WalletUserMapper walletUserMapper;
+
     /**
      * 查询钱包用户列表
      *
@@ -548,6 +551,16 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         update.setFundPassword( passwordEncoder.encode( reqResetFundPasswd.fundNewPass() ) );
 
         return this.baseMapper.updateById( update ) > 0 ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
+    }
+
+    @Override
+    public void addBuyerTransactionTime( String id ) {
+         walletUserMapper.addBuyerTransactionTime( id );
+    }
+
+    @Override
+    public void addSellerTransactionTime( String id ) {
+        walletUserMapper.addSellerTransactionTime( id );
     }
 }
 

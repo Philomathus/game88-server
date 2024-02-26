@@ -539,11 +539,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         WalletUser buyer = walletUserService.getById( walletTransactionDetail.getBuyerId() );
         WalletUser seller = walletUserService.getById( walletTransactionDetail.getSellerId() );
 
-        buyer.setBuyOrderNum( buyer.getBuyOrderNum() + 1 );
-        seller.setSellOrderNum( buyer.getSellOrderNum() + 1 );
+        walletUserService.addBuyerTransactionTime( buyer.getId() );
+        walletUserService.addSellerTransactionTime( seller.getId() );
 
-        walletUserService.updateById( buyer );
-        walletUserService.updateById( seller );
 
         if ( i > 0 ) {
             // 确认是否存在其它未完成的订单

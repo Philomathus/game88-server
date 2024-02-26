@@ -63,4 +63,8 @@ public interface WalletUserService extends IService<WalletUser> {
     RspBase<?> setPassword( String userId, ReqConstant.ReqSetPasswd reqSetPasswd );
 
     RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd );
+
+    void addBuyerTransactionTime( String id );
+
+    void addSellerTransactionTime( String id );
 }

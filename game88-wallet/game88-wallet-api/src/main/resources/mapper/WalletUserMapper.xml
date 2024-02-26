@@ -25,6 +25,8 @@
         <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
         <result property="deviceId" column="device_id" jdbcType="VARCHAR" />
         <result property="totalCharge" column="total_charge" jdbcType="DECIMAL" />
+        <result property="buyOrderNum" column="buy_order_num"  />
+        <result property="sellOrderNum" column="sell_order_num"  />
         <result property="totalSale" column="total_sale" jdbcType="DECIMAL" />
         <result property="phoneModel" column="phone_model" jdbcType="VARCHAR" />
         <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
@@ -138,4 +140,16 @@
         from wallet_user
         where id = #{userId}
     </select>
+
+    <update id="addBuyerTransactionTime">
+        update  wallet_user
+            set buy_order_num = buy_order_num + 1
+        where id = #{id}
+    </update>
+
+    <update id="addSellerTransactionTime">
+        update  wallet_user
+        set sell_order_num = sell_order_num + 1
+        where id = #{id}
+    </update>
 </mapper>
