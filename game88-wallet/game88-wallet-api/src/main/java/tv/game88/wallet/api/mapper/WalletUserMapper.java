@@ -44,8 +44,12 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
 
     String getUserPasswd( String userId );
 
-    void addBuyerTransactionTime( @Param( "id" ) String id );
-    void addSellerTransactionTime( @Param( "id" ) String id );
+    void addBuyerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money );
+    void addSellerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money);
+
+    void addSellerTotalSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money);
+    void addSellerOngoingSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
+    void addSellerCancelSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
 }
 
 

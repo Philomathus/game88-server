@@ -143,6 +143,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + sellNum;
             walletFundManager.reduceWalletUserMoney( userId, null, sellNum, fundEnum, mark,
                     walletTransaction.getTransactionId(), walletTransaction.getTransactionId() );
+//            walletUserService.addSellerTotalSellingAmount( userId , walletTransaction.getAmount() );
         } else {
             throw new BusinessException( "发布挂单失败,请重试" );
         }
@@ -158,6 +159,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + amount;
             walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark,
                     update.getTransactionId() + "QuXiao", update.getTransactionId() );
+            walletUserService.addSellerCancelSellingAmount( userId , update.getAmount() );
         } else {
             throw new BusinessException( "取消挂单失败,请重试" );
         }

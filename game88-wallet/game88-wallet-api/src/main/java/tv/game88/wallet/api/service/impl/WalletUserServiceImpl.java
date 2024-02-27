@@ -554,13 +554,28 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
-    public void addBuyerTransactionTime( String id ) {
-         walletUserMapper.addBuyerTransactionTime( id );
+    public void addBuyerTransactionSuccess( String id ,Long money ) {
+         walletUserMapper.addBuyerTransactionSuccess( id , money );
     }
 
     @Override
-    public void addSellerTransactionTime( String id ) {
-        walletUserMapper.addSellerTransactionTime( id );
+    public void addSellerTransactionSuccess( String id , Long money ) {
+        walletUserMapper.addSellerTransactionSuccess( id , money );
+    }
+
+    @Override
+    public void addSellerTotalSellingAmount( String id ,Long amount ) {
+        walletUserMapper.addSellerTotalSellingAmount( id , amount );
+    }
+
+    @Override
+    public void addSellerOngoingSellingAmount( String id ,Long amount) {
+        walletUserMapper.addSellerOngoingSellingAmount( id , amount );
+    }
+
+    @Override
+    public void addSellerCancelSellingAmount( String id ,Long amount) {
+        walletUserMapper.addSellerCancelSellingAmount( id , amount );
     }
 }
 

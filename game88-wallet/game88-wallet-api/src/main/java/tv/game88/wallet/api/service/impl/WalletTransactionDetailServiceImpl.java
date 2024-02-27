@@ -179,6 +179,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
         // 保存交易
         int i = this.baseMapper.insert( walletTransactionDetail );
+
+//        walletUserService.addSellerTotalSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount() );
+        walletUserService.addSellerOngoingSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount());
+
         if ( !( update && i > 0 ) ) {
             throw new BusinessException( "购买失败,请重试" );
         }
@@ -315,6 +319,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
+            walletUserService.addSellerOngoingSellingAmount( userId , walletTransactionDetail.getAmount() );
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
@@ -398,6 +403,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 if ( !updateTrans ) {
                     throw new BusinessException( "取消交易失败,请重试" );
                 }
+
+                walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId() , updateTransactionDetail.getAmount() );
             }
         } else {
             throw new BusinessException( "取消交易失败,请重试" );
@@ -554,8 +561,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         WalletUser buyer = walletUserService.getById( walletTransactionDetail.getBuyerId() );
         WalletUser seller = walletUserService.getById( walletTransactionDetail.getSellerId() );
 
-        walletUserService.addBuyerTransactionTime( buyer.getId() );
-        walletUserService.addSellerTransactionTime( seller.getId() );
+        walletUserService.addBuyerTransactionSuccess( buyer.getId(), walletTransactionDetail.getAmount() );
+        walletUserService.addSellerTransactionSuccess( seller.getId() , walletTransactionDetail.getAmount() );
 
 
         if ( i > 0 ) {
