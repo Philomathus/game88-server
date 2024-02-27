@@ -1,4 +1,4 @@
-package tv.game88.wallet.api.sse.model;
+package tv.game88.wallet.api.dto;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,8 +8,8 @@ import java.io.Serializable;
 
 @Value
 @Builder
-public class TransDetailStreamMessage implements Serializable {
-    String transDetailId;
-    Boolean isSeller;
+public class SseStreamTransDetailMessage implements Serializable {
+    String          transDetailId;
+    Boolean         isSeller;
     WalletTransEnum walletTransEnum;
 }

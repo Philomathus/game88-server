@@ -2,10 +2,10 @@ package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.ValidatorUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -19,7 +19,6 @@ import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -44,7 +43,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         if ( walletUser.getStatus() != 1 ) {
             return RspBase.businessError( "用户状态异常,请联系客服" );
         }
-        if ( walletUser.getIsVerified() < 2 ) {
+        if ( walletUser.getIsVerified() < 2 || StringUtils.isBlank( walletUser.getRealName() ) ) {
             return RspBase.businessError( "用户未实名或实名未认证" );
         }
         if ( walletUser.getFundPassword() == null ) {
@@ -64,7 +63,6 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
                 return RspBase.businessError( "请输入微信实名姓名" );
             }
-            reqPayMethod.setRealName( walletUser.getRealName() );
         }
         case WECHAT_PAY -> {
             if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
@@ -80,9 +78,6 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             }
             if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
                 return RspBase.businessError( "请上传收款码" );
-            }
-            if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
-                return RspBase.businessError( "请输入微信实名姓名" );
             }
             reqPayMethod.setRealName( walletUser.getRealName() );
         }

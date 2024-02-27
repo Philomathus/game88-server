@@ -3,27 +3,25 @@ package tv.game88.wallet.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
+import tv.game88.wallet.api.dto.SseStreamTransDetailMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.service.WalletMessageService;
-import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 import tv.game88.wallet.api.type.WalletTransEnum;
-import tv.game88.wallet.api.sse.model.TransDetailStreamMessage;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static tv.game88.wallet.api.type.StreamMessageType.NOTIFICATION;
 
 /**
  * 站内信Service业务层处理
@@ -33,9 +31,9 @@ import static tv.game88.wallet.api.type.StreamMessageType.NOTIFICATION;
 @Service
 public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, WalletMessage> implements WalletMessageService {
     @Resource
-    private RedisUtils                    redisUtils;
+    private RedisUtils          redisUtils;
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 查询站内信列表
@@ -177,14 +175,12 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         walletMessage.setCreateTime( LocalDateTime.now() );
         this.baseMapper.insert( walletMessage );
 
-        redisTemplate.convertAndSend( ConstantsWallet.MESSAGE_CHANNEL + receiverUserId, SimpleProtocolMessage
-                .<TransDetailStreamMessage>builder()
-                .messageType( NOTIFICATION )
-                .data( TransDetailStreamMessage.builder()
+        stringRedisTemplate.convertAndSend(
+                ConstantsWallet.SSE_MEMBER_CHANNEL + receiverUserId, JsonUtil.object2Json( SseStreamTransDetailMessage
+                        .builder()
                         .transDetailId( transDetailId )
-                        .isSeller(isSeller)
+                        .isSeller( isSeller )
                         .walletTransEnum( walletTransEnum )
-                        .build() )
-                .build() );
+                        .build() ) );
     }
 }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试SSE</title>
+</head>
+<body>
+<h1>测试SSE</h1>
+<div id="stock-price"></div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/event-source-polyfill@1.0.31/src/eventsource.min.js"></script>
+<script>
+    let eventSource;
+
+    function init() {
+        eventSource = new EventSourcePolyfill('http://localhost:18862/api/stream/subscribe', {
+            headers: {
+                token: 'CpJb08f15f37c49c28eb7f08c2f98232fe1'
+            }
+        });
+        eventSource.onerror = function (event) {
+            console.error(event)
+        };
+        eventSource.addEventListener('CONNECTION', function (event) {
+            printMessage(event.data)
+        }, false);
+        eventSource.addEventListener('MEMBER', function (event) {
+            printMessage(event.data)
+        }, false);
+        eventSource.addEventListener('NOTIFICATION', function (event) {
+            printMessage(event.data)
+        }, false);
+    }
+
+    function printMessage(data) {
+        let messages = document.getElementById("stock-price");
+        let newMessage = document.createElement("div");
+        newMessage.innerHTML = data;
+        messages.insertBefore(newMessage, messages.firstChild);
+    }
+
+    init();
+</script>
+</html>
