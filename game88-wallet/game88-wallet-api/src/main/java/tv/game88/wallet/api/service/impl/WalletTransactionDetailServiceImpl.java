@@ -180,9 +180,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 保存交易
         int i = this.baseMapper.insert( walletTransactionDetail );
 
-//        walletUserService.addSellerTotalSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount() );
-        walletUserService.addSellerOngoingSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount());
-
         if ( !( update && i > 0 ) ) {
             throw new BusinessException( "购买失败,请重试" );
         }
@@ -395,6 +392,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )
                     .ne( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
+            walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount() );
             // 如果不存在则将挂单改为挂单中
             if ( !exists ) {
                 boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
@@ -404,7 +402,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     throw new BusinessException( "取消交易失败,请重试" );
                 }
 
-                walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId() , updateTransactionDetail.getAmount() );
             }
         } else {
             throw new BusinessException( "取消交易失败,请重试" );
