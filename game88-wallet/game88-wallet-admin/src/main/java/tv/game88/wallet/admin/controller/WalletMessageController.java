@@ -1,21 +1,24 @@
 package tv.game88.wallet.admin.controller;
 
+import jakarta.annotation.Resource;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.wallet.api.constants.ConstantsWallet;
+import tv.game88.wallet.api.dto.SseStreamNotificationMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +35,8 @@ public class WalletMessageController extends BaseController {
     private WalletMessageService walletMessageService;
     @Resource
     private RedisUtils           redisUtils;
+    @Resource
+    private StringRedisTemplate  stringRedisTemplate;
 
     /**
      * 查询系统站内信列表
@@ -69,7 +74,17 @@ public class WalletMessageController extends BaseController {
         walletMessage.setIsRead( null );
         walletMessage.setReceiverUserId( null );
         walletMessage.setType( WalletMessageEnum.system );
-        return toResult( walletMessageService.save( walletMessage ) );
+        boolean save = walletMessageService.save( walletMessage );
+        if ( save ) {
+            stringRedisTemplate.convertAndSend( ConstantsWallet.SSE_NOTIFICATION_CHANNEL,
+                    JsonUtil.object2Json( SseStreamNotificationMessage
+                    .builder()
+                    .messageId( walletMessage.getId() )
+                    .title( walletMessage.getTitle() )
+                    .type( WalletMessageEnum.system )
+                    .build() ) );
+        }
+        return toResult( save );
     }
 
     /**
