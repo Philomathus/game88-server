@@ -13,7 +13,9 @@ import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
+import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
@@ -36,10 +38,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author meng.jun
@@ -62,6 +61,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private ConfigBankListCache configBankListCache;
 
     @Override
     public List<RspTransDetail> transDetailList( String userId, ReqTransDetailList req ) {
@@ -209,13 +211,25 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         rspBuyOrderDetail.setSellerId( walletTransactionDetail.getSellerId() );
         rspBuyOrderDetail.setTransStartTime( walletTransactionDetail.getBuyerConfirmBuyTime() );
 
+        List<RspConfigBankList> configBankList = configBankListCache.getEffectList();
+
         RspPayMethod2 rspBuyerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( bPayMethod, rspBuyerPayMethod );
         rspBuyOrderDetail.setBuyerPayMethod( rspBuyerPayMethod );
+        for ( RspConfigBankList rspConfigBank : configBankList ) {
+            if ( Objects.equals( bPayMethod.getBankId(), rspConfigBank.getId() ) ) {
+                rspBuyerPayMethod.setBankName( rspConfigBank.getBankName() );
+            }
+        }
 
         RspPayMethod2 rspSellerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setSellerPayMethod( rspSellerPayMethod );
+        for ( RspConfigBankList rspConfigBank : configBankList ) {
+            if ( Objects.equals( bPayMethod.getBankId(), rspConfigBank.getId() ) ) {
+                rspSellerPayMethod.setBankName( rspConfigBank.getBankName() );
+            }
+        }
 
         // 计算订单倒计时
         if ( redisUtils.exists( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) ) {
