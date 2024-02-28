@@ -39,7 +39,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
     public RspBase<?> bindNewPayMethod( String userId, ReqPayMethod reqPayMethod ) {
         boolean accountExist = this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "bank_account", reqPayMethod.getAccount() ) );
         if( accountExist ){
-            return RspBase.businessError( "账户已绑定。请到另一家银行试试" );
+            return RspBase.businessError( "该银行卡已经绑定,请输入其它银行卡号" );
         }
 
         WalletUser walletUser = walletUserMapper.selectById( userId );
