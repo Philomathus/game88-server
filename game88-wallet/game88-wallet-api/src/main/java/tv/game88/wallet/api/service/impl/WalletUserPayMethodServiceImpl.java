@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,11 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
     @Override
     public RspBase<?> bindNewPayMethod( String userId, ReqPayMethod reqPayMethod ) {
+        boolean accountExist = this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "bank_account", reqPayMethod.getAccount() ) );
+        if( accountExist ){
+            return RspBase.businessError( "账户已绑定。请到另一家银行试试" );
+        }
+
         WalletUser walletUser = walletUserMapper.selectById( userId );
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
