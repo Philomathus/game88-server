@@ -74,6 +74,17 @@
             <if test="loginIp != null  and loginIp != ''"> and login_ip = #{loginIp}</if>
             <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
             <if test="loginDevice != null "> and login_device = #{loginDevice}</if>
+            <if test="searchValues != null and searchValues.size() != 0">
+                and (id in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                or phone in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                )
+            </if>
         </where>
     </select>
 
