@@ -14,6 +14,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
@@ -64,11 +65,11 @@ public class PayMethodController extends BaseController {
         return walletUserPayMethodService.bindNewPayMethod( MemberSecurityUtils.getUserId(), reqPayMethod );
     }
 
-    public record ReqPayMethodId(@Schema( title = "支付方式ID" ) int payMethodId) {}
+
 
     @Operation( summary = "解绑支付方式" )
     @PostMapping( "/api/unBindPayMethod" )
-    public RspBase<?> unBindPayMethod( @RequestBody ReqPayMethodId req ) {
+    public RspBase<?> unBindPayMethod( @RequestBody ReqConstant.ReqPayMethodId req ) {
         return walletUserPayMethodService.unBindPayMethod( MemberSecurityUtils.getUserId(), req.payMethodId() );
     }
 

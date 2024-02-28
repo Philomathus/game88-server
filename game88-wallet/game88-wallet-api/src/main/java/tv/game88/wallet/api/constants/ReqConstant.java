@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 
 public class ReqConstant {
 
+    public record ReqPayMethodId(@Schema( title = "支付方式ID" ) int payMethodId) {}
+
     public record ReqSetPasswd(
             @Schema( title = "新密码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotBlank( message = "新密码不能为空" ) String password,
             @Schema( title = "确认密码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotBlank( message = "确认密码不能为空" ) String confirmPassword) {}
