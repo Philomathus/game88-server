@@ -15,6 +15,7 @@ import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.dto.SseStreamTransDetailMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
+import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.mapper.WalletMessageMapper;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.api.type.WalletMessageEnum;
@@ -111,12 +112,15 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
 
     @Async
     @Override
-    public void saveWalletMessage( String receiverUserId, String transDetailId, WalletTransEnum walletTransEnum,
-                                   boolean isSeller ) {
+    public void saveWalletMessage( WalletTransactionDetail walletTransactionDetail, boolean isSeller ) {
         String titleText;
         String actionText;
         String orderText;
 
+        WalletTransEnum walletTransEnum = walletTransactionDetail.getStatus();
+        String          transDetailId   = walletTransactionDetail.getTransDetailId();
+        String          transactionId   = walletTransactionDetail.getTransactionId();
+        String          receiverUserId  = isSeller ? walletTransactionDetail.getSellerId() : walletTransactionDetail.getBuyerId();
         switch ( walletTransEnum ) {
         case BUYER_CONFIRM_BUY -> {
             titleText  = "您有新的交易订单";
@@ -179,6 +183,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
                 ConstantsWallet.SSE_MEMBER_CHANNEL + receiverUserId, JsonUtil.object2Json( SseStreamTransDetailMessage
                         .builder()
                         .transDetailId( transDetailId )
+                        .transactionId( transactionId )
                         .isSeller( isSeller )
                         .walletTransEnum( walletTransEnum )
                         .build() ) );

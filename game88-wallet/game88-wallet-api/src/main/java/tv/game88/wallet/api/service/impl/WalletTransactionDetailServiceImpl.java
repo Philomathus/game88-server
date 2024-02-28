@@ -34,6 +34,7 @@ import tv.game88.wallet.api.type.WalletTransEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -124,19 +125,17 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             return RspBase.businessError( "挂单余额不足" );
         }
 
-        String          sellerId        = walletTransaction.getUserId();
-        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CONFIRM_BUY;
-        String          transDetailId   = GenerateOrderCacheUtils.me.getOrderId( "BUY", 5 );
+        String transDetailId = GenerateOrderCacheUtils.me.getOrderId( "BUY", 5 );
 
         WalletTransactionDetail walletTransactionDetail = new WalletTransactionDetail();
         walletTransactionDetail.setTransDetailId( transDetailId );
         walletTransactionDetail.setTransactionId( transactionId );
         walletTransactionDetail.setAmount( reqBuyCoins.getAmount() );
-        walletTransactionDetail.setStatus( walletTransEnum );
+        walletTransactionDetail.setStatus( WalletTransEnum.BUYER_CONFIRM_BUY );
         LocalDateTime now = LocalDateTime.now();
         walletTransactionDetail.setBuyerConfirmBuyTime( now );
         walletTransactionDetail.setTime( now );
-        walletTransactionDetail.setSellerId( sellerId );
+        walletTransactionDetail.setSellerId( walletTransaction.getUserId() );
         walletTransactionDetail.setBuyerId( userId );
         walletTransactionDetail.setBuyerPayMethodId( reqBuyCoins.getPayMethodId() );
 
@@ -155,20 +154,19 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "买家" + userId + "确认购买" + reqBuyCoins.getAmount() + ",时间:" + LocalDateTimeUtils.format( now );
         walletTransactionDetail.setRemark( remark );
 
-        SpringUtils.getBean( WalletTransactionDetailService.class ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
 
         // 卖家订单倒计时 5分钟后取消订单
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
                 + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
 
         // 通知消息给卖家
-        walletMessageService.saveWalletMessage( sellerId, transDetailId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
 
         return RspBase.ok( "确认购买成功", transDetailId );
     }
 
     @Transactional( rollbackFor = Exception.class )
-    @Override
     public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
@@ -316,7 +314,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
-            walletUserService.addSellerOngoingSellingAmount( userId , walletTransactionDetail.getAmount() );
+            walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+
+            walletUserService.addSellerOngoingSellingAmount( userId, walletTransactionDetail.getAmount() );
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
@@ -325,7 +325,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 20 ) );
 
             // 消息通知买家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+            walletMessageService.saveWalletMessage( walletTransactionDetail, false );
 
             return RspBase.ok( "确认交易成功" );
         }
@@ -360,18 +360,17 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n卖家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 消息通知买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
 
         return RspBase.ok( "确认取消交易成功", transDetailId );
     }
 
     @Transactional( rollbackFor = Exception.class )
-    @Override
     public void updateTransDetailOrAddTransAmount( WalletTransactionDetail updateTransactionDetail,
                                                    WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
@@ -382,8 +381,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
-                .eq( "status", 1 )
-        );
+                .eq( "status", 1 ) );
         if ( update && i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
@@ -392,7 +390,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )
                     .ne( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
-            walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId() , walletTransactionDetail.getAmount() );
+            walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
+                    walletTransactionDetail.getAmount() );
             // 如果不存在则将挂单改为挂单中
             if ( !exists ) {
                 boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
@@ -448,8 +447,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER
                     + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 30 ) );
 
+            walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+
             // 消息通知卖家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
+            walletMessageService.saveWalletMessage( walletTransactionDetail, true );
 
             return RspBase.ok( "确认转账成功" );
         }
@@ -484,15 +485,15 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 取消超时订单
         redisUtils.unlink( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER + transDetailId );
 
         // 消息通知卖家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
 
         return RspBase.ok( "确认取消交易成功", walletTransactionDetail.getTransDetailId() );
     }
@@ -528,21 +529,20 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         long intervalTime = LocalDateTimeUtils.getIntervalTime( walletTransactionDetail.getBuyerConfirmTransferTime(), now );
         update.setReceivedTimeSec( ( int ) ( intervalTime / 1000 ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 取消超时订单
         redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
         // 通知消息给买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
 
         return RspBase.ok( "确认转币成功", transDetailId );
     }
 
     @Transactional( rollbackFor = Exception.class )
-    @Override
     public void updateTransDetailOrAddUserAmount( WalletTransactionDetail updateTransactionDetail,
                                                   WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
@@ -555,11 +555,11 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, walletTransactionDetail.getAmount(),
                 fundEnum, mark, walletTransactionDetail.getTransDetailId(), walletTransactionDetail.getTransDetailId() );
 
-        WalletUser buyer = walletUserService.getById( walletTransactionDetail.getBuyerId() );
+        WalletUser buyer  = walletUserService.getById( walletTransactionDetail.getBuyerId() );
         WalletUser seller = walletUserService.getById( walletTransactionDetail.getSellerId() );
 
         walletUserService.addBuyerTransactionSuccess( buyer.getId(), walletTransactionDetail.getAmount() );
-        walletUserService.addSellerTransactionSuccess( seller.getId() , walletTransactionDetail.getAmount() );
+        walletUserService.addSellerTransactionSuccess( seller.getId(), walletTransactionDetail.getAmount() );
 
 
         if ( i > 0 ) {
@@ -620,8 +620,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER + transDetailId );
 
+            walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+
             // 消息通知买家
-            walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+            walletMessageService.saveWalletMessage( walletTransactionDetail, false );
 
             return RspBase.ok( "确认未收到转账" );
         }
@@ -653,13 +655,13 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 "\n卖家" + walletTransactionDetail.getSellerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 消息通知卖家和买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
     }
 
     /**
@@ -686,13 +688,13 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + walletTransactionDetail.getBuyerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 消息通知卖家和买家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
     }
 
     /**
@@ -720,13 +722,13 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils
-                .getBean( WalletTransactionDetailService.class )
-                .updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
         // 通知消息给买家和卖家
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getSellerId(), transDetailId, walletTransEnum, true );
-        walletMessageService.saveWalletMessage( walletTransactionDetail.getBuyerId(), transDetailId, walletTransEnum, false );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
     }
 }
 

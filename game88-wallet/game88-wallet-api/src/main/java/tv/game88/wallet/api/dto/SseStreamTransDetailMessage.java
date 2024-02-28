@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Builder
 public class SseStreamTransDetailMessage implements Serializable {
     String          transDetailId;
+    String          transactionId;
     Boolean         isSeller;
     WalletTransEnum walletTransEnum;
 }
