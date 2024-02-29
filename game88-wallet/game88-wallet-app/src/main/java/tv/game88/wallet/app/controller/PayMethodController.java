@@ -55,8 +55,8 @@ public class PayMethodController extends BaseController {
 
     @Operation( summary = "是否有支付方式" )
     @PostMapping( "/api/hasPayMethod" )
-    public RspBase<Boolean> hasPayMethod() {
-        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId() );
+    public RspBase<Boolean> hasPayMethod( @RequestBody ReqConstant.ReqHasPay type ) {
+        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId() , type.methodType());
     }
 
     @Operation( summary = "绑定新支付方式" )

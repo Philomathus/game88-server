@@ -3,12 +3,14 @@ package tv.game88.wallet.api.constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.math.BigDecimal;
 
 public class ReqConstant {
 
     public record ReqPayMethodId(@Schema( title = "支付方式ID" ) int payMethodId) {}
+    public record ReqHasPay( String methodType ) {}
 
     public record ReqSetPasswd(
             @Schema( title = "新密码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotBlank( message = "新密码不能为空" ) String password,
