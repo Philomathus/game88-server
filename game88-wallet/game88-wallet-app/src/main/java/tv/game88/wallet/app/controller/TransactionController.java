@@ -47,7 +47,7 @@ public class TransactionController extends BaseController {
         startPage( reqSellOrderList );
         List<RspSellOrderDetail> resultList = walletTransactionService.sellOrderList( MemberSecurityUtils.getUserId(),
                 reqSellOrderList );
-        return getRspBasePage( resultList, reqSellOrderList );
+        return getRspBasePage( resultList );
     }
 
     @Operation( summary = "交易中心 - 交易中心挂单列表" )
