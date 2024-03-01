@@ -46,7 +46,7 @@ public class GamePullDockPP extends AbstractGamePull {
         if ( !CollectionUtils.isEmpty( firstTimeDataList ) ) {
             resultDataList.addAll( firstTimeDataList );
             // 加1分钟,每1分钟拉一次单
-            gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 60000 ) );
+            gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 120000 ) );
         }
         // 加10分钟再拉一次,避免漏单
         String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 600000 );
