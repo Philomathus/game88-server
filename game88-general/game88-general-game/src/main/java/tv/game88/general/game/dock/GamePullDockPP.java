@@ -49,11 +49,11 @@ public class GamePullDockPP extends AbstractGamePull {
             gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
         }
         // 加10分钟再拉一次,避免漏单
-        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 600000 );
-        List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
-        if ( !CollectionUtils.isEmpty( secondTimeDataList ) ) {
-            resultDataList.addAll( secondTimeDataList );
-        }
+        //String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 600000 );
+        //List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
+        //if ( !CollectionUtils.isEmpty( secondTimeDataList ) ) {
+        //    resultDataList.addAll( secondTimeDataList );
+        //}
         return resultDataList;
     }
 
