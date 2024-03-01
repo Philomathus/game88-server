@@ -87,7 +87,11 @@ public class GamePullDockShaBa extends AbstractGamePull {
         String agent  = userID.split( "_" )[ 0 ];
         gameDataRecord.setAccount( userID );
         gameDataRecord.setAgent( agent );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "sport_type" ) ) );
+        Object sportType = remoteGameDatum.get( "sport_type" );
+        if(sportType == null){
+            log.warn( JsonUtil.object2Json( remoteGameDatum ) );
+        }
+        gameDataRecord.setKindId( String.valueOf( sportType ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "stake" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "stake" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) );
