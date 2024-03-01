@@ -78,6 +78,15 @@ public interface ISysMenuService extends IService<SysMenu> {
     public List<TreeSelect> buildMenuTreeSelect( List<SysMenu> menus );
 
     /**
+     * 根据菜单ID查询信息
+     *
+     * @param menuId 菜单ID
+     *
+     * @return 菜单信息
+     */
+    public SysMenu selectMenuById( Long menuId );
+
+    /**
      * 是否存在菜单子节点
      *
      * @param menuId 菜单ID
@@ -94,6 +103,24 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @return 结果 true 存在 false 不存在
      */
     public boolean checkMenuExistRole( Long menuId );
+
+    /**
+     * 新增保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    public int insertMenu( SysMenu menu );
+
+    /**
+     * 修改保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    public int updateMenu( SysMenu menu );
 
     /**
      * 校验菜单名称是否唯一

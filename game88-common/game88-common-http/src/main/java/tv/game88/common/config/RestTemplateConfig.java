@@ -105,6 +105,7 @@ public class RestTemplateConfig {
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
                         .create()
                         .setMaxConnTotal( 500 )
+                        .setMaxConnPerRoute( 100 )
                         .setSSLSocketFactory( socketFactory )
                         .build() )
                 .build();
@@ -120,6 +121,8 @@ public class RestTemplateConfig {
                 .disableRedirectHandling()
                 .setConnectionManager( PoolingHttpClientConnectionManagerBuilder
                         .create()
+                        .setMaxConnTotal( 500 )
+                        .setMaxConnPerRoute( 100 )
                         .setSSLSocketFactory( socketFactory )
                         .build() )
                 .build();

@@ -1,64 +1,54 @@
 package tv.game88.wallet.app.see;
 
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.MediaType;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.wallet.api.constants.ConstantsWallet;
-import tv.game88.wallet.api.sse.model.SimpleProtocolMessage;
+import tv.game88.wallet.api.type.StreamMessageType;
+import tv.game88.wallet.app.utils.SseSendMessageUtils;
 
-import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
-import static tv.game88.wallet.api.type.StreamMessageType.CONNECTION;
-
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class SseStreamService {
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
     public SseEmitter createEmitter( String memberId ) {
-        if ( memberId == null ) {
-            throw new RuntimeException( "No member id received" );
+        SseEmitter sseEmitter = new SseEmitter();
+        sseEmitter.onCompletion( completionCallBack( memberId ) );
+        sseEmitter.onTimeout( completionCallBack( memberId ) );
+        sseEmitter.onError( errorCallBack( memberId ) );
+        if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
+            ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
         }
-        SseEmitter emitter = new SseEmitter( -1L );
-        Function<String, Runnable> removeEmitter = id -> () -> redisTemplate.convertAndSend(
-                ConstantsWallet.MESSAGE_SSEEMITTER_REMOVE_CHANNEL + id, new Object() );
+        ConstantsWallet.MEMBER_SSEEMITTER_MAP.put( memberId, sseEmitter );
 
-        emitter.onCompletion( removeEmitter.apply( memberId ) );
-        emitter.onTimeout( removeEmitter.apply( memberId ) );
-
-        ConstantsWallet.MEMBER_SSEEMITTER_MAP.put( memberId, emitter );
-
-        SimpleProtocolMessage<String> message = SimpleProtocolMessage
-                .<String>builder()
-                .messageType( CONNECTION )
-                .data( "Connection successful" )
-                .build();
-        SseEmitter.SseEventBuilder event = SseEmitter
-                .event()
-                .name( message.getMessageType().toString() )
-                .id( memberId )
-                .data( message.getData(), MediaType.APPLICATION_JSON )
-                .reconnectTime( 1000 );
-        sendMessage( emitter, event );
-        return emitter;
+        SseSendMessageUtils.me.sendMessage( sseEmitter, memberId, JsonUtil.object2Json( ImmutableMap.of( "msg",
+                "Connection " + "Success" ) ), StreamMessageType.CONNECTION );
+        return sseEmitter;
     }
 
-    public void sendMessage( SseEmitter emitter, SseEmitter.SseEventBuilder event ) {
-        if ( emitter == null ) {
-            return;
+    private Runnable completionCallBack( String memberId ) {
+        return () -> {
+            // log.info( "用户:{} 连接结束", memberId );
+            this.removeMemberSseEmitter( memberId );
+        };
+    }
+
+    private Consumer<Throwable> errorCallBack( String memberId ) {
+        return throwable -> {
+            log.error( "用户:{} 连接异常:{}", memberId, throwable.getMessage() );
+            this.removeMemberSseEmitter( memberId );
+        };
+    }
+
+    private void removeMemberSseEmitter( String memberId ) {
+        if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
+            ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
         }
-        Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
-            try {
-                emitter.send( event );
-            } catch ( IOException ex ) {
-                emitter.completeWithError( ex );
-            }
-        } );
+        ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( memberId );
     }
 }

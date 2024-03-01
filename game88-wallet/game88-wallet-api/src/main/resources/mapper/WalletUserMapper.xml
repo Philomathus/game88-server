@@ -25,6 +25,8 @@
         <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
         <result property="deviceId" column="device_id" jdbcType="VARCHAR" />
         <result property="totalCharge" column="total_charge" jdbcType="DECIMAL" />
+        <result property="buyOrderNum" column="buy_order_num"  />
+        <result property="sellOrderNum" column="sell_order_num"  />
         <result property="totalSale" column="total_sale" jdbcType="DECIMAL" />
         <result property="phoneModel" column="phone_model" jdbcType="VARCHAR" />
         <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
@@ -60,6 +62,31 @@
                link_url
         from wallet_user
     </sql>
+
+    <select id="selectWalletUserList" parameterType="tv.game88.wallet.api.entity.WalletUser" resultMap="WalletUserResult">
+        <include refid="selectWalletUserVo"/>
+        <where>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+            <if test="idNumber != null  and idNumber != ''"> and id_number = #{idNumber}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="loginIp != null  and loginIp != ''"> and login_ip = #{loginIp}</if>
+            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
+            <if test="loginDevice != null "> and login_device = #{loginDevice}</if>
+            <if test="searchValues != null and searchValues.size() != 0">
+                and (id in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                or phone in
+                <foreach item="value" collection="searchValues" open="(" separator="," close=")">
+                    #{value}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
 
     <select id="getUserMoney" resultType="Long">
         select amount
@@ -124,4 +151,39 @@
         from wallet_user
         where id = #{userId}
     </select>
+
+    <update id="addBuyerTransactionSuccess">
+        update  wallet_user
+            set buy_order_num = buy_order_num + 1,
+                total_charge = total_charge - #{money}
+        where id = #{id}
+    </update>
+
+    <update id="addSellerTransactionSuccess">
+        update  wallet_user
+        set sell_order_num = sell_order_num + 1,
+            total_charge = total_charge - #{money}
+        where id = #{id}
+    </update>
+
+    <update id="addSellerTotalSellingAmount" >
+        update  wallet_user
+        set total_sale = total_sale + #{money}
+        where id = #{id}
+    </update>
+
+    <update id="addSellerOngoingSellingAmount" >
+        update  wallet_user
+        set total_sale = total_sale - #{money},
+            total_charge = total_charge + #{money}
+        where id = #{id}
+    </update>
+
+    <update id="addSellerCancelSellingAmount" >
+        update  wallet_user
+        set total_sale = total_sale + #{money},
+            total_charge = total_charge - #{money}
+        where id = #{id}
+    </update>
+
 </mapper>

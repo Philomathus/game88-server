@@ -1,13 +1,18 @@
 package tv.game88.wallet.api.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import tv.game88.common.utils.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 钱包用户表
@@ -128,4 +133,26 @@ public class WalletUser implements Serializable {
      * 登录域名
      */
     private String        linkUrl;
+
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String   searchValue;
+
+    @TableField( exist = false )
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private Set<String> searchValues;
+
+    public Set<String> getSearchValues() {
+        if ( StringUtils.isNotBlank( searchValue ) ) {
+            String[]    strings        = searchValue.split( "," );
+            Set<String> searchValueSet = new HashSet<>();
+            for ( String s : strings ) {
+                if ( StringUtils.isNotBlank( s ) ) {
+                    searchValueSet.add( s.trim() );
+                }
+            }
+            return searchValueSet;
+        }
+        return searchValues;
+    }
 }

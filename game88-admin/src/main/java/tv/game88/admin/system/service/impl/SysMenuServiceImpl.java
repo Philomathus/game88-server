@@ -175,6 +175,18 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
+     * 根据菜单ID查询信息
+     *
+     * @param menuId 菜单ID
+     *
+     * @return 菜单信息
+     */
+    @Override
+    public SysMenu selectMenuById( Long menuId ) {
+        return this.baseMapper.selectMenuById( menuId );
+    }
+
+    /**
      * 是否存在菜单子节点
      *
      * @param menuId 菜单ID
@@ -196,6 +208,30 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public boolean checkMenuExistRole( Long menuId ) {
         return new LambdaQueryChainWrapper<>( roleMenuMapper ).eq( SysRoleMenu::getMenuId, menuId ).count() > 0;
+    }
+
+    /**
+     * 新增保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    @Override
+    public int insertMenu( SysMenu menu ) {
+        return this.baseMapper.insertMenu( menu );
+    }
+
+    /**
+     * 修改保存菜单信息
+     *
+     * @param menu 菜单信息
+     *
+     * @return 结果
+     */
+    @Override
+    public int updateMenu( SysMenu menu ) {
+        return this.baseMapper.updateMenu( menu );
     }
 
     /**

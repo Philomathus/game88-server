@@ -18,15 +18,11 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
 
     RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins );
 
-    void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail );
-
     RspBase<RspBuyOrderDetail> buyOrderDetail( String userId, String transDetailId );
 
     RspBase<?> sellerConfirmTrans( String userId, String transDetailId );
 
     RspBase<?> sellerCancelTrans( String userId, String transDetailId );
-
-    void updateTransDetailOrAddTransAmount( WalletTransactionDetail update, WalletTransactionDetail walletTransactionDetail );
 
     RspBase<?> buyerConfirmTransfer( String userId, ReqBuyerConfirmTransfer reqBuyerConfirmTransfer );
 
@@ -35,8 +31,6 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
     RspBase<?> sellerConfirmTransfer( String userId, String transDetailId );
 
     RspBase<?> sellerNotReceived( String userId, String transDetailId );
-
-    void updateTransDetailOrAddUserAmount( WalletTransactionDetail update, WalletTransactionDetail walletTransactionDetail );
 
     void processBuyerConfirmBuyTimeout( String transDetailId );
 

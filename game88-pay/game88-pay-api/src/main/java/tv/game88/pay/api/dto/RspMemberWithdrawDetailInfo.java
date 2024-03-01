@@ -13,4 +13,6 @@ public class RspMemberWithdrawDetailInfo {
     private BigDecimal accountNow;
     @Schema( title = "还需打码" )
     private BigDecimal needBeat;
+    @Schema( title = "USDT汇率" )
+    private BigDecimal usdtWithdrawExchangeRate;
 }

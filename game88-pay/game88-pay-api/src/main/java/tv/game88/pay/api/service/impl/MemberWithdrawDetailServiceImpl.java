@@ -93,6 +93,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         rsp.setNeedBeat( noClean );
         rsp.setCanWithdrawMoney( canWithdrawMoney );
         rsp.setAccountNow( accountNow );
+        rsp.setUsdtWithdrawExchangeRate( configEnvCacheUtil.getConfBd( "usdt_withdraw_exchange_rate" ) );
         return rsp;
     }
 
@@ -381,7 +382,7 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( withdrawLogList == null || withdrawLogList.isEmpty() ) {
             return RspBase.businessError( "订单已被处理,请刷新界面" );
         }
-        String                      mark          = "操作人:" + userName + " ip:" + ServletUtil.getIp();
+        String mark = "操作人:" + userName + " ip:" + ServletUtil.getIp();
         for ( MemberWithdrawDetail withdrawDetail : withdrawLogList ) {
             if ( withdrawDetail == null ) {
                 return RspBase.businessError( "订单不存在" );
@@ -852,6 +853,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                 .withdrawBank( memberInfo, req.getWithdrawMoney(), memberCard );
         MemberWithdrawDetail update = new MemberWithdrawDetail();
         update.setWithdrawOrderNo( withdrawOrderNo );
+        if ( StringUtils.isNotBlank( req.getUsdtRateInfo() ) ) {
+            BigDecimal usdtRate = new BigDecimal( req.getUsdtRateInfo() );
+            BigDecimal usdtNum  = req.getWithdrawMoney().divide( usdtRate, 2, RoundingMode.HALF_DOWN );
+            update.setBankAddress( usdtRate + ":" + usdtNum );
+        }
         //出款金额汇总
         BigDecimal withdrawMoney = this.baseMapper.totalWithdrawMoney( memberId );
         //入款:银行卡入款/线上充值/USDT充值
@@ -863,7 +869,6 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         }
         int i = this.baseMapper.updateById( update );
         if ( i > 0 ) {
-            // TODO send message to telegram ; ID: withdraw_log_telegram ; message: 您有新的提现订单,金额:{},请及时处理!
             telegramBotMessage.sendByChatId( String.format( "您有新的提现订单,金额:%s,请及时处理!", req.getWithdrawMoney() ),
                     configEnvCacheUtil.getConf( "recharge_log_telegram" ) );
             return RspBase.ok( "提现申请请求成功，请耐心等待" );
@@ -891,7 +896,6 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                                 new BigDecimal( spits[ 1 ] ) );
                         withdrawAward     = withdrawMoney.multiply( withdrawAwardRate ).setScale( 0, RoundingMode.HALF_UP );
                     }
-
                 }
             }
         }
@@ -958,7 +962,17 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         };
         for ( RspWithdrawRechargeDetail detail : resultList ) {
             switch ( type ) {
-            case withdraw -> this.setWithdrawColor( detail );
+            case withdraw -> {
+                this.setWithdrawColor( detail );
+                if ( detail.getBankName().contains( "usdt" ) || detail.getBankName().contains( "USDT" ) ) {
+                    if ( StringUtils.isNotBlank( detail.getBankAddress() ) && detail.getBankAddress().contains( ":" ) ) {
+                        String[] split = detail.getBankAddress().split( ":" );
+                        detail.setBankAddress( "提现汇率:" + split[ 0 ] + ";提现个数:" + split[ 1 ] );
+                    }
+                } else {
+                    detail.setBankAddress( "" );
+                }
+            }
             case rechargeBank, rechargeUsdt -> this.setRechargeBankColor( detail );
             case rechargeOnline -> this.setRechargeOnlineColor( detail );
             }

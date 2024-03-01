@@ -171,7 +171,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public int insertRole( SysRole role ) {
         role.setCreateTime( LocalDateTime.now() );
         // 新增角色信息
-        this.baseMapper.insert( role );
+        this.baseMapper.insertRole( role );
         return insertRoleMenu( role );
     }
 
@@ -187,7 +187,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public int updateRole( SysRole role ) {
         role.setUpdateTime( LocalDateTime.now() );
         // 修改角色信息
-        this.baseMapper.updateById( role );
+        this.baseMapper.updateRole( role );
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId( role.getRoleId() );
         return insertRoleMenu( role );
@@ -203,7 +203,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     public int updateRoleStatus( SysRole role ) {
         role.setUpdateTime( LocalDateTime.now() );
-        return this.baseMapper.updateById( role );
+        return this.baseMapper.updateRole( role );
     }
 
     /**
@@ -239,7 +239,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public int deleteRoleById( Long roleId ) {
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenuByRoleId( roleId );
-        return this.baseMapper.deleteRoleById( roleId );
+        return this.baseMapper.deleteById( roleId );
     }
 
     /**
@@ -261,7 +261,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         }
         // 删除角色与菜单关联
         roleMenuMapper.deleteRoleMenu( roleIds );
-        return this.baseMapper.deleteRoleByIds( roleIds );
+        return this.baseMapper.deleteBatchIds( Arrays.asList( roleIds ) );
     }
 
     @Override

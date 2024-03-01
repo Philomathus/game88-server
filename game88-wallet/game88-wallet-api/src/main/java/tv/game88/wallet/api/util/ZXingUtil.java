@@ -11,7 +11,9 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,16 +63,13 @@ public class ZXingUtil {
     /**
      * 解密：二维码->文字
      *
-     * @param file 图片文件
+     * @param inputStream 图片文件流
      *
      * @throws Exception 异常
      */
-    public static String decodeImg( File file ) throws Exception {
-        if ( !file.exists() ) {
-            return null;
-        }
+    public static String decodeImg( InputStream inputStream ) throws Exception {
         //读取指定的二维码文件
-        BufferedImage   bufferedImage = ImageIO.read( file );
+        BufferedImage   bufferedImage = ImageIO.read( inputStream );
         LuminanceSource source        = new BufferedImageLuminanceSource( bufferedImage );
         BinaryBitmap    binaryBitmap  = new BinaryBitmap( new HybridBinarizer( source ) );
         //定义二维码参数
@@ -121,8 +120,8 @@ public class ZXingUtil {
     public static void main( String[] args ) throws Exception {
         //String imgPath = "/Users/meng.jun/Downloads/5a7fdffcdcebc.png";
         String imgPath = "/Users/meng.jun/Downloads/1.jpg";
-        System.out.println( decodeImg( new File( imgPath ) ) );
+        System.out.println( decodeImg( new FileInputStream( imgPath ) ) );
         String imgPath2 = "/Users/meng.jun/Downloads/2.jpg";
-        System.out.println( decodeImg( new File( imgPath2 ) ) );
+        System.out.println( decodeImg( new FileInputStream( imgPath2 ) ) );
     }
 }

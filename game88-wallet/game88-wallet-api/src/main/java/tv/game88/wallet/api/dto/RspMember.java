@@ -27,9 +27,9 @@ public class RspMember {
     @Schema( title = "信用等级" )
     private Integer    creditRating;
     @Schema( title = "累积充值金额" )
-    private BigDecimal totalCharge;
+    private Long totalCharge;
     @Schema( title = "累积出售金额" )
-    private BigDecimal totalSale;
+    private Long totalSale;
 
     @Schema( title = "是否有登录密码" )
     private Boolean hasPassword;

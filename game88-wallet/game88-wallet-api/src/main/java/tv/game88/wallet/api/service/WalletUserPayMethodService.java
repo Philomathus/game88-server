@@ -5,6 +5,7 @@ import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import com.baomidou.mybatisplus.extension.service.IService;
+import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,5 @@ public interface WalletUserPayMethodService extends IService<WalletUserPayMethod
 
     RspBase<Map<String, List<RspPayMethod>>> getPayMethod( String userId );
 
-    RspBase<Boolean> hasPayMethod( String userId );
-
-    List<WalletUserPayMethod> getWalletUserPayMethodList( WalletUserPayMethod walletUserPayMethod );
+    RspBase<Boolean> hasPayMethod( String userId  );
 }

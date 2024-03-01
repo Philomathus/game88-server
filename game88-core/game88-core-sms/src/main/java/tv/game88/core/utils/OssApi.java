@@ -14,6 +14,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -21,18 +22,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigOssCacheUtil;
 import tv.game88.core.config.entity.ConfigOss;
 import tv.game88.core.config.mapper.ConfigOssMapper;
 
-import jakarta.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -55,27 +51,34 @@ public class OssApi {
     }
 
     private RspBase<String> updateByProvider( MultipartFile file, String path, ConfigOss configOss ) throws IOException {
-        String      fileName      = file.getOriginalFilename();
-        String      extension     = FilenameUtils.getExtension( fileName );
-        InputStream inputStream   = file.getInputStream();
-        File        newFile       = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
-        Path        newFileToPath = newFile.toPath();
-        IOUtils.copy( inputStream, Files.newOutputStream( newFileToPath ) );
+        String       fileName        = file.getOriginalFilename();
+        String       extension       = FilenameUtils.getExtension( fileName );
+        InputStream  inputStream     = file.getInputStream();
+        File         newFile         = new File( System.getProperty( "java.io.tmpdir" ) + fileName );
+        Path         newFileToPath   = newFile.toPath();
+        OutputStream newOutputStream = Files.newOutputStream( newFileToPath );
+        IOUtils.copy( inputStream, newOutputStream );
         InputStream newInputStream = Files.newInputStream( newFileToPath );
         String      rFileName      = DigestUtils.md5Hex( newInputStream );
-        String      fileKey        = "88lm/" + path + "/" + rFileName + "." + extension;
+        String      newFileName    = rFileName + "." + extension;
+
+        String fileKey = "88lm/" + path + "/" + newFileName;
         String url = switch ( configOss.getProvider() ) {
             case 0 -> this.uploadAliyun( configOss, fileKey, newFile );
             case 1 -> this.uploadAmazon( configOss, fileKey, newFile );
             case 2 -> this.uploadKuaiKuai( configOss, fileKey, newFile );
-            default -> throw new BusinessException( "未找到相应的服务商" );
+            default -> {
+                log.error( "未找到相应的服务商" );
+                yield "";
+            }
         };
         newFile.delete();
+        IOUtils.closeQuietly( inputStream, newInputStream, newOutputStream );
         if ( StringUtils.isBlank( url ) ) {
             return RspBase.businessError( "上传失败,请联系技术人员" );
         }
         RspBase<String> rspBase = RspBase.ok( "上传成功", url );
-        rspBase.setOtherData( rFileName + "." + extension );
+        rspBase.setOtherData( newFileName );
         return rspBase;
     }
 

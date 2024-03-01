@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Param;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.vo.PlatformUser;
 
+import java.util.List;
+
 /**
  * @author meng.jun
  * @description 针对表【wallet_user(钱包用户表)】的数据库操作Mapper
@@ -12,6 +14,15 @@ import tv.game88.wallet.api.vo.PlatformUser;
  * @Entity tv.game88.wallet.api.entity.WalletUser
  */
 public interface WalletUserMapper extends BaseMapper<WalletUser> {
+
+    /**
+     * 查询钱包用户列表
+     *
+     * @param walletUser 钱包用户
+     *
+     * @return 钱包用户集合
+     */
+    List<WalletUser> selectWalletUserList( WalletUser walletUser );
 
     Long getUserMoney( @Param( "userId" ) String userId );
 
@@ -32,6 +43,13 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     WalletUser findMemberHistoryById( @Param( "id" ) String walletAddress );
 
     String getUserPasswd( String userId );
+
+    void addBuyerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money );
+    void addSellerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money);
+
+    void addSellerTotalSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money);
+    void addSellerOngoingSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
+    void addSellerCancelSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
 }
 
 

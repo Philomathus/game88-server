@@ -15,6 +15,15 @@ import java.util.List;
  */
 public interface WalletUserService extends IService<WalletUser> {
 
+    /**
+     * 查询钱包用户列表
+     *
+     * @param walletUser 钱包用户
+     *
+     * @return 钱包用户集合
+     */
+    List<WalletUser> selectWalletUserList( WalletUser walletUser );
+
     RspBase<?> sendSmsVerifyCode( Phone phone );
 
     RspBase<RspMember> login( MobileLogin mobileLogin, Integer dev, String loginUrl );
@@ -54,4 +63,13 @@ public interface WalletUserService extends IService<WalletUser> {
     RspBase<?> setPassword( String userId, ReqConstant.ReqSetPasswd reqSetPasswd );
 
     RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd );
+
+    void addBuyerTransactionSuccess( String id ,Long money);
+
+    void addSellerTransactionSuccess( String id , Long money );
+
+    void addSellerTotalSellingAmount( String id ,Long amount );
+
+    void addSellerOngoingSellingAmount( String id ,Long amount);
+    void addSellerCancelSellingAmount( String id ,Long amount);
 }
