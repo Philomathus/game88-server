@@ -49,7 +49,7 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 30 ) ) {
+            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 60 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
@@ -74,6 +74,7 @@ public class RemoteGameDataRecordTask {
                     }
                 } catch ( Exception e ) {
                     log.error( e.getMessage(), e );
+                } finally {
                     redisUtils.unLock( "remoteGameDataRecord:" + gamePlatform.getId() );
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
@@ -84,7 +85,7 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecordFix() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionFixList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 30 ) ) {
+            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 60 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
@@ -115,6 +116,7 @@ public class RemoteGameDataRecordTask {
                     }
                 } catch ( Exception e ) {
                     log.error( e.getMessage(), e );
+                } finally {
                     redisUtils.unLock( "remoteGameDataRecordFix:" + gamePlatform.getId() );
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
