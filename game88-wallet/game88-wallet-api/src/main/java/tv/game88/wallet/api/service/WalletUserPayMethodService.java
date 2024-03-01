@@ -24,4 +24,6 @@ public interface WalletUserPayMethodService extends IService<WalletUserPayMethod
     RspBase<Map<String, List<RspPayMethod>>> getPayMethod( String userId );
 
     RspBase<Boolean> hasPayMethod( String userId  );
+
+    List<WalletUserPayMethod> getWalletUserPayMethodList( WalletUserPayMethod walletUserPayMethod );
 }
