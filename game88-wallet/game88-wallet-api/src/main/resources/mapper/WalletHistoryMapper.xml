@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.wallet.api.mapper.WalletHistoryMapper">
+
+    <resultMap id="WalletHistoryResult" type="tv.game88.wallet.api.entity.WalletHistory">
+        <id property="id"               column="id"/>
+        <result property="phone"        column="phone"/>
+        <result property="nickName"     column="nick_name"/>
+        <result property="headImg"      column="head_img"/>
+        <result property="password"     column="password"/>
+        <result property="amount"       column="amount"/>
+        <result property="fundPassword" column="fund_password"/>
+        <result property="isVerified"   column="is_verified"/>
+        <result property="verifiedTime" column="verified_time"/>
+        <result property="realName"     column="real_name"/>
+        <result property="idNumber"     column="id_number"/>
+        <result property="idFrontPic"   column="id_front_pic"/>
+        <result property="idBackPic"    column="id_back_pic"/>
+        <result property="level"        column="level"/>
+        <result property="createdTime"  column="created_time"/>
+        <result property="status"       column="status"/>
+        <result property="loginIp"      column="login_ip"/>
+        <result property="deviceId"     column="device_id"/>
+        <result property="loginDevice"  column="login_device"/>
+        <result property="phoneModel"   column="phone_model"/>
+        <result property="loginTime"    column="login_time"/>
+        <result property="linkUrl"      column="link_url"/>
+        <result property="totalCharge"  column="total_charge"/>
+        <result property="totalSale"    column="total_sale"/>
+        <result property="buyOrderNum"  column="buy_order_num"/>
+        <result property="sellOrderNum" column="sell_order_num"/>
+
+    </resultMap>
+    <sql id="selectWalletHistory">
+        select id,
+               phone,
+               nick_name,
+               head_img,
+               password,
+               amount,
+               fund_password,
+               is_verified,
+               verified_time,
+               real_name,
+               id_number,
+               id_front_pic,
+               id_back_pic,
+               level,
+               created_time,
+               status,
+               login_ip,
+               device_id,
+               login_device,
+               phone_model,
+               login_time,
+               link_url,
+               total_charge,
+               total_sale,
+               buy_order_num,
+               sell_order_num
+        from wallet_user_history
+    </sql>
+
+    <select id="selectWalletHistoryList" parameterType="tv.game88.wallet.api.entity.WalletHistory"
+            resultMap="WalletHistoryResult">
+        <include refid="selectWalletHistory"/>
+        <where>
+            <if test="id != null">and id = #{id}</if>
+        </where>
+    </select>
+
+</mapper>
