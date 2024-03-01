@@ -35,14 +35,14 @@ public class GamePullDockPP extends AbstractGamePull {
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         long          gamePlatformVersion = Long.parseLong( gamePlatform.getVersionValue() );
         LocalDateTime start               = LocalDateTimeUtils.getDateTimeFromTimestamp( gamePlatformVersion );
-        // 如果不是5分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 5 ) ) ) {
+        // 如果不是10分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 10 ) ) ) {
             return null;
         }
         String       firstTimeResult = this.execute( gamePlatform, gamePlatformVersion );
         List<Object> resultDataList  = this.getDataList( firstTimeResult );
 
-        // 加1分钟,每1分钟拉一次单
+        // 加5分钟,每5分钟拉一次单
         gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
 
         // 加10分钟再拉一次,避免漏单
