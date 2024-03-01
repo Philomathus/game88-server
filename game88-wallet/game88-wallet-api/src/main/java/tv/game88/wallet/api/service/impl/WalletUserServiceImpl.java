@@ -485,6 +485,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
+        if( StringUtils.isBlank( reqVerifyIdCard.getRealName()) ) {
+            return RspBase.businessError( "需要实名" );
+        }
         if ( walletUser.getStatus() != 1 ) {
             return RspBase.businessError( "用户状态异常,请联系客服" );
         }
