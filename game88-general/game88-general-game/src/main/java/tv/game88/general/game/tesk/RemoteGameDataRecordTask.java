@@ -53,15 +53,15 @@ public class RemoteGameDataRecordTask {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                String name         = gamePlatform.getName() + "-" + gamePlatform.getId();
+                String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
                 String versionValue = gamePlatform.getVersionValue();
                 if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
                         && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
                     LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
 
-                    log.info( "开始执行{}注单拉取程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
+                    log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
                 } else {
-                    log.info( "开始执行{}注单拉取程序, 开始版本:{}", name, versionValue );
+                    log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
                 }
 
                 try {
@@ -88,15 +88,15 @@ public class RemoteGameDataRecordTask {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
-                String name         = gamePlatform.getName() + "-" + gamePlatform.getId();
+                String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
                 String versionValue = gamePlatform.getVersionValue();
                 if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
                         && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
                     LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
 
-                    log.info( "开始执行{}补单程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
+                    log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
                 } else {
-                    log.info( "开始执行{}补单程序, 开始版本:{}", name, versionValue );
+                    log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
                 }
 
                 try {
@@ -126,7 +126,7 @@ public class RemoteGameDataRecordTask {
         BaseGamePull baseGamePull   = gamePullDockFactoryUtil.createGamePullProcessor( gamePlatform.getGameCategory() );
         List<Object> remoteGameData = baseGamePull.requestRemoteGameData( gamePlatform );
         if ( !CollectionUtils.isEmpty( remoteGameData ) ) {
-            log.info( "{}拉取数据成功, 条数:{}", name, remoteGameData.size() );
+            log.info( "{}数据成功, 条数:{}", name, remoteGameData.size() );
             List<GameDataRecord> gameDataRecords = new ArrayList<>();
             for ( Object remoteGameDatum : remoteGameData ) {
                 GameDataRecord gameDataRecord = baseGamePull.handleResult( remoteGameDatum, gamePlatform );
@@ -134,7 +134,7 @@ public class RemoteGameDataRecordTask {
                     gameDataRecords.add( gameDataRecord );
                 }
             }
-            gameDataRecordService.batchInsert( gameDataRecords, gamePlatform );
+            gameDataRecordService.batchInsert( gameDataRecords, gamePlatform, name );
         }
     }
 }

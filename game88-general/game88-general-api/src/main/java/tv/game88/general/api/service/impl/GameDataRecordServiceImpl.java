@@ -41,7 +41,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
     }
 
     @Override
-    public void batchInsert( List<GameDataRecord> gameDataRecords, GamePlatform gamePlatform ) {
+    public void batchInsert( List<GameDataRecord> gameDataRecords, GamePlatform gamePlatform, String name ) {
         SqlSession           session = sqlSessionTemplate.getSqlSessionFactory().openSession( ExecutorType.BATCH, false );
         GameDataRecordMapper mapper  = session.getMapper( GameDataRecordMapper.class );
         int                  i       = 0;
@@ -64,8 +64,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         }
         session.close();
 
-        log.info( "{}注单数据开始存库,预存数据条数:{};实际存储数据条数:{}",
-                gamePlatform.getName() + "-" + gamePlatform.getId(), gameDataRecords.size(), num );
+        log.info( "{}数据开始存库,预存数据条数:{};实际存储数据条数:{}", name, gameDataRecords.size(), num );
     }
 
     @Override
