@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.common.base.BaseController;
@@ -26,18 +25,12 @@ public class WalletUserPayMethodController extends BaseController {
 
     @Resource
     private WalletUserPayMethodService walletUserPayMethodService;
-
-    @Resource
-    private RedisUtils redisUtils;
-
-
     @GetMapping("/list")
     public RspBase<List<WalletUserPayMethod>> list( WalletUserPayMethod walletUserPayMethod ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
 
         List<WalletUserPayMethod> walletUserPayMethodList = walletUserPayMethodService.getWalletUserPayMethodList( walletUserPayMethod );
-        System.out.println("walletlist" + walletUserPayMethodList);
         return getRspBasePage( walletUserPayMethodList, pageDomain );
     }
 
