@@ -166,4 +166,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
                     .eq( WalletUserPayMethod::getUserId, userId )
                     .eq( WalletUserPayMethod::getAuditStatus, 1 ) ) );
     }
+
+    @Override
+    public List<WalletUserPayMethod> getWalletUserPayMethodList(WalletUserPayMethod walletUserPayMethod) {
+        return this.baseMapper.selectWalletUserPayMethod( walletUserPayMethod );
+    }
 }

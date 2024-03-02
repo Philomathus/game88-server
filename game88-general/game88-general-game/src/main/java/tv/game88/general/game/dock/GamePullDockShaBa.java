@@ -87,7 +87,16 @@ public class GamePullDockShaBa extends AbstractGamePull {
         String agent  = userID.split( "_" )[ 0 ];
         gameDataRecord.setAccount( userID );
         gameDataRecord.setAgent( agent );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "sport_type" ) ) );
+        Object sportType = remoteGameDatum.get( "sport_type" );
+        if ( sportType == null ) {
+            List<Map<String, Object>> ParlayDatas = ( List<Map<String, Object>> ) remoteGameDatum.get( "ParlayData" );
+            if ( !CollectionUtils.isEmpty( ParlayDatas ) ) {
+                Map<String, Object> ParlayData = ParlayDatas.getFirst();
+                gameDataRecord.setKindId( String.valueOf( ParlayData.getOrDefault( "sport_type", "" ) ) );
+            }
+        } else {
+            gameDataRecord.setKindId( String.valueOf( sportType ) );
+        }
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "stake" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "stake" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) );
@@ -102,9 +111,9 @@ public class GamePullDockShaBa extends AbstractGamePull {
         if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
             return null;
         } else {
-            LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( String.valueOf( settlementTimeObj )
-                                                                                             .substring( 0, 19 ),
-                    LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+            LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( String
+                    .valueOf( settlementTimeObj )
+                    .substring( 0, 19 ), LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
             gameDataRecord.setGameStartTime( gameDataRecord.getGameEndTime() );
         }

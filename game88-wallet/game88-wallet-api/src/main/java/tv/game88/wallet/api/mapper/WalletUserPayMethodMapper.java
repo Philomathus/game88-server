@@ -3,6 +3,8 @@ package tv.game88.wallet.api.mapper;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
 * @author meng.jun
 * @description 针对表【wallet_user_pay_method】的数据库操作Mapper
@@ -10,6 +12,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity tv.game88.wallet.api.entity.WalletUserPayMethod
 */
 public interface WalletUserPayMethodMapper extends BaseMapper<WalletUserPayMethod> {
+
+    List<WalletUserPayMethod> selectWalletUserPayMethod(WalletUserPayMethod walletUserPayMethod );
 
 }
 

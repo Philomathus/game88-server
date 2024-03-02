@@ -29,4 +29,11 @@
                create_time
         from wallet_user_pay_method
     </sql>
+    <select id="selectWalletUserPayMethod" parameterType="tv.game88.wallet.api.entity.WalletMessage"
+            resultMap="WalletUserPayMethodResult">
+        <include refid="selectWalletUserPayMethodVo" />
+        <where>
+
+        </where>
+    </select>
 </mapper>
