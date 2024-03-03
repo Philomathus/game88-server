@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
@@ -35,6 +36,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
     @Resource
     private ConfigBankListCache configBankListCache;
 
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public RspBase<?> bindNewPayMethod( String userId, ReqPayMethod reqPayMethod ) {
         boolean accountExist = this.baseMapper.exists( new QueryWrapper<WalletUserPayMethod>().eq( "bank_account", reqPayMethod.getAccount() ) );
@@ -54,6 +58,10 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         }
         if ( walletUser.getFundPassword() == null ) {
             return RspBase.businessError( "必须设置资金密码才能绑定支付方式" );
+        }
+
+        if( !passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )){
+            return RspBase.businessError( "密码不匹配" );
         }
         switch ( reqPayMethod.getMethodType() ) {
         case CREDIT_CARD -> {
