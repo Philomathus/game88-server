@@ -162,9 +162,17 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
     @Override
     public RspBase<Boolean> hasPayMethod( String userId , String type) {
-            return RspBase.ok( this.baseMapper.exists( new LambdaQueryWrapper<WalletUserPayMethod>()
-                    .eq( WalletUserPayMethod::getUserId, userId )
-                    .eq( WalletUserPayMethod::getMethodType , type )
-                    .eq( WalletUserPayMethod::getAuditStatus, 1 ) ) );
+
+         if( type == null ){
+             return RspBase.ok( this.baseMapper.exists( new LambdaQueryWrapper<WalletUserPayMethod>()
+                     .eq( WalletUserPayMethod::getUserId, userId )
+                     .eq( WalletUserPayMethod::getAuditStatus, 1 ) ) );
+         }else{
+             return RspBase.ok( this.baseMapper.exists( new LambdaQueryWrapper<WalletUserPayMethod>()
+                     .eq( WalletUserPayMethod::getUserId, userId )
+                     .eq( WalletUserPayMethod::getMethodType , type )
+                     .eq( WalletUserPayMethod::getAuditStatus, 1 ) ) );
+         }
+
     }
 }
