@@ -242,6 +242,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         // 50是vipPay支付平台ID
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.UPAY_PAY_PLATFORM_ID );
         String      userPhone   = memberInfoMapper.getUserPhone( memberId );
+        log.info( "user phone number {} " , userPhone );
         if ( StringUtils.isBlank( userPhone ) ) {
             return RspBase.businessError( "请绑定手机后登录" );
         }
