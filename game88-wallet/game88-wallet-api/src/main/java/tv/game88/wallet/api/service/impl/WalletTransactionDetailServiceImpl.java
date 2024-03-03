@@ -378,10 +378,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY, WalletTransEnum.SELLER_CONFIRM_TRANS )
                 .eq( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
         // 回退挂单金额
-        boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
+        boolean update = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
-                .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
-                .eq( "status", 1 ) );
+                .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
+                .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
