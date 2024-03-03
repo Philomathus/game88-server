@@ -29,4 +29,12 @@
                create_time
         from wallet_user_pay_method
     </sql>
+    <select id="selectWalletUserPayMethod" parameterType="tv.game88.wallet.api.entity.WalletUserPayMethod"
+            resultMap="WalletUserPayMethodResult">
+        <include refid="selectWalletUserPayMethodVo" />
+        <where>
+            <if test="methodId != null  and methodId != ''"> and method_id = #{methodId}</if>
+            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+        </where>
+    </select>
 </mapper>

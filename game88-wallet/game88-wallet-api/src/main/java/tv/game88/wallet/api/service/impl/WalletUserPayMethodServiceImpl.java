@@ -183,4 +183,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
          }
 
     }
+
+    @Override
+    public List<WalletUserPayMethod> getWalletUserPayMethodList(WalletUserPayMethod walletUserPayMethod) {
+        return this.baseMapper.selectWalletUserPayMethod( walletUserPayMethod );
+    }
 }
