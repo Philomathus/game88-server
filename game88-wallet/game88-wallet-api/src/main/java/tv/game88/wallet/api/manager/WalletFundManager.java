@@ -48,7 +48,7 @@ public class WalletFundManager {
         Long userBalance = walletUserMapper.getUserMoney( userId );
 
         int updateMoney;
-        if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_IN ) {
+        if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_IN  && fundEnum != WalletUserFundEnum.CANCEL_ORDER_IN) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
