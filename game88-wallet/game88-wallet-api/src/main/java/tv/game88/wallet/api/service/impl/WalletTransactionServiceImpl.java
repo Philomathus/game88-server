@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,6 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
-import tv.game88.core.config.entity.ConfigBankList;
-import tv.game88.core.config.mapper.ConfigBankListMapper;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -26,12 +25,10 @@ import tv.game88.wallet.api.mapper.WalletTransactionDetailMapper;
 import tv.game88.wallet.api.mapper.WalletTransactionMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
 import tv.game88.wallet.api.service.WalletTransactionService;
-import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 
-import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -80,7 +77,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "您的G币不足,G币数量:" + walletUser.getAmount() );
         }
 
-        if( !passwordEncoder.matches( reqSellCoins.getFundPass() , walletUser.getFundPassword() )){
+        if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不匹配" );
         }
 
@@ -143,7 +140,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + sellNum;
             walletFundManager.reduceWalletUserMoney( userId, null, sellNum, fundEnum, mark,
                     walletTransaction.getTransactionId(), walletTransaction.getTransactionId() );
-//            walletUserService.addSellerTotalSellingAmount( userId , walletTransaction.getAmount() );
+            walletUserService.addSellerTotalSellingAmount( userId, walletTransaction.getAmount() );
         } else {
             throw new BusinessException( "发布挂单失败,请重试" );
         }
@@ -159,7 +156,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             String             mark     = "用户" + fundEnum.getDes() + amount;
             walletFundManager.addWalletUserMoney( userId, null, amount, fundEnum, mark,
                     update.getTransactionId() + "QuXiao", update.getTransactionId() );
-            walletUserService.addSellerInitCancelSell( userId , amount );
+            walletUserService.addSellerInitCancelSell( userId, amount );
         } else {
             throw new BusinessException( "取消挂单失败,请重试" );
         }
@@ -194,7 +191,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
 
             for ( RspConfigBankList rspConfigBank : configBankList ) {
-                if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
+                if ( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                     rspPayMethod.setBankName( rspConfigBank.getBankName() );
                 }
             }
@@ -242,8 +239,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         reqSellOrderList.setUserId( userId );
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqSellOrderList, query );
-        if(CollectionUtils.isEmpty(reqSellOrderList.getPayMethodType())) {
-            reqSellOrderList.setPayMethodType(List.of(WalletPayMethodEnum.values()));
+        if ( CollectionUtils.isEmpty( reqSellOrderList.getPayMethodType() ) ) {
+            reqSellOrderList.setPayMethodType( List.of( WalletPayMethodEnum.values() ) );
         }
         query.setPayMethodTypeList( reqSellOrderList.getPayMethodType() );
 
@@ -262,8 +259,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     public List<RspTransCenterDetail> transSellOrderList( String userId, ReqTransCenterDetail reqTransCenterDetail ) {
         WalletTransaction query = new WalletTransaction();
         BeanUtils.copyProperties( reqTransCenterDetail, query );
-        if(CollectionUtils.isEmpty(reqTransCenterDetail.getPayMethodType())) {
-            reqTransCenterDetail.setPayMethodType(List.of(WalletPayMethodEnum.values()));
+        if ( CollectionUtils.isEmpty( reqTransCenterDetail.getPayMethodType() ) ) {
+            reqTransCenterDetail.setPayMethodType( List.of( WalletPayMethodEnum.values() ) );
         }
         query.setPayMethodTypeList( reqTransCenterDetail.getPayMethodType() );
         query.setStatusList( Arrays.asList( 0, 1 ) );
@@ -309,7 +306,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
         rspSellOrderDetail2.setCreditRating( 5 );
         rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
-        if( walletTransaction.getCanSplit() ){
+        if ( walletTransaction.getCanSplit() ) {
             rspSellOrderDetail2.setMinBuyNum( walletTransaction.getMinBuyNum() );
         }
 
@@ -319,7 +316,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .orderByDesc( "create_time" ) );
 
         Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
-        List<RspConfigBankList>    configBankList      = configBankListCache.getEffectList();
+        List<RspConfigBankList>    configBankList  = configBankListCache.getEffectList();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );

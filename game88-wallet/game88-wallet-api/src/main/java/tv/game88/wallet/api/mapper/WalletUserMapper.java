@@ -28,9 +28,9 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
 
     int addMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
 
-    int reduceMoney( @Param( "userId" ) String userId, @Param( "money" ) Long reduceMoney );
-
     int addChargeMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
+
+    int reduceMoney( @Param( "userId" ) String userId, @Param( "money" ) Long reduceMoney );
 
     int reduceSaleMoney( @Param( "userId" ) String userId, @Param( "money" ) Long reduceMoney );
 
@@ -44,13 +44,17 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
 
     String getUserPasswd( String userId );
 
-    void addBuyerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money );
-    void addSellerTransactionSuccess( @Param( "id" ) String id , @Param( "money" ) Long money);
+    void addBuyerTransactionSuccess( @Param( "id" ) String id, @Param( "money" ) Long money );
 
-    void addSellerTotalSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money);
-    void addSellerOngoingSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
-    void addSellerCancelSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
-    void addSellerInitCancelSell( @Param( "id" ) String id ,  @Param( "money" ) Long money );
+    void addSellerTransactionSuccess( @Param( "id" ) String id, @Param( "money" ) Long money );
+
+    void addSellerTotalSellingAmount( @Param( "id" ) String id, @Param( "money" ) Long money );
+
+    void addSellerOngoingSellingAmount( @Param( "id" ) String id, @Param( "money" ) Long money );
+
+    void addSellerCancelSellingAmount( @Param( "id" ) String id, @Param( "money" ) Long money );
+
+    void addSellerInitCancelSell( @Param( "id" ) String id, @Param( "money" ) Long money );
 }
 
 

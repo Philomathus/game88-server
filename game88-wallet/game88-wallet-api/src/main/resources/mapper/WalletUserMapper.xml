@@ -24,10 +24,13 @@
         <result property="status" column="status" jdbcType="INTEGER" />
         <result property="loginIp" column="login_ip" jdbcType="VARCHAR" />
         <result property="deviceId" column="device_id" jdbcType="VARCHAR" />
-        <result property="totalCharge" column="total_charge" jdbcType="DECIMAL" />
-        <result property="buyOrderNum" column="buy_order_num"  />
-        <result property="sellOrderNum" column="sell_order_num"  />
-        <result property="totalSale" column="total_sale" jdbcType="DECIMAL" />
+        <result property="totalCharge" column="total_charge" jdbcType="BIGINT" />
+        <result property="totalSale" column="total_sale" jdbcType="BIGINT" />
+        <result property="totalBuy" column="total_buy" jdbcType="BIGINT" />
+        <result property="sellingAmount" column="selling_amount" jdbcType="BIGINT" />
+        <result property="tradingAmount" column="trading_amount" jdbcType="BIGINT" />
+        <result property="buyOrderNum" column="buy_order_num" jdbcType="BIGINT" />
+        <result property="sellOrderNum" column="sell_order_num" jdbcType="BIGINT" />
         <result property="phoneModel" column="phone_model" jdbcType="VARCHAR" />
         <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
         <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
@@ -56,6 +59,9 @@
                device_id,
                total_charge,
                total_sale,
+               total_buy,
+               selling_amount,
+               trading_amount,
                phone_model,
                login_device,
                login_time,
@@ -63,17 +69,18 @@
         from wallet_user
     </sql>
 
-    <select id="selectWalletUserList" parameterType="tv.game88.wallet.api.entity.WalletUser" resultMap="WalletUserResult">
-        <include refid="selectWalletUserVo"/>
+    <select id="selectWalletUserList" parameterType="tv.game88.wallet.api.entity.WalletUser"
+            resultMap="WalletUserResult">
+        <include refid="selectWalletUserVo" />
         <where>
-            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
-            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
-            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
-            <if test="idNumber != null  and idNumber != ''"> and id_number = #{idNumber}</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="loginIp != null  and loginIp != ''"> and login_ip = #{loginIp}</if>
-            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
-            <if test="loginDevice != null "> and login_device = #{loginDevice}</if>
+            <if test="phone != null  and phone != ''">and phone = #{phone}</if>
+            <if test="nickName != null  and nickName != ''">and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="realName != null  and realName != ''">and real_name like concat('%', #{realName}, '%')</if>
+            <if test="idNumber != null  and idNumber != ''">and id_number = #{idNumber}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="loginIp != null  and loginIp != ''">and login_ip = #{loginIp}</if>
+            <if test="deviceId != null  and deviceId != ''">and device_id = #{deviceId}</if>
+            <if test="loginDevice != null ">and login_device = #{loginDevice}</if>
             <if test="searchValues != null and searchValues.size() != 0">
                 and (id in
                 <foreach item="value" collection="searchValues" open="(" separator="," close=")">
@@ -153,42 +160,43 @@
     </select>
 
     <update id="addBuyerTransactionSuccess">
-        update  wallet_user
-            set buy_order_num = buy_order_num + 1,
-                total_charge = total_charge - #{money}
+        update wallet_user
+        set buy_order_num  = buy_order_num + 1,
+            total_buy = total_buy + #{money}
         where id = #{id}
     </update>
 
     <update id="addSellerTransactionSuccess">
-        update  wallet_user
+        update wallet_user
         set sell_order_num = sell_order_num + 1,
-            total_charge = total_charge - #{money}
+            total_sale     = total_sale + #{money},
+            trading_amount = trading_amount - #{money}
         where id = #{id}
     </update>
 
-    <update id="addSellerTotalSellingAmount" >
-        update  wallet_user
-        set total_sale = total_sale + #{money}
+    <update id="addSellerTotalSellingAmount">
+        update wallet_user
+        set selling_amount = selling_amount + #{money}
         where id = #{id}
     </update>
 
-    <update id="addSellerOngoingSellingAmount" >
-        update  wallet_user
-        set total_sale = total_sale - #{money},
-            total_charge = total_charge + #{money}
+    <update id="addSellerOngoingSellingAmount">
+        update wallet_user
+        set selling_amount = selling_amount - #{money},
+            trading_amount = trading_amount + #{money}
         where id = #{id}
     </update>
 
-    <update id="addSellerInitCancelSell" >
-        update  wallet_user
-        set total_sale = total_sale - #{money}
+    <update id="addSellerInitCancelSell">
+        update wallet_user
+        set selling_amount = selling_amount - #{money}
         where id = #{id}
     </update>
 
-    <update id="addSellerCancelSellingAmount" >
-        update  wallet_user
-        set total_sale = total_sale + #{money},
-            total_charge = total_charge - #{money}
+    <update id="addSellerCancelSellingAmount">
+        update wallet_user
+        set selling_amount = selling_amount + #{money},
+            trading_amount = trading_amount - #{money}
         where id = #{id}
     </update>
 

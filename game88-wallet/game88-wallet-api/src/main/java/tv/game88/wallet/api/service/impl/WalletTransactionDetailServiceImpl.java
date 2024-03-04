@@ -360,7 +360,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n卖家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrRollbackTrans( update, walletTransactionDetail );
 
         walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
@@ -371,8 +371,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void updateTransDetailOrAddTransAmount( WalletTransactionDetail updateTransactionDetail,
-                                                   WalletTransactionDetail walletTransactionDetail ) {
+    public void updateTransDetailOrRollbackTrans( WalletTransactionDetail updateTransactionDetail,
+                                                  WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
                 .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY, WalletTransEnum.SELLER_CONFIRM_TRANS )
@@ -383,6 +383,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                 .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
+            WalletTransaction walletTransaction = walletTransactionService.getById( walletTransactionDetail.getTransactionId() );
+
+            Boolean canSplit = walletTransaction.getCanSplit();
+
             // 确认是否存在其它未完成的订单
             boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
                     .eq( WalletTransactionDetail::getSellerId, walletTransactionDetail.getSellerId() )
@@ -390,6 +394,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )
                     .ne( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
+            //
             walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
                     walletTransactionDetail.getAmount() );
             // 如果不存在则将挂单改为挂单中
@@ -485,7 +490,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrRollbackTrans( update, walletTransactionDetail );
 
         walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
@@ -560,7 +565,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         walletUserService.addBuyerTransactionSuccess( buyer.getId(), walletTransactionDetail.getAmount() );
         walletUserService.addSellerTransactionSuccess( seller.getId(), walletTransactionDetail.getAmount() );
-
 
         if ( i > 0 ) {
             // 确认是否存在其它未完成的订单
@@ -655,7 +659,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 "\n卖家" + walletTransactionDetail.getSellerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrRollbackTrans( update, walletTransactionDetail );
 
         walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
@@ -688,7 +692,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         String remark = "\n买家" + walletTransactionDetail.getBuyerId() + "超时取消交易,时间:" + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
-        SpringUtils.getAopProxy( this ).updateTransDetailOrAddTransAmount( update, walletTransactionDetail );
+        SpringUtils.getAopProxy( this ).updateTransDetailOrRollbackTrans( update, walletTransactionDetail );
 
         walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
