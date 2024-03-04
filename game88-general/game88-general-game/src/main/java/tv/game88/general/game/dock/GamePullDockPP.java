@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
@@ -45,12 +46,12 @@ public class GamePullDockPP extends AbstractGamePull {
         // 加5分钟,每5分钟拉一次单
         gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
 
-        // 加10分钟再拉一次,避免漏单
-        //String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 600000 );
-        //List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
-        //if ( !CollectionUtils.isEmpty( secondTimeDataList ) ) {
-        //    resultDataList.addAll( secondTimeDataList );
-        //}
+        // 加1小时再拉一次,避免漏单
+        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 3600000 );
+        List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
+        if ( resultDataList != null && !CollectionUtils.isEmpty( secondTimeDataList ) ) {
+            resultDataList.addAll( secondTimeDataList );
+        }
         return resultDataList;
     }
 
