@@ -6,7 +6,9 @@ import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -49,7 +51,7 @@ public class RspSellOrderDetail2 {
     private Integer    creditRating;
 
     @Schema( title = "买家收款方式" )
-    private Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+    private List<RspPayMethod2> rspPayMethodMap = new ArrayList<>();
 
     public String getHeadImg() {
         if ( StringUtils.isBlank( headImg ) ) {
