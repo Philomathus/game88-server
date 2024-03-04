@@ -179,6 +179,12 @@
         where id = #{id}
     </update>
 
+    <update id="addSellerInitCancelSell" >
+        update  wallet_user
+        set total_sale = total_sale - #{money}
+        where id = #{id}
+    </update>
+
     <update id="addSellerCancelSellingAmount" >
         update  wallet_user
         set total_sale = total_sale + #{money},

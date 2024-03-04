@@ -577,6 +577,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
+    public void addSellerInitCancelSell( String id ,Long amount) {
+        walletUserMapper.addSellerInitCancelSell( id , amount );
+    }
+
+    @Override
     public void addSellerCancelSellingAmount( String id ,Long amount) {
         walletUserMapper.addSellerCancelSellingAmount( id , amount );
     }

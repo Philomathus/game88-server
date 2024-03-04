@@ -50,6 +50,7 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     void addSellerTotalSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money);
     void addSellerOngoingSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
     void addSellerCancelSellingAmount( @Param( "id" ) String id ,  @Param( "money" ) Long money );
+    void addSellerInitCancelSell( @Param( "id" ) String id ,  @Param( "money" ) Long money );
 }
 
 
