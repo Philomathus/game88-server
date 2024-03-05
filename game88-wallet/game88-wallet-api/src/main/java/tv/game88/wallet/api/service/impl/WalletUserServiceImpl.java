@@ -378,9 +378,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             if ( byType != null ) {
                 rspLogMoney.setDes( byType.getDes() );
             }
-            rspLogMoney.setAmount( rspLogMoney
-                    .getPay()
-                    .subtract( rspLogMoney.getIncome() )
+            rspLogMoney.setAmount(
+                    rspLogMoney.getIncome().subtract( rspLogMoney
+                    .getPay() )
                     .setScale( 2, RoundingMode.HALF_DOWN ) );
         }
         return logMoneyList;
