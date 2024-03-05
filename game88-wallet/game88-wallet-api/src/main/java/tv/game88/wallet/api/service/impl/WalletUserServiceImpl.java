@@ -341,6 +341,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<RspMember> getUserInfo( String userId ) {
         WalletUser walletUser = this.baseMapper.selectById( userId );
         RspMember  rspMember  = new RspMember();
+        rspMember.setCreditRating( 5 );
         rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
 
