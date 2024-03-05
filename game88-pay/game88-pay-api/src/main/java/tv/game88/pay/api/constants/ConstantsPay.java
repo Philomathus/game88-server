@@ -7,9 +7,9 @@ package tv.game88.pay.api.constants;
  */
 public abstract class ConstantsPay {
     public static final Long VIPPAY_BANK_ID         = 68L;
-    public static final Long UPAY_BANK_ID           = 116L;
+    public static final Long QDPAY_BANK_ID          = 116L;
     public static final Long VIPPAY_PAY_PLATFORM_ID = 24L;
-    public static final Long UPAY_PAY_PLATFORM_ID   = 50L;
+    public static final Long QDPAY_PAY_PLATFORM_ID  = 50L;
 
     // LB支付
     public static final String LB_PAY         = "LBPay";
