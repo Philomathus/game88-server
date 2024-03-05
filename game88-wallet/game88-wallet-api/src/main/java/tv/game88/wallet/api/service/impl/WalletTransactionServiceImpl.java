@@ -324,6 +324,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             for ( RspConfigBankList rspConfigBank : configBankList ) {
                 if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
                     rspPayMethod.setBankName( rspConfigBank.getBankName() );
+                    rspPayMethod.setType( userPayMethod.getMethodType() );
                 }
             }
             rspPayMethodMap.add(  rspPayMethod );

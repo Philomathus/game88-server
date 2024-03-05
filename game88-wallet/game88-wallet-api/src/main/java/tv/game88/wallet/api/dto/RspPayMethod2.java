@@ -2,6 +2,7 @@ package tv.game88.wallet.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 @Data
 public class RspPayMethod2 {
@@ -19,4 +20,7 @@ public class RspPayMethod2 {
     private String realName;
     @Schema( title = "收款码图片地址" )
     private String payPicAddr;
+
+    @Schema( title = "卡类型" )
+    private WalletPayMethodEnum type;
 }
