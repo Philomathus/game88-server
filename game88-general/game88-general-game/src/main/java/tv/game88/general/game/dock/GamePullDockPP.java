@@ -43,14 +43,16 @@ public class GamePullDockPP extends AbstractGamePull {
         String       firstTimeResult = this.execute( gamePlatform, gamePlatformVersion );
         List<Object> resultDataList  = this.getDataList( firstTimeResult );
 
-        // 加5分钟,每5分钟拉一次单
-        gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
+        if ( resultDataList != null ) {
+            // 加5分钟,每5分钟拉一次单
+            gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
 
-        // 加2小时再拉一次,避免漏单
-        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 7200000 );
-        List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
-        if ( resultDataList != null && !CollectionUtils.isEmpty( secondTimeDataList ) ) {
-            resultDataList.addAll( secondTimeDataList );
+            // 加2小时再拉一次,避免漏单
+            String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 7200000 );
+            List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
+            if ( !CollectionUtils.isEmpty( secondTimeDataList ) ) {
+                resultDataList.addAll( secondTimeDataList );
+            }
         }
         return resultDataList;
     }
