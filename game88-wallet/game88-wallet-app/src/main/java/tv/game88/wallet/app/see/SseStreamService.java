@@ -26,6 +26,8 @@ public class SseStreamService {
         }
         ConstantsWallet.MEMBER_SSEEMITTER_MAP.put( memberId, sseEmitter );
 
+        log.info( "用户:{} 开始连接", memberId );
+
         SseSendMessageUtils.me.sendMessage( sseEmitter, memberId, JsonUtil.object2Json( ImmutableMap.of( "msg",
                 "Connection " + "Success" ) ), StreamMessageType.CONNECTION );
         return sseEmitter;
@@ -33,7 +35,7 @@ public class SseStreamService {
 
     private Runnable completionCallBack( String memberId ) {
         return () -> {
-            // log.info( "用户:{} 连接结束", memberId );
+            log.info( "用户:{} 连接结束", memberId );
             this.removeMemberSseEmitter( memberId );
         };
     }
