@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class SseStreamService {
     public SseEmitter createEmitter( String memberId ) {
-        SseEmitter sseEmitter = new SseEmitter();
+        SseEmitter sseEmitter = new SseEmitter( 60000L );
         sseEmitter.onCompletion( completionCallBack( memberId ) );
         sseEmitter.onTimeout( completionCallBack( memberId ) );
         sseEmitter.onError( errorCallBack( memberId ) );
