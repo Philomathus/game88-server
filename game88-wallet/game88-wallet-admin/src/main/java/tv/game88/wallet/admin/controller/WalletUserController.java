@@ -2,15 +2,19 @@ package tv.game88.wallet.admin.controller;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.service.WalletUserService;
 
@@ -57,5 +61,16 @@ public class WalletUserController extends BaseController {
     @GetMapping( value = "/{id}" )
     public RspBase<WalletUser> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( walletUserService.getById( id ) );
+    }
+
+    @PreAuthorize( "@ss.hasPermi('admin:walletUser:changeStatus')" )
+    @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeStatus/{memberId}" )
+    public Object changeStatusBan( @PathVariable String memberId, Integer status, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
+        WalletUser update = new WalletUser();
+        update.setId( memberId );
+        update.setStatus( status );
+        return toResult( walletUserService.updateById( update ) );
     }
 }
