@@ -64,7 +64,7 @@ spring:
     time-zone: Asia/Shanghai
   mvc:
     async:
-      request-timeout: 20000
+      request-timeout: 60000
     pathmatch:
       matching-strategy: ant_path_matcher
   servlet:
