@@ -12,6 +12,12 @@ import java.util.Map;
 public class RspSellOrderDetail {
     @Schema( title = "挂单编号" )
     private String                     transactionId;
+
+    /**
+     * 交易明细ID
+     */
+    private String transDetailId;
+
     @Schema( title = "挂单状态", description = "0挂单中 1交易中 2已售罄 3取消挂单" )
     private Integer                    status;
     @Schema( title = "售卖数量" )

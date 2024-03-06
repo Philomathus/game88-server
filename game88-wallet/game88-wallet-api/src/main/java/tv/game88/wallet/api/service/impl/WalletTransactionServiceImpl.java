@@ -18,6 +18,7 @@ import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
+import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.manager.WalletFundManager;
@@ -196,6 +197,14 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 }
             }
         }
+        if( walletTransaction.getStatus() == 1 ){
+            WalletTransactionDetail transactionId1 =
+                    walletTransactionDetailMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().select(
+                            "trans_detail_id" ).eq( "transaction_id"
+                            , transactionId ) );
+            rspSellOrderDetail.setTransDetailId( transactionId1.getTransDetailId() );
+        }
+
         rspSellOrderDetail.setRspPayMethodMap( rspPayMethodMap );
         return RspBase.ok( rspSellOrderDetail );
     }
