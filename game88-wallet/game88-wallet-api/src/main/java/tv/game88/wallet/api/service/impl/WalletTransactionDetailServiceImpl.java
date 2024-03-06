@@ -734,6 +734,11 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletMessageService.saveWalletMessage( walletTransactionDetail, true );
         walletMessageService.saveWalletMessage( walletTransactionDetail, false );
     }
+
+    @Override
+    public List<WalletTransactionDetail> getWalletTransactionList(WalletTransactionDetail walletTransactionDetail) {
+        return this.baseMapper.selectWalletTransactionDetailList( walletTransactionDetail );
+    }
 }
 
 

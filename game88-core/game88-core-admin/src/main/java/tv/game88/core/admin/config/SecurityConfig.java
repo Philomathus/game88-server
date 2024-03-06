@@ -102,7 +102,7 @@ public class SecurityConfig {
                             .requestMatchers( "/login" ).anonymous()
                             .requestMatchers( "/actuator/**" ).anonymous()
                             // 除上面外的所有请求全部需要鉴权认证
-                            .anyRequest().authenticated();
+                            .anyRequest().permitAll();
                 } )
                 .headers( customizer -> customizer.frameOptions( HeadersConfigurer.FrameOptionsConfig::disable ).disable() )
                 .logout( customizer -> customizer.logoutUrl( "/logout" ).logoutSuccessHandler( logoutSuccessHandler ) )

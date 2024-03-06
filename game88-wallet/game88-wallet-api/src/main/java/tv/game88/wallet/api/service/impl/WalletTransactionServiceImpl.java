@@ -345,6 +345,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         }
         return null;
     }
+
+    @Override
+    public List<WalletTransaction> getWalletTransactionList(WalletTransaction walletTransaction) {
+         return this.baseMapper.selectWalletTransactionList( walletTransaction );
+    }
 }
 
 
