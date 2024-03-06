@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.constants.ConstantsWallet;
@@ -186,6 +187,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
                         .transactionId( transactionId )
                         .isSeller( isSeller )
                         .walletTransEnum( walletTransEnum )
+                        .time( LocalDateTimeUtils.format( LocalDateTime.now() ) )
                         .build() ) );
     }
 }

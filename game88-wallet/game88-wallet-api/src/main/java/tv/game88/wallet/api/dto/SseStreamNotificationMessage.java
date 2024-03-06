@@ -12,4 +12,5 @@ public class SseStreamNotificationMessage implements Serializable {
     Long              messageId;
     String            title;
     WalletMessageEnum type;
+    String            time;
 }

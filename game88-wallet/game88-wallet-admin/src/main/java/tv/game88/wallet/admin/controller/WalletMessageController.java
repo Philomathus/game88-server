@@ -8,6 +8,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -82,6 +83,7 @@ public class WalletMessageController extends BaseController {
                     .messageId( walletMessage.getId() )
                     .title( walletMessage.getTitle() )
                     .type( WalletMessageEnum.system )
+                    .time( LocalDateTimeUtils.format( LocalDateTime.now() ) )
                     .build() ) );
         }
         return toResult( save );

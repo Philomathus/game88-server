@@ -13,4 +13,5 @@ public class SseStreamTransDetailMessage implements Serializable {
     String          transactionId;
     Boolean         isSeller;
     WalletTransEnum walletTransEnum;
+    String          time;
 }
