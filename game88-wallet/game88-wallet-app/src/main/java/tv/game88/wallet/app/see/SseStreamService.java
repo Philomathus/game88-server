@@ -19,7 +19,7 @@ public class SseStreamService {
     public SseEmitter createEmitter( String memberId ) {
         SseEmitter sseEmitter = new SseEmitter( 60000L );
         sseEmitter.onCompletion( completionCallBack( memberId ) );
-        sseEmitter.onTimeout( completionCallBack( memberId ) );
+        sseEmitter.onTimeout( timeoutCallBack( memberId ) );
         sseEmitter.onError( errorCallBack( memberId ) );
         if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
             ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
@@ -36,6 +36,13 @@ public class SseStreamService {
     private Runnable completionCallBack( String memberId ) {
         return () -> {
             log.info( "用户:{} 连接结束", memberId );
+            this.removeMemberSseEmitter( memberId );
+        };
+    }
+
+    private Runnable timeoutCallBack( String memberId ) {
+        return () -> {
+            log.info( "用户:{} 连接超时", memberId );
             this.removeMemberSseEmitter( memberId );
         };
     }
