@@ -320,12 +320,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
-
-            //            for ( RspConfigBankList rspConfigBank : configBankList ) {
-            //                if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
-            //                    rspPayMethod.setBankName( rspConfigBank.getBankName() );
-            //                }
-            //            }
+             for ( RspConfigBankList rspConfigBank : configBankList ) {
+                 if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
+                     rspPayMethod.setBankName( rspConfigBank.getBankName() );
+                 }
+             }
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
         }
         rspSellOrderDetail2.setRspPayMethodMap( rspPayMethodMap );
