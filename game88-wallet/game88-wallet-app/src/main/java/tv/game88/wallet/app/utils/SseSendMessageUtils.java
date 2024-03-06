@@ -30,7 +30,7 @@ public class SseSendMessageUtils {
                         .name( messageType.name() )
                         .id( memberId )
                         .data( messageBody, MediaType.APPLICATION_JSON )
-                        .reconnectTime( 1000 ) );
+                        .reconnectTime( 2000L ) );
             } catch ( Exception e ) {
                 sseEmitter.completeWithError( e );
             }
