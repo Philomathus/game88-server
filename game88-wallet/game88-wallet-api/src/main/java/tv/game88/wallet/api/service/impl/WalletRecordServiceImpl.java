@@ -122,7 +122,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             return rspBase;
         }
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
-                .eq( "merchant_id", reqOrderQuery.getMerchantId() ).eq( "order_id", reqOrderQuery.getOrderNo() ) );
+                .eq( "merchant_id", reqOrderQuery.getMerchantId() ).eq( "order_no", reqOrderQuery.getOrderNo() ) );
         if ( walletRecord == null ) {
             return RspBase.businessError( "订单号" + reqOrderQuery.getOrderNo() + "不存在" );
         }
