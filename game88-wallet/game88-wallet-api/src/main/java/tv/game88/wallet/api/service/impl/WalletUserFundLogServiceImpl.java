@@ -6,6 +6,8 @@ import tv.game88.wallet.api.service.WalletUserFundLogService;
 import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author meng.jun
  * @description 针对表【wallet_user_fund_log(用户资金日志表)】的数据库操作Service实现
@@ -14,6 +16,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class WalletUserFundLogServiceImpl extends ServiceImpl<WalletUserFundLogMapper, WalletUserFundLog> implements WalletUserFundLogService {
 
+    @Override
+    public List<WalletUserFundLog> getWalletUserFundLog(WalletUserFundLog walletUserFundLog) {
+        return this.baseMapper.selectWalletUserFundLog( walletUserFundLog );
+    }
 }
 
 
