@@ -112,6 +112,7 @@ public class RemoteGameDataRecordTask {
                     GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
                     if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
                             - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
+                        log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
                         gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
                     }
                 } catch ( Exception e ) {
