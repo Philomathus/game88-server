@@ -67,6 +67,7 @@
         <include refid="selectWalletHistory"/>
         <where>
             <if test="id != null">and id = #{id}</if>
+            <if test="nickName != null">and nick_name #{nickName}</if>
         </where>
     </select>
 

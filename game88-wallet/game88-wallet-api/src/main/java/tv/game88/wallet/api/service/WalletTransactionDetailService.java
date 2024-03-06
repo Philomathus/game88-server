@@ -37,4 +37,6 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
     void processSellerConfirmTransTimeout( String transDetailId );
 
     void processBuyerConfirmTransferTimeout( String transDetailId );
+
+    List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail );
 }
