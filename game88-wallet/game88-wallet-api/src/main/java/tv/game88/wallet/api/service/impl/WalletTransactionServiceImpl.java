@@ -315,7 +315,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .eq( "audit_status", 1 )
                 .orderByDesc( "create_time" ) );
 
-        Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+        Map<String, List<RspPayMethod2>> rspPayMethodMap = new HashMap<>();
         List<RspConfigBankList>    configBankList  = configBankListCache.getEffectList();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
@@ -325,7 +325,8 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                      rspPayMethod.setBankName( rspConfigBank.getBankName() );
                  }
              }
-            rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
+            rspPayMethodMap.putIfAbsent( userPayMethod.getMethodType().name(), new ArrayList<>() );
+            rspPayMethodMap.get( userPayMethod.getMethodType().name() ).add(  rspPayMethod );
         }
         rspSellOrderDetail2.setRspPayMethodMap( rspPayMethodMap );
         return RspBase.ok( rspSellOrderDetail2 );

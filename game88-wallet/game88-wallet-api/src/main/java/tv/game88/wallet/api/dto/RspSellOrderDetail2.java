@@ -51,7 +51,7 @@ public class RspSellOrderDetail2 {
     private Integer    creditRating;
 
     @Schema( title = "买家收款方式" )
-    private Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
+    private Map<String, List<RspPayMethod2>> rspPayMethodMap = new HashMap<>();
 
     public String getHeadImg() {
         if ( StringUtils.isBlank( headImg ) ) {
