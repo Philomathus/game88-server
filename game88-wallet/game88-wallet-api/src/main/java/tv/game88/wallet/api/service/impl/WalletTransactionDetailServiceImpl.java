@@ -380,33 +380,12 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 回退挂单金额
         boolean update = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
+                .set( WalletTransaction::getStatus, 0 )
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                 .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
-            WalletTransaction walletTransaction = walletTransactionService.getById( walletTransactionDetail.getTransactionId() );
-
-            Boolean canSplit = walletTransaction.getCanSplit();
-
-            // 确认是否存在其它未完成的订单
-            boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
-                    .eq( WalletTransactionDetail::getSellerId, walletTransactionDetail.getSellerId() )
-                    .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY,
-                            WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
-                            WalletTransEnum.SELLER_NOT_RECEIVED )
-                    .ne( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
-            //
             walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
                     walletTransactionDetail.getAmount() );
-            // 如果不存在则将挂单改为挂单中
-            if ( !exists ) {
-                boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
-                        .set( WalletTransaction::getStatus, 0 )
-                        .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
-                if ( !updateTrans ) {
-                    throw new BusinessException( "取消交易失败,请重试" );
-                }
-
-            }
         } else {
             throw new BusinessException( "取消交易失败,请重试" );
         }
@@ -551,20 +530,19 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     public void updateTransDetailOrAddUserAmount( WalletTransactionDetail updateTransactionDetail,
                                                   WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
+        String transDetailId = walletTransactionDetail.getTransDetailId();
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
                 .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
-                .eq( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
+                .eq( WalletTransactionDetail::getTransDetailId, transDetailId ) );
         // 给买家加币
         WalletUserFundEnum fundEnum = WalletUserFundEnum.TRANSACTION_ORDER_IN;
-        String             mark     = "用户" + fundEnum.getDes() + walletTransactionDetail.getAmount();
-        walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, walletTransactionDetail.getAmount(),
-                fundEnum, mark, walletTransactionDetail.getTransDetailId(), walletTransactionDetail.getTransDetailId() );
+        Long               amount   = walletTransactionDetail.getAmount();
+        String             mark     = "用户" + fundEnum.getDes() + amount;
+        walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, amount, fundEnum, mark, transDetailId
+                , transDetailId );
 
-        WalletUser buyer  = walletUserService.getById( walletTransactionDetail.getBuyerId() );
-        WalletUser seller = walletUserService.getById( walletTransactionDetail.getSellerId() );
-
-        walletUserService.addBuyerTransactionSuccess( buyer.getId(), walletTransactionDetail.getAmount() );
-        walletUserService.addSellerTransactionSuccess( seller.getId(), walletTransactionDetail.getAmount() );
+        walletUserService.addBuyerTransactionSuccess( walletTransactionDetail.getBuyerId(), amount );
+        walletUserService.addSellerTransactionSuccess( walletTransactionDetail.getSellerId(), amount );
 
         if ( i > 0 ) {
             // 确认是否存在其它未完成的订单
@@ -573,7 +551,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY,
                             WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
                             WalletTransEnum.SELLER_NOT_RECEIVED )
-                    .ne( WalletTransactionDetail::getTransDetailId, walletTransactionDetail.getTransDetailId() ) );
+                    .ne( WalletTransactionDetail::getTransDetailId, transDetailId ) );
             WalletTransaction walletTransaction = walletTransactionService.getOne( new LambdaQueryWrapper<WalletTransaction>()
                     .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                     .select( WalletTransaction::getAmount ) );
