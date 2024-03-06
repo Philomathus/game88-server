@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.wallet.api.type.StreamMessageType;
 
 import java.util.concurrent.Executors;
@@ -32,6 +33,7 @@ public class SseSendMessageUtils {
                         .data( messageBody, MediaType.APPLICATION_JSON )
                         .reconnectTime( 1000 ) );
             } catch ( Exception e ) {
+                log.error( JsonUtil.object2Json( sseEmitter ) + " ::: " + e.getMessage(), e );
                 sseEmitter.completeWithError( e );
             }
         } );
