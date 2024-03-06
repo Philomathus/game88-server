@@ -18,6 +18,8 @@ public interface WalletUserFundLogMapper extends BaseMapper<WalletUserFundLog> {
 
     List<RspLogFund> findLogFundList( @Param( "userId" ) String userId, @Param( "req" ) ReqLogFund reqLogFund, @Param(
             "beginDay" ) String beginDay, @Param( "endDay" ) String endDay );
+
+    List<WalletUserFundLog> selectWalletUserFundLog (WalletUserFundLog walletUserFundLog );
 }
 
 

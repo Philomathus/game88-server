@@ -25,18 +25,18 @@ import java.io.Reader;
 import java.math.RoundingMode;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.UPAY + ConstantsPayAgent.PROCESSOR )
+@Repository( value = ConstantsPayAgent.QD_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
-public class UPayAgentProcessor extends AbstractPayAgent {
+public class QDPayAgentProcessor extends AbstractPayAgent {
     @Override
     public String getName() {
-        return "UPay";
+        return "QDPay";
     }
 
     @Override
     public boolean orderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
                              PayAgentPlatform payAgentPlatform, ReqPayAgent reqPayAgent ) throws Exception {
-        if ( !Objects.equals( withdrawDetail.getBankId(), ConstantsPay.UPAY_BANK_ID ) ) {
+        if ( !Objects.equals( withdrawDetail.getBankId(), ConstantsPay.QDPAY_BANK_ID ) ) {
             payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             log.warn( "此代付无法支持的银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
             throw new BusinessException( "此代付无法支持的银行类型：" + withdrawDetail.getBankId() );

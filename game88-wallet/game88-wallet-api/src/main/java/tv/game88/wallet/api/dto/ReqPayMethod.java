@@ -27,7 +27,7 @@ public class ReqPayMethod {
     private String payAddrProvince;
 
     @Schema( title = "所在地-市" )
-    @NotBlank( message = "所在地-市不能为空" )
+//    @NotBlank( message = "所在地-市不能为空" )
     private String payAddrCity;
 
     @Schema( title = "收款码图片地址" )

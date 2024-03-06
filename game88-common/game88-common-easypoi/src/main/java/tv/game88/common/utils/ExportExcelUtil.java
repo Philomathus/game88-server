@@ -53,6 +53,12 @@ public class ExportExcelUtil {
         } catch ( IOException e ) {
             log.error( e.getMessage(), e );
             throw new ExcelException( e.getMessage() );
+        } finally {
+            try {
+                workbook.close();
+            } catch ( IOException e ) {
+                log.error( e.getMessage() );
+            }
         }
     }
 

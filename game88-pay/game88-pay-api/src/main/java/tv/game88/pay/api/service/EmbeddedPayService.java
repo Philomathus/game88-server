@@ -9,7 +9,7 @@ public interface EmbeddedPayService {
 
     RspBase<?> vipPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId );
 
-    RspBase<RspVipPayLogin> uPayLogin( String userId );
+    RspBase<RspVipPayLogin> qdPayLogin( String userId );
 
-    RspBase<?> uPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String userId );
+    RspBase<?> qdPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String userId );
 }

@@ -36,22 +36,20 @@ public class GamePullDockPP extends AbstractGamePull {
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         long          gamePlatformVersion = Long.parseLong( gamePlatform.getVersionValue() );
         LocalDateTime start               = LocalDateTimeUtils.getDateTimeFromTimestamp( gamePlatformVersion );
-        // 如果不是5分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 5 ) ) ) {
+        // 如果不是10分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 10 ) ) ) {
             return null;
         }
-        List<Object> resultDataList    = new ArrayList<>();
-        String       firstTimeResult   = this.execute( gamePlatform, gamePlatformVersion );
-        List<Object> firstTimeDataList = this.getDataList( firstTimeResult );
-        if ( !CollectionUtils.isEmpty( firstTimeDataList ) ) {
-            resultDataList.addAll( firstTimeDataList );
-            // 加1分钟,每1分钟拉一次单
-            gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 60000 ) );
-        }
-        // 加10分钟再拉一次,避免漏单
-        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 600000 );
+        String       firstTimeResult = this.execute( gamePlatform, gamePlatformVersion );
+        List<Object> resultDataList  = this.getDataList( firstTimeResult );
+
+        // 加5分钟,每5分钟拉一次单
+        gamePlatform.setVersionValue( String.valueOf( gamePlatformVersion + 300000 ) );
+
+        // 加1小时再拉一次,避免漏单
+        String       secondTimeResult   = this.execute( gamePlatform, gamePlatformVersion + 3600000 );
         List<Object> secondTimeDataList = this.getDataList( secondTimeResult );
-        if ( !CollectionUtils.isEmpty( secondTimeDataList ) ) {
+        if ( resultDataList != null && !CollectionUtils.isEmpty( secondTimeDataList ) ) {
             resultDataList.addAll( secondTimeDataList );
         }
         return resultDataList;

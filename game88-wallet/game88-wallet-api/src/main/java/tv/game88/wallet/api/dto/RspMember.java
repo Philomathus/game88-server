@@ -27,16 +27,20 @@ public class RspMember {
     @Schema( title = "信用等级" )
     private Integer    creditRating;
     @Schema( title = "累积充值金额" )
-    private Long totalCharge;
+    private Long       totalCharge;
     @Schema( title = "累积出售金额" )
-    private Long totalSale;
+    private Long       totalSale;
+    @Schema( title = "卖单中金额" )
+    private Long       sellingAmount;
+    @Schema( title = "交易中金额" )
+    private Long       tradingAmount;
 
     @Schema( title = "是否有登录密码" )
     private Boolean hasPassword;
     @Schema( title = "是否有资金密码" )
     private Boolean hasFundPassword;
     @Schema( title = "用户头像" )
-    private String        headImg;
+    private String  headImg;
 
     public String getPhone() {
         if ( StringUtils.isNotBlank( phone ) ) {

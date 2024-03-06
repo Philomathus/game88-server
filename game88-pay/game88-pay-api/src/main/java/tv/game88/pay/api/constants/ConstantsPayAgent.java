@@ -13,7 +13,7 @@ public abstract class ConstantsPayAgent {
     public static final String TO_PAY         = "toPay";
     public static final String SANJIN_PAY     = "sanJinPay";
     public static final String BB_JIUDING_PAY = "bbJiuDIngPay";
-    public static final String BAXI_PAY = "baxiPay";
+    public static final String BAXI_PAY       = "baxiPay";
     public static final String JQ_PAY         = "jqPay";
     public static final String MY_PAY         = "myPay";
     public static final String _8K_PAY        = "8kPay";
@@ -22,5 +22,6 @@ public abstract class ConstantsPayAgent {
     public static final String HENG_SHENG_PAY = "hengShengPay";
     public static final String CBI_PAY        = "cbiPay";
     public static final String HUA_ZHONG_PAY  = "huaZhongPay";
-    public static final String UPAY           = "upay";
+    public static final String QD_PAY         = "qdPay";
+    public static final String TIANXIAHUI_PAY = "tianXiaHuiPay";
 }

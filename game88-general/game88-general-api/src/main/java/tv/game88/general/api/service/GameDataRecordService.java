@@ -11,7 +11,7 @@ import java.util.List;
 public interface GameDataRecordService extends IService<GameDataRecord> {
     void cutTable( int num );
 
-    void batchInsert( List<GameDataRecord> gameDataRecords, GamePlatform gamePlatform );
+    void batchInsert( List<GameDataRecord> gameDataRecords, GamePlatform gamePlatform, String name );
 
     List<RspGameDataLog> getListByReq( ReqGameDataRecord req );
 }

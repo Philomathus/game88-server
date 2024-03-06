@@ -35,15 +35,15 @@ public class EmbeddedPayController extends BaseController {
         return embeddedPayService.vipPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
 
-    @Operation( summary = "UPay登录注册" )
-    @PostMapping( "/uPayLogin" )
-    public RspBase<RspVipPayLogin> uPayLogin() {
-        return embeddedPayService.uPayLogin( MemberSecurityUtils.getUserId() );
+    @Operation( summary = "QDPay登录注册" )
+    @PostMapping( value = { "/qdPayLogin", "/uPayLogin" } )
+    public RspBase<RspVipPayLogin> qdPayLogin() {
+        return embeddedPayService.qdPayLogin( MemberSecurityUtils.getUserId() );
     }
 
-    @Operation( summary = "UPay扣款并充值平台" )
-    @PostMapping( "/uPayDeposit" )
-    public RspBase<?> uPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
-        return embeddedPayService.uPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
+    @Operation( summary = "QDPay扣款并充值平台" )
+    @PostMapping( value = { "qdPayDeposit", "/uPayDeposit" } )
+    public RspBase<?> qdPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
+        return embeddedPayService.qdPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
 }

@@ -109,6 +109,18 @@ public class WalletUser implements Serializable {
      */
     private Long          totalSale;
     /**
+     * 累积购买金额
+     */
+    private Long          totalBuy;
+    /**
+     * 卖单中金额
+     */
+    private Long          sellingAmount;
+    /**
+     * 交易中金额
+     */
+    private Long          tradingAmount;
+    /**
      * 买单次数
      */
     private Long          buyOrderNum;
@@ -136,7 +148,7 @@ public class WalletUser implements Serializable {
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
-    private String   searchValue;
+    private String searchValue;
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )

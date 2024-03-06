@@ -28,7 +28,7 @@ public class TransactionDetailController extends BaseController {
     public RspBase<List<RspTransDetail>> transDetailList( @RequestBody ReqTransDetailList req ) {
         startPage( req );
         List<RspTransDetail> resultList = walletTransactionDetailService.transDetailList( MemberSecurityUtils.getUserId(), req );
-        return getRspBasePage( resultList, req );
+        return getRspBasePage( resultList );
     }
 
     @Operation( summary = "购买G币" )

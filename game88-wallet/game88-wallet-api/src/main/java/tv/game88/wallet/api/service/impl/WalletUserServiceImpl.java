@@ -341,6 +341,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<RspMember> getUserInfo( String userId ) {
         WalletUser walletUser = this.baseMapper.selectById( userId );
         RspMember  rspMember  = new RspMember();
+        rspMember.setCreditRating( 5 );
         rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
 
@@ -379,8 +380,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 rspLogMoney.setDes( byType.getDes() );
             }
             rspLogMoney.setAmount( rspLogMoney
-                    .getPay()
-                    .subtract( rspLogMoney.getIncome() )
+                    .getIncome()
+                    .subtract( rspLogMoney.getPay() )
                     .setScale( 2, RoundingMode.HALF_DOWN ) );
         }
         return logMoneyList;
@@ -485,6 +486,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
+        if( StringUtils.isBlank( reqVerifyIdCard.getRealName()) ) {
+            return RspBase.businessError( "需要实名" );
+        }
         if ( walletUser.getStatus() != 1 ) {
             return RspBase.businessError( "用户状态异常,请联系客服" );
         }
@@ -571,6 +575,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public void addSellerOngoingSellingAmount( String id ,Long amount) {
         walletUserMapper.addSellerOngoingSellingAmount( id , amount );
+    }
+
+    @Override
+    public void addSellerInitCancelSell( String id ,Long amount) {
+        walletUserMapper.addSellerInitCancelSell( id , amount );
     }
 
     @Override

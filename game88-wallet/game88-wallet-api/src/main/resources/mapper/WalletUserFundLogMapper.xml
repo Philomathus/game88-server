@@ -50,4 +50,15 @@
         </if>
         order by create_time desc
     </select>
+    <select id="selectWalletUserFundLog" resultType="tv.game88.wallet.api.entity.WalletUserFundLog">
+        <include refid="selectWalletUserFundLogVo"/>
+        <where>
+            <if test="id != null  and id != ''">
+                and id = #{id}
+            </if>
+            <if test="type != null  and type != ''">
+                and type = #{type}
+            </if>
+        </where>
+    </select>
 </mapper>

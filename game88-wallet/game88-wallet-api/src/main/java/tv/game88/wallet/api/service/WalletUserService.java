@@ -72,4 +72,5 @@ public interface WalletUserService extends IService<WalletUser> {
 
     void addSellerOngoingSellingAmount( String id ,Long amount);
     void addSellerCancelSellingAmount( String id ,Long amount);
+    void addSellerInitCancelSell( String id ,Long amount);
 }

@@ -48,36 +48,37 @@ public class WalletFundManager {
         Long userBalance = walletUserMapper.getUserMoney( userId );
 
         int updateMoney;
-        if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_IN ) {
+        if ( fundEnum == WalletUserFundEnum.WITHDRAW_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
         }
 
         //日志
-        WalletUserFundLog log = new WalletUserFundLog();
+        WalletUserFundLog userFundLog = new WalletUserFundLog();
         if ( StringUtils.isNotBlank( businessId ) ) {
-            log.setId( businessId );
+            userFundLog.setId( businessId );
         } else {
-            log.setId( IdWorker.get32UUID() );
+            userFundLog.setId( IdWorker.get32UUID() );
         }
-        log.setUserId( userId );
-        log.setCreateTime( LocalDateTime.now() );
-        log.setIncome( addMoney );
-        log.setPay( 0L );
-        log.setType( fundEnum.getType() );
-        log.setDes( fundEnum.getDes() );
-        log.setMark( mark );
-        log.setTotalBefore( userBalance );
-        log.setTotal( userBalance + addMoney );
-        log.setMarkorder( markorder );
-        int insertLogMoney = walletUserFundLogMapper.insert( log );
+        userFundLog.setUserId( userId );
+        userFundLog.setCreateTime( LocalDateTime.now() );
+        userFundLog.setIncome( addMoney );
+        userFundLog.setPay( 0L );
+        userFundLog.setType( fundEnum.getType() );
+        userFundLog.setDes( fundEnum.getDes() );
+        userFundLog.setMark( mark );
+        userFundLog.setTotalBefore( userBalance );
+        userFundLog.setTotal( userBalance + addMoney );
+        userFundLog.setMarkorder( markorder );
+        int insertLogMoney = walletUserFundLogMapper.insert( userFundLog );
         if ( updateMoney <= 0 || insertLogMoney <= 0 ) {
             throw new BusinessException( "会员资金日志记入失败,请重试" );
         }
         // 用户加钱,商户减钱
         if ( !fundEnum.getIsTransaction() ) {
-            this.reduceWalletMerchantMoney( merchantId, addMoney, fundEnum, mark, log.getId(), markorder, log.getCreateTime() );
+            this.reduceWalletMerchantMoney( merchantId, addMoney, fundEnum, mark, userFundLog.getId(), markorder,
+                    userFundLog.getCreateTime() );
         }
     }
 
@@ -107,29 +108,30 @@ public class WalletFundManager {
             throw new NoMoneyException( "余额不足" );
         }
         //插入会员资金信息记录
-        WalletUserFundLog log = new WalletUserFundLog();
+        WalletUserFundLog userFundLog = new WalletUserFundLog();
         if ( StringUtils.isNotBlank( businessId ) ) {
-            log.setId( businessId );
+            userFundLog.setId( businessId );
         } else {
-            log.setId( IdWorker.get32UUID() );
+            userFundLog.setId( IdWorker.get32UUID() );
         }
-        log.setUserId( userId );
-        log.setCreateTime( LocalDateTime.now() );
-        log.setIncome( 0L );
-        log.setPay( reduceMoney );
-        log.setType( fundEnum.getType() );
-        log.setDes( fundEnum.getDes() );
-        log.setMark( mark );
-        log.setTotalBefore( userMoney );
-        log.setTotal( userMoney - reduceMoney );
-        log.setMarkorder( markorder );
-        int insertLogMoney = walletUserFundLogMapper.insert( log );
+        userFundLog.setUserId( userId );
+        userFundLog.setCreateTime( LocalDateTime.now() );
+        userFundLog.setIncome( 0L );
+        userFundLog.setPay( reduceMoney );
+        userFundLog.setType( fundEnum.getType() );
+        userFundLog.setDes( fundEnum.getDes() );
+        userFundLog.setMark( mark );
+        userFundLog.setTotalBefore( userMoney );
+        userFundLog.setTotal( userMoney - reduceMoney );
+        userFundLog.setMarkorder( markorder );
+        int insertLogMoney = walletUserFundLogMapper.insert( userFundLog );
         if ( insertLogMoney <= 0 ) {
             throw new BusinessException( "会员资金日志记入失败,请重试" );
         }
         // 用户减钱,商户加钱
         if ( !fundEnum.getIsTransaction() ) {
-            this.addWalletMerchantMoney( merchantId, reduceMoney, fundEnum, mark, log.getId(), markorder, log.getCreateTime() );
+            this.addWalletMerchantMoney( merchantId, reduceMoney, fundEnum, mark, userFundLog.getId(), markorder,
+                    userFundLog.getCreateTime() );
         }
     }
 
