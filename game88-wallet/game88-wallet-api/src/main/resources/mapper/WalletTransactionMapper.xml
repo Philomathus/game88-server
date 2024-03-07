@@ -74,6 +74,12 @@
             <if test="unUserId != null">
                 and user_id <![CDATA[ <> ]]> #{unUserId}
             </if>
+            <if test="payMethodTypes != null and payMethodTypes != '' ">
+                AND pay_method_types = #{payMethodTypes}
+            </if>
+            <if test="beginTime != null and endTime != null ">
+                AND create_time BETWEEN #{beginTime} AND #{endTime}
+            </if>
         </where>
         order by create_time desc
     </select>

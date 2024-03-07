@@ -106,4 +106,7 @@ public class WalletTransaction implements Serializable {
     private List<Integer>       statusList;
     @TableField( exist = false )
     private String       unUserId;
+
+    private String beginTime;
+    private String endTime;
 }
