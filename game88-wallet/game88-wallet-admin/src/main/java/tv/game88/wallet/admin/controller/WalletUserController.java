@@ -16,6 +16,7 @@ import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.wallet.api.entity.WalletUser;
+import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.service.WalletUserService;
 
 import java.util.List;
@@ -82,6 +83,21 @@ public class WalletUserController extends BaseController {
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setIsVerified( isVerified );
+        return toResult( walletUserService.updateById( update ) );
+    }
+
+    /**
+     * 重置基金密码
+     *
+     * @param memberId
+     * @param googleAuthCode
+     */
+    @PostMapping( "/resetFundPass/{memberId}" )
+    public Object resetTxPass( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
+        WalletUser update = new WalletUser();
+        update.setId( memberId );
+        update.setFundPassword( "" );
         return toResult( walletUserService.updateById( update ) );
     }
 
