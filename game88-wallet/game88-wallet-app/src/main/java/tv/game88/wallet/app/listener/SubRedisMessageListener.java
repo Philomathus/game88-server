@@ -10,6 +10,8 @@ import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.type.StreamMessageType;
 import tv.game88.wallet.app.utils.SseSendMessageUtils;
 
+import java.time.Duration;
+
 /**
  * @author meng.jun
  */
@@ -42,8 +44,16 @@ public class SubRedisMessageListener implements MessageListener {
             }
             SseEmitter sseEmitter = ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId );
             if ( sseEmitter == null ) {
-                log.warn( "会员{}不在线,无法发送个人消息", memberId );
-                return;
+                try {
+                    Thread.sleep( Duration.ofSeconds( 3 ) );
+                } catch ( InterruptedException e ) {
+                    log.error( e.getMessage(), e );
+                }
+                sseEmitter = ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId );
+                if ( sseEmitter == null ) {
+                    log.warn( "会员{}不在线,无法发送个人消息", memberId );
+                    return;
+                }
             }
             SseSendMessageUtils.me.sendMessage( sseEmitter, memberId, messageBody, StreamMessageType.MEMBER );
         }

@@ -42,7 +42,7 @@ public class SseStreamService {
 
     private Runnable timeoutCallBack( String memberId ) {
         return () -> {
-            log.info( "用户:{} 连接超时", memberId );
+            // log.info( "用户:{} 连接超时", memberId );
             this.removeMemberSseEmitter( memberId );
         };
     }
