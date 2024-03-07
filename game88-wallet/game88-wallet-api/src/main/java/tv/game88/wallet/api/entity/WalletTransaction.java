@@ -107,6 +107,9 @@ public class WalletTransaction implements Serializable {
     @TableField( exist = false )
     private String       unUserId;
 
+    @TableField( exist = false )
     private String beginTime;
+    
+    @TableField( exist = false )
     private String endTime;
 }
