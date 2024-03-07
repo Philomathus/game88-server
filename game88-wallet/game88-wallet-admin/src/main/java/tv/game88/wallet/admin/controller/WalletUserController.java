@@ -73,4 +73,16 @@ public class WalletUserController extends BaseController {
         update.setStatus( status );
         return toResult( walletUserService.updateById( update ) );
     }
+
+
+    @PostMapping( value = "/realNameUpdate/{memberId}" )
+    @Log( title = "重置会员登录密码", businessType = BusinessType.UPDATE )
+    public RspBase<?> reset( @PathVariable String memberId, String realName, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
+        WalletUser update = new WalletUser();
+        update.setId( memberId );
+        update.setRealName( realName );
+        return toResult(walletUserService.updateById( update ) );
+    }
+
 }
