@@ -375,7 +375,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     public void updateTransDetailOrRollbackTrans( WalletTransactionDetail updateTransactionDetail,
                                                   WalletTransactionDetail walletTransactionDetail ) {
 
-        WalletTransactionDetail transDetailId = this.baseMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().eq( "trans_detail_id", walletTransactionDetail.getTransDetailId() ) );
+        WalletTransactionDetail transDetailId = this.baseMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().eq(
+                "trans_detail_id", walletTransactionDetail.getTransDetailId() ) );
 
         // 保存状态
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
@@ -388,7 +389,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                 .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
-            if( transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS || transDetailId.getStatus() == WalletTransEnum.SELLER_CANCEL){
+            if ( transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS
+                    || transDetailId.getStatus() == WalletTransEnum.SELLER_CANCEL ) {
                 walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
                         walletTransactionDetail.getAmount() );
             }
@@ -551,20 +553,14 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletUserService.addSellerTransactionSuccess( walletTransactionDetail.getSellerId(), amount );
 
         if ( i > 0 ) {
-            // 确认是否存在其它未完成的订单
-            boolean exists = this.baseMapper.exists( new LambdaQueryWrapper<WalletTransactionDetail>()
-                    .eq( WalletTransactionDetail::getSellerId, walletTransactionDetail.getSellerId() )
-                    .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY,
-                            WalletTransEnum.SELLER_CONFIRM_TRANS, WalletTransEnum.BUYER_CONFIRM_TRANSFER,
-                            WalletTransEnum.SELLER_NOT_RECEIVED )
-                    .ne( WalletTransactionDetail::getTransDetailId, transDetailId ) );
             WalletTransaction walletTransaction = walletTransactionService.getOne( new LambdaQueryWrapper<WalletTransaction>()
                     .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                     .select( WalletTransaction::getAmount ) );
-            // 如果不存在并且挂单金额为0则将挂单改为交易成功
-            if ( !exists && walletTransaction != null && walletTransaction.getAmount() <= 0 ) {
+            // 如果挂单金额为0则将挂单改为交易成功, 否则改为挂单中
+            if ( walletTransaction != null ) {
                 boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
-                        .set( WalletTransaction::getStatus, 0 )
+                        .set( WalletTransaction::getStatus, walletTransaction.getAmount() <= 0 ? 2 : 0 )
+                        .eq( WalletTransaction::getStatus, 1 )
                         .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
                 if ( !updateTrans ) {
                     throw new BusinessException( "转币失败,请重试" );
@@ -720,7 +716,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Override
-    public List<WalletTransactionDetail> getWalletTransactionList(WalletTransactionDetail walletTransactionDetail) {
+    public List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail ) {
         return this.baseMapper.selectWalletTransactionDetailList( walletTransactionDetail );
     }
 }
