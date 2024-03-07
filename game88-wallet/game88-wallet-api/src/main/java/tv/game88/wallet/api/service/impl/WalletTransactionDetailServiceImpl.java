@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -373,6 +374,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     @Transactional( rollbackFor = Exception.class )
     public void updateTransDetailOrRollbackTrans( WalletTransactionDetail updateTransactionDetail,
                                                   WalletTransactionDetail walletTransactionDetail ) {
+
+        WalletTransactionDetail transDetailId = this.baseMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().eq( "trans_detail_id", walletTransactionDetail.getTransDetailId() ) );
+
         // 保存状态
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
                 .in( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_BUY, WalletTransEnum.SELLER_CONFIRM_TRANS )
@@ -384,8 +388,10 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                 .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
-            walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
-                    walletTransactionDetail.getAmount() );
+            if( transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS || transDetailId.getStatus() == WalletTransEnum.SELLER_CANCEL){
+                walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
+                        walletTransactionDetail.getAmount() );
+            }
         } else {
             throw new BusinessException( "取消交易失败,请重试" );
         }
