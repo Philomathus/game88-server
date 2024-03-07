@@ -74,6 +74,17 @@ public class WalletUserController extends BaseController {
         return toResult( walletUserService.updateById( update ) );
     }
 
+    @PreAuthorize( "@ss.hasPermi('admin:walletUser:changeStatus')" )
+    @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeVerified/{memberId}" )
+    public Object changeVerified( @PathVariable String memberId, Integer isVerified, Integer googleAuthCode ) throws Exception {
+        SecurityUtils.verifyMFACode( googleAuthCode );
+        WalletUser update = new WalletUser();
+        update.setId( memberId );
+        update.setIsVerified( isVerified );
+        return toResult( walletUserService.updateById( update ) );
+    }
+
 
     @PostMapping( value = "/realNameUpdate/{memberId}" )
     @Log( title = "重置会员登录密码", businessType = BusinessType.UPDATE )
