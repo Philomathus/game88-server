@@ -111,6 +111,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( rspBase != null ) {
             return rspBase;
         }
+        if ( walletTransaction.getStatus() == 1 ) {
+            return RspBase.businessError( "挂单交易中,请等待卖家交易结束" );
+        }
         // 买家支付方式
         WalletUserPayMethod bPayMethod = walletUserPayMethodMapper.selectById( reqBuyCoins.getPayMethodId() );
         if ( bPayMethod == null ) {
