@@ -56,7 +56,7 @@ public class WalletMessageController extends BaseController {
     /**
      * 获取站内信详细信息
      */
-    @PreAuthorize( "@ss.hasPermi('admin:walletMessage:query')" )
+//    @PreAuthorize( "@ss.hasPermi('admin:walletMessage:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<WalletMessage> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( walletMessageService.getById( id ) );

@@ -27,13 +27,17 @@
 
     <select id="selectWalletMessageList" parameterType="tv.game88.wallet.api.entity.WalletMessage"
             resultMap="WalletMessageResult">
-        <include refid="selectWalletMessageVo" />
+        <include refid="selectWalletMessageVo"/>
         <where>
-            <if test="title != null  and title != ''">and title = #{title}</if>
-            <if test="receiverUserId != null  and receiverUserId != ''">and receiver_user_id = #{receiverUserId}</if>
-            <if test="createTime != null ">and create_time = #{createTime}</if>
-            <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
-            <if test="type != null  and type != ''">and type = #{type}</if>
+            <if test="id != null  and id != ''">
+                and id = #{id}
+            </if>
+<!--            <if test="beginTime != null and beginTime != ''">-->
+<!--                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')-->
+<!--            </if>-->
+<!--            <if test="endTime != null and endTime != ''">-->
+<!--                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')-->
+<!--            </if>-->
         </where>
     </select>
 
