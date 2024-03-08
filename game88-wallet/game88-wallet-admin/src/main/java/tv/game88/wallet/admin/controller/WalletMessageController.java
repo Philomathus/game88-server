@@ -15,6 +15,7 @@ import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.wallet.api.constants.ConstantsWallet;
+import tv.game88.wallet.api.dto.RspWalletMessage;
 import tv.game88.wallet.api.dto.SseStreamNotificationMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.service.WalletMessageService;
@@ -44,19 +45,19 @@ public class WalletMessageController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('admin:walletMessage:list')" )
     @GetMapping( "/list" )
-    public RspBase<List<WalletMessage>> list( WalletMessage walletMessage ) {
+    public RspBase<List<RspWalletMessage>> list(WalletMessage walletMessage ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
 
         walletMessage.setType( WalletMessageEnum.system );
-        List<WalletMessage> list = walletMessageService.selectWalletMessageList( walletMessage );
+        List<RspWalletMessage> list = walletMessageService.selectWalletMessageList( walletMessage );
         return getRspBasePage( list, pageDomain );
     }
 
     /**
      * 获取站内信详细信息
      */
-//    @PreAuthorize( "@ss.hasPermi('admin:walletMessage:query')" )
+    @PreAuthorize( "@ss.hasPermi('admin:walletMessage:query')" )
     @GetMapping( value = "/{id}" )
     public RspBase<WalletMessage> getInfo( @PathVariable( "id" ) Long id ) {
         return RspBase.ok( walletMessageService.getById( id ) );

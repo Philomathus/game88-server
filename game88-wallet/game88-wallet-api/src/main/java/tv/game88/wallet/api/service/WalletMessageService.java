@@ -3,6 +3,7 @@ package tv.game88.wallet.api.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.RspMessage;
+import tv.game88.wallet.api.dto.RspWalletMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 
@@ -21,7 +22,7 @@ public interface WalletMessageService extends IService<WalletMessage> {
      *
      * @return 站内信集合
      */
-    public List<WalletMessage> selectWalletMessageList( WalletMessage walletMessage );
+    List<RspWalletMessage> selectWalletMessageList(WalletMessage walletMessage );
 
     List<RspMessage> getMessageList( String userId );
 

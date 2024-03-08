@@ -14,6 +14,7 @@ import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.dto.RspMessage;
+import tv.game88.wallet.api.dto.RspWalletMessage;
 import tv.game88.wallet.api.dto.SseStreamTransDetailMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
@@ -45,8 +46,19 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
      * @return 站内信
      */
     @Override
-    public List<WalletMessage> selectWalletMessageList( WalletMessage walletMessage ) {
-        return this.baseMapper.selectWalletMessageList( walletMessage );
+    public List<RspWalletMessage> selectWalletMessageList(WalletMessage walletMessage ) {
+        final List<WalletMessage> walletMessages = this.baseMapper.selectWalletMessageList( walletMessage );
+        return walletMessages.stream().map(wm->RspWalletMessage.builder()
+                .id(String.valueOf(wm.getId()))
+                .title(wm.getTitle())
+                .content(wm.getContent())
+                .receiverUserId(wm.getReceiverUserId())
+                .isRead(wm.getIsRead())
+                .type(wm.getType())
+                .createBy(wm.getCreateBy())
+                .createTime(wm.getCreateTime())
+                .build()
+        ).toList();
     }
 
     @Override
