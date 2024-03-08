@@ -1,7 +1,9 @@
 package tv.game88.wallet.api.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import tv.game88.wallet.api.type.WalletMessageEnum;
 
@@ -57,4 +59,12 @@ public class WalletMessage {
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime createTime;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String beginTime;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String endTime;
 }
