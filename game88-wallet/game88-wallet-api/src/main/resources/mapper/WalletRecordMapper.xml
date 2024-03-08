@@ -36,4 +36,16 @@
                update_time
         from wallet_record
     </sql>
+    <select id="selectWalletRecord" resultType="tv.game88.wallet.api.entity.WalletRecord">
+        <include refid="selectWalletRecordVo"/>
+        <where>
+            <if test="tradeNo != null  and tradeNo != ''"> and trade_no = #{tradeNo}</if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+        </where>
+    </select>
 </mapper>

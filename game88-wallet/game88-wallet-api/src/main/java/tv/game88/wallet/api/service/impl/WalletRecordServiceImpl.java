@@ -31,6 +31,7 @@ import tv.game88.wallet.api.vo.PlatformUser;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -343,6 +344,11 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         Map<String, Object> reqquestMap = JsonUtil.object2Map( rspWalletRecord );
         rspWalletRecord.setSign( this.sign( reqquestMap, walletMerchant ) );
         return rspWalletRecord;
+    }
+
+    @Override
+    public List<WalletRecord> getWalletRecordList( WalletRecord walletRecord ) {
+        return this.baseMapper.selectWalletRecord( walletRecord );
     }
 }
 
