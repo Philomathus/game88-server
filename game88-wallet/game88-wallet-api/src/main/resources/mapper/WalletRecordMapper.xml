@@ -39,7 +39,8 @@
     <select id="selectWalletRecord" resultType="tv.game88.wallet.api.entity.WalletRecord">
         <include refid="selectWalletRecordVo"/>
         <where>
-            <if test="tradeNo != null  and tradeNo != ''"> and trade_no = #{tradeNo}</if>
+            <if test="tradeNo != null and tradeNo != ''">and trade_no = #{tradeNo}</if>
+            <if test="orderNo != null and orderNo != ''">and order_no = #{orderNo}</if>
             <if test="beginTime != null and beginTime != ''">
                 AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>

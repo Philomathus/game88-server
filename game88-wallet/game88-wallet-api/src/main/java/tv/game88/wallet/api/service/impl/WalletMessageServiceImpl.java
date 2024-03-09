@@ -47,18 +47,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
      */
     @Override
     public List<RspWalletMessage> selectWalletMessageList(WalletMessage walletMessage ) {
-        final List<WalletMessage> walletMessages = this.baseMapper.selectWalletMessageList( walletMessage );
-        return walletMessages.stream().map(wm->RspWalletMessage.builder()
-                .id(String.valueOf(wm.getId()))
-                .title(wm.getTitle())
-                .content(wm.getContent())
-                .receiverUserId(wm.getReceiverUserId())
-                .isRead(wm.getIsRead())
-                .type(wm.getType())
-                .createBy(wm.getCreateBy())
-                .createTime(wm.getCreateTime())
-                .build()
-        ).toList();
+        return this.baseMapper.selectWalletMessageList( walletMessage );
     }
 
     @Override

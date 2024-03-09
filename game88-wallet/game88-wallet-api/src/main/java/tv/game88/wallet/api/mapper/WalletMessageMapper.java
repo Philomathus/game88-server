@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tv.game88.wallet.api.dto.RspWalletMessage;
 import tv.game88.wallet.api.entity.WalletMessage;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public interface WalletMessageMapper extends BaseMapper<WalletMessage> {
      *
      * @return 站内信集合
      */
-    public List<WalletMessage> selectWalletMessageList( WalletMessage walletMessage );
+    public List<RspWalletMessage> selectWalletMessageList(WalletMessage walletMessage );
 }

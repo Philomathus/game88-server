@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.wallet.api.mapper.WalletMessageMapper">
 
-    <resultMap type="tv.game88.wallet.api.entity.WalletMessage" id="WalletMessageResult">
+    <resultMap type="tv.game88.wallet.api.dto.RspWalletMessage" id="WalletMessageResult">
         <result property="id" column="id" />
         <result property="title" column="title" />
         <result property="content" column="content" />
