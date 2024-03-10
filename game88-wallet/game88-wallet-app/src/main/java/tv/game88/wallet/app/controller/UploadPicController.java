@@ -77,6 +77,14 @@ public class UploadPicController {
         if ( rspBase.getData() != null ) {
             rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );
         }
+
+        long fileSizeInMB = file.getSize() / (1024 * 1024); // Convert bytes to megabytes
+
+        if (fileSizeInMB > 0.1) {
+            System.out.println("Error: File size exceeds 5 MB.");
+        } else {
+            System.out.println("File size is within the limit.");
+        }
         return rspBase;
     }
 }
