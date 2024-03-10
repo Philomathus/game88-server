@@ -73,17 +73,12 @@ public class UploadPicController {
     @Operation( summary = "其它类型图片上传" )
     @PostMapping( "/api/uploadOther" )
     public RspBase<?> uploadOther( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        if (  file.getSize() > 5 * 1024 * 1024 ) {
+            return RspBase.businessError( "Error: File size exceeds 5 MB" );
+        }
         RspBase<String> rspBase = ossApi.upload( file, "wallet" );
         if ( rspBase.getData() != null ) {
             rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );
-        }
-
-        long fileSizeInMB = file.getSize() / (1024 * 1024); // Convert bytes to megabytes
-
-        if ( fileSizeInMB > 0.001) {
-            System.out.println("Error: File size exceeds 5 MB.");
-        } else {
-            System.out.println("File size is within the limit.");
         }
         return rspBase;
     }
