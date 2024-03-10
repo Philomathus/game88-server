@@ -197,13 +197,13 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 }
             }
         }
-        if( walletTransaction.getStatus() == 1 ){
-            WalletTransactionDetail transactionId1 =
-                    walletTransactionDetailMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().select(
-                            "trans_detail_id" ).eq( "transaction_id"
-                            , transactionId ) );
-            rspSellOrderDetail.setTransDetailId( transactionId1.getTransDetailId() );
-        }
+//        if( walletTransaction.getStatus() == 1 ){
+//            WalletTransactionDetail transactionId1 =
+//                    walletTransactionDetailMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().select(
+//                            "trans_detail_id" ).eq( "transaction_id"
+//                            , transactionId ) );
+//            rspSellOrderDetail.setTransDetailId( transactionId1.getTransDetailId() );
+//        }
 
         rspSellOrderDetail.setRspPayMethodMap( rspPayMethodMap );
         return RspBase.ok( rspSellOrderDetail );
