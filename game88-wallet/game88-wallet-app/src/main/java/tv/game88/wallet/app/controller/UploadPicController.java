@@ -80,7 +80,7 @@ public class UploadPicController {
 
         long fileSizeInMB = file.getSize() / (1024 * 1024); // Convert bytes to megabytes
 
-        if (fileSizeInMB > 0.1) {
+        if ( fileSizeInMB > 0.001) {
             System.out.println("Error: File size exceeds 5 MB.");
         } else {
             System.out.println("File size is within the limit.");
