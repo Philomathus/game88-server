@@ -181,6 +181,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
         // 保存交易
         int i = this.baseMapper.insert( walletTransactionDetail );
+        walletUserService.addSellerOngoingSellingAmount( walletTransactionDetail.getSellerId(), walletTransactionDetail.getAmount() );
 
         if ( !( update && i > 0 ) ) {
             throw new BusinessException( "购买失败,请重试" );
@@ -320,7 +321,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
-            walletUserService.addSellerOngoingSellingAmount( userId, walletTransactionDetail.getAmount() );
+//            walletUserService.addSellerOngoingSellingAmount( userId, walletTransactionDetail.getAmount() );
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
