@@ -189,7 +189,8 @@
 
     <update id="addSellerInitCancelSell">
         update wallet_user
-        set selling_amount = selling_amount - #{money}
+        set selling_amount = trading_amount - #{money},
+            selling_amount = selling_amount + #{money},
         where id = #{id}
     </update>
 
