@@ -101,7 +101,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     public RspBase<?> buyOrder( String userId, ReqBuyCoins reqBuyCoins ) {
         // 买家用户
         WalletUser buyer   = walletUserService.getById( userId );
-        RspBase    rspBase = walletUserService.validWalletUser( buyer );
+        RspBase<?> rspBase = walletUserService.validWalletUser( buyer );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -230,7 +230,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setSellerPayMethod( rspSellerPayMethod );
         for ( RspConfigBankList rspConfigBank : configBankList ) {
-            if ( Objects.equals( bPayMethod.getBankId(), rspConfigBank.getId() ) ) {
+            if ( Objects.equals( sPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                 rspSellerPayMethod.setBankName( rspConfigBank.getBankName() );
             }
         }
