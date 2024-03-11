@@ -67,6 +67,7 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             }
             RspMessage rsp = new RspMessage();
             BeanUtils.copyProperties( hn, rsp );
+            rsp.setDate( hn.getCreateTime().format( LocalDateTimeUtils.YYYY_MM_DD_FORMATTER ) );
             return rsp;
         } ).toList();
     }

@@ -3,6 +3,8 @@ package tv.game88.wallet.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class RspMessage {
     @Schema( title = "消息ID" )
@@ -13,4 +15,6 @@ public class RspMessage {
     private String  content;
     @Schema( title = "是否已读" )
     private Boolean isRead;
+
+    private String date;
 }
