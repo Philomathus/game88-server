@@ -393,8 +393,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
                 .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
-            if ( transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS
-                    || transDetailId.getStatus() == WalletTransEnum.SELLER_CANCEL ) {
+            if ( transDetailId.getStatus() == WalletTransEnum.BUYER_CONFIRM_BUY  ) {
                 walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
                         walletTransactionDetail.getAmount() );
             }
