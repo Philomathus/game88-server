@@ -2,9 +2,13 @@ package tv.game88.platform.api.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import tv.game88.common.page.PageDomain;
 
 import java.math.BigDecimal;
 
@@ -14,8 +18,10 @@ import java.math.BigDecimal;
  * @author 77tv
  * @date 2021-02-20
  */
+@EqualsAndHashCode( callSuper = true )
+@FieldDefaults( level = AccessLevel.PRIVATE )
 @Data
-public class ReportPlamGameschilds {
+public class ReportPlamGameschilds extends PageDomain {
 
     /**
      * id
@@ -101,6 +107,7 @@ public class ReportPlamGameschilds {
     @Excel( name = "日期", width = 30, databaseFormat = "yyyy-MM-dd" )
     private String begindate;
     private String endDate;
+    private String gameplamid;
 
     @Override
     public String toString() {
@@ -119,6 +126,7 @@ public class ReportPlamGameschilds {
                 .append( "plampfit", getPlampfit() )
                 .append( "bili", getBili() )
                 .append( "begindate", getBegindate() )
+                .append( "gameplamid", getGameplamid() )
                 .toString();
     }
 }

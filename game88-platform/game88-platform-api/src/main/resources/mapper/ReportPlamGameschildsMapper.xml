@@ -91,4 +91,28 @@
             </if>
         </where>
     </select>
+
+    <select id="getPlatformIdByGameUuid" resultType="java.lang.String">
+
+        select
+            gameplamid
+        from
+            report_plam_gameschilds
+        where
+            game_uuid = #{gameUuid}
+
+    </select>
+    <select id="selectByBettorsCounts" resultType="tv.game88.platform.api.entity.ReportPlamGameschilds">
+        select * from (
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild'from member_game_data0 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate} and platform_id = #{gameplamid} and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell', ROUND(sum(profit),2) as 'gameprofit', account as 'agentchild' from member_game_data1 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate} and platform_id = #{gameplamid} and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data2 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data3 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data4 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell', ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data5 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data6 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data7 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data8 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account union all
+                          select ROUND(sum(cell_score),2) as 'gamecell',ROUND(sum(profit),2) as 'gameprofit',account as 'agentchild' from member_game_data9 where  game_end_time <![CDATA[ >= ]]> #{begindate} and game_end_time <![CDATA[ <= ]]> #{endDate}  and platform_id = #{gameplamid}  and agent = #{gameagent} and kind_id = #{agentchild}  GROUP BY account ) d
+    </select>
 </mapper>
