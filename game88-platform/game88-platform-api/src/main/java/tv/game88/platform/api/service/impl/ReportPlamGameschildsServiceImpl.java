@@ -23,11 +23,20 @@ public class ReportPlamGameschildsServiceImpl implements ReportPlamGameschildsSe
      * 查询游戏投注报表子表列表
      *
      * @param reportPlamGameschilds 游戏投注报表子表
-     *
      * @return 游戏投注报表子表
      */
     @Override
     public List<ReportPlamGameschilds> selectReportPlamGameschildsList( ReportPlamGameschilds reportPlamGameschilds ) {
         return reportPlamGameschildsMapper.selectReportPlamGameschildsList( reportPlamGameschilds );
+    }
+
+    @Override
+    public String getPlatformId( ReportPlamGameschilds reportPlamGamesChilds ) {
+        return reportPlamGameschildsMapper.getPlatformIdByGameUuid( reportPlamGamesChilds.getGameUuid() );
+    }
+
+    @Override
+    public List<ReportPlamGameschilds> selectByBettorsCount( ReportPlamGameschilds reportPlamGamesChilds ) {
+        return reportPlamGameschildsMapper.selectByBettorsCounts( reportPlamGamesChilds );
     }
 }

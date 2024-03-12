@@ -18,5 +18,9 @@ public interface ReportPlamGameschildsMapper {
      *
      * @return 游戏投注报表子表集合
      */
-    public List<ReportPlamGameschilds> selectReportPlamGameschildsList( ReportPlamGameschilds reportPlamGameschilds );
+    List<ReportPlamGameschilds> selectReportPlamGameschildsList( ReportPlamGameschilds reportPlamGameschilds );
+
+    String getPlatformIdByGameUuid( String gameUuid );
+
+    List<ReportPlamGameschilds> selectByBettorsCounts( ReportPlamGameschilds reportPlamGamesChilds );
 }

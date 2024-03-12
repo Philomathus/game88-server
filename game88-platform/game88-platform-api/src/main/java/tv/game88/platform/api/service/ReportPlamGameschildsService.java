@@ -17,5 +17,7 @@ public interface ReportPlamGameschildsService {
 	 * @param reportPlamGameschilds 游戏投注报表子表
 	 * @return 游戏投注报表子表集合
 	 */
-	public List<ReportPlamGameschilds> selectReportPlamGameschildsList(ReportPlamGameschilds reportPlamGameschilds);
+	List<ReportPlamGameschilds> selectReportPlamGameschildsList(ReportPlamGameschilds reportPlamGameschilds);
+	String getPlatformId( ReportPlamGameschilds reportPlamGameschilds );
+	List<ReportPlamGameschilds> selectByBettorsCount( ReportPlamGameschilds reportPlamGameschilds );
 }
