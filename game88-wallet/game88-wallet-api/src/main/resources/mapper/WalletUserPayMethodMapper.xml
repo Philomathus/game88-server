@@ -35,6 +35,8 @@
         <where>
             <if test="methodId != null  and methodId != ''"> and method_id = #{methodId}</if>
             <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="auditStatus != null"> and audit_status = #{auditStatus}</if>
         </where>
     </select>
 </mapper>
