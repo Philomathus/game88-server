@@ -27,6 +27,9 @@ public class UploadPicController {
     @Operation( summary = "微信个人收款码上传" )
     @PostMapping( "/api/uploadWxp" )
     public RspBase<?> uploadWxp( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        if (  file.getSize() > 5 * 1024 * 1024 ) {
+            return RspBase.businessError( "错误:文件大小超过5mb" );
+        }
         InputStream inputStream = file.getInputStream();
         boolean     isWxp       = false;
         try {
@@ -50,6 +53,9 @@ public class UploadPicController {
     @Operation( summary = "支付宝个人收款码上传" )
     @PostMapping( "/api/uploadAlipay" )
     public RspBase<?> uploadAlipay( @RequestParam( "file" ) MultipartFile file ) throws IOException {
+        if (  file.getSize() > 5 * 1024 * 1024 ) {
+            return RspBase.businessError( "错误:文件大小超过5mb" );
+        }
         InputStream inputStream = file.getInputStream();
         boolean     isWxp       = false;
         try {
