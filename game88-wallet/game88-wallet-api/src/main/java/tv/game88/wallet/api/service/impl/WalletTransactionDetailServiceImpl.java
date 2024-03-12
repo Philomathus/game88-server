@@ -175,7 +175,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
-                .set( "status", 1 )
+//                .set( "status", 1 )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
                 .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
