@@ -82,8 +82,6 @@ public class UploadPicController {
         if (  file.getSize() > 5 * 1024 * 1024 ) {
             return RspBase.businessError( "错误:文件大小超过5mb" );
         }
-        log.info(  file.getSize() > 5 * 1024 * 1024 );
-        log.info(  "LOG is here ." );
         RspBase<String> rspBase = ossApi.upload( file, "wallet" );
         if ( rspBase.getData() != null ) {
             rspBase.setData( ConfigDomainCacheUtil.me.getDomainOssValue() + rspBase.getData() );

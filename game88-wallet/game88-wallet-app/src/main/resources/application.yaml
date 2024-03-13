@@ -67,9 +67,9 @@ spring:
       request-timeout: 60000
     pathmatch:
       matching-strategy: ant_path_matcher
-  servlet:
-    multipart:
-      max-file-size: 5MB
+#  servlet:
+#    multipart:
+#      max-file-size: 5MB
   lifecycle:
     timeout-per-shutdown-phase: 10s
   task:
