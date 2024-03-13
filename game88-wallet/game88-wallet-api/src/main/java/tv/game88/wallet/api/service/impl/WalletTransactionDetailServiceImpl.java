@@ -221,6 +221,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         RspPayMethod2 rspBuyerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( bPayMethod, rspBuyerPayMethod );
         rspBuyOrderDetail.setBuyerPayMethod( rspBuyerPayMethod );
+        rspBuyerPayMethod.setType( bPayMethod.getMethodType() );
         for ( RspConfigBankList rspConfigBank : configBankList ) {
             if ( Objects.equals( bPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                 rspBuyerPayMethod.setBankName( rspConfigBank.getBankName() );
@@ -230,6 +231,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         RspPayMethod2 rspSellerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setSellerPayMethod( rspSellerPayMethod );
+        rspSellerPayMethod.setType( sPayMethod.getMethodType() );
         for ( RspConfigBankList rspConfigBank : configBankList ) {
             if ( Objects.equals( sPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                 rspSellerPayMethod.setBankName( rspConfigBank.getBankName() );
@@ -237,6 +239,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         }
 
         // 计算订单倒计时
+        rspBuyOrderDetail.setCountdownSec( 0L );
         if ( redisUtils.exists( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) ) {
             rspBuyOrderDetail.setCountdownSec( redisUtils.getExpire( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId ) );
         }
