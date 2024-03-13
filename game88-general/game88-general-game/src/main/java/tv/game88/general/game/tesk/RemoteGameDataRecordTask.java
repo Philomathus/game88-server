@@ -45,6 +45,15 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService      gameDataRecordService;
 
+    @Scheduled( cron = "0 0 15 * * ?" ) // 每天15点执行一次
+    public void fixRecordPPEveryDay() {
+        GameRecordFixVersion gameRecordFixVersion = new GameRecordFixVersion();
+        gameRecordFixVersion.setPlatformId( 49L );
+        gameRecordFixVersion.setVersionValue(
+                LocalDateTimeUtils.localDateToTimestamp( LocalDateTimeUtils.getStartOfToday() ) + "" );
+        gameRecordFixVersionMapper.insert( gameRecordFixVersion );
+    }
+
     @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
