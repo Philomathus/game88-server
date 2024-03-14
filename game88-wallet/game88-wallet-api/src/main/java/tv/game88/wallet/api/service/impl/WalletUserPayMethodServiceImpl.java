@@ -6,23 +6,30 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
+import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
+import tv.game88.wallet.api.mapper.WalletTransactionDetailMapper;
+import tv.game88.wallet.api.mapper.WalletTransactionMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
+import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author meng.jun
@@ -33,11 +40,16 @@ import java.util.*;
 public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMethodMapper, WalletUserPayMethod> implements WalletUserPayMethodService {
     @Resource
     private WalletUserMapper    walletUserMapper;
+//    @Resource
+//    private WalletTransactionMapper walletTransactionMapper;
+    @Resource
+    private WalletTransactionService walletTransactionService;
     @Resource
     private ConfigBankListCache configBankListCache;
-
     @Resource
     private PasswordEncoder passwordEncoder;
+    @Resource
+    private WalletUserPayMethodMapper walletUserPayMethodMapper;
 
     @Override
     public RspBase<?> bindNewPayMethod( String userId, ReqPayMethod reqPayMethod ) {
@@ -112,6 +124,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
     }
 
     @Override
+    @Transactional( rollbackFor = Exception.class )
     public RspBase<?> unBindPayMethod( String userId, int payMethodId ) {
         WalletUserPayMethod walletUserPayMethod = this.baseMapper.selectById( payMethodId );
         if ( walletUserPayMethod == null ) {
@@ -121,7 +134,42 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             return RspBase.businessError( "绑定用户错误" );
         }
         int i = this.baseMapper.deleteById( payMethodId );
-        return i > 0 ? RspBase.ok( "解绑支付方式成功" ) : RspBase.businessError( "解绑支付方式异常，请稍后再试" );
+
+        if ( i > 0 ) {
+            List<WalletTransaction> walletTransactionList = walletTransactionService.getBaseMapper().selectList( new LambdaQueryWrapper<WalletTransaction>()
+                    .select( WalletTransaction::getTransactionId, WalletTransaction::getPayMethodIds, WalletTransaction::getPayMethodTypes )
+                    .eq( WalletTransaction::getUserId, userId )
+                            .and( innerWrapper ->
+                                    innerWrapper.eq( WalletTransaction::getStatus, 0 )
+                                            .or()
+                                            .eq( WalletTransaction::getStatus, 1 ) ) );
+
+            List<WalletTransaction> updatedWalletTransactionList = walletTransactionList.stream()
+                    .filter( wt -> {
+                        List<String> paymethodList = Arrays.asList( wt.getPayMethodIds().split( "," ) );
+                        return paymethodList.stream().anyMatch( payMethod -> Integer.parseInt( payMethod ) == payMethodId );
+                    } )
+                    .peek( walletTransaction -> {
+
+                        List<Long> paymethodList = new ArrayList<>( Arrays.stream( walletTransaction.getPayMethodIds().split( "," ) ).map( Long::parseLong ).toList() );
+                        paymethodList.removeIf( payMethod -> payMethod == payMethodId );
+
+                        Set<String> typeSet = walletUserPayMethodMapper
+                                .selectBatchIds( paymethodList )
+                                .stream()
+                                .map( pm -> pm.getMethodType().name() )
+                                .collect( Collectors.toSet() );
+
+                        walletTransaction.setPayMethodIds( StringUtils.join( paymethodList, "," ) );
+                        walletTransaction.setPayMethodTypes( StringUtils.join( typeSet, "," ) );
+                    } )
+                    .toList();
+            walletTransactionService.saveOrUpdateBatch( updatedWalletTransactionList );
+
+            return RspBase.ok( "解绑支付方式成功" );
+        }
+        return RspBase.businessError( "解绑支付方式异常，请稍后再试" );
+
     }
 
     @Override
