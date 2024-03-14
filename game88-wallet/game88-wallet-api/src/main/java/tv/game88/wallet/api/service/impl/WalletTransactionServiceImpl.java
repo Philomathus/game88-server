@@ -18,7 +18,6 @@ import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
-import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.manager.WalletFundManager;
@@ -189,6 +188,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
+            rspPayMethod.setType( userPayMethod.getMethodType() );
             rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
 
             for ( RspConfigBankList rspConfigBank : configBankList ) {
@@ -212,7 +212,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     @Override
     public RspBase<?> cancelSellOrder( String userId, String transactionId ) {
         WalletUser walletUser = walletUserService.getById( userId );
-        RspBase    rspBase    = walletUserService.validWalletUser( walletUser );
+        RspBase<?>    rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -329,6 +329,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
+            rspPayMethod.setType( userPayMethod.getMethodType() );
              for ( RspConfigBankList rspConfigBank : configBankList ) {
                  if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
                      rspPayMethod.setBankName( rspConfigBank.getBankName() );
