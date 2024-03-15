@@ -324,7 +324,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
-//            walletUserService.addSellerOngoingSellingAmount( userId, walletTransactionDetail.getAmount() );
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
@@ -394,7 +393,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
                 .set( WalletTransaction::getStatus, 0 )
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
-                .eq( WalletTransaction::getStatus,  walletTransactionDetail.getAmount()>= 0 ? 0 :  1  ) );
+                .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
             if ( transDetailId.getStatus() == WalletTransEnum.BUYER_CONFIRM_BUY || transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS ) {
                 walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
@@ -566,7 +565,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             if ( walletTransaction != null ) {
                 boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
                         .set( WalletTransaction::getStatus, walletTransaction.getAmount() <= 0 ? 2 : 0 )
-//                        .eq( WalletTransaction::getStatus, 1 )
+                        .eq( WalletTransaction::getStatus, 1 )
                         .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
                 if ( !updateTrans ) {
                     throw new BusinessException( "转币失败,请重试" );
