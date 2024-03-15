@@ -157,9 +157,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         String remark = "买家" + userId + "确认购买" + reqBuyCoins.getAmount() + ",时间:" + LocalDateTimeUtils.format( now );
         walletTransactionDetail.setRemark( remark );
-        long remainingAmount = walletTransaction.getAmount() - reqBuyCoins.getAmount();
 
-        SpringUtils.getAopProxy( this ).saveTransDetailOrReduceTransAmount( walletTransactionDetail, remainingAmount );
+        SpringUtils.getAopProxy( this ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
 
         // 卖家订单倒计时 5分钟后取消订单
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
@@ -172,11 +171,11 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail, Long remainingAmount ) {
+    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
-                .set( "status", remainingAmount > 0 ? 0 : 1 )
+                .set( "status", 1 )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
                 .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
