@@ -135,40 +135,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         }
         int i = this.baseMapper.deleteById( payMethodId );
 
-        if ( i > 0 ) {
-            List<WalletTransaction> walletTransactionList = walletTransactionService.getBaseMapper().selectList( new LambdaQueryWrapper<WalletTransaction>()
-                    .select( WalletTransaction::getTransactionId, WalletTransaction::getPayMethodIds, WalletTransaction::getPayMethodTypes )
-                    .eq( WalletTransaction::getUserId, userId )
-                            .and( innerWrapper ->
-                                    innerWrapper.eq( WalletTransaction::getStatus, 0 )
-                                            .or()
-                                            .eq( WalletTransaction::getStatus, 1 ) ) );
-
-            List<WalletTransaction> updatedWalletTransactionList = walletTransactionList.stream()
-                    .filter( wt -> {
-                        List<String> paymethodList = Arrays.asList( wt.getPayMethodIds().split( "," ) );
-                        return paymethodList.stream().anyMatch( payMethod -> Integer.parseInt( payMethod ) == payMethodId );
-                    } )
-                    .peek( walletTransaction -> {
-
-                        List<Long> paymethodList = new ArrayList<>( Arrays.stream( walletTransaction.getPayMethodIds().split( "," ) ).map( Long::parseLong ).toList() );
-                        paymethodList.removeIf( payMethod -> payMethod == payMethodId );
-
-                        Set<String> typeSet = walletUserPayMethodMapper
-                                .selectBatchIds( paymethodList )
-                                .stream()
-                                .map( pm -> pm.getMethodType().name() )
-                                .collect( Collectors.toSet() );
-
-                        walletTransaction.setPayMethodIds( StringUtils.join( paymethodList, "," ) );
-                        walletTransaction.setPayMethodTypes( StringUtils.join( typeSet, "," ) );
-                    } )
-                    .toList();
-            walletTransactionService.saveOrUpdateBatch( updatedWalletTransactionList );
-
-            return RspBase.ok( "解绑支付方式成功" );
-        }
-        return RspBase.businessError( "解绑支付方式异常，请稍后再试" );
+        return i > 0 ? RspBase.ok( "解绑支付方式成功" ) : RspBase.businessError( "解绑支付方式异常，请稍后再试" );
 
     }
 
