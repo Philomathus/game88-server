@@ -27,26 +27,28 @@
     </resultMap>
 
     <sql id="selectWalletTransactionDetailVo">
-        select trans_detail_id,
-               transaction_id,
-               seller_id,
-               buyer_id,
-               buyer_pay_method_id,
-               seller_pay_method_id,
-               amount,
-               trans_cert_pic,
-               status,
-               `time`,
-               buyer_confirm_buy_time,
-               seller_confirm_trans_time,
-               buyer_confirm_transfer_time,
-               seller_not_received_time,
-               cancel_time,
-               success_trans_time,
-               transfer_time_sec,
-               received_time_sec,
-               remark
-        from wallet_transaction_detail
+        select wtd.trans_detail_id,
+               wtd.transaction_id,
+               wtd.seller_id,
+               wtd.buyer_id,
+               wtd.buyer_pay_method_id,
+               (select method_type from wallet_user_pay_method wupm  where wtd.buyer_pay_method_id = wupm.method_id) as buyer_pay_method_name,
+               wtd.seller_pay_method_id,
+               (select method_type from wallet_user_pay_method wupm  where wtd.seller_pay_method_id = wupm.method_id) as seller_pay_method_name,
+               wtd.amount,
+               wtd.trans_cert_pic,
+               wtd.status,
+               wtd.`time`,
+               wtd.buyer_confirm_buy_time,
+               wtd.seller_confirm_trans_time,
+               wtd.buyer_confirm_transfer_time,
+               wtd.seller_not_received_time,
+               wtd.cancel_time,
+               wtd.success_trans_time,
+               wtd.transfer_time_sec,
+               wtd.received_time_sec,
+               wtd.remark
+        from    wallet_transaction_detail wtd
     </sql>
 
     <select id="selectWalletTransactionDetailList" parameterType="tv.game88.wallet.api.entity.WalletTransactionDetail"
