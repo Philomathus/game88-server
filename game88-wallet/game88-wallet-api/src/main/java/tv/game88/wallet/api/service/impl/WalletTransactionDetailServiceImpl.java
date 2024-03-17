@@ -157,9 +157,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
         String remark = "买家" + userId + "确认购买" + reqBuyCoins.getAmount() + ",时间:" + LocalDateTimeUtils.format( now );
         walletTransactionDetail.setRemark( remark );
-        long remainingAmount = walletTransaction.getAmount() - reqBuyCoins.getAmount();
 
-        SpringUtils.getAopProxy( this ).saveTransDetailOrReduceTransAmount( walletTransactionDetail, remainingAmount );
+        SpringUtils.getAopProxy( this ).saveTransDetailOrReduceTransAmount( walletTransactionDetail );
 
         // 卖家订单倒计时 5分钟后取消订单
         redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER
@@ -172,11 +171,11 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail, Long remainingAmount ) {
+    public void saveTransDetailOrReduceTransAmount( WalletTransactionDetail walletTransactionDetail ) {
         // 扣除挂单表金额并修改订单状态
         boolean update = walletTransactionService.update( new UpdateWrapper<WalletTransaction>()
                 .setSql( "amount = amount - {0}", walletTransactionDetail.getAmount() )
-                .set( "status", remainingAmount > 0 ? 0 : 1 )
+                .set( "status", 1 )
                 .eq( "transaction_id", walletTransactionDetail.getTransactionId() )
                 .le( "status", 1 )
                 .ge( "amount - " + walletTransactionDetail.getAmount(), 0 ) );
@@ -325,7 +324,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( i > 0 ) {
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
-//            walletUserService.addSellerOngoingSellingAmount( userId, walletTransactionDetail.getAmount() );
             // 取消超时订单
             redisUtils.unlink( ConstantsWallet.BUYER_CONFIRM_BUY_ORDER + transDetailId );
 
@@ -395,7 +393,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                 .setSql( "amount = amount + {0}", walletTransactionDetail.getAmount() )
                 .set( WalletTransaction::getStatus, 0 )
                 .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
-                .eq( WalletTransaction::getStatus,  walletTransactionDetail.getAmount()>= 0 ? 0 :  1  ) );
+                .eq( WalletTransaction::getStatus, 1 ) );
         if ( update && i > 0 ) {
             if ( transDetailId.getStatus() == WalletTransEnum.BUYER_CONFIRM_BUY || transDetailId.getStatus() == WalletTransEnum.SELLER_CONFIRM_TRANS ) {
                 walletUserService.addSellerCancelSellingAmount( walletTransactionDetail.getSellerId(),
@@ -567,7 +565,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             if ( walletTransaction != null ) {
                 boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
                         .set( WalletTransaction::getStatus, walletTransaction.getAmount() <= 0 ? 2 : 0 )
-//                        .eq( WalletTransaction::getStatus, 1 )
+                        .eq( WalletTransaction::getStatus, 1 )
                         .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
                 if ( !updateTrans ) {
                     throw new BusinessException( "转币失败,请重试" );
