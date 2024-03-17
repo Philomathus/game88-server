@@ -130,6 +130,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
         long transactionCount = walletTransactionService.getBaseMapper().selectCount( new LambdaQueryWrapper<WalletTransaction>()
                 .eq( WalletTransaction::getUserId, userId )
+                .like( WalletTransaction::getPayMethodIds, payMethodId + "," )
                 .and( innerWrapper ->
                         innerWrapper.eq( WalletTransaction::getStatus, 0 )
                                 .or()
