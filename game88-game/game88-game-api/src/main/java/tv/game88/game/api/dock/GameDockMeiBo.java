@@ -7,11 +7,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.game.api.base.AbstractGameDock;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -43,40 +46,11 @@ public class GameDockMeiBo extends AbstractGameDock {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        String time = System.currentTimeMillis() + "";
         String params = String.format( "s=%s&account=%s&lineCode=%s&KindID=%s&language=chinese_zh&loginHall=true&backHall"
                 + "=false", 0, reqJoinGame.getGameMemberId(), reqJoinGame.getLinecode(), reqJoinGame.getKindId() );
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyIv( params, reqJoinGame.getDes(), reqJoinGame.getMd5() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=%s", reqJoinGame.getAgent(), time, MD5 );
 
-        Map<String, String> requestMap = new HashMap<>();
-        requestMap.put( "agent", reqJoinGame.getAgent() );
-        requestMap.put( "timestamp", time );
-        requestMap.put( "param", param );
-        requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
+        Map<String, Object> resultMap = execute( reqJoinGame, params, "/third/login" );
 
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
-
-        String url = reqJoinGame.getApiUrl() + "/third/login";
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
-                restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -85,55 +59,26 @@ public class GameDockMeiBo extends AbstractGameDock {
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), url );
+                    + "获取游戏链接失败:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
 
     @Override
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String time = System.currentTimeMillis() + "";
         String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 2, reqJoinGame.getGameMemberId(),
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyIv( params, reqJoinGame.getDes(), reqJoinGame.getMd5() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=%s", reqJoinGame.getAgent(), time, MD5 );
-
-        Map<String, String> requestMap = new HashMap<>();
-        requestMap.put( "agent", reqJoinGame.getAgent() );
-        requestMap.put( "timestamp", time );
-        requestMap.put( "param", param );
-        requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
-
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
-
-        String              url       = reqJoinGame.getApiUrl() + "/third/addPlayerMoney";
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
-                    response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return JsonUtil.json2Map( text );
-            } );
+            resultMap = execute( reqJoinGame, params, "/third/addPlayerMoney" );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
+
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -148,48 +93,19 @@ public class GameDockMeiBo extends AbstractGameDock {
 
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String time = System.currentTimeMillis() + "";
         String params = String.format( "s=%s&account=%s&money=%s&orderid=%s", 3, reqJoinGame.getGameMemberId(),
                 reqJoinGame.getTransferMoney(), reqJoinGame.getOrderId() );
-        String param = null;
-        try {
-            param = AESCoder.encryptByKeyIv( params, reqJoinGame.getDes(), reqJoinGame.getMd5() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
-        }
-        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=%s", reqJoinGame.getAgent(), time, MD5 );
-
-        Map<String, String> requestMap = new HashMap<>();
-        requestMap.put( "agent", reqJoinGame.getAgent() );
-        requestMap.put( "timestamp", time );
-        requestMap.put( "param", param );
-        requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
-
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
-
-        String              url       = reqJoinGame.getApiUrl() + "/third/lowerPlayerMoney";
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
-                    response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return JsonUtil.json2Map( text );
-            } );
+            resultMap = execute( reqJoinGame, params, "/third/lowerPlayerMoney" );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
+
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -204,39 +120,14 @@ public class GameDockMeiBo extends AbstractGameDock {
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        String time   = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&account=%s", 8, reqJoinGame.getGameMemberId() );
-        String param  = null;
-        try {
-            param = AESCoder.encryptByKeyIv( params, reqJoinGame.getDes(), reqJoinGame.getMd5() );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-            throw new BusinessException( e.getMessage() );
+        if ( reqJoinGame.getMoneyType() != null && reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+            SpringUtils.getBean( GameDockMeiBo.class ).kickMember( reqJoinGame );
         }
-        String keyParams = String.format( "agent=%s&timestamp=%s&MD5Key=%s", reqJoinGame.getAgent(), time, MD5 );
 
-        Map<String, String> requestMap = new HashMap<>();
-        requestMap.put( "agent", reqJoinGame.getAgent() );
-        requestMap.put( "timestamp", time );
-        requestMap.put( "param", param );
-        requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
+        String params = String.format( "s=%s&account=%s", 8, reqJoinGame.getGameMemberId() );
 
-        log.warn( JsonUtil.object2Json( requestMap ) );
+        Map<String, Object> resultMap = execute( reqJoinGame, params, "/third/queryPlayerGold" );
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
-
-        String url = reqJoinGame.getApiUrl() + "/third/queryPlayerGold";
-        Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
-                restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( d ) ) {
@@ -253,11 +144,29 @@ public class GameDockMeiBo extends AbstractGameDock {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
-        String time   = System.currentTimeMillis() + "";
-        String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
-        String param  = null;
+    @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 2000 ),
+            maxAttempts = 3 )
+    protected void kickMember( ReqJoinGame reqJoinGame ) {
+        String params = String.format( "s=%s&account=%s", 9, reqJoinGame.getGameMemberId() );
+
+        Map<String, Object> resultMap = execute( reqJoinGame, params, "/third/kickPlayer" );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "强制登出玩家 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
+            if ( !CollectionUtils.isEmpty( d ) && Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() ) == 0 ) {
+                return;
+            }
+            throw new RuntimeException( JsonUtil.object2Json( resultMap ) );
+        }
+        throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + "强制登出玩家失败" );
+    }
+
+    private Map<String, Object> execute( ReqJoinGame reqJoinGame, String params, String path ) {
+        String time  = System.currentTimeMillis() + "";
+        String param = null;
         try {
             param = AESCoder.encryptByKeyIv( params, reqJoinGame.getDes(), reqJoinGame.getMd5() );
         } catch ( Exception e ) {
@@ -272,13 +181,14 @@ public class GameDockMeiBo extends AbstractGameDock {
         requestMap.put( "param", param );
         requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
 
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( requestMap, httpHeaders );
 
-        String url = reqJoinGame.getApiUrl() + "/third/queryOrderId";
+        String url = reqJoinGame.getApiUrl() + path;
+
+        log.warn( "URL: {} ::: BODY: {}", url, JsonUtil.object2Json( requestMap ) );
+
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.POST,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
             InputStream bodyStream = response.getBody();
@@ -288,8 +198,18 @@ public class GameDockMeiBo extends AbstractGameDock {
             }
             return JsonUtil.json2Map( text );
         } );
+        return resultMap;
+    }
+
+    @Override
+    public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
+        String params = String.format( "s=%s&orderid=%s", 4, reqJoinGame.getOrderId() );
+
+        Map<String, Object> resultMap = execute( reqJoinGame, params, "/third/queryOrderId" );
+
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
 

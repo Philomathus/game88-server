@@ -1,6 +1,7 @@
 package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -9,17 +10,20 @@ import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.game.api.base.BaseGameDock;
 import tv.game88.game.api.base.GameDockFactoryUtil;
 import tv.game88.game.api.cache.GameCacheUtils;
@@ -34,7 +38,6 @@ import tv.game88.game.api.mapper.MemberGameMoneyMapper;
 import tv.game88.game.api.service.GameService;
 import tv.game88.game.api.service.MemberGameMoneyService;
 
-import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -70,6 +73,10 @@ public class GameServiceImpl implements GameService {
     private MemberGameMoneyMapper  memberGameMoneyMapper;
     @Resource
     private MemberGameMoneyService memberGameMoneyService;
+    @Resource
+    private TelegramBotMessage     telegramBotMessage;
+    @Resource
+    private ConfigEnvCacheUtil     configEnvCacheUtil;
 
 
     @Value( "${spring.profiles.active}" )
@@ -85,7 +92,8 @@ public class GameServiceImpl implements GameService {
         List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
         boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.13.0", version );
         gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L ).contains( rspGameType.getId() ) : Arrays
-                .asList( 8L, 9L ).contains( rspGameType.getId() ) );
+                .asList( 8L, 9L )
+                .contains( rspGameType.getId() ) );
         for ( RspGameType rspGameType : gameTypeList ) {
             if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
@@ -147,8 +155,9 @@ public class GameServiceImpl implements GameService {
                 if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon().startsWith( "http" ) ) {
                     rspGamePlatform.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getIcon() );
                 }
-                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform.getCardIcon()
-                                                                                                .startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform
+                        .getCardIcon()
+                        .startsWith( "http" ) ) {
                     rspGamePlatform.setCardIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getCardIcon() );
                 }
             }
@@ -173,7 +182,7 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "该游戏正在维护,请选择其他游戏" );
         }
 
-        if ( !redisUtils.lock( "joinGame" + platformUser.getId(), 20 ) ) {
+        if ( !redisUtils.lock( "joinGame" + platformUser.getId(), 100 ) ) {
             return RspBase.businessError( "正在进入游戏中.." );
         }
 
@@ -202,35 +211,93 @@ public class GameServiceImpl implements GameService {
             }
             // 获取游戏链接
             baseGameDock.getJoinGameUrl( reqJoinGame );
-            if ( changeMoney.compareTo( BigDecimal.ZERO ) > 0 ) {
-                // 扣除会员金额
-                memberGameMoneyService.beginGameEnter( reqJoinGame );
-                // 设置为上分操作
-                reqJoinGame.setMoneyType( 1 );
-                // 上分
-                baseGameDock.transferMoney( reqJoinGame );
-            }
-            memberGameMoneyService.enterGameSuccess( reqJoinGame );
-            redisUtils.unLock( "joinGame" + platformUser.getId() );
+
+            // 异步上分
+            SpringUtils.getAopProxy( this ).topUpGame( reqJoinGame, baseGameDock );
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
-            // 如果发生转账异常
-            if ( e instanceof GameTransferException ) {
-                // 查询转账记录
-                if ( baseGameDock.queryTransfer( reqJoinGame ) ) {
-                    memberGameMoneyService.enterGameSuccess( reqJoinGame );
-                    redisUtils.unLock( "joinGame" + platformUser.getId() );
-                    return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
-                } else {
-                    // 如果转账记录不存在则回退会员上分金额
-                    memberGameMoneyService.enterGameFail( reqJoinGame );
-                }
-            }
-            log.error( "进入游戏失败,失败原因:" + e.getMessage(), e );
+            log.error( "gameId:{}, userId:{}, 进入游戏失败,失败原因:{}", infoId, platformUser.getId(), e.getMessage(), e );
             redisUtils.unLock( "joinGame" + platformUser.getId() );
             return RspBase.businessError( "进入游戏失败,请重试" );
         }
+    }
 
+    @Async
+    protected void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
+        // 设置为上分操作
+        reqJoinGame.setMoneyType( 1 );
+        if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) > 0 ) {
+            // 扣除会员金额
+            memberGameMoneyService.beginGameEnter( reqJoinGame );
+            boolean success = false;
+            try {
+                // 上分
+                baseGameDock.transferMoney( reqJoinGame );
+                success = true;
+            } catch ( Exception e ) {
+                if ( e instanceof GameTransferException ) {
+                    // 查询转账记录
+                    if ( this.queryTransfer( reqJoinGame, baseGameDock ) ) {
+                        success = true;
+                    } else {
+                        // 如果转账记录不存在则回退会员上分金额
+                        memberGameMoneyService.enterGameFail( reqJoinGame );
+                    }
+                } else {
+                    log.error( "会员{}上分失败,失败原因:{}", reqJoinGame.getMemberId(), e.getMessage(), e );
+                }
+            }
+            if ( success ) {
+                memberGameMoneyService.enterGameSuccess( reqJoinGame );
+            }
+        }
+        redisUtils.unLock( "joinGame" + reqJoinGame.getMemberId() );
+    }
+
+    private boolean queryTransfer( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
+        boolean success;
+        try {
+            success = baseGameDock.queryTransfer( reqJoinGame );
+        } catch ( Exception e ) {
+            log.error( "会员{}查询转账失败 - 失败原因: {}", reqJoinGame.getMemberId(), e.getMessage(), e );
+            success = false;
+
+            if ( reqJoinGame.getMoneyType() == 1 ) {
+                String gameDes = reqJoinGame.getGameCategory().getDes();
+                String msg = String.format( "There was an error transferring money for the member's game. Please attend to the "
+                        + "member's money loss promptly! ::: gamePlatform: %s ; gameId: %s ; transferOrderId: %s ; "
+                        + "memberId: %s ; money: %s ; memberIp: %s", gameDes, reqJoinGame.getGameInfoId(),
+                        reqJoinGame.getOrderId(), reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(),
+                        reqJoinGame.getIp() );
+                telegramBotMessage.sendByChatId( msg, configEnvCacheUtil.getConf( "gametransfer_error_telegram" ) );
+            }
+        }
+        return success;
+    }
+
+    @Async
+    protected void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
+        boolean success = false;
+        try {
+            baseGameDock.withdrawal( reqJoinGame );
+            success = true;
+        } catch ( Exception e ) {
+            // 如果发生提现异常
+            if ( e instanceof GameTransferException ) {
+                if ( this.queryTransfer( reqJoinGame, baseGameDock ) ) {
+                    success = true;
+                } else {
+                    memberGameMoneyService.outGameFail( reqJoinGame );
+                }
+            } else {
+                log.error( "会员{}下分失败,失败原因:{}", reqJoinGame.getMemberId(), e.getMessage(), e );
+            }
+        }
+        if ( success ) {
+            memberGameMoneyService.outGameSuccess( reqJoinGame );
+        }
+
+        redisUtils.unLock( "escGame" + reqJoinGame.getMemberId() );
     }
 
     @Override
@@ -270,19 +337,10 @@ public class GameServiceImpl implements GameService {
                 return RspBase.ok( "游戏余额为0，无需下分" );
             }
             reqJoinGame.setTransferMoney( balance );
-            baseGameDock.withdrawal( reqJoinGame );
-            memberGameMoneyService.outGameSuccess( reqJoinGame );
+            // 异步下分
+            SpringUtils.getAopProxy( this ).cashOutGame( reqJoinGame, baseGameDock );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
-            // 如果发生提现异常
-            if ( e instanceof GameTransferException ) {
-                if ( baseGameDock.queryTransfer( reqJoinGame ) ) {
-                    memberGameMoneyService.outGameSuccess( reqJoinGame );
-                    return RspBase.ok( "下分成功" );
-                } else {
-                    memberGameMoneyService.outGameFail( reqJoinGame );
-                }
-            }
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
             redisUtils.unLock( "escGame" + memberId );
             return RspBase.businessError( "下分失败,请重试" );
@@ -291,12 +349,14 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
-        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper ).eq( "member_id", memberId )
-                                                                                .ge( "create_time", LocalDateTime.now()
-                                                                                                                 .minusMonths( 1 ) )
-                                                                                .select( "platform_id", "order_id" ).list()
-                                                                                .stream().map( MemberGameMoney::getPlatformId )
-                                                                                .collect( Collectors.toSet() );
+        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
+                .eq( "member_id", memberId )
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+                .select( "platform_id", "order_id" )
+                .list()
+                .stream()
+                .map( MemberGameMoney::getPlatformId )
+                .collect( Collectors.toSet() );
         if ( CollectionUtils.isEmpty( platformIds ) ) {
             return RspBase.ok( new ArrayList<>() );
         }
@@ -347,8 +407,10 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) {
-        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper ).eq( "agent", agent )
-                                                                                 .eq( "game_category", gameCategory ).one();
+        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
+                .eq( "agent", agent )
+                .eq( "game_category", gameCategory )
+                .one();
         if ( gamePlatform == null ) {
             return RspBase.businessError( "游戏平台不存在" );
         }
@@ -371,14 +433,26 @@ public class GameServiceImpl implements GameService {
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
-        return ReqJoinGame.builder().des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                          .md5( AESCoder.decrypt( gamePlatform.getMd5() ) ).agent( gamePlatform.getAgent() )
-                          .apiUrl( gamePlatform.getApiUrl() ).recordUrl( gamePlatform.getRecordUrl() )
-                          .linecode( gamePlatform.getLinecode() ).kindId( gameInfo == null ? null : gameInfo.getKindId() )
-                          .gameMemberId( gameMemberId ).memberId( memberId ).transferMoney( changeMoney )
-                          .platformId( gamePlatform.getId() ).platformName( gamePlatform.getName() )
-                          .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                          .ip( ServletUtil.getIp() ).gameCategory( gamePlatform.getGameCategory() ).dev( dev ).build();
+        return ReqJoinGame
+                .builder()
+                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
+                .agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() )
+                .recordUrl( gamePlatform.getRecordUrl() )
+                .linecode( gamePlatform.getLinecode() )
+                .kindId( gameInfo == null ? null : gameInfo.getKindId() )
+                .gameInfoId( gameInfo == null ? null : gameInfo.getId() )
+                .gameMemberId( gameMemberId )
+                .memberId( memberId )
+                .transferMoney( changeMoney )
+                .platformId( gamePlatform.getId() )
+                .platformName( gamePlatform.getName() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
+                .ip( ServletUtil.getIp() )
+                .gameCategory( gamePlatform.getGameCategory() )
+                .dev( dev )
+                .build();
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
@@ -387,10 +461,12 @@ public class GameServiceImpl implements GameService {
             case MEITIAN -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
-            case HG -> AESCoder.decrypt( gamePlatform.getDes() )
-                               .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
-                               .concat( RandomStringUtils.randomAlphabetic( 5 ) );
-            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
+            case HG -> AESCoder
+                    .decrypt( gamePlatform.getDes() )
+                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                    .concat( RandomStringUtils.randomAlphabetic( 5 ) );
+            case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
+                    LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
             default -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
@@ -420,7 +496,7 @@ public class GameServiceImpl implements GameService {
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
 
         List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
-        List<String> hosts2 = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
+        List<String>         hosts2          = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
 
         List<Map<String, Object>> resultList2 = restTemplate.postForObject(
                 hosts2.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/gameDataRecord/getList", httpEntity, List.class );

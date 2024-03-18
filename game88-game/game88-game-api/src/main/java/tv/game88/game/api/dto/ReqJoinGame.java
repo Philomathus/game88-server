@@ -16,6 +16,7 @@ public class ReqJoinGame {
     private String apiUrl;
     private String recordUrl;
     private String kindId;
+    private Long   gameInfoId;
 
     private EnumGameCategory gameCategory;
 

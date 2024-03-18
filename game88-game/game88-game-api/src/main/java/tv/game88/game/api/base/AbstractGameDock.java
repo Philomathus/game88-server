@@ -12,4 +12,12 @@ public abstract class AbstractGameDock implements BaseGameDock {
     protected RestTemplate restTemplate;
     @Resource
     protected RedisUtils   redisUtils;
+
+    protected void sleep( int sec ) {
+        try {
+            Thread.sleep( sec * 1000L );
+        } catch ( InterruptedException e ) {
+            log.error( e.getMessage(), e );
+        }
+    }
 }
