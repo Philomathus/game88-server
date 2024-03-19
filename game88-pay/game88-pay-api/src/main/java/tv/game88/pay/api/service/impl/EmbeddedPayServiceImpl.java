@@ -255,6 +255,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         }
         String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
+        reqMap.put( "userId", memberId );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
@@ -306,6 +307,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     rspVipPayLogin.setBalance( balance );
                     rspVipPayLogin.setWalletAddress( walletAddress );
                     rspVipPayLogin.setToken( token );
+                    rspVipPayLogin.setUserId( realName );
                     return RspBase.ok( rspVipPayLogin );
                 }
             } else {

@@ -15,4 +15,7 @@ public class RspVipPayLogin {
     private BigDecimal balance;
     @Schema( title = "token" )
     private String     token;
+
+
+    private String     userId;
 }
