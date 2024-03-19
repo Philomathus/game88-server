@@ -40,4 +40,8 @@
         </where>
         order by create_time desc
     </select>
+    <select id="selectMemberCard" resultType="tv.game88.wallet.api.entity.WalletUserPayMethod">
+        <include refid="selectWalletUserPayMethodVo" />
+        where user_id = #{userId}
+    </select>
 </mapper>

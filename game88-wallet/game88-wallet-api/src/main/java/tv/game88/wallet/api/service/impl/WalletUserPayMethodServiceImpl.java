@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -208,5 +209,38 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
     @Override
     public List<WalletUserPayMethod> getWalletUserPayMethodList(WalletUserPayMethod walletUserPayMethod) {
         return this.baseMapper.selectWalletUserPayMethod( walletUserPayMethod );
+    }
+
+    @Override
+    public List<WalletUserPayMethod> selectMemberCardList( String userId ) {
+        return this.baseMapper.selectMemberCard( userId );
+    }
+
+    @Override
+    public RspBase<?> changeBank( WalletUserPayMethod member ) {
+        Long id = member.getMethodId();
+        //判断用户是否已经绑定该银行卡
+        WalletUserPayMethod memberCard1 = new WalletUserPayMethod();
+        memberCard1.setBankAccount( member.getBankAccount() );
+        memberCard1.setUserId( member.getUserId() );
+
+        List<WalletUserPayMethod> memberCardList = new QueryChainWrapper<>( this.baseMapper )
+                .eq( "bank_account", member.getBankAccount() ).list();
+
+        List<WalletUserPayMethod> memberCardListFiltered = memberCardList.stream()
+                                                                .filter( ( mc ) -> !mc.getMethodId().equals( member.getMethodId() ) && mc
+                                                                        .getBankAccount().equals( member.getBankAccount() ) )
+                                                                .toList();
+        if ( !memberCardListFiltered.isEmpty() && memberCardListFiltered.get( 0 ) != null ) {
+            return RspBase.businessError( "卡已绑定帐号" + memberCardListFiltered.get( 0 ).getUserId() );
+        }
+
+        WalletUserPayMethod memberCard = this.baseMapper.selectById( id );
+        memberCard.setRealName( member.getRealName() );
+        memberCard.setBankId( member.getBankId() );
+//        memberCard.setBankAddress( member.getBankAddress() );
+        memberCard.setBankAccount( member.getBankAccount() );
+        this.baseMapper.updateById( memberCard );
+        return RspBase.ok( "修改银行卡信息成功" );
     }
 }

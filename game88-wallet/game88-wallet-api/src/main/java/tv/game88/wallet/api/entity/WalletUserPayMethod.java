@@ -70,4 +70,11 @@ public class WalletUserPayMethod implements Serializable {
      * 绑定时间
      */
     private LocalDateTime createTime;
+
+    @TableField(exist = false)
+    private Long    oldBankId;
+    @TableField(exist = false)
+    private String  oldRealName;
+    @TableField(exist = false)
+    private String  oldBankAccount;
 }

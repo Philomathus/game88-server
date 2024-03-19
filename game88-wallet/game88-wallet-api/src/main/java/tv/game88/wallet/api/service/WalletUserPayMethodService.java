@@ -29,4 +29,7 @@ public interface WalletUserPayMethodService extends IService<WalletUserPayMethod
 
     List<WalletUserPayMethod> getWalletUserPayMethodList( WalletUserPayMethod walletUserPayMethod );
 
+    List<WalletUserPayMethod> selectMemberCardList( String userId );
+
+    RspBase<?> changeBank( WalletUserPayMethod memberCard );
 }

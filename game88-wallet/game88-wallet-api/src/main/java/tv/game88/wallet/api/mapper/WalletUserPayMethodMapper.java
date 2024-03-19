@@ -1,5 +1,6 @@
 package tv.game88.wallet.api.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -15,6 +16,7 @@ public interface WalletUserPayMethodMapper extends BaseMapper<WalletUserPayMetho
 
     List<WalletUserPayMethod> selectWalletUserPayMethod(WalletUserPayMethod walletUserPayMethod );
 
+    List<WalletUserPayMethod> selectMemberCard( @Param( "userId" ) String userId );
 }
 
 

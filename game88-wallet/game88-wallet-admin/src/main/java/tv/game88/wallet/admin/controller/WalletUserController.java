@@ -17,6 +17,7 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
+import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.service.WalletUserService;
 
 import java.util.List;
@@ -31,6 +32,9 @@ import java.util.List;
 public class WalletUserController extends BaseController {
     @Resource
     private WalletUserService walletUserService;
+
+    @Resource
+    private WalletUserPayMethodService walletUserPayMethodService;
 
     /**
      * 查询钱包用户列表
@@ -110,6 +114,29 @@ public class WalletUserController extends BaseController {
         update.setId( memberId );
         update.setRealName( realName );
         return toResult(walletUserService.updateById( update ) );
+    }
+
+    /**
+     * 会员银行卡列表
+     */
+    @GetMapping( value = "/card-list" )
+    public RspBase<List<WalletUserPayMethod>> findMemberCardList( String userId ) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        startPage( pageDomain );
+        List<WalletUserPayMethod> list = walletUserPayMethodService.selectMemberCardList( userId );
+        for ( WalletUserPayMethod memberCard : list ) {
+            memberCard.setOldBankAccount( memberCard.getBankAccount() );
+            memberCard.setOldBankId( memberCard.getBankId() );
+            memberCard.setOldRealName( memberCard.getRealName() );
+        }
+        return getRspBasePage( list, pageDomain );
+    }
+
+
+    @Log( title = "修改用户银行卡信息", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeBank" )
+    public RspBase<?> changeBank( @RequestBody WalletUserPayMethod memberCard ) {
+        return walletUserPayMethodService.changeBank( memberCard );
     }
 
 }
