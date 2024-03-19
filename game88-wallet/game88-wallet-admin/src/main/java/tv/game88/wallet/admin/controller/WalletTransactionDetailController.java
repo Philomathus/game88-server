@@ -8,6 +8,7 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 
@@ -25,7 +26,12 @@ public class WalletTransactionDetailController extends BaseController {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<WalletTransactionDetail> list = walletTransactionDetailService.getWalletTransactionList( walletTransactionDetail );
-        return getRspBasePage( list, pageDomain );
-    }
+        RspBase<List<WalletTransactionDetail>> walletTransactionRsp =  getRspBasePage( list, pageDomain );
 
+        String domainOssValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        walletTransactionRsp.setData( list.stream().peek( wtd -> wtd.setTransCertPic( domainOssValue + wtd.getTransCertPic() ) )
+                .toList() );
+
+        return walletTransactionRsp;
+    }
 }
