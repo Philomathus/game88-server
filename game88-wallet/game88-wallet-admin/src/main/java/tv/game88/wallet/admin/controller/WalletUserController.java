@@ -139,4 +139,11 @@ public class WalletUserController extends BaseController {
         return walletUserPayMethodService.changeBank( memberCard );
     }
 
+//    @PreAuthorize( "@ss.hasPermi('member:memberInfo:unbindCard')" )
+    @Log( title = "解绑银行卡", businessType = BusinessType.UPDATE )
+    @PutMapping( "/unbindCard" )
+    public RspBase<?> unbindCard( @RequestBody WalletUserPayMethod memberCard ) {
+        return walletUserPayMethodService.unbindCard( memberCard );
+    }
+
 }

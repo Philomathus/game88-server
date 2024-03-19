@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,5 +243,16 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         memberCard.setBankAccount( member.getBankAccount() );
         this.baseMapper.updateById( memberCard );
         return RspBase.ok( "修改银行卡信息成功" );
+    }
+
+    @Override
+    public RspBase<?> unbindCard( WalletUserPayMethod memberCard ) {
+        Long             id             = memberCard.getMethodId();
+        WalletUserPayMethod       getMemberCard     = this.baseMapper.selectById( id );
+        if ( Objects.isNull( getMemberCard ) ) {
+            return RspBase.businessError( "卡号不存在" );
+        }
+        this.baseMapper.deleteById( id );
+        return RspBase.ok( "解绑成功" );
     }
 }
