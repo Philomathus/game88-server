@@ -127,20 +127,20 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             return RspBase.businessError( "支付方式不存在" );
         }
         if ( !walletUserPayMethod.getUserId().equals( userId ) ) {
-            return RspBase.businessError( "" );
+            return RspBase.businessError( "绑定用户错误" );
         }
-
-        long transactionCount = walletTransactionService.getBaseMapper().selectCount( new LambdaQueryWrapper<WalletTransaction>()
-                .eq( WalletTransaction::getUserId, userId )
-                .like( WalletTransaction::getPayMethodIds, payMethodId + "," )
-                .and( innerWrapper ->
-                        innerWrapper.eq( WalletTransaction::getStatus, 0 )
-                                .or()
-                                .eq( WalletTransaction::getStatus, 1 ) ) );
-
-        if ( transactionCount > 0 ) {
-            return RspBase.businessError( "无法取消绑定活动交易中使用的银行。" );
-        }
+//
+//        long transactionCount = walletTransactionService.getBaseMapper().selectCount( new LambdaQueryWrapper<WalletTransaction>()
+//                .eq( WalletTransaction::getUserId, userId )
+//                .like( WalletTransaction::getPayMethodIds, payMethodId + "," )
+//                .and( innerWrapper ->
+//                        innerWrapper.eq( WalletTransaction::getStatus, 0 )
+//                                .or()
+//                                .eq( WalletTransaction::getStatus, 1 ) ) );
+//
+//        if ( transactionCount > 0 ) {
+//            return RspBase.businessError( "无法取消绑定活动交易中使用的银行。" );
+//        }
 
         int i = this.baseMapper.deleteById( payMethodId );
 
