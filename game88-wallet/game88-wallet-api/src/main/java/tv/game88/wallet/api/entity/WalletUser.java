@@ -30,6 +30,8 @@ public class WalletUser implements Serializable {
     /**
      * 昵称
      */
+    private String        platformId;
+
     private String        nickName;
     /**
      * 用户头像
