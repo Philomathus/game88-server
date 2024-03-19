@@ -281,6 +281,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 } else {
                     walletUser = this.newWalletUserReg( new MobileLogin() );
                     walletUser.setPhone( reqEmbeddedLogin.getPhone() );
+                    walletUser.setRealName( reqEmbeddedLogin.getUserId() );
+                    log.info( "this is details id and userid {} , {}" , reqEmbeddedLogin.getPhone(),
+                            reqEmbeddedLogin.getUserId() );
 
                     this.baseMapper.insert( walletUser );
                 }

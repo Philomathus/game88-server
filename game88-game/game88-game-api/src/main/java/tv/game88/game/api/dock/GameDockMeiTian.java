@@ -4,10 +4,13 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.constants.Constants;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -29,6 +32,7 @@ public class GameDockMeiTian extends AbstractGameDock {
     private static final String TO_WITHDRAW    = "/services/dg/player/withdraw2";
     private static final String LOGIN          = "/services/dg/player/playerPlatformUrl";
     private static final String QUERY_TRANSFER = "/services/dg/player/queryTransbyId";
+    private static final String LOG_OUT        = "/services/dg/player/logOutGame";
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
@@ -106,8 +110,8 @@ public class GameDockMeiTian extends AbstractGameDock {
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
-            log.error( reqJoinGame.getGameCategory().getDes() + " 获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ),
-                    reqJoinGame.getGameMemberId(), url );
+            log.error( reqJoinGame.getGameCategory().getDes()
+                    + " 获取游戏链接失败:{}; userId:{}; url:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId(), url );
             throw new BusinessException( "获取游戏链接失败" );
         }
     }
@@ -144,7 +148,8 @@ public class GameDockMeiTian extends AbstractGameDock {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( reqJoinGame.getGameCategory().getDes() + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "上分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !"1".equals( resultMap.getOrDefault( "resultCode", -1 ).toString() ) ) {
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 上分异常 - 上分失败或数据为空" );
         }
@@ -182,14 +187,41 @@ public class GameDockMeiTian extends AbstractGameDock {
             log.error( e.getMessage(), e );
             throw new GameTransferException( e.getMessage() );
         }
-        log.info( reqJoinGame.getGameCategory().getDes() + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "下分信息:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
         if ( CollectionUtils.isEmpty( resultMap ) || !"1".equals( resultMap.getOrDefault( "resultCode", -1 ).toString() ) ) {
             throw new GameTransferException( reqJoinGame.getGameCategory().getDes() + " 下分异常 - 下分失败或数据为空" );
         }
     }
 
+    @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 2000 ),
+            maxAttempts = 3 )
+    protected void kickMember( ReqJoinGame reqJoinGame ) {
+        String url = reqJoinGame.getApiUrl() + LOG_OUT + "/" + reqJoinGame.getAgent() + "/" + reqJoinGame.getGameMemberId();
+
+        HttpHeaders                     httpHeaders = new HttpHeaders();
+        HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
+
+        Map<String, String> resultMap = restTemplate.postForObject( url, httpEntity, Map.class );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "强制登出玩家 - userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( StringUtils.equals( "1", resultMap.get( "resultCode" ) ) ) {
+                return;
+            }
+            throw new RuntimeException( JsonUtil.object2Json( resultMap ) );
+        }
+        throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + "强制登出玩家失败" );
+    }
+
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
+        if ( reqJoinGame.getMoneyType() != null && reqJoinGame.getMoneyType() == 2 ) { // 提现时必须登出玩家,否则无法下分
+            SpringUtils.getBean( GameDockMeiTian.class ).kickMember( reqJoinGame );
+        }
+
         String url = reqJoinGame.getApiUrl() + QUERY_BALANCE + "/" + reqJoinGame.getGameMemberId() + "/" + reqJoinGame.getAgent();
 
         HttpHeaders                     httpHeaders = new HttpHeaders();
@@ -201,7 +233,8 @@ public class GameDockMeiTian extends AbstractGameDock {
                 return new BigDecimal( resultMap.get( "coinBalance" ) ).setScale( 2, RoundingMode.FLOOR );
             }
         }
-        log.error( reqJoinGame.getGameCategory().getDes() + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "查询余额失败userId：{},rep:{}", reqJoinGame.getGameMemberId(), JsonUtil.object2Json( resultMap ) );
         return BigDecimal.ZERO;
     }
 

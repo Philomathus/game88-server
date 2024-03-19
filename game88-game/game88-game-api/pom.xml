@@ -38,6 +38,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>tv.game88.core</groupId>
+            <artifactId>game88-core-telegramBot</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>tv.game88.common</groupId>
             <artifactId>game88-common-http</artifactId>
             <version>1.0</version>

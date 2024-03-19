@@ -20,4 +20,6 @@ public class ReqEmbeddedLogin {
     private String walletAddress;
     @Schema( title = "签名数据", requiredMode = Schema.RequiredMode.REQUIRED )
     private String sign;
+
+    private String userId;
 }

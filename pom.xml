@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.3</version>
         <relativePath />
     </parent>
 
@@ -41,7 +41,7 @@
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <dynamic.datasource.version>4.3.0</dynamic.datasource.version>
 
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.4.0</springdoc.version>
         <swagger-annotation.version>2.2.20</swagger-annotation.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
@@ -53,7 +53,7 @@
         <easypoi.version>4.4.0</easypoi.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <jjwt.version>0.12.3</jjwt.version>
+        <jjwt.version>0.12.5</jjwt.version>
         <caffeine.version>3.1.8</caffeine.version>
         <telegrambots.version>6.9.7.1</telegrambots.version>
         <zxing.version>3.5.3</zxing.version>
@@ -72,7 +72,7 @@
         <maven-surefire-plugin.verion>3.2.5</maven-surefire-plugin.verion>
 
         <snakeyaml.version>2.2</snakeyaml.version>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.1.0-jre</guava.version>
         <org.json.verion>20240205</org.json.verion>
         <bouncycastle.version>1.77</bouncycastle.version>
     </properties>

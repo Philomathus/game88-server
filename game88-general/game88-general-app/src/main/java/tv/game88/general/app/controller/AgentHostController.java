@@ -27,7 +27,7 @@ public class AgentHostController {
     @Resource
     private AgentHostClientService agentHostClientService;
 
-    @PostMapping( "agent" )
+    @RequestMapping( "agent" )
     @Operation( summary = "主播获取代理信息" )
     public RspBase<RspAgent> getAgentInfo( @RequestBody ReqAgent req ) {
         if ( StringUtils.isEmpty( req.getAgent() ) ) {
@@ -55,7 +55,7 @@ public class AgentHostController {
         }
     }
 
-    @PostMapping( "init" )
+    @RequestMapping( "init" )
     @Operation( summary = "主播客户端初始化" )
     public RspBase<RspHostClient> init( @RequestHeader( "dev" ) Integer dev ) {
         if ( dev == null ) {
