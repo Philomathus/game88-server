@@ -69,5 +69,6 @@
                 AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
         </where>
+        order by create_time desc
     </select>
 </mapper>
