@@ -184,6 +184,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         Map<String, Object> reqquestMap = JsonUtil.object2Map( obj );
         String              sign        = reqquestMap.remove( "sign" ).toString();
 
+        log.info( "this is requestMap {} " ,reqquestMap );
+        log.info( "this is requestMap2 {} " ,walletMerchant );
         if ( !sign.equalsIgnoreCase( this.sign( reqquestMap, walletMerchant ) ) ) {
             return RspBase.businessError( "验签失败!" );
         }
