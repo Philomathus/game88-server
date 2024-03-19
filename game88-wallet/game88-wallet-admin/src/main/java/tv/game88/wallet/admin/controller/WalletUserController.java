@@ -1,5 +1,8 @@
 package tv.game88.wallet.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +17,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
-import tv.game88.core.config.constants.Constants;
+import tv.game88.wallet.api.dto.ReqChangeAllStatus;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
@@ -39,7 +42,7 @@ public class WalletUserController extends BaseController {
     /**
      * 查询钱包用户列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
+   // @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
     @GetMapping( "/list" )
     public RspBase<List<WalletUser>> list( WalletUser walletUser ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -144,6 +147,18 @@ public class WalletUserController extends BaseController {
     @PutMapping( "/unbindCard" )
     public RspBase<?> unbindCard( @RequestBody WalletUserPayMethod memberCard ) {
         return walletUserPayMethodService.unbindCard( memberCard );
+    }
+
+    @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeAllStatus" )
+    public Object changeAllStatus(@RequestBody ReqChangeAllStatus reqChangeAllStatus) throws Exception {
+        SecurityUtils.verifyMFACode( reqChangeAllStatus.getGoogleAuthCode() );
+
+        return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
+                .set(WalletUser::getStatus, reqChangeAllStatus.getStatus())
+                .in(WalletUser::getId, reqChangeAllStatus.getMemberIds())
+        ));
+
     }
 
 }
