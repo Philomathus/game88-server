@@ -442,7 +442,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
             // 卖家 订单倒计时 30分钟 用于确认是否收到转账
             redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER
-                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 30 ) );
+                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofSeconds( 30 ) );
 
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
@@ -545,34 +545,42 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         // 保存状态
         String transDetailId = walletTransactionDetail.getTransDetailId();
         int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
-                .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
+                .and( innerWrapper -> innerWrapper
+                        .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
+                        .or()
+                        .eq( WalletTransactionDetail::getStatus, WalletTransEnum.CUSTOMER_SERVICE )
+                )
                 .eq( WalletTransactionDetail::getTransDetailId, transDetailId ) );
         // 给买家加币
-        WalletUserFundEnum fundEnum = WalletUserFundEnum.TRANSACTION_ORDER_IN;
-        Long               amount   = walletTransactionDetail.getAmount();
-        String             mark     = "用户" + fundEnum.getDes() + amount;
-        walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, amount, fundEnum, mark, transDetailId
-                , transDetailId );
-
-        walletUserService.addBuyerTransactionSuccess( walletTransactionDetail.getBuyerId(), amount );
-        walletUserService.addSellerTransactionSuccess( walletTransactionDetail.getSellerId(), amount );
-
-        if ( i > 0 ) {
-            WalletTransaction walletTransaction = walletTransactionService.getOne( new LambdaQueryWrapper<WalletTransaction>()
-                    .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
-                    .select( WalletTransaction::getAmount ) );
-            // 如果挂单金额为0则将挂单改为交易成功, 否则改为挂单中
-            if ( walletTransaction != null ) {
-                boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
-                        .set( WalletTransaction::getStatus, walletTransaction.getAmount() <= 0 ? 2 : 0 )
-                        .eq( WalletTransaction::getStatus, 1 )
-                        .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
-                if ( !updateTrans ) {
-                    throw new BusinessException( "转币失败,请重试" );
-                }
-            }
+        if( updateTransactionDetail.getStatus() == WalletTransEnum.CUSTOMER_SERVICE ){
+            log.warn( "Transfer Money failed, seller did not confirm transfer" );
         } else {
-            throw new BusinessException( "转币失败,请重试" );
+            WalletUserFundEnum fundEnum = WalletUserFundEnum.TRANSACTION_ORDER_IN;
+            Long amount = walletTransactionDetail.getAmount();
+            String mark = "用户" + fundEnum.getDes() + amount;
+            walletFundManager.addWalletUserMoney( walletTransactionDetail.getBuyerId(), null, amount, fundEnum, mark, transDetailId
+                    , transDetailId );
+
+            walletUserService.addBuyerTransactionSuccess( walletTransactionDetail.getBuyerId(), amount );
+            walletUserService.addSellerTransactionSuccess( walletTransactionDetail.getSellerId(), amount );
+
+            if ( i > 0 ) {
+                WalletTransaction walletTransaction = walletTransactionService.getOne( new LambdaQueryWrapper<WalletTransaction>()
+                        .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() )
+                        .select( WalletTransaction::getAmount ) );
+                // 如果挂单金额为0则将挂单改为交易成功, 否则改为挂单中
+                if ( walletTransaction != null ) {
+                    boolean updateTrans = walletTransactionService.update( new LambdaUpdateWrapper<WalletTransaction>()
+                            .set( WalletTransaction::getStatus, walletTransaction.getAmount() <= 0 ? 2 : 0 )
+                            .eq( WalletTransaction::getStatus, 1 )
+                            .eq( WalletTransaction::getTransactionId, walletTransactionDetail.getTransactionId() ) );
+                    if ( ! updateTrans ) {
+                        throw new BusinessException( "转币失败,请重试" );
+                    }
+                }
+            } else {
+                throw new BusinessException( "转币失败,请重试" );
+            }
         }
     }
 
@@ -700,14 +708,14 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_TRANSFER ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SYSTEM_CONFIRM_TRANSFER;
+        WalletTransEnum walletTransEnum = WalletTransEnum.CUSTOMER_SERVICE;
         // 修改订单状态并给买家加币
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
         LocalDateTime now = LocalDateTime.now();
         update.setSuccessTransTime( now );
         update.setTime( now );
-        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间未操作,系统确认转币,时间:"
+        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间不操作，系统确认会锁定交易，客服会处理:"
                 + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -723,6 +731,39 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     @Override
     public List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail ) {
         return this.baseMapper.selectWalletTransactionDetailList( walletTransactionDetail );
+    }
+
+    @Override
+    public RspBase<?> confirmTransaction( String transDetailId ) {
+
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+        if ( walletTransactionDetail == null ) {
+            return RspBase.businessError( "Transaction does not exist" );
+        }
+        if ( walletTransactionDetail.getStatus() != WalletTransEnum.CUSTOMER_SERVICE ) {
+            return RspBase.businessError( "Transaction does not exist" );
+        }
+        WalletTransEnum walletTransEnum = WalletTransEnum.SYSTEM_CONFIRM_TRANSFER;
+        // 修改订单状态并给买家加币
+        WalletTransactionDetail update = new WalletTransactionDetail();
+        update.setTransDetailId( transDetailId );
+        update.setStatus( walletTransEnum );
+        LocalDateTime now = LocalDateTime.now();
+        update.setSuccessTransTime( now );
+        update.setTime( now );
+        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间不操作，系统确认会锁定交易，客服会处理:"
+                + LocalDateTimeUtils.format( now );
+        update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
+
+        SpringUtils.getAopProxy( this ).updateTransDetailOrAddUserAmount( update, walletTransactionDetail );
+
+        walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+
+        // 通知消息给买家和卖家
+        walletMessageService.saveWalletMessage( walletTransactionDetail, true );
+        walletMessageService.saveWalletMessage( walletTransactionDetail, false );
+
+        return RspBase.ok();
     }
 }
 

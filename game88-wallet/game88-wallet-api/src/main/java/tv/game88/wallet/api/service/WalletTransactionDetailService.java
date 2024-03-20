@@ -39,4 +39,6 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
     void processBuyerConfirmTransferTimeout( String transDetailId );
 
     List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail );
+
+    RspBase<?> confirmTransaction( String transDetailId );
 }

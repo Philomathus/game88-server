@@ -1,9 +1,7 @@
 package tv.game88.wallet.admin.controller;
 
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
@@ -11,6 +9,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
+import tv.game88.wallet.api.type.WalletTransEnum;
 
 import java.util.List;
 
@@ -33,5 +32,15 @@ public class WalletTransactionDetailController extends BaseController {
                 .toList() );
 
         return walletTransactionRsp;
+    }
+
+    @PutMapping( "/confirmTransaction/{transDetailId}" )
+    public RspBase<?> confirmTransaction( @PathVariable String transDetailId ) {
+        return walletTransactionDetailService.confirmTransaction( transDetailId );
+    }
+
+    @GetMapping( "/confirmTransaction/transactionDetailStatusList" )
+    public RspBase<List<String>> transactionDetailStatusList() {
+        return RspBase.ok( WalletTransEnum.getPayMethodTypes() );
     }
 }
