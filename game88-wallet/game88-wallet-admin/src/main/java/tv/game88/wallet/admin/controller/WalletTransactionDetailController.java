@@ -39,6 +39,11 @@ public class WalletTransactionDetailController extends BaseController {
         return walletTransactionDetailService.confirmTransaction( transDetailId );
     }
 
+    @PutMapping( "/systemCancelTrans/{transDetailId}/{userId}" )
+    public RspBase<?> cancelTransactionBySystem( @PathVariable String transDetailId, @PathVariable String userId ) {
+        return walletTransactionDetailService.systemCancelTrans( userId, transDetailId );
+    }
+
     @GetMapping( "/confirmTransaction/transactionDetailStatusList" )
     public RspBase<List<String>> transactionDetailStatusList() {
         return RspBase.ok( WalletTransEnum.getPayMethodTypes() );
