@@ -41,4 +41,6 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
     List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail );
 
     RspBase<?> confirmTransaction( String transDetailId );
+
+    RspBase<?> systemCancelTrans( String userId, String transDetailId );
 }

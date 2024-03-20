@@ -23,11 +23,11 @@ public enum WalletTransEnum {
     // 系统确认转币
     SYSTEM_CONFIRM_TRANSFER,
 
+    //系统取消交易
+    SYSTEM_CANCEL_TRANS,
+
     // 卖家未收到转账
     SELLER_NOT_RECEIVED,
-
-    // 买方未收到转账。客服人员可通过管理员手动转账
-    CUSTOMER_SERVICE,
     ;
 
     public static List<String> getPayMethodTypes() {
