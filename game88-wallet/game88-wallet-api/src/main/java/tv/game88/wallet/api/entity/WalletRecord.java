@@ -95,4 +95,11 @@ public class WalletRecord implements Serializable {
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     @TableField( exist = false )
     private String endTime;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String minAmount;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    private String maxAmount;
+
 }

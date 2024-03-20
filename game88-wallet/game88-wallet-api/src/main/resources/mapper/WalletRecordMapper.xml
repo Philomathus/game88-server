@@ -40,12 +40,17 @@
         <include refid="selectWalletRecordVo"/>
         <where>
             <if test="tradeNo != null and tradeNo != ''">and trade_no = #{tradeNo}</if>
-            <if test="orderNo != null and orderNo != ''">and order_no = #{orderNo}</if>
+            <if test="merchantId != null and merchantId != ''">and merchant_id = #{merchantId}</if>
+            <if test="userId != null and userId != ''">and user_id = #{userId}</if>
             <if test="beginTime != null and beginTime != ''">
                 AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endTime != null and endTime != ''">
                 AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="minAmount != null and maxAmount != null and minAmount != '' and maxAmount != ''">
+                and amount <![CDATA[ >= ]]> #{minAmount}
+                and amount <![CDATA[ <= ]]> #{maxAmount}
             </if>
         </where>
     </select>
