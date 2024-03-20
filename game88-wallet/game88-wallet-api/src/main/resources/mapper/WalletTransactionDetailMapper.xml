@@ -56,6 +56,7 @@
         <include refid="selectWalletTransactionDetailVo" />
         <where>
             <if test="transactionId != null  and transactionId != ''">and transaction_id = #{transactionId}</if>
+            <if test="transDetailId != null  and transDetailId != ''">and trans_detail_id = #{transDetailId}</if>
             <if test="sellerId != null  and sellerId != ''">and seller_id = #{sellerId}</if>
             <if test="buyerId != null  and buyerId != ''">and buyer_id = #{buyerId}</if>
             <if test="amount != null ">and amount = #{amount}</if>
