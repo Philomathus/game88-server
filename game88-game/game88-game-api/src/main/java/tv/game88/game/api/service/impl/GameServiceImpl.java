@@ -245,6 +245,7 @@ public class GameServiceImpl implements GameService {
                     }
                 } else {
                     log.error( "会员{}上分失败,失败原因:{}", reqJoinGame.getMemberId(), e.getMessage(), e );
+                    this.processTopUpNotice( reqJoinGame );
                 }
             }
             if ( success ) {
@@ -263,16 +264,19 @@ public class GameServiceImpl implements GameService {
             success = false;
 
             if ( reqJoinGame.getMoneyType() == 1 ) {
-                String gameDes = reqJoinGame.getGameCategory().getDes();
-                String msg = String.format( "There was an error transferring money for the member's game. Please attend to the "
-                        + "member's money loss promptly! ::: gamePlatform: %s ; gameId: %s ; transferOrderId: %s ; "
-                        + "memberId: %s ; money: %s ; memberIp: %s", gameDes, reqJoinGame.getGameInfoId(),
-                        reqJoinGame.getOrderId(), reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(),
-                        reqJoinGame.getIp() );
-                telegramBotMessage.sendByChatId( msg, configEnvCacheUtil.getConf( "gametransfer_error_telegram" ) );
+                this.processTopUpNotice( reqJoinGame );
             }
         }
         return success;
+    }
+
+    private void processTopUpNotice( ReqJoinGame reqJoinGame ) {
+        String gameDes = reqJoinGame.getGameCategory().getDes();
+        String msg = String.format( "There was an error transferring money for the member's game. Please attend to the "
+                + "member's money loss promptly! ::: gamePlatform: %s ; gameId: %s ; transferOrderId: %s ; "
+                + "memberId: %s ; money: %s ; IP: %s", gameDes, reqJoinGame.getGameInfoId(), reqJoinGame.getOrderId(),
+                reqJoinGame.getMemberId(), reqJoinGame.getTransferMoney(), reqJoinGame.getIp() );
+        telegramBotMessage.sendByChatId( msg, configEnvCacheUtil.getConf( "gametransfer_error_telegram" ) );
     }
 
     @Async
