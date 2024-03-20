@@ -544,15 +544,15 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                                                   WalletTransactionDetail walletTransactionDetail ) {
         // 保存状态
         String transDetailId = walletTransactionDetail.getTransDetailId();
-        int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>()
-                .and( innerWrapper -> innerWrapper
-                        .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
-                        .or()
-                        .eq( WalletTransactionDetail::getStatus, WalletTransEnum.CUSTOMER_SERVICE )
+        int i = this.baseMapper.update( updateTransactionDetail, new LambdaUpdateWrapper<WalletTransactionDetail>().and( innerWrapper ->
+                                                                                                                           innerWrapper
+                                                                                                                                   .eq( WalletTransactionDetail::getStatus, WalletTransEnum.BUYER_CONFIRM_TRANSFER )
+                                                                                                                                   .or()
+                                                                                                                                   .eq( WalletTransactionDetail::getStatus, WalletTransEnum.CUSTOMER_SERVICE )
                 )
                 .eq( WalletTransactionDetail::getTransDetailId, transDetailId ) );
         // 给买家加币
-        if( updateTransactionDetail.getStatus() == WalletTransEnum.CUSTOMER_SERVICE ){
+        if( updateTransactionDetail.getStatus() == WalletTransEnum.SELLER_NOT_RECEIVED ){
             log.warn( "Transfer Money failed, seller did not confirm transfer" );
         } else {
             WalletUserFundEnum fundEnum = WalletUserFundEnum.TRANSACTION_ORDER_IN;
