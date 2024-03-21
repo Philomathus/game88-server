@@ -133,7 +133,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             authenticationManager.authenticate( authenticationToken );
         } catch ( Exception e ) {
             if ( e instanceof BadCredentialsException ) {
-                log.error( "密码错误:{} ", JsonUtil.object2Json( mobileLogin ) );
+                log.error( "密码错误test:{} ", JsonUtil.object2Json( mobileLogin ) );
             } else {
                 log.error( e.getMessage(), e );
             }
