@@ -50,6 +50,8 @@ public class WalletFundManager {
         int updateMoney;
         if ( fundEnum == WalletUserFundEnum.WITHDRAW_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
+        } else if ( fundEnum == WalletUserFundEnum.CANCEL_ORDER_IN  ) {
+            updateMoney = walletUserMapper.addCancelOrderMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
         }

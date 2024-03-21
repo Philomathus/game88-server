@@ -131,6 +131,12 @@
         where id = #{userId}
     </select>
 
+    <insert id="addCancelOrderMoney">
+        update wallet_user
+        set amount = amount + #{money}
+        where id = #{userId}
+    </insert>
+
     <update id="addMoney">
         update wallet_user
         set amount = amount + #{money},
