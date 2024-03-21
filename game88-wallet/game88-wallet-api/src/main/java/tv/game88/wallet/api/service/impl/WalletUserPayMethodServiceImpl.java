@@ -68,7 +68,10 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             return RspBase.businessError( "必须设置资金密码才能绑定支付方式" );
         }
 
-        log.info( "password condition check {}" , passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )  );
+        log.info( "password condition check {} ,{} ,{}" ,
+                reqPayMethod.getFundPassword()  ,
+                walletUser.getFundPassword() , passwordEncoder.matches( reqPayMethod.getFundPassword() ,
+                walletUser.getFundPassword() )  );
 
 
         if( !passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )){
