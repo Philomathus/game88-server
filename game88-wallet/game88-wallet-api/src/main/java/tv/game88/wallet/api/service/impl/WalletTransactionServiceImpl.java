@@ -3,6 +3,7 @@ package tv.game88.wallet.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  * @createDate 2023-08-21 17:27:31
  */
 @Service
+@Slf4j
 public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionMapper, WalletTransaction> implements WalletTransactionService {
     @Resource
     private WalletUserService             walletUserService;
@@ -73,7 +75,11 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( rspBase != null ) {
             return rspBase;
         }
+        log.info(  "walletUser amount {} ,FrozenAmount {} " , walletUser.getAmount() ,
+                walletUser.getFrozenAmount());
         if ( walletUser.getAmount() - walletUser.getFrozenAmount() < reqSellCoins.getSellNum() ) {
+            log.info(  "walletUser amount {} ,FrozenAmount {} " , walletUser.getAmount() ,
+                    walletUser.getFrozenAmount());
             return RspBase.businessError( "您的G币不足,G币数量:" + ( walletUser.getAmount() - walletUser.getFrozenAmount() ) );
         }
 
