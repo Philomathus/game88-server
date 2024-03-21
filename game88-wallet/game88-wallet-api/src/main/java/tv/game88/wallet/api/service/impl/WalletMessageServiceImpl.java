@@ -165,6 +165,21 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             orderText  = "订单";
             actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
         }
+        case SELLER_CONFIRM_TIMEOUT -> {
+            titleText  = "系统确认转币";
+            orderText  = "订单";
+            actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
+        case BUYER_CONFIRM_TRANSFER_TIMEOUT -> {
+            titleText  = "系统确认转币";
+            orderText  = "订单";
+            actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
+        case SYSTEM_CANCEL_TRANS -> {
+            titleText  = "系统确认转币";
+            orderText  = "订单";
+            actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
+        }
         default -> {
             titleText  = "标题";
             orderText  = "订单";
