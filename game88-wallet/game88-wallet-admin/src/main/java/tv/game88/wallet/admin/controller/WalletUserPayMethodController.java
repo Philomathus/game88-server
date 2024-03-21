@@ -2,10 +2,7 @@ package tv.game88.wallet.admin.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
