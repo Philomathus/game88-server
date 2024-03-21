@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.apache.ibatis.type.JdbcType;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.io.Serializable;
@@ -64,7 +62,7 @@ public class WalletUserPayMethod implements Serializable {
     /**
      * 审核状态
      */
-    //0 未审核 1已审核 2审核不通过
+    // 0 未审核 1已审核 2审核不通过
     private Integer auditStatus;
 
     /**
