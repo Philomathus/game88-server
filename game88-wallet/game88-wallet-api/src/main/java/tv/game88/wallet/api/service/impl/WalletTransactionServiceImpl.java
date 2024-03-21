@@ -80,6 +80,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( walletUser.getAmount() - walletUser.getFrozenAmount()  < reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
         }
+        log.info(  "request body122 {} , {}" , userId ,reqSellCoins  );
         if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不匹配" );
         }
