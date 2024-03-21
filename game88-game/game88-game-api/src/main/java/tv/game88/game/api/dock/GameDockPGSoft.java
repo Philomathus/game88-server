@@ -35,7 +35,7 @@ import java.util.*;
 @Repository( value = ConstantsGame.PG_SOFT + "GameProcessor" )
 @SuppressWarnings( "unchecked" )
 public class GameDockPGSoft extends AbstractGameDock {
-    private static final String CURRENCY = "IDR";
+    private static final String CURRENCY = "RMB";
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {

@@ -13,6 +13,7 @@
         <result property="secretKey" column="secret_key" jdbcType="VARCHAR" />
         <result property="phone" column="phone" jdbcType="VARCHAR" />
         <result property="amount" column="amount" jdbcType="BIGINT" />
+        <result property="frozenAmount" column="frozen_amount" jdbcType="BIGINT" />
         <result property="fundPassword" column="fund_password" jdbcType="VARCHAR" />
         <result property="isVerified" column="is_verified" jdbcType="INTEGER" />
         <result property="verifiedTime" column="verified_time" jdbcType="TIMESTAMP" />
@@ -47,6 +48,7 @@
                secret_key,
                phone,
                amount,
+               frozen_amount,
                fund_password,
                is_verified,
                verified_time,
