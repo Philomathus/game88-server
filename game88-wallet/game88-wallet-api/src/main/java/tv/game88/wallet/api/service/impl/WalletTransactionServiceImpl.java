@@ -61,7 +61,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
 
     @Override
     public RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
-        log.info( "testing log request {}" , reqSellCoins  );
+        log.info( "testing log request1 {}" , reqSellCoins  );
         if ( reqSellCoins.getCanSplit() && reqSellCoins.getMinBuyNum() == null ) {
             return RspBase.businessError( "最低购买数量不能为空" );
         }
@@ -78,21 +78,19 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return rspBase;
         }
         log.info( "testing log request3 {}" , reqSellCoins  );
-//        if ( walletUser.getAmount() - walletUser.getFrozenAmount()  < reqSellCoins.getSellNum() ) {
-//            return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
-//        }
+        if ( walletUser.getAmount() - walletUser.getFrozenAmount()  < reqSellCoins.getSellNum() ) {
+            return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
+        }
         log.info( "testing log request4 {}" , reqSellCoins  );
-//        if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
-//            return RspBase.businessError( "密码不匹配" );
-//        }
-        log.info( "testing log request5 {}" , reqSellCoins  );
+        if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
+            return RspBase.businessError( "密码不匹配" );
+        }
 
         Set<String> typeSet = walletUserPayMethodMapper
                 .selectBatchIds( reqSellCoins.getPayMethodIds() )
                 .stream()
                 .map( pm -> pm.getMethodType().name() )
                 .collect( Collectors.toSet() );
-        log.info( "testing log request6 {}" , reqSellCoins  );
         LocalDateTime now     = LocalDateTime.now();
         Long          sellNum = reqSellCoins.getSellNum();
 
