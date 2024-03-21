@@ -124,7 +124,9 @@
 
     <update id="reduceMoney">
         update wallet_user
-        set amount = amount - #{money}
+        set amount = amount - #{money},
+<!--  this is tmp list -->
+            frozen_amount = frozen_amount - #{money}
         where id = #{userId}
           and amount - #{money} >= 0
     </update>
