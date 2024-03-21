@@ -443,7 +443,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
             // 卖家 订单倒计时 30分钟 用于确认是否收到转账
             redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER
                     + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
-
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
             // 消息通知卖家
@@ -637,7 +636,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_BUY ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CANCEL;
+        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TIMEOUT;
+//        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
@@ -671,7 +671,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.SELLER_CONFIRM_TRANS ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CANCEL;
+        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CONFIRM_TRANSFER_TIMEOUT;
+//        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
@@ -704,7 +705,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_TRANSFER ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SYSTEM_CONFIRM_TRANSFER;
+        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TIMEOUT;
         // 修改订单状态并给买家加币
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );

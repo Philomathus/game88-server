@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
-import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
@@ -142,7 +140,10 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 //            return RspBase.businessError( "无法取消绑定活动交易中使用的银行。" );
 //        }
 
-        int i = this.baseMapper.deleteById( payMethodId );
+
+        walletUserPayMethod.setAuditStatus( 0 );
+
+        int i = this.baseMapper.updateById( walletUserPayMethod );
 
         return i > 0 ? RspBase.ok( "解绑支付方式成功" ) : RspBase.businessError( "解绑支付方式异常，请稍后再试" ) ;
     }

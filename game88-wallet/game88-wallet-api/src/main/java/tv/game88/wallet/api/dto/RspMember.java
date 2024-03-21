@@ -22,6 +22,10 @@ public class RspMember {
     private String     phone;
     @Schema( title = "余额" )
     private BigDecimal amount;
+
+    @Schema( title = "可售金额" )
+    private BigDecimal sellAbleAmount;
+
     @Schema( title = "是否实名认证" )
     private Integer    isVerified;
     @Schema( title = "信用等级" )
