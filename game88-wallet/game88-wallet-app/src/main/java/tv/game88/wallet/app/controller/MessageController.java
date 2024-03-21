@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.vo.RspBase;
+import tv.game88.common.vo.RspEntity;
+import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.wallet.api.dto.RspMessage;
 import tv.game88.wallet.api.service.WalletMessageService;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
@@ -21,6 +23,9 @@ import java.util.List;
 public class MessageController {
     @Resource
     private WalletMessageService walletMessageService;
+
+    @Resource
+    private ConfigEnvCacheUtil configEnvCacheUtil;
 
     @Operation( summary = "获取站内信息列表" )
     @PostMapping( "/api/getMessageList" )
@@ -47,4 +52,11 @@ public class MessageController {
     public RspBase<Boolean> isNewMessage() {
         return walletMessageService.isNewMessage( MemberSecurityUtils.getUserId() );
     }
+
+
+    @PostMapping( "/api/customerSupport" )
+    public RspEntity<?> customerSupportLink() {
+        return RspEntity.ok( configEnvCacheUtil.getConf( "customer_support" ) );
+    }
+
 }
