@@ -346,6 +346,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         RspMember  rspMember  = new RspMember();
         rspMember.setCreditRating( 5 );
         rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
+        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() -  walletUser.getFrozenAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
 
         rspMember.setHasPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
