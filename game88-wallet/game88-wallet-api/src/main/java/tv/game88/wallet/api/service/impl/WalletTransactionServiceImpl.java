@@ -61,6 +61,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
 
     @Override
     public RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins ) {
+        log.info(  "request body {} , {}" , userId ,reqSellCoins  );
         if ( reqSellCoins.getCanSplit() && reqSellCoins.getMinBuyNum() == null ) {
             return RspBase.businessError( "最低购买数量不能为空" );
         }
@@ -75,6 +76,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( rspBase != null ) {
             return rspBase;
         }
+        log.info(  "request body2 {} , {}" , userId ,reqSellCoins  );
         if ( walletUser.getAmount() - walletUser.getFrozenAmount()  < reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
         }
