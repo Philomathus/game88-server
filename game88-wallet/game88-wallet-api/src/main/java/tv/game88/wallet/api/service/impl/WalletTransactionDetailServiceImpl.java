@@ -636,7 +636,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_BUY ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CANCEL;
+        WalletTransEnum walletTransEnum = WalletTransEnum.TIMEOUT;
+//        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
@@ -670,7 +671,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.SELLER_CONFIRM_TRANS ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CANCEL;
+        WalletTransEnum walletTransEnum = WalletTransEnum.TIMEOUT;
+//        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );

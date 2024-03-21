@@ -28,6 +28,9 @@ public enum WalletTransEnum {
 
     // 卖家未收到转账
     SELLER_NOT_RECEIVED,
+
+    // redis 定时器过期时的状态
+    TIMEOUT,
     ;
 
     public static List<String> getPayMethodTypes() {
