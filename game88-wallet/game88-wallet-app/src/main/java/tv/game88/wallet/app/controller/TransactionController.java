@@ -26,6 +26,7 @@ public class TransactionController extends BaseController {
     @Operation( summary = "出售G币 - 发布挂单" )
     @PostMapping( "/api/sellOrder" )
     public RspBase<String> sellOrder( @RequestBody @Validated ReqSellCoins reqSellCoins ) {
+        log.info( "testing log request {}" , reqSellCoins  );
         return walletTransactionService.sellOrder( MemberSecurityUtils.getUserId(), reqSellCoins );
     }
 
