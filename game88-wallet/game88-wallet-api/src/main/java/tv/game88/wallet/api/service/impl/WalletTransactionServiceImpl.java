@@ -75,7 +75,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( rspBase != null ) {
             return rspBase;
         }
-        if ( walletUser.getAmount() - walletUser.getFrozenAmount() < reqSellCoins.getSellNum() ) {
+        if ( walletUser.getAmount()  < reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
         }
         
