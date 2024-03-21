@@ -53,6 +53,12 @@ public class WalletUser implements Serializable {
      * 金额
      */
     private Long          amount;
+
+    /**
+     * 冻结金额
+     */
+    private Long frozenAmount;
+
     /**
      * 资金密码
      */
