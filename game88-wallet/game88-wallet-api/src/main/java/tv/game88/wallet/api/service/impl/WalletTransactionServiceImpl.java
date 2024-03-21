@@ -83,7 +83,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不匹配" );
         }
-
+        log.info(  "request body3 {} , {}" , userId ,reqSellCoins  );
         Set<String> typeSet = walletUserPayMethodMapper
                 .selectBatchIds( reqSellCoins.getPayMethodIds() )
                 .stream()
