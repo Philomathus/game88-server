@@ -29,8 +29,11 @@ public enum WalletTransEnum {
     // 卖家未收到转账
     SELLER_NOT_RECEIVED,
 
-    // redis 定时器过期时的状态
-    TIMEOUT,
+    // 计时器到期时的状态，等待卖方确认
+    SELLER_CONFIRM_TIMEOUT,
+
+    //计时器到期时的状态，等待买方转账
+    BUYER_CONFIRM_TRANSFER_TIMEOUT,
     ;
 
     public static List<String> getPayMethodTypes() {

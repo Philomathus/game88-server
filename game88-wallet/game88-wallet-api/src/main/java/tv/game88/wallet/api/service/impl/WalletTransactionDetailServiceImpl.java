@@ -636,7 +636,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_BUY ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.TIMEOUT;
+        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TIMEOUT;
 //        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
@@ -671,7 +671,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.SELLER_CONFIRM_TRANS ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.TIMEOUT;
+        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CONFIRM_TRANSFER_TIMEOUT;
 //        WalletTransEnum walletTransEnum = WalletTransEnum.BUYER_CANCEL;
 
         WalletTransactionDetail update = new WalletTransactionDetail();
@@ -705,7 +705,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_TRANSFER ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SYSTEM_CONFIRM_TRANSFER;
+        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TIMEOUT;
         // 修改订单状态并给买家加币
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
