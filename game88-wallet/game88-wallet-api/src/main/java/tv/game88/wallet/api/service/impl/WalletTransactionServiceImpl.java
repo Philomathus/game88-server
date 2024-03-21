@@ -81,17 +81,18 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( walletUser.getAmount() - walletUser.getFrozenAmount()  < reqSellCoins.getSellNum() ) {
             return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
         }
-        
+        log.info( "testing log request4 {}" , reqSellCoins  );
         if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不匹配" );
         }
+        log.info( "testing log request5 {}" , reqSellCoins  );
 
         Set<String> typeSet = walletUserPayMethodMapper
                 .selectBatchIds( reqSellCoins.getPayMethodIds() )
                 .stream()
                 .map( pm -> pm.getMethodType().name() )
                 .collect( Collectors.toSet() );
-
+        log.info( "testing log request6 {}" , reqSellCoins  );
         LocalDateTime now     = LocalDateTime.now();
         Long          sellNum = reqSellCoins.getSellNum();
 
