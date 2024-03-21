@@ -81,9 +81,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             return RspBase.businessError( "您的G币不足,G币数量:" + reqSellCoins.getSellNum() );
         }
         log.info(  "request body122 {} , {}" , userId ,reqSellCoins  );
-        if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
-            return RspBase.businessError( "密码不匹配" );
-        }
+//        if ( !passwordEncoder.matches( reqSellCoins.getFundPass(), walletUser.getFundPassword() ) ) {
+//            return RspBase.businessError( "密码不匹配" );
+//        }
         log.info(  "request body3 {} , {}" , userId ,reqSellCoins  );
         Set<String> typeSet = walletUserPayMethodMapper
                 .selectBatchIds( reqSellCoins.getPayMethodIds() )
