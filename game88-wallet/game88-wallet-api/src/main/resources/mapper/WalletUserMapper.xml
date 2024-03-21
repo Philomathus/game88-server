@@ -37,6 +37,7 @@
         <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
         <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
         <result property="linkUrl" column="link_url" jdbcType="VARCHAR" />
+        <result property="frozenAmount" column="frozen_amount" jdbcType="BIGINT" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
@@ -69,7 +70,8 @@
                phone_model,
                login_device,
                login_time,
-               link_url
+               link_url,
+               frozen_amount
         from wallet_user
     </sql>
 
@@ -118,7 +120,8 @@
 
     <update id="addMoney">
         update wallet_user
-        set amount = amount + #{money}
+        set amount = amount + #{money},
+            frozen_amount = frozen_amount + #{money}
         where id = #{userId}
     </update>
 
@@ -133,8 +136,9 @@
 
     <update id="addChargeMoney">
         update wallet_user
-        set amount       = amount + #{money},
-            total_charge = total_charge + #{money}
+        set amount        = amount + #{money},
+            frozen_amount = frozen_amount + #{money},
+            total_charge  = total_charge + #{money}
         where id = #{userId}
     </update>
 
