@@ -122,6 +122,9 @@
             <if test="endTime != null and endTime != ''">
                 AND created_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
+            <if test="isVerified != null">
+                and is_verified = #{isVerified}
+            </if>
         </where>
     </select>
 
