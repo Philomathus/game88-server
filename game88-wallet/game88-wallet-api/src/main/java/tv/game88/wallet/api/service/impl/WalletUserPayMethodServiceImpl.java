@@ -101,7 +101,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
                 return RspBase.businessError( "请上传收款码" );
             }
-            reqPayMethod.setRealName( walletUser.getRealName() );
+//            reqPayMethod.setRealName( walletUser.getRealName() );
         }
         }
         WalletUserPayMethod walletUserPayMethod = new WalletUserPayMethod();
@@ -109,7 +109,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         walletUserPayMethod.setMethodType( reqPayMethod.getMethodType() );
         walletUserPayMethod.setPayAddrProvince( reqPayMethod.getPayAddrProvince() );
         walletUserPayMethod.setPayAddrCity( reqPayMethod.getPayAddrCity() );
-        walletUserPayMethod.setRealName( reqPayMethod.getRealName() );
+        walletUserPayMethod.setRealName( walletUser.getRealName() );
         walletUserPayMethod.setBankId( reqPayMethod.getBankId() );
         walletUserPayMethod.setBankAccount( reqPayMethod.getAccount() );
         walletUserPayMethod.setPayPicAddr( reqPayMethod.getPayPicAddr() );
