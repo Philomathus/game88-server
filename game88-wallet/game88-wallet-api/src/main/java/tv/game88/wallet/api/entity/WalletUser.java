@@ -53,6 +53,12 @@ public class WalletUser implements Serializable {
      * 金额
      */
     private Long          amount;
+
+    /**
+     * 冻结金额
+     */
+    private Long frozenAmount;
+
     /**
      * 资金密码
      */
@@ -169,4 +175,12 @@ public class WalletUser implements Serializable {
         }
         return searchValues;
     }
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String beginTime;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String endTime;
 }

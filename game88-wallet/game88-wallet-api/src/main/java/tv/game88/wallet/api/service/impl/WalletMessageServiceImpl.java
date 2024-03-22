@@ -165,6 +165,21 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             orderText  = "订单";
             actionText = "经系统确认收款并转币，请前往＂我的" + orderText + "＂查看";
         }
+        case SELLER_CONFIRM_TIMEOUT -> {
+             titleText  = "卖方确认超时";
+            orderText  = "订单";
+            actionText = "卖家没有及时确认您的购买订单，现在已经取消。请执行其他卖出订单中的另一个买入订单。";
+        }
+        case BUYER_CONFIRM_TRANSFER_TIMEOUT -> {
+            titleText  = "买方转移超时";
+            orderText  = "订单";
+            actionText = "买方未按时转账并上传付款凭证。他的订单现在被取消了。请等待另一位买家。";
+        }
+        case SYSTEM_CANCEL_TRANS -> {
+            titleText  = "系统取消交易";
+            orderText  = "订单";
+            actionText = "系统已取消您的交易。您可能上传了伪造或模糊的代金券。有关详细信息，请与管理员联系。";
+        }
         default -> {
             titleText  = "标题";
             orderText  = "订单";

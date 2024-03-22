@@ -1,6 +1,7 @@
 package tv.game88.wallet.api.manager;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,14 +9,13 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.exception.NoMoneyException;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.wallet.api.entity.WalletMerchantFundLog;
+import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserFundLog;
 import tv.game88.wallet.api.mapper.WalletMerchantFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletMerchantMapper;
 import tv.game88.wallet.api.mapper.WalletUserFundLogMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
-
-import jakarta.annotation.Resource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -50,6 +50,8 @@ public class WalletFundManager {
         int updateMoney;
         if ( fundEnum == WalletUserFundEnum.WITHDRAW_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
+        } else if ( fundEnum == WalletUserFundEnum.CANCEL_ORDER_IN  ) {
+            updateMoney = walletUserMapper.addCancelOrderMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
         }
@@ -96,11 +98,20 @@ public class WalletFundManager {
         if ( fundEnum.getType() > 0 || ( !fundEnum.getIsTransaction() && merchantId == null ) ) {
             throw new BusinessException( "逻辑异常" );
         }
-        Long userMoney = walletUserMapper.getUserMoney( userId );
+        WalletUser walletUser   = walletUserMapper.selectById( userId );
+        Long       userMoney    = walletUser.getAmount();
+        Long       frozenAmount = walletUser.getFrozenAmount();
         //扣减金额
         int reducedMoney;
         if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_OUT ) {
             reducedMoney = walletUserMapper.reduceSaleMoney( userId, reduceMoney );
+        } else if ( fundEnum == WalletUserFundEnum.DEPOSIT_OUT ) {
+            if ( reduceMoney > frozenAmount ) {
+                Long needAmount = reduceMoney - frozenAmount;
+                reducedMoney = walletUserMapper.reduceFrozenAndAmount( userId, needAmount, frozenAmount );
+            } else {
+                reducedMoney = walletUserMapper.reduceFrozenMoney( userId, reduceMoney );
+            }
         } else {
             reducedMoney = walletUserMapper.reduceMoney( userId, reduceMoney );
         }
