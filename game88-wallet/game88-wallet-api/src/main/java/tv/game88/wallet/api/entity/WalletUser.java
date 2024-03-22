@@ -175,4 +175,12 @@ public class WalletUser implements Serializable {
         }
         return searchValues;
     }
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String beginTime;
+
+    @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
+    @TableField( exist = false )
+    private String endTime;
 }

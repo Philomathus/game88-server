@@ -116,6 +116,12 @@
                 </foreach>
                 )
             </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND created_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND created_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
         </where>
     </select>
 
