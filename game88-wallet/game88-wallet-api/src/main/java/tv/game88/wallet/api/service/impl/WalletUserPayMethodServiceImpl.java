@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import java.util.*;
  * @createDate 2023-08-21 17:33:52
  */
 @Service
+@Slf4j
 public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMethodMapper, WalletUserPayMethod> implements WalletUserPayMethodService {
     @Resource
     private WalletUserMapper    walletUserMapper;
@@ -65,7 +67,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         if ( walletUser.getFundPassword() == null ) {
             return RspBase.businessError( "必须设置资金密码才能绑定支付方式" );
         }
-
+        
         if( !passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )){
             return RspBase.businessError( "密码不匹配" );
         }
