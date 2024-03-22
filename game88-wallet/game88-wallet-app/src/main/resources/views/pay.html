@@ -453,6 +453,7 @@
                             Android.receiveStatusCode(200);  // Mimic sending a "status code"
                         }
                         window.postMessage({ statusCode: 200 }, '*');
+                        document.getElementById("submitButton").style.display = "none"
                         window.close();
                     }
                     // Sub-case 2: Custom API response code is 401
