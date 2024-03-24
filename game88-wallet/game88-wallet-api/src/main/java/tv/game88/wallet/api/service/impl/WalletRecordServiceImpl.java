@@ -176,6 +176,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             walletRecord.setAmount( reqWithdrawOrder.getAmount() );
             walletRecord.setNotifyUrl( reqWithdrawOrder.getNotifyUrl() );
             walletRecord.setUserId( reqWithdrawOrder.getWalletAddress() );
+            walletRecord.setStatus( 1 );
 
             // 添加会员金额
             WalletUserFundEnum fundEnum = WalletUserFundEnum.WITHDRAW_IN;
@@ -202,8 +203,6 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         Map<String, Object> reqquestMap = JsonUtil.object2Map( obj );
         String              sign        = reqquestMap.remove( "sign" ).toString();
 
-        log.info( "this is requestMap {} ", reqquestMap );
-        log.info( "this is requestMap2 {} ", walletMerchant );
         if ( !sign.equalsIgnoreCase( this.sign( reqquestMap, walletMerchant ) ) ) {
             return RspBase.businessError( "验签失败!" );
         }
@@ -358,6 +357,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         BeanUtils.copyProperties( walletRecord, rspWalletRecord );
         Map<String, Object> reqquestMap = JsonUtil.object2Map( rspWalletRecord );
         rspWalletRecord.setSign( this.sign( reqquestMap, walletMerchant ) );
+        log.error( JsonUtil.object2Json( rspWalletRecord ) );
         return rspWalletRecord;
     }
 

@@ -50,7 +50,7 @@ public class WalletFundManager {
         int updateMoney;
         if ( fundEnum == WalletUserFundEnum.WITHDRAW_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
-        } else if ( fundEnum == WalletUserFundEnum.CANCEL_ORDER_IN  ) {
+        } else if ( fundEnum == WalletUserFundEnum.CANCEL_ORDER_IN ) {
             updateMoney = walletUserMapper.addCancelOrderMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
@@ -110,7 +110,7 @@ public class WalletFundManager {
                 Long needAmount = reduceMoney - frozenAmount;
                 reducedMoney = walletUserMapper.reduceFrozenAndAmount( userId, needAmount, frozenAmount );
             } else {
-                reducedMoney = walletUserMapper.reduceFrozenMoney( userId, reduceMoney );
+                reducedMoney = walletUserMapper.reduceFrozenAndAmount( userId, 0L, reduceMoney );
             }
         } else {
             reducedMoney = walletUserMapper.reduceMoney( userId, reduceMoney );

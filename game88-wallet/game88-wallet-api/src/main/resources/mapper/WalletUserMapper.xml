@@ -186,13 +186,6 @@
           and frozen_amount - #{frozenAmount} >= 0
     </update>
 
-    <update id="reduceFrozenMoney">
-        update wallet_user
-        set frozen_amount = frozen_amount - #{frozenAmount}
-        where id = #{userId}
-          and frozen_amount - #{frozenAmount} >= 0
-    </update>
-
     <select id="findMemberHistoryByMobile" resultType="tv.game88.wallet.api.entity.WalletUser">
         select *
         from wallet_user_history

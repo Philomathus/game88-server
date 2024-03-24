@@ -38,8 +38,6 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     int reduceFrozenAndAmount( @Param( "userId" ) String userId, @Param( "needAmount" ) Long needAmount,
                                @Param( "frozenAmount" ) Long frozenAmount );
 
-    int reduceFrozenMoney( @Param( "userId" ) String userId, @Param( "frozenAmount" ) Long reduceMoney );
-
     PlatformUser selectPlatformUserByUserId( @Param( "userId" ) String userId );
 
     WalletUser findMemberHistoryByMobile( @Param( "mobile" ) String mobile );
