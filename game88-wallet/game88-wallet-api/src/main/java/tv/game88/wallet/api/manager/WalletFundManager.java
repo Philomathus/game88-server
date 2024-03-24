@@ -47,11 +47,16 @@ public class WalletFundManager {
         }
         Long userBalance = walletUserMapper.getUserMoney( userId );
 
+        Long   addMoneyNew = addMoney;
+        String newMark     = "";
+
         int updateMoney;
         if ( fundEnum == WalletUserFundEnum.WITHDRAW_IN ) {
             updateMoney = walletUserMapper.addChargeMoney( userId, addMoney );
-        } else if ( fundEnum == WalletUserFundEnum.CANCEL_ORDER_IN ) {
-            updateMoney = walletUserMapper.addCancelOrderMoney( userId, addMoney );
+        } else if ( fundEnum == WalletUserFundEnum.TRANSACTION_ORDER_IN ) {
+            addMoneyNew = 0L;
+            newMark     = " :: 添加冻结金额: " + addMoney;
+            updateMoney = walletUserMapper.addFrozenMoney( userId, addMoney );
         } else {
             updateMoney = walletUserMapper.addMoney( userId, addMoney );
         }
@@ -65,13 +70,13 @@ public class WalletFundManager {
         }
         userFundLog.setUserId( userId );
         userFundLog.setCreateTime( LocalDateTime.now() );
-        userFundLog.setIncome( addMoney );
+        userFundLog.setIncome( addMoneyNew );
         userFundLog.setPay( 0L );
         userFundLog.setType( fundEnum.getType() );
         userFundLog.setDes( fundEnum.getDes() );
-        userFundLog.setMark( mark );
+        userFundLog.setMark( mark + newMark );
         userFundLog.setTotalBefore( userBalance );
-        userFundLog.setTotal( userBalance + addMoney );
+        userFundLog.setTotal( userBalance + addMoneyNew );
         userFundLog.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( userFundLog );
         if ( updateMoney <= 0 || insertLogMoney <= 0 ) {
@@ -101,6 +106,10 @@ public class WalletFundManager {
         WalletUser walletUser   = walletUserMapper.selectById( userId );
         Long       userMoney    = walletUser.getAmount();
         Long       frozenAmount = walletUser.getFrozenAmount();
+
+        Long   reduceMoneyNew = reduceMoney;
+        String newMark        = "";
+
         //扣减金额
         int reducedMoney;
         if ( fundEnum.getIsTransaction() && fundEnum != WalletUserFundEnum.PERSONAL_TRANSFER_OUT ) {
@@ -108,10 +117,12 @@ public class WalletFundManager {
         } else if ( fundEnum == WalletUserFundEnum.DEPOSIT_OUT ) {
             if ( reduceMoney > frozenAmount ) {
                 Long needAmount = reduceMoney - frozenAmount;
-                reducedMoney = walletUserMapper.reduceFrozenAndAmount( userId, needAmount, frozenAmount );
+                reduceMoneyNew = needAmount;
+                reducedMoney   = walletUserMapper.reduceFrozenAndAmount( userId, needAmount, frozenAmount );
             } else {
                 reducedMoney = walletUserMapper.reduceFrozenAndAmount( userId, 0L, reduceMoney );
             }
+            newMark = " :: 扣除冻结金额: " + frozenAmount;
         } else {
             reducedMoney = walletUserMapper.reduceMoney( userId, reduceMoney );
         }
@@ -128,12 +139,12 @@ public class WalletFundManager {
         userFundLog.setUserId( userId );
         userFundLog.setCreateTime( LocalDateTime.now() );
         userFundLog.setIncome( 0L );
-        userFundLog.setPay( reduceMoney );
+        userFundLog.setPay( reduceMoneyNew );
         userFundLog.setType( fundEnum.getType() );
         userFundLog.setDes( fundEnum.getDes() );
-        userFundLog.setMark( mark );
+        userFundLog.setMark( mark + newMark );
         userFundLog.setTotalBefore( userMoney );
-        userFundLog.setTotal( userMoney - reduceMoney );
+        userFundLog.setTotal( userMoney - reduceMoneyNew );
         userFundLog.setMarkorder( markorder );
         int insertLogMoney = walletUserFundLogMapper.insert( userFundLog );
         if ( insertLogMoney <= 0 ) {

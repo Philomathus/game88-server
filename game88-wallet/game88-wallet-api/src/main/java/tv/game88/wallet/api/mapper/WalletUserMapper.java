@@ -27,7 +27,8 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     Long getUserMoney( @Param( "userId" ) String userId );
 
     int addMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
-    int addCancelOrderMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
+
+    int addFrozenMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
 
     int addChargeMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
 
