@@ -234,7 +234,6 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
 
     @Override
     public RspBase<RspVipPayLogin> qdPayLogin( String memberId ) {
-        // 116是UPay的银行ID
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
                 .eq( "member_id", memberId )
                 .eq( "bank_id", ConstantsPay.QDPAY_BANK_ID )
@@ -256,7 +255,6 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         reqMap.put( "userId", memberId );
         String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
-        reqMap.put( "userId", memberId );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
@@ -271,7 +269,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
             }
             return JsonUtil.json2Map( text );
         } );
-        log.info( "UPay登录信息:{}", JsonUtil.object2Json( resultMap ) );
+        log.info( "QDPay登录信息:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String code = resultMap.getOrDefault( "code", "" ).toString();
             if ( "200".equals( code ) ) {
@@ -308,16 +306,15 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     rspVipPayLogin.setBalance( balance );
                     rspVipPayLogin.setWalletAddress( walletAddress );
                     rspVipPayLogin.setToken( token );
-                    rspVipPayLogin.setUserId( realName );
                     return RspBase.ok( rspVipPayLogin );
                 }
             } else {
                 return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
-        log.error( "UPay登录失败 - 会员:{} - 钱包地址:{} - 结果:{}", memberId, reqMap.get( "walletAddress" ),
+        log.error( "QDPay登录失败 - 会员:{} - 钱包地址:{} - 结果:{}", memberId, reqMap.get( "walletAddress" ),
                 JsonUtil.object2Json( resultMap ) );
-        return RspBase.businessError( "UPay登录失败,请重试" );
+        return RspBase.businessError( "QDPay登录失败,请重试" );
     }
 
     @Override
@@ -330,7 +327,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                 .eq( "bank_id", ConstantsPay.QDPAY_BANK_ID )
                 .one();
         if ( memberCard == null ) {
-            return RspBase.businessError( "未注册vipPay,请登录后重试" );
+            return RspBase.businessError( "未注册QDPay,请登录后重试" );
         }
         String orderId = GenerateOrderCacheUtils.me.getOrderId( "P", 2 );
         // 先保存 MemberRechargeOnline
@@ -379,12 +376,12 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
             if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
                 Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
                 if ( !CollectionUtils.isEmpty( result ) ) {
-                    return RspBase.ok( "请求成功,请前往UPay支付中心确认", result.getOrDefault( "payUrl", "" ).toString() );
+                    return RspBase.ok( "请求成功,请前往QDPay支付中心确认", result.getOrDefault( "payUrl", "" ).toString() );
                 }
             } else {
                 return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
-        return RspBase.businessError( "访问UPay支付中心失败,请重试或者联系客服" );
+        return RspBase.businessError( "访问QDPay支付中心失败,请重试或者联系客服" );
     }
 }

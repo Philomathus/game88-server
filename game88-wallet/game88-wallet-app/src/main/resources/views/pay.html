@@ -435,7 +435,7 @@
 
             // Initialize a new XMLHttpRequest
             const xhr = new XMLHttpRequest();
-            const url = urlObject.protocol + '//' + urlObject.hostname + '/api/common//payDepositOrder';
+            const url = urlObject.protocol + '//' + urlObject.hostname + '/api/common/payDepositOrder';
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
 
@@ -453,6 +453,7 @@
                             Android.receiveStatusCode(200);  // Mimic sending a "status code"
                         }
                         window.postMessage({ statusCode: 200 }, '*');
+                        document.getElementById("submitButton").style.display = "none"
                         window.close();
                     }
                     // Sub-case 2: Custom API response code is 401

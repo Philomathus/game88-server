@@ -52,6 +52,15 @@
                 and amount <![CDATA[ >= ]]> #{minAmount}
                 and amount <![CDATA[ <= ]]> #{maxAmount}
             </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="notifyStatus != null and notifyStatus != ''">
+                AND notify_status = #{notifyStatus}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no = #{orderNo}
+            </if>
         </where>
     </select>
 </mapper>

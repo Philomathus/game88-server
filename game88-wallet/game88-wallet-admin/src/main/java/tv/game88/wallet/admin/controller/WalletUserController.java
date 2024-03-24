@@ -161,4 +161,15 @@ public class WalletUserController extends BaseController {
 
     }
 
+    @Log( title = "修改用户验证状态", businessType = BusinessType.UPDATE )
+    @PutMapping( "/changeAllVerificationStatus" )
+    public RspBase<?> changeAllVerificationStatus( @RequestBody ReqChangeAllStatus reqChangeAllVerificationStatus ) throws Exception {
+        SecurityUtils.verifyMFACode( reqChangeAllVerificationStatus.getGoogleAuthCode() );
+
+        return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
+                .set(WalletUser::getIsVerified, reqChangeAllVerificationStatus.getStatus())
+                .in(WalletUser::getId, reqChangeAllVerificationStatus.getMemberIds())
+        ));
+    }
+
 }

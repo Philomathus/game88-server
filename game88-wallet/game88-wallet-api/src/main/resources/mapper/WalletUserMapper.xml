@@ -3,7 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tv.game88.wallet.api.mapper.WalletUserMapper">
-
     <resultMap id="WalletUserResult" type="tv.game88.wallet.api.entity.WalletUser">
         <id property="id" column="id" jdbcType="VARCHAR" />
         <id property="platformId" column="platform_id" jdbcType="VARCHAR" />
@@ -48,8 +47,8 @@
                password,
                secret_key,
                phone,
-               amount,
                frozen_amount,
+               amount,
                fund_password,
                is_verified,
                verified_time,
@@ -79,14 +78,30 @@
             resultMap="WalletUserResult">
         <include refid="selectWalletUserVo" />
         <where>
-            <if test="phone != null  and phone != ''">and phone = #{phone}</if>
-            <if test="nickName != null  and nickName != ''">and nick_name like concat('%', #{nickName}, '%')</if>
-            <if test="realName != null  and realName != ''">and real_name like concat('%', #{realName}, '%')</if>
-            <if test="idNumber != null  and idNumber != ''">and id_number = #{idNumber}</if>
-            <if test="status != null ">and status = #{status}</if>
-            <if test="loginIp != null  and loginIp != ''">and login_ip = #{loginIp}</if>
-            <if test="deviceId != null  and deviceId != ''">and device_id = #{deviceId}</if>
-            <if test="loginDevice != null ">and login_device = #{loginDevice}</if>
+            <if test="phone != null  and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="nickName != null  and nickName != ''">
+                and nick_name like concat('%', #{nickName}, '%')
+            </if>
+            <if test="realName != null  and realName != ''">
+                and real_name like concat('%', #{realName}, '%')
+            </if>
+            <if test="idNumber != null  and idNumber != ''">
+                and id_number = #{idNumber}
+            </if>
+            <if test="status != null ">
+                and status = #{status}
+            </if>
+            <if test="loginIp != null  and loginIp != ''">
+                and login_ip = #{loginIp}
+            </if>
+            <if test="deviceId != null  and deviceId != ''">
+                and device_id = #{deviceId}
+            </if>
+            <if test="loginDevice != null ">
+                and login_device = #{loginDevice}
+            </if>
             <if test="searchValues != null and searchValues.size() != 0">
                 and (id in
                 <foreach item="value" collection="searchValues" open="(" separator="," close=")">
@@ -103,6 +118,15 @@
                 </foreach>
                 )
             </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND created_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND created_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="isVerified != null">
+                and is_verified = #{isVerified}
+            </if>
         </where>
     </select>
 
@@ -118,6 +142,13 @@
         where id = #{userId}
     </select>
 
+    <insert id="addCancelOrderMoney">
+        update wallet_user
+        set amount = amount + #{money},
+            frozen_amount = frozen_amount + #{money}
+        where id = #{userId}
+    </insert>
+
     <update id="addMoney">
         update wallet_user
         set amount = amount + #{money},
@@ -128,10 +159,10 @@
     <update id="reduceMoney">
         update wallet_user
         set amount = amount - #{money},
-<!--  this is tmp list -->
-            frozen_amount = frozen_amount - #{money}
+        <!--  this is tmp list -->
+        frozen_amount = frozen_amount - #{money}
         where id = #{userId}
-          and amount - #{money} >= 0
+        and amount - #{money} >= 0
     </update>
 
     <update id="addChargeMoney">
@@ -150,11 +181,26 @@
           and amount - #{money} >= 0
     </update>
 
+    <update id="reduceFrozenAndAmount">
+        update wallet_user
+        set amount        = amount - #{needAmount},
+            frozen_amount = frozen_amount - #{frozenAmount}
+        where id = #{userId}
+          and amount - #{needAmount} >= 0
+          and frozen_amount - #{frozenAmount} >= 0
+    </update>
+
+    <update id="reduceFrozenMoney">
+        update wallet_user
+        set frozen_amount = frozen_amount - #{frozenAmount}
+        where id = #{userId}
+          and frozen_amount - #{frozenAmount} >= 0
+    </update>
+
     <select id="findMemberHistoryByMobile" resultType="tv.game88.wallet.api.entity.WalletUser">
         select *
         from wallet_user_history
-        where phone = #{mobile}
-        limit 1
+        where phone = #{mobile} limit 1
     </select>
 
     <delete id="deleteByHistoryKey">
@@ -176,8 +222,8 @@
 
     <update id="addBuyerTransactionSuccess">
         update wallet_user
-        set buy_order_num  = buy_order_num + 1,
-            total_buy = total_buy + #{money}
+        set buy_order_num = buy_order_num + 1,
+            total_buy     = total_buy + #{money}
         where id = #{id}
     </update>
 
@@ -214,5 +260,4 @@
             trading_amount = trading_amount - #{money}
         where id = #{id}
     </update>
-
 </mapper>
