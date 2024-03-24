@@ -15,7 +15,7 @@ public class RspWalletRecord {
     /**
      * 商户ID
      */
-    private String merchantId;
+    private Long merchantId;
 
     /**
      * 交易数量
