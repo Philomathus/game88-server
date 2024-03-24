@@ -263,7 +263,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
+        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
+                reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -280,7 +281,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     walletUser = this.newWalletUserReg( new MobileLogin() );
                     walletUser.setPhone( reqEmbeddedLogin.getPhone() );
                     walletUser.setPlatformId( reqEmbeddedLogin.getUserId() );
-                    log.info( "this is details id and userid {} , {}" , reqEmbeddedLogin.getPhone(),
+                    log.info( "this is details id and userid {} , {}", reqEmbeddedLogin.getPhone(),
                             reqEmbeddedLogin.getUserId() );
 
                     this.baseMapper.insert( walletUser );
@@ -343,8 +344,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         WalletUser walletUser = this.baseMapper.selectById( userId );
         RspMember  rspMember  = new RspMember();
         rspMember.setCreditRating( 5 );
-        rspMember.setAmount( new BigDecimal( walletUser.getAmount() ) );
-        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() -  walletUser.getFrozenAmount() ) );
+        rspMember.setAmount( new BigDecimal( walletUser.getAmount() + walletUser.getFrozenAmount() ) );
+        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
 
         rspMember.setHasPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
@@ -488,7 +489,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
-        if( StringUtils.isBlank( reqVerifyIdCard.getRealName()) ) {
+        if ( StringUtils.isBlank( reqVerifyIdCard.getRealName() ) ) {
             return RspBase.businessError( "需要实名" );
         }
         if ( walletUser.getStatus() != 1 ) {
@@ -560,33 +561,33 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     }
 
     @Override
-    public void addBuyerTransactionSuccess( String id ,Long money ) {
-         walletUserMapper.addBuyerTransactionSuccess( id , money );
+    public void addBuyerTransactionSuccess( String id, Long money ) {
+        walletUserMapper.addBuyerTransactionSuccess( id, money );
     }
 
     @Override
-    public void addSellerTransactionSuccess( String id , Long money ) {
-        walletUserMapper.addSellerTransactionSuccess( id , money );
+    public void addSellerTransactionSuccess( String id, Long money ) {
+        walletUserMapper.addSellerTransactionSuccess( id, money );
     }
 
     @Override
-    public void addSellerTotalSellingAmount( String id ,Long amount ) {
-        walletUserMapper.addSellerTotalSellingAmount( id , amount );
+    public void addSellerTotalSellingAmount( String id, Long amount ) {
+        walletUserMapper.addSellerTotalSellingAmount( id, amount );
     }
 
     @Override
-    public void addSellerOngoingSellingAmount( String id ,Long amount) {
-        walletUserMapper.addSellerOngoingSellingAmount( id , amount );
+    public void addSellerOngoingSellingAmount( String id, Long amount ) {
+        walletUserMapper.addSellerOngoingSellingAmount( id, amount );
     }
 
     @Override
-    public void addSellerInitCancelSell( String id ,Long amount) {
-        walletUserMapper.addSellerInitCancelSell( id , amount );
+    public void addSellerInitCancelSell( String id, Long amount ) {
+        walletUserMapper.addSellerInitCancelSell( id, amount );
     }
 
     @Override
-    public void addSellerCancelSellingAmount( String id ,Long amount) {
-        walletUserMapper.addSellerCancelSellingAmount( id , amount );
+    public void addSellerCancelSellingAmount( String id, Long amount ) {
+        walletUserMapper.addSellerCancelSellingAmount( id, amount );
     }
 }
 
