@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import tv.game88.common.constant.HttpStatus;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.GoogleAuthUtil;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RSACoder;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.admin.constant.KeyConstants;
@@ -57,7 +58,9 @@ public class SecurityUtils {
      * 获取Authentication
      */
     public static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.warn( JsonUtil.object2Json( authentication ) );
+        return authentication;
     }
 
     /**
