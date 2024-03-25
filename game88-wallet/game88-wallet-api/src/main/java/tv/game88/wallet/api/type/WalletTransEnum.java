@@ -32,6 +32,8 @@ public enum WalletTransEnum {
     // 计时器到期时的状态，等待卖方确认
     SELLER_CONFIRM_TIMEOUT,
 
+    SELLER_CONFIRM_TRANSFER_TIMEOUT,
+
     //计时器到期时的状态，等待买方转账
     BUYER_CONFIRM_TRANSFER_TIMEOUT,
     ;
