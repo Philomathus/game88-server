@@ -705,7 +705,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.BUYER_CONFIRM_TRANSFER ) {
             return;
         }
-        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TIMEOUT;
+        WalletTransEnum walletTransEnum = WalletTransEnum.SELLER_CONFIRM_TRANSFER_TIMEOUT;
         // 修改订单状态并给买家加币
         WalletTransactionDetail update = new WalletTransactionDetail();
         update.setStatus( walletTransEnum );
