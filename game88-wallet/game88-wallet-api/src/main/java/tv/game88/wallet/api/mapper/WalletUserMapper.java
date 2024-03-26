@@ -27,7 +27,8 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
     Long getUserMoney( @Param( "userId" ) String userId );
 
     int addMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
-    int addCancelOrderMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
+
+    int addFrozenMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
 
     int addChargeMoney( @Param( "userId" ) String userId, @Param( "money" ) Long addMoney );
 
@@ -37,8 +38,6 @@ public interface WalletUserMapper extends BaseMapper<WalletUser> {
 
     int reduceFrozenAndAmount( @Param( "userId" ) String userId, @Param( "needAmount" ) Long needAmount,
                                @Param( "frozenAmount" ) Long frozenAmount );
-
-    int reduceFrozenMoney( @Param( "userId" ) String userId, @Param( "frozenAmount" ) Long reduceMoney );
 
     PlatformUser selectPlatformUserByUserId( @Param( "userId" ) String userId );
 
