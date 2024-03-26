@@ -68,6 +68,9 @@
             <if test="endTime != null and endTime != ''">
                 AND create_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
+            <if test="des != null and des != ''">
+                AND des = #{des}
+            </if>
         </where>
         order by create_time desc
     </select>
