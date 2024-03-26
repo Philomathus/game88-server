@@ -170,6 +170,11 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
             orderText  = "订单";
             actionText = "卖家没有及时确认您的购买订单，现在已经取消。请执行其他卖出订单中的另一个买入订单。";
         }
+        case SELLER_CONFIRM_TRANSFER_TIMEOUT -> {
+             titleText  = "卖家确认转账超时";
+            orderText  = "订单";
+            actionText = "卖方没有及时确认您的转账。这可能是由于他的网络连接造成的，或者他仍在验证其有效性。如需更多信息，请联系管理员";
+        }
         case BUYER_CONFIRM_TRANSFER_TIMEOUT -> {
             titleText  = "买方转移超时";
             orderText  = "订单";

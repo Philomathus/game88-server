@@ -29,6 +29,7 @@ import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.api.vo.PlatformUser;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,17 +61,25 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqDepositOrder.getMerchantId() );
-        RspBase rspBase = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress(),
-                reqDepositOrder.getOrderNo() );
+        RspBase        rspBase        = this.validated( reqDepositOrder, walletMerchant, reqDepositOrder.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
+        }
+        if ( StringUtils.isNotBlank( reqDepositOrder.getOrderNo() ) ) {
+            QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>()
+                    .eq( "merchant_id", walletMerchant.getId() )
+                    .eq( "order_no", reqDepositOrder.getOrderNo() );
+            if ( this.baseMapper.exists( queryWrapper ) ) {
+                return RspBase.businessError( "订单号" + reqDepositOrder.getOrderNo() + "重复" );
+            }
         }
 
         // 先保存订单,等待会员主动请求支付并扣除会员金额, 再异步处理订单回调
         SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqDepositOrder, walletMerchant, 1 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
-                .eq( "merchant_id", reqDepositOrder.getMerchantId() ).eq( "order_no", reqDepositOrder.getOrderNo() ) );
+                .eq( "merchant_id", reqDepositOrder.getMerchantId() )
+                .eq( "order_no", reqDepositOrder.getOrderNo() ) );
         RspWalletRecordPay rspWalletRecord = new RspWalletRecordPay();
         BeanUtils.copyProperties( walletRecord, rspWalletRecord );
 
@@ -93,10 +102,17 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
-        RspBase rspBase = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress(),
-                reqWithdrawOrder.getOrderNo() );
+        RspBase        rspBase        = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
+        }
+        if ( StringUtils.isNotBlank( reqWithdrawOrder.getOrderNo() ) ) {
+            QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>()
+                    .eq( "merchant_id", walletMerchant.getId() )
+                    .eq( "order_no", reqWithdrawOrder.getOrderNo() );
+            if ( this.baseMapper.exists( queryWrapper ) ) {
+                return RspBase.businessError( "订单号" + reqWithdrawOrder.getOrderNo() + "重复" );
+            }
         }
         if ( walletMerchant.getAmount().compareTo( new BigDecimal( reqWithdrawOrder.getAmount() ) ) < 0 ) {
             return RspBase.businessError( "商户余额不足:" + walletMerchant.getAmount() );
@@ -106,7 +122,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqWithdrawOrder, walletMerchant, 2 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
-                .eq( "merchant_id", reqWithdrawOrder.getMerchantId() ).eq( "order_no", reqWithdrawOrder.getOrderNo() ) );
+                .eq( "merchant_id", reqWithdrawOrder.getMerchantId() )
+                .eq( "order_no", reqWithdrawOrder.getOrderNo() ) );
         RspWalletRecord rspWalletRecord = new RspWalletRecord();
         BeanUtils.copyProperties( walletRecord, rspWalletRecord );
 
@@ -118,12 +135,13 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     @Override
     public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqOrderQuery.getMerchantId() );
-        RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null, reqOrderQuery.getOrderNo() );
+        RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null );
         if ( rspBase != null ) {
             return rspBase;
         }
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
-                .eq( "merchant_id", reqOrderQuery.getMerchantId() ).eq( "order_no", reqOrderQuery.getOrderNo() ) );
+                .eq( "merchant_id", reqOrderQuery.getMerchantId() )
+                .eq( "order_no", reqOrderQuery.getOrderNo() ) );
         if ( walletRecord == null ) {
             return RspBase.businessError( "订单号" + reqOrderQuery.getOrderNo() + "不存在" );
         }
@@ -158,6 +176,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
             walletRecord.setAmount( reqWithdrawOrder.getAmount() );
             walletRecord.setNotifyUrl( reqWithdrawOrder.getNotifyUrl() );
             walletRecord.setUserId( reqWithdrawOrder.getWalletAddress() );
+            walletRecord.setStatus( 1 );
 
             // 添加会员金额
             WalletUserFundEnum fundEnum = WalletUserFundEnum.WITHDRAW_IN;
@@ -174,7 +193,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Override
-    public RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress, String orderNo ) {
+    public RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress ) {
         if ( walletMerchant == null ) {
             return RspBase.businessError( "商户不存在" );
         }
@@ -184,19 +203,10 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         Map<String, Object> reqquestMap = JsonUtil.object2Map( obj );
         String              sign        = reqquestMap.remove( "sign" ).toString();
 
-        log.info( "this is requestMap {} " ,reqquestMap );
-        log.info( "this is requestMap2 {} " ,walletMerchant );
         if ( !sign.equalsIgnoreCase( this.sign( reqquestMap, walletMerchant ) ) ) {
             return RspBase.businessError( "验签失败!" );
         }
 
-        if ( StringUtils.isNotBlank( orderNo ) ) {
-            QueryWrapper<WalletRecord> queryWrapper = new QueryWrapper<WalletRecord>().eq( "merchant_id", walletMerchant.getId() )
-                                                                                      .eq( "order_no", orderNo );
-            if ( this.baseMapper.exists( queryWrapper ) ) {
-                return RspBase.businessError( "订单号" + orderNo + "重复" );
-            }
-        }
         if ( StringUtils.isNotBlank( walletAddress ) ) {
             PlatformUser platformUser = walletUserMapper.selectPlatformUserByUserId( walletAddress );
             if ( platformUser == null ) {
@@ -230,8 +240,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         String orderNo       = resultMap.getOrDefault( "order_no", "" ).toString();
         String walletAddress = resultMap.getOrDefault( "walletAddress", "" ).toString();
 
-        WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>().eq( "merchant_id", merchantId )
-                                                                                               .eq( "order_no", orderNo ) );
+        WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
+                .eq( "merchant_id", merchantId )
+                .eq( "order_no", orderNo ) );
         if ( walletRecord == null ) {
             throw new BusinessException( "订单不存在" );
         }
@@ -270,8 +281,9 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         String              orderNo       = resultMap.getOrDefault( "order_no", "" ).toString();
         String              walletAddress = resultMap.getOrDefault( "walletAddress", "" ).toString();
 
-        WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>().eq( "merchant_id", merchantId )
-                                                                                               .eq( "order_no", orderNo ) );
+        WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
+                .eq( "merchant_id", merchantId )
+                .eq( "order_no", orderNo ) );
         if ( walletRecord == null ) {
             return RspBase.businessError( "订单不存在" );
         }
@@ -345,6 +357,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         BeanUtils.copyProperties( walletRecord, rspWalletRecord );
         Map<String, Object> reqquestMap = JsonUtil.object2Map( rspWalletRecord );
         rspWalletRecord.setSign( this.sign( reqquestMap, walletMerchant ) );
+        log.error( JsonUtil.object2Json( rspWalletRecord ) );
         return rspWalletRecord;
     }
 

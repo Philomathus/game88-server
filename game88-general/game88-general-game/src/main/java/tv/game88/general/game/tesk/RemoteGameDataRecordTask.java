@@ -50,7 +50,7 @@ public class RemoteGameDataRecordTask {
         GameRecordFixVersion gameRecordFixVersion = new GameRecordFixVersion();
         gameRecordFixVersion.setPlatformId( 49L );
         gameRecordFixVersion.setVersionValue(
-                LocalDateTimeUtils.localDateToTimestamp( LocalDateTime.now().minusHours( 6 ) ) + "" );
+                LocalDateTimeUtils.localDateToTimestamp( LocalDateTime.now().minusHours( 8 ) ) + "" );
         gameRecordFixVersionMapper.insert( gameRecordFixVersion );
     }
 
