@@ -42,7 +42,7 @@ public class WalletUserController extends BaseController {
     /**
      * 查询钱包用户列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
+   // @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
     @GetMapping( "/list" )
     public RspBase<List<WalletUser>> list( WalletUser walletUser ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
@@ -70,6 +70,7 @@ public class WalletUserController extends BaseController {
     public RspBase<WalletUser> getInfo( @PathVariable( "id" ) String id ) {
         return RspBase.ok( walletUserService.getById( id ) );
     }
+
 
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus/{memberId}" )

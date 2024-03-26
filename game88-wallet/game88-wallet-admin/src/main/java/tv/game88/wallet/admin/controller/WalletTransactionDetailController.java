@@ -6,7 +6,11 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.enums.BusinessType;
+import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 import tv.game88.wallet.api.service.WalletTransactionDetailService;
 import tv.game88.wallet.api.type.WalletTransEnum;
@@ -34,14 +38,18 @@ public class WalletTransactionDetailController extends BaseController {
         return walletTransactionRsp;
     }
 
-    @PutMapping( "/confirmTransaction/{transDetailId}" )
-    public RspBase<?> confirmTransaction( @PathVariable String transDetailId ) {
-        return walletTransactionDetailService.confirmTransaction( transDetailId );
+    @PutMapping( "/confirmTransaction" )
+    @Log( title = "confirmTransaction", businessType = BusinessType.UPDATE )
+    public RspBase<?> confirmTransaction( @RequestBody ReqConstant.ReqProcessTransDetail reqProcessTransDetail )  throws Exception {
+        SecurityUtils.verifyMFACode( reqProcessTransDetail.googleAuthCode() );
+        return walletTransactionDetailService.systemConfirmTransaction( reqProcessTransDetail );
     }
 
-    @PutMapping( "/systemCancelTrans/{transDetailId}/{userId}" )
-    public RspBase<?> cancelTransactionBySystem( @PathVariable String transDetailId, @PathVariable String userId ) {
-        return walletTransactionDetailService.systemCancelTrans( userId, transDetailId );
+    @PutMapping( "/systemCancelTrans" )
+    @Log( title = "confirmTransaction", businessType = BusinessType.UPDATE )
+    public RspBase<?> cancelTransactionBySystem( @RequestBody ReqConstant.ReqProcessTransDetail reqProcessTransDetail )  throws Exception {
+        SecurityUtils.verifyMFACode( reqProcessTransDetail.googleAuthCode() );
+        return walletTransactionDetailService.systemCancelTrans( reqProcessTransDetail );
     }
 
     @GetMapping( "/confirmTransaction/transactionDetailStatusList" )
