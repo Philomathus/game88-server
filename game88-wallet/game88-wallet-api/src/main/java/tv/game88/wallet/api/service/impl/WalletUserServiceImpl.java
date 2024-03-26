@@ -312,7 +312,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
         resultMap.put( "walletAddress", walletUser.getId() );
         resultMap.put( "realName", walletUser.getRealName() );
-        resultMap.put( "balance", walletUser.getAmount() );
+        resultMap.put( "balance", walletUser.getAmount() + walletUser.getFrozenAmount() );
         return RspBase.ok( "成功", resultMap );
     }
 
