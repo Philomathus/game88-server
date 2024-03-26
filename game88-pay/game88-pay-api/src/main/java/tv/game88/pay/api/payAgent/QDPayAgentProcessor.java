@@ -101,19 +101,19 @@ public class QDPayAgentProcessor extends AbstractPayAgent {
             return "fail";
         }
         String sign      = requestMap.remove( "sign" ).toString();
-        String depositNo = requestMap.getOrDefault( "withdrawNo", "" ).toString();
+        String orderNo = requestMap.getOrDefault( "orderNo", "" ).toString();
         String status    = requestMap.getOrDefault( "status", "" ).toString();
 
-        MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( depositNo );
+        MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( orderNo );
         if ( withdrawDetail == null ) {
-            log.error( "提现相关记录丢失 - merOrderNo:{}", depositNo );
+            log.error( "提现相关记录丢失 - merOrderNo:{}", orderNo );
             return "fail";
         }
         if ( withdrawDetail.getStatus() == 6 ) {
-            log.error( "已有代付记录 - merOrderNo:{}", depositNo );
+            log.error( "已有代付记录 - merOrderNo:{}", orderNo );
             return "success";
         }
-        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( depositNo );
+        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( orderNo );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         // 去除空值
@@ -125,7 +125,7 @@ public class QDPayAgentProcessor extends AbstractPayAgent {
         String mySign  = DigestUtils.md5Hex( signStr ).toUpperCase();
         if ( mySign.equalsIgnoreCase( sign ) ) {
             boolean isSuccess = "1".equals( status );
-            payAgentService.processOrderPay( withdrawDetail, payAgentLog, depositNo, payAgentChannel, isSuccess );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, orderNo, payAgentChannel, isSuccess );
             return "success";
         }
         return "fail";

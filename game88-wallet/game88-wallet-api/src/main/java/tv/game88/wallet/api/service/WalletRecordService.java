@@ -22,7 +22,7 @@ public interface WalletRecordService extends IService<WalletRecord> {
 
     RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery );
 
-    RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress, String orderNo );
+    RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress );
 
     ModelAndView toDepositOrder( String s, long t ) throws Exception;
 

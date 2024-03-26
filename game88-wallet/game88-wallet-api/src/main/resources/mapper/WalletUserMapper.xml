@@ -140,26 +140,23 @@
         where id = #{userId}
     </select>
 
-    <insert id="addCancelOrderMoney">
+    <insert id="addFrozenMoney">
         update wallet_user
-        set amount = amount + #{money}
+        set frozen_amount = frozen_amount + #{money}
         where id = #{userId}
     </insert>
 
     <update id="addMoney">
         update wallet_user
-        set amount = amount + #{money},
-            frozen_amount = frozen_amount + #{money}
+        set amount = amount + #{money}
         where id = #{userId}
     </update>
 
     <update id="reduceMoney">
         update wallet_user
-        set amount = amount - #{money},
-        <!--  this is tmp list -->
-        frozen_amount = frozen_amount - #{money}
+        set amount = amount - #{money}
         where id = #{userId}
-        and amount - #{money} >= 0
+          and amount - #{money} >= 0
     </update>
 
     <update id="addChargeMoney">
@@ -183,13 +180,6 @@
             frozen_amount = frozen_amount - #{frozenAmount}
         where id = #{userId}
           and amount - #{needAmount} >= 0
-          and frozen_amount - #{frozenAmount} >= 0
-    </update>
-
-    <update id="reduceFrozenMoney">
-        update wallet_user
-        set frozen_amount = frozen_amount - #{frozenAmount}
-        where id = #{userId}
           and frozen_amount - #{frozenAmount} >= 0
     </update>
 
