@@ -31,15 +31,29 @@
     </sql>
     <select id="selectWalletUserPayMethod" parameterType="tv.game88.wallet.api.entity.WalletUserPayMethod"
             resultMap="WalletUserPayMethodResult">
-        <include refid="selectWalletUserPayMethodVo" />
+        select
+            wupm.method_id,
+            wupm.method_type,
+            wupm.user_id,
+            wupm.real_name,
+            wupm.bank_account,
+            wupm.bank_id,
+            wupm.pay_addr_province,
+            wupm.pay_pic_addr,
+            wupm.pay_addr_city,
+            wupm.audit_status,
+            wupm.create_time,
+            cbl.bank_name
+        from wallet_user_pay_method wupm
+        inner join config_bank_list cbl on cbl.id = wupm.bank_id
         <where>
-            <if test="methodId != null  and methodId != ''"> and method_id = #{methodId}</if>
-            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
-            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="methodType != null  and methodType.name() != ''"> and method_type = #{methodType}</if>
-            <if test="auditStatus != null"> and audit_status = #{auditStatus}</if>
+            <if test="methodId != null  and methodId != ''"> and wupm.method_id = #{methodId}</if>
+            <if test="realName != null  and realName != ''"> and wupm.real_name like concat('%', #{realName}, '%')</if>
+            <if test="userId != null  and userId != ''"> and wupm.user_id = #{userId}</if>
+            <if test="methodType != null  and methodType.name() != ''"> and wupm.method_type = #{methodType}</if>
+            <if test="auditStatus != null"> and wupm.audit_status = #{auditStatus}</if>
         </where>
-        order by create_time desc
+        order by wupm.create_time desc
     </select>
     <select id="selectMemberCard" resultType="tv.game88.wallet.api.entity.WalletUserPayMethod">
         <include refid="selectWalletUserPayMethodVo" />
