@@ -3,7 +3,6 @@ package tv.game88.wallet.api.constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
 import java.math.BigDecimal;
 
@@ -35,4 +34,6 @@ public class ReqConstant {
             @Schema( title = "商户号", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "商户ID不能为空" ) Long merchantId,
             @Schema( title = "MFA验证码", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "MFA验证码不能为空" ) Integer otpAuthCode,
             @Schema( title = "状态", requiredMode = Schema.RequiredMode.REQUIRED ) @NotNull( message = "状态不能为空" ) Integer status) {}
+
+    public record ReqProcessTransDetail(Integer googleAuthCode, String userId, String transDetailId, String remarks) {}
 }

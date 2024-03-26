@@ -18,6 +18,7 @@ import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.wallet.api.constants.ConstantsWallet;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
@@ -731,14 +732,17 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Override
-    public RspBase<?> confirmTransaction( String transDetailId ) {
+    public RspBase<?> systemConfirmTransaction( ReqConstant.ReqProcessTransDetail reqProcessTransDetail ) {
+
+        String transDetailId = reqProcessTransDetail.transDetailId();
+        String remarks = reqProcessTransDetail.remarks();
 
         WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
         if ( walletTransactionDetail == null ) {
-            return RspBase.businessError( "Transaction does not exist" );
+            return RspBase.businessError( "交易订单不存在" );
         }
         if ( walletTransactionDetail.getStatus() != WalletTransEnum.SELLER_NOT_RECEIVED ) {
-            return RspBase.businessError( "Transaction does not exist" );
+            return RspBase.businessError( "买单状态有误,无法确认交易,请刷新订单后重试" );
         }
         WalletTransEnum walletTransEnum = WalletTransEnum.SYSTEM_CONFIRM_TRANSFER;
         // 修改订单状态并给买家加币
@@ -748,7 +752,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         LocalDateTime now = LocalDateTime.now();
         update.setSuccessTransTime( now );
         update.setTime( now );
-        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "长时间不操作，系统确认会锁定交易，客服会处理:"
+        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "系统将确认交易原因:" + remarks + " ,时间:"
                 + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
@@ -764,9 +768,12 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
     }
 
     @Override
-    public RspBase<?> systemCancelTrans( String userId, String transDetailId ) {
+    public RspBase<?> systemCancelTrans( ReqConstant.ReqProcessTransDetail reqProcessTransDetail ) {
+        String userId = reqProcessTransDetail.userId();
+        String transDetailId = reqProcessTransDetail.transDetailId();
+        String remarks = reqProcessTransDetail.remarks();
 
-        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( transDetailId );
+        WalletTransactionDetail walletTransactionDetail = this.baseMapper.selectById( reqProcessTransDetail.transDetailId() );
         if ( walletTransactionDetail == null ) {
             return RspBase.businessError( "交易订单不存在" );
         }
@@ -783,7 +790,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         LocalDateTime now = LocalDateTime.now();
         update.setCancelTime( now );
         update.setTime( now );
-        String remark = "\n卖家" + userId + "取消交易,时间:" + LocalDateTimeUtils.format( now );
+        String remark = "\n卖家" + walletTransactionDetail.getSellerId() + "系统会取消交易，原因::" + remarks + " ,时间:"
+                + LocalDateTimeUtils.format( now );
         update.setRemark( walletTransactionDetail.getRemark().concat( remark ) );
 
         SpringUtils.getAopProxy( this ).updateTransDetailOrRollbackTrans( update, walletTransactionDetail );
@@ -794,7 +802,6 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         walletMessageService.saveWalletMessage( walletTransactionDetail, false );
 
         return RspBase.ok( "确认取消交易成功", transDetailId );
-
     }
 }
 
