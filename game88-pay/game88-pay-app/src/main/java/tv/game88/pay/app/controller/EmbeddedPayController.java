@@ -36,13 +36,13 @@ public class EmbeddedPayController extends BaseController {
     }
 
     @Operation( summary = "QDPay登录注册" )
-    @PostMapping( value = { "/qdPayLogin", "/uPayLogin" } )
+    @PostMapping( value = { "/qdPayLogin" } )
     public RspBase<RspVipPayLogin> qdPayLogin() {
         return embeddedPayService.qdPayLogin( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "QDPay扣款并充值平台" )
-    @PostMapping( value = { "qdPayDeposit", "/uPayDeposit" } )
+    @PostMapping( value = { "qdPayDeposit" } )
     public RspBase<?> qdPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
         return embeddedPayService.qdPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
