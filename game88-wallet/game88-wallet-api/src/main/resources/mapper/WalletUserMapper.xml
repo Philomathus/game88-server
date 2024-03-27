@@ -142,8 +142,7 @@
 
     <insert id="addFrozenMoney">
         update wallet_user
-        set amount = amount + #{money},
-            frozen_amount = frozen_amount + #{money}
+        set frozen_amount = frozen_amount + #{money}
         where id = #{userId}
     </insert>
 
