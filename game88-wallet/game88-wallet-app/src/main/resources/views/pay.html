@@ -307,18 +307,8 @@
     const requestBody = {};
     const errorText = "${error}";
 
-    // Get the element with class "amount"
-    const amountElement = document.querySelector(".amount");
-
-    // Check if the element exists (optional)
-    if (amountElement) {
-        // Get the text content
-        const textContent = amountElement.textContent;
-        if (textContent == errorText) {
-            showModal(errorText, true);
-        }
-    } else {
-        console.log("Element with class 'amount' not found.");
+    if (errorText) {
+        showModal(errorText, true);
     }
 
     // Get the current URL and create a URL object
