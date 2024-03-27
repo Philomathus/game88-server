@@ -266,7 +266,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
         Map<String, Object> model = Maps.newHashMap();
         model.put( "orderNo", orderNo );
-        model.put( "userMoney", walletUser.getAmount() );
+        model.put( "userMoney", walletUser.getAmount() + walletUser.getFrozenAmount() );
         model.put( "orderMoney", walletRecord.getAmount() );
         return new ModelAndView( "pay", model );
     }
