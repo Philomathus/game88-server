@@ -308,7 +308,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( rspBase != null ) {
             return rspBase;
         }
-        if ( walletUser.getAmount().compareTo( walletRecord.getAmount() ) < 0 ) {
+        if ( ( walletUser.getAmount() + walletUser.getFrozenAmount() ) < walletRecord.getAmount() ) {
             return RspBase.businessError( "用户余额不足" );
         }
         // 修改用户支付订单状态并扣除会员金额,然后异步通知支付回调
