@@ -116,5 +116,5 @@ spring:
           password: dRmBstReqberz!14Xm#
   data:
     redis:
-      host: zongdainew-zczoyz.serverless.ape1.cache.amazonaws.com
+      host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
       port: 6379
