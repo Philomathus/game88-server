@@ -53,10 +53,10 @@ public class RspMember {
         return phone;
     }
 
-    public String getRealName() {
-        if ( StringUtils.isNotBlank( realName ) ) {
-            return phone.charAt( 0 ) + "**";
-        }
-        return realName;
-    }
+//    public String getRealName() {
+//        if ( StringUtils.isNotBlank( realName ) ) {
+//            return phone.charAt( 0 ) + "**";
+//        }
+//        return realName;
+//    }
 }
