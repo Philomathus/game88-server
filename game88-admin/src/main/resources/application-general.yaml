@@ -7,3 +7,5 @@ spring:
     redis:
       host: zongdainew-zczoyz.serverless.ape1.cache.amazonaws.com
       port: 6379
+      ssl:
+        enabled: true

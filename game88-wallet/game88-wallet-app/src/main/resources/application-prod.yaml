@@ -8,3 +8,5 @@ spring:
       host: zongdainew-zczoyz.serverless.ape1.cache.amazonaws.com
       port: 6379
       database: 1
+      ssl:
+        enabled: true
