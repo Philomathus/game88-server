@@ -32,18 +32,18 @@
     <select id="selectWalletUserPayMethod" parameterType="tv.game88.wallet.api.entity.WalletUserPayMethod"
             resultMap="WalletUserPayMethodResult">
         select
-        wupm.method_id,
-        wupm.method_type,
-        wupm.user_id,
-        wupm.real_name,
-        wupm.bank_account,
-        wupm.bank_id,
-        wupm.pay_addr_province,
-        wupm.pay_pic_addr,
-        wupm.pay_addr_city,
-        wupm.audit_status,
-        wupm.create_time,
-        cbl.bank_name
+            wupm.method_id,
+            wupm.method_type,
+            wupm.user_id,
+            wupm.real_name,
+            wupm.bank_account,
+            wupm.bank_id,
+            wupm.pay_addr_province,
+            wupm.pay_pic_addr,
+            wupm.pay_addr_city,
+            wupm.audit_status,
+            wupm.create_time,
+            cbl.bank_name
         from wallet_user_pay_method wupm
         inner join config_bank_list cbl on cbl.id = wupm.bank_id
         <where>
