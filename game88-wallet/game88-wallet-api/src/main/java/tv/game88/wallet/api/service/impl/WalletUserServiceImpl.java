@@ -346,11 +346,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         WalletUser walletUser = this.baseMapper.selectById( userId );
         RspMember  rspMember  = new RspMember();
         rspMember.setCreditRating( 5 );
-//        rspMember.setAmount( new BigDecimal( walletUser.getAmount() + walletUser.getFrozenAmount() ) );
-//        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() ) );
-//tmp test
-        rspMember.setAmount( new BigDecimal( walletUser.getAmount()  ) );
-        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() - walletUser.getFrozenAmount() ) );
+        rspMember.setAmount( new BigDecimal( walletUser.getAmount() + walletUser.getFrozenAmount() ) );
+        rspMember.setSellAbleAmount( new BigDecimal( walletUser.getAmount() ) );
         BeanUtils.copyProperties( walletUser, rspMember );
 
         rspMember.setHasPassword( StringUtils.isNotBlank( walletUser.getPassword() ) );
