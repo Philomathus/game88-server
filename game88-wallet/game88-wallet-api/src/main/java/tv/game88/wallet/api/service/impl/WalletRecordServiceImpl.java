@@ -242,6 +242,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         model.put( "orderNo", orderNo );
         model.put( "userMoney", 0 );
         model.put( "orderMoney", 0 );
+        model.put( "errorText", "" );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", merchantId )
