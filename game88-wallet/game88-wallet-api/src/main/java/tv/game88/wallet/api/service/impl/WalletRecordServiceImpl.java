@@ -247,30 +247,30 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
                 .eq( "merchant_id", merchantId )
                 .eq( "order_no", orderNo ) );
         if ( walletRecord == null ) {
-            model.put( "error", "订单不存在" );
+            model.put( "errorText", "订单不存在" );
             return new ModelAndView( "pay", model );
         }
         model.put( "orderMoney", walletRecord.getAmount() );
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( merchantId );
         if ( walletMerchant == null ) {
-            model.put( "error", "商户不存在" );
+            model.put( "errorText", "商户不存在" );
             return new ModelAndView( "pay", model );
         }
         if ( walletMerchant.getStatus() == 0 ) {
-            model.put( "error", "此商户已封禁,请联系客服" );
+            model.put( "errorText", "此商户已封禁,请联系客服" );
             return new ModelAndView( "pay", model );
         }
         WalletUser walletUser = walletUserMapper.selectById( walletAddress );
         if ( walletUser == null ) {
-            model.put( "error", "钱包用户不存在" );
+            model.put( "errorText", "钱包用户不存在" );
             return new ModelAndView( "pay", model );
         }
         if ( walletUser.getStatus() != 1 ) {
-            model.put( "error", "用户状态异常,请联系客服" );
+            model.put( "errorText", "用户状态异常,请联系客服" );
             return new ModelAndView( "pay", model );
         }
         if ( walletUser.getIsVerified() < 2 ) {
-            model.put( "error", "用户未实名或实名未认证" );
+            model.put( "errorText", "用户未实名或实名未认证" );
             return new ModelAndView( "pay", model );
         }
         model.put( "userMoney", walletUser.getAmount() + walletUser.getFrozenAmount() );
