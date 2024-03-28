@@ -305,7 +305,7 @@
 <script>
     // Initialize an empty object for the request body
     const requestBody = {};
-    const errorText = "";
+    const errorText = "${error}";
 
     if (errorText) {
         showModal(errorText, true);
@@ -413,8 +413,7 @@
     submitButton.addEventListener("click", function () {
         // Validate the password
 
-        alert( "test " )
-
+        
         // Case 1: Check if password is empty
         if (passwordValue.trim() === "") {
             showModal("密码不能为空");
