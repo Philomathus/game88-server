@@ -22,4 +22,5 @@ public class ReqEmbeddedLogin {
     private String sign;
 
     private String userId;
+    private String realName;
 }
