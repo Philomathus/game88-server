@@ -410,10 +410,12 @@
 <script>
     const submitButton = document.getElementById("submitButton");
 
+    console.info(submitButton)
+
     submitButton.addEventListener("click", function () {
         // Validate the password
 
-        
+        console.info(111)
         // Case 1: Check if password is empty
         if (passwordValue.trim() === "") {
             showModal("密码不能为空");
