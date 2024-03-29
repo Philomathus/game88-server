@@ -76,5 +76,7 @@ public class WalletUserPayMethod implements Serializable {
     private String  oldRealName;
     @TableField(exist = false)
     private String  oldBankAccount;
+
+    @TableField( exist = false )
     private String bankName;
 }

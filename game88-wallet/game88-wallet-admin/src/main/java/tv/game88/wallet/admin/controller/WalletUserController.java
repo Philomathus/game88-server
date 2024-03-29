@@ -42,7 +42,7 @@ public class WalletUserController extends BaseController {
     /**
      * 查询钱包用户列表
      */
-    @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
+   // @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
     @GetMapping( "/list" )
     public RspBase<List<WalletUser>> list( WalletUser walletUser ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();

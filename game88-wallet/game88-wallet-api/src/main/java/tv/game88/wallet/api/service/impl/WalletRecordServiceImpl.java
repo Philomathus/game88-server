@@ -3,13 +3,13 @@ package tv.game88.wallet.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
-import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
@@ -27,8 +27,6 @@ import tv.game88.wallet.api.service.WalletRecordService;
 import tv.game88.wallet.api.service.WalletUserService;
 import tv.game88.wallet.api.type.WalletUserFundEnum;
 import tv.game88.wallet.api.vo.PlatformUser;
-
-import jakarta.annotation.Resource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -240,34 +238,43 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         String orderNo       = resultMap.getOrDefault( "order_no", "" ).toString();
         String walletAddress = resultMap.getOrDefault( "walletAddress", "" ).toString();
 
+        Map<String, Object> model = Maps.newHashMap();
+        model.put( "orderNo", orderNo );
+        model.put( "userMoney", 0 );
+        model.put( "orderMoney", 0 );
+        model.put( "errorText", "" );
+
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", merchantId )
                 .eq( "order_no", orderNo ) );
         if ( walletRecord == null ) {
-            throw new BusinessException( "订单不存在" );
+            model.put( "errorText", "订单不存在" );
+            return new ModelAndView( "pay", model );
         }
+        model.put( "orderMoney", walletRecord.getAmount() );
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( merchantId );
         if ( walletMerchant == null ) {
-            throw new BusinessException( "商户不存在" );
+            model.put( "errorText", "商户不存在" );
+            return new ModelAndView( "pay", model );
         }
         if ( walletMerchant.getStatus() == 0 ) {
-            throw new BusinessException( "此商户已封禁,请联系客服" );
+            model.put( "errorText", "此商户已封禁,请联系客服" );
+            return new ModelAndView( "pay", model );
         }
         WalletUser walletUser = walletUserMapper.selectById( walletAddress );
         if ( walletUser == null ) {
-            throw new BusinessException( "钱包用户不存在" );
+            model.put( "errorText", "钱包用户不存在" );
+            return new ModelAndView( "pay", model );
         }
         if ( walletUser.getStatus() != 1 ) {
-            throw new BusinessException( "用户状态异常,请联系客服" );
+            model.put( "errorText", "用户状态异常,请联系客服" );
+            return new ModelAndView( "pay", model );
         }
         if ( walletUser.getIsVerified() < 2 ) {
-            throw new BusinessException( "用户未实名或实名未认证" );
+            model.put( "errorText", "用户未实名或实名未认证" );
+            return new ModelAndView( "pay", model );
         }
-
-        Map<String, Object> model = Maps.newHashMap();
-        model.put( "orderNo", orderNo );
-        model.put( "userMoney", walletUser.getAmount() );
-        model.put( "orderMoney", walletRecord.getAmount() );
+        model.put( "userMoney", walletUser.getAmount() + walletUser.getFrozenAmount() );
         return new ModelAndView( "pay", model );
     }
 
@@ -308,7 +315,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         if ( rspBase != null ) {
             return rspBase;
         }
-        if ( walletUser.getAmount().compareTo( walletRecord.getAmount() ) < 0 ) {
+        if ( ( walletUser.getAmount() + walletUser.getFrozenAmount() ) < walletRecord.getAmount() ) {
             return RspBase.businessError( "用户余额不足" );
         }
         // 修改用户支付订单状态并扣除会员金额,然后异步通知支付回调

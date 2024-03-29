@@ -263,8 +263,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
-                reqEmbeddedLogin.getWalletAddress() );
+        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -281,6 +280,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     walletUser = this.newWalletUserReg( new MobileLogin() );
                     walletUser.setPhone( reqEmbeddedLogin.getPhone() );
                     walletUser.setPlatformId( reqEmbeddedLogin.getUserId() );
+                    if ( StringUtils.isNotBlank( reqEmbeddedLogin.getRealName() ) ) {
+                        walletUser.setRealName( reqEmbeddedLogin.getRealName() );
+                    }
                     log.info( "this is details id and userid {} , {}", reqEmbeddedLogin.getPhone(),
                             reqEmbeddedLogin.getUserId() );
 
@@ -312,7 +314,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
         resultMap.put( "walletAddress", walletUser.getId() );
         resultMap.put( "realName", walletUser.getRealName() );
-        resultMap.put( "balance", walletUser.getAmount() );
+        resultMap.put( "balance", walletUser.getAmount() + walletUser.getFrozenAmount() );
         return RspBase.ok( "成功", resultMap );
     }
 

@@ -118,3 +118,4 @@ spring:
     redis:
       host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
       port: 6379
+

@@ -2,6 +2,7 @@ package tv.game88.wallet.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
+import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransactionDetail;
 
@@ -40,7 +41,7 @@ public interface WalletTransactionDetailService extends IService<WalletTransacti
 
     List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail );
 
-    RspBase<?> confirmTransaction( String transDetailId );
+    RspBase<?> systemConfirmTransaction( ReqConstant.ReqProcessTransDetail reqProcessTransDetail );
 
-    RspBase<?> systemCancelTrans( String userId, String transDetailId );
+    RspBase<?> systemCancelTrans( ReqConstant.ReqProcessTransDetail reqProcessTransDetail );
 }
