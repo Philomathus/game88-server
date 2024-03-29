@@ -309,6 +309,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             this.baseMapper.insert( walletUser );
         }
 
+        if ( walletUser.getFrozenAmount() == null ) {
+            log.error( JsonUtil.object2Json( walletUser ) );
+            return RspBase.businessError( "数据有误,请联系客服" );
+        }
+
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "url", configEnvCacheUtil.getConf( "pay_host_url" ) );
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
