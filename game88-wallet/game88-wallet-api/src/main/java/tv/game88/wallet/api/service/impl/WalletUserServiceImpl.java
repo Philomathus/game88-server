@@ -263,7 +263,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
+        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
+                reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -310,8 +311,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
 
         if ( walletUser.getFrozenAmount() == null ) {
-            log.error( JsonUtil.object2Json( walletUser ) );
-            return RspBase.businessError( "数据有误,请联系客服" );
+            walletUser.setFrozenAmount( 0L );
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
