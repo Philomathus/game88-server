@@ -2,6 +2,7 @@ package tv.game88.pay.api.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import tv.game88.pay.api.dto.MemberSumRecharge;
 import tv.game88.pay.api.dto.ReqMemberRechargeBank;
 import tv.game88.pay.api.dto.RspRechargeBankReport;
 import tv.game88.pay.api.dto.RspWithdrawRechargeDetail;
@@ -31,5 +32,7 @@ public interface MemberRechargeBankMapper extends BaseMapper<MemberRechargeBank>
 
     Map listCount( @Param( "req" ) ReqMemberRechargeBank req );
 
-    List<MemberRechargeBank> yesterdaySuccessOrder();
+    List<MemberSumRecharge> bankRechargeSum();
+
+    List<MemberSumRecharge> allRechargeSum();
 }

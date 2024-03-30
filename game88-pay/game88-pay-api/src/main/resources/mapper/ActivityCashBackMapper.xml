@@ -32,12 +32,4 @@
             </if>
         </where>
     </select>
-
-    <select id="selectActivityCashBackBycash" parameterType="java.math.BigDecimal" resultType="java.lang.Integer">
-        select rebate
-        from activity_cash_back
-        where status = 1
-          and deposit_total_min <![CDATA[ <= ]]> #{cash}
-          and deposit_total_max > #{cash}
-    </select>
 </mapper>

@@ -92,13 +92,13 @@
 
     <select id="selectReportList" resultType="tv.game88.pay.api.dto.RspRechargeBankReport">
         SELECT w.bank_user_name as bankUserName,
-               l.bank_name      as bankName,
-               w.bank_account   as bankAccount,
-               w.recharge_money as rechargeMoney,
-               COUNT(1)         as time,
-               w.update_time    as updateTime
+        l.bank_name as bankName,
+        w.bank_account as bankAccount,
+        w.recharge_money as rechargeMoney,
+        COUNT(1) as time,
+        w.update_time as updateTime
         FROM member_recharge_bank w
-                 left join config_bank_list l on l.id = w.bank_id
+        left join config_bank_list l on l.id = w.bank_id
         WHERE w.`STATUS` = '3'
         <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != '' and req.priceMax != ''">
             and w.recharge_money <![CDATA[ >= ]]> #{req.priceMin}
@@ -116,8 +116,8 @@
 
     <select id="selectReportListCount" resultType="java.util.Map">
         SELECT *,
-               sum(recharge_money) as rechargeMoney,
-               count(*)            as totalcount
+        sum(recharge_money) as rechargeMoney,
+        count(*) as totalcount
         FROM member_recharge_bank
         WHERE STATUS = '3'
         <if test="req.priceMin != null and req.priceMax != null  and req.priceMin != ''  and req.priceMax != ''">
@@ -174,7 +174,7 @@
 
     <select id="listCount" resultType="java.util.Map">
         select a.total, b.successMoney, totalSuccess / total successRate from (<include refid="totalCount" />)a
-                                                                                                                 left join (
+        left join (
         <include refid="successMoney" />)b on 1 = 1
     </select>
 
@@ -190,14 +190,40 @@
         and status = 3
     </sql>
 
-    <select id="yesterdaySuccessOrder" resultMap="MemberRechargeBankResult">
-        select l.member_id,
-               ifnull(sum(l.recharge_money), 0) as recharge_money
-        from member_recharge_bank l
-                 left join member_info m ON l.member_id = m.id
-        where l.status = 3
-          and m.status in (1, 7)
-          and date_format(l.create_time, '%y%m%d') = DATE_ADD(CURDATE(), INTERVAL -1 DAY)
-        GROUP BY l.member_id
+    <select id="bankRechargeSum" resultType="tv.game88.pay.api.dto.MemberSumRecharge">
+        SELECT member_id as memberId, ifnull(sum(recharge_money), 0) AS money
+        FROM member_recharge_bank
+        WHERE STATUS = 3
+          AND create_time >= DATE_ADD(CURDATE(), INTERVAL - 1 DAY)
+          AND create_time <![CDATA[ <= ]]> DATE_ADD(CURDATE(), INTERVAL 0 DAY)
+        GROUP BY member_id
     </select>
+
+    <!-- @formatter:off -->
+    <select id="allRechargeSum" resultType="tv.game88.pay.api.dto.MemberSumRecharge">
+        SELECT b.* FROM (
+            SELECT a.member_id                      AS memberId,
+                   ifnull(sum(a.recharge_money), 0) AS money
+            FROM (
+                SELECT member_id, ifnull(sum(recharge_money), 0) AS recharge_money
+                FROM member_recharge_bank WHERE STATUS = 3
+                     AND create_time >= DATE_ADD(CURDATE(), INTERVAL - 1 DAY)
+                     AND create_time <![CDATA[ <= ]]> DATE_ADD(CURDATE(), INTERVAL 0 DAY)
+                GROUP BY member_id
+                UNION ALL
+                SELECT member_id, ifnull(sum(money), 0) AS recharge_money
+                FROM member_recharge_online WHERE STATUS = 1
+                     AND update_time >= DATE_ADD(CURDATE(), INTERVAL - 1 DAY)
+                     AND update_time <![CDATA[ <= ]]> DATE_ADD(CURDATE(), INTERVAL 0 DAY)
+                GROUP BY member_id
+                UNION ALL
+                SELECT member_id, ifnull(sum(recharge_money), 0) AS recharge_money
+                FROM member_recharge_usdt WHERE STATUS = 3
+                     AND create_time >= DATE_ADD(CURDATE(), INTERVAL - 1 DAY)
+                     AND create_time <![CDATA[ <= ]]> DATE_ADD(CURDATE(), INTERVAL 0 DAY)
+                GROUP BY member_id
+            ) a GROUP BY a.member_id
+        ) b LEFT JOIN member_info t ON b.memberId = t.id WHERE t.STATUS IN ( 1, 7 )
+    </select>
+    <!-- @formatter:on -->
 </mapper>
