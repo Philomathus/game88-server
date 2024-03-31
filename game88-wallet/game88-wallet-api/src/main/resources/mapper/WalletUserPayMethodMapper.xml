@@ -58,5 +58,7 @@
     <select id="selectMemberCard" resultType="tv.game88.wallet.api.entity.WalletUserPayMethod">
         <include refid="selectWalletUserPayMethodVo" />
         where user_id = #{userId}
+<!--  hidding unbind audit_status 0-->
+        and audit_status = 1
     </select>
 </mapper>

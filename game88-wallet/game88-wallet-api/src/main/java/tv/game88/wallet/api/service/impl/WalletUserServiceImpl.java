@@ -281,6 +281,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     walletUser = this.newWalletUserReg( new MobileLogin() );
                     walletUser.setPhone( reqEmbeddedLogin.getPhone() );
                     walletUser.setPlatformId( reqEmbeddedLogin.getUserId() );
+                    if ( StringUtils.isNotBlank( reqEmbeddedLogin.getRealName() ) ) {
+                        walletUser.setRealName( reqEmbeddedLogin.getRealName() );
+                    }
                     log.info( "this is details id and userid {} , {}", reqEmbeddedLogin.getPhone(),
                             reqEmbeddedLogin.getUserId() );
 
@@ -305,6 +308,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( oldm != null ) {
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
             this.baseMapper.insert( walletUser );
+        }
+
+        if ( walletUser.getFrozenAmount() == null ) {
+            walletUser.setFrozenAmount( 0L );
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
