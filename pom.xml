@@ -42,7 +42,7 @@
         <dynamic.datasource.version>4.3.0</dynamic.datasource.version>
 
         <springdoc.version>2.4.0</springdoc.version>
-        <swagger-annotation.version>2.2.20</swagger-annotation.version>
+        <swagger-annotation.version>2.2.21</swagger-annotation.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.15.1</commons-io.version>
@@ -97,7 +97,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
                 <exclusions>
                     <exclusion>
