@@ -7,6 +7,8 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
@@ -41,9 +43,10 @@ public class WalletUserPayMethodController extends BaseController {
         return RspBase.ok( WalletPayMethodEnum.getPayMethodTypes() );
     }
 
-    @PutMapping( "/changeStatus/{methodId}" )
-    public RspBase<?> changeStatus( @PathVariable String methodId, Integer auditStatus, Integer googleAuthCode ) throws Exception {
-        SecurityUtils.verifyMFACode( googleAuthCode );
+    @Log( title = "钱包付款方式钱包付款方式", businessType = BusinessType.EFFECT )
+    @PutMapping( "/changeStatus/{methodId}/{auditStatus}/{mfa}" )
+    public RspBase<?> changeStatus( @PathVariable String methodId, @PathVariable Integer auditStatus, @PathVariable Integer mfa ) throws Exception {
+        SecurityUtils.verifyMFACode( mfa );
         WalletUserPayMethod walletUserPayMethod = new WalletUserPayMethod();
         walletUserPayMethod.setMethodId(Long.valueOf(methodId));
         walletUserPayMethod.setAuditStatus( auditStatus );
