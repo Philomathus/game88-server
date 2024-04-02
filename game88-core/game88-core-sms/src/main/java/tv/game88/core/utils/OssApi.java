@@ -59,7 +59,7 @@ public class OssApi {
         OutputStream newOutputStream = Files.newOutputStream( newFileToPath );
         IOUtils.copy( inputStream, newOutputStream );
         InputStream newInputStream = Files.newInputStream( newFileToPath );
-        String      rFileName      = DigestUtils.md5Hex( newInputStream );
+        String      rFileName      = DigestUtils.md5Hex( newInputStream ) + System.currentTimeMillis();
         String      newFileName    = rFileName + "." + extension;
 
         String fileKey = "88lm/" + path + "/" + newFileName;
