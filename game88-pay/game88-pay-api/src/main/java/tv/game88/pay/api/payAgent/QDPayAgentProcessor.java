@@ -157,7 +157,7 @@ public class QDPayAgentProcessor extends AbstractPayAgent {
         if ( !CollectionUtils.isEmpty( resultMap ) && "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
             Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( dataMap ) ) {
-                int orderState = Integer.parseInt( resultMap.getOrDefault( "status", 0 ).toString() );
+                int orderState = Integer.parseInt( dataMap.getOrDefault( "status", 0 ).toString() );
                 // status 4代付中5代付失败6代付成功
                 // orderState (0处理失败，1处理成功，2处理中)
                 int status = switch ( orderState ) {

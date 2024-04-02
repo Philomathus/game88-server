@@ -309,6 +309,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             this.baseMapper.insert( walletUser );
         }
 
+        if ( walletUser.getFrozenAmount() == null ) {
+            walletUser.setFrozenAmount( 0L );
+        }
+
         Map<String, Object> resultMap = Maps.newHashMap();
         resultMap.put( "url", configEnvCacheUtil.getConf( "pay_host_url" ) );
         resultMap.put( "userInfo", this.baseMapper.selectPlatformUserByUserId( walletUser.getId() ) );
