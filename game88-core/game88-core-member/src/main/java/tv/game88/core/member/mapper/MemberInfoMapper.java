@@ -114,17 +114,20 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     String selectMemberInfoAddressById( String memberId );
 
     Integer clearMemberMoney();
-    Integer insertBatchMemberMoney(String userIds);
 
-    MemberInfo selectMemberInfoById(String id);
-    
-    int updatePhones(ReqSmallFeatures reqSmallFeatures);
+    Integer insertBatchMemberMoney( String userIds );
 
-    List<ReqSmallFeatures> queryPhones(ReqSmallFeatures reqSmallFeatures);
+    MemberInfo selectMemberInfoById( String id );
+
+    int updatePhones( ReqSmallFeatures reqSmallFeatures );
+
+    List<ReqSmallFeatures> queryPhones( ReqSmallFeatures reqSmallFeatures );
 
     Integer clear();
 
-    Integer insertPaiSong(@Param("userIds") String userIds);
+    Integer insertPaiSong( @Param( "userIds" ) String userIds );
 
     int updateCodeTotalVipLevel( MemberInfo memberInfo );
+
+    BigDecimal sumRecharge( @Param( "memberId" ) String memberId, @Param( "days" ) int days );
 }

@@ -9,6 +9,9 @@
         <result column="channel" property="channel" />
         <result column="client" property="client" />
         <result column="bcode" property="bcode" />
+        <result column="week_charge" property="weekCharge" />
+        <result column="month_charge" property="monthCharge" />
+        <result column="bcode_multiple" property="bcodeMultiple" />
     </resultMap>
     <sql id="selectConfigVipVo">
         select `level`,
@@ -17,7 +20,10 @@
                month_bonus,
                channel,
                client,
-               bcode
+               bcode,
+               week_charge,
+               month_charge,
+               bcode_multiple
         from config_vip
     </sql>
 
