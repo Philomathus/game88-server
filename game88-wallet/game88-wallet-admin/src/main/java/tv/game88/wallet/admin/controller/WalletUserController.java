@@ -71,7 +71,6 @@ public class WalletUserController extends BaseController {
         return RspBase.ok( walletUserService.getById( id ) );
     }
 
-
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus/{memberId}" )
     public Object changeStatusBan( @PathVariable String memberId, Integer status, Integer googleAuthCode ) throws Exception {
