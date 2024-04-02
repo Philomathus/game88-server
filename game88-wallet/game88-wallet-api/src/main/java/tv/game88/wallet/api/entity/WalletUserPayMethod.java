@@ -62,7 +62,7 @@ public class WalletUserPayMethod implements Serializable {
     /**
      * 审核状态
      */
-    // 0 未审核 1已审核 2审核不通过
+    // 1已审核 2审核不通过 3松绑
     private Integer auditStatus;
 
     /**
