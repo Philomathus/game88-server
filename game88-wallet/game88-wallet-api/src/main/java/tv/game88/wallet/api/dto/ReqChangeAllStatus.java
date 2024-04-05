@@ -5,7 +5,8 @@ import lombok.Data;
 public class ReqChangeAllStatus {
 
     private String [] memberIds;
-    private Integer status;
-    private Integer googleAuthCode;
+    private Integer   status;
+    private Integer   googleAuthCode;
+    private String    remarks;
 
 }
