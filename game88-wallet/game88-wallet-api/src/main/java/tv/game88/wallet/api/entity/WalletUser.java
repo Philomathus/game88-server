@@ -153,6 +153,10 @@ public class WalletUser implements Serializable {
      * 登录域名
      */
     private String        linkUrl;
+    /**
+     * Remarks
+     */
+    private String        remarks;
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )

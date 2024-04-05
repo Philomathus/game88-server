@@ -36,6 +36,7 @@
         <result property="loginDevice" column="login_device" jdbcType="TINYINT" />
         <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
         <result property="linkUrl" column="link_url" jdbcType="VARCHAR" />
+        <result property="remarks" column="remarks" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
@@ -68,7 +69,8 @@
                phone_model,
                login_device,
                login_time,
-               link_url
+               link_url,
+               remarks
         from wallet_user
     </sql>
 

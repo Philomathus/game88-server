@@ -73,22 +73,24 @@ public class WalletUserController extends BaseController {
 
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus/{memberId}" )
-    public Object changeStatusBan( @PathVariable String memberId, Integer status, Integer googleAuthCode ) throws Exception {
+    public Object changeStatusBan( @PathVariable String memberId, Integer status, Integer googleAuthCode, String remarks) throws Exception {
         SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setStatus( status );
+        update.setRemarks( remarks );
         return toResult( walletUserService.updateById( update ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('admin:walletUser:changeStatus')" )
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeVerified/{memberId}" )
-    public Object changeVerified( @PathVariable String memberId, Integer isVerified, Integer googleAuthCode ) throws Exception {
+    public Object changeVerified( @PathVariable String memberId, Integer isVerified, Integer googleAuthCode, String remarks) throws Exception {
         SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setIsVerified( isVerified );
+        update.setRemarks( remarks );
         return toResult( walletUserService.updateById( update ) );
     }
 
@@ -155,6 +157,7 @@ public class WalletUserController extends BaseController {
 
         return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
                 .set(WalletUser::getStatus, reqChangeAllStatus.getStatus())
+                .set(WalletUser::getRemarks, reqChangeAllStatus.getRemarks())
                 .in(WalletUser::getId, reqChangeAllStatus.getMemberIds())
         ));
 
@@ -167,6 +170,7 @@ public class WalletUserController extends BaseController {
 
         return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
                 .set(WalletUser::getIsVerified, reqChangeAllVerificationStatus.getStatus())
+                .set(WalletUser::getRemarks, reqChangeAllVerificationStatus.getRemarks())
                 .in(WalletUser::getId, reqChangeAllVerificationStatus.getMemberIds())
         ));
     }
