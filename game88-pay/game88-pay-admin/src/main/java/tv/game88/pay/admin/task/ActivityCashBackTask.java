@@ -80,8 +80,7 @@ public class ActivityCashBackTask {
             String orderId = "CZFX" + LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDD_FORMATTER )
                     + sumRecharge.getMemberId();
             String dbNodes = sumRecharge.getMemberId().substring( sumRecharge.getMemberId().length() - 1 );
-            int    count   = logMoneyMapper.findExist( dbNodes, orderId );
-            if ( count > 0 ) {
+            if ( logMoneyMapper.findExist( dbNodes, orderId ) != null ) {
                 log.error( "执行充值返现活动任务 - 存在充值记录的会员:{}, 金额:{}", sumRecharge.getMemberId(), sumRecharge.getMoney() );
                 continue;
             }
