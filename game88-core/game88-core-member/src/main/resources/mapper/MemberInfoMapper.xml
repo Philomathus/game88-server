@@ -548,10 +548,34 @@
 
     <update id="updateCodeTotalVipLevel" parameterType="tv.game88.core.member.entity.MemberInfo">
         update member_info
-            set vip = (select max(level) from config_vip
-                        where bcode <![CDATA[ <= ]]> #{codeTotal}),
-                code_total = #{codeTotal}
+        set vip = (select max(level) from config_vip
+                   where bcode <![CDATA[ <= ]]> #{codeTotal}),
+            code_total = #{codeTotal}
         where id = #{id}
 
     </update>
+
+    <select id="sumRecharge" resultType="java.math.BigDecimal">
+        select sum(a.recharge_money)
+        FROM (SELECT ifnull(sum(recharge_money), 0) AS recharge_money
+              FROM member_recharge_bank
+              WHERE STATUS = 3
+                AND member_id = #{memberId}
+                AND create_time >= DATE_ADD(NOW(), INTERVAL - ${days} DAY)
+                AND create_time <![CDATA[ <= ]]> NOW()
+              UNION ALL
+              SELECT ifnull(sum(money), 0) AS recharge_money
+              FROM member_recharge_online
+              WHERE STATUS = 1
+                AND member_id = #{memberId}
+                AND update_time >= DATE_ADD(NOW(), INTERVAL - ${days} DAY)
+                AND update_time <![CDATA[ <= ]]> NOW()
+              UNION ALL
+              SELECT ifnull(sum(recharge_money), 0) AS recharge_money
+              FROM member_recharge_usdt
+              WHERE STATUS = 3
+                AND member_id = #{memberId}
+                AND create_time >= DATE_ADD(NOW(), INTERVAL - ${days} DAY)
+                AND create_time <![CDATA[ <= ]]> NOW()) a
+    </select>
 </mapper>

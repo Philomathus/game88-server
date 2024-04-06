@@ -243,7 +243,8 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         if ( Objects.isNull( getMemberCard ) ) {
             return RspBase.businessError( "卡号不存在" );
         }
-        this.baseMapper.deleteById( id );
+        getMemberCard.setAuditStatus( 3 );
+        this.baseMapper.updateById( getMemberCard );
         return RspBase.ok( "解绑成功" );
     }
 }

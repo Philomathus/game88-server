@@ -48,4 +48,8 @@ public class ConfigVip {
     * 需充值量
     */
     private BigDecimal bcode;
+
+    private BigDecimal weekCharge;
+    private BigDecimal monthCharge;
+    private BigDecimal bcodeMultiple;
 }
