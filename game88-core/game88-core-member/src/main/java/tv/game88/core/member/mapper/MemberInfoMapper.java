@@ -117,7 +117,7 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     Integer insertBatchMemberMoney(String userIds);
 
     MemberInfo selectMemberInfoById(String id);
-    
+
     int updatePhones(ReqSmallFeatures reqSmallFeatures);
 
     List<ReqSmallFeatures> queryPhones(ReqSmallFeatures reqSmallFeatures);
@@ -127,4 +127,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
     Integer insertPaiSong(@Param("userIds") String userIds);
 
     int updateCodeTotalVipLevel( MemberInfo memberInfo );
+
+    BigDecimal sumRecharge( @Param( "memberId" ) String memberId, @Param( "days" ) int days );
 }
