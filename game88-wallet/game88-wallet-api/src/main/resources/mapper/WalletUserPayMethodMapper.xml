@@ -52,13 +52,13 @@
             <if test="userId != null  and userId != ''"> and wupm.user_id = #{userId}</if>
             <if test="methodType != null  and methodType.name() != ''"> and wupm.method_type = #{methodType}</if>
             <if test="auditStatus != null"> and wupm.audit_status = #{auditStatus}</if>
+            <if test="auditStatus == null ">  and audit_status = 1 or audit_status = 0 </if>
         </where>
         order by wupm.create_time desc
     </select>
     <select id="selectMemberCard" resultType="tv.game88.wallet.api.entity.WalletUserPayMethod">
         <include refid="selectWalletUserPayMethodVo" />
         where user_id = #{userId}
-<!--  hidding unbind audit_status 0-->
         and audit_status = 1
     </select>
 </mapper>
