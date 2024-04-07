@@ -263,9 +263,13 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
+        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
+                reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
+        }
+        if ( !redisUtils.lock( "memberLogin:" + reqEmbeddedLogin.getPhone(), 5 ) ) {
+            return RspBase.businessError( "请勿重复访问" );
         }
         WalletUser walletUser = null;
         WalletUser oldm       = null;
@@ -297,12 +301,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                 if ( oldm != null ) {
                     walletUser = oldm;
                 } else {
+                    redisUtils.unLock( "memberLogin:" + reqEmbeddedLogin.getPhone() );
                     return RspBase.businessError( "钱包地址不存在" );
                 }
             }
-        }
-        if ( !redisUtils.lock( "memberLogin:" + reqEmbeddedLogin.getPhone(), 5 ) ) {
-            return RspBase.businessError( "请勿重复访问" );
         }
         if ( oldm != null ) {
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
@@ -319,6 +321,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         resultMap.put( "walletAddress", walletUser.getId() );
         resultMap.put( "realName", walletUser.getRealName() );
         resultMap.put( "balance", walletUser.getAmount() + walletUser.getFrozenAmount() );
+        redisUtils.unLock( "memberLogin:" + reqEmbeddedLogin.getPhone() );
         return RspBase.ok( "成功", resultMap );
     }
 
