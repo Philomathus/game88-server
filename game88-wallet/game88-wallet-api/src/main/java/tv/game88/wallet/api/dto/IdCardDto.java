@@ -1,11 +1,12 @@
  package tv.game88.wallet.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class ReqUpdateIdCard {
+@Builder
+public class IdCardDto {
     @Schema( title = "真实姓名" )
     private String realName;
     @Schema( title = "身份证号码" )

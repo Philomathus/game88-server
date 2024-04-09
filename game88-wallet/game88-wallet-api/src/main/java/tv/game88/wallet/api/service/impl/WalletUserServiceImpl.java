@@ -1,5 +1,6 @@
 package tv.game88.wallet.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
@@ -597,6 +598,23 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public void addSellerCancelSellingAmount( String id, Long amount ) {
         walletUserMapper.addSellerCancelSellingAmount( id, amount );
+    }
+
+    @Override
+    public RspBase<IdCardDto> getIdCard( String userId ) {
+        WalletUser walletUser = walletUserMapper.selectOne( new LambdaQueryWrapper<WalletUser>()
+                .select( WalletUser::getRealName, WalletUser::getIdNumber, WalletUser::getIdFrontPic, WalletUser::getIdBackPic )
+                .eq( WalletUser::getId, userId )
+                .last( "limit 1" ) );
+        if ( walletUser == null ) {
+            return RspBase.businessError( "用户不存在" );
+        }
+        return RspBase.ok( IdCardDto.builder()
+                .realName( walletUser.getRealName() )
+                .idCardNumber( walletUser.getIdNumber() )
+                .idFrontPic( walletUser.getIdFrontPic() )
+                .idBackPic( walletUser.getIdBackPic() )
+                .build() );
     }
 }
 

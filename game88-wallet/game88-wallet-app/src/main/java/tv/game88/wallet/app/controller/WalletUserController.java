@@ -85,7 +85,7 @@ public class WalletUserController extends BaseController {
 
     @Operation( summary = "上传验证身份信息" )
     @PutMapping( "/api/updateIdCard" )
-    public RspBase<?> updateIdCardPut( @RequestBody ReqUpdateIdCard reqUpdateIdCard ) {
+    public RspBase<?> updateIdCardPut( @RequestBody IdCardDto reqUpdateIdCard ) {
 
         WalletUser update = new WalletUser();
         update.setId( MemberSecurityUtils.getUserId() );
@@ -106,5 +106,11 @@ public class WalletUserController extends BaseController {
         boolean hasUpdated = walletUserService.updateById( update );
 
         return hasUpdated ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
+    }
+
+    @Operation( summary = "上传验证身份信息" )
+    @PostMapping( "/api/idCard" )
+    public RspBase<?> getIdCard( ) {
+        return  RspBase.ok( walletUserService.getIdCard( MemberSecurityUtils.getUserId() ) );
     }
 }

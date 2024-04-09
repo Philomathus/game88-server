@@ -49,7 +49,6 @@ public interface WalletUserService extends IService<WalletUser> {
      *
      * @param rawPassword 资金密码6位数字
      * @param walletUser  钱包用户
-     *
      * @return 错误结果
      */
     RspBase validatedPasswordTimes( String rawPassword, WalletUser walletUser );
@@ -73,4 +72,6 @@ public interface WalletUserService extends IService<WalletUser> {
     void addSellerOngoingSellingAmount( String id ,Long amount);
     void addSellerCancelSellingAmount( String id ,Long amount);
     void addSellerInitCancelSell( String id ,Long amount);
+
+    RspBase<IdCardDto> getIdCard( String userId );
 }
