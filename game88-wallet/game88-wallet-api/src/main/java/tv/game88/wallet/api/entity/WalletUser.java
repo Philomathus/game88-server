@@ -64,7 +64,7 @@ public class WalletUser implements Serializable {
      */
     private String        fundPassword;
     /**
-     * 是否实名认证 (0 未认证 1 申请认证 2 已认证)
+     * 是否实名认证 0 未认证 1 申请认证 2 已认证  3 拒绝
      */
     private Integer       isVerified;
     /**
