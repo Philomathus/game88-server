@@ -111,6 +111,6 @@ public class WalletUserController extends BaseController {
     @Operation( summary = "上传验证身份信息" )
     @PostMapping( "/api/idCard" )
     public RspBase<?> getIdCard( ) {
-        return  RspBase.ok( walletUserService.getIdCard( MemberSecurityUtils.getUserId() ) );
+        return walletUserService.getIdCard( MemberSecurityUtils.getUserId() );
     }
 }
