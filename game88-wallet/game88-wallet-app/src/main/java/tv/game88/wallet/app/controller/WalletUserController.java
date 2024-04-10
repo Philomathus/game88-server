@@ -103,6 +103,8 @@ public class WalletUserController extends BaseController {
             update.setIdBackPic( reqUpdateIdCard.getIdBackPic() );
         }
 
+        update.setIsVerified( 1 );
+
         boolean hasUpdated = walletUserService.updateById( update );
 
         return hasUpdated ? RspBase.ok() : RspBase.businessError( "申请身份认证异常，请稍后再试" );
