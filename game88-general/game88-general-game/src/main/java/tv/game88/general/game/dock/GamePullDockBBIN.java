@@ -106,6 +106,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getApiUrl() + "/WagersRecordBy" + wagerTypes[ 0 ] ).queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
