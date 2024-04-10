@@ -57,7 +57,7 @@ public class RGPayProcessor extends AbstractPay {
             if ( "1".equals( resultMap.getOrDefault( "status", "" ) ) ) {
                 return resultMap.getOrDefault( "h5_url", "" ).toString();
             } else {
-                reqPayRecharge.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
+                reqPayRecharge.setFailReason( String.valueOf( resultMap.getOrDefault( "msg", "" ) ) );
             }
         }
         return null;
