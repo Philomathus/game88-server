@@ -44,10 +44,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Component
@@ -192,8 +189,6 @@ public class SmsApi {
     /**
      * 构造X-WSSE参数值 Construct X-WSSE parameter value
      *
-     * @param appKey
-     * @param appSecret
      */
     private static String buildWsseHeader( String appKey, String appSecret ) {
         try {
@@ -231,7 +226,7 @@ public class SmsApi {
         req.setPhoneNumberSet( phoneNumbers );
         String[] templateParams = { msg };
         req.setTemplateParamSet( templateParams );
-        com.tencentcloudapi.sms.v20190711.models.SendSmsResponse res = null;
+        com.tencentcloudapi.sms.v20190711.models.SendSmsResponse res;
         try {
             res = client.SendSms( req );
         } catch ( TencentCloudSDKException e ) {
@@ -275,7 +270,7 @@ public class SmsApi {
         smsRequest.setTemplateCode( configSms.getTemplate() );
         smsRequest.setTemplateParam( "{\"code\":" + msg + "}" );
 
-        SendSmsResponse sendSmsResponse = null;
+        SendSmsResponse sendSmsResponse;
         try {
             sendSmsResponse = acsClient.getAcsResponse( smsRequest );
         } catch ( ClientException e ) {
