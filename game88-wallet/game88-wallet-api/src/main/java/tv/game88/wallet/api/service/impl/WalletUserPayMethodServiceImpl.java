@@ -80,9 +80,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
                 return RspBase.businessError( "请输入银行卡号" );
             }
-            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
-                return RspBase.businessError( "请输入正确的银行卡号" );
-            }
+//            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
+//                return RspBase.businessError( "请输入正确的银行卡号" );
+//            }
             if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
                 return RspBase.businessError( "请输入微信实名姓名" );
             }
