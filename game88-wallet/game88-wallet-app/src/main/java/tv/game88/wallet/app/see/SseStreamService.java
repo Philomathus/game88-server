@@ -1,6 +1,7 @@
 package tv.game88.wallet.app.see;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ import java.util.function.Consumer;
 @Service
 @RequiredArgsConstructor
 public class SseStreamService {
+    @Resource
+    private SseSendMessageUtils sseSendMessageUtils;
+
     public SseEmitter createEmitter( String memberId ) {
         SseEmitter sseEmitter = new SseEmitter( 60000L );
         sseEmitter.onCompletion( completionCallBack( memberId ) );
@@ -28,8 +32,8 @@ public class SseStreamService {
 
         log.info( "用户:{} 开始连接", memberId );
 
-        SseSendMessageUtils.me.sendMessage( sseEmitter, memberId, JsonUtil.object2Json( ImmutableMap.of( "msg",
-                "Connection " + "Success" ) ), StreamMessageType.CONNECTION );
+        sseSendMessageUtils.sendMessage( memberId, JsonUtil.object2Json( ImmutableMap.of( "msg", "Connection Success" ) ),
+                StreamMessageType.CONNECTION );
         return sseEmitter;
     }
 
