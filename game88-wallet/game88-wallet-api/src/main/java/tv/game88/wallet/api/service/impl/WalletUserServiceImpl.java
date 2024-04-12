@@ -293,6 +293,9 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
 
                     this.baseMapper.insert( walletUser );
                 }
+            }else{
+                walletUser.setPlatformId( walletUser.getPlatformId() + " , " + reqEmbeddedLogin.getUserId() );
+                this.baseMapper.updateById( walletUser );
             }
         } else {
             walletUser = this.baseMapper.selectById( reqEmbeddedLogin.getWalletAddress() );
