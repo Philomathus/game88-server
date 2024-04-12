@@ -255,7 +255,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         if ( memberCard != null && StringUtils.isNotBlank( memberCard.getRealName() ) ) {
             reqMap.put( "realName", memberCard.getRealName() );
         }
-        reqMap.put( "userId", profile + "_" + memberId );
+        reqMap.put( "userId", memberId );
         String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
 
