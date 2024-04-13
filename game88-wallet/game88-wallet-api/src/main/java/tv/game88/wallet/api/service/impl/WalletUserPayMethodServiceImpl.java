@@ -247,4 +247,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         this.baseMapper.updateById( getMemberCard );
         return RspBase.ok( "解绑成功" );
     }
+
+    @Override
+    public WalletUserPayMethod getWalletUserPayMethod( String bankAccount ) {
+        return this.baseMapper.getWalletUserPayMethod( bankAccount );
+    }
 }

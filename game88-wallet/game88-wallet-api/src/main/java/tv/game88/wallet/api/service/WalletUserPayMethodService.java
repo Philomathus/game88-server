@@ -34,4 +34,6 @@ public interface WalletUserPayMethodService extends IService<WalletUserPayMethod
     RspBase<?> changeBank( WalletUserPayMethod memberCard );
 
     RspBase<?> unbindCard( WalletUserPayMethod memberCard );
+
+    WalletUserPayMethod getWalletUserPayMethod( String bankAccount );
 }

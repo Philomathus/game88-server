@@ -12,7 +12,7 @@
         <result property="payAddrCity" column="pay_addr_city" jdbcType="VARCHAR" />
         <result property="payPicAddr" column="pay_pic_addr" jdbcType="VARCHAR" />
         <result property="auditStatus" column="audit_status" jdbcType="TINYINT" />
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+
     </resultMap>
 
     <sql id="selectWalletUserPayMethodVo">
@@ -60,5 +60,21 @@
         <include refid="selectWalletUserPayMethodVo" />
         where user_id = #{userId}
         and audit_status = 1
+    </select>
+    <select id="getWalletUserPayMethod" resultMap="WalletUserPayMethodResult">
+        select
+            keke.method_id,
+            keke.method_type,
+            keke.user_id,
+            keke.real_name,
+            keke.bank_account,
+            keke.bank_id,
+            keke.pay_addr_province,
+            keke.pay_pic_addr,
+            keke.pay_addr_city,
+            keke.audit_status,
+            keke.create_time
+        from wallet_user_pay_method keke
+        where keke.bank_account = #{bankAccount}
     </select>
 </mapper>

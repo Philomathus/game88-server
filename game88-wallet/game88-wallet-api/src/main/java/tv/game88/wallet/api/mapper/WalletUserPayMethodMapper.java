@@ -17,6 +17,8 @@ public interface WalletUserPayMethodMapper extends BaseMapper<WalletUserPayMetho
     List<WalletUserPayMethod> selectWalletUserPayMethod(WalletUserPayMethod walletUserPayMethod );
 
     List<WalletUserPayMethod> selectMemberCard( @Param( "userId" ) String userId );
+
+    WalletUserPayMethod getWalletUserPayMethod( @Param( "bankAccount" ) String bankAccount );
 }
 
 
