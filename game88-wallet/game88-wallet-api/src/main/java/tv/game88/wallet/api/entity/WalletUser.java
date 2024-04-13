@@ -158,6 +158,8 @@ public class WalletUser implements Serializable {
      */
     private String        remarks;
 
+    private String        bankAccount;
+
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String searchValue;
