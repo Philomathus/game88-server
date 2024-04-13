@@ -68,6 +68,7 @@
         <where>
             <if test="id != null">and id = #{id}</if>
             <if test="realName != null">and real_name = #{realName}</if>
+            <if test="phone != null">and phone = #{phone}</if>
         </where>
     </select>
 
