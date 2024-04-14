@@ -530,6 +530,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
+
         if ( StringUtils.isNotBlank( walletUser.getPassword() ) ) {
             return RspBase.businessError( "钱包用户密码已经存在。如果你忘记了，请重新设置!" );
         }
@@ -538,6 +539,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         if ( !reqSetPasswd.password().equals( reqSetPasswd.confirmPassword() ) ) {
             return RspBase.businessError( "密码和确认密码必须匹配!" );
+        }
+
+        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
         }
 
         WalletUser updateUser = new WalletUser();
@@ -565,6 +571,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         if ( passwordEncoder.matches( reqResetFundPasswd.fundNewPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不能与已有密码相同!" );
+        }
+
+        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
         }
 
         WalletUser update = new WalletUser();
