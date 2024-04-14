@@ -530,7 +530,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "钱包用户不存在" );
         }
-
         if ( StringUtils.isNotBlank( walletUser.getPassword() ) ) {
             return RspBase.businessError( "钱包用户密码已经存在。如果你忘记了，请重新设置!" );
         }
