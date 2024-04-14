@@ -38,9 +38,9 @@
         <result property="linkUrl" column="link_url" jdbcType="VARCHAR" />
         <result property="remarks" column="remarks" jdbcType="VARCHAR" />
         <result property="successNumMonth" column="success_num_month" jdbcType="INTEGER" />
-        <result property="successRateMonth" column="success_rate_month" jdbcType="INTEGER" />
-        <result property="receivedTimeMonth" column="received_time_month" jdbcType="INTEGER" />
-        <result property="transferTimeMonth" column="transfer_time_month" jdbcType="INTEGER" />
+        <result property="successRateMonth" column="success_rate_month" jdbcType="VARCHAR" />
+        <result property="receivedTimeMonth" column="received_time_month" jdbcType="VARCHAR" />
+        <result property="transferTimeMonth" column="transfer_time_month" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
