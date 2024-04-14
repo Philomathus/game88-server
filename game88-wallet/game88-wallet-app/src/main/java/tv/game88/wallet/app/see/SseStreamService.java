@@ -21,16 +21,14 @@ public class SseStreamService {
     private SseSendMessageUtils sseSendMessageUtils;
 
     public SseEmitter createEmitter( String memberId ) {
+        if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
+            return ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId );
+        }
         SseEmitter sseEmitter = new SseEmitter( 60000L );
         sseEmitter.onCompletion( completionCallBack( memberId ) );
         sseEmitter.onTimeout( timeoutCallBack( memberId ) );
         sseEmitter.onError( errorCallBack( memberId ) );
-        if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
-            ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
-        }
         ConstantsWallet.MEMBER_SSEEMITTER_MAP.put( memberId, sseEmitter );
-
-        log.info( "用户:{} 开始连接", memberId );
 
         sseSendMessageUtils.sendMessage( memberId, JsonUtil.object2Json( ImmutableMap.of( "msg", "Connection Success" ) ),
                 StreamMessageType.CONNECTION );
@@ -39,7 +37,7 @@ public class SseStreamService {
 
     private Runnable completionCallBack( String memberId ) {
         return () -> {
-            log.info( "用户:{} 连接结束", memberId );
+            // log.info( "用户:{} 连接结束", memberId );
             this.removeMemberSseEmitter( memberId );
         };
     }
