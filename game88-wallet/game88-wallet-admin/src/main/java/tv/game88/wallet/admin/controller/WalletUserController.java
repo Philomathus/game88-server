@@ -1,8 +1,6 @@
 package tv.game88.wallet.admin.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +10,6 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -45,14 +42,16 @@ public class WalletUserController extends BaseController {
    // @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
     @GetMapping( "/list" )
     public RspBase<List<WalletUser>> list( WalletUser walletUser ) {
-        if( walletUser.getBankAccount() != null && !walletUser.getBankAccount().equals("")){
+        if( StringUtils.isNotBlank( walletUser.getBankAccount()  ) ){
             WalletUserPayMethod wallet = walletUserPayMethodService.getWalletUserPayMethod( walletUser.getBankAccount() );
-            walletUser.setSearchValue( wallet.getUserId() );
 
-            PageDomain pageDomain = TableSupport.buildPageRequest();
-            startPage( pageDomain );
-            List<WalletUser> list = walletUserService.selectWalletUserList(walletUser);
-            return getRspBasePage( list, pageDomain );
+            if ( wallet != null) {
+                walletUser.setId(wallet.getUserId());
+            }
+//            PageDomain pageDomain = TableSupport.buildPageRequest();
+//            startPage( pageDomain );
+//            List<WalletUser> list = walletUserService.selectWalletUserList(walletUser);
+//            return getRspBasePage( list, pageDomain );
         }
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );

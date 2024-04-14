@@ -158,6 +158,7 @@ public class WalletUser implements Serializable {
      */
     private String        remarks;
 
+    @TableField( exist = false )
     private String        bankAccount;
 
     @TableField( exist = false )

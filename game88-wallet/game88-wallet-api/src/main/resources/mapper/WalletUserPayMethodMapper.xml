@@ -63,18 +63,18 @@
     </select>
     <select id="getWalletUserPayMethod" resultMap="WalletUserPayMethodResult">
         select
-            keke.method_id,
-            keke.method_type,
-            keke.user_id,
-            keke.real_name,
-            keke.bank_account,
-            keke.bank_id,
-            keke.pay_addr_province,
-            keke.pay_pic_addr,
-            keke.pay_addr_city,
-            keke.audit_status,
-            keke.create_time
-        from wallet_user_pay_method keke
-        where keke.bank_account = #{bankAccount}
+            wupm.method_id,
+            wupm.method_type,
+            wupm.user_id,
+            wupm.real_name,
+            wupm.bank_account,
+            wupm.bank_id,
+            wupm.pay_addr_province,
+            wupm.pay_pic_addr,
+            wupm.pay_addr_city,
+            wupm.audit_status,
+            wupm.create_time
+        from wallet_user_pay_method wupm
+        where wupm.bank_account = #{bankAccount}
     </select>
 </mapper>
