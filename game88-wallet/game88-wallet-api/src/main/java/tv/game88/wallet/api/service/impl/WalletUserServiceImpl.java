@@ -264,8 +264,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
-                reqEmbeddedLogin.getWalletAddress() );
+        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -294,10 +293,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     this.baseMapper.insert( walletUser );
                 }
             }
-//            else{
-//                walletUser.setPlatformId( walletUser.getPlatformId() + " , " + reqEmbeddedLogin.getUserId() );
-//                this.baseMapper.updateById( walletUser );
-//            }
+            //            else{
+            //                walletUser.setPlatformId( walletUser.getPlatformId() + " , " + reqEmbeddedLogin.getUserId() );
+            //                this.baseMapper.updateById( walletUser );
+            //            }
         } else {
             walletUser = this.baseMapper.selectById( reqEmbeddedLogin.getWalletAddress() );
             if ( walletUser == null ) {
@@ -444,15 +443,17 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         String key = Constants.WALLET_PREX + "lock:fundPassword:" + walletUser.getId();
         if ( redisUtils.exists( key ) && Long.parseLong( redisUtils.strGet( key ) ) >= 5 ) {
-            return RspBase.businessError(
-                    "资金密码错误过多，账号被锁定" + LocalDateTimeUtils.secondsToTime( redisUtils.getExpire( key ) )
-                            + ",请联系客服重置" );
+            return RspBase.businessError( "资金密码错误过多，账号被锁定,请联系客服重置" );
         }
         if ( !passwordEncoder.matches( rawPassword, walletUser.getFundPassword() ) ) {
             Long num = redisUtils.strIncrement( key );
             redisUtils.expire( key, Duration.ofDays( 1 ) );
             if ( num >= 5 ) {
-                return RspBase.businessError( "资金密码错误5次，账号被锁定一天,请联系客服重置" );
+                WalletUser update = new WalletUser();
+                update.setId( walletUser.getId() );
+                update.setStatus( 2 );
+                this.baseMapper.updateById( update );
+                return RspBase.businessError( "资金密码错误5次，账号被锁定,请联系客服重置" );
             }
             return RspBase.businessError( "资金密码错误，请重新输入" );
         } else {
@@ -540,7 +541,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "密码和确认密码必须匹配!" );
         }
 
-        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        RspBase<?> rspBase = this.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -572,7 +573,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "密码不能与已有密码相同!" );
         }
 
-        RspBase<?> rspBase    = this.validWalletUser( walletUser );
+        RspBase<?> rspBase = this.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -623,7 +624,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
-        return RspBase.ok( IdCardDto.builder()
+        return RspBase.ok( IdCardDto
+                .builder()
                 .realName( walletUser.getRealName() )
                 .idCardNumber( walletUser.getIdNumber() )
                 .idFrontPic( walletUser.getIdFrontPic() )
