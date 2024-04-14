@@ -4,7 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.wallet.api.constants.ConstantsWallet;
@@ -12,6 +16,7 @@ import tv.game88.wallet.api.type.StreamMessageType;
 import tv.game88.wallet.app.utils.SseSendMessageUtils;
 
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -24,7 +29,7 @@ public class SseStreamService {
         if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
             return ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId );
         }
-        SseEmitter sseEmitter = new SseEmitter( 60000L );
+        SseEmitter sseEmitter = new SseEmitter( 55000L );
         sseEmitter.onCompletion( completionCallBack( memberId ) );
         sseEmitter.onTimeout( timeoutCallBack( memberId ) );
         sseEmitter.onError( errorCallBack( memberId ) );
@@ -61,5 +66,19 @@ public class SseStreamService {
             ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
         }
         ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( memberId );
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public String handleAsyncRequestTimeoutException( AsyncRequestTimeoutException e ) {
+        // log.warn( "timeout error is occurred." );
+        return SseEmitter
+                .event()
+                .name( StreamMessageType.MEMBER.name() )
+                .data( JsonUtil.object2Json( ImmutableMap.of( "msg", "timeout" ) ), MediaType.APPLICATION_JSON )
+                .build()
+                .stream()
+                .map( d -> d.getData().toString() )
+                .collect( Collectors.joining() );
     }
 }

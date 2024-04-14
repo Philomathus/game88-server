@@ -20,7 +20,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.ZHONG_XING_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.ZHONG_XING_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
     @Override
