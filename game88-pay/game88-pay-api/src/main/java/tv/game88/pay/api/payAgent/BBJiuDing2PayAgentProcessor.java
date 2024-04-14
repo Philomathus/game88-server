@@ -32,7 +32,7 @@ public class BBJiuDing2PayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "merchant_no", payAgentChannel.getMerId() );
         bodyMap.put( "out_trade_no", withdrawDetail.getWithdrawOrderNo() );
-        bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
+        bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ).toString() );
         List<RspConfigBankList> effectList = configBankListCache.getEffectList();
         for ( RspConfigBankList rspConfigBank : effectList ) {
             if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
