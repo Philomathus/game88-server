@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import tv.game88.common.utils.StringUtils;
 
@@ -160,6 +161,18 @@ public class WalletUser implements Serializable {
 
     @TableField( exist = false )
     private String        bankAccount;
+
+    @Schema( title = "30日成单数" )
+    private Integer successNumMonth;
+
+    @Schema( title = "30日成单率" )
+    private String  successRateMonth;
+
+    @Schema( title = "30日平均付款时间" )
+    private String  receivedTimeMonth;
+
+    @Schema( title = "30日平均放币时间" )
+    private String  transferTimeMonth;
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )

@@ -124,20 +124,26 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         long aveReceivedTime = sellerSuccessCount == 0 ? 0 : receivedTimeTotal / sellerSuccessCount;
         long aveTransferTime = buyerSuccessCount == 0 ? 0 : transferTimeTotal / buyerSuccessCount;
 
-        walletTransaction.setSuccessNumMonth( sellerSuccessCount );
-        walletTransaction.setSuccessRateMonth( successRateMonth );
-        walletTransaction.setReceivedTimeMonth( LocalDateTimeUtils.secondsToTime( aveReceivedTime ) );
-        walletTransaction.setTransferTimeMonth( LocalDateTimeUtils.secondsToTime( aveTransferTime ) );
+        WalletUser update = new WalletUser();
+        update.setSuccessNumMonth( sellerSuccessCount );
+        update.setSuccessRateMonth( successRateMonth );
+        update.setReceivedTimeMonth( LocalDateTimeUtils.secondsToTime( aveReceivedTime ) );
+        update.setTransferTimeMonth( LocalDateTimeUtils.secondsToTime( aveTransferTime ) );
+        update.setId( userId );
 
-        SpringUtils.getBean( WalletTransactionService.class ).saveTransAndReduceUserAmount( userId, walletTransaction, sellNum );
+        SpringUtils
+                .getBean( WalletTransactionService.class )
+                .saveTransAndReduceUserAmount( userId, walletTransaction, sellNum, update );
         return RspBase.ok( "挂单成功", walletTransaction.getTransactionId() );
     }
 
     @Transactional( rollbackFor = Exception.class )
     @Override
-    public void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum ) {
-        int i = this.baseMapper.insert( walletTransaction );
-        if ( i > 0 ) {
+    public void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum,
+                                              WalletUser update ) {
+        int     i = this.baseMapper.insert( walletTransaction );
+        boolean b = walletUserService.updateById( update );
+        if ( i > 0 && b ) {
             // 扣除会员金额
             WalletUserFundEnum fundEnum = WalletUserFundEnum.PUT_ORDER_OUT;
             String             mark     = "用户" + fundEnum.getDes() + sellNum;
@@ -176,13 +182,17 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( walletTransaction == null ) {
             return RspBase.businessError( "此挂单不存在" );
         }
-        if ( !walletTransaction.getUserId().equals( userId ) ) {
+        if ( !walletTransaction
+                .getUserId()
+                .equals( userId ) ) {
             return RspBase.businessError( "此挂单并不属于您" );
         }
         RspSellOrderDetail rspSellOrderDetail = new RspSellOrderDetail();
         BeanUtils.copyProperties( walletTransaction, rspSellOrderDetail );
 
-        String[]                  payMethodIds   = walletTransaction.getPayMethodIds().split( "," );
+        String[]                  payMethodIds   = walletTransaction
+                .getPayMethodIds()
+                .split( "," );
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectBatchIds( Arrays.asList( payMethodIds ) );
 
         List<RspConfigBankList> configBankList = configBankListCache.getEffectList();
@@ -192,7 +202,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
             rspPayMethod.setType( userPayMethod.getMethodType() );
-            rspPayMethodMap.put( userPayMethod.getMethodType().name(), rspPayMethod );
+            rspPayMethodMap.put( userPayMethod
+                    .getMethodType()
+                    .name(), rspPayMethod );
 
             for ( RspConfigBankList rspConfigBank : configBankList ) {
                 if ( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ) {
@@ -200,13 +212,13 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 }
             }
         }
-//        if( walletTransaction.getStatus() == 1 ){
-//            WalletTransactionDetail transactionId1 =
-//                    walletTransactionDetailMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().select(
-//                            "trans_detail_id" ).eq( "transaction_id"
-//                            , transactionId ) );
-//            rspSellOrderDetail.setTransDetailId( transactionId1.getTransDetailId() );
-//        }
+        //        if( walletTransaction.getStatus() == 1 ){
+        //            WalletTransactionDetail transactionId1 =
+        //                    walletTransactionDetailMapper.selectOne( new QueryWrapper<WalletTransactionDetail>().select(
+        //                            "trans_detail_id" ).eq( "transaction_id"
+        //                            , transactionId ) );
+        //            rspSellOrderDetail.setTransDetailId( transactionId1.getTransDetailId() );
+        //        }
 
         rspSellOrderDetail.setRspPayMethodMap( rspPayMethodMap );
         return RspBase.ok( rspSellOrderDetail );
@@ -215,7 +227,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
     @Override
     public RspBase<?> cancelSellOrder( String userId, String transactionId ) {
         WalletUser walletUser = walletUserService.getById( userId );
-        RspBase<?>    rspBase    = walletUserService.validWalletUser( walletUser );
+        RspBase<?> rspBase    = walletUserService.validWalletUser( walletUser );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -223,7 +235,9 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         if ( walletTransaction == null ) {
             return RspBase.businessError( "此挂单不存在" );
         }
-        if ( !walletTransaction.getUserId().equals( userId ) ) {
+        if ( !walletTransaction
+                .getUserId()
+                .equals( userId ) ) {
             return RspBase.businessError( "此挂单并不属于您" );
         }
         if ( walletTransaction.getStatus() == 1 ) {

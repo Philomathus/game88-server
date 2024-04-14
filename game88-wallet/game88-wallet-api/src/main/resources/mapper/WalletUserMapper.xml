@@ -37,6 +37,10 @@
         <result property="loginTime" column="login_time" jdbcType="TIMESTAMP" />
         <result property="linkUrl" column="link_url" jdbcType="VARCHAR" />
         <result property="remarks" column="remarks" jdbcType="VARCHAR" />
+        <result property="successNumMonth" column="success_num_month" jdbcType="INTEGER" />
+        <result property="successRateMonth" column="success_rate_month" jdbcType="INTEGER" />
+        <result property="receivedTimeMonth" column="received_time_month" jdbcType="INTEGER" />
+        <result property="transferTimeMonth" column="transfer_time_month" jdbcType="INTEGER" />
     </resultMap>
 
     <sql id="selectWalletUserVo">
@@ -70,7 +74,11 @@
                login_device,
                login_time,
                link_url,
-               remarks
+               remarks,
+               success_num_month,
+               success_rate_month,
+               received_time_month,
+               transfer_time_month
         from wallet_user
     </sql>
 
