@@ -183,7 +183,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('system:user:resetOtp')" )
     @DeleteMapping( "resetUserOtpSecret" )
     @Log( title = "重置用户MFA秘钥", businessType = BusinessType.DELETE )
-    public RspBase<?> resetUserOtpSecret( @RequestBody RecordConstants.ReqResetUserOtpSecret req ) throws Exception {
+    public RspBase<?> resetUserOtpSecret( RecordConstants.ReqResetUserOtpSecret req ) throws Exception {
         SecurityUtils.verifyMFACode( req.otpAuthCode() );
         SysUser sysUser = new SysUser( req.userId() );
         sysUser.setOtpSecret( null );
