@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tv.game88.wallet.api.mapper.ReportUserAmountMapper">
+
+    <resultMap id="ReportUserAmountResult" type="tv.game88.wallet.api.entity.ReportUserAmount">
+        <result property="userAmount"        column="user_amount"/>
+        <result property="userFrozenAmount"     column="user_frozen_amount"/>
+        <result property="upAmount"      column="up_amount"/>
+        <result property="upPeople"     column="up_people"/>
+        <result property="downAmount"       column="down_amount"/>
+        <result property="downPeople"       column="down_people"/>
+        <result property="memberBuy"       column="member_buy"/>
+        <result property="reportTime"       column="report_time"/>
+    </resultMap>
+    <sql id="selectReportUserAmountResult">
+        select user_amount,
+               user_frozen_amount,
+               up_amount,
+               up_people,
+               down_amount,
+               down_people,
+               member_buy,
+               report_time
+        from report_user_amount
+    </sql>
+
+    <select id="selectReportUserAmountList" parameterType="tv.game88.wallet.api.entity.ReportUserAmount"
+            resultMap="ReportUserAmountResult">
+        <include refid="selectReportUserAmountResult"/>
+        <where>
+            <if test="userAmount != null">
+                AND user_amount = #{userAmount}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND report_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND report_time <![CDATA[ <= ]]> STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
+            </if>
+        </where>
+    </select>
+
+</mapper>
