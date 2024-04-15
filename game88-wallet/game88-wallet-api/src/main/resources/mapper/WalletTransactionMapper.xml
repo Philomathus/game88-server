@@ -40,6 +40,9 @@
     <select id="selectWalletTransactionList" resultType="tv.game88.wallet.api.entity.WalletTransaction">
         <include refid="selectWalletTransactionVo" />
         <where>
+            <if test="transactionId != null">
+                and transaction_id = #{transactionId}
+            </if>
             <if test="userId != null">
                 and user_id = #{userId}
             </if>
