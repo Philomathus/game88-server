@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
@@ -30,6 +31,7 @@ import tv.game88.platform.api.service.MemberInfoService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +70,12 @@ public class MemberInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:memberInfo:export')" )
     @Log( title = "导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<?> export( MemberInfo memberInfo, HttpServletResponse response ) {
+    public void export( MemberInfo memberInfo, HttpServletResponse response ) {
         List<MemberInfo> list = memberInfoService.selectMemberInfoList( memberInfo );
         if ( list.size() <= 200000L ) {
             ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
-            return RspBase.ok( "下载成功" );
         } else {
-            return RspBase.businessError( "导出条数超过20万条" );
+            throw new BusinessException( "导出条数超过20万条" );
         }
     }
 
@@ -155,9 +156,8 @@ public class MemberInfoController extends BaseController {
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
                 redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
-                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
-                                                        .toString();
-                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
+                PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
                 platformUser.setStatus( status );
                 redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
@@ -396,8 +396,15 @@ public class MemberInfoController extends BaseController {
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
-                               .append( cell3 ).append( "),(" );
+                userId = userId
+                        .append( "\"" )
+                        .append( cell1 )
+                        .append( "\"" )
+                        .append( "," )
+                        .append( cell2 )
+                        .append( "," )
+                        .append( cell3 )
+                        .append( "),(" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -472,8 +479,15 @@ public class MemberInfoController extends BaseController {
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
-                               .append( cell3 ).append( "),(" );
+                userId = userId
+                        .append( "\"" )
+                        .append( cell1 )
+                        .append( "\"" )
+                        .append( "," )
+                        .append( cell2 )
+                        .append( "," )
+                        .append( cell3 )
+                        .append( "),(" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
