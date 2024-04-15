@@ -235,7 +235,7 @@
 
     <update id="addSellerTotalSellingAmount">
         update wallet_user
-        set selling_amount = selling_amount + #{money},
+        set selling_amount = selling_amount + #{money}
         where id = #{id}
     </update>
 
