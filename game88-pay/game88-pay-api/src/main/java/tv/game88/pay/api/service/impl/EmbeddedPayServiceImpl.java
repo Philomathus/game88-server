@@ -382,6 +382,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     return RspBase.ok( "请求成功,请前往QDPay支付中心确认", result.getOrDefault( "payUrl", "" ).toString() );
                 }
             } else {
+                memberRechargeOnlineMapper.deleteById( orderId );
                 return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
