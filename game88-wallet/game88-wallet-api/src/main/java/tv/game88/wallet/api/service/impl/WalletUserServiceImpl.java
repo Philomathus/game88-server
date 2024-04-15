@@ -370,13 +370,16 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id", "fund_password" )
+                .select( "id","status" ,"fund_password" )
                 .one();
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
         if ( StringUtils.isNotBlank( walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "已经设置过资金密码" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
         }
         WalletUser update = new WalletUser();
         update.setId( userId );
@@ -557,7 +560,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id", "fund_password" )
+                .select( "id","status", "fund_password" )
                 .one();
 
         if ( walletUser == null ) {
@@ -573,9 +576,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "密码不能与已有密码相同!" );
         }
 
-        RspBase<?> rspBase = this.validWalletUser( walletUser );
-        if ( rspBase != null ) {
-            return rspBase;
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
         }
 
         WalletUser update = new WalletUser();
