@@ -75,7 +75,7 @@
                 and user_id <![CDATA[ <> ]]> #{unUserId}
             </if>
             <if test="payMethodTypes != null and payMethodTypes != '' ">
-                AND pay_method_types = #{payMethodTypes}
+                AND pay_method_types LIKE CONCAT('%', #{payMethodTypes}, '%')
             </if>
             <if test="beginTime != null and endTime != null ">
                 AND create_time BETWEEN #{beginTime} AND #{endTime}
