@@ -22,37 +22,41 @@ public class ReportMemberDataStatisticsController extends BaseController {
     private ReportMemberStatisticsService reportMemberStatisticsService;
 
     @PostMapping( "/recharge" )
-    public RspEntity<BigDecimal> getTotalRecharge(@RequestBody ReqReportMemberStatistics req) {
-        BigDecimal result = reportMemberStatisticsService.getTotalRecharge(req);
+    public RspEntity<BigDecimal> getTotalRecharge( @RequestBody ReqReportMemberStatistics req ) {
+        BigDecimal result = reportMemberStatisticsService.getTotalRecharge( req );
         return RspEntity.ok( result == null ? BigDecimal.ZERO : result );
     }
 
     @PostMapping( "/withdrawal" )
-    public RspEntity<BigDecimal> getTotalWithdrawal(@RequestBody ReqReportMemberStatistics req) {
-        BigDecimal result = reportMemberStatisticsService.getTotalWithdrawal(req);
+    public RspEntity<BigDecimal> getTotalWithdrawal( @RequestBody ReqReportMemberStatistics req ) {
+        BigDecimal result = reportMemberStatisticsService.getTotalWithdrawal( req );
         return RspEntity.ok( result == null ? BigDecimal.ZERO : result );
     }
 
     @PostMapping( "/balance" )
-    public RspEntity<BigDecimal> getUserBalance(@RequestBody ReqReportMemberStatistics req) {
-        BigDecimal result = reportMemberStatisticsService.getUserBalance(req);
+    public RspEntity<BigDecimal> getUserBalance( @RequestBody ReqReportMemberStatistics req ) {
+        BigDecimal result = reportMemberStatisticsService.getUserBalance( req );
         return RspEntity.ok( result == null ? BigDecimal.ZERO : result );
     }
 
     @PostMapping( "/registration" )
-    public RspEntity<Long> getTotalRegistration( @RequestBody ReqReportMemberStatistics req) {
-        Long result = reportMemberStatisticsService.getTotalRegistration(req);
+    public RspEntity<Long> getTotalRegistration( @RequestBody ReqReportMemberStatistics req ) {
+        Long result = reportMemberStatisticsService.getTotalRegistration( req );
         return RspEntity.ok( result == null ? 0L : result );
     }
 
     @PostMapping( "/dailyFirstRechargeCount" )
-    public RspEntity<Long> getDailyFirstRechargeCount(@RequestBody ReqReportMemberStatistics req) {
-        return RspEntity.ok( reportMemberStatisticsService.getDailyFirstRechargeCount(req) );
+    public RspEntity<Long> getDailyFirstRechargeCount( @RequestBody ReqReportMemberStatistics req ) {
+        return RspEntity.ok( reportMemberStatisticsService.getDailyFirstRechargeCount( req ) );
     }
 
     @PostMapping( "/dailyRechargeCount" )
-    public RspEntity<Long> getDailyRechargeCount(@RequestBody ReqReportMemberStatistics req) {
-        return RspEntity.ok( reportMemberStatisticsService.getDailyRechargeCount(req) );
+    public RspEntity<Long> getDailyRechargeCount( @RequestBody ReqReportMemberStatistics req ) {
+        return RspEntity.ok( reportMemberStatisticsService.getDailyRechargeCount( req ) );
     }
 
+    @PostMapping( "/gift" )
+    public RspEntity<BigDecimal> getTotalGift( @RequestBody ReqReportMemberStatistics req ) {
+        return RspEntity.ok( BigDecimal.ZERO );
+    }
 }

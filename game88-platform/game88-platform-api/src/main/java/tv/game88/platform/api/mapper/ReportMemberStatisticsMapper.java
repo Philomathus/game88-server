@@ -6,15 +6,15 @@ import tv.game88.platform.api.dto.ReqReportMemberStatistics;
 import java.math.BigDecimal;
 
 public interface ReportMemberStatisticsMapper {
-    BigDecimal getTotalRecharge(@Param("req") ReqReportMemberStatistics req);
+    BigDecimal getTotalRecharge( @Param( "req" ) ReqReportMemberStatistics req );
 
-    BigDecimal getTotalWithdrawal(@Param("req") ReqReportMemberStatistics req);
+    BigDecimal getTotalWithdrawal( @Param( "req" ) ReqReportMemberStatistics req );
 
-    BigDecimal getUserBalance(@Param("req") ReqReportMemberStatistics req);
+    BigDecimal getUserBalance( @Param( "req" ) ReqReportMemberStatistics req );
 
-    Long getTotalRegistration(@Param("req") ReqReportMemberStatistics req);
+    Long getTotalRegistration( @Param( "req" ) ReqReportMemberStatistics req );
 
-    Long getDailyRechargeCount( @Param("req")  ReqReportMemberStatistics req );
+    Long getDailyRechargeCount( @Param( "req" ) ReqReportMemberStatistics req );
 
-    Long getDailyFirstRechargeCount( @Param("req")  ReqReportMemberStatistics req );
+    Long getDailyFirstRechargeCount( @Param( "req" ) ReqReportMemberStatistics req );
 }
