@@ -16,71 +16,68 @@
         <result property="transEndTime" column="trans_end_time" jdbcType="TIMESTAMP" />
         <result property="successNumMonth" column="success_num_month" jdbcType="INTEGER" />
         <result property="successRateMonth" column="success_rate_month" jdbcType="VARCHAR" />
-        <result property="receivedTimeMonth" column="received_time_month" jdbcType="VARCHAR" />
-        <result property="transferTimeMonth" column="transfer_time_month" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="selectWalletTransactionVo">
-        select transaction_id,
-               user_id,
-               pay_method_ids,
-               pay_method_types,
-               can_split,
-               amount,
-               `status`,
-               create_time,
-               trans_end_time,
-               success_num_month,
-               success_rate_month,
-               received_time_month,
-               transfer_time_month
-        from wallet_transaction
+        select t.transaction_id,
+               t.user_id,
+               t.pay_method_ids,
+               t.pay_method_types,
+               t.can_split,
+               t.amount,
+               t.`status`,
+               t.create_time,
+               t.trans_end_time,
+               u.success_num_month,
+               u.success_rate_month
+        from wallet_transaction t
+                 left join wallet_user u on u.id = user_id
     </sql>
 
     <select id="selectWalletTransactionList" resultType="tv.game88.wallet.api.entity.WalletTransaction">
         <include refid="selectWalletTransactionVo" />
         <where>
             <if test="userId != null">
-                and user_id = #{userId}
+                and t.user_id = #{userId}
             </if>
             <if test="payMethodType != null">
-                and pay_method_types like concat('%', #{payMethodType}, '%')
+                and t.pay_method_types like concat('%', #{payMethodType}, '%')
             </if>
             <if test="payMethodTypeList != null">
                 <foreach item="paymentMethod" collection="payMethodTypeList" open="and (" separator="or" close=")">
-                    pay_method_types like concat('%', #{paymentMethod}, '%')
+                    t.pay_method_types like concat('%', #{paymentMethod}, '%')
                 </foreach>
             </if>
             <if test="canSplit != null">
-                and can_split = #{canSplit}
+                and t.can_split = #{canSplit}
             </if>
             <choose>
                 <when test="minAmount != null and maxAmount != null">
-                    and amount BETWEEN #{minAmount} AND #{maxAmount}
+                    and t.amount BETWEEN #{minAmount} AND #{maxAmount}
                 </when>
                 <otherwise>
-                    and amount > 0
+                    and t.amount > 0
                 </otherwise>
             </choose>
             <if test="status != null">
-                and `status` = #{status}
+                and t.`status` = #{status}
             </if>
             <if test="statusList != null">
-                and `status` in
+                and t.`status` in
                 <foreach item="status" collection="statusList" open="(" separator="," close=")">
                     #{status}
                 </foreach>
             </if>
             <if test="unUserId != null">
-                and user_id <![CDATA[ <> ]]> #{unUserId}
+                and t.user_id <![CDATA[ <> ]]> #{unUserId}
             </if>
             <if test="payMethodTypes != null and payMethodTypes != '' ">
-                AND pay_method_types LIKE CONCAT('%', #{payMethodTypes}, '%')
+                AND t.pay_method_types LIKE CONCAT('%', #{payMethodTypes}, '%')
             </if>
             <if test="beginTime != null and endTime != null ">
-                AND create_time BETWEEN #{beginTime} AND #{endTime}
+                AND t.create_time BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
-        order by create_time desc
+        order by t.create_time desc
     </select>
 </mapper>
