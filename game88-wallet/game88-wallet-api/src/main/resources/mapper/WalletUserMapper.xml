@@ -182,7 +182,6 @@
     <update id="reduceSaleMoney">
         update wallet_user
         set amount     = amount - #{money},
-            total_sale = total_sale + #{money}
         where id = #{userId}
           and amount - #{money} >= 0
     </update>
@@ -236,7 +235,8 @@
 
     <update id="addSellerTotalSellingAmount">
         update wallet_user
-        set selling_amount = selling_amount + #{money}
+        set selling_amount = selling_amount + #{money},
+            total_sale = total_sale + #{money}
         where id = #{id}
     </update>
 
