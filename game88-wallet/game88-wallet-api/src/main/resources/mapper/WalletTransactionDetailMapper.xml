@@ -27,33 +27,84 @@
     </resultMap>
 
     <sql id="selectWalletTransactionDetailVo">
-        select wtd.trans_detail_id,
-               wtd.transaction_id,
-               wtd.seller_id,
-               wtd.buyer_id,
-               wtd.buyer_pay_method_id,
-               (select method_type from wallet_user_pay_method wupm  where wtd.buyer_pay_method_id = wupm.method_id) as buyer_pay_method_name,
-               wtd.seller_pay_method_id,
-               (select method_type from wallet_user_pay_method wupm  where wtd.seller_pay_method_id = wupm.method_id) as seller_pay_method_name,
-               wtd.amount,
-               wtd.trans_cert_pic,
-               wtd.status,
-               wtd.`time`,
-               wtd.buyer_confirm_buy_time,
-               wtd.seller_confirm_trans_time,
-               wtd.buyer_confirm_transfer_time,
-               wtd.seller_not_received_time,
-               wtd.cancel_time,
-               wtd.success_trans_time,
-               wtd.transfer_time_sec,
-               wtd.received_time_sec,
-               wtd.remark
-        from    wallet_transaction_detail wtd
+        select trans_detail_id,
+               transaction_id,
+               seller_id,
+               buyer_id,
+               buyer_pay_method_id,
+               seller_pay_method_id,
+               amount,
+               trans_cert_pic,
+               status,
+               `time`,
+               buyer_confirm_buy_time,
+               seller_confirm_trans_time,
+               buyer_confirm_transfer_time,
+               seller_not_received_time,
+               cancel_time,
+               success_trans_time,
+               transfer_time_sec,
+               received_time_sec,
+               remark
+        from wallet_transaction_detail
     </sql>
 
     <select id="selectWalletTransactionDetailList" parameterType="tv.game88.wallet.api.entity.WalletTransactionDetail"
             resultMap="WalletTransactionDetailResult">
         <include refid="selectWalletTransactionDetailVo" />
+        <where>
+            <if test="transactionId != null  and transactionId != ''">and transaction_id = #{transactionId}</if>
+            <if test="transDetailId != null  and transDetailId != ''">and trans_detail_id = #{transDetailId}</if>
+            <if test="sellerId != null  and sellerId != ''">and seller_id = #{sellerId}</if>
+            <if test="buyerId != null  and buyerId != ''">and buyer_id = #{buyerId}</if>
+            <if test="amount != null ">and amount = #{amount}</if>
+            <if test="status != null  and status.toString() != ''">and status = #{status}</if>
+
+            <if test="buySellId != null and buySellId != ''">
+                and (buyer_id = #{buySellId} or seller_id = #{buySellId})
+            </if>
+            <if test="statusList != null">
+                and `status` in
+                <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+        order by `time` desc
+    </select>
+
+    <select id="selectWalletTransactionDetailListAdmin" parameterType="tv.game88.wallet.api.entity.WalletTransactionDetail"
+            resultMap="WalletTransactionDetailResult">
+        SELECT
+        wtd.trans_detail_id,
+        wtd.transaction_id,
+        wtd.seller_id,
+        wtd.buyer_id,
+        wtd.buyer_pay_method_id,
+        buyer_wupm.method_type AS buyer_pay_method_name,
+        buyer_wupm.bank_account AS buyer_bank_account,
+        wtd.seller_pay_method_id,
+        seller_wupm.method_type AS seller_pay_method_name,
+        seller_wupm.bank_account AS seller_bank_account,
+        wtd.amount,
+        wtd.trans_cert_pic,
+        wtd.status,
+        wtd.`time`,
+        wtd.buyer_confirm_buy_time,
+        wtd.seller_confirm_trans_time,
+        wtd.buyer_confirm_transfer_time,
+        wtd.seller_not_received_time,
+        wtd.cancel_time,
+        wtd.success_trans_time,
+        wtd.transfer_time_sec,
+        wtd.received_time_sec,
+        wtd.remark
+        FROM
+        wallet_transaction_detail wtd
+        LEFT JOIN
+        wallet_user_pay_method AS buyer_wupm ON wtd.buyer_pay_method_id = buyer_wupm.method_id
+        LEFT JOIN
+        wallet_user_pay_method AS seller_wupm ON wtd.seller_pay_method_id = seller_wupm.method_id
         <where>
             <if test="transactionId != null  and transactionId != ''">and transaction_id = #{transactionId}</if>
             <if test="transDetailId != null  and transDetailId != ''">and trans_detail_id = #{transDetailId}</if>

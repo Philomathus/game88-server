@@ -728,7 +728,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
     @Override
     public List<WalletTransactionDetail> getWalletTransactionList( WalletTransactionDetail walletTransactionDetail ) {
-        return this.baseMapper.selectWalletTransactionDetailList( walletTransactionDetail );
+        return this.baseMapper.selectWalletTransactionDetailListAdmin( walletTransactionDetail );
     }
 
     @Override

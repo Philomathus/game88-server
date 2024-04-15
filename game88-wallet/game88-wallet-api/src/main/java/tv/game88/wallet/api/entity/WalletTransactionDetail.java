@@ -131,6 +131,11 @@ public class WalletTransactionDetail implements Serializable {
     @TableField(exist = false)
     private String sellerPayMethodName;
 
+    @TableField(exist = false)
+    private String buyerBankAccount;
+    @TableField(exist = false)
+    private String sellerBankAccount;
+
     @TableField( exist = false )
     @JsonIgnore
     private String                buySellId;
