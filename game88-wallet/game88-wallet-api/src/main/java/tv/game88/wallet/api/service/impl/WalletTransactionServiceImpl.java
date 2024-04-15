@@ -326,10 +326,10 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
         rspSellOrderDetail2.setTransactionId( walletTransaction.getTransactionId() );
         rspSellOrderDetail2.setAmount( walletTransaction.getAmount() );
         rspSellOrderDetail2.setPayMethodTypes( walletTransaction.getPayMethodTypes() );
-        rspSellOrderDetail2.setReceivedTimeMonth( walletTransaction.getReceivedTimeMonth() );
-        rspSellOrderDetail2.setTransferTimeMonth( walletTransaction.getTransferTimeMonth() );
-        rspSellOrderDetail2.setSuccessNumMonth( walletTransaction.getSuccessNumMonth() );
-        rspSellOrderDetail2.setSuccessRateMonth( walletTransaction.getSuccessRateMonth() );
+        rspSellOrderDetail2.setReceivedTimeMonth( seller.getReceivedTimeMonth() );
+        rspSellOrderDetail2.setTransferTimeMonth( seller.getTransferTimeMonth() );
+        rspSellOrderDetail2.setSuccessNumMonth( seller.getSuccessNumMonth() );
+        rspSellOrderDetail2.setSuccessRateMonth( seller.getSuccessRateMonth() );
         rspSellOrderDetail2.setCreditRating( 5 );
         rspSellOrderDetail2.setCanSplit( walletTransaction.getCanSplit() );
         if ( walletTransaction.getCanSplit() ) {
