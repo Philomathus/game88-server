@@ -25,6 +25,8 @@ public interface WalletTransactionDetailMapper extends BaseMapper<WalletTransact
      */
     public List<WalletTransactionDetail> selectWalletTransactionDetailList( WalletTransactionDetail walletTransactionDetail );
 
+    public List<WalletTransactionDetail> selectWalletTransactionDetailListAdmin( WalletTransactionDetail walletTransactionDetail );
+
     @Select( "select count(1) from wallet_transaction_detail where seller_id = #{sellerId} and buyer_confirm_buy_time >= "
             + "#{startTime} and buyer_confirm_buy_time <= #{endTime} and status <> 'BUYER_CANCEL';" )
     Long countSellerTotal( @Param( "sellerId" ) String sellerId, @Param( "startTime" ) LocalDateTime startTime, @Param(

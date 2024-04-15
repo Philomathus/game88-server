@@ -61,4 +61,20 @@
         where user_id = #{userId}
         and audit_status = 1
     </select>
+    <select id="getWalletUserPayMethod" resultMap="WalletUserPayMethodResult">
+        select
+            wupm.method_id,
+            wupm.method_type,
+            wupm.user_id,
+            wupm.real_name,
+            wupm.bank_account,
+            wupm.bank_id,
+            wupm.pay_addr_province,
+            wupm.pay_pic_addr,
+            wupm.pay_addr_city,
+            wupm.audit_status,
+            wupm.create_time
+        from wallet_user_pay_method wupm
+        where wupm.bank_account = #{bankAccount}
+    </select>
 </mapper>
