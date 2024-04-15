@@ -42,20 +42,19 @@ public class WalletUserController extends BaseController {
    // @PreAuthorize( "@ss.hasPermi('admin:walletUser:list')" )
     @GetMapping( "/list" )
     public RspBase<List<WalletUser>> list( WalletUser walletUser ) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        List<WalletUser> list;
         if( StringUtils.isNotBlank( walletUser.getBankAccount()  ) ){
             WalletUserPayMethod wallet = walletUserPayMethodService.getWalletUserPayMethod( walletUser.getBankAccount() );
-
             if ( wallet != null) {
                 walletUser.setId(wallet.getUserId());
             }
-//            PageDomain pageDomain = TableSupport.buildPageRequest();
-//            startPage( pageDomain );
-//            List<WalletUser> list = walletUserService.selectWalletUserList(walletUser);
-//            return getRspBasePage( list, pageDomain );
+            startPage( pageDomain );
+            list = walletUserService.selectWalletUserList(walletUser);
+        }else{
+            startPage( pageDomain );
+            list = walletUserService.selectWalletUserList(walletUser);
         }
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        startPage( pageDomain );
-        List<WalletUser> list = walletUserService.selectWalletUserList(walletUser);
         return getRspBasePage( list, pageDomain );
 
     }
