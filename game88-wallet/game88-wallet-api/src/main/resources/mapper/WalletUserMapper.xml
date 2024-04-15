@@ -181,7 +181,7 @@
 
     <update id="reduceSaleMoney">
         update wallet_user
-        set amount     = amount - #{money},
+        set amount     = amount - #{money}
         where id = #{userId}
           and amount - #{money} >= 0
     </update>
