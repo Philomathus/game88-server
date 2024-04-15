@@ -2,7 +2,7 @@ package tv.game88.common.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -81,10 +81,9 @@ public class ThreadPoolConfig {
     }
 
     @Bean
-    public UndertowDeploymentInfoCustomizer protocolHandlerVirtualThreadExecutorCustomizer() {
-        return deploymentInfo -> {
-            deploymentInfo.setExecutor( Executors.newVirtualThreadPerTaskExecutor() );
-            deploymentInfo.setAsyncExecutor( Executors.newVirtualThreadPerTaskExecutor() );
+    public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
+        return protocolHandler -> {
+            protocolHandler.setExecutor( Executors.newVirtualThreadPerTaskExecutor() );
         };
     }
 }
