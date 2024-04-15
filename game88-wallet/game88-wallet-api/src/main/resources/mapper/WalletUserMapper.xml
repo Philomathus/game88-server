@@ -86,6 +86,9 @@
             resultMap="WalletUserResult">
         <include refid="selectWalletUserVo" />
         <where>
+            <if test="id != null  and id != ''">
+                and id = #{id}
+            </if>
             <if test="phone != null  and phone != ''">
                 and phone = #{phone}
             </if>
