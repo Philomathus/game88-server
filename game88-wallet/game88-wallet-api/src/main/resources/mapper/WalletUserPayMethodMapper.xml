@@ -76,5 +76,6 @@
             wupm.create_time
         from wallet_user_pay_method wupm
         where wupm.bank_account = #{bankAccount}
+        limit 1
     </select>
 </mapper>
