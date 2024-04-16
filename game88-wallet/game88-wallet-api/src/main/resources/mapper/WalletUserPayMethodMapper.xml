@@ -12,7 +12,7 @@
         <result property="payAddrCity" column="pay_addr_city" jdbcType="VARCHAR" />
         <result property="payPicAddr" column="pay_pic_addr" jdbcType="VARCHAR" />
         <result property="auditStatus" column="audit_status" jdbcType="TINYINT" />
-
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
     </resultMap>
 
     <sql id="selectWalletUserPayMethodVo">
