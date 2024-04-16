@@ -119,6 +119,7 @@ public class WalletUserController extends BaseController {
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setFundPassword( "" );
+        update.setStatus( 1 );
         redisUtils.unlink( Constants.WALLET_PREX + "lock:fundPassword:" + memberId );
         return toResult( walletUserService.updateById( update ) );
     }
