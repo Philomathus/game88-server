@@ -43,7 +43,7 @@ public class WalletUserPayMethodController extends BaseController {
         return RspBase.ok( WalletPayMethodEnum.getPayMethodTypes() );
     }
 
-    @Log( title = "钱包付款方式钱包付款方式", businessType = BusinessType.EFFECT )
+//    @Log( title = "钱包付款方式钱包付款方式", businessType = BusinessType.EFFECT )
     @PutMapping( "/changeStatus/{methodId}/{auditStatus}/{mfa}" )
     public RspBase<?> changeStatus( @PathVariable String methodId, @PathVariable Integer auditStatus, @PathVariable Integer mfa ) throws Exception {
         SecurityUtils.verifyMFACode( mfa );
