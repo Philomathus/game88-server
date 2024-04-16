@@ -255,7 +255,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         if ( memberCard != null && StringUtils.isNotBlank( memberCard.getRealName() ) ) {
             reqMap.put( "realName", memberCard.getRealName() );
         }
-        reqMap.put( "userId", memberId );
+        reqMap.put( "userId", profile + "_" + memberId );
         String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
 
@@ -382,6 +382,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
                     return RspBase.ok( "请求成功,请前往QDPay支付中心确认", result.getOrDefault( "payUrl", "" ).toString() );
                 }
             } else {
+                memberRechargeOnlineMapper.deleteById( orderId );
                 return RspBase.businessError( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }

@@ -1,6 +1,5 @@
 package tv.game88.common.exception;
 
-import io.undertow.server.handlers.form.MultiPartParserDefinition;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -41,8 +40,6 @@ public abstract class ControllerExceptionHandler {
         } else if ( e instanceof NumberFormatException ) {
             log.error( e.getMessage(), e );
             return new RspBase<>( 1, "数据格式校验失败" );
-        } else if ( e instanceof MultiPartParserDefinition.FileTooLargeException ) {
-            return RspBase.businessError( "文件上传过大,请缩小图片尺寸" );
         } else if ( e instanceof BusinessException ) {
             log.error( e.getMessage(), e );
             return RspBase.businessError( e.getMessage() );

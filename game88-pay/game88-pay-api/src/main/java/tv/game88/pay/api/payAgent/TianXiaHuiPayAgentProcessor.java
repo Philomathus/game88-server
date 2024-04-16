@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.TIANXIAHUI_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.TIANXIAHUI_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
     @Override

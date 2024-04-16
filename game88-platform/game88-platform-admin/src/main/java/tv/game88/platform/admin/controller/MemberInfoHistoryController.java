@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
@@ -58,13 +59,12 @@ public class MemberInfoHistoryController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:infoHistory:export')" )
     @Log( title = "导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<?> export( MemberInfoHistory memberInfo, HttpServletResponse response ) {
+    public void export( MemberInfoHistory memberInfo, HttpServletResponse response ) {
         List<MemberInfoHistory> list = memberInfoHistoryService.memberInfoHistoryList( memberInfo );
         if ( list.size() <= 200000L ) {
             ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
-            return RspBase.ok( "下载成功" );
         } else {
-            return RspBase.businessError( "导出条数超过20万条" );
+            throw new BusinessException( "导出条数超过20万条" );
         }
     }
 

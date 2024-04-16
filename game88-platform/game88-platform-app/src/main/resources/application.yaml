@@ -1,7 +1,7 @@
 server:
   undertow:
     threads:
-      io: 16
+      io: 32
       worker: 256
     buffer-size: 1024
     direct-buffers: true
@@ -67,7 +67,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   lifecycle:
-    timeout-per-shutdown-phase: 5s
+    timeout-per-shutdown-phase: 10s
 
 pagehelper:
   autoRuntimeDialect: true

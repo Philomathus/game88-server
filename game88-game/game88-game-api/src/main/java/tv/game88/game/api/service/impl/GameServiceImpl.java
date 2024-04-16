@@ -213,7 +213,7 @@ public class GameServiceImpl implements GameService {
             baseGameDock.getJoinGameUrl( reqJoinGame );
 
             // 异步上分
-            SpringUtils.getAopProxy( this ).topUpGame( reqJoinGame, baseGameDock );
+            SpringUtils.getBean( GameService.class ).topUpGame( reqJoinGame, baseGameDock );
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
             log.error( "gameId:{}, userId:{}, 进入游戏失败,失败原因:{}", infoId, platformUser.getId(), e.getMessage(), e );
@@ -223,7 +223,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Async
-    protected void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
+    public void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         // 设置为上分操作
         reqJoinGame.setMoneyType( 1 );
         if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) > 0 ) {
@@ -280,7 +280,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Async
-    protected void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
+    public void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         boolean success = false;
         try {
             baseGameDock.withdrawal( reqJoinGame );
@@ -342,7 +342,7 @@ public class GameServiceImpl implements GameService {
             }
             reqJoinGame.setTransferMoney( balance );
             // 异步下分
-            SpringUtils.getAopProxy( this ).cashOutGame( reqJoinGame, baseGameDock );
+            SpringUtils.getBean( GameService.class ).cashOutGame( reqJoinGame, baseGameDock );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
