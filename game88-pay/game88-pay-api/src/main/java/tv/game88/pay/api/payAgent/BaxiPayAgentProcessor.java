@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-@Repository( value = ConstantsPayAgent.BAXI_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.BAXI_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class BaxiPayAgentProcessor extends AbstractPayAgent {
 

@@ -77,39 +77,31 @@ public class WalletTransaction implements Serializable {
     /**
      * 30日成单数
      */
+    @TableField( exist = false )
     private Integer successNumMonth;
 
     /**
      * 30日成单率
      */
+    @TableField( exist = false )
     private String successRateMonth;
 
-    /**
-     * 30日平均付款时间
-     */
-    private String receivedTimeMonth;
-
-    /**
-     * 30日平均放币时间
-     */
-    private String transferTimeMonth;
-
     @TableField( exist = false )
-    private WalletPayMethodEnum payMethodType;
+    private WalletPayMethodEnum       payMethodType;
     @TableField( exist = false )
     private List<WalletPayMethodEnum> payMethodTypeList;
     @TableField( exist = false )
-    private Long                minAmount;
+    private Long                      minAmount;
     @TableField( exist = false )
-    private Long                maxAmount;
+    private Long                      maxAmount;
     @TableField( exist = false )
-    private List<Integer>       statusList;
+    private List<Integer>             statusList;
     @TableField( exist = false )
-    private String       unUserId;
+    private String                    unUserId;
 
     @TableField( exist = false )
     private String beginTime;
-    
+
     @TableField( exist = false )
     private String endTime;
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import tv.game88.common.vo.RspBase;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
+import tv.game88.wallet.api.entity.WalletUser;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public interface WalletTransactionService extends IService<WalletTransaction> {
     RspBase<String> sellOrder( String userId, ReqSellCoins reqSellCoins );
 
-    void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum );
+    void saveTransAndReduceUserAmount( String userId, WalletTransaction walletTransaction, Long sellNum, WalletUser update );
 
     void updateTransAndAddUserAmount( String userId, WalletTransaction update, Long amount );
 

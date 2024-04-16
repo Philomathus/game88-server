@@ -19,10 +19,11 @@ import java.util.Arrays;
 public class RedisSubConfig {
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer( RedisConnectionFactory redisConnectionFactory ) {
+    public RedisMessageListenerContainer redisMessageListenerContainer( RedisConnectionFactory redisConnectionFactory,
+                                                                        SubRedisMessageListener subRedisMessageListener ) {
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
         listenerContainer.setConnectionFactory( redisConnectionFactory );
-        listenerContainer.addMessageListener( new SubRedisMessageListener(), Arrays.asList(
+        listenerContainer.addMessageListener( subRedisMessageListener, Arrays.asList(
                 new PatternTopic( ConstantsWallet.SSE_NOTIFICATION_CHANNEL + "*" ),
                 new PatternTopic( ConstantsWallet.SSE_MEMBER_CHANNEL + "*" )
         ) );

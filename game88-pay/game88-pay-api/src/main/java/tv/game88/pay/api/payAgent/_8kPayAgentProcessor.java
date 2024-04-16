@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent._8K_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent._8K_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class _8kPayAgentProcessor extends AbstractPayAgent {
 

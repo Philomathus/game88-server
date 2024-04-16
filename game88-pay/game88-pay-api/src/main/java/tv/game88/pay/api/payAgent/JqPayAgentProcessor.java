@@ -26,7 +26,7 @@ import java.io.Reader;
 import java.math.RoundingMode;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.JQ_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.JQ_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class JqPayAgentProcessor extends AbstractPayAgent {
     @Override

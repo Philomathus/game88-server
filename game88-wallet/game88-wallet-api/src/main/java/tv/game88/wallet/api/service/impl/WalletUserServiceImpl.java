@@ -264,8 +264,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
-                reqEmbeddedLogin.getWalletAddress() );
+        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -294,6 +293,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     this.baseMapper.insert( walletUser );
                 }
             }
+            //            else{
+            //                walletUser.setPlatformId( walletUser.getPlatformId() + " , " + reqEmbeddedLogin.getUserId() );
+            //                this.baseMapper.updateById( walletUser );
+            //            }
         } else {
             walletUser = this.baseMapper.selectById( reqEmbeddedLogin.getWalletAddress() );
             if ( walletUser == null ) {
@@ -367,13 +370,16 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id", "fund_password" )
+                .select( "id","status" ,"fund_password" )
                 .one();
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
         if ( StringUtils.isNotBlank( walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "已经设置过资金密码" );
+        }
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
         }
         WalletUser update = new WalletUser();
         update.setId( userId );
@@ -440,15 +446,17 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         String key = Constants.WALLET_PREX + "lock:fundPassword:" + walletUser.getId();
         if ( redisUtils.exists( key ) && Long.parseLong( redisUtils.strGet( key ) ) >= 5 ) {
-            return RspBase.businessError(
-                    "资金密码错误过多，账号被锁定" + LocalDateTimeUtils.secondsToTime( redisUtils.getExpire( key ) )
-                            + ",请联系客服重置" );
+            return RspBase.businessError( "资金密码错误过多，账号被锁定,请联系客服重置" );
         }
         if ( !passwordEncoder.matches( rawPassword, walletUser.getFundPassword() ) ) {
             Long num = redisUtils.strIncrement( key );
             redisUtils.expire( key, Duration.ofDays( 1 ) );
             if ( num >= 5 ) {
-                return RspBase.businessError( "资金密码错误5次，账号被锁定一天,请联系客服重置" );
+                WalletUser update = new WalletUser();
+                update.setId( walletUser.getId() );
+                update.setStatus( 2 );
+                this.baseMapper.updateById( update );
+                return RspBase.businessError( "资金密码错误5次，账号被锁定,请联系客服重置" );
             }
             return RspBase.businessError( "资金密码错误，请重新输入" );
         } else {
@@ -536,6 +544,11 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "密码和确认密码必须匹配!" );
         }
 
+        RspBase<?> rspBase = this.validWalletUser( walletUser );
+        if ( rspBase != null ) {
+            return rspBase;
+        }
+
         WalletUser updateUser = new WalletUser();
         updateUser.setId( userId );
         updateUser.setPassword( passwordEncoder.encode( reqSetPasswd.password() ) );
@@ -547,7 +560,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id", "fund_password" )
+                .select( "id","status", "fund_password" )
                 .one();
 
         if ( walletUser == null ) {
@@ -561,6 +574,10 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         }
         if ( passwordEncoder.matches( reqResetFundPasswd.fundNewPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不能与已有密码相同!" );
+        }
+
+        if ( walletUser.getStatus() != 1 ) {
+            return RspBase.businessError( "用户状态异常,请联系客服" );
         }
 
         WalletUser update = new WalletUser();
@@ -609,7 +626,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
         }
-        return RspBase.ok( IdCardDto.builder()
+        return RspBase.ok( IdCardDto
+                .builder()
                 .realName( walletUser.getRealName() )
                 .idCardNumber( walletUser.getIdNumber() )
                 .idFrontPic( walletUser.getIdFrontPic() )

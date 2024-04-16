@@ -5,6 +5,7 @@ import org.springframework.retry.annotation.Retryable;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.game.api.base.BaseGameDock;
 import tv.game88.game.api.dto.*;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public interface GameService {
 
     RspBase<?> verify( String traceId, ReqPGSoftGameData data );
 
-    @Retryable( value = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
+    @Retryable( retryFor = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
     List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds );
+
+    void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock );
+
+    void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock );
 }

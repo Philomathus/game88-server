@@ -20,7 +20,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.BB_JIUDING_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.BB_JIUDING_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
     @Override

@@ -42,7 +42,8 @@
 
     <select id="selectGameDataRecordAgentList" resultMap="GameDataRecordResult">
         <include refid="selectGameDataRecordVo" />
-        where create_time <![CDATA[ >= ]]>  #{start} and create_time <![CDATA[ <= ]]>  #{end}
+        where create_time <![CDATA[ >= ]]> TIMESTAMP(STR_TO_DATE(#{start}, '%Y-%m-%d %H:%i:%s')) and create_time
+        <![CDATA[ <= ]]> TIMESTAMP(STR_TO_DATE(#{end}, '%Y-%m-%d %H:%i:%s'))
         and agent = #{agent}
         <if test="account != null ">and account = #{account}</if>
         <if test="platformId != null ">and platform_id = #{platformId}</if>

@@ -3,6 +3,7 @@ package tv.game88.platform.admin.controller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
@@ -69,13 +70,12 @@ public class MemberMoneyController extends BaseController{
     @PreAuthorize( "@ss.hasPermi('member:money:export')" )
     @Log( title = "导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<?> export( MemberMoney memberMoney, HttpServletResponse response ) {
+    public void export( MemberMoney memberMoney, HttpServletResponse response ) {
         List<MemberMoney> list = memberMoneyService.selectAllMemberMoneyList( memberMoney );
         if ( list.size() <= 200000L ) {
             ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberMoney.class, response );
-            return RspBase.ok( "下载成功" );
         } else {
-            return RspBase.businessError( "导出条数超过20万条" );
+            throw new BusinessException( "导出条数超过20万条" );
         }
     }
 

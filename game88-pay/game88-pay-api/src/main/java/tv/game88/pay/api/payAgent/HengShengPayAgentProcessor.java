@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.HENG_SHENG_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.HENG_SHENG_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class HengShengPayAgentProcessor extends AbstractPayAgent {
 

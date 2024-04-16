@@ -31,7 +31,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.SANJIN_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.SANJIN_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class SanJinPayAgentProcessor extends AbstractPayAgent {
     @Override

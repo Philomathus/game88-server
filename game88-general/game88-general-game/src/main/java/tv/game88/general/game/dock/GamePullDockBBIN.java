@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
 @Log4j2
 @Repository( value = ConstantsGame.BBIN + "GamePullProcessor" )
 public class GamePullDockBBIN extends AbstractGamePull {
-    private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", "30", "31",
+    private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", /*"30",*/ "31",
             "38", "66", /*"93",*/ "99" );
     private static final String       WAGERS_RECORD_KEY8 = "SNjv90Bz";
 
@@ -106,6 +106,7 @@ public class GamePullDockBBIN extends AbstractGamePull {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getApiUrl() + "/WagersRecordBy" + wagerTypes[ 0 ] ).queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
