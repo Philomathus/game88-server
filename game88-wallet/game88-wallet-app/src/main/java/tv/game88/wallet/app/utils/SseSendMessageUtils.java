@@ -28,7 +28,6 @@ public class SseSendMessageUtils {
                         .data( messageBody, MediaType.APPLICATION_JSON )
                         .reconnectTime( 2000L ) );
             } catch ( Exception e ) {
-                ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( memberId );
                 sseEmitter.completeWithError( e );
             }
         } );
