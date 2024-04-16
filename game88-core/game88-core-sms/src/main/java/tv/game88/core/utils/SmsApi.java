@@ -192,8 +192,6 @@ public class SmsApi {
     /**
      * 构造X-WSSE参数值 Construct X-WSSE parameter value
      *
-     * @param appKey
-     * @param appSecret
      */
     private static String buildWsseHeader( String appKey, String appSecret ) {
         try {
