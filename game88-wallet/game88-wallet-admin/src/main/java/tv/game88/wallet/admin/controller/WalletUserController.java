@@ -10,10 +10,12 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
+import tv.game88.core.config.constants.Constants;
 import tv.game88.wallet.api.dto.ReqChangeAllStatus;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
@@ -35,6 +37,9 @@ public class WalletUserController extends BaseController {
 
     @Resource
     private WalletUserPayMethodService walletUserPayMethodService;
+
+    @Resource
+    private RedisUtils              redisUtils;
 
     /**
      * 查询钱包用户列表
@@ -114,6 +119,7 @@ public class WalletUserController extends BaseController {
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setFundPassword( "" );
+        redisUtils.unlink( Constants.WALLET_PREX + "lock:fundPassword:" + memberId );
         return toResult( walletUserService.updateById( update ) );
     }
 
