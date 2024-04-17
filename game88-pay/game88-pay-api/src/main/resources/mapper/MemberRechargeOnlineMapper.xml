@@ -140,7 +140,7 @@
 
     <select id="selectRspReportList" resultType="tv.game88.pay.api.dto.RspRechargeOnline">
         SELECT p.name AS platformName,
-        c.rate as channelPayRate,
+        IFNULL(c.rate,t.rate) as channelPayRate,
         c.name AS channelName,
         t.platform_id as platformId,
         t.channel_id as channelId,
