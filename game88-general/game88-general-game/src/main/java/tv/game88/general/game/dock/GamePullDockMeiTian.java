@@ -30,10 +30,10 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         String url = gamePlatform.getApiUrl() + QUERY_RECORD_2 + "/" + gamePlatform.getAgent() + "/" + Base64
                 .getEncoder()
                 .encodeToString( rawDataStr.getBytes() );
-
+        log.warn( url );
         Map<String, Object> resultMap = restTemplate.postForObject( url, null, Map.class );
 
-        //log.warn( JsonUtil.object2Json( resultMap ) );
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( StringUtils.equals( "1", resultMap.getOrDefault( "resultCode", "-2" ).toString() ) ) {
                 List<Object> transList = ( List<Object> ) resultMap.get( "transList" );
