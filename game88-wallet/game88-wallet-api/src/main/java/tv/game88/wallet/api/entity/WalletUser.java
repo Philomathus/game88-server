@@ -28,11 +28,14 @@ public class WalletUser implements Serializable {
      */
     @TableId( type = IdType.INPUT )
     private String        id;
+    private String        platformId;
+    /**
+     * 商户ID
+     */
+    private Long          merchantId;
     /**
      * 昵称
      */
-    private String        platformId;
-
     private String        nickName;
     /**
      * 用户头像
@@ -54,12 +57,10 @@ public class WalletUser implements Serializable {
      * 金额
      */
     private Long          amount;
-
     /**
      * 冻结金额
      */
-    private Long frozenAmount;
-
+    private Long          frozenAmount;
     /**
      * 资金密码
      */
@@ -160,19 +161,19 @@ public class WalletUser implements Serializable {
     private String        remarks;
 
     @TableField( exist = false )
-    private String        bankAccount;
+    private String bankAccount;
 
     @Schema( title = "30日成单数" )
     private Integer successNumMonth;
 
     @Schema( title = "30日成单率" )
-    private String  successRateMonth;
+    private String successRateMonth;
 
     @Schema( title = "30日平均付款时间" )
-    private String  receivedTimeMonth;
+    private String receivedTimeMonth;
 
     @Schema( title = "30日平均放币时间" )
-    private String  transferTimeMonth;
+    private String transferTimeMonth;
 
     @TableField( exist = false )
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )

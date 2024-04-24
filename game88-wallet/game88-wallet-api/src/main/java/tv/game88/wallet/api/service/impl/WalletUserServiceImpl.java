@@ -38,9 +38,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author meng.jun
@@ -264,7 +262,8 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
+        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
+                reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -293,10 +292,6 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
                     this.baseMapper.insert( walletUser );
                 }
             }
-            //            else{
-            //                walletUser.setPlatformId( walletUser.getPlatformId() + " , " + reqEmbeddedLogin.getUserId() );
-            //                this.baseMapper.updateById( walletUser );
-            //            }
         } else {
             walletUser = this.baseMapper.selectById( reqEmbeddedLogin.getWalletAddress() );
             if ( walletUser == null ) {
@@ -314,6 +309,14 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
             this.baseMapper.insert( walletUser );
         }
+
+        WalletUser update = new WalletUser();
+        update.setId( walletUser.getId() );
+        update.setMerchantId( reqEmbeddedLogin.getMerchantId() );
+        Set<String> platformIds = new TreeSet<>( Arrays.asList( walletUser.getPlatformId().split( "," ) ) );
+        platformIds.add( reqEmbeddedLogin.getUserId() );
+        update.setPlatformId( String.join( ",", platformIds ) );
+        this.baseMapper.updateById( update );
 
         if ( walletUser.getFrozenAmount() == null ) {
             walletUser.setFrozenAmount( 0L );
@@ -370,7 +373,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> fundPassSet( String userId, ReqFundPass reqFundPass ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id","status" ,"fund_password" )
+                .select( "id", "status", "fund_password" )
                 .one();
         if ( walletUser == null ) {
             return RspBase.businessError( "用户不存在" );
@@ -560,7 +563,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     public RspBase<?> resetFunPassword( String userId, ReqConstant.ReqResetFundPasswd reqResetFundPasswd ) {
         WalletUser walletUser = new QueryChainWrapper<>( this.baseMapper )
                 .eq( "id", userId )
-                .select( "id","status", "fund_password" )
+                .select( "id", "status", "fund_password" )
                 .one();
 
         if ( walletUser == null ) {
