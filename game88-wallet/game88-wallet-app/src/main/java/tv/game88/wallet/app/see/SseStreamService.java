@@ -62,10 +62,10 @@ public class SseStreamService {
     }
 
     private void removeMemberSseEmitter( String memberId ) {
-        if ( ConstantsWallet.MEMBER_SSEEMITTER_MAP.containsKey( memberId ) ) {
-            ConstantsWallet.MEMBER_SSEEMITTER_MAP.get( memberId ).complete();
+        SseEmitter sseEmitter = ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( memberId );
+        if ( sseEmitter != null ) {
+            sseEmitter.complete();
         }
-        ConstantsWallet.MEMBER_SSEEMITTER_MAP.remove( memberId );
     }
 
     @ExceptionHandler

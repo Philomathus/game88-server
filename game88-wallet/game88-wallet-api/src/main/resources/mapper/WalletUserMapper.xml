@@ -5,7 +5,8 @@
 <mapper namespace="tv.game88.wallet.api.mapper.WalletUserMapper">
     <resultMap id="WalletUserResult" type="tv.game88.wallet.api.entity.WalletUser">
         <id property="id" column="id" jdbcType="VARCHAR" />
-        <id property="platformId" column="platform_id" jdbcType="VARCHAR" />
+        <result property="platformId" column="platform_id" jdbcType="VARCHAR" />
+        <result property="merchantId" column="merchant_id" jdbcType="BIGINT" />
         <result property="nickName" column="nick_name" jdbcType="VARCHAR" />
         <result property="headImg" column="head_img" jdbcType="VARCHAR" />
         <result property="password" column="password" jdbcType="VARCHAR" />
@@ -46,6 +47,7 @@
     <sql id="selectWalletUserVo">
         select id,
                platform_id,
+               merchant_id,
                nick_name,
                head_img,
                password,
