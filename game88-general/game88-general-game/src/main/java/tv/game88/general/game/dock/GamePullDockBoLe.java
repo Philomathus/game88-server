@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BOLE + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.BOLE + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBoLe extends AbstractGamePull {
 
     @Override

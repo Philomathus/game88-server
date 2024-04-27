@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 @Log4j2
-@Repository( value = ConstantsGame.JDB + "GamePullProcessor" )
+@Repository( value = ConstantsGame.JDB + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockJDB extends AbstractGamePull {
 
     @Override

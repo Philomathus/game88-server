@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.BG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBG extends AbstractGamePull {
     // 443 棋牌 105 捕鱼 411 西游捕鱼 484 大仙捕鱼
     private static final String[] GAME_TYPE_LIST = { "443" };

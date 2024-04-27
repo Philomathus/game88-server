@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.CG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.CG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockCG extends AbstractGamePull {
 
     private static final BigDecimal RATE = new BigDecimal( 1000 );

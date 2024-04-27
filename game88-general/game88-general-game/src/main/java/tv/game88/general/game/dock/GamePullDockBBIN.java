@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository( value = ConstantsGame.BBIN + "GamePullProcessor" )
+@Repository( value = ConstantsGame.BBIN + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBBIN extends AbstractGamePull {
     private static final List<String> WAGER_TYPE_LIST    = Arrays.asList( "3", "5-1", "5-2", "5-3", "5-5", "12", /*"30",*/ "31",
             "38", "66", /*"93",*/ "99" );
@@ -168,27 +168,5 @@ public class GamePullDockBBIN extends AbstractGamePull {
         gameDataRecord.setGameStartTime( endString );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTime.now() ) );
         return gameDataRecord;
-    }
-
-    public static void main( String[] args ) {
-
-        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( 1695268760000L );
-        LocalDateTime end = start.plusMinutes( 1 );
-
-        System.out.println(LocalDateTimeUtils.format( end ));
-
-        LocalDateTime startMD = LocalDateTimeUtils.convertToMeiDong( start );
-        LocalDateTime endMD   = LocalDateTimeUtils.convertToMeiDong( end );
-
-        System.out.println(LocalDateTimeUtils.format( startMD ));
-        System.out.println(LocalDateTimeUtils.format( endMD ));
-
-        if ( !LocalDateTimeUtils.isSameDay( startMD, endMD ) ) {
-            endMD = startMD.toLocalDate().atTime( 23, 59, 59 );
-            end = LocalDateTimeUtils.convertMeiDongToDefault( LocalDateTimeUtils.format( endMD.plusSeconds( 1 ) ) );
-
-            System.out.println(LocalDateTimeUtils.format( endMD ));
-            System.out.println(LocalDateTimeUtils.format( end ));
-        }
     }
 }

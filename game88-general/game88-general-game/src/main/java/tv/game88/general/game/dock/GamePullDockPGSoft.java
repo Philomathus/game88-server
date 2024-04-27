@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.PG_SOFT + "GamePullProcessor" )
+@Repository( value = ConstantsGame.PG_SOFT + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockPGSoft extends AbstractGamePull {
 
     private static final BigDecimal RATE = new BigDecimal( 1000 );

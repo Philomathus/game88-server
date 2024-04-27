@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.MG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.MG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockMG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {

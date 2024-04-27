@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.GAMING_365 + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.GAMING_365 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDock365 extends AbstractGamePull {
 
     @Override

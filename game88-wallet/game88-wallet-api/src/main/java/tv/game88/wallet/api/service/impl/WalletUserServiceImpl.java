@@ -573,7 +573,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
             return RspBase.businessError( "资金密码不存在,请设置您的资金密码!" );
         }
         if ( !passwordEncoder.matches( reqResetFundPasswd.fundOldPass(), walletUser.getFundPassword() ) ) {
-            return RspBase.businessError( "你以前的基金密码不匹配!" );
+            return RspBase.businessError( "您之前的资金密码不正确！" );
         }
         if ( passwordEncoder.matches( reqResetFundPasswd.fundNewPass(), walletUser.getFundPassword() ) ) {
             return RspBase.businessError( "密码不能与已有密码相同!" );

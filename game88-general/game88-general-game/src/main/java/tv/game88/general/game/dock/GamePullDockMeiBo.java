@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.MEIBO + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.MEIBO + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockMeiBo extends AbstractGamePull {
 
     @Override

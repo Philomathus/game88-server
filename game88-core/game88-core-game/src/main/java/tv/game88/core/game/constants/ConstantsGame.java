@@ -1,6 +1,8 @@
 package tv.game88.core.game.constants;
 
 public class ConstantsGame {
+    public static final String GAME_PULL_PROCESSOR = "GamePullProcessor";
+
     public static final String KAI_YUAN   = "kaiYuan";
     public static final String OG         = "og";
     public static final String AG         = "ag";
@@ -28,9 +30,9 @@ public class ConstantsGame {
     public static final String PG_SOFT    = "PGSoft";
     public static final String SHABA      = "shaBa";
 
-    public static final String T1      = "t1";
-    public static final String PP      = "pp";
-    public static final String CG      = "cg";
-    public static final String JILI    = "jiLi";
-    public static final String HACKSAW = "hacksaw";
+    public static final String T1     = "t1";
+    public static final String PP     = "pp";
+    public static final String CG     = "cg";
+    public static final String JILI   = "jiLi";
+    public static final String PG_NEW = "PGNew";
 }

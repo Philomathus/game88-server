@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.SHABA + "GamePullProcessor" )
+@Repository( value = ConstantsGame.SHABA + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockShaBa extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -118,10 +118,5 @@ public class GamePullDockShaBa extends AbstractGamePull {
             gameDataRecord.setGameStartTime( gameDataRecord.getGameEndTime() );
         }
         return gameDataRecord;
-    }
-
-    public static void main( String[] args ) {
-        String data = "2023-08-28T18:46:59.94";
-        System.out.println( data.substring( 0, 19 ) );
     }
 }

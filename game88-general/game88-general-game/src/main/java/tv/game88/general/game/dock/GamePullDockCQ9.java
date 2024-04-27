@@ -29,7 +29,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.CQ9 + "GamePullProcessor" )
+@Repository( value = ConstantsGame.CQ9 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockCQ9 extends AbstractGamePull {
 
     private static final String dateT_pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
