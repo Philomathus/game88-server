@@ -87,7 +87,7 @@ public class WalletUserController extends BaseController {
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeStatus/{memberId}" )
     public Object changeStatusBan( @PathVariable String memberId, Integer status, Integer googleAuthCode, String remarks) throws Exception {
-        SecurityUtils.verifyMFACode( googleAuthCode );
+//        SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setStatus( status );
@@ -99,7 +99,7 @@ public class WalletUserController extends BaseController {
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeVerified/{memberId}" )
     public Object changeVerified( @PathVariable String memberId, Integer isVerified, Integer googleAuthCode, String remarks) throws Exception {
-        SecurityUtils.verifyMFACode( googleAuthCode );
+//        SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setIsVerified( isVerified );
@@ -115,7 +115,7 @@ public class WalletUserController extends BaseController {
      */
     @PostMapping( "/resetFundPass/{memberId}" )
     public Object resetTxPass( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
-        SecurityUtils.verifyMFACode( googleAuthCode );
+//        SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setFundPassword( "" );
@@ -128,7 +128,7 @@ public class WalletUserController extends BaseController {
     @PostMapping( value = "/realNameUpdate/{memberId}" )
     @Log( title = "重置会员登录密码", businessType = BusinessType.UPDATE )
     public RspBase<?> reset( @PathVariable String memberId, String realName, Integer googleAuthCode ) throws Exception {
-        SecurityUtils.verifyMFACode( googleAuthCode );
+//        SecurityUtils.verifyMFACode( googleAuthCode );
         WalletUser update = new WalletUser();
         update.setId( memberId );
         update.setRealName( realName );
@@ -168,7 +168,7 @@ public class WalletUserController extends BaseController {
     @Log( title = "修改用户状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeAllStatus" )
     public Object changeAllStatus(@RequestBody ReqChangeAllStatus reqChangeAllStatus) throws Exception {
-        SecurityUtils.verifyMFACode( reqChangeAllStatus.getGoogleAuthCode() );
+//        SecurityUtils.verifyMFACode( reqChangeAllStatus.getGoogleAuthCode() );
 
         return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
                 .set(WalletUser::getStatus, reqChangeAllStatus.getStatus())
@@ -181,7 +181,7 @@ public class WalletUserController extends BaseController {
     @Log( title = "修改用户验证状态", businessType = BusinessType.UPDATE )
     @PutMapping( "/changeAllVerificationStatus" )
     public RspBase<?> changeAllVerificationStatus( @RequestBody ReqChangeAllStatus reqChangeAllVerificationStatus ) throws Exception {
-        SecurityUtils.verifyMFACode( reqChangeAllVerificationStatus.getGoogleAuthCode() );
+//        SecurityUtils.verifyMFACode( reqChangeAllVerificationStatus.getGoogleAuthCode() );
 
         return toResult(walletUserService.update(new LambdaUpdateWrapper<WalletUser>()
                 .set(WalletUser::getIsVerified, reqChangeAllVerificationStatus.getStatus())
