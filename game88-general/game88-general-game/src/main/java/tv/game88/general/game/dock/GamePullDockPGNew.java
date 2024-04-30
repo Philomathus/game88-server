@@ -22,6 +22,8 @@ import java.util.TreeMap;
 @Repository( value = ConstantsGame.PG_NEW + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockPGNew extends AbstractGamePull {
 
+    private static final BigDecimal RATE = new BigDecimal( 1000 );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
@@ -48,7 +50,7 @@ public class GamePullDockPGNew extends AbstractGamePull {
                     String              payoffTime = String.valueOf( last.get( "payoff_time" ) ).substring( 0, 19 );
 
                     // 状态正常,无论是否有数据,从结束时间开始查询
-                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime, LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) ) );
+                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime, LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) ) );
                 }
                 return transactions;
             } else {
@@ -73,26 +75,27 @@ public class GamePullDockPGNew extends AbstractGamePull {
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
         String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String   account = String.valueOf( remoteGameDatum.get( "thirdUid" ) ).toLowerCase();
+        String   account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
         String[] spl     = account.split( "_" );
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
-        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "nid" ) ) );
-        String chip = remoteGameDatum.get( "chip" ).toString();
-        gameDataRecord.setCellScore( chip );
-        gameDataRecord.setAllBet( chip );
-        BigDecimal allGetMoney = new BigDecimal( remoteGameDatum.get( "allGetMoney" ).toString() );
-        gameDataRecord.setProfit( allGetMoney.subtract( new BigDecimal( chip ) ).toString() );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
+        BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
+        gameDataRecord.setCellScore( chip.toString() );
+        gameDataRecord.setAllBet( chip.toString() );
+        BigDecimal allGetMoney = new BigDecimal( remoteGameDatum.get( "allGetMoney" ).toString() ).multiply( RATE );
+        gameDataRecord.setProfit( allGetMoney.subtract( chip ).toString() );
 
         String createTime = remoteGameDatum.get( "create_time" ).toString();
         String payoffTime = remoteGameDatum.get( "payoff_time" ).toString();
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( createTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setAgent( spl[ 0 ] );
+        gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
