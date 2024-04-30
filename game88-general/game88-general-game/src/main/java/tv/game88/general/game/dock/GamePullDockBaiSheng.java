@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BAISHENG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.BAISHENG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBaiSheng extends AbstractGamePull {
 
     @Override

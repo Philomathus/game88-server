@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository ( value = ConstantsGame.FG + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.FG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockFG extends AbstractGamePull {
 
     private static final List<String> GT_TYPE_LIST = Arrays.asList( "hunter", "chess", "slot", "arcade" );

@@ -14,7 +14,6 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
-import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.dto.RspZdList;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -32,7 +31,7 @@ import java.util.Map;
 
 
 @Log4j2
-@Repository ( value = ConstantsGame.KAI_YUAN + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.KAI_YUAN + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockKaiYuan extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -144,13 +143,5 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
-    }
-
-    public static void main( String[] args ) {
-        String   accounts   = "602986_7708_1886050";
-        String[] splitParam = accounts.split( "_" );
-        System.out.println( StringUtils.substringAfter( accounts, "_" ) );
-        System.out.println( splitParam[ 0 ] );
-        System.out.println( splitParam[ 1 ] );
     }
 }

@@ -13,10 +13,10 @@ public class GamePullDockFactoryUtil {
 
     public BaseGamePull createGamePullProcessor( EnumGameCategory enumGameCategory ) {
         return switch ( enumGameCategory ) {
-            case UPG, MG -> ( BaseGamePull ) context.getBean( EnumGameCategory.MG.getType() + "GamePullProcessor" );
+            case UPG, MG -> ( BaseGamePull ) context.getBean( EnumGameCategory.MG.getType() + ConstantsGame.GAME_PULL_PROCESSOR );
             case KAIXUAN_X, KAIYUAN, LEYOU -> ( BaseGamePull ) context.getBean(
-                    EnumGameCategory.KAIYUAN.getType() + "GamePullProcessor" );
-            default -> ( BaseGamePull ) context.getBean( enumGameCategory.getType() + "GamePullProcessor" );
+                    EnumGameCategory.KAIYUAN.getType() + ConstantsGame.GAME_PULL_PROCESSOR );
+            default -> ( BaseGamePull ) context.getBean( enumGameCategory.getType() + ConstantsGame.GAME_PULL_PROCESSOR );
         };
     }
 }

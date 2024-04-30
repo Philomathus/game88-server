@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.HG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.HG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockHG extends AbstractGamePull {
 
     private static final String MODE = "2";

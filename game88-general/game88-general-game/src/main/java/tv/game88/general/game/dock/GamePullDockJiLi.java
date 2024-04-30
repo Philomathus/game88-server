@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2
-@Repository( value = ConstantsGame.JILI + "GamePullProcessor" )
+@Repository( value = ConstantsGame.JILI + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockJiLi extends AbstractGamePull {
 
     private static final BigDecimal RATE = new BigDecimal( 1000 );

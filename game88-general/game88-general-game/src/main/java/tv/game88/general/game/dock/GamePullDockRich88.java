@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository ( value = ConstantsGame.RICH88 + "GamePullProcessor" )
+@Repository ( value = ConstantsGame.RICH88 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockRich88 extends AbstractGamePull {
 
     @Override

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Log4j2
-@Repository( value = ConstantsGame.AG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.AG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockAG extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {

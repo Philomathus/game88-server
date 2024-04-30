@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository( value = ConstantsGame.DATANG + "GamePullProcessor" )
+@Repository( value = ConstantsGame.DATANG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockDaTang extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {

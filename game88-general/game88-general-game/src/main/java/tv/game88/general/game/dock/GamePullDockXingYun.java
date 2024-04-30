@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository( value = ConstantsGame.XINGYUN + "GamePullProcessor" )
+@Repository( value = ConstantsGame.XINGYUN + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockXingYun extends AbstractGamePull {
 
     @Override
