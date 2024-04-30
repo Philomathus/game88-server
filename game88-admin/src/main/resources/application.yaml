@@ -13,7 +13,7 @@ spring:
     virtual:
       enabled: true
   profiles:
-    active: 8800
+    active: wallet-dev
   application:
     name: game88-admin
   datasource:
