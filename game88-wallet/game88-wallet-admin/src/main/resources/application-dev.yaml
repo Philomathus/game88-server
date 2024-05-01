@@ -9,4 +9,4 @@ spring:
       port: 6379
       password: EvYsN39ViArDumx4pWyH
 #     change DB for QA testing (24-03-2024)
-      database: 4
+      database: 2
