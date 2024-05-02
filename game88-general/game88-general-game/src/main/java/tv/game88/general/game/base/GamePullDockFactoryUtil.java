@@ -2,6 +2,7 @@ package tv.game88.general.game.base;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.core.game.type.EnumGameCategory;
 
 import jakarta.annotation.Resource;
