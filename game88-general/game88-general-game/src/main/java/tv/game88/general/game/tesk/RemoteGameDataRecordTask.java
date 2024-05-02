@@ -147,9 +147,6 @@ public class RemoteGameDataRecordTask {
                     gameDataRecords.add( gameDataRecord );
                 }
             }
-            if ( gamePlatform.getGameCategory() == EnumGameCategory.JDB ) {
-                log.warn( JsonUtil.object2Json( gameDataRecords ) );
-            }
             gameDataRecordService.batchInsert( gameDataRecords, gamePlatform, name );
         }
     }

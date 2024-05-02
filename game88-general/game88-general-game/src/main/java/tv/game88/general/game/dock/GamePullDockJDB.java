@@ -55,8 +55,6 @@ public class GamePullDockJDB extends AbstractGamePull {
             throw new BusinessException( e.getMessage() );
         }
 
-        // log.warn( json );
-
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "dc", gamePlatform.getLinecode() );
         requestMap.put( "x", encodedParam );
@@ -65,8 +63,8 @@ public class GamePullDockJDB extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
-        log.warn( "url:{} - x:{} - request:{} - result:{}", url, json, JsonUtil.object2Json( requestMap ),
-                JsonUtil.object2Json( resultMap ) );
+        /*log.warn( "url:{} - x:{} - request:{} - result:{}", url, json, JsonUtil.object2Json( requestMap ),
+                JsonUtil.object2Json( resultMap ) );*/
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "0000".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
