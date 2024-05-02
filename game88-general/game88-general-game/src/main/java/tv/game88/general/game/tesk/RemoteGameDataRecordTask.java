@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
@@ -145,6 +146,9 @@ public class RemoteGameDataRecordTask {
                 if ( gameDataRecord != null ) {
                     gameDataRecords.add( gameDataRecord );
                 }
+            }
+            if ( gamePlatform.getGameCategory() == EnumGameCategory.JDB ) {
+                log.warn( JsonUtil.object2Json( gameDataRecords ) );
             }
             gameDataRecordService.batchInsert( gameDataRecords, gamePlatform, name );
         }

@@ -83,15 +83,12 @@ public class GamePullDockJDB extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
-        String              seqNo           = String.valueOf( remoteGameDatum.get( "seqNo" ) );
-        if ( StringUtils.isBlank( seqNo ) ) {
-            seqNo = String.valueOf( remoteGameDatum.get( "historyId" ) );
-        }
-        if ( StringUtils.isBlank( seqNo ) ) {
+        String              historyId       = String.valueOf( remoteGameDatum.get( "historyId" ) );
+        if ( StringUtils.isBlank( historyId ) ) {
             log.error( "seqNo为空" + JsonUtil.object2Json( object ) );
             return null;
         }
-        gameDataRecord.setGameId( seqNo );
+        gameDataRecord.setGameId( historyId );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
