@@ -55,8 +55,6 @@ public class GamePullDockJDB extends AbstractGamePull {
             throw new BusinessException( e.getMessage() );
         }
 
-        // log.warn( json );
-
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "dc", gamePlatform.getLinecode() );
         requestMap.put( "x", encodedParam );
@@ -65,7 +63,8 @@ public class GamePullDockJDB extends AbstractGamePull {
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 
-        //log.warn( JsonUtil.object2Json( resultMap ) );
+        /*log.warn( "url:{} - x:{} - request:{} - result:{}", url, json, JsonUtil.object2Json( requestMap ),
+                JsonUtil.object2Json( resultMap ) );*/
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "0000".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
                 // 状态正常,无论是否有数据,从结束时间开始查询
@@ -82,15 +81,12 @@ public class GamePullDockJDB extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
-        String              seqNo           = String.valueOf( remoteGameDatum.get( "seqNo" ) );
-        if ( StringUtils.isBlank( seqNo ) ) {
-            seqNo = String.valueOf( remoteGameDatum.get( "historyId" ) );
-        }
-        if ( StringUtils.isBlank( seqNo ) ) {
+        String              historyId       = String.valueOf( remoteGameDatum.get( "historyId" ) );
+        if ( StringUtils.isBlank( historyId ) ) {
             log.error( "seqNo为空" + JsonUtil.object2Json( object ) );
             return null;
         }
-        gameDataRecord.setGameId( seqNo );
+        gameDataRecord.setGameId( historyId );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
