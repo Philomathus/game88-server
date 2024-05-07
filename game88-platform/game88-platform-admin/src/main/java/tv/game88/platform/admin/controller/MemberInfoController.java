@@ -220,6 +220,7 @@ public class MemberInfoController extends BaseController {
     /**
      * 修改邀请码
      */
+    @PreAuthorize( "@ss.hasPermi('member:memberInfo:updateInviterCode')" )
     @PostMapping( value = "/updateInviterCode/{memberId}" )
     @Log( title = "会员修改邀请码", businessType = BusinessType.UPDATE )
     public RspBase<?> updateInviterCode( @PathVariable String memberId, Integer googleAuthCode, String inviterCode ) throws Exception {
