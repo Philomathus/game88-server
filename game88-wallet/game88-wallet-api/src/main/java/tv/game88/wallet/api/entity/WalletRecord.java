@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -35,6 +34,11 @@ public class WalletRecord implements Serializable {
      * 钱包用户ID
      */
     private String userId;
+
+    /**
+     * 商户平台ID
+     */
+    private String merchantPlatformId;
 
     /**
      * 交易类型 （1-下分充值 2-上分提现）

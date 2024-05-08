@@ -44,6 +44,7 @@ public class QDPayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "merchantId", payAgentChannel.getMerId() );
         bodyMap.put( "orderNo", withdrawDetail.getWithdrawOrderNo() );
+        bodyMap.put( "merchantPlatformId", profile );
         bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
         bodyMap.put( "walletAddress", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );

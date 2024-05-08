@@ -17,5 +17,6 @@ public class ReqWithdrawOrder extends ReqOrderBase {
     private Long   amount;
 
     private String notifyUrl;
+    private String merchantPlatformId;
     private String remark;
 }
