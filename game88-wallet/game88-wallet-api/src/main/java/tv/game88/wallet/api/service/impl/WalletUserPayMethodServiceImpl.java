@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.ValidatorUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -69,42 +68,45 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             return RspBase.businessError( "必须设置资金密码才能绑定支付方式" );
         }
         
-        if( !passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )){
-            return RspBase.businessError( "密码不匹配" );
-        }
+//        if( !passwordEncoder.matches( reqPayMethod.getFundPassword() , walletUser.getFundPassword() )){
+//            return RspBase.businessError( "密码不匹配" );
+//        }
         switch ( reqPayMethod.getMethodType() ) {
-        case CREDIT_CARD -> {
-            if ( reqPayMethod.getBankId() == null ) {
-                return RspBase.businessError( "请选择开户行" );
+            case CREDIT_CARD -> {
+                if ( reqPayMethod.getBankId() == null ) {
+                    return RspBase.businessError( "请选择开户行" );
+                }
+                if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
+                    return RspBase.businessError( "请输入银行卡号" );
+                }
+    //            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
+    //                return RspBase.businessError( "请输入正确的银行卡号" );
+    //            }
+                if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
+                    return RspBase.businessError( "请输入微信实名姓名" );
+                }
             }
-            if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
-                return RspBase.businessError( "请输入银行卡号" );
+            case WECHAT_PAY -> {
+                if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
+                    return RspBase.businessError( "请输入微信实名姓名" );
+                }
+                if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
+                    return RspBase.businessError( "请上传收款码" );
+                }
             }
-//            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
-//                return RspBase.businessError( "请输入正确的银行卡号" );
-//            }
-            if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
-                return RspBase.businessError( "请输入微信实名姓名" );
+            case ALIPAY -> {
+                if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
+                    return RspBase.businessError( "请输入支付宝账号" );
+                }
+                if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
+                    return RspBase.businessError( "请上传收款码" );
+                }
+    //            reqPayMethod.setRealName( walletUser.getRealName() );
             }
         }
-        case WECHAT_PAY -> {
-            if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
-                return RspBase.businessError( "请输入微信实名姓名" );
-            }
-            if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
-                return RspBase.businessError( "请上传收款码" );
-            }
-        }
-        case ALIPAY -> {
-            if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
-                return RspBase.businessError( "请输入支付宝账号" );
-            }
-            if ( StringUtils.isBlank( reqPayMethod.getPayPicAddr() ) ) {
-                return RspBase.businessError( "请上传收款码" );
-            }
-//            reqPayMethod.setRealName( walletUser.getRealName() );
-        }
-        }
+
+        boolean isAliPay = reqPayMethod.getMethodType() == WalletPayMethodEnum.ALIPAY;
+
         WalletUserPayMethod walletUserPayMethod = new WalletUserPayMethod();
         walletUserPayMethod.setUserId( userId );
         walletUserPayMethod.setMethodType( reqPayMethod.getMethodType() );
@@ -115,9 +117,18 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         walletUserPayMethod.setBankAccount( reqPayMethod.getAccount() );
         walletUserPayMethod.setPayPicAddr( reqPayMethod.getPayPicAddr() );
         walletUserPayMethod.setCreateTime( LocalDateTime.now() );
-        walletUserPayMethod.setAuditStatus( reqPayMethod.getMethodType() == WalletPayMethodEnum.ALIPAY ? 0 : 1 );
+        walletUserPayMethod.setAuditStatus( isAliPay ? 0 : 1 );
         int i = this.baseMapper.insert( walletUserPayMethod );
-        return i > 0 ? RspBase.ok( "新增支付方式成功" ) : RspBase.businessError( "新增支付方式异常，请稍后再试" );
+
+        if ( i > 0 ) {
+            if ( !isAliPay ) {
+                return RspBase.ok("系统已审核认证,");
+            } else {
+                return RspBase.ok( "新增支付方式成功" );
+            }
+        }
+
+        return RspBase.businessError( "新增支付方式异常，请稍后再试" );
     }
 
     @Override
