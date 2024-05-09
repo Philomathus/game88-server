@@ -8,6 +8,7 @@
         <id property="tradeNo" column="trade_no" jdbcType="VARCHAR" />
         <result property="merchantId" column="merchant_id" jdbcType="BIGINT" />
         <result property="userId" column="user_id" jdbcType="VARCHAR" />
+        <result property="merchantPlatformId" column="merchant_platform_id" jdbcType="VARCHAR" />
         <result property="tradeType" column="trade_type" jdbcType="INTEGER" />
         <result property="amount" column="amount" jdbcType="BIGINT" />
         <result property="orderNo" column="order_no" jdbcType="VARCHAR" />
@@ -24,6 +25,7 @@
         select trade_no,
                merchant_id,
                user_id,
+               merchant_platform_id,
                trade_type,
                amount,
                order_no,
@@ -42,6 +44,7 @@
             <if test="tradeNo != null and tradeNo != ''">and trade_no = #{tradeNo}</if>
             <if test="merchantId != null and merchantId != ''">and merchant_id = #{merchantId}</if>
             <if test="userId != null and userId != ''">and user_id = #{userId}</if>
+            <if test="merchantPlatformId != null and merchantPlatformId != ''">and merchant_platform_id = #{merchantPlatformId}</if>
             <if test="beginTime != null and beginTime != ''">
                 AND create_time <![CDATA[ >= ]]> STR_TO_DATE(#{beginTime}, '%Y-%m-%d %H:%i:%s')
             </if>

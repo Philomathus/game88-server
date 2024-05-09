@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,6 @@ import tv.game88.pay.api.cache.PayCacheUtil;
 import tv.game88.pay.api.dto.ReqPayAgent;
 import tv.game88.pay.api.mapper.MemberWithdrawDetailMapper;
 import tv.game88.pay.api.mapper.PayAgentLogMapper;
-import tv.game88.pay.api.mapper.PayAgentPlatformMapper;
 import tv.game88.pay.api.service.PayAgentService;
 
 import java.io.InputStream;
@@ -34,8 +34,6 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     @Resource
     protected PayCacheUtil               payCacheUtil;
     @Resource
-    protected PayAgentPlatformMapper     payAgentPlatformMapper;
-    @Resource
     protected MemberWithdrawDetailMapper withdrawDetailMapper;
     @Resource
     protected PayAgentLogMapper          payAgentLogMapper;
@@ -47,6 +45,9 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     protected ConfigEnvCacheUtil         configEnvCacheUtil;
     @Resource
     protected ConfigBankListCache        configBankListCache;
+
+    @Value( "${spring.profiles.active}" )
+    protected String profile;
 
     protected String assemblyUrl( Map<String, ?> bodyMap ) {
         StringBuilder sb = new StringBuilder();

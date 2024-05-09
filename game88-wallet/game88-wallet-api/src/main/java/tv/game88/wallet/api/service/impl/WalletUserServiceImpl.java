@@ -262,8 +262,7 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
     @Override
     public RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqEmbeddedLogin.getMerchantId() );
-        RspBase        rspBase        = walletRecordService.validated( reqEmbeddedLogin, walletMerchant,
-                reqEmbeddedLogin.getWalletAddress() );
+        RspBase rspBase = walletRecordService.validated( reqEmbeddedLogin, walletMerchant, reqEmbeddedLogin.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
         }
@@ -313,9 +312,14 @@ public class WalletUserServiceImpl extends ServiceImpl<WalletUserMapper, WalletU
         WalletUser update = new WalletUser();
         update.setId( walletUser.getId() );
         update.setMerchantId( reqEmbeddedLogin.getMerchantId() );
-        Set<String> platformIds = new TreeSet<>( Arrays.asList( walletUser.getPlatformId().split( "," ) ) );
-        platformIds.add( reqEmbeddedLogin.getUserId() );
-        update.setPlatformId( String.join( ",", platformIds ) );
+        if ( walletUser.getPlatformId() == null ) {
+            update.setPlatformId( reqEmbeddedLogin.getUserId() );
+        } else {
+            Set<String> platformIds = new TreeSet<>( Arrays.asList( walletUser.getPlatformId().split( "," ) ) );
+            platformIds.add( reqEmbeddedLogin.getUserId() );
+            update.setPlatformId( String.join( ",", platformIds ) );
+        }
+
         this.baseMapper.updateById( update );
 
         if ( walletUser.getFrozenAmount() == null ) {

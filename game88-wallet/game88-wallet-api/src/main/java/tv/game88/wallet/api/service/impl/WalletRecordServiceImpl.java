@@ -73,7 +73,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         }
 
         // 先保存订单,等待会员主动请求支付并扣除会员金额, 再异步处理订单回调
-        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqDepositOrder, walletMerchant, 1 );
+        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqDepositOrder, reqDepositOrder.getMerchantPlatformId(), 1 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqDepositOrder.getMerchantId() )
@@ -117,7 +117,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         }
 
         // 先保存订单并添加会员金额, 再异步处理订单回调
-        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqWithdrawOrder, walletMerchant, 2 );
+        SpringUtils.getAopProxy( this ).saveOrderAndSendTask( reqWithdrawOrder, reqWithdrawOrder.getMerchantPlatformId(), 2 );
 
         WalletRecord walletRecord = this.baseMapper.selectOne( new QueryWrapper<WalletRecord>()
                 .eq( "merchant_id", reqWithdrawOrder.getMerchantId() )
@@ -152,12 +152,13 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Transactional( rollbackFor = Exception.class )
-    public void saveOrderAndSendTask( ReqOrderBase reqOrderBase, WalletMerchant walletMerchant, int tradeType ) {
+    public void saveOrderAndSendTask( ReqOrderBase reqOrderBase, String merchantPlatformId, int tradeType ) {
         WalletRecord walletRecord = new WalletRecord();
         walletRecord.setTradeNo( GenerateOrderCacheUtils.me.getOrderIdNoTime( 32 ) );
         walletRecord.setStatus( 2 ); //0 处理失败，1 处理成功 ，2 处理中
         walletRecord.setNotifyStatus( 0 ); //0 无需通知, 1 通知成功, 2 通知失败
         walletRecord.setMerchantId( reqOrderBase.getMerchantId() );
+        walletRecord.setMerchantPlatformId( merchantPlatformId );
         walletRecord.setOrderNo( reqOrderBase.getOrderNo() );
         walletRecord.setTradeType( tradeType );
         walletRecord.setCreateTime( LocalDateTime.now() );

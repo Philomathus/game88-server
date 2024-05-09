@@ -355,6 +355,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         reqMap.put( "orderNo", orderId );
         reqMap.put( "amount", reqVipPayDeposit.getAmount() );
         reqMap.put( "walletAddress", memberCard.getBankAccount().trim() );
+        reqMap.put( "merchantPlatformId", profile );
         reqMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         String signTemp = this.assemblyUrl( reqMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         reqMap.put( "sign", DigestUtils.md5Hex( signTemp ).toUpperCase() );
