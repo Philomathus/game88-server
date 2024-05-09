@@ -43,6 +43,7 @@ public enum EnumGameCategory {
     PP( ConstantsGame.PP, "pp" ),
     CG( ConstantsGame.CG, "cg" ),
     JILI( ConstantsGame.JILI, "jiLi" ),
+    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
     ;
 
     private final String type;
