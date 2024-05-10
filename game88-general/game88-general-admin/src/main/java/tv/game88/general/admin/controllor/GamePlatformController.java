@@ -1,11 +1,13 @@
 package tv.game88.general.admin.controllor;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.AESCoder;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -17,6 +19,7 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.service.GamePlatformService;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.List;
  *
  * @author MengJun
  */
+@Log4j2
 @RestController
 @RequestMapping( "/admin/game/platform" )
 public class GamePlatformController extends BaseController {
@@ -101,23 +105,23 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setUpdateBy( SecurityUtils.getUsername() );
         gamePlatform.setUpdateTime( LocalDateTime.now() );
         gamePlatform.setEffect( null );
-
-        GamePlatform gamePlatformOld = gamePlatformService.getById( gamePlatform.getId() );
-        String       a               = "***";
+        log.warn( JsonUtil.object2Json( gamePlatform ) );
+        String a = "***";
         if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
             if ( gamePlatform.getDes().contains( a ) ) {
-                gamePlatform.setDes( gamePlatformOld.getDes() );
+                gamePlatform.setDes( null );
             } else {
                 gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDes() ) );
             }
         }
         if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
             if ( gamePlatform.getMd5().contains( a ) ) {
-                gamePlatform.setMd5( gamePlatformOld.getMd5() );
+                gamePlatform.setMd5( null );
             } else {
                 gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5() ) );
             }
         }
+        log.warn( JsonUtil.object2Json( gamePlatform ) );
         boolean isSave = gamePlatformService.updateById( gamePlatform );
         return toResult( isSave );
     }
