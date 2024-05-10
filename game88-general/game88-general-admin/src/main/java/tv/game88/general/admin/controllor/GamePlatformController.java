@@ -84,11 +84,11 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setCreateBy( SecurityUtils.getUsername() );
         gamePlatform.setCreateTime( LocalDateTime.now() );
         gamePlatform.setEffect( false );
-        if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
-            gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDes() ) );
+        if ( StringUtils.isNotBlank( gamePlatform.getDesOriginal() ) ) {
+            gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDesOriginal() ) );
         }
-        if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
-            gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5() ) );
+        if ( StringUtils.isNotBlank( gamePlatform.getMd5Original() ) ) {
+            gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5Original() ) );
         }
         return toResult( gamePlatformService.save( gamePlatform ) );
     }
@@ -104,15 +104,15 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setUpdateTime( LocalDateTime.now() );
         gamePlatform.setEffect( null );
         String a = "***";
-        if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
-            if ( gamePlatform.getDes().contains( a ) ) {
+        if ( StringUtils.isNotBlank( gamePlatform.getDesOriginal() ) ) {
+            if ( gamePlatform.getDesOriginal().contains( a ) ) {
                 gamePlatform.setDes( null );
             } else {
                 gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDesOriginal() ) );
             }
         }
-        if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
-            if ( gamePlatform.getMd5().contains( a ) ) {
+        if ( StringUtils.isNotBlank( gamePlatform.getMd5Original() ) ) {
+            if ( gamePlatform.getMd5Original().contains( a ) ) {
                 gamePlatform.setMd5( null );
             } else {
                 gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5Original() ) );
