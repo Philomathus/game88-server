@@ -98,4 +98,12 @@ public class GamePlatform {
         }
         return md5;
     }
+
+    public String getMd5Original() {
+        return md5;
+    }
+
+    public String getDesOriginal() {
+        return des;
+    }
 }
