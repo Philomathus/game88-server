@@ -87,14 +87,22 @@ public class GamePlatform {
 
     public String getDes() {
         if ( StringUtils.isNotBlank( des ) ) {
-            return AESCoder.decrypt( des );
+            try {
+                return AESCoder.decrypt( des );
+            } catch ( Exception ig ) {
+                //
+            }
         }
         return des;
     }
 
     public String getMd5() {
         if ( StringUtils.isNotBlank( md5 ) ) {
-            return AESCoder.decrypt( md5 );
+            try {
+                return AESCoder.decrypt( md5 );
+            } catch ( Exception ig ) {
+                //
+            }
         }
         return md5;
     }
