@@ -43,8 +43,8 @@ public class GamePullDockPGNew extends AbstractGamePull {
 
         // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "transactions", new ArrayList<>() );
-            if ( "1".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
+            if ( "200".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
+                List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "transactions", new ArrayList<>() );
                 if ( CollectionUtils.isEmpty( transactions ) ) {
                     Map<String, Object> last       = ( Map<String, Object> ) transactions.getLast();
                     String              payoffTime = String.valueOf( last.get( "payoff_time" ) ).substring( 0, 19 );
