@@ -85,6 +85,9 @@ public class GamePullDockPGNew extends AbstractGamePull {
         BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
         gameDataRecord.setCellScore( chip.toString() );
         gameDataRecord.setAllBet( chip.toString() );
+        if(remoteGameDatum.get( "allGetMoney" ) == null){
+            log.warn( JsonUtil.object2Json( remoteGameDatum ) );
+        }
         BigDecimal allGetMoney = new BigDecimal( remoteGameDatum.get( "allGetMoney" ).toString() ).multiply( RATE );
         gameDataRecord.setProfit( allGetMoney.subtract( chip ).toString() );
 
