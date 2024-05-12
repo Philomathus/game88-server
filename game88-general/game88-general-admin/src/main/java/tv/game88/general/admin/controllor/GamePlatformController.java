@@ -117,6 +117,7 @@ public class GamePlatformController extends BaseController {
         if ( StringUtils.isNotBlank( gamePlatform.getMd5Original() ) && !gamePlatform.getMd5Original().contains( a ) ) {
             updateChainWrapper.set( GamePlatform::getMd5, AESCoder.encrypt( gamePlatform.getMd5Original() ) );
         }
+        updateChainWrapper.eq( GamePlatform::getId, gamePlatform.getId() );
         return toResult( updateChainWrapper.update() );
     }
 
