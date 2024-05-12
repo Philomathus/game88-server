@@ -74,9 +74,12 @@ public class GamePullDockPGNew extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
-        String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String   account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
-        String[] spl     = account.split( "_" );
+        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
+        if ( !account.contains( "_" ) ) {
+            return null;
+        }
+        String[] spl = account.split( "_" );
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
