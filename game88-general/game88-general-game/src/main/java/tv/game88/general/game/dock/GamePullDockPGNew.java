@@ -45,7 +45,7 @@ public class GamePullDockPGNew extends AbstractGamePull {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "200".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
                 List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
-                if ( CollectionUtils.isEmpty( transactions ) ) {
+                if ( !CollectionUtils.isEmpty( transactions ) ) {
                     Map<String, Object> last       = ( Map<String, Object> ) transactions.getLast();
                     // 状态正常,无论是否有数据,从结束时间开始查询
                     gamePlatform.setVersionValue( String.valueOf( last.get( "id" ) ) );
