@@ -196,9 +196,9 @@ public class GameServiceImpl implements GameService {
             changeMoney = BigDecimal.ZERO;
         }
 
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
-        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
                 // 创建账号
                 baseGameDock.createAccount( reqJoinGame );
@@ -325,9 +325,9 @@ public class GameServiceImpl implements GameService {
         if ( !redisUtils.lock( "escGame" + memberId, 10 ) ) {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             // 获取token
             if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                     && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
@@ -352,7 +352,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
+    public RspBase<List<RspGameMoney>> getGameBalance( final String memberId ) {
         Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
                 .eq( "member_id", memberId )
                 .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
@@ -366,12 +366,12 @@ public class GameServiceImpl implements GameService {
         }
         List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
-        for ( GamePlatform gamePlatform : gamePlatforms ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
+        for ( final GamePlatform gamePlatform : gamePlatforms ) {
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
                 try {
+                    ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
+                    BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
                     // 获取token
                     if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                             && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
@@ -410,7 +410,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) {
+    public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception {
         GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
                 .eq( "agent", agent )
                 .eq( "game_category", gameCategory )
@@ -428,7 +428,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
-                                           BigDecimal changeMoney, Integer dev ) {
+                                           BigDecimal changeMoney, Integer dev ) throws Exception {
         // BBIN会员ID只能是英文加数字
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
@@ -459,7 +459,7 @@ public class GameServiceImpl implements GameService {
                 .build();
     }
 
-    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
+    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) throws Exception {
         String orderId = switch ( gamePlatform.getGameCategory() ) {
             case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent

@@ -32,7 +32,7 @@ public class BaxiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "merId", payPlatform.getMerId() );
         params.put( "orderId", reqPayRecharge.getOrderNo() );
@@ -76,7 +76,7 @@ public class BaxiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String              orderNo = memberRechargeOnline.getOrderNo();
         Map<String, Object> params  = new TreeMap<>();
         params.put( "merId", payPlatform.getMerId() );
@@ -111,7 +111,7 @@ public class BaxiPayProcessor extends AbstractPay {
 
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               sign                 = requestMap.getOrDefault( "sign", "" ).toString();
         String               merOrderNo           = requestMap.getOrDefault( "orderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( merOrderNo );

@@ -29,7 +29,7 @@ public class ETPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mch_id", payPlatform.getMerId() );
         params.put( "ptype", payChannel.getChannelCode() );
@@ -65,7 +65,7 @@ public class ETPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mch_id", payPlatform.getMerId() );
         params.put( "out_order_sn", memberRechargeOnline.getOrderNo() );
@@ -97,7 +97,7 @@ public class ETPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         // 订单id
         String sh_order = requestMap.getOrDefault( "sh_order", "" ).toString();
         // 上游订单ID

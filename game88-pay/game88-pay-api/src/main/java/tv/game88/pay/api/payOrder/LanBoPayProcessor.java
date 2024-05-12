@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Repository(value = ConstantsPay.LAN_BO_PAY + "Processor")
+@Repository( value = ConstantsPay.LAN_BO_PAY + "Processor" )
 @Log4j2
 public class LanBoPayProcessor extends AbstractPay {
 
@@ -34,31 +34,32 @@ public class LanBoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay(PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
-        params.put("mchId", payPlatform.getMerId());
-        params.put("productId", Integer.parseInt(payChannel.getChannelCode()));
-        params.put("mchOrderNo", reqPayRecharge.getOrderNo());
-        params.put("amount", reqPayRecharge.getMoney()
-              .multiply( BigDecimal.valueOf( 100 ) )
-              .setScale( 0, RoundingMode.HALF_UP )
-              .toString());
-        params.put("notifyUrl", configEnvCacheUtil.getConf("payCallbackUrl") + payPlatform.getCode());
-        params.put("returnUrl", configEnvCacheUtil.getConf("payReturnUrl"));
+        params.put( "mchId", payPlatform.getMerId() );
+        params.put( "productId", Integer.parseInt( payChannel.getChannelCode() ) );
+        params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
+        params.put( "amount", reqPayRecharge
+                .getMoney()
+                .multiply( BigDecimal.valueOf( 100 ) )
+                .setScale( 0, RoundingMode.HALF_UP )
+                .toString() );
+        params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
+        params.put( "returnUrl", configEnvCacheUtil.getConf( "payReturnUrl" ) );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        String sign = DigestUtils.md5Hex( signStr ).toUpperCase();
+        String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
         params.put( "sign", sign );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
-        log.warn(payPlatform.getName()
-                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json(resultMap), payChannel.getChannelCode(),
-                reqPayRecharge.getOrderNo());
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            if ("SUCCESS".equals(resultMap.get("retCode"))) {
-                Map urlsMap = (Map) resultMap.get("payParams");
-                return urlsMap.get("payUrl").toString();
+        log.warn( payPlatform.getName()
+                + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
+                reqPayRecharge.getOrderNo() );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "SUCCESS".equals( resultMap.get( "retCode" ) ) ) {
+                Map urlsMap = ( Map ) resultMap.get( "payParams" );
+                return urlsMap.get( "payUrl" ).toString();
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
             }
@@ -67,10 +68,10 @@ public class LanBoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay(MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, String> params = new TreeMap<>();
-        params.put("mchId", payPlatform.getMerId());
-        params.put("mchOrderNo", memberRechargeOnline.getOrderNo());
+        params.put( "mchId", payPlatform.getMerId() );
+        params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String sign    = DigestUtils.md5Hex( signStr ).toUpperCase();
@@ -89,21 +90,21 @@ public class LanBoPayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendGetMap( uriComponents.toUriString(), null );
 
 
-        log.warn(payPlatform.getName()
-                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json(resultMap));
-            String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
-            if (!CollectionUtils.isEmpty(resultMap) && "SUCCESS".equals(retCode)) {
-                BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
-                if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
-                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
-                    return true;
-                }
+        log.warn( payPlatform.getName()
+                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
+        String retCode = resultMap.getOrDefault( "retCode", "FAIL" ).toString();
+        if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( retCode ) ) {
+            BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "amount", 0 ).toString() );
+            if ( amount.compareTo( BigDecimal.ZERO ) > 0 ) {
+                memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
+                return true;
             }
+        }
         return false;
     }
 
     @Override
-    public String callbackPay(Map<String, Object> requestMap, String realIp) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
 
         String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
         String               payOrderId           = requestMap.getOrDefault( "payOrderId", "" ).toString();
@@ -144,7 +145,8 @@ public class LanBoPayProcessor extends AbstractPay {
             if ( ( "2".equals( status ) || "3".equals( status ) )
                     && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( payOrderId );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" }, payChannel.getName() );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "fail" },
+                        payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );

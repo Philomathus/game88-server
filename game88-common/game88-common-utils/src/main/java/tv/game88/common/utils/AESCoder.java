@@ -78,24 +78,17 @@ public class AESCoder {
      * @param content  解密内容
      * @param password 解密密码
      */
-    private static String AESDecode( String content, String password ) {
-        try {
-            // 将加密并编码后的内容解码成字节数组
-            byte[] bytes = Base64.getDecoder().decode( content );
-            // 这里指定了算法为AES
-            Cipher cipher = Cipher.getInstance( AES );
-            // 基于解密模式和密钥初始化Cipher
-            cipher.init( Cipher.DECRYPT_MODE, generateKey( password ) );
-            // 单部分加密结束，重置Cipher
-            byte[] result = cipher.doFinal( bytes );
-            // 将解密后的字节数组转成 UTF-8 编码的字符串返回
-            return new String( result, charsetName );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
-        }
-
-        // 如果有错就返回 null
-        return null;
+    private static String AESDecode( String content, String password ) throws Exception {
+        // 将加密并编码后的内容解码成字节数组
+        byte[] bytes = Base64.getDecoder().decode( content );
+        // 这里指定了算法为AES
+        Cipher cipher = Cipher.getInstance( AES );
+        // 基于解密模式和密钥初始化Cipher
+        cipher.init( Cipher.DECRYPT_MODE, generateKey( password ) );
+        // 单部分加密结束，重置Cipher
+        byte[] result = cipher.doFinal( bytes );
+        // 将解密后的字节数组转成 UTF-8 编码的字符串返回
+        return new String( result, charsetName );
     }
 
     /**
@@ -112,7 +105,7 @@ public class AESCoder {
      *
      * @param content 解密内容
      */
-    public static String decrypt( String content ) {
+    public static String decrypt( String content ) throws Exception {
         return StringUtils.isBlank( content ) ? null : AESDecode( content, secretKey );
     }
 
@@ -135,20 +128,20 @@ public class AESCoder {
         return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
-    public static String encryptByKeyIvNoPadding(String data, String key, String iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        int blockSize = cipher.getBlockSize();
-        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-        int plainTextLength = dataBytes.length;
-        if (plainTextLength % blockSize != 0) {
-            plainTextLength = plainTextLength + (blockSize - plainTextLength % blockSize);
+    public static String encryptByKeyIvNoPadding( String data, String key, String iv ) throws Exception {
+        Cipher cipher          = Cipher.getInstance( "AES/CBC/NoPadding" );
+        int    blockSize       = cipher.getBlockSize();
+        byte[] dataBytes       = data.getBytes( StandardCharsets.UTF_8 );
+        int    plainTextLength = dataBytes.length;
+        if ( plainTextLength % blockSize != 0 ) {
+            plainTextLength = plainTextLength + ( blockSize - plainTextLength % blockSize );
         }
-        byte[] plaintext = new byte[plainTextLength];
-        System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
-        SecretKeySpec   keySpec = new SecretKeySpec(key.getBytes(), AES);
-        IvParameterSpec ivSpec  = new IvParameterSpec(iv.getBytes());
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-        byte[] encrypted = cipher.doFinal(plaintext);
+        byte[] plaintext = new byte[ plainTextLength ];
+        System.arraycopy( dataBytes, 0, plaintext, 0, dataBytes.length );
+        SecretKeySpec   keySpec = new SecretKeySpec( key.getBytes(), AES );
+        IvParameterSpec ivSpec  = new IvParameterSpec( iv.getBytes() );
+        cipher.init( Cipher.ENCRYPT_MODE, keySpec, ivSpec );
+        byte[] encrypted = cipher.doFinal( plaintext );
         return Base64.getUrlEncoder().encodeToString( encrypted );
     }
 

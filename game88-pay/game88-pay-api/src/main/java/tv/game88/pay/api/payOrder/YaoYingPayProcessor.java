@@ -31,7 +31,7 @@ public class YaoYingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "productId", payChannel.getChannelCode() );
@@ -69,7 +69,7 @@ public class YaoYingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String                    orderNo = memberRechargeOnline.getOrderNo();
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "mchId", payPlatform.getMerId() );
@@ -99,7 +99,7 @@ public class YaoYingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String orderNum   = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
         String payOrderId = requestMap.getOrDefault( "payOrderId", "" ).toString();
         int    status     = Integer.parseInt( requestMap.getOrDefault( "status", "0" ).toString() );

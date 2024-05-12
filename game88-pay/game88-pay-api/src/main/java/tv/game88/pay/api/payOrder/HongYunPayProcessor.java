@@ -29,7 +29,7 @@ public class HongYunPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mch_id", payPlatform.getMerId() );
         params.put( "trade_type", payChannel.getChannelCode() );
@@ -68,7 +68,7 @@ public class HongYunPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String                    orderNo = memberRechargeOnline.getOrderNo();
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "mch_id", payPlatform.getMerId() );
@@ -94,7 +94,7 @@ public class HongYunPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               orderNo              = ( String ) requestMap.get( "out_trade_no" );
         String               sign                 = ( String ) requestMap.remove( "sign" );
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( orderNo );

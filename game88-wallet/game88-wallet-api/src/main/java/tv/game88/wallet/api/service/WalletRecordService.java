@@ -18,17 +18,17 @@ public interface WalletRecordService extends IService<WalletRecord> {
 
     RspBase<RspWalletRecordPay> payOrder( ReqDepositOrder reqDepositOrder ) throws Exception;
 
-    RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder );
+    RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) throws Exception;
 
-    RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery );
+    RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) throws Exception;
 
-    RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress );
+    RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress ) throws Exception;
 
     ModelAndView toDepositOrder( String s, long t ) throws Exception;
 
     RspBase<?> payDepositOrder( ReqPayDepositOrder reqPayDepositOrder ) throws Exception;
 
-    RspWalletRecord getRspData( String tradeNo );
+    RspWalletRecord getRspData( String tradeNo ) throws Exception;
 
     List<WalletRecord> getWalletRecordList( WalletRecord walletRecord );
 }

@@ -28,7 +28,7 @@ public class XiongMaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "currency", "CNY" );
@@ -39,7 +39,7 @@ public class XiongMaoPayProcessor extends AbstractPay {
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( signStr );
-        String sign    = DigestUtils.md5Hex( signStr );
+        String sign = DigestUtils.md5Hex( signStr );
         sign = DigestUtils.md5Hex( sign );
         sign = DigestUtils.md5Hex( sign );
         params.put( "sign", sign.toUpperCase() );
@@ -47,7 +47,7 @@ public class XiongMaoPayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
-                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
+                + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "0".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
@@ -61,7 +61,7 @@ public class XiongMaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "orderId", memberRechargeOnline.getOrderNo() );
@@ -84,7 +84,7 @@ public class XiongMaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
 
         String order_sn = requestMap.getOrDefault( "orderId", "" ).toString();
 

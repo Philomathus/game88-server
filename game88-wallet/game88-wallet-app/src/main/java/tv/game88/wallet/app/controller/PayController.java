@@ -44,7 +44,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/withdrawOrder" )
     @ResponseBody
     @Anonymous
-    public RspBase<RspWalletRecord> withdrawOrder( @RequestBody @Validated ReqWithdrawOrder reqWithdrawOrder ) {
+    public RspBase<RspWalletRecord> withdrawOrder( @RequestBody @Validated ReqWithdrawOrder reqWithdrawOrder ) throws Exception {
         return walletRecordService.withdrawOrder( reqWithdrawOrder );
     }
 
@@ -52,7 +52,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/orderQuery" )
     @ResponseBody
     @Anonymous
-    public RspBase<RspWalletRecord> orderQuery( @RequestBody @Validated ReqOrderQuery reqOrderQuery ) {
+    public RspBase<RspWalletRecord> orderQuery( @RequestBody @Validated ReqOrderQuery reqOrderQuery ) throws Exception {
         return walletRecordService.orderQuery( reqOrderQuery );
     }
 
@@ -67,7 +67,7 @@ public class PayController extends BaseController {
     @PostMapping( "/common/embeddedLogin" )
     @ResponseBody
     @Anonymous
-    public RspBase<?> embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) {
+    public RspBase<?> embeddedLogin( @RequestBody @Validated ReqEmbeddedLogin reqEmbeddedLogin ) throws Exception {
         RspBase<?> rspMemberRspBase = walletUserService.embeddedLogin( reqEmbeddedLogin );
         Object     object           = rspMemberRspBase.getData();
         if ( object != null ) {

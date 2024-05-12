@@ -115,7 +115,7 @@ public class GameController extends BaseController {
     // 获取游戏token,内部接口
     @GetMapping ( "/getGameToken" )
     @Hidden
-    public RspBase<String> getGameToken( String agent, String gameCategory ) {
+    public RspBase<String> getGameToken( String agent, String gameCategory ) throws Exception {
         return gameService.getGameTokenByAgent( agent, gameCategory );
     }
 

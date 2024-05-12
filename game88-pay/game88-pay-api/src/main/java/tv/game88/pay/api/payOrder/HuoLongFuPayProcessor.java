@@ -29,7 +29,7 @@ public class HuoLongFuPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "pay_memberid", payPlatform.getMerId() );
         reqMap.put( "pay_orderid", reqPayRecharge.getOrderNo() );
@@ -59,7 +59,7 @@ public class HuoLongFuPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         Map<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "pay_memberid", payPlatform.getMerId() );
         bodyMap.put( "pay_orderid", memberRechargeOnline.getOrderNo() );
@@ -84,7 +84,7 @@ public class HuoLongFuPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               merOrderNo           = requestMap.getOrDefault( "orderid", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( merOrderNo );
 

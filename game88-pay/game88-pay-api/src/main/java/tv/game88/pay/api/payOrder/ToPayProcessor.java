@@ -31,7 +31,7 @@ public class ToPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         if ( ( StringUtils.hasText( payChannel.getChannelCode() ) && payChannel.getChannelCode().contains( "h5" ) ) || (
                 StringUtils.hasText( payChannel.getName() ) && payChannel.getName().contains( "h5" ) ) ) {
             SortedMap<String, String> params = new TreeMap<>();
@@ -99,7 +99,7 @@ public class ToPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.getForObject(
@@ -125,7 +125,7 @@ public class ToPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         // 订单id
         String orderid = requestMap.getOrDefault( "orderid", "" ).toString();
 

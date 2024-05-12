@@ -30,7 +30,7 @@ public class NanBeiPayProcessor extends AbstractPay {
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "productId", Integer.parseInt( payChannel.getChannelCode() ) );
@@ -65,7 +65,7 @@ public class NanBeiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
@@ -92,7 +92,7 @@ public class NanBeiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               mchOrderNo           = requestMap.getOrDefault( "mchOrderNo", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( mchOrderNo );
 

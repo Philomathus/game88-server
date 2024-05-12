@@ -31,7 +31,7 @@ public class ASPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "pay_memberid", payPlatform.getMerId() );
         params.put( "pay_orderid", reqPayRecharge.getOrderNo() );
@@ -60,7 +60,7 @@ public class ASPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String                    orderNo = memberRechargeOnline.getOrderNo();
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "pay_memberid", payPlatform.getMerId() );
@@ -85,7 +85,7 @@ public class ASPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               merOrderNo           = requestMap.getOrDefault( "orderid", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( merOrderNo );
         if ( memberRechargeOnline.getStatus() == 1 ) {

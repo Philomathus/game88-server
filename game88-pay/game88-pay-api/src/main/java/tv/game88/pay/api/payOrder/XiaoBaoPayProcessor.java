@@ -31,7 +31,7 @@ public class XiaoBaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "merchant_no", payPlatform.getMerId() );
         bodyMap.put( "order_money", reqPayRecharge.getMoney().setScale( 2, RoundingMode.HALF_UP ) );
@@ -58,7 +58,7 @@ public class XiaoBaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "merchant_no", payPlatform.getMerId() );
         bodyMap.put( "merchant_order_no", memberRechargeOnline.getOrderNo() );
@@ -82,7 +82,7 @@ public class XiaoBaoPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               out_trade_no         = String.valueOf( requestMap.get( "order_no" ) );
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( out_trade_no );
         if ( memberRechargeOnline.getStatus() == 1 ) {

@@ -23,7 +23,7 @@ public interface GameService {
 
     RspBase<?> escGame( Long infoId, String memberId );
 
-    RspBase<String> getGameTokenByAgent( String agent, String gameCategory );
+    RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception;
 
     RspBase<List<RspGameMoney>> getGameBalance( String memberId );
 
