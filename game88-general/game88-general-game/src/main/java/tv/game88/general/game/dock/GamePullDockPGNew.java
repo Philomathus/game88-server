@@ -47,10 +47,8 @@ public class GamePullDockPGNew extends AbstractGamePull {
                 List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
                 if ( CollectionUtils.isEmpty( transactions ) ) {
                     Map<String, Object> last       = ( Map<String, Object> ) transactions.getLast();
-                    String              payoffTime = String.valueOf( last.get( "payoff_time" ) ).substring( 0, 19 );
-
                     // 状态正常,无论是否有数据,从结束时间开始查询
-                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime, LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) ) );
+                    gamePlatform.setVersionValue( String.valueOf( last.get( "id" ) ) );
                 }
                 return transactions;
             } else {
