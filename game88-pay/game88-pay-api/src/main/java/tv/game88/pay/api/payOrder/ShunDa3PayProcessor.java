@@ -19,7 +19,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
-@Repository( value = ConstantsPay.SHUNDA2_PAY + "Processor" )
+@Repository( value = ConstantsPay.SHUNDA3_PAY + "Processor" )
 @Log4j2
 public class ShunDa3PayProcessor extends AbstractPay {
     @Override

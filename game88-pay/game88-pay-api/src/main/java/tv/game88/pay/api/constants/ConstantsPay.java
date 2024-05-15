@@ -66,5 +66,5 @@ public abstract class ConstantsPay {
     public static final String CXXM_PAY       = "cXXMPay";
     public static final String HENG_YUAN_PAY  = "hengYuanPay";
     public static final String QD_PAY         = "qdPay";
-    public static final String SHUNDA2_PAY    = "shunDa3Pay";
+    public static final String SHUNDA3_PAY    = "shunDa3Pay";
 }
