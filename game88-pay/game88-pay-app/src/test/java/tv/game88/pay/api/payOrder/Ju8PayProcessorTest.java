@@ -65,7 +65,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void orderPaySuccess() {
+    void orderPaySuccess() throws Exception {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
                 .thenReturn(Map.of("retCode", "0", "payUrl", "http://localhost:8080/success"));
         String result = mockJu8PayProcessor.orderPay(createPayChannel(), createPayPlatform(), createReqPayRecharge());
@@ -74,7 +74,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void orderPayFail() {
+    void orderPayFail() throws Exception {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
                 .thenReturn(Map.of("retCode", "0100", "retMsg", "商户签名异常"));
         ReqPayRecharge reqPayRecharge = createReqPayRecharge();
@@ -84,7 +84,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void queryPaySuccess() {
+    void queryPaySuccess() throws Exception {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
                 .thenReturn(Map.of("retCode", "0", "amount", "12345.98", "status", "2"));
         MemberRechargeOnline memberRechargeOnline = createMemberRechargeOnline(1);
@@ -94,7 +94,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void queryPayFail() {
+    void queryPayFail() throws Exception {
         when(restTemplate.execute(anyString(), any(HttpMethod.class), any(), any()))
                 .thenReturn(Map.of("retCode", "0011"));
         MemberRechargeOnline memberRechargeOnline = createMemberRechargeOnline(2);
@@ -104,7 +104,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPaySuccess() {
+    void callbackPaySuccess() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", "C98F6E51E7C384CBCF2CFC8FED60D6E4", "status", "2"));
         PayPlatform platform = createPayPlatform();
@@ -128,7 +128,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPaySuccessStatusIs1() {
+    void callbackPaySuccessStatusIs1() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", "C98F6E51E7C384CBCF2CFC8FED60D6E4", "status", "2"));
 
@@ -140,7 +140,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPayFailInvalidMd5Sign() {
+    void callbackPayFailInvalidMd5Sign() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", Objects.requireNonNull(AESCoder.encrypt("test")), "status", "2"));
         PayPlatform platform = createPayPlatform();
@@ -162,7 +162,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPayFailInvalidIp() {
+    void callbackPayFailInvalidIp() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", "C98F6E51E7C384CBCF2CFC8FED60D6E4", "status", "2"));
         PayPlatform platform = createPayPlatform();
@@ -180,7 +180,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPayFailInvalidPayTime() {
+    void callbackPayFailInvalidPayTime() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", "C98F6E51E7C384CBCF2CFC8FED60D6E4", "status", "2"));
         PayPlatform platform = createPayPlatform();
@@ -200,7 +200,7 @@ class Ju8PayProcessorTest {
     }
 
     @Test
-    void callbackPayFailCannotCallback() {
+    void callbackPayFailCannotCallback() throws Exception {
         Map<String, Object> requestMap = new HashMap<>(Map.of("mchOrderNo", "MERCH1", "payOrderId", "ORDER123",
                 "sign", "C98F6E51E7C384CBCF2CFC8FED60D6E4", "status", "2"));
         PayPlatform platform = createPayPlatform();
