@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -28,7 +29,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mchKey", payPlatform.getMerId() );
         params.put( "product", payChannel.getChannelCode() );
@@ -42,7 +43,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
                 .intValue() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
 
-        String signStr = this.assemblyUrl( params ) + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         params.put( "sign", DigestUtils.md5Hex( signStr ) );
 
         log.warn( JsonUtil.object2Json( params ) );
@@ -66,7 +67,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String                    orderNo = memberRechargeOnline.getOrderNo();
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "mchKey", payPlatform.getMerId() );
@@ -74,7 +75,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
         bodyMap.put( "nonce", UUID.randomUUID().toString().replace( "-", "" ) );
         bodyMap.put( "timestamp", System.currentTimeMillis() );
 
-        String signStr = this.assemblyUrl( bodyMap ) + payPlatform.getSignMd5();
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( signStr ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( bodyMap ), null );
@@ -97,7 +98,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               orderNo              = ( String ) requestMap.get( "mchOrderNo" );
         String               sign                 = ( String ) requestMap.remove( "sign" );
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( orderNo );
@@ -121,7 +122,7 @@ public class ShunDa3PayProcessor extends AbstractPay {
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
-        String signStr  = this.assemblyUrl( bodyMap ) + payPlatform.getSignMd5();
+        String signStr  = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
         String signTemp = DigestUtils.md5Hex( signStr );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + signTemp );
