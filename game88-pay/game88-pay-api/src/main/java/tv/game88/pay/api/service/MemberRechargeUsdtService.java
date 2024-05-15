@@ -18,7 +18,7 @@ public interface MemberRechargeUsdtService extends IService<MemberRechargeUsdt> 
 
     RspBase<?> unLock( String orderNo, String userName, boolean contains );
 
-    RspBase<?> refused( String orderNo, String username );
+    RspBase<?> refused( String orderNo, String username, String remark );
 
     RspBase<?> updateMemberRechargeUsdt( MemberRechargeUsdt memberRechargeUsdt, String username );
 

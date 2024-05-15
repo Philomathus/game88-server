@@ -100,8 +100,8 @@ public class MemberRechargeUsdtController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
     @Log( title = "拒绝USDT充值信息", businessType = BusinessType.UPDATE )
     @PutMapping( "/refused/{orderNo}" )
-    public RspBase<?> refuse( @PathVariable( "orderNo" ) String orderNo ) {
-        return memberRechargeUsdtService.refused( orderNo, SecurityUtils.getUsername() );
+    public RspBase<?> refuse( @PathVariable( "orderNo" ) String orderNo, @RequestBody String remark ) {
+        return memberRechargeUsdtService.refused( orderNo, SecurityUtils.getUsername(), remark );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:edit')" )
