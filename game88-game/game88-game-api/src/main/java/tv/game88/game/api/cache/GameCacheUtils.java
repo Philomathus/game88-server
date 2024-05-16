@@ -168,6 +168,7 @@ public class GameCacheUtils {
         List<RspGameType> effectTypeList = getEffectTypeList();
         for ( RspGameType rspGameType : effectTypeList ) {
             this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
+            this.clear( GAME_INFO_LIST_ALL_KEY + rspGameType.getId() );
             this.clear( GAME_INFO_S_KEY + rspGameType.getId() );
         }
     }
