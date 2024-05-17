@@ -197,7 +197,8 @@ public class GameServiceImpl implements GameService {
         }
 
         try {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev,
+                    ServletUtil.getIp() );
             BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
                 // 创建账号
@@ -326,7 +327,7 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
         try {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null, ServletUtil.getIp() );
             BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             // 获取token
             if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
@@ -365,12 +366,13 @@ public class GameServiceImpl implements GameService {
             return RspBase.ok( new ArrayList<>() );
         }
         List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
+        String                      ip            = ServletUtil.getIp();
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
         for ( final GamePlatform gamePlatform : gamePlatforms ) {
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
                 try {
-                    ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
+                    ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null, ip );
                     BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
                     // 获取token
                     if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
@@ -419,7 +421,7 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "游戏平台不存在" );
         }
         if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null, ServletUtil.getIp() );
             BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             baseGameDock.getToken( reqJoinGame );
             return RspBase.ok( "", reqJoinGame.getToken() );
@@ -428,7 +430,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
-                                           BigDecimal changeMoney, Integer dev ) throws Exception {
+                                           BigDecimal changeMoney, Integer dev, String ip ) throws Exception {
         // BBIN会员ID只能是英文加数字
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
@@ -453,7 +455,7 @@ public class GameServiceImpl implements GameService {
                 .platformId( gamePlatform.getId() )
                 .platformName( gamePlatform.getName() )
                 .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .ip( ServletUtil.getIp() )
+                .ip( ip )
                 .gameCategory( gamePlatform.getGameCategory() )
                 .dev( dev )
                 .build();
