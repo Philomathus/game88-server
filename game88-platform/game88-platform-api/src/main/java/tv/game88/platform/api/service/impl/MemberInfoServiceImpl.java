@@ -353,6 +353,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     @Override
     public RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) throws Exception {
+        if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
+            return RspBase.businessError( "请勿重复注册" );
+        }
         String login_restrict_ip = configEnvCacheUtil.getConf( "login_restrict_ip", null );
         if ( StringUtils.isNotBlank( mobileLogin.getIp() ) && StringUtils.isNotBlank( login_restrict_ip ) ) {
             for ( String dip : login_restrict_ip.split( "," ) ) {
@@ -369,58 +372,57 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return rspBase;
         }
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
-        MemberInfo oldm       = null;
-        if ( memberInfo == null ) {
-            //注册校验反作弊
-            String  msg    = "";
-            Boolean status = false;
-            Boolean flag   = true;
-            if ( configEnvCacheUtil.getConfBool( "163action_check_switch" )
-                    && StringUtil.isNotEmpty( mobileLogin.getDeviceId() ) ) {
-                //反作弊
-                RspCheckMsg check = this.check( mobileLogin.getToken(), mobileLogin.getMobile(), mobileLogin.getIp(),
-                        mobileLogin.getDeviceId(), mobileLogin.getInviterCode(), version );
-                msg    = check.getMsg();
-                status = check.getStatus();
-                flag   = check.getFlag();
-            }
+        if ( memberInfo != null ) {
+            return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
+        }
+        MemberInfo oldm = null;
+        //注册校验反作弊
+        String  msg    = "";
+        Boolean status = false;
+        Boolean flag   = true;
+        if ( configEnvCacheUtil.getConfBool( "163action_check_switch" ) && StringUtil.isNotEmpty( mobileLogin.getDeviceId() ) ) {
+            //反作弊
+            RspCheckMsg check = this.check( mobileLogin.getToken(), mobileLogin.getMobile(), mobileLogin.getIp(),
+                    mobileLogin.getDeviceId(), mobileLogin.getInviterCode(), version );
+            msg    = check.getMsg();
+            status = check.getStatus();
+            flag   = check.getFlag();
+        }
 
-            //检查是不是归档会员回归
-            oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
-            if ( oldm != null ) {
-                return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
-            } else {
-                memberInfo = this.newMemberInfoReg( mobileLogin );
-                memberInfo.setRegisterType( 1 );
-            }
+        //检查是不是归档会员回归
+        oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
+        if ( oldm != null ) {
+            return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
+        }
+        //检查有没有相同设备号
+        memberInfo = this.baseMapper.findMemberByDeviceId( mobileLogin.getDeviceId() );
+        if ( memberInfo != null ) {
+            MemberInfo update = new MemberInfo();
+            update.setId( memberInfo.getId() );
+            update.setPassword( mobileLogin.getPasswordEncrypt() );
+            update.setPhone( mobileLogin.getMobile() );
+
+            this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
+
+            this.baseMapper.updateById( update );
+        } else {
+            memberInfo = this.newMemberInfoReg( mobileLogin );
+            memberInfo.setRegisterType( 1 );
+
             this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), memberInfo );
 
-            if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getMobile(), 5 ) ) {
-                return RspBase.businessError( "请勿重复注册" );
-            }
-
             this.baseMapper.insert( memberInfo );
-            if ( oldm != null ) {
-                this.baseMapper.deleteByHistoryKey( oldm.getId() );
-            }
-
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                if ( oldm == null ) {
-                    regChannelNotice( mobileLogin, dev, memberInfo.getId(), flag, msg );
-                }
+                regChannelNotice( mobileLogin, dev, memberInfo.getId(), flag, msg );
             } catch ( Exception e ) {
                 try {
                     regChannelNotice( mobileLogin, dev, memberInfo.getId(), flag, msg );
                 } catch ( Exception p ) {
                     log.error( "反作弊注册成功，通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
                 }
-
             }
-        } else {
-            return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
         }
-
         RspMember rspMember = new RspMember();
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "注册成功", rspMember );
