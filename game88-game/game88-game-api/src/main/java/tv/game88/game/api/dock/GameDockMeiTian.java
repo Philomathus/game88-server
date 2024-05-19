@@ -60,7 +60,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, String>             resultMap   = restTemplate.postForObject( url.toString(), httpEntity, Map.class );
@@ -99,7 +99,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
 
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
@@ -138,7 +138,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;
@@ -177,7 +177,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;

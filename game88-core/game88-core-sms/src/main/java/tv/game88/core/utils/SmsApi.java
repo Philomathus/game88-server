@@ -20,6 +20,7 @@ import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -44,7 +45,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,7 +200,7 @@ public class SmsApi {
             String            nonce             = IdWorker.get32UUID();
             MessageDigest     md                = MessageDigest.getInstance( "SHA-256" );
             md.update( ( nonce + time + appSecret ).getBytes() );
-            String passwordDigestBase64Str = Base64.getEncoder().encodeToString( md.digest() );
+            String passwordDigestBase64Str = Base64.encodeBase64String( md.digest() );
             return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
         } catch ( NoSuchAlgorithmException e ) {
             log.error( e.getMessage(), e );
