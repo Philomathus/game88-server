@@ -688,6 +688,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Override
     public RspBase<?> addMemberMoneyOnly( String ip, String userName, ReqAddScore req ) {
         String     userId        = req.getId();
+        String     moneydes      = req.getMoneydes();
         BigDecimal money         = req.getScore();
         BigDecimal beatNum       = req.getBeatNum();
         String     Mk            = req.getMk() + ",操作人:" + userName;
@@ -718,7 +719,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 markList = logMoneyMapper.findMark( userId, markorder, null, negate, userId.substring(
                         userId.length() - 1 ), null );
             }
-            if ( markList.size() > 0 ) {
+            if ( !CollectionUtils.isEmpty( markList ) ) {
                 return RspBase.businessError( "请查看此笔金额是否已经入款过，如否请输入其他订单备注" );
             }
         }
@@ -727,7 +728,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( beatNum == null || beatNum.compareTo( BigDecimal.ZERO ) < 1 ) {
                 beatNum = BigDecimal.ZERO;
             }
-            memberMoneyManager.addMemberMoney( userId, money, EnumMoney.GM, beatNum, Mk, null, markorder );
+            memberMoneyManager.addMemberMoney( userId, money, "1".equals( moneydes ) ? EnumMoney.GM : EnumMoney.ACTIVITY,
+                    beatNum, Mk, null, markorder );
         } else {
             return RspBase.businessError( "该成员未初始化金额，或者您输入的金额有误" );
         }
