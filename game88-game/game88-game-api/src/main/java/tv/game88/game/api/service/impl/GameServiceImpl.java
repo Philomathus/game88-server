@@ -209,11 +209,7 @@ public class GameServiceImpl implements GameService {
             // 获取游戏链接
             baseGameDock.getJoinGameUrl( reqJoinGame );
 
-            if ( gamePlatform.getGameCategory() == EnumGameCategory.JDB ) {
-                this.topUpGame( reqJoinGame, baseGameDock );// 同步执行上分任务
-            } else {
-                Executors.newVirtualThreadPerTaskExecutor().execute( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
-            }
+            Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
 
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
