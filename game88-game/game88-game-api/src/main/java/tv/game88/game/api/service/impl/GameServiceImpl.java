@@ -10,7 +10,6 @@ import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -43,10 +42,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -197,7 +193,7 @@ public class GameServiceImpl implements GameService {
         }
 
         try {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev,
+            ReqJoinGame reqJoinGame = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev,
                     ServletUtil.getIp() );
             BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
@@ -213,8 +209,12 @@ public class GameServiceImpl implements GameService {
             // 获取游戏链接
             baseGameDock.getJoinGameUrl( reqJoinGame );
 
-            // 异步上分
-            SpringUtils.getBean( GameService.class ).topUpGame( reqJoinGame, baseGameDock );
+            if ( gamePlatform.getGameCategory() == EnumGameCategory.JDB ) {
+                this.topUpGame( reqJoinGame, baseGameDock );// 同步执行上分任务
+            } else {
+                Executors.newVirtualThreadPerTaskExecutor().execute( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+            }
+
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
             log.error( "gameId:{}, userId:{}, 进入游戏失败,失败原因:{}", infoId, platformUser.getId(), e.getMessage(), e );
@@ -223,7 +223,6 @@ public class GameServiceImpl implements GameService {
         }
     }
 
-    @Async
     public void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         // 设置为上分操作
         reqJoinGame.setMoneyType( 1 );
@@ -280,7 +279,6 @@ public class GameServiceImpl implements GameService {
         telegramBotMessage.sendByChatId( msg, configEnvCacheUtil.getConf( "gametransfer_error_telegram" ) );
     }
 
-    @Async
     public void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         boolean success = false;
         try {
@@ -343,7 +341,7 @@ public class GameServiceImpl implements GameService {
             }
             reqJoinGame.setTransferMoney( balance );
             // 异步下分
-            SpringUtils.getBean( GameService.class ).cashOutGame( reqJoinGame, baseGameDock );
+            Thread.ofVirtual().start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );

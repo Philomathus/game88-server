@@ -89,7 +89,7 @@ spring:
       max-file-size: 5GB
       max-request-size: 5GB
   lifecycle:
-    timeout-per-shutdown-phase: 5s
+    timeout-per-shutdown-phase: 10s
   task:
     scheduling:
       pool:

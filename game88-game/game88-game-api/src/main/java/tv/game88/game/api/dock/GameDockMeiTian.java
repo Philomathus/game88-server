@@ -1,6 +1,7 @@
 package tv.game88.game.api.dock;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +21,10 @@ import tv.game88.game.api.exception.GameTransferException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.MEITIAN + "GameProcessor" )
