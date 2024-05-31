@@ -142,8 +142,7 @@ public class AESCoder {
         IvParameterSpec ivSpec  = new IvParameterSpec( iv.getBytes() );
         cipher.init( Cipher.ENCRYPT_MODE, keySpec, ivSpec );
         byte[] encrypted = cipher.doFinal( plaintext );
-        String base64    = Base64.encodeBase64String( encrypted );// 此处使用BASE64做转码
-        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
+        return java.util.Base64.getUrlEncoder().encodeToString( encrypted );
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
