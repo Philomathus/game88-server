@@ -365,6 +365,13 @@ public class GameServiceImpl implements GameService {
         for ( final GamePlatform gamePlatform : gamePlatforms ) {
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
+                if ( gamePlatform.getMaintain() ) {
+                    RspGameMoney rspGameMoney = new RspGameMoney();
+                    rspGameMoney.setMoney( new BigDecimal( -1 ) );
+                    rspGameMoney.setPlatformId( gamePlatform.getId() );
+                    rspGameMoney.setPlatformName( gamePlatform.getName() );
+                    return rspGameMoney;
+                }
                 try {
                     ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null, ip );
                     BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
