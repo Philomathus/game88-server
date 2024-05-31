@@ -42,7 +42,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
         String params = String.format( "startTime=%s&endTime=%s", startTime, endTime );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, gamePlatform.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );

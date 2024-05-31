@@ -8,6 +8,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -123,7 +124,8 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64.encodeBase64URLSafeString( encrypted );//URL加密
+        String base64    = Base64.encodeBase64String( encrypted );// 此处使用BASE64做转码
+        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
     public static String encryptByKeyIvNoPadding( String data, String key, String iv ) throws Exception {
@@ -140,7 +142,8 @@ public class AESCoder {
         IvParameterSpec ivSpec  = new IvParameterSpec( iv.getBytes() );
         cipher.init( Cipher.ENCRYPT_MODE, keySpec, ivSpec );
         byte[] encrypted = cipher.doFinal( plaintext );
-        return Base64.encodeBase64URLSafeString( encrypted );
+        String base64    = Base64.encodeBase64String( encrypted );// 此处使用BASE64做转码
+        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
