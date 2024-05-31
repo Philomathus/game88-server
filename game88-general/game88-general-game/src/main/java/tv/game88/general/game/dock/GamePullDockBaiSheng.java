@@ -49,7 +49,7 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         String params = String.format( "action=9&start_time=%s&end_time=%s&money_type=RMB", startTime / 1000, endTime / 1000 );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, gamePlatform.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
