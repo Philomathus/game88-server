@@ -118,10 +118,4 @@ public class GameController extends BaseController {
     public RspBase<String> getGameToken( String agent, String gameCategory ) throws Exception {
         return gameService.getGameTokenByAgent( agent, gameCategory );
     }
-
-    @Operation ( summary = "PG Verify Session" )
-    @PostMapping ( value = "/VerifySession", consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE } )
-    public RspBase<?> verifySession( @RequestParam ( value = "trace_id" ) String traceId, @Validated ReqPGSoftGameData data ) {
-        return gameService.verify( traceId, data );
-    }
 }

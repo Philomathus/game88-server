@@ -2,23 +2,17 @@ package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
@@ -42,7 +36,10 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -51,8 +48,6 @@ public class GameServiceImpl implements GameService {
 
     public static final BigDecimal ONE_HUNDRED = new BigDecimal( 100 );
 
-    @Resource
-    private RestTemplate           restTemplate;
     @Resource
     private RedisUtils             redisUtils;
     @Resource
@@ -489,59 +484,5 @@ public class GameServiceImpl implements GameService {
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
                                                                                                       + entityIdCounter.getAndIncrement() );
-    }
-
-    public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
-        Map<String, Object> map = new HashMap<>();
-        map.put( "agent", profile );
-        map.put( "account", account );
-        map.put( "platformIds", platformIds );
-        map.put( "startTime", start );
-        map.put( "endTime", end );
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
-
-        List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
-        List<String>         hosts2          = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
-
-        List<Map<String, Object>> resultList2 = restTemplate.postForObject(
-                hosts2.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/gameDataRecord/getList", httpEntity, List.class );
-        if ( !CollectionUtils.isEmpty( resultList2 ) ) {
-            for ( Map<String, Object> resultMap : resultList2 ) {
-                rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
-            }
-        }
-        return rspGameDataLogs;
-    }
-
-    @Override
-    public RspBase<?> verify( String traceId, ReqPGSoftGameData data ) {
-        String ot  = redisUtils.strGet( Constants.GAME_PGSOFT_OT + data.getCustom_parameter() );
-        String key = redisUtils.strGet( Constants.GAME_PGSOFT_KEY + data.getCustom_parameter() );
-        String ops = redisUtils.strGet( Constants.GAME_PGSOFT_OPS + data.getCustom_parameter() );
-        log.info( "PGSoft Verify: trace_id - {}, data - {}, system - {}", traceId, data.toString(), String.format(
-                "Ot: %s, " + "Key: %s, Ops: %s", ot, key, ops ) );
-        if ( StringUtils.isEmpty( ot ) || StringUtils.isEmpty( key ) || StringUtils.isEmpty( ops ) ) {
-            return createResponse( 1200, null, Map.of( "code", "500", "message", "Required field missing" ) );
-        } else {
-            boolean isOt  = ot.equals( data.getOperator_token() );
-            boolean isKey = key.equals( data.getSecret_key() );
-            boolean isOps = ops.equals( data.getOperator_player_session() );
-            if ( isOt && isKey && isOps ) {
-                Map<String, String> successMap = Map.of( "player_name", data.getCustom_parameter(), "currency", "CNY" );
-                return createResponse( HttpServletResponse.SC_OK, successMap, null );
-            } else {
-                return createResponse( 1034, null, Map.of( "code", "400", "message", "One of required fields not equal" ) );
-            }
-        }
-    }
-
-    private static RspBase<RspPGSoftGameData> createResponse( int rspCode, Map<String, String> data, Map<String, String> error ) {
-        RspPGSoftGameData          rspData  = RspPGSoftGameData.builder().data( data ).error( error ).build();
-        RspBase<RspPGSoftGameData> response = new RspBase<>();
-        response.setCode( rspCode );
-        response.setData( rspData );
-        return response;
     }
 }
