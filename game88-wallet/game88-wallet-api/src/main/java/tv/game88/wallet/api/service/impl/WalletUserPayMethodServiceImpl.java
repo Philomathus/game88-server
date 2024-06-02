@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.ValidatorUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -105,6 +104,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 //            reqPayMethod.setRealName( walletUser.getRealName() );
         }
         }
+
+        boolean isAliPay = reqPayMethod.getMethodType() == WalletPayMethodEnum.ALIPAY;
+
         WalletUserPayMethod walletUserPayMethod = new WalletUserPayMethod();
         walletUserPayMethod.setUserId( userId );
         walletUserPayMethod.setMethodType( reqPayMethod.getMethodType() );
@@ -115,9 +117,18 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
         walletUserPayMethod.setBankAccount( reqPayMethod.getAccount() );
         walletUserPayMethod.setPayPicAddr( reqPayMethod.getPayPicAddr() );
         walletUserPayMethod.setCreateTime( LocalDateTime.now() );
-        walletUserPayMethod.setAuditStatus( reqPayMethod.getMethodType() == WalletPayMethodEnum.ALIPAY ? 0 : 1 );
+        walletUserPayMethod.setAuditStatus( isAliPay ? 0 : 1 );
         int i = this.baseMapper.insert( walletUserPayMethod );
-        return i > 0 ? RspBase.ok( "新增支付方式成功" ) : RspBase.businessError( "新增支付方式异常，请稍后再试" );
+
+        if ( i > 0 ) {
+            if ( !isAliPay ) {
+                return RspBase.ok("系统已审核认证,");
+            } else {
+                return RspBase.ok( "新增支付方式成功" );
+            }
+        }
+
+        return RspBase.businessError( "新增支付方式异常，请稍后再试" );
     }
 
     @Override

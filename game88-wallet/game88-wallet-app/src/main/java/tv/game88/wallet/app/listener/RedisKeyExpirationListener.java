@@ -23,7 +23,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
 
     public RedisKeyExpirationListener( RedisMessageListenerContainer listenerContainer ) {
         super( listenerContainer );
-        super.setKeyspaceNotificationsConfigParameter( "" );
+        super.setKeyspaceNotificationsConfigParameter( "Ex" );
     }
 
     @Override
