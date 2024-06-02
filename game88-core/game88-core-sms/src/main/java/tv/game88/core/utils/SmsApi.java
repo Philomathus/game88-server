@@ -20,6 +20,7 @@ import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -44,7 +45,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Component
@@ -197,7 +200,7 @@ public class SmsApi {
             String            nonce             = IdWorker.get32UUID();
             MessageDigest     md                = MessageDigest.getInstance( "SHA-256" );
             md.update( ( nonce + time + appSecret ).getBytes() );
-            String passwordDigestBase64Str = Base64.getEncoder().encodeToString( md.digest() );
+            String passwordDigestBase64Str = Base64.encodeBase64String( md.digest() );
             return String.format( WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time );
         } catch ( NoSuchAlgorithmException e ) {
             log.error( e.getMessage(), e );
@@ -226,7 +229,7 @@ public class SmsApi {
         req.setPhoneNumberSet( phoneNumbers );
         String[] templateParams = { msg };
         req.setTemplateParamSet( templateParams );
-        com.tencentcloudapi.sms.v20190711.models.SendSmsResponse res;
+        com.tencentcloudapi.sms.v20190711.models.SendSmsResponse res = null;
         try {
             res = client.SendSms( req );
         } catch ( TencentCloudSDKException e ) {
@@ -270,7 +273,7 @@ public class SmsApi {
         smsRequest.setTemplateCode( configSms.getTemplate() );
         smsRequest.setTemplateParam( "{\"code\":" + msg + "}" );
 
-        SendSmsResponse sendSmsResponse;
+        SendSmsResponse sendSmsResponse = null;
         try {
             sendSmsResponse = acsClient.getAcsResponse( smsRequest );
         } catch ( ClientException e ) {

@@ -128,15 +128,17 @@ public class MemberRechargeUsdtServiceImpl extends ServiceImpl<MemberRechargeUsd
      * 拒绝USDT充值提交记录
      *
      * @param orderNo
+     * @param remark
      *
      * @return 结果
      */
     @Override
-    public RspBase<?> refused( String orderNo, String userName ) {
+    public RspBase<?> refused( String orderNo, String userName, String remark ) {
         MemberRechargeUsdt update = new MemberRechargeUsdt();
         update.setRechargeOrderNo( orderNo );
         update.setOpName( userName );
         update.setUpdateTime( LocalDateTime.now() );
+        update.setRemark( remark );
         update.setStatus( 2 );
         int i = this.baseMapper.updateById( update );
         return i > 0 ? RspBase.ok() : RspBase.businessError( "拒绝失败" );

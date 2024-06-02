@@ -1,5 +1,8 @@
 package tv.game88.general.admin.controllor;
 
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
+import jakarta.annotation.Resource;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
@@ -16,7 +19,6 @@ import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.service.GamePlatformService;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.List;
  *
  * @author MengJun
  */
+@Log4j2
 @RestController
 @RequestMapping( "/admin/game/platform" )
 public class GamePlatformController extends BaseController {
@@ -82,11 +85,11 @@ public class GamePlatformController extends BaseController {
         gamePlatform.setCreateBy( SecurityUtils.getUsername() );
         gamePlatform.setCreateTime( LocalDateTime.now() );
         gamePlatform.setEffect( false );
-        if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
-            gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDes() ) );
+        if ( StringUtils.isNotBlank( gamePlatform.getDesOriginal() ) ) {
+            gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDesOriginal() ) );
         }
-        if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
-            gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5() ) );
+        if ( StringUtils.isNotBlank( gamePlatform.getMd5Original() ) ) {
+            gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5Original() ) );
         }
         return toResult( gamePlatformService.save( gamePlatform ) );
     }
@@ -98,28 +101,24 @@ public class GamePlatformController extends BaseController {
     @Log( title = "游戏平台", businessType = BusinessType.UPDATE )
     @PutMapping
     public RspBase<?> edit( @RequestBody GamePlatform gamePlatform ) {
-        gamePlatform.setUpdateBy( SecurityUtils.getUsername() );
-        gamePlatform.setUpdateTime( LocalDateTime.now() );
-        gamePlatform.setEffect( null );
-
-        GamePlatform gamePlatformOld = gamePlatformService.getById( gamePlatform.getId() );
-        String       a               = "***";
-        if ( StringUtils.isNotBlank( gamePlatform.getDes() ) ) {
-            if ( gamePlatform.getDes().contains( a ) ) {
-                gamePlatform.setDes( gamePlatformOld.getDes() );
-            } else {
-                gamePlatform.setDes( AESCoder.encrypt( gamePlatform.getDes() ) );
-            }
+        LambdaUpdateChainWrapper<GamePlatform> updateChainWrapper =
+                new LambdaUpdateChainWrapper<>( gamePlatformService.getBaseMapper() )
+                .set( GamePlatform::getUpdateBy, SecurityUtils.getUsername() )
+                .set( GamePlatform::getUpdateTime, LocalDateTime.now() )
+                .set( GamePlatform::getName, gamePlatform.getName() )
+                .set( GamePlatform::getAgent, gamePlatform.getAgent() )
+                .set( GamePlatform::getRecordUrl, gamePlatform.getRecordUrl() )
+                .set( GamePlatform::getLinecode, gamePlatform.getLinecode() )
+                .set( GamePlatform::getApiUrl, gamePlatform.getApiUrl() );
+        String a = "***";
+        if ( StringUtils.isNotBlank( gamePlatform.getDesOriginal() ) && !gamePlatform.getDesOriginal().contains( a ) ) {
+            updateChainWrapper.set( GamePlatform::getDes, AESCoder.encrypt( gamePlatform.getDesOriginal() ) );
         }
-        if ( StringUtils.isNotBlank( gamePlatform.getMd5() ) ) {
-            if ( gamePlatform.getMd5().contains( a ) ) {
-                gamePlatform.setMd5( gamePlatformOld.getMd5() );
-            } else {
-                gamePlatform.setMd5( AESCoder.encrypt( gamePlatform.getMd5() ) );
-            }
+        if ( StringUtils.isNotBlank( gamePlatform.getMd5Original() ) && !gamePlatform.getMd5Original().contains( a ) ) {
+            updateChainWrapper.set( GamePlatform::getMd5, AESCoder.encrypt( gamePlatform.getMd5Original() ) );
         }
-        boolean isSave = gamePlatformService.updateById( gamePlatform );
-        return toResult( isSave );
+        updateChainWrapper.eq( GamePlatform::getId, gamePlatform.getId() );
+        return toResult( updateChainWrapper.update() );
     }
 
     /**

@@ -30,7 +30,7 @@ public interface WalletUserService extends IService<WalletUser> {
 
     RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String loginUrl );
 
-    RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin );
+    RspBase<?> embeddedLogin( ReqEmbeddedLogin reqEmbeddedLogin ) throws Exception;
 
     RspBase<?> resetPasswd( ReqResetPasswd reqResetPasswd, String userId );
 

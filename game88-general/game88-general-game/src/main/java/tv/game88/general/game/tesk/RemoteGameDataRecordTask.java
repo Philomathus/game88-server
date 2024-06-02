@@ -6,11 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
-import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordFixVersion;
@@ -65,10 +63,8 @@ public class RemoteGameDataRecordTask {
             scheduledExecutorService.schedule( () -> {
                 String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
                 String versionValue = gamePlatform.getVersionValue();
-                if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
-                        && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
+                if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
                     LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
-
                     log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
                 } else {
                     log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
@@ -101,10 +97,8 @@ public class RemoteGameDataRecordTask {
             scheduledExecutorService.schedule( () -> {
                 String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
                 String versionValue = gamePlatform.getVersionValue();
-                if ( StringUtils.isNumeric( versionValue ) && gamePlatform.getGameCategory() != EnumGameCategory.MEITIAN
-                        && gamePlatform.getGameCategory() != EnumGameCategory.SHABA ) {
+                if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
                     LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
-
                     log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
                 } else {
                     log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );

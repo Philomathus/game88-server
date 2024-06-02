@@ -98,7 +98,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Override
-    public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) {
+    public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
         RspBase        rspBase        = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
         if ( rspBase != null ) {
@@ -131,7 +131,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Override
-    public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) {
+    public RspBase<RspWalletRecord> orderQuery( ReqOrderQuery reqOrderQuery ) throws Exception {
         WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqOrderQuery.getMerchantId() );
         RspBase        rspBase        = this.validated( reqOrderQuery, walletMerchant, null );
         if ( rspBase != null ) {
@@ -192,7 +192,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     }
 
     @Override
-    public RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress ) {
+    public RspBase validated( Object obj, WalletMerchant walletMerchant, String walletAddress ) throws Exception {
         if ( walletMerchant == null ) {
             return RspBase.businessError( "商户不存在" );
         }
@@ -218,7 +218,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
         return null;
     }
 
-    private String sign( Map<String, Object> reqquestMap, WalletMerchant walletMerchant ) {
+    private String sign( Map<String, Object> reqquestMap, WalletMerchant walletMerchant ) throws Exception {
         reqquestMap.entrySet().removeIf( me -> me.getValue() == null || StringUtils.isBlank( me.getValue().toString() ) );
         reqquestMap.remove( "sign" );
 
@@ -358,7 +358,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
 
     @Override
-    public RspWalletRecord getRspData( String tradeNo ) {
+    public RspWalletRecord getRspData( String tradeNo ) throws Exception {
         WalletRecord    walletRecord    = this.baseMapper.selectById( tradeNo );
         WalletMerchant  walletMerchant  = walletMerchantCacheUtil.getWalletMerchantCache( walletRecord.getMerchantId() );
         RspWalletRecord rspWalletRecord = new RspWalletRecord();

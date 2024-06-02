@@ -80,7 +80,7 @@ public class GamePlatformController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('game:platform:query')" )
     @GetMapping( value = "/{id}" )
-    public RspBase<GamePlatform> getInfo( @PathVariable( "id" ) Long id ) {
+    public RspBase<GamePlatform> getInfo( @PathVariable( "id" ) Long id ) throws Exception {
         GamePlatform gamePlatform = gamePlatformService.getById( id );
         if ( gamePlatform != null ) {
             String a = "**********";

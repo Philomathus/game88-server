@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.MEIBO + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.MEIBO + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockMeiBo extends AbstractGamePull {
 
     @Override
@@ -55,6 +55,8 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         requestMap.put( "key", DigestUtils.md5Hex( keyParams ) );
 
         String url = gamePlatform.getRecordUrl() + "/third/getGameRecord";
+
+        log.warn( url + " ::: " + JsonUtil.object2Json( requestMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( url, packageJson( requestMap ) );
 

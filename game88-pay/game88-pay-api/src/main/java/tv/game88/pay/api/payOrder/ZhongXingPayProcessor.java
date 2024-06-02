@@ -30,7 +30,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "Amount", reqPayRecharge.getMoney().setScale( 2, RoundingMode.HALF_UP ) );
         String realName = memberCardMapper.findRealNameById( reqPayRecharge.getUserId() );
@@ -66,7 +66,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "MerchantId", payPlatform.getMerId() );
         reqMap.put( "MerchantUniqueOrderId", memberRechargeOnline.getOrderNo() );
@@ -91,7 +91,7 @@ public class ZhongXingPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         // 订单id
         String MerchantUniqueOrderId = requestMap.getOrDefault( "MerchantUniqueOrderId", "" ).toString();
 

@@ -121,13 +121,13 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
 
     @Override
     public Map<String, Object> reverseCheckOrderPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap,
-                                                     String realIp ) {
+                                                     String realIp ) throws Exception {
         return null;
     }
 
     @Override
     public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
-                                 PayAgentPlatform payAgentPlatform ) {
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "MerchantId", payAgentPlatform.getId() );
         dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );

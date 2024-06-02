@@ -20,36 +20,33 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
-@Repository( value = ConstantsPay.HONGYUN_PAY + "Processor" )
+@Repository( value = ConstantsPay.SHUNDA3_PAY + "Processor" )
 @Log4j2
-public class HongYunPayProcessor extends AbstractPay {
+public class ShunDa3PayProcessor extends AbstractPay {
     @Override
     public String getName() {
-        return "鸿运支付";
+        return "顺达3支付";
     }
 
     @Override
-     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
-        params.put( "mch_id", payPlatform.getMerId() );
-        params.put( "trade_type", payChannel.getChannelCode() );
+        params.put( "mchKey", payPlatform.getMerId() );
+        params.put( "product", payChannel.getChannelCode() );
         params.put( "nonce", UUID.randomUUID().toString().replace( "-", "" ) );
         params.put( "timestamp", System.currentTimeMillis() );
-        params.put( "subject", "subject" );
-        params.put( "out_trade_no", reqPayRecharge.getOrderNo() );
-        params.put( "total_fee", reqPayRecharge
+        params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
+        params.put( "amount", reqPayRecharge
                 .getMoney()
                 .multiply( BigDecimal.valueOf( 100 ) )
                 .setScale( 0, RoundingMode.HALF_UP )
                 .intValue() );
-        params.put( "spbill_create_ip", reqPayRecharge.getRealIp() );
-        params.put( "notify_url", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
-        params.put( "sign_type", "MD5" );
-        StringBuilder sb = new StringBuilder();
-        params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String sign = sb.substring( 0, sb.length() - 1 ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        sign = DigestUtils.md5Hex( sign ).toUpperCase();
-        params.put( "sign", sign );
+        params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
+
+        String signStr = this.assemblyUrl( params ) + AESCoder.decrypt( payPlatform.getSignMd5() );
+        params.put( "sign", DigestUtils.md5Hex( signStr ) );
+
+        log.warn( JsonUtil.object2Json( params ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
@@ -57,11 +54,13 @@ public class HongYunPayProcessor extends AbstractPay {
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            if ( "SUCCESS".equals( resultMap.getOrDefault( "result_code", "" ).toString() ) ) {
-                return ( String ) resultMap.get( "pay_url" );
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+            if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+                Map<String, Object> urlMap = ( Map<String, Object> ) dataMap.get( "url" );
+                return ( String ) urlMap.get( "payUrl" );
             } else {
                 // 存档失败原因
-                reqPayRecharge.setFailReason( resultMap.getOrDefault( "result_msg", "" ).toString() );
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
         return null;
@@ -71,23 +70,28 @@ public class HongYunPayProcessor extends AbstractPay {
     public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         String                    orderNo = memberRechargeOnline.getOrderNo();
         SortedMap<String, Object> bodyMap = new TreeMap<>();
-        bodyMap.put( "mch_id", payPlatform.getMerId() );
-        bodyMap.put( "out_trade_no", orderNo );
-        bodyMap.put( "sign_type", "MD5" );
-        StringBuilder sb = new StringBuilder();
-        bodyMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String sign = sb.substring( 0, sb.length() - 1 ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        log.warn( sign );
-        sign = DigestUtils.md5Hex( sign ).toUpperCase();
-        bodyMap.put( "sign", sign );
+        bodyMap.put( "mchKey", payPlatform.getMerId() );
+        bodyMap.put( "mchOrderNo", orderNo );
+        bodyMap.put( "nonce", UUID.randomUUID().toString().replace( "-", "" ) );
+        bodyMap.put( "timestamp", System.currentTimeMillis() );
+
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
+        bodyMap.put( "sign", DigestUtils.md5Hex( signStr ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( bodyMap ), null );
 
-        log.warn( "鸿运支付查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
+        log.warn( payPlatform.getName()
+                + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            if ( "SUCCESS".equals( resultMap.getOrDefault( "result_code", "FAIL" ).toString() ) ) {
-                int status = Integer.parseInt( resultMap.getOrDefault( "trade_status", "0" ).toString() );
-                return status == 1;
+            Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "data" );
+            if ( "200".equals( resultMap.getOrDefault( "code", "" ).toString() ) ) {
+                if ( "SUCCESS".equals( dataMap.getOrDefault( "payStatus", "0" ).toString() ) ) {
+                    String realAmount = dataMap.getOrDefault( "realAmount", "-1" ).toString();
+                    memberRechargeOnline.setRealMoney( new BigDecimal( realAmount ).divide( BigDecimal.valueOf( 100 ), 2,
+                            RoundingMode.HALF_DOWN ) );
+                    memberRechargeOnline.setUpperOrderNo( dataMap.getOrDefault( "serialOrderNo", "" ).toString() );
+                    return true;
+                }
             }
         }
         return false;
@@ -95,7 +99,7 @@ public class HongYunPayProcessor extends AbstractPay {
 
     @Override
     public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
-        String               orderNo              = ( String ) requestMap.get( "out_trade_no" );
+        String               orderNo              = ( String ) requestMap.get( "mchOrderNo" );
         String               sign                 = ( String ) requestMap.remove( "sign" );
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( orderNo );
         if ( memberRechargeOnline.getStatus() == 1 ) {
@@ -117,19 +121,14 @@ public class HongYunPayProcessor extends AbstractPay {
         }
 
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
-        StringBuilder             sb      = new StringBuilder();
-        bodyMap.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String signTemp = sb.substring( 0, sb.length() - 1 ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
-        signTemp = DigestUtils.md5Hex( signTemp ).toUpperCase();
+
+        String signStr  = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payPlatform.getSignMd5() );
+        String signTemp = DigestUtils.md5Hex( signStr );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + signTemp );
         if ( signTemp.equals( sign ) ) {
-            BigDecimal userPayAmount = new BigDecimal( requestMap.getOrDefault( "total_fee", 0 ).toString() );
-            String     trade_no      = ( String ) requestMap.get( "trade_no" );
-            String     status        = ( String ) requestMap.getOrDefault( "result_code", "FAIL" );
+            String status = requestMap.getOrDefault( "payStatus", "FAIL" ).toString();
             if ( "SUCCESS".equals( status ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
-                memberRechargeOnline.setRealMoney( userPayAmount.divide( BigDecimal.valueOf( 100 ), 2, RoundingMode.HALF_UP ) );
-                memberRechargeOnline.setUpperOrderNo( trade_no );
                 return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "SUCCESS", "FAIL" },
                         payChannel.getName() );
             }

@@ -1,12 +1,11 @@
 package tv.game88.game.api.service;
 
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import tv.game88.common.vo.RspBase;
-import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.game.api.base.BaseGameDock;
-import tv.game88.game.api.dto.*;
+import tv.game88.game.api.dto.RspGameInfo;
+import tv.game88.game.api.dto.RspGameMoney;
+import tv.game88.game.api.dto.RspGamePlatform;
+import tv.game88.game.api.dto.RspGameTypes;
 
 import java.util.List;
 
@@ -23,18 +22,9 @@ public interface GameService {
 
     RspBase<?> escGame( Long infoId, String memberId );
 
-    RspBase<String> getGameTokenByAgent( String agent, String gameCategory );
+    RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception;
 
     RspBase<List<RspGameMoney>> getGameBalance( String memberId );
 
     RspBase<?> gameWithdrawal( Long platformId, String memberId );
-
-    RspBase<?> verify( String traceId, ReqPGSoftGameData data );
-
-    @Retryable( retryFor = Exception.class, maxAttempts = 5, backoff = @Backoff( delay = 500 ) )
-    List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds );
-
-    void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock );
-
-    void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock );
 }

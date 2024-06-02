@@ -1,6 +1,7 @@
 package tv.game88.pay.api.utils;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 import tv.game88.common.utils.JsonUtil;
 
 import javax.crypto.Mac;
@@ -28,19 +29,19 @@ public class BankAddressUtil {
 		Key    sKey    = new SecretKeySpec( secretKey.getBytes( StandardCharsets.UTF_8 ), mac.getAlgorithm() );
 		mac.init( sKey );
 		byte[] hash = mac.doFinal( signStr.getBytes( StandardCharsets.UTF_8 ) );
-		String sig  = Base64.getEncoder().encodeToString( hash );
+		String sig  = Base64.encodeBase64String( hash );
 		return "hmac id=\"" + secretId + "\", algorithm=\"hmac-sha1\", headers=\"x-date x-source\", signature=\"" + sig + "\"";
 	}
 
-	public static String urlencode( Map<?, ?> map ) throws UnsupportedEncodingException {
+	public static String urlencode( Map<?, ?> map ) {
 		StringBuilder sb = new StringBuilder();
 		for ( Map.Entry<?, ?> entry : map.entrySet() ) {
 			if ( !sb.isEmpty() ) {
 				sb.append( "&" );
 			}
 			sb.append( String.format( "%s=%s",
-					URLEncoder.encode( entry.getKey().toString(), "UTF-8" ),
-					URLEncoder.encode( entry.getValue().toString(), "UTF-8" )
+					URLEncoder.encode( entry.getKey().toString(), StandardCharsets.UTF_8 ),
+					URLEncoder.encode( entry.getValue().toString(), StandardCharsets.UTF_8 )
 			) );
 		}
 		return sb.toString();
@@ -114,22 +115,22 @@ public class BankAddressUtil {
 					Map    dataMap  = ( Map ) mapResult.get( "data" );
 					String province = ( String ) dataMap.get( "province" );
 					String city     = ( String ) dataMap.get( "city" );
-					if ( province.contains( "上海" ) && ( city == null || city.equals( "" )  ) ) {
+					if ( province.contains( "上海" ) && ( city == null || city.isEmpty() ) ) {
 						city = "上海";
 					}
-					if ( province.contains( "北京" ) && ( city == null || city.equals( "" ) ) ) {
+					if ( province.contains( "北京" ) && ( city == null || city.isEmpty() ) ) {
 						city = "北京";
 					}
-					if ( province.contains( "天津" ) && ( city == null || city.equals( "" ) ) ) {
+					if ( province.contains( "天津" ) && ( city == null || city.isEmpty() ) ) {
 						city = "天津";
 					}
-					if ( province.contains( "重庆" ) && ( city == null || city.equals( "" ) ) ) {
+					if ( province.contains( "重庆" ) && ( city == null || city.isEmpty() ) ) {
 						city = "重庆";
 					}
-					if ( province.contains( "广西" ) && ( city == null || city.equals( "" ) ) ) {
+					if ( province.contains( "广西" ) && ( city == null || city.isEmpty() ) ) {
 						city = "南宁";
 					}
-					if ( province.contains( "云南" ) && ( city == null || city.equals( "" ) ) ) {
+					if ( province.contains( "云南" ) && ( city == null || city.isEmpty() ) ) {
 						city = "昆明";
 					}
 					return province + "/" + city;

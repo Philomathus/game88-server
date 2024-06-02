@@ -131,7 +131,7 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
 
     @Override
     public String queryOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentChannel payAgentChannel,
-                                 PayAgentPlatform payAgentPlatform ) {
+                                 PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> dataMap = new LinkedHashMap<>();
         dataMap.put( "merchantId", payAgentPlatform.getId() );
         dataMap.put( "merchantOrderId", withdrawDetail.getWithdrawOrderNo() );

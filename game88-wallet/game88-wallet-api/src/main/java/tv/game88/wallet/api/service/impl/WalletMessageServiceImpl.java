@@ -113,7 +113,6 @@ public class WalletMessageServiceImpl extends ServiceImpl<WalletMessageMapper, W
         return RspBase.ok( redisUtils.exists( ConstantsWallet.MESSAGE_PERSONAL_PROMPT + userId ) );
     }
 
-    @Async
     @Override
     public void saveWalletMessage( WalletTransactionDetail walletTransactionDetail, boolean isSeller ) {
         String titleText;

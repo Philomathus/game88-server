@@ -166,8 +166,13 @@ public class GameDockJDB extends AbstractGameDock {
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            return "0000".equals( resultMap.getOrDefault( "status", "" ).toString() );
+        if ( !CollectionUtils.isEmpty( resultMap ) && "0000".equals( resultMap.getOrDefault( "status", "" ).toString() ) ) {
+            List<Map<String, Object>> dataMapList = ( List<Map<String, Object>> ) resultMap.getOrDefault( "data",
+                    new ArrayList<>() );
+            if ( !CollectionUtils.isEmpty( dataMapList ) ) {
+                Map<String, Object> dataMap = dataMapList.getFirst();
+                return reqJoinGame.getGameMemberId().equals( dataMap.getOrDefault( "uid", "0" ).toString() );
+            }
         }
         throw new BusinessException( "查询结果为空,需要重试" );
     }

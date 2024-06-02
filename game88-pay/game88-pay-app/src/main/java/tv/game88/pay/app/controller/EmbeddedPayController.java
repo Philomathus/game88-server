@@ -25,25 +25,25 @@ public class EmbeddedPayController extends BaseController {
 
     @Operation( summary = "vipPay登录注册" )
     @PostMapping( "/vipPayLogin" )
-    public RspBase<RspVipPayLogin> vipPayLogin() {
+    public RspBase<RspVipPayLogin> vipPayLogin() throws Exception {
         return embeddedPayService.vipPayLogin( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "vipPay扣款并充值平台" )
     @PostMapping( "/vipPayDeposit" )
-    public RspBase<?> vipPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
+    public RspBase<?> vipPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) throws Exception {
         return embeddedPayService.vipPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "QDPay登录注册" )
     @PostMapping( value = { "/qdPayLogin" } )
-    public RspBase<RspVipPayLogin> qdPayLogin() {
+    public RspBase<RspVipPayLogin> qdPayLogin() throws Exception {
         return embeddedPayService.qdPayLogin( MemberSecurityUtils.getUserId() );
     }
 
     @Operation( summary = "QDPay扣款并充值平台" )
     @PostMapping( value = { "qdPayDeposit" } )
-    public RspBase<?> qdPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) {
+    public RspBase<?> qdPayDeposit( @Validated @RequestBody ReqVipPayDeposit reqVipPayDeposit ) throws Exception {
         return embeddedPayService.qdPayDeposit( reqVipPayDeposit, MemberSecurityUtils.getUserId() );
     }
 }

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.2.5</version>
+        <version>3.3.0</version>
         <relativePath />
     </parent>
 
@@ -35,19 +35,19 @@
 
         <spring.boot.version>${project.parent.version}</spring.boot.version>
 
-        <mysql-connector-java.version>8.3.0</mysql-connector-java.version>
+        <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper.starter.version>2.1.0</pagehelper.starter.version>
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <dynamic.datasource.version>4.3.0</dynamic.datasource.version>
 
-        <springdoc.version>2.4.0</springdoc.version>
-        <swagger-annotation.version>2.2.21</swagger-annotation.version>
+        <springdoc.version>2.5.0</springdoc.version>
+        <swagger-annotation.version>2.2.22</swagger-annotation.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <commons-io.version>2.15.1</commons-io.version>
-        <commons-compress.version>1.25.0</commons-compress.version>
-        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-io.version>2.16.1</commons-io.version>
+        <commons-compress.version>1.26.2</commons-compress.version>
+        <commons-codec.version>1.17.0</commons-codec.version>
         <opencsv.version>5.9</opencsv.version>
         <httpclient5.version>5.3.1</httpclient5.version>
         <easypoi.version>4.4.0</easypoi.version>
@@ -58,23 +58,23 @@
         <telegrambots.version>6.9.7.1</telegrambots.version>
         <zxing.version>3.5.3</zxing.version>
 
-        <tencentcloud.vesion>3.1.967</tencentcloud.vesion>
+        <tencentcloud.vesion>3.1.1031</tencentcloud.vesion>
         <aliyun.core.version>4.6.4</aliyun.core.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <aliyun.sts.version>3.1.2</aliyun.sts.version>
         <aliyun.dysmsapi.version>2.2.1</aliyun.dysmsapi.version>
-        <baidubce.version>0.10.297</baidubce.version>
-        <amazon.s3.version>1.12.664</amazon.s3.version>
+        <baidubce.version>0.10.314</baidubce.version>
+        <amazon.s3.version>1.12.732</amazon.s3.version>
 
         <!-- plugin -->
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-help-plugin.verion>3.4.0</maven-help-plugin.verion>
         <maven-surefire-plugin.verion>3.2.5</maven-surefire-plugin.verion>
 
         <snakeyaml.version>2.2</snakeyaml.version>
-        <guava.version>33.1.0-jre</guava.version>
-        <org.json.verion>20240205</org.json.verion>
-        <bouncycastle.version>1.77</bouncycastle.version>
+        <guava.version>33.2.0-jre</guava.version>
+        <org.json.verion>20240303</org.json.verion>
+        <bcprov-jdk18on.version>1.78.1</bcprov-jdk18on.version>
     </properties>
 
     <dependencyManagement>
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
-                <version>${mysql-connector-java.version}</version>
+                <version>${mysql-connector-j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>

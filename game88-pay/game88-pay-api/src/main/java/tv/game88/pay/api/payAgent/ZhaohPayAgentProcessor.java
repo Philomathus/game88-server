@@ -141,7 +141,7 @@ public class ZhaohPayAgentProcessor extends AbstractPayAgent {
 
     @Override
     public Map<String, Object> reverseCheckOrderPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap,
-                                                     String realIp ) {
+                                                     String realIp ) throws Exception {
         Map<String, Object> resultMap = new TreeMap<>();
         if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {
             log.warn( "请求ip非白名单:{},request:{}", realIp, JsonUtil.object2Json( requestMap ) );

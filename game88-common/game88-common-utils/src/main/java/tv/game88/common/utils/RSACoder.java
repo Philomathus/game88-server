@@ -1,6 +1,7 @@
 package tv.game88.common.utils;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -15,7 +16,6 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 /**
  * 经典的数字签名算法RSA 数字签名
@@ -48,7 +48,7 @@ public class RSACoder {
      * @throws Exception
      */
     public static String encryptByPublicKeyHex( String data, String key ) throws Exception {
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( key ) );
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.decodeBase64( key ) );
         KeyFactory         keyFactory  = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          pubKey      = keyFactory.generatePublic( x509KeySpec );
         Cipher             cipher      = Cipher.getInstance( keyFactory.getAlgorithm() );
@@ -63,13 +63,13 @@ public class RSACoder {
      * @param key  密钥
      */
     public static String encryptByPublicKey( String data, String key ) throws Exception {
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( key ) );
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.decodeBase64( key ) );
         KeyFactory         keyFactory  = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          pubKey      = keyFactory.generatePublic( x509KeySpec );
         Cipher             cipher      = Cipher.getInstance( keyFactory.getAlgorithm() );
         cipher.init( Cipher.ENCRYPT_MODE, pubKey );
         byte[] resultBytes = cipherDoFinal( cipher, data.getBytes( StandardCharsets.UTF_8 ), EN_SEGMENT_SIZE );
-        return Base64.getEncoder().encodeToString( resultBytes );
+        return Base64.encodeBase64String( resultBytes );
     }
 
     /**
@@ -79,13 +79,13 @@ public class RSACoder {
      * @param key  密钥
      */
     public static String encryptByPrivateKey( String data, String key ) throws Exception {
-        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec( Base64.getDecoder().decode( key ) );
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec( Base64.decodeBase64( key ) );
         KeyFactory          keyFactory   = KeyFactory.getInstance( KEY_ALGORITHM );
         PrivateKey          privateKey   = keyFactory.generatePrivate( pkcs8KeySpec );
         Cipher              cipher       = Cipher.getInstance( keyFactory.getAlgorithm() );
         cipher.init( Cipher.ENCRYPT_MODE, privateKey );
         byte[] resultBytes = cipherDoFinal( cipher, data.getBytes( StandardCharsets.UTF_8 ), EN_SEGMENT_SIZE );
-        return Base64.getEncoder().encodeToString( resultBytes );
+        return Base64.encodeBase64String( resultBytes );
     }
 
     /**
@@ -95,12 +95,12 @@ public class RSACoder {
      * @param key  密钥
      */
     public static String decryptByPublicKey( String data, String key ) throws Exception {
-        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( key ) );
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec( Base64.decodeBase64( key ) );
         KeyFactory         keyFactory         = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          publicKey          = keyFactory.generatePublic( x509EncodedKeySpec );
         Cipher             cipher             = Cipher.getInstance( keyFactory.getAlgorithm() );
         cipher.init( Cipher.DECRYPT_MODE, publicKey );
-        byte[] decBytes = cipherDoFinal( cipher, Base64.getDecoder().decode( data ), DE_SEGMENT_SIZE );
+        byte[] decBytes = cipherDoFinal( cipher, Base64.decodeBase64( data ), DE_SEGMENT_SIZE );
         return new String( decBytes, StandardCharsets.UTF_8 );
     }
 
@@ -108,12 +108,12 @@ public class RSACoder {
      * 私钥解密
      **/
     public static String decryptByPrivateKey( String data, String key ) throws Exception {
-        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec( Base64.getDecoder().decode( key ) );
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec( Base64.decodeBase64( key ) );
         KeyFactory          keyFactory   = KeyFactory.getInstance( KEY_ALGORITHM );
         PrivateKey          privateKey   = keyFactory.generatePrivate( pkcs8KeySpec );
         Cipher              cipher       = Cipher.getInstance( keyFactory.getAlgorithm() );
         cipher.init( Cipher.DECRYPT_MODE, privateKey );
-        byte[] decodeData = Base64.getDecoder().decode( data );
+        byte[] decodeData = Base64.decodeBase64( data );
         int    blockSize  = cipher.getOutputSize( decodeData.length );
         return new String( cipherDoFinal( cipher, decodeData, blockSize ), StandardCharsets.UTF_8 );
     }
@@ -148,62 +148,62 @@ public class RSACoder {
     }
 
     public static String signMd5Rsa( String data, String privateKey ) throws Exception {
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.getDecoder().decode( privateKey ) );
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.decodeBase64( privateKey ) );
         KeyFactory          keyFactory          = KeyFactory.getInstance( KEY_ALGORITHM );
         PrivateKey          priKey              = keyFactory.generatePrivate( pkcs8EncodedKeySpec );
         Signature           signature           = Signature.getInstance( SIGNATURE_ALGORITHM_MD5 );
         signature.initSign( priKey );
         signature.update( data.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64.getEncoder().encodeToString( signature.sign() );
+        return Base64.encodeBase64String( signature.sign() );
     }
 
     public static boolean verifyMd5Rsa( String data, String publicKey, String sign ) throws Exception {
-        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( publicKey ) );
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec( Base64.decodeBase64( publicKey ) );
         KeyFactory         keyFactory         = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          pubKey             = keyFactory.generatePublic( x509EncodedKeySpec );
         Signature          signature          = Signature.getInstance( SIGNATURE_ALGORITHM_MD5 );
         signature.initVerify( pubKey );
         signature.update( data.getBytes( StandardCharsets.UTF_8 ) );
-        return signature.verify( Base64.getDecoder().decode( sign ) );
+        return signature.verify( Base64.decodeBase64( sign ) );
     }
 
     public static boolean verifySha256Rsa( String data, String publicKey, String sign ) throws Exception {
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( publicKey ) );
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.decodeBase64( publicKey ) );
         KeyFactory         keyFactory  = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          pubKey      = keyFactory.generatePublic( x509KeySpec );
         Signature          signVer     = Signature.getInstance( SIGNATURE_ALGORITHM_SHA256 );
         signVer.initVerify( pubKey );
         signVer.update( data.getBytes( StandardCharsets.UTF_8 ) );
-        return signVer.verify( Base64.getDecoder().decode( sign ) );
+        return signVer.verify( Base64.decodeBase64( sign ) );
     }
 
     public static String signSha256Rsa( String data, String privateKey ) throws Exception {
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.getDecoder().decode( privateKey ) );
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.decodeBase64( privateKey ) );
         KeyFactory          keyFactory          = KeyFactory.getInstance( KEY_ALGORITHM );
         PrivateKey          priKey              = keyFactory.generatePrivate( pkcs8EncodedKeySpec );
         Signature           signature           = Signature.getInstance( SIGNATURE_ALGORITHM_SHA256 );
         signature.initSign( priKey );
         signature.update( data.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64.getEncoder().encodeToString( signature.sign() );
+        return Base64.encodeBase64String( signature.sign() );
     }
 
     public static String signSha1Rsa( String source, String privateKey ) throws Exception {
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.getDecoder().decode( privateKey ) );
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec( Base64.decodeBase64( privateKey ) );
         KeyFactory          keyFactory          = KeyFactory.getInstance( KEY_ALGORITHM );
         PrivateKey          priKey              = keyFactory.generatePrivate( pkcs8EncodedKeySpec );
         Signature           sign                = Signature.getInstance( SIGNATURE_ALGORITHM_SHA1 );
         sign.initSign( priKey );
         sign.update( source.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64.getEncoder().encodeToString( sign.sign() );
+        return Base64.encodeBase64String( sign.sign() );
     }
 
     public static boolean verifySha1Rsa( String data, String publicKey, String sign ) throws Exception {
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.getDecoder().decode( publicKey ) );
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec( Base64.decodeBase64( publicKey ) );
         KeyFactory         keyFactory  = KeyFactory.getInstance( KEY_ALGORITHM );
         PublicKey          pubKey      = keyFactory.generatePublic( x509KeySpec );
         Signature          signVer     = Signature.getInstance( SIGNATURE_ALGORITHM_SHA1 );
         signVer.initVerify( pubKey );
         signVer.update( data.getBytes( StandardCharsets.UTF_8 ) );
-        return signVer.verify( Base64.getDecoder().decode( sign ) );
+        return signVer.verify( Base64.decodeBase64( sign ) );
     }
 }

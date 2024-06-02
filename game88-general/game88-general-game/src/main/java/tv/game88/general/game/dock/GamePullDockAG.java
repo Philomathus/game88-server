@@ -241,7 +241,7 @@ public class GamePullDockAG extends AbstractGamePull {
     }
 
     public String convertNum( String data ) {
-        data = data.equals( "" ) ? "0" : data;
+        data = data.isEmpty() ? "0" : data;
         return new BigDecimal( StringUtils.isBlank( data ) ? "0" : data ).setScale( 2, RoundingMode.HALF_UP ).toString();
     }
 }

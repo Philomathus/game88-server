@@ -30,7 +30,7 @@ public class VipPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> reqMap = new TreeMap<>();
         reqMap.put( "merchantNo", payPlatform.getMerId() );
         reqMap.put( "depositNo", reqPayRecharge.getOrderNo() );
@@ -62,7 +62,7 @@ public class VipPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "merchantNo", payPlatform.getMerId() );
         params.put( "orderNo", memberRechargeOnline.getOrderNo() );
@@ -89,7 +89,7 @@ public class VipPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               merOrderNo           = requestMap.getOrDefault( "depositNo", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( merOrderNo );
 

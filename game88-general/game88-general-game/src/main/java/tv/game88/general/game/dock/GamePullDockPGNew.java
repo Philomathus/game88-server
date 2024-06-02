@@ -43,14 +43,12 @@ public class GamePullDockPGNew extends AbstractGamePull {
 
         // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "transactions", new ArrayList<>() );
-            if ( "1".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
-                if ( CollectionUtils.isEmpty( transactions ) ) {
+            if ( "200".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
+                List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( transactions ) ) {
                     Map<String, Object> last       = ( Map<String, Object> ) transactions.getLast();
-                    String              payoffTime = String.valueOf( last.get( "payoff_time" ) ).substring( 0, 19 );
-
                     // 状态正常,无论是否有数据,从结束时间开始查询
-                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime, LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) ) );
+                    gamePlatform.setVersionValue( String.valueOf( last.get( "id" ) ) );
                 }
                 return transactions;
             } else {
@@ -74,9 +72,12 @@ public class GamePullDockPGNew extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
-        String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String   account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
-        String[] spl     = account.split( "_" );
+        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
+        if ( !account.contains( "_" ) ) {
+            return null;
+        }
+        String[] spl = account.split( "_" );
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
@@ -85,7 +86,7 @@ public class GamePullDockPGNew extends AbstractGamePull {
         BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
         gameDataRecord.setCellScore( chip.toString() );
         gameDataRecord.setAllBet( chip.toString() );
-        BigDecimal allGetMoney = new BigDecimal( remoteGameDatum.get( "allGetMoney" ).toString() ).multiply( RATE );
+        BigDecimal allGetMoney = new BigDecimal( remoteGameDatum.get( "allgetmoney" ).toString() ).multiply( RATE );
         gameDataRecord.setProfit( allGetMoney.subtract( chip ).toString() );
 
         String createTime = remoteGameDatum.get( "create_time" ).toString();

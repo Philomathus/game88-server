@@ -119,11 +119,6 @@ public class WalletMerchantController extends BaseController {
         return toResult( update );
     }
 
-    // TODO new API showMd5key and need verifyMFACode
-    public static void main( String[] args ) {
-        System.out.println(AESCoder.decrypt( "TO28wZrMa+rLSwgr0UCadAZxSCagRo0DbL9G33VI1vYPaOYuDkK+KTeOLbU4M638" ));
-    }
-
     /**
      * 重置商户登录密码
      */

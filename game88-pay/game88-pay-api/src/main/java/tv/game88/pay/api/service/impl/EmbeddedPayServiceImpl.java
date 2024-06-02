@@ -33,6 +33,7 @@ import tv.game88.pay.api.mapper.MemberRechargeOnlineMapper;
 import tv.game88.pay.api.service.EmbeddedPayService;
 
 import jakarta.annotation.Resource;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -63,7 +64,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     private String profile;
 
     @Override
-    public RspBase<RspVipPayLogin> vipPayLogin( String memberId ) {
+    public RspBase<RspVipPayLogin> vipPayLogin( String memberId ) throws Exception {
         // 68是vipPay的银行ID
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
                 .eq( "member_id", memberId )
@@ -161,7 +162,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     }
 
     @Override
-    public RspBase<?> vipPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) {
+    public RspBase<?> vipPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) throws Exception {
         if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
             return RspBase.businessError( "充值金额最低10" );
         }
@@ -233,7 +234,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     }
 
     @Override
-    public RspBase<RspVipPayLogin> qdPayLogin( String memberId ) {
+    public RspBase<RspVipPayLogin> qdPayLogin( String memberId ) throws Exception {
         MemberCard memberCard = new QueryChainWrapper<>( memberCardMapper )
                 .eq( "member_id", memberId )
                 .eq( "bank_id", ConstantsPay.QDPAY_BANK_ID )
@@ -241,7 +242,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
         // 50是vipPay支付平台ID
         PayPlatform payPlatform = payCacheUtil.getPayPlatform( ConstantsPay.QDPAY_PAY_PLATFORM_ID );
         String      userPhone   = memberInfoMapper.getUserPhone( memberId );
-        log.info( "user phone number {} " , userPhone );
+        log.info( "user phone number {} ", userPhone );
         if ( StringUtils.isBlank( userPhone ) ) {
             return RspBase.businessError( "请绑定手机后登录" );
         }
@@ -321,7 +322,7 @@ public class EmbeddedPayServiceImpl implements EmbeddedPayService {
     }
 
     @Override
-    public RspBase<?> qdPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) {
+    public RspBase<?> qdPayDeposit( ReqVipPayDeposit reqVipPayDeposit, String memberId ) throws Exception {
         if ( reqVipPayDeposit.getAmount().compareTo( BigDecimal.TEN ) < 0 ) {
             return RspBase.businessError( "充值金额最低10" );
         }

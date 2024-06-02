@@ -2,24 +2,17 @@ package tv.game88.game.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.*;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.core.game.dto.RspGameDataLog;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
@@ -55,8 +48,6 @@ public class GameServiceImpl implements GameService {
 
     public static final BigDecimal ONE_HUNDRED = new BigDecimal( 100 );
 
-    @Resource
-    private RestTemplate           restTemplate;
     @Resource
     private RedisUtils             redisUtils;
     @Resource
@@ -196,9 +187,10 @@ public class GameServiceImpl implements GameService {
             changeMoney = BigDecimal.ZERO;
         }
 
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev );
-        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
+            ReqJoinGame reqJoinGame = this.createReqJoinGame( gamePlatform, gameInfo, platformUser.getId(), changeMoney, dev,
+                    ServletUtil.getIp() );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             if ( gamePlatform.getGameCategory() == EnumGameCategory.CQ9 ) {
                 // 创建账号
                 baseGameDock.createAccount( reqJoinGame );
@@ -212,8 +204,8 @@ public class GameServiceImpl implements GameService {
             // 获取游戏链接
             baseGameDock.getJoinGameUrl( reqJoinGame );
 
-            // 异步上分
-            SpringUtils.getBean( GameService.class ).topUpGame( reqJoinGame, baseGameDock );
+            Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
             log.error( "gameId:{}, userId:{}, 进入游戏失败,失败原因:{}", infoId, platformUser.getId(), e.getMessage(), e );
@@ -222,7 +214,6 @@ public class GameServiceImpl implements GameService {
         }
     }
 
-    @Async
     public void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         // 设置为上分操作
         reqJoinGame.setMoneyType( 1 );
@@ -279,7 +270,6 @@ public class GameServiceImpl implements GameService {
         telegramBotMessage.sendByChatId( msg, configEnvCacheUtil.getConf( "gametransfer_error_telegram" ) );
     }
 
-    @Async
     public void cashOutGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         boolean success = false;
         try {
@@ -325,9 +315,9 @@ public class GameServiceImpl implements GameService {
         if ( !redisUtils.lock( "escGame" + memberId, 10 ) ) {
             return RspBase.businessError( "操作频繁,请稍后再试" );
         }
-        ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-        BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
         try {
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null, ServletUtil.getIp() );
+            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             // 获取token
             if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                     && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
@@ -342,7 +332,7 @@ public class GameServiceImpl implements GameService {
             }
             reqJoinGame.setTransferMoney( balance );
             // 异步下分
-            SpringUtils.getBean( GameService.class ).cashOutGame( reqJoinGame, baseGameDock );
+            Thread.ofVirtual().start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
@@ -352,7 +342,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<List<RspGameMoney>> getGameBalance( String memberId ) {
+    public RspBase<List<RspGameMoney>> getGameBalance( final String memberId ) {
         Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
                 .eq( "member_id", memberId )
                 .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
@@ -365,13 +355,21 @@ public class GameServiceImpl implements GameService {
             return RspBase.ok( new ArrayList<>() );
         }
         List<GamePlatform>          gamePlatforms = gamePlatformMapper.selectBatchIds( platformIds );
+        String                      ip            = ServletUtil.getIp();
         Set<Callable<RspGameMoney>> forkJoinTasks = new HashSet<>();
-        for ( GamePlatform gamePlatform : gamePlatforms ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null );
-            BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
+        for ( final GamePlatform gamePlatform : gamePlatforms ) {
             forkJoinTasks.add( () -> {
                 BigDecimal balance = null;
+                if ( gamePlatform.getMaintain() ) {
+                    RspGameMoney rspGameMoney = new RspGameMoney();
+                    rspGameMoney.setMoney( new BigDecimal( -1 ) );
+                    rspGameMoney.setPlatformId( gamePlatform.getId() );
+                    rspGameMoney.setPlatformName( gamePlatform.getName() );
+                    return rspGameMoney;
+                }
                 try {
+                    ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, memberId, null, null, ip );
+                    BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
                     // 获取token
                     if ( gamePlatform.getGameCategory() != EnumGameCategory.BBIN
                             && gamePlatform.getGameCategory() != EnumGameCategory.GAMING_365 ) {
@@ -410,7 +408,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) {
+    public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception {
         GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
                 .eq( "agent", agent )
                 .eq( "game_category", gameCategory )
@@ -419,7 +417,7 @@ public class GameServiceImpl implements GameService {
             return RspBase.businessError( "游戏平台不存在" );
         }
         if ( !redisUtils.exists( Constants.GAME_TOKEN_PREX + gamePlatform.getId() ) ) {
-            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null );
+            ReqJoinGame  reqJoinGame  = this.createReqJoinGame( gamePlatform, null, null, null, null, ServletUtil.getIp() );
             BaseGameDock baseGameDock = gameDockFactoryUtil.createGameDockProcessor( gamePlatform.getGameCategory() );
             baseGameDock.getToken( reqJoinGame );
             return RspBase.ok( "", reqJoinGame.getToken() );
@@ -428,7 +426,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private ReqJoinGame createReqJoinGame( GamePlatform gamePlatform, GameInfo gameInfo, String memberId,
-                                           BigDecimal changeMoney, Integer dev ) {
+                                           BigDecimal changeMoney, Integer dev, String ip ) throws Exception {
         // BBIN会员ID只能是英文加数字
         String gameMemberId = switch ( gamePlatform.getGameCategory() ) {
             case BBIN -> profile + "BBIN" + memberId;
@@ -453,13 +451,13 @@ public class GameServiceImpl implements GameService {
                 .platformId( gamePlatform.getId() )
                 .platformName( gamePlatform.getName() )
                 .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .ip( ServletUtil.getIp() )
+                .ip( ip )
                 .gameCategory( gamePlatform.getGameCategory() )
                 .dev( dev )
                 .build();
     }
 
-    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) {
+    private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) throws Exception {
         String orderId = switch ( gamePlatform.getGameCategory() ) {
             case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent
@@ -486,59 +484,5 @@ public class GameServiceImpl implements GameService {
                 Constants.GAME_ATOMIC_PREX + platformId, redisUtils.getConnectionFactory() );
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
                                                                                                       + entityIdCounter.getAndIncrement() );
-    }
-
-    public List<RspGameDataLog> remoteDataGrab( String start, String end, String account, List<Integer> platformIds ) {
-        Map<String, Object> map = new HashMap<>();
-        map.put( "agent", profile );
-        map.put( "account", account );
-        map.put( "platformIds", platformIds );
-        map.put( "startTime", start );
-        map.put( "endTime", end );
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( map, httpHeaders );
-
-        List<RspGameDataLog> rspGameDataLogs = new ArrayList<>();
-        List<String>         hosts2          = Arrays.asList( "http://18.167.242.177:18850", "http://16.163.247.190:18850" );
-
-        List<Map<String, Object>> resultList2 = restTemplate.postForObject(
-                hosts2.get( RandomUtils.randomIntWithMax( 0, 1 ) ) + "/gameDataRecord/getList", httpEntity, List.class );
-        if ( !CollectionUtils.isEmpty( resultList2 ) ) {
-            for ( Map<String, Object> resultMap : resultList2 ) {
-                rspGameDataLogs.add( JsonUtil.map2Object( resultMap, RspGameDataLog.class ) );
-            }
-        }
-        return rspGameDataLogs;
-    }
-
-    @Override
-    public RspBase<?> verify( String traceId, ReqPGSoftGameData data ) {
-        String ot  = redisUtils.strGet( Constants.GAME_PGSOFT_OT + data.getCustom_parameter() );
-        String key = redisUtils.strGet( Constants.GAME_PGSOFT_KEY + data.getCustom_parameter() );
-        String ops = redisUtils.strGet( Constants.GAME_PGSOFT_OPS + data.getCustom_parameter() );
-        log.info( "PGSoft Verify: trace_id - {}, data - {}, system - {}", traceId, data.toString(), String.format(
-                "Ot: %s, " + "Key: %s, Ops: %s", ot, key, ops ) );
-        if ( StringUtils.isEmpty( ot ) || StringUtils.isEmpty( key ) || StringUtils.isEmpty( ops ) ) {
-            return createResponse( 1200, null, Map.of( "code", "500", "message", "Required field missing" ) );
-        } else {
-            boolean isOt  = ot.equals( data.getOperator_token() );
-            boolean isKey = key.equals( data.getSecret_key() );
-            boolean isOps = ops.equals( data.getOperator_player_session() );
-            if ( isOt && isKey && isOps ) {
-                Map<String, String> successMap = Map.of( "player_name", data.getCustom_parameter(), "currency", "CNY" );
-                return createResponse( HttpServletResponse.SC_OK, successMap, null );
-            } else {
-                return createResponse( 1034, null, Map.of( "code", "400", "message", "One of required fields not equal" ) );
-            }
-        }
-    }
-
-    private static RspBase<RspPGSoftGameData> createResponse( int rspCode, Map<String, String> data, Map<String, String> error ) {
-        RspPGSoftGameData          rspData  = RspPGSoftGameData.builder().data( data ).error( error ).build();
-        RspBase<RspPGSoftGameData> response = new RspBase<>();
-        response.setCode( rspCode );
-        response.setData( rspData );
-        return response;
     }
 }

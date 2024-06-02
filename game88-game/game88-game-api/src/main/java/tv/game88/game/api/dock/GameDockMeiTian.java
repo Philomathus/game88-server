@@ -1,6 +1,7 @@
 package tv.game88.game.api.dock;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +21,10 @@ import tv.game88.game.api.exception.GameTransferException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Log4j2
 @Repository( value = ConstantsGame.MEITIAN + "GameProcessor" )
@@ -60,7 +64,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, String>             resultMap   = restTemplate.postForObject( url.toString(), httpEntity, Map.class );
@@ -99,7 +103,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ).toLowerCase() )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
 
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
@@ -138,7 +142,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;
@@ -177,7 +181,7 @@ public class GameDockMeiTian extends AbstractGameDock {
                 .append( "/" )
                 .append( DigestUtils.md5Hex( reqJoinGame.getMd5() + rawDataStr ) )
                 .append( "/" )
-                .append( Base64.getEncoder().encodeToString( rawDataStr.getBytes() ) );
+                .append( Base64.encodeBase64String( rawDataStr.getBytes() ) );
         HttpHeaders                     httpHeaders = new HttpHeaders();
         HttpEntity<Map<String, String>> httpEntity  = new HttpEntity<>( httpHeaders );
         Map<String, Object>             resultMap;
