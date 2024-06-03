@@ -21,6 +21,7 @@ import tv.game88.wallet.api.entity.WalletMerchant;
 import tv.game88.wallet.api.entity.WalletRecord;
 import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.manager.WalletFundManager;
+import tv.game88.wallet.api.mapper.WalletMerchantMapper;
 import tv.game88.wallet.api.mapper.WalletRecordMapper;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.service.WalletRecordService;
@@ -53,6 +54,8 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
     private WalletFundManager       walletFundManager;
     @Resource
     private WalletUserMapper        walletUserMapper;
+    @Resource
+    private WalletMerchantMapper    walletMerchantMapper;
     @Resource
     private WalletUserService       walletUserService;
 
@@ -99,7 +102,7 @@ public class WalletRecordServiceImpl extends ServiceImpl<WalletRecordMapper, Wal
 
     @Override
     public RspBase<RspWalletRecord> withdrawOrder( ReqWithdrawOrder reqWithdrawOrder ) throws Exception {
-        WalletMerchant walletMerchant = walletMerchantCacheUtil.getWalletMerchantCache( reqWithdrawOrder.getMerchantId() );
+        WalletMerchant walletMerchant = walletMerchantMapper.selectById( reqWithdrawOrder.getMerchantId() );
         RspBase        rspBase        = this.validated( reqWithdrawOrder, walletMerchant, reqWithdrawOrder.getWalletAddress() );
         if ( rspBase != null ) {
             return rspBase;
