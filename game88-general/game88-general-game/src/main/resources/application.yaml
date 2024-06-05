@@ -67,7 +67,3 @@ spring:
       request-timeout: 20000
   lifecycle:
     timeout-per-shutdown-phase: 10s
-  task:
-    scheduling:
-      pool:
-        size: 50

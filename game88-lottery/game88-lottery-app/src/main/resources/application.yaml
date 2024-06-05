@@ -68,10 +68,6 @@ spring:
       matching-strategy: ant_path_matcher
   lifecycle:
     timeout-per-shutdown-phase: 10s
-  task:
-    scheduling:
-      pool:
-        size: 50
 
 pagehelper:
   autoRuntimeDialect: true
