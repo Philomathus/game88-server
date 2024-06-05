@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.common.utils.ValidatorUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -79,9 +80,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
                 return RspBase.businessError( "请输入银行卡号" );
             }
-//            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
-//                return RspBase.businessError( "请输入正确的银行卡号" );
-//            }
+            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
+                return RspBase.businessError( "请输入正确的银行卡号" );
+            }
             if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
                 return RspBase.businessError( "请输入微信实名姓名" );
             }
