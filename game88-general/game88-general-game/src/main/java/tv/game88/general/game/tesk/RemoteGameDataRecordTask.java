@@ -57,7 +57,7 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 120 ) ) {
+            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 12000 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
@@ -91,7 +91,7 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecordFix() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionFixList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 120 ) ) {
+            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 12000 ) ) {
                 continue;
             }
             scheduledExecutorService.schedule( () -> {
