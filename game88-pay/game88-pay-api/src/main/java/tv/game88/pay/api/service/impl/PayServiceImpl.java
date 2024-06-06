@@ -2,12 +2,20 @@ package tv.game88.pay.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import tv.game88.common.utils.*;
+import tv.game88.common.exception.BusinessException;
+import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
@@ -31,15 +39,12 @@ import tv.game88.pay.api.entity.*;
 import tv.game88.pay.api.mapper.*;
 import tv.game88.pay.api.service.PayService;
 
-import jakarta.annotation.Resource;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -74,6 +79,9 @@ public class PayServiceImpl implements PayService {
     private ConfigEnvCacheUtil      configEnvCacheUtil;
     @Resource
     private PayCacheUtil            payCacheUtil;
+
+    @Value( "${spring.profiles.active}" )
+    private String profile;
 
     @Override
     public List<PayType> findPayTypeList( PlatformUser platformUser, String deviceType ) {
@@ -125,8 +133,8 @@ public class PayServiceImpl implements PayService {
         rspPayChannel.setQuickAmount( StringUtils.join( moneyList, "," ) );
         rspPayChannel.setId( typeId );
         rspPayChannel.setName( "固定金额" );
-        rspPayChannel.setRechargeMin( new BigDecimal( moneyList.get( 0 ) ) );
-        rspPayChannel.setRechargeMax( new BigDecimal( moneyList.get( moneyList.size() - 1 ) ) );
+        rspPayChannel.setRechargeMin( new BigDecimal( moneyList.getFirst() ) );
+        rspPayChannel.setRechargeMax( new BigDecimal( moneyList.getLast() ) );
         rspPayChannel.setOpenLevelMin( 0 );
         rspPayChannel.setOpenLevelMax( 0 );
         return Collections.singletonList( rspPayChannel );
@@ -328,88 +336,91 @@ public class PayServiceImpl implements PayService {
     }
 
     @Override
-    public RspBase<?> payRecharge( ReqPayRecharge reqPayRecharge, PlatformUser platformUser ) throws Exception {
+    public RspBase<?> payRecharge( String memberId, Integer vip, ReqPayRecharge reqPayRecharge ) throws Exception {
         BigDecimal money = reqPayRecharge.getMoney();
         if ( money == null || money.compareTo( BigDecimal.ZERO ) <= 0 ) {
             return RspBase.businessError( "请选择金额" );
         }
         // 加3秒锁
-        if ( !redisUtil.lock( "payRecharge" + platformUser.getId(), 3 ) ) {
-            log.warn( "请勿重复提交{}", platformUser.getId() );
+        if ( !redisUtil.lock( "payRecharge" + memberId, 3 ) ) {
+            log.warn( "请勿重复提交{}", memberId );
             return RspBase.businessError( "请勿重复提交" );
         }
-        Long payIntervalExpire = redisUtil.getExpire( "pay:interval:" + platformUser.getId() );
+        Long payIntervalExpire = redisUtil.getExpire( "pay:interval:" + memberId );
         if ( payIntervalExpire > 0 ) {
-            log.warn( "请求订单过于频繁哦{}", platformUser.getId() );
+            log.warn( "请求订单过于频繁哦{}", memberId );
             return RspBase.businessError( String.format( "请求订单过于频繁哦，请%s秒后再试", payIntervalExpire ) );
         }
         long payOrderNum = memberRechargeOnlineMapper.selectCount( new QueryWrapper<MemberRechargeOnline>()
-                .eq( "member_id", platformUser.getId() )
+                .eq( "member_id", memberId )
                 .le( "status", 0 )
                 .ge( "pay_time", LocalDateTimeUtils.format( LocalDateTime.now().minusMinutes( 10 ) ) ) );
         if ( payOrderNum >= configEnvCacheUtil.getConfInt( "pay_order_num_5min", 10 ) ) {
-            log.warn( "您请求订单次数过多{}", platformUser.getId() );
+            log.warn( "您请求订单次数过多{}", memberId );
             return RspBase.businessError( "您请求订单次数过多，请稍后重试" );
         }
+        reqPayRecharge.setUserId( profile + memberId );
 
+        List<Integer> channelIds;
         if ( reqPayRecharge.getChannelId() < 0 ) {
-            //把code转化成通道id
-            this.payNewLogicRecharge( reqPayRecharge, platformUser );
+            channelIds = payChannelMoneyMapper.matchChannelId( reqPayRecharge.getChannelId(), reqPayRecharge.getMoney(), vip );
+        } else {
+            channelIds = List.of( reqPayRecharge.getChannelId() );
         }
 
-        PayChannel payChannel = payCacheUtil.getPayChannel( reqPayRecharge.getChannelId() );
-        if ( payChannel == null ) {
-            return RspBase.businessError( "充值调整,请退出并重新进入充值界面" );
-        }
-        PayPlatform payPlatform = payCacheUtil.getPayPlatform( payChannel.getPlatformId() );
-        PayType     payType     = payCacheUtil.getPayType( payChannel.getTypeId() );
-
-
-        reqPayRecharge.setOrderNo( GenerateOrderCacheUtils.me.getOrderId( "P", 2 ) );
-        reqPayRecharge.setUserId( platformUser.getId() );
-
-
-        BasePay basePay     = payProcessorFactoryUtil.createPayProcessor( payPlatform.getCode() );
-        String  paymentCode = basePay.orderPay( payChannel, payPlatform, reqPayRecharge );
-
-
-        // 释放锁
-        redisUtil.unLock( "payRecharge" + platformUser.getId() );
-
-        if ( StringUtils.isNotBlank( paymentCode ) ) {
-            reqPayRecharge.setName( payPlatform.getName() + "-" + payType.getName() );
-
-            this.savePayRecharge( platformUser, paymentCode, reqPayRecharge, payChannel );
-            redisUtil.strSet( "pay:interval:"
-                    + platformUser.getId(), "0", Duration.ofSeconds( configEnvCacheUtil.getConfInt( "pay_interval_sec" ) ) );
-
-            insertPayLog( reqPayRecharge, platformUser, payChannel, payPlatform, paymentCode );
+        try {
+            String paymentResult = SpringUtils.getAopProxy( this ).requestOrder( channelIds, reqPayRecharge, memberId );
             if ( Objects.equals( reqPayRecharge.getUrlType(), 1 ) ) {
                 return RspBase.ok( "获取充值连接成功",
                         configEnvCacheUtil.getConf( "payRedirectUrl" ) + reqPayRecharge.getOrderNo() );
             } else {
-                return RspBase.ok( "获取充值连接成功", paymentCode );
+                return RspBase.ok( "获取充值连接成功", paymentResult );
             }
-        } else {
-            if ( StringUtils.isNotBlank( reqPayRecharge.getFailReason() ) ) {
-                if ( reqPayRecharge.getFailReason().startsWith( "I/O error on POST request for" ) ) {
-                    //超时的再下单一次
-                    reqPayRecharge.setFailReason( "网络连接失败,下单超时" );
-                } else if ( reqPayRecharge.getFailReason().startsWith( "403 Forbidden" ) ) {
-                    reqPayRecharge.setFailReason( "支付IP未加白名单,请发给三方加白" );
-                } else if ( reqPayRecharge.getFailReason().length() > 255 ) {
-                    reqPayRecharge.setFailReason( "网络连接失败,下单报错" );
-                }
-            } else {
-                reqPayRecharge.setFailReason( "网络连接失败,下单返回空值" );
-            }
-            insertPayLog( reqPayRecharge, platformUser, payChannel, payPlatform, paymentCode );
+        } catch ( Exception e ) {
+            log.error( e.getMessage() );
             return RspBase.businessError( "充值失败,请重试或更换金额" );
+        } finally {
+            // 释放锁
+            redisUtil.unLock( "payRecharge" + memberId );
         }
     }
 
-    private void insertPayLog( ReqPayRecharge reqPayRecharge, PlatformUser platformUser, PayChannel payChannel,
-                               PayPlatform payPlatform, String paymentCode ) {
+    @Retryable( retryFor = Exception.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff( delay = 500 ) )
+    public String requestOrder( List<Integer> channelIds, ReqPayRecharge reqPayRecharge, String memberId ) throws Exception {
+        if ( CollectionUtils.isEmpty( channelIds ) ) {
+            throw new IllegalArgumentException( "未匹配到通道,请更换金额" );
+        }
+        if ( channelIds.size() > 1 ) {
+            Collections.shuffle( channelIds );
+        }
+        Integer    channelId  = channelIds.getFirst();
+        PayChannel payChannel = payCacheUtil.getPayChannel( channelId );
+        if ( payChannel == null ) {
+            channelIds.removeIf( c -> Objects.equals( c, channelId ) );
+            throw new BusinessException( "通道不存在或已关闭" );
+        }
+        PayPlatform payPlatform = payCacheUtil.getPayPlatform( payChannel.getPlatformId() );
+        PayType     payType     = payCacheUtil.getPayType( payChannel.getTypeId() );
+
+        reqPayRecharge.setOrderNo( GenerateOrderCacheUtils.me.getOrderId( "P", 2 ) );
+        reqPayRecharge.setName( payPlatform.getName() + "-" + payType.getName() );
+
+        BasePay basePay     = payProcessorFactoryUtil.createPayProcessor( payPlatform.getCode() );
+        String  paymentCode = basePay.orderPay( payChannel, payPlatform, reqPayRecharge );
+        this.insertPayLog( reqPayRecharge, memberId, payChannel, payPlatform, paymentCode );
+
+        if ( StringUtils.isBlank( paymentCode ) ) {
+            throw new BusinessException( "获取支付链接失败" );
+        }
+        redisUtil.strSet(
+                "pay:interval:" + memberId, "0", Duration.ofSeconds( configEnvCacheUtil.getConfInt( "pay_interval_sec" ) ) );
+
+        this.savePayRecharge( memberId, paymentCode, reqPayRecharge, payChannel );
+        return paymentCode;
+    }
+
+    private void insertPayLog( ReqPayRecharge reqPayRecharge, String memberId, PayChannel payChannel, PayPlatform payPlatform,
+                               String paymentCode ) {
         //新增支付日志
         PayLog payLog = new PayLog();
         payLog.setSuccess( StringUtils.isNotBlank( paymentCode ) );
@@ -417,57 +428,18 @@ public class PayServiceImpl implements PayService {
         payLog.setChannelName( payChannel.getName() );
         payLog.setCreateTime( LocalDateTime.now() );
         payLog.setFailReason( reqPayRecharge.getFailReason() );
-        payLog.setMemberId( platformUser.getId() );
+        payLog.setMemberId( memberId );
         payLog.setMoney( reqPayRecharge.getMoney() );
         payLog.setPlatformId( payPlatform.getId() );
         payLog.setPlatformName( payPlatform.getName() );
         payLogMapper.insert( payLog );
     }
 
-    //选择通道算法
-    private void payNewLogicRecharge( ReqPayRecharge reqPayRecharge, PlatformUser platformUser ) {
-        List<Map<String, Object>> resultList = memberRechargeOnlineMapper.countOrder( platformUser.getId() );
-        log.warn( "会员ID ：{}，数量查询 ：{}", platformUser.getId(), JsonUtil.object2Json( resultList ) );
-        // 成功数量
-        int scount = 0;
-        // 失败数量 = 状态失败和状态待确认的数量
-        int fcount = 0;
-        for ( Map<String, Object> resultMap : resultList ) {
-            if ( "1".equals( resultMap.getOrDefault( "status", "" ).toString() ) ) {
-                scount += Integer.parseInt( resultMap.getOrDefault( "count", "0" ).toString() );
-            } else {
-                fcount += Integer.parseInt( resultMap.getOrDefault( "count", "0" ).toString() );
-            }
-        }
-        if ( ( scount + fcount ) == 0 ) { // min
-            Integer channelId = payChannelMoneyMapper.minRateChannel( reqPayRecharge.getChannelId(), reqPayRecharge.getMoney(),
-                    platformUser.getVip() );
-            log.warn( "会员ID ：{}，min ：{}", platformUser.getId(), channelId );
-            reqPayRecharge.setChannelId( channelId );
-        } else if ( fcount == 1 && scount == 0 ) { // random
-            Integer channelId = payChannelMoneyMapper.randomChannelId( reqPayRecharge.getChannelId(), reqPayRecharge.getMoney()
-                    , platformUser.getVip() );
-            log.warn( "会员ID ：{}，random ：{}", platformUser.getId(), channelId );
-            reqPayRecharge.setChannelId( channelId );
-        } else if ( fcount >= 2 && scount == 0 ) { // max
-            Integer channelId = payChannelMoneyMapper.maxRateChannel( reqPayRecharge.getChannelId(), reqPayRecharge.getMoney(),
-                    platformUser.getVip() );
-            log.warn( "会员ID ：{}，max ：{}", platformUser.getId(), channelId );
-            reqPayRecharge.setChannelId( channelId );
-        } else { // random
-            Integer channelId = payChannelMoneyMapper.randomChannelId( reqPayRecharge.getChannelId(), reqPayRecharge.getMoney()
-                    , platformUser.getVip() );
-            log.warn( "会员ID ：{}，random ：{}", platformUser.getId(), channelId );
-            reqPayRecharge.setChannelId( channelId );
-        }
-    }
-
-    public void savePayRecharge( PlatformUser platformUser, String paymentCode, ReqPayRecharge reqPayRecharge,
-                                 PayChannel payChannel ) {
-        log.info( "获取paymentCode成功，开始保存订单信息，userId:{}", platformUser.getId() );
+    public void savePayRecharge( String memberId, String paymentCode, ReqPayRecharge reqPayRecharge, PayChannel payChannel ) {
+        log.info( "获取paymentCode成功，开始保存订单信息，userId:{}", memberId );
         MemberRechargeOnline memberRechargeOnline = new MemberRechargeOnline();
         memberRechargeOnline.setOrderNo( reqPayRecharge.getOrderNo() );
-        memberRechargeOnline.setMemberId( platformUser.getId() );
+        memberRechargeOnline.setMemberId( memberId );
         memberRechargeOnline.setPlatformId( payChannel.getPlatformId() );
         memberRechargeOnline.setChannelId( payChannel.getId() );
         if ( StringUtils.isNotBlank( reqPayRecharge.getUpperOrderNo() ) ) {

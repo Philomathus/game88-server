@@ -50,34 +50,13 @@
         order by money
     </select>
 
-    <select id="randomChannelId" resultType="java.lang.Integer">
+    <select id="matchChannelId" resultType="java.lang.Integer">
         select channel_id
         from pay_channel_money
         where type_id = #{typeId}
           and money = #{money}
           and open_level_min <![CDATA[ <= ]]> #{vipLevel}
           and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        ORDER BY RAND() LIMIT 1
-    </select>
-
-    <select id="maxRateChannel" resultType="java.lang.Integer">
-        select channel_id
-        from pay_channel_money
-        where type_id = #{typeId}
-          and money = #{money}
-          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        order by channel_pay_rate desc LIMIT 1
-    </select>
-
-    <select id="minRateChannel" resultType="java.lang.Integer">
-        select channel_id
-        from pay_channel_money
-        where type_id = #{typeId}
-          and money = #{money}
-          and open_level_min <![CDATA[ <= ]]> #{vipLevel}
-          and open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        order by channel_pay_rate asc LIMIT 1
     </select>
 
     <delete id="deleteByChannelIds">
