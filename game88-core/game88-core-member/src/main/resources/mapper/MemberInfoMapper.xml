@@ -210,6 +210,13 @@
         limit 1
     </select>
 
+    <select id="findMemberHistoryByUsername" resultType="tv.game88.core.member.entity.MemberInfo">
+        select *
+        from member_info_history
+        where nick_name = #{nickName}
+        limit 1
+    </select>
+
     <select id="findMemberHistoryByMobile" resultType="tv.game88.core.member.entity.MemberInfo">
         select *
         from member_info_history

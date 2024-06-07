@@ -92,6 +92,34 @@ public class LoginController extends BaseController {
         return rspMemberRspBase;
     }
 
+    @Operation( summary = "用户名注册接口", description = "用户名注册,同时也会更新密码以及直接登录" )
+    @PostMapping( "/usernameRegister" )
+    @Anonymous
+    public RspBase<RspMember> usernameRegister( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
+                                                @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version
+            , @RequestBody MobileLogin mobileLogin ) throws Exception {
+        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
+        }
+        RspBase<RspMember> rspMemberRspBase = memberInfoService.usernameRegister( mobileLogin, dev, version, loginUrl );
+        memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
+        return rspMemberRspBase;
+    }
+
+    @Operation( summary = "用户名密码登录接口" )
+    @PostMapping( "/usernameLogin" )
+    @Anonymous
+    public RspBase<RspMember> usernameLogin( @RequestHeader( value = "frond-host", required = false ) String loginUrl,
+                                           @RequestHeader( "dev" ) Integer dev, @RequestHeader( "version" ) String version,
+                                           @RequestBody MobileLogin mobileLogin ) {
+        if ( StringUtils.isNotBlank( mobileLogin.getPasswd() ) ) {
+            mobileLogin.setPasswordEncrypt( passwordEncoder.encode( mobileLogin.getPasswd() ) );
+        }
+        RspBase<RspMember> rspMemberRspBase = memberInfoService.usernameLogin( mobileLogin, dev, version, loginUrl );
+        memberTokenManager.setRspMemberToken( rspMemberRspBase.getData(), mobileLogin.getIp() );
+        return rspMemberRspBase;
+    }
+
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/sendSmsVerifyCode" )
     @Anonymous

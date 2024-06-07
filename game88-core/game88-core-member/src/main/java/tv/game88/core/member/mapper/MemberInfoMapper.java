@@ -30,6 +30,8 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     MemberInfo findMemberHistoryByDeviceId( @Param( "deviceId" ) String deviceId );
 
+    MemberInfo findMemberHistoryByUsername( @Param( "nickName" )String username );
+
     MemberInfo findMemberHistoryByMobile( String mobile );
 
     RspMember findMemberDetail( @Param( "userId" ) String userId );

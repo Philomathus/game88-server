@@ -24,6 +24,10 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<RspMember> register( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) throws Exception;
 
+    RspBase<RspMember> usernameRegister( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
+
+    RspBase<RspMember> usernameLogin( MobileLogin mobileLogin, Integer dev, String version, String loginUrl );
+
     RspBase<?> sendSmsVerifyCode( Phone phone );
 
     RspBase<?> addMemberMoneyOnly( String ip, String userName, ReqAddScore req );
@@ -32,7 +36,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     Map listCount( MemberInfo memberInfo );
 
-    RspBase<?> updateMobile( String oldMobile,String newMobile, String memberId );
+    RspBase<?> updateMobile( String oldMobile, String newMobile, String memberId );
 
     List<MemberCard> selectMemberCardList( String memberId );
 
@@ -72,7 +76,8 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<?> receiveVipGift( String userId, Integer type );
 
-    void receiveVipGift( String memberId, boolean isInsert, MemberVipGift saveOrUpdate, String name, BigDecimal addMoney, BigDecimal needBcode );
+    void receiveVipGift( String memberId, boolean isInsert, MemberVipGift saveOrUpdate, String name, BigDecimal addMoney,
+                         BigDecimal needBcode );
 
     RspBase<RspImToken> getImToken( String userId );
 
@@ -88,17 +93,17 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<?> insertBatchExcelMoney( String userIds );
 
-    RspBase<?>  updatePhones(ReqSmallFeatures req);
+    RspBase<?> updatePhones( ReqSmallFeatures req );
 
-    RspBase<?> queryPhones(ReqSmallFeatures req);
+    RspBase<?> queryPhones( ReqSmallFeatures req );
 
-    RspBase<?> commitMoney(ReqSmallFeatures req);
+    RspBase<?> commitMoney( ReqSmallFeatures req );
 
-    RspBase<?> insertPaiSong(String req);
+    RspBase<?> insertPaiSong( String req );
 
-    RspBase<?>  clear();
+    RspBase<?> clear();
 
-    void sendMsg(String msg, String memberId);
+    void sendMsg( String msg, String memberId );
 
     RspBase<?> updateCodeTotalVipLevel( MemberInfo memberInfo );
 }
