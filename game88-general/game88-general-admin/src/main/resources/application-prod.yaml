@@ -82,6 +82,10 @@ spring:
           url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/88ky2?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
+        slave_8803:
+          url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/8803?useUnicode=true&allowMultiQueries=true
+          username: admin
+          password: dRmBstReqberz!14Xm#
         slave_77bl:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77bl_main?useUnicode=true&allowMultiQueries=true
           username: admin
