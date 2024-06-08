@@ -91,7 +91,8 @@ public class RemoteGameDataRecordTask {
         for ( GamePlatform gamePlatform : gamePlatformList ) {
             scheduledExecutorService.schedule( () -> {
                 if ( redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 12000 ) ) {
-                    String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
+                    String name = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
+                    gamePlatform.setFix( true );
                     String versionValue = gamePlatform.getVersionValue();
                     if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
                         LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
