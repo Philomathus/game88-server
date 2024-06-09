@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.utils.ServletUtil;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.core.session.utils.MemberSecurityUtils;
@@ -19,6 +20,7 @@ import tv.game88.pay.api.entity.PayType;
 import tv.game88.pay.api.service.PayService;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 
 @RestController
@@ -51,7 +53,9 @@ public class MemberRechargeOnlineController {
     @PostMapping( "/onlineRecharge" )
     public RspBase<?> onlineRecharge( @Validated @RequestBody ReqPayRecharge reqPayRecharge ) throws Exception {
         PlatformUser platformUser = MemberSecurityUtils.getLoginUser().getPlatformUser();
-        reqPayRecharge.setRealIp( ServletUtil.getIp() );
-        return payService.payRecharge( reqPayRecharge, platformUser );
+        if ( StringUtils.isBlank( reqPayRecharge.getRealIp() ) ) {
+            reqPayRecharge.setRealIp( ServletUtil.getIp() );
+        }
+        return payService.payRecharge( platformUser.getId(), platformUser.getVip(), reqPayRecharge );
     }
 }

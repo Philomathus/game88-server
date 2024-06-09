@@ -91,9 +91,9 @@ public class GamePullDockPGNew extends AbstractGamePull {
 
         String createTime = remoteGameDatum.get( "create_time" ).toString();
         String payoffTime = remoteGameDatum.get( "payoff_time" ).toString();
-        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( createTime,
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( createTime,
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
-        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( payoffTime,
+        gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );

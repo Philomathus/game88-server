@@ -69,7 +69,7 @@ public class HuoJianPayProcessor extends AbstractPay {
                 return dataMap.getOrDefault( "pay_url", "" ).toString();
             } else {
                 // 存档失败原因
-                reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "msg", "" ).toString() );
             }
         }
         return null;

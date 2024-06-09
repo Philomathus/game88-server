@@ -7,6 +7,8 @@ import lombok.Data;
 public class MobileBind {
     @Schema( title = "手机号" )
     private String mobile;
+    @Schema( title = "用户名" )
+    private String username;
     @Schema( title = "验证码" )
     private String code;
     @Schema( title = "登录密码" )

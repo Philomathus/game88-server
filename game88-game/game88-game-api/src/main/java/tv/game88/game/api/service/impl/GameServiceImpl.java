@@ -485,4 +485,48 @@ public class GameServiceImpl implements GameService {
         return gameOrderPrefix + ( platformId <= 9 ? "0" + platformId : platformId + "" ) + ( Constants.GAME_ATOMIC_INIT
                                                                                                       + entityIdCounter.getAndIncrement() );
     }
+
+    @Override
+    public String verifyPGSession( ReqPGSoftGameData reqPGSoftGameData ) throws Exception {
+        // 45 是PG的游戏平台ID
+        GamePlatform gamePlatform = gameCacheUtils.getGamePlatform( 35L );
+
+        Map<String, String> dataMap  = new HashMap<>();
+        Map<String, String> errorMap = new HashMap<>();
+        if ( Objects.equals( AESCoder.decrypt( gamePlatform.getDes() ), reqPGSoftGameData.getOperatorToken() )
+                && Objects.equals( AESCoder.decrypt( gamePlatform.getMd5() ), reqPGSoftGameData.getSecretKey() ) ) {
+            String decrypt = AESCoder.decryptByKey( reqPGSoftGameData.getOperatorPlayerSession(), AESCoder.secretKey );
+            if ( StringUtils.isNotBlank( decrypt ) ) {
+                String[] split        = decrypt.split( "-" );
+                String   gameMemberId = split[ 0 ];
+                String   time         = split[ 1 ];
+                String   currency     = split[ 2 ];
+
+                /*if ( Math.abs( ( Long.parseLong( time ) - System.currentTimeMillis() ) / 1000 ) < 20 ) {
+                    errorMap.put( "code", "1034" );
+                    errorMap.put( "message", "The interval between request and verification exceeds 20 seconds" );
+                }*/
+
+                dataMap.put( "player_name", gameMemberId );
+                dataMap.put( "nickname", gameMemberId );
+                dataMap.put( "currency", currency );
+            } else {
+                errorMap.put( "code", "1034" );
+                errorMap.put( "message", "Unable to decrypt operatorPlayerSession" );
+            }
+        } else {
+            errorMap.put( "code", "1034" );
+            errorMap.put( "message", "operatorToken or secretKey is inconsistent with the server" );
+        }
+        Map<String, Map<String, String>> resultMap = new HashMap<>();
+        if ( errorMap.isEmpty() ) {
+            resultMap.put( "data", dataMap );
+        } else {
+            resultMap.put( "data", null );
+        }
+        resultMap.put( "error", errorMap.isEmpty() ? null : errorMap );
+        String s = JsonUtil.object2Json( resultMap );
+        log.warn( "PG请求验证 - 返回结果:{}", s );
+        return s;
+    }
 }
