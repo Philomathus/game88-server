@@ -53,7 +53,7 @@ public class YaTaiPayProcessor extends AbstractPay {
             if ( !CollectionUtils.isEmpty( payParams ) ) {
                 return ( String ) payParams.get( "payUrl" );
             } else {
-                reqPayRecharge.setFailReason( resultMap.getOrDefault( "retMsg", "" ).toString() );
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "errDes", "" ).toString() );
             }
         }
         return null;
