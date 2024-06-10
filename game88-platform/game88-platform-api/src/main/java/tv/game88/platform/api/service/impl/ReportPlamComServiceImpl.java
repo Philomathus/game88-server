@@ -45,8 +45,8 @@ public class ReportPlamComServiceImpl implements ReportPlamComService {
         }
         Map<String, Object> resultMap = new HashMap<>();
         if ( LocalDateTimeUtils.parseLocalDate( reportPlamCom.getReporttime() ).isAfter( date ) ) {
-            if ( !redisUtils.exists( "admin-reportPlamCom" ) ) {
-                storage( LocalDateTimeUtils.format( date ) );
+            if ( !redisUtils.exists( "admin-reportPlamCom" + reportPlamCom.getReporttime() ) ) {
+                storage( reportPlamCom.getReporttime() );
             }
         }
         List<ReportPlamCom> allList = reportPlamComMapper.selectReportPlamComList( reportPlamCom );
@@ -60,7 +60,7 @@ public class ReportPlamComServiceImpl implements ReportPlamComService {
     }
 
     public void storage( String dateNowStr ) {
-        redisUtils.strSet( "admin-reportPlamCom", "0", Duration.ofMinutes( 5 ) );
+        redisUtils.strSet( "admin-reportPlamCom" + dateNowStr, "0", Duration.ofMinutes( 5 ) );
         reportPlamComMapper.calldataProrepPlamcom( dateNowStr );
     }
 

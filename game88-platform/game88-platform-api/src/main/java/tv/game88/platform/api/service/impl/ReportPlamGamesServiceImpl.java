@@ -9,6 +9,7 @@ import tv.game88.platform.api.mapper.ReportPlamGamesMapper;
 import tv.game88.platform.api.service.ReportPlamGamesService;
 
 import jakarta.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,12 +27,12 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
     private RedisUtils            redisUtils;
 
     @Override
-    public List<ReportPlamGames> selectReportPlamGamesList(ReportPlamGames reportPlamGames ) {
+    public List<ReportPlamGames> selectReportPlamGamesList( ReportPlamGames reportPlamGames ) {
         LocalDate date = LocalDate.now().minusDays( 2 );
 
         if ( LocalDateTimeUtils.parseLocalDate( reportPlamGames.getEndDate() ).isAfter( date ) ) {
-            if ( !redisUtils.exists( "admin-reportPlamGames" ) ) {
-                storage( LocalDateTimeUtils.format( date ) );
+            if ( !redisUtils.exists( "admin-reportPlamGames" + reportPlamGames.getEndDate() ) ) {
+                storage( reportPlamGames.getEndDate() );
             }
         }
         return reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
@@ -43,7 +44,7 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
     }
 
     public void storage( String dateNowStr ) {
-        redisUtils.strSet( "admin-reportPlamGames", "0", Duration.ofMinutes( 5 ) );
+        redisUtils.strSet( "admin-reportPlamGames" + dateNowStr, "0", Duration.ofMinutes( 5 ) );
         reportPlamGamesMapper.calldataProrepPlamcom( dateNowStr );
 
     }
