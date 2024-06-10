@@ -19,14 +19,10 @@ public interface PayChannelMoneyMapper extends BaseMapper<PayChannelMoney> {
 
     List<Long> selectMoney( @Param( "typeId" ) Long typeId, @Param( "vipLevel" ) Integer vipLevel );
 
-    Integer randomChannelId( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
-                             @Param( "vipLevel" ) Integer vipLevel );
-
-    Integer maxRateChannel( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
-                            @Param( "vipLevel" ) Integer vipLevel );
-
-    Integer minRateChannel( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
-                            @Param( "vipLevel" ) Integer vipLevel );
+    List<Integer> matchChannelId( @Param( "typeId" ) Integer typeId, @Param( "money" ) BigDecimal money,
+                                  @Param( "vipLevel" ) Integer vipLevel );
 
     int deleteByChannelIds( @Param( "channelIds" ) List<Long> channelIds );
+
+
 }

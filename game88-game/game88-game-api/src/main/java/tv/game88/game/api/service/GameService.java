@@ -2,10 +2,7 @@ package tv.game88.game.api.service;
 
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.member.vo.PlatformUser;
-import tv.game88.game.api.dto.RspGameInfo;
-import tv.game88.game.api.dto.RspGameMoney;
-import tv.game88.game.api.dto.RspGamePlatform;
-import tv.game88.game.api.dto.RspGameTypes;
+import tv.game88.game.api.dto.*;
 
 import java.util.List;
 
@@ -27,4 +24,6 @@ public interface GameService {
     RspBase<List<RspGameMoney>> getGameBalance( String memberId );
 
     RspBase<?> gameWithdrawal( Long platformId, String memberId );
+
+    String verifyPGSession( ReqPGSoftGameData reqPGSoftGameData ) throws Exception;
 }

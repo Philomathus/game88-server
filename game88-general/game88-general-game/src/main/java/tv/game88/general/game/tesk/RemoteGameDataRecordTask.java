@@ -57,31 +57,29 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 120 ) ) {
-                continue;
-            }
             scheduledExecutorService.schedule( () -> {
-                String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
-                String versionValue = gamePlatform.getVersionValue();
-                if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
-                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
-                    log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
-                } else {
-                    log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
-                }
-
-                try {
-                    this.gamePullAndInsert( gamePlatform, name );
-                    if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
-                        GameRecordVersion update = new GameRecordVersion();
-                        update.setPlatformId( gamePlatform.getId() );
-                        update.setVersionValue( gamePlatform.getVersionValue() );
-                        gameRecordVersionMapper.updateById( update );
+                if ( redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 12000 ) ) {
+                    String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
+                    String versionValue = gamePlatform.getVersionValue();
+                    if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
+                        LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
+                        log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
+                    } else {
+                        log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
                     }
-                } catch ( Exception e ) {
-                    log.error( e.getMessage(), e );
-                } finally {
-                    redisUtils.unLock( "remoteGameDataRecord:" + gamePlatform.getId() );
+                    try {
+                        this.gamePullAndInsert( gamePlatform, name );
+                        if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
+                            GameRecordVersion update = new GameRecordVersion();
+                            update.setPlatformId( gamePlatform.getId() );
+                            update.setVersionValue( gamePlatform.getVersionValue() );
+                            gameRecordVersionMapper.updateById( update );
+                        }
+                    } catch ( Exception e ) {
+                        log.error( e.getMessage(), e );
+                    } finally {
+                        redisUtils.unLock( "remoteGameDataRecord:" + gamePlatform.getId() );
+                    }
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
         }
@@ -91,38 +89,38 @@ public class RemoteGameDataRecordTask {
     public void remoteGameDataRecordFix() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionFixList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
-            if ( !redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 120 ) ) {
-                continue;
-            }
             scheduledExecutorService.schedule( () -> {
-                String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
-                String versionValue = gamePlatform.getVersionValue();
-                if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
-                    LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
-                    log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
-                } else {
-                    log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
-                }
+                if ( redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 12000 ) ) {
+                    String name = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
+                    gamePlatform.setFix( true );
+                    String versionValue = gamePlatform.getVersionValue();
+                    if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
+                        LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
+                        log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
+                    } else {
+                        log.info( "开始执行{}程序, 开始版本:{}", name, versionValue );
+                    }
 
-                try {
-                    this.gamePullAndInsert( gamePlatform, name );
-                    if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
-                        GameRecordFixVersion update = new GameRecordFixVersion();
-                        update.setPlatformId( gamePlatform.getId() );
-                        update.setVersionValue( gamePlatform.getVersionValue() );
-                        gameRecordFixVersionMapper.updateById( update );
+                    try {
+                        this.gamePullAndInsert( gamePlatform, name );
+                        if ( !StringUtils.equals( gamePlatform.getVersionValue(), versionValue ) ) {
+                            GameRecordFixVersion update = new GameRecordFixVersion();
+                            update.setPlatformId( gamePlatform.getId() );
+                            update.setVersionValue( gamePlatform.getVersionValue() );
+                            gameRecordFixVersionMapper.updateById( update );
+                        }
+                        // 如果补单程序
+                        GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
+                        if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
+                                - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
+                            log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
+                            gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                        }
+                    } catch ( Exception e ) {
+                        log.error( e.getMessage(), e );
+                    } finally {
+                        redisUtils.unLock( "remoteGameDataRecordFix:" + gamePlatform.getId() );
                     }
-                    // 如果补单程序
-                    GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
-                    if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
-                            - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
-                        log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
-                        gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
-                    }
-                } catch ( Exception e ) {
-                    log.error( e.getMessage(), e );
-                } finally {
-                    redisUtils.unLock( "remoteGameDataRecordFix:" + gamePlatform.getId() );
                 }
             }, RandomUtils.randomIntWithMax( 0, 5 ), TimeUnit.SECONDS );
         }

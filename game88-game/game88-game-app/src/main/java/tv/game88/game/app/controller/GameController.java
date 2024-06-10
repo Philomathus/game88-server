@@ -1,13 +1,15 @@
 package tv.game88.game.app.controller;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
 import tv.game88.common.utils.StringUtils;
@@ -17,7 +19,6 @@ import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.game.api.dto.*;
 import tv.game88.game.api.service.GameService;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 @RestController
@@ -110,12 +111,5 @@ public class GameController extends BaseController {
     @PostMapping ( "/gameWithdrawal" )
     public RspBase<?> gameWithdrawal( @Validated @RequestBody ReqGame req ) {
         return gameService.gameWithdrawal( req.getId(), MemberSecurityUtils.getUserId() );
-    }
-
-    // 获取游戏token,内部接口
-    @GetMapping ( "/getGameToken" )
-    @Hidden
-    public RspBase<String> getGameToken( String agent, String gameCategory ) throws Exception {
-        return gameService.getGameTokenByAgent( agent, gameCategory );
     }
 }

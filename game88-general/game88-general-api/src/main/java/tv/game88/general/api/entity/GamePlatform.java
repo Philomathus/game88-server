@@ -85,6 +85,8 @@ public class GamePlatform {
     @TableField( exist = false )
     private String versionValue;
 
+    private boolean isFix = false;
+
     public String getDes() {
         if ( StringUtils.isNotBlank( des ) ) {
             try {

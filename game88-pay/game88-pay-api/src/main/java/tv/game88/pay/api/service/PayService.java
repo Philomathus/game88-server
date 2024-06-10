@@ -18,7 +18,7 @@ public interface PayService {
 
     String payRedirect( String orderNo );
 
-    RspBase<?> payRecharge( ReqPayRecharge reqPayRecharge, PlatformUser platformUser ) throws Exception;
+    RspBase<?> payRecharge( String memberId, Integer vip, ReqPayRecharge reqPayRecharge ) throws Exception;
 
     void payQuery10Min() throws Exception;
 

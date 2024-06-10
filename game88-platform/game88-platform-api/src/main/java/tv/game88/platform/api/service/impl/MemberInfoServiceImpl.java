@@ -299,7 +299,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 this.baseMapper.deleteByHistoryKey( oldm.getId() );
             } else {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId(), true, "" );
+                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
             }
         }
         RspMember rspMember = new RspMember();
@@ -376,19 +376,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
         }
         MemberInfo oldm = null;
-        //注册校验反作弊
-        String  msg    = "";
-        Boolean status = false;
-        Boolean flag   = true;
-        if ( configEnvCacheUtil.getConfBool( "163action_check_switch" ) && StringUtil.isNotEmpty( mobileLogin.getDeviceId() ) ) {
-            //反作弊
-            RspCheckMsg check = this.check( mobileLogin.getToken(), mobileLogin.getMobile(), mobileLogin.getIp(),
-                    mobileLogin.getDeviceId(), mobileLogin.getInviterCode(), version );
-            msg    = check.getMsg();
-            status = check.getStatus();
-            flag   = check.getFlag();
-        }
-
         //检查是不是归档会员回归
         oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
         if ( oldm != null ) {
@@ -414,10 +401,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             this.baseMapper.insert( memberInfo );
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId(), flag, msg );
+                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
             } catch ( Exception e ) {
                 try {
-                    regChannelNotice( mobileLogin, dev, memberInfo.getId(), flag, msg );
+                    regChannelNotice( mobileLogin, dev, memberInfo.getId() );
                 } catch ( Exception p ) {
                     log.error( "反作弊注册成功，通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
                 }
@@ -428,102 +415,133 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         return RspBase.ok( "注册成功", rspMember );
     }
 
-    //反作弊校验
-    private RspCheckMsg check( String token, String phone, String ip, String deviceId, String inviterCode, String version ) throws Exception {
-        RspCheckMsg         rspCheckMsg = new RspCheckMsg();
-        Map<String, Object> params      = new TreeMap<>();
-        params.put( "secretId", configEnvCacheUtil.getConf( "163action_secretId" ) );
-        params.put( "version", "300" );
-        params.put( "businessId", configEnvCacheUtil.getConf( "163action_businessId" ) );
-        params.put( "timestamp", System.currentTimeMillis() / 1000 );
-        params.put( "nonce", Math.random() + "" );
-        params.put( "token", token );
-        params.put( "account", DigestUtils.md5Hex( deviceId ) );
-        params.put( "phone", phone );
-        params.put( "ip", ip );
-        params.put( "activityId", version );
-        params.put( "target", inviterCode );
-        // 生成签名，参见签名过程的示例代码
-        params.put( "signature", genSignature( configEnvCacheUtil.getConf( "163action_secretkey" ), params ) );
-        log.warn( JsonUtil.object2Json( params ) );
-
-        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
-        requestMap.setAll( params );
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
-        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
-
-        Map<String, Object> resultMap = null;
-
-        try {
-            resultMap = restTemplate.postForObject( configEnvCacheUtil.getConf( "163action_check_url" ), httpEntity, Map.class );
-        } catch ( RestClientException e ) {
-            log.error( e.getMessage(), e );
+    @Override
+    public RspBase<RspMember> usernameRegister( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) {
+        if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getUsername(), 5 ) ) {
+            return RspBase.businessError( "请勿重复注册" );
         }
-        log.warn( JsonUtil.object2Json( resultMap ) );
-        if ( !CollectionUtils.isEmpty( resultMap ) ) {
-            int    code = Integer.parseInt( resultMap.get( "code" ).toString() );
-            String msg  = resultMap.get( "msg" ).toString();
-            if ( code == 200 ) {
-                Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.get( "result" );
-                Map<String, Object> result  = null;
-                int                 action  = Integer.parseInt( dataMap.get( "action" ).toString() );
-                if ( action == 0 ) {
-                    return rspCheckMsg;
-                } else {
-                    ArrayList<Map<String, Object>> list = ( ArrayList ) dataMap.get( "hitInfos" );
-                    if ( list != null && list.size() > 0 ) {
-                        result = list.get( 0 );
-                        String hitType     = result.getOrDefault( "hitType", "0" ).toString();
-                        String hitTypeDesc = result.getOrDefault( "hitTypeDesc", "" ).toString();
-                        String hitMsg      = result.getOrDefault( "hitMsg", "" ).toString();
-                        //hitype值等于这些的不传到代理后台
-                        String hitTypes = configEnvCacheUtil.getConf( "163action_hitTypes" );
-                        if ( StringUtil.isNotEmpty( hitTypes ) ) {
-                            String[]     strs     = hitTypes.split( "," );
-                            List<String> lists    = Arrays.asList( strs );
-                            boolean      contains = lists.contains( hitType );
-                            if ( contains ) {
-                                rspCheckMsg.setFlag( false );
-                            }
-                        }
-                        rspCheckMsg.setMsg( hitType + "-" + hitTypeDesc + "-" + hitMsg );
-                        return rspCheckMsg;
-                    }
+        String login_restrict_ip = configEnvCacheUtil.getConf( "login_restrict_ip", null );
+        if ( StringUtils.isNotBlank( mobileLogin.getIp() ) && StringUtils.isNotBlank( login_restrict_ip ) ) {
+            for ( String dip : login_restrict_ip.split( "," ) ) {
+                if ( mobileLogin.getIp().equals( dip ) ) {
+                    return RspBase.businessError( "您已被限制登录,请联系客服" );
                 }
-            } else {
-                log.warn( String.format( "ERROR: code=%d, msg=%s", code, msg ) );
-                rspCheckMsg.setMsg( "验证异常" );
-                return rspCheckMsg;
             }
         }
-        rspCheckMsg.setMsg( "验证异常" );
-        return rspCheckMsg;
+        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
+            return RspBase.businessError( "请输入登陆密码" );
+        }
+        if ( configEnvCacheUtil.getConfBool( "163action_switch" ) ) {
+            //行为式验证码校验
+            if ( !verification( mobileLogin.getValidate() ) ) {
+                return RspBase.businessError( "验证不通过" );
+            }
+        }
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "nick_name", mobileLogin.getUsername() ).one();
+        if ( memberInfo != null ) {
+            return RspBase.businessError( "用户名已存在" );
+        }
+        //检查是不是归档会员回归
+        MemberInfo oldm = this.baseMapper.findMemberHistoryByUsername( mobileLogin.getUsername() );
+        if ( oldm != null ) {
+            return RspBase.businessError( "用户名已存在" );
+        }
+        memberInfo = this.newMemberInfoReg( mobileLogin );
+        memberInfo.setNickName( mobileLogin.getUsername() );
+        memberInfo.setRegisterType( 1 );
+
+        this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), memberInfo );
+
+        this.baseMapper.insert( memberInfo );
+        try {
+            //渠道邀请码注册通知(归档会员回归不通知)
+            regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+        } catch ( Exception e ) {
+            try {
+                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+            } catch ( Exception p ) {
+                log.error( "通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
+            }
+        }
+        RspMember rspMember = new RspMember();
+        BeanUtils.copyProperties( memberInfo, rspMember );
+        return RspBase.ok( "注册成功", rspMember );
     }
 
-    /**
-     * 生成签名信息
-     *
-     * @param secretKey 产品私钥
-     * @param params    接口请求参数名和参数值map，不包括signature参数名
-     */
-    public static String genSignature( String secretKey, Map<String, Object> params ) throws UnsupportedEncodingException {
-        if ( secretKey == null || params == null || params.size() == 0 ) {
-            return "";
+    @Override
+    public RspBase<RspMember> usernameLogin( MobileLogin mobileLogin, Integer dev, String version, String loginUrl ) {
+        if ( StringUtils.isBlank( mobileLogin.getUsername() ) ) {
+            return RspBase.businessError( "请输入用户名" );
         }
-        // 1. 参数名按照ASCII码表升序排序
-        String[] keys = params.keySet().toArray( new String[ 0 ] );
-        Arrays.sort( keys );
-        // 2. 按照排序拼接参数名与参数值
-        StringBuilder paramBuffer = new StringBuilder();
-        for ( String key : keys ) {
-            paramBuffer.append( key ).append( params.get( key ) == null ? "" : params.get( key ) );
+        if ( mobileLogin.getUsername().length() > 25 || mobileLogin.getUsername().length() < 8 ) {
+            return RspBase.businessError( "用户名长度为8-25位" );
         }
-        // 3. 将secretKey拼接到最后
-        paramBuffer.append( secretKey );
-        // 4. MD5是128位长度的摘要算法，用16进制表示，一个十六进制的字符能表示4个位，所以签名后的字符串长度固定为32个十六进制字符。
-        return DigestUtils.md5Hex( paramBuffer.toString().getBytes( StandardCharsets.UTF_8 ) );
+        if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
+            return RspBase.businessError( "请输入登陆密码" );
+        }
+
+        if ( configEnvCacheUtil.getConfBool( "163action_switch" ) ) {
+            //行为式验证码校验
+            if ( !verification( mobileLogin.getValidate() ) ) {
+                return RspBase.businessError( "验证不通过" );
+            }
+        }
+
+        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "nick_name", mobileLogin.getUsername() ).one();
+        MemberInfo oldm       = null;
+        if ( memberInfo == null ) {
+            //检查是不是归档会员回归
+            oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
+            if ( oldm == null ) {
+                return RspBase.businessError( "用户名不存在/密码错误" );
+            }
+            memberInfo = oldm;
+        }
+        if ( memberInfo.getStatus() == 0 ) {
+            return RspBase.businessError( "您被限制登录,请联系客服" );
+        }
+
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken( memberInfo.getId(), mobileLogin.getPasswd() );
+            AuthContextHolderUtils.setContext( authenticationToken );
+            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+            authenticationManager.authenticate( authenticationToken );
+        } catch ( Exception e ) {
+            if ( e instanceof BadCredentialsException ) {
+                log.error( "密码错误:{} ", JsonUtil.object2Json( mobileLogin ) );
+            } else {
+                log.error( e.getMessage(), e );
+            }
+            AuthContextHolderUtils.clearContext();
+            return RspBase.businessError( "用户名不存在/密码错误" );
+        } finally {
+            AuthContextHolderUtils.clearContext();
+        }
+
+        String ip = ServletUtil.getIp();
+        log.info( "会员{}用户名{}密码登录IP:{}", memberInfo.getId(), memberInfo.getNickName(), ip );
+
+        MemberInfo update = new MemberInfo();
+        update.setId( memberInfo.getId() );
+        update.setDeviceId( mobileLogin.getDeviceId() );
+        this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), update );
+
+        if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getUsername(), 5 ) ) {
+            return RspBase.businessError( "请勿重复登录" );
+        }
+
+        if ( oldm != null ) {
+            this.baseMapper.insert( memberInfo );
+            this.baseMapper.deleteByHistoryKey( oldm.getId() );
+        } else {
+            this.baseMapper.updateById( update );
+        }
+
+        RspMember rspMember = new RspMember();
+        BeanUtils.copyProperties( memberInfo, rspMember );
+        setNextLevelIntegral( memberInfo, rspMember );
+        return RspBase.ok( "登录成功", rspMember );
     }
 
     private void setMemberLoginParam( MobileLogin mobileLogin, Integer dev, String version, String loginUrl,
@@ -609,11 +627,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
 
-    private void regChannelNotice( MobileLogin mobileLogin, Integer dev, String userId, Boolean flag, String msg ) {
-        if ( !flag ) {
-            log.error( "不通知推广渠道,网易反作弊注册验证，账号{},原因：{}", userId, msg );
-            return;
-        }
+    private void regChannelNotice( MobileLogin mobileLogin, Integer dev, String userId ) {
         String noticeUrl = configEnvCacheUtil.getConf( "channel_reg_notice" );
         if ( StringUtils.isBlank( noticeUrl ) ) {
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );
@@ -649,13 +663,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private String makeMemberCode() {
         if ( !redisUtils.exists( Constants.MEMBER_CODE ) ) {
             String maxCode = this.baseMapper.selectMaxMemberCode();
-            long   mysqlMaxCode;
-            if ( "0".equals( maxCode ) ) {
-                mysqlMaxCode = Constants.MEMBER_CODE_INIT;
-            } else {
-                mysqlMaxCode = Integer.parseInt( maxCode.replaceFirst( "M", "" ) ) - Constants.MEMBER_CODE_INIT;
-            }
-            redisUtils.strSet( Constants.MEMBER_CODE, String.valueOf( mysqlMaxCode + 1 ) );
+            long mysqlMaxCode = "0".equals( maxCode ) ? Constants.MEMBER_CODE_INIT :
+                    Long.parseLong( maxCode.replaceFirst( "M", "" ) ) - Constants.MEMBER_CODE_INIT;
+            redisUtils.strSet( Constants.MEMBER_CODE, String.valueOf( mysqlMaxCode ) );
+            return "M" + mysqlMaxCode;
         }
         RedisAtomicLong entityIdCounter = new RedisAtomicLong( Constants.MEMBER_CODE, redisUtils.getConnectionFactory() );
         return "M" + ( Constants.MEMBER_CODE_INIT + entityIdCounter.getAndIncrement() );
