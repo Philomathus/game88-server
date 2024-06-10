@@ -27,17 +27,13 @@ public class ReportPlamGamesServiceImpl implements ReportPlamGamesService {
 
     @Override
     public List<ReportPlamGames> selectReportPlamGamesList(ReportPlamGames reportPlamGames ) {
-        String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
+        LocalDate date = LocalDate.now().minusDays( 2 );
 
-        if ( dateNowStr.equals( reportPlamGames.getEndDate() ) ) {
+        if ( LocalDateTimeUtils.parseLocalDate( reportPlamGames.getEndDate() ).isAfter( date ) ) {
             if ( !redisUtils.exists( "admin-reportPlamGames" ) ) {
-                storage( dateNowStr );
+                storage( LocalDateTimeUtils.format( date ) );
             }
         }
-//        List<ReportPlamGames> allList   = reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
-//        Map<String, Object>   resultMap = new HashMap<>();
-//        resultMap.put( "rows", allList );
-//        return resultMap;
         return reportPlamGamesMapper.selectReportPlamGamesList( reportPlamGames );
     }
 
