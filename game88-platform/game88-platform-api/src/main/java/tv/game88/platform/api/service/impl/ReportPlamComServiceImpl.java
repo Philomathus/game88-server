@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service.impl;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import tv.game88.platform.api.entity.ReportPlamCom;
 import tv.game88.platform.api.mapper.ReportPlamComMapper;
 import tv.game88.platform.api.service.ReportPlamComService;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -39,14 +39,14 @@ public class ReportPlamComServiceImpl implements ReportPlamComService {
      */
     @Override
     public Object selectReportPlamComList( ReportPlamCom reportPlamCom ) {
-        String dateNowStr = LocalDateTimeUtils.format( LocalDate.now() );
+        LocalDate date = LocalDate.now().minusDays( 2 );
         if ( Strings.isBlank( reportPlamCom.getReporttime() ) ) {
-            reportPlamCom.setReporttime( dateNowStr );
+            reportPlamCom.setReporttime( LocalDateTimeUtils.format( LocalDate.now() ) );
         }
         Map<String, Object> resultMap = new HashMap<>();
-        if ( reportPlamCom.getReporttime().equals( dateNowStr ) ) {
-            if ( !redisUtils.exists( "admin-reportPlamCom" ) ) {
-                storage( dateNowStr );
+        if ( LocalDateTimeUtils.parseLocalDate( reportPlamCom.getReporttime() ).isAfter( date ) ) {
+            if ( !redisUtils.exists( "admin-reportPlamCom" + reportPlamCom.getReporttime() ) ) {
+                storage( reportPlamCom.getReporttime() );
             }
         }
         List<ReportPlamCom> allList = reportPlamComMapper.selectReportPlamComList( reportPlamCom );
@@ -60,7 +60,7 @@ public class ReportPlamComServiceImpl implements ReportPlamComService {
     }
 
     public void storage( String dateNowStr ) {
-        redisUtils.strSet( "admin-reportPlamCom", "0", Duration.ofMinutes( 5 ) );
+        redisUtils.strSet( "admin-reportPlamCom" + dateNowStr, "0", Duration.ofMinutes( 5 ) );
         reportPlamComMapper.calldataProrepPlamcom( dateNowStr );
     }
 

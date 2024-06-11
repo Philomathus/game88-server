@@ -52,7 +52,11 @@ public class LBPayProcessor extends AbstractPay {
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", result, payChannel.getChannelCode(), reqPayRecharge.getOrderNo() );
         if ( StringUtils.isNotBlank( result ) ) {
-            return filterSpecialStr( result );
+            String s = filterSpecialStr( result );
+            if ( s.startsWith( "http" ) ) {
+                return s;
+            }
+            reqPayRecharge.setFailReason( result );
         }
         return null;
     }

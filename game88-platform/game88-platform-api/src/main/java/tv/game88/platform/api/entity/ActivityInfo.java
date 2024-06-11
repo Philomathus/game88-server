@@ -45,7 +45,7 @@ public class ActivityInfo {
     private Boolean effect;
 
     /**
-     * 0=活动详情 1=跳转链接
+     * 0=活动详情 1=跳转链接, 3 = webview
      */
     private Integer type;
 

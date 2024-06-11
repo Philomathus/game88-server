@@ -28,7 +28,8 @@ import java.util.*;
 @Repository( value = ConstantsGame.PG_SOFT + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockPGSoft extends AbstractGamePull {
 
-    private static final BigDecimal RATE = new BigDecimal( 1000 );
+    private static final BigDecimal IDR_RATE = new BigDecimal( 1000 );
+    private static final BigDecimal CNY_RATE = BigDecimal.ONE;
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -96,10 +97,12 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         LocalDateTime end     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( end ) );
 
-        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( RATE );
+        BigDecimal exchangeRate = account.startsWith( "99" ) ? IDR_RATE : CNY_RATE;
+
+        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( exchangeRate );
         gameDataRecord.setAllBet( betAmount.toString() );
         gameDataRecord.setCellScore( gameDataRecord.getAllBet() );
-        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ).multiply( RATE );
+        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ).multiply( exchangeRate );
         gameDataRecord.setProfit( payoffAmount.subtract( betAmount ).toString() );
         return gameDataRecord;
     }
