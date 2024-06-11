@@ -41,8 +41,11 @@ public class BoBiPayAgentProcessor extends AbstractPayAgent {
 
         String tempStr = this.assemblyUrl( bodyMap ) + "&pri_key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
-        String sign = DigestUtils.md5Hex( tempStr ).toLowerCase();
-        bodyMap.put( "sign", sign );
+        log.warn( tempStr );
+
+        bodyMap.put( "sign", DigestUtils.md5Hex( tempStr ).toLowerCase() );
+
+        log.warn( JsonUtil.object2Json( bodyMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
 
