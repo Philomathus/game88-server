@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 @Repository( value = ConstantsPayAgent.SW_PAY + "PayAgentProcessor" )
 @Log4j2
-public class HeXingPayAgentProcessor extends AbstractPayAgent {
+public class SwPayAgentProcessor extends AbstractPayAgent {
 
     @Override
     public String getName() {
@@ -36,7 +36,7 @@ public class HeXingPayAgentProcessor extends AbstractPayAgent {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "Timestamp", System.currentTimeMillis() / 1000 );
         bodyMap.put( "AccessKey", payAgentChannel.getMerId() );
-        bodyMap.put( "PayChannelId", "1" );
+        bodyMap.put( "PayChannelId", "12" );
         bodyMap.put( "Payee", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "PayeeNo", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "PayeeAddress", withdrawDetail.getBankAddress() );
