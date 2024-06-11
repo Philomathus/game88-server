@@ -575,6 +575,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
                     throw new BusinessException( "转币失败,请重试" );
                 }
             }
+            //TODO IF MONEY IS LESS THEN MIN SELL AMOUNT THEN RETURN MONEY TO MEMBER ACCOUNT AND MAKE STATUS RETURN_MONEY 4 .
+
         } else {
             throw new BusinessException( "转币失败,请重试" );
         }
