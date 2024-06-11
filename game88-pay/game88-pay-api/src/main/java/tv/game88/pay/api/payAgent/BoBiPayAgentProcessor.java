@@ -47,7 +47,7 @@ public class BoBiPayAgentProcessor extends AbstractPayAgent {
 
         log.warn( JsonUtil.object2Json( bodyMap ) );
 
-        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
+        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( bodyMap ), reqPayAgent );
 
         log.info( payAgentPlatform.getName() + "下单结果- result:{}", JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
@@ -112,7 +112,7 @@ public class BoBiPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "sign", sign );
 
         Map<String, Object> resultMap = null;
-        resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageJson( dataMap ), null );
+        resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageForm( dataMap ), null );
         log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
