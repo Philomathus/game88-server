@@ -40,6 +40,7 @@ public class BoBiPayProcessor extends AbstractPay {
         params.put( "time", System.currentTimeMillis() / 1000 );
 
         String signTemp = this.assemblyUrl( params ) + "&pri_key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( signTemp );
         params.put( "sign", DigestUtils.md5Hex( signTemp ).toLowerCase() );
         log.warn( JsonUtil.object2Json( params ) );
 
