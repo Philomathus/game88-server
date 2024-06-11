@@ -44,7 +44,7 @@ public class BoBiPayProcessor extends AbstractPay {
         params.put( "sign", DigestUtils.md5Hex( signTemp ).toLowerCase() );
         log.warn( JsonUtil.object2Json( params ) );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
@@ -70,7 +70,7 @@ public class BoBiPayProcessor extends AbstractPay {
         String sign = this.assemblyUrl( bodyMap ) + "&pri_key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( sign ).toLowerCase() );
 
-        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageForm( bodyMap ), null );
+        Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( bodyMap ), null );
 
         log.warn( payPlatform.getName()
                 + "查询结果 - orderNo:{};result:{}", memberRechargeOnline.getOrderNo(), JsonUtil.object2Json( resultMap ) );
