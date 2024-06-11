@@ -80,7 +80,7 @@ public class BoBiPayProcessor extends AbstractPay {
                 int status = Integer.parseInt( resultMap.getOrDefault( "status", -1 ).toString() );
                 if ( status == 1 ) {
                     BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "money", 0 ).toString() );
-                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 0, RoundingMode.HALF_UP ) );
+                    memberRechargeOnline.setRealMoney( amount );
                     return true;
                 }
             }
