@@ -45,7 +45,7 @@
             wupm.create_time,
             cbl.bank_name
         from wallet_user_pay_method wupm
-        inner join config_bank_list cbl on cbl.id = wupm.bank_id
+        left join config_bank_list cbl on cbl.id = wupm.bank_id
         <where>
             <if test="methodId != null  and methodId != ''"> and wupm.method_id = #{methodId}</if>
             <if test="realName != null  and realName != ''"> and wupm.real_name like concat('%', #{realName}, '%')</if>
