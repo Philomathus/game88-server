@@ -50,7 +50,11 @@ public class JinDunPayProcessor extends AbstractPay {
         log.warn( payPlatform.getName()
                 + "下单结果:{},支付通道:{},订单号:{}", resultStr, payChannel.getChannelCode(), reqPayRecharge.getOrderNo() );
         if ( StringUtils.isNoneBlank( resultStr ) ) {
-            return filterSpecialStr( resultStr );
+            String s = filterSpecialStr( resultStr );
+            if ( s.startsWith( "http" ) ) {
+                return s;
+            }
+            reqPayRecharge.setFailReason( resultStr );
         }
         return null;
     }
