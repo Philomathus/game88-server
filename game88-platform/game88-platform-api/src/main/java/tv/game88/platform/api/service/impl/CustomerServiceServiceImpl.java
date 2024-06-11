@@ -19,8 +19,10 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     @Override
     public List<CustomerService> selectCustomerServiceList(CustomerService customerService) {
         var queryWrapper = new QueryWrapper<CustomerService>();
+        addEqCondition(queryWrapper, "id",customerService.getId());
         addEqCondition(queryWrapper, "title",customerService.getTitle());
         addEqCondition(queryWrapper, "status",customerService.getStatus());
+        addEqCondition(queryWrapper, "details",customerService.getDetails());
 
         List<CustomerService> customerServices = this.baseMapper.selectList(queryWrapper);
 

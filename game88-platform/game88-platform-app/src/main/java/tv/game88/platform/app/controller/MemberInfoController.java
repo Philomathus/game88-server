@@ -20,6 +20,8 @@ import tv.game88.core.session.manager.MemberTokenManager;
 import tv.game88.core.session.utils.MemberSecurityUtils;
 import tv.game88.core.session.vo.MemberLoginUser;
 import tv.game88.platform.api.dto.*;
+import tv.game88.platform.api.entity.CustomerService;
+import tv.game88.platform.api.service.CustomerServiceService;
 import tv.game88.platform.api.service.MemberInfoService;
 
 import jakarta.annotation.Resource;
@@ -35,6 +37,9 @@ public class MemberInfoController extends BaseController {
 
     @Resource
     private MemberTokenManager memberTokenManager;
+
+    @Resource
+    private CustomerServiceService customerServiceService;
 
     @Operation( summary = "查看是否开启保险箱", description = "返回值:true=输入密码,false设置密码" )
     @PostMapping( "/boxPassIsOpen" )
@@ -121,5 +126,14 @@ public class MemberInfoController extends BaseController {
     @PostMapping( "/getImToken" )
     public RspBase<RspImToken> getImToken() {
         return memberInfoService.getImToken( MemberSecurityUtils.getUserId() );
+    }
+
+    @Operation( summary = "获取客服列表" )
+    @PostMapping( "/customerService" )
+    public RspBase<List<CustomerService>> getCustomerServiceList(@RequestBody(required = false) CustomerService customerService) {
+        if (customerService == null) {
+            customerService = new CustomerService();
+        }
+        return RspBase.ok( customerServiceService.selectCustomerServiceList(customerService) );
     }
 }
