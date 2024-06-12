@@ -1,11 +1,6 @@
 package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.AESCoder;
@@ -21,9 +16,6 @@ import tv.game88.pay.api.entity.PayAgentLog;
 import tv.game88.pay.api.entity.PayAgentPlatform;
 import tv.game88.pay.api.type.BankCodeMyType;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -55,12 +47,11 @@ public class HuaZhongPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "bankCode", bankCodeType.name() );
         dataMap.put( "version", "1.0.0" );
 
-        String tempStr        = this.assemblyUrl( dataMap );
-        String signPrivateKey = AESCoder.decrypt( payAgentChannel.getSignPrivateKey() );
-        String sign           = RSACoder.signSha1Rsa( tempStr, signPrivateKey );
-        dataMap.put( "sign", sign );
+        String tempStr = this.assemblyUrl( dataMap );
+        log.warn( tempStr );
+        dataMap.put( "sign", RSACoder.signSha1Rsa( tempStr, AESCoder.decrypt( payAgentChannel.getSignPrivateKey() ) ) );
 
-        log.warn( payAgentPlatform.getName() + "下单请求参数{}", JsonUtil.object2Json( dataMap ) );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( dataMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( dataMap ), reqPayAgent );
 
@@ -143,39 +134,23 @@ public class HuaZhongPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "sign", sign );
 
         log.warn( payAgentPlatform.getName() + "查询请求参数{}", JsonUtil.object2Json( dataMap ) );
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
-        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( dataMap, httpHeaders );
 
-        Map<String, Object> resultMap = null;
-        try {
-            resultMap = restTemplate.execute( payAgentPlatform.getOrderQueryUrl(), HttpMethod.POST,
-                    restTemplate.httpEntityCallback( httpEntity ), response -> {
-                InputStream bodyStream = response.getBody();
-                String      text;
-                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                    text = IOUtils.toString( reader );
-                }
-                return JsonUtil.json2Map( text );
-            } );
-            log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
+        Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageJson( dataMap ), null );
 
-            if ( !CollectionUtils.isEmpty( resultMap ) && resultMap.containsKey( "status" ) ) {
-                //  statusCode
-                //  1-成功，2-失败，0-处理中
-                String statusCode = resultMap.getOrDefault( "status", "" ).toString();
-                //  4代付中 5代付失败 6代付成功
-                int status = switch ( statusCode ) {
-                    case "1" -> 6;
-                    case "2" -> 5;
-                    default -> 4;
-                };
-                payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
-                return resultMap.getOrDefault( "msg", "" ).toString();
-            }
+        log.warn( payAgentPlatform.getName() + "查询结果 - result:{}", JsonUtil.object2Json( resultMap ) );
 
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
+        if ( !CollectionUtils.isEmpty( resultMap ) && resultMap.containsKey( "status" ) ) {
+            //  statusCode
+            //  1-成功，2-失败，0-处理中
+            String statusCode = resultMap.getOrDefault( "status", "" ).toString();
+            //  4代付中 5代付失败 6代付成功
+            int status = switch ( statusCode ) {
+                case "1" -> 6;
+                case "2" -> 5;
+                default -> 4;
+            };
+            payAgentService.processOrder( payAgentChannel, withdrawDetail, withdrawDetail.getUpdateTime(), status );
+            return resultMap.getOrDefault( "msg", "" ).toString();
         }
         return payAgentPlatform.getName() + "查询失败,订单号:" + withdrawDetail.getWithdrawOrderNo();
     }

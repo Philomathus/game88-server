@@ -49,7 +49,7 @@ public class JingDongPayAgentProcessor extends AbstractPayAgent {
         String sign    = DigestUtils.md5Hex( tempStr );
         dataMap.put( "pay_sign", sign );
 
-        log.warn( payAgentPlatform.getName() + "下单请求参数{}", JsonUtil.object2Json( dataMap ) );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( dataMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderQueryUrl(), packageForm( dataMap ),
                 reqPayAgent );

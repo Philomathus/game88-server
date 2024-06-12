@@ -37,8 +37,7 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "Amount", withdrawDetail.getWithdrawMoney().setScale( 0, RoundingMode.HALF_UP ) );
 
         bodyMap.put( "BankCardBankName", withdrawDetail.getBankAddress() );
-        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
-        for ( RspConfigBankList rspConfigBank : effectList ) {
+        for ( RspConfigBankList rspConfigBank : configBankListCache.getEffectList() ) {
             if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
                 bodyMap.put( "BankCardBankName", rspConfigBank.getBankName() );
             }
@@ -51,14 +50,12 @@ public class ChongUAgentProcessor extends AbstractPayAgent {
                 LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         bodyMap.put( "WithdrawTypeId", 0 );
 
-        String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String signStr = this.assemblyUrl( bodyMap ) + signMd5;
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
+        log.warn( signStr );
 
-        String sign = DigestUtils.md5Hex( signStr ).toLowerCase();
-        bodyMap.put( "Sign", sign );
+        bodyMap.put( "Sign", DigestUtils.md5Hex( signStr ) );
 
-        String orderJson = JsonUtil.object2Json( bodyMap );
-        log.info( "非对称加密加密前:" + orderJson );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( bodyMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( bodyMap ), reqPayAgent );
 

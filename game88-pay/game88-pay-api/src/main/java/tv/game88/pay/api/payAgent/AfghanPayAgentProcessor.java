@@ -58,6 +58,8 @@ public class AfghanPayAgentProcessor extends AbstractPayAgent {
         log.warn( tempStr );
         bodyMap.put( "sign", DigestUtils.md5Hex( tempStr ).toUpperCase() );
 
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( bodyMap ) );
+
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( bodyMap ), reqPayAgent );
 
         log.info( payAgentPlatform.getName()

@@ -62,7 +62,7 @@ public class _8kPayAgentProcessor extends AbstractPayAgent {
         String sign = RSACoder.signSha1Rsa( tempStr, signPrivateKey );
         dataMap.put( "sign", sign );
 
-        log.warn( payAgentPlatform.getName() + "下单请求参数{}", JsonUtil.object2Json( dataMap ) );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( dataMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageJson( dataMap ), reqPayAgent );
 

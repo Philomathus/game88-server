@@ -50,7 +50,7 @@ public class ToPayAgentProcessor extends AbstractPayAgent {
         String sign = DigestUtils.md5Hex( tempStr );
         dataMap.put( "sign", sign );
 
-        log.warn( payAgentPlatform.getName() + "下单请求参数{}", JsonUtil.object2Json( dataMap ) );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( dataMap ) );
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity( dataMap, httpHeaders );
