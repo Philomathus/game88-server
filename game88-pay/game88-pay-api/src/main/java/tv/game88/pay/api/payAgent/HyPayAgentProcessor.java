@@ -105,16 +105,16 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
         String signStr = DigestUtils.md5Hex( tempStr );
         log.warn( sign + " : " + signStr );
         if ( signStr.equalsIgnoreCase( sign ) ) {
-            MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( merchantOrderId );
-            if ( withdrawLog == null ) {
+            MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( merchantOrderId );
+            if ( withdrawDetail == null ) {
                 log.error( "提现相关记录丢失 - merOrderNo:{}", merchantOrderId );
                 return "fail";
             }
-            if ( withdrawLog.getStatus() == 6 ) {
+            if ( withdrawDetail.getStatus() == 6 ) {
                 log.error( "已有代付记录 - merOrderNo:{}", merchantOrderId );
                 return "OK";
             }
-            payAgentService.processOrderPay( withdrawLog, payAgentLog, requestMap
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, requestMap
                     .getOrDefault( "systemOrderId", "" )
                     .toString(), payAgentChannel, "3".equals( status ) );
             return "OK";

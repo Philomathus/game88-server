@@ -378,12 +378,12 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
         if ( !redisUtils.lock( "WithdrawDetailRefused" + userName, 5 ) ) {
             return RspBase.businessError( "请勿重复提交" );
         }
-        List<MemberWithdrawDetail> withdrawLogList = this.baseMapper.selectBatchIds( req.getIds() );
-        if ( withdrawLogList == null || withdrawLogList.isEmpty() ) {
+        List<MemberWithdrawDetail> withdrawDetailList = this.baseMapper.selectBatchIds( req.getIds() );
+        if ( withdrawDetailList == null || withdrawDetailList.isEmpty() ) {
             return RspBase.businessError( "订单已被处理,请刷新界面" );
         }
         String mark = "操作人:" + userName + " ip:" + ServletUtil.getIp();
-        for ( MemberWithdrawDetail withdrawDetail : withdrawLogList ) {
+        for ( MemberWithdrawDetail withdrawDetail : withdrawDetailList ) {
             if ( withdrawDetail == null ) {
                 return RspBase.businessError( "订单不存在" );
             }
