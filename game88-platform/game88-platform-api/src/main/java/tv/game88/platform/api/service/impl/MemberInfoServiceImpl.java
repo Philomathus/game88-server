@@ -420,6 +420,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( !redisUtils.lock( "memberLogin:" + mobileLogin.getUsername(), 5 ) ) {
             return RspBase.businessError( "请勿重复注册" );
         }
+        if ( mobileLogin.getUsername().length() < 6 || mobileLogin.getUsername().length() > 25 ) {
+            return RspBase.businessError( "用户名长度为8-25位" );
+        }
         String login_restrict_ip = configEnvCacheUtil.getConf( "login_restrict_ip", null );
         if ( StringUtils.isNotBlank( mobileLogin.getIp() ) && StringUtils.isNotBlank( login_restrict_ip ) ) {
             for ( String dip : login_restrict_ip.split( "," ) ) {
@@ -473,7 +476,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( StringUtils.isBlank( mobileLogin.getUsername() ) ) {
             return RspBase.businessError( "请输入用户名" );
         }
-        if ( mobileLogin.getUsername().length() > 25 || mobileLogin.getUsername().length() < 8 ) {
+        if ( mobileLogin.getUsername().length() < 6 || mobileLogin.getUsername().length() > 25 ) {
             return RspBase.businessError( "用户名长度为8-25位" );
         }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
