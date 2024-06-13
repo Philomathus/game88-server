@@ -131,7 +131,7 @@ public abstract class AbstractPay implements BasePay {
         return new HttpEntity<>( requestMap, httpHeaders );
     }
 
-    protected static HttpEntity<Map<String, Object>> packageJson( Map<String, Object> params ) {
+    protected static HttpEntity<Map<String, ?>> packageJson( Map<String, ?> params ) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         return new HttpEntity<>( params, httpHeaders );

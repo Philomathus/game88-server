@@ -20,9 +20,9 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository( value = ConstantsPayAgent.CHONG_U + ConstantsPayAgent.PROCESSOR )
+@Repository( value = ConstantsPayAgent.CHONG_U_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
-public class ChongUAgentProcessor extends AbstractPayAgent {
+public class ChongUPayAgentProcessor extends AbstractPayAgent {
     @Override
     public String getName() {
         return "充u代付";
