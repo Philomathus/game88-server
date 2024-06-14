@@ -206,6 +206,9 @@ public class GameServiceImpl implements GameService {
 
             Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
 
+            log.info( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
+
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
             log.error( "gameId:{}, userId:{}, 进入游戏失败,失败原因:{}", infoId, platformUser.getId(), e.getMessage(), e );

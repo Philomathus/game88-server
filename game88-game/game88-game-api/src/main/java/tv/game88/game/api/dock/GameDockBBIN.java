@@ -139,8 +139,6 @@ public class GameDockBBIN extends AbstractGameDock {
                 String              mobile  = dataMap.getOrDefault( "mobile", "" ).toString();
                 String              html5   = dataMap.getOrDefault( "html5", "" ).toString();
                 reqJoinGame.setGameUrl( StringUtils.isBlank( mobile ) ? html5 : mobile );
-                log.info( reqJoinGame.getGameCategory().getDes()
-                        + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
