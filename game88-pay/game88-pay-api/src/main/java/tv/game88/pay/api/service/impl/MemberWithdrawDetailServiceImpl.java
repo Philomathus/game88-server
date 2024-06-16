@@ -983,15 +983,15 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     private void setRechargeOnlineColor( RspWithdrawRechargeDetail detail ) {
         switch ( detail.getStatus() ) {
         case -1 -> {
-            detail.setColor( "#FF2A4E" );
+            detail.setColor( "#F57B0B" );
             detail.setRemark( "申请入款" );
         }
         case 0 -> {
-            detail.setColor( "#FF0E0E" );
+            detail.setColor( "#FF0000" );
             detail.setRemark( "入款失败" );
         }
         case 1 -> {
-            detail.setColor( "#12ED40" );
+            detail.setColor( "#00AD27" );
             detail.setRemark( "入款成功" );
         }
         }
@@ -1000,11 +1000,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     private void setRechargeBankColor( RspWithdrawRechargeDetail detail ) {
         switch ( detail.getStatus() ) {
         case 0, 1 -> {
-            detail.setColor( "#FF2A4E" );
+            detail.setColor( "#F57B0B" );
             detail.setRemark( "申请入款" );
         }
         case 2 -> {
-            detail.setColor( "#FF0E0E" );
+            detail.setColor( "#FF0000" );
             if ( StringUtils.isBlank( detail.getRemark() ) ) {
                 detail.setRemark( "拒绝入款" );
             } else {
@@ -1012,11 +1012,11 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             }
         }
         case 3 -> {
-            detail.setColor( "#12ED40" );
+            detail.setColor( "#00AD27" );
             detail.setRemark( "入款成功" );
         }
         case 4 -> {
-            detail.setColor( "#FF0E0E" );
+            detail.setColor( "#FF0000" );
             if ( StringUtils.isBlank( detail.getRemark() ) ) {
                 detail.setRemark( "入款失败" );
             } else {
