@@ -44,9 +44,10 @@ public class CBiPayAgentProcessor extends AbstractPayAgent {
                 "address" ), params.get( "userCode" ), signMd5 );
         params.put( "sign", DigestUtils.md5Hex( tempStr ).toUpperCase() );
 
-        log.warn( JsonUtil.object2Json( params ) );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( params ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( params ), reqPayAgent );
+
         log.info( payAgentPlatform.getName()
                 + "下单结果{},订单号:{}", JsonUtil.object2Json( resultMap ), withdrawDetail.getWithdrawOrderNo() );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {

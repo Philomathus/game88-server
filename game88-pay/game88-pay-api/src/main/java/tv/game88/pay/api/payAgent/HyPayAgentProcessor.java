@@ -49,14 +49,12 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "reverseUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         bodyMap.put( "submitIp", "192.168.0.1" );
 
-        String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
-        String signStr = this.assemblyUrl( bodyMap ) + signMd5;
+        String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         log.warn( signStr );
-        String sign = DigestUtils.md5Hex( signStr ).toLowerCase();
-        bodyMap.put( "sign", sign );
-
+        bodyMap.put( "sign", DigestUtils.md5Hex( signStr ) );
         bodyMap.put( "subBranch", withdrawDetail.getBankUserName() );
-        log.warn( JsonUtil.object2Json( bodyMap ) );
+
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( bodyMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( bodyMap ), reqPayAgent );
 
@@ -84,12 +82,16 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
 
         String sign            = requestMap.remove( "sign" ).toString();
         String merchantOrderId = requestMap.getOrDefault( "merchantOrderId", "" ).toString();
+        String systemOrderId   = requestMap.getOrDefault( "systemOrderId", "" ).toString();
+        String status          = requestMap.getOrDefault( "status", "" ).toString();
 
-        PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( merchantOrderId );
-        PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
-
-        String status  = requestMap.getOrDefault( "status", "" ).toString();
-        String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
+        PayAgentLog          payAgentLog     = payAgentLogMapper.selectById( merchantOrderId );
+        PayAgentChannel      payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
+        MemberWithdrawDetail withdrawDetail  = withdrawDetailMapper.selectById( merchantOrderId );
+        if ( withdrawDetail == null ) {
+            log.error( "提现相关记录丢失 - merOrderNo:{}", merchantOrderId );
+            return "fail";
+        }
 
         Map<String, Object> bodyMap = new LinkedHashMap<>();
         bodyMap.put( "merchantId", requestMap.get( "merchantId" ) );
@@ -101,22 +103,15 @@ public class HyPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "remark", requestMap.get( "remark" ) );
         bodyMap.put( "submitIp", requestMap.get( "submitIp" ) );
 
-        String tempStr = this.assemblyUrl( bodyMap ) + signMd5;
+        String tempStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String signStr = DigestUtils.md5Hex( tempStr );
         log.warn( sign + " : " + signStr );
         if ( signStr.equalsIgnoreCase( sign ) ) {
-            MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( merchantOrderId );
-            if ( withdrawLog == null ) {
-                log.error( "提现相关记录丢失 - merOrderNo:{}", merchantOrderId );
-                return "fail";
-            }
-            if ( withdrawLog.getStatus() == 6 ) {
+            if ( withdrawDetail.getStatus() == 6 ) {
                 log.error( "已有代付记录 - merOrderNo:{}", merchantOrderId );
                 return "OK";
             }
-            payAgentService.processOrderPay( withdrawLog, payAgentLog, requestMap
-                    .getOrDefault( "systemOrderId", "" )
-                    .toString(), payAgentChannel, "3".equals( status ) );
+            payAgentService.processOrderPay( withdrawDetail, payAgentLog, systemOrderId, payAgentChannel, "3".equals( status ) );
             return "OK";
         }
 

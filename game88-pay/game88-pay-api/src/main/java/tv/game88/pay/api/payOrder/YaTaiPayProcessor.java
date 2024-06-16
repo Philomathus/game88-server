@@ -29,13 +29,15 @@ public class YaTaiPayProcessor extends AbstractPay {
 
     @Override
     @SuppressWarnings( "unchecked" )
-     public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "productId", payChannel.getChannelCode() );
         params.put( "mchOrderNo", reqPayRecharge.getOrderNo() );
-        params.put( "amount", reqPayRecharge.getMoney().multiply( BigDecimal.valueOf( 100 ) )
-                                            .setScale( 0, RoundingMode.HALF_UP ) );
+        params.put( "amount", reqPayRecharge
+                .getMoney()
+                .multiply( BigDecimal.valueOf( 100 ) )
+                .setScale( 0, RoundingMode.HALF_UP ) );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "clientIp", reqPayRecharge.getRealIp() );
 
@@ -45,15 +47,18 @@ public class YaTaiPayProcessor extends AbstractPay {
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageForm( params ), reqPayRecharge );
 
         log.warn( payPlatform.getName()
-                        + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
+                + "下单结果:{},支付通道:{},订单号:{}", JsonUtil.object2Json( resultMap ), payChannel.getChannelCode(),
                 reqPayRecharge.getOrderNo() );
 
-        if ( !CollectionUtils.isEmpty( resultMap ) && "SUCCESS".equals( resultMap.getOrDefault( "retCode", "" ).toString() ) ) {
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> payParams = ( Map<String, Object> ) resultMap.get( "payParams" );
-            if ( !CollectionUtils.isEmpty( payParams ) ) {
+            if ( "SUCCESS".equals( resultMap.getOrDefault( "retCode", "" ).toString() )
+                    && !CollectionUtils.isEmpty( payParams ) ) {
                 return ( String ) payParams.get( "payUrl" );
             } else {
-                reqPayRecharge.setFailReason( resultMap.getOrDefault( "errDes", "" ).toString() );
+                reqPayRecharge.setFailReason( resultMap.getOrDefault( "errDes", "" ).toString() + "," + resultMap
+                        .getOrDefault( "retMsg", "" )
+                        .toString() );
             }
         }
         return null;
@@ -121,7 +126,8 @@ public class YaTaiPayProcessor extends AbstractPay {
             int status = Integer.parseInt( requestMap.getOrDefault( "status", -1 ).toString() );
             if ( ( status == 3 || status == 2 ) && this.queryPay( memberRechargeOnline, payPlatform, payChannel ) ) {
                 memberRechargeOnline.setUpperOrderNo( requestMap.getOrDefault( "payOrderId", "" ).toString() );
-                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "non-success" }, payChannel.getName() );
+                return payService.updatePayJourStatus( memberRechargeOnline, new String[] { "success", "non-success" },
+                        payChannel.getName() );
             }
         }
         log.info( payPlatform.getName() + "回调验签失败" );
