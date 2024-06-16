@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -29,7 +30,7 @@ public class BoBiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "mch_id", payPlatform.getMerId() );
         params.put( "currency_id", "1" );
@@ -38,9 +39,9 @@ public class BoBiPayProcessor extends AbstractPay {
         params.put( "callback_url", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "time", System.currentTimeMillis() / 1000 );
 
-        String signTemp = this.assemblyUrl( params ) + "&pri_key=" + payPlatform.getSignMd5();
-        String sign     = DigestUtils.md5Hex( signTemp ).toLowerCase();
-        params.put( "sign", sign );
+        String signTemp = this.assemblyUrl( params ) + "&pri_key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
+        log.warn( signTemp );
+        params.put( "sign", DigestUtils.md5Hex( signTemp ).toLowerCase() );
         log.warn( JsonUtil.object2Json( params ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getPayUrl(), packageJson( params ), reqPayRecharge );
@@ -61,12 +62,12 @@ public class BoBiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         SortedMap<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "mch_id", payPlatform.getMerId() );
         bodyMap.put( "cp_order_id", memberRechargeOnline.getOrderNo() );
 
-        String sign = this.assemblyUrl( bodyMap ) + "&pri_key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( bodyMap ) + "&pri_key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         bodyMap.put( "sign", DigestUtils.md5Hex( sign ).toLowerCase() );
 
         Map<String, Object> resultMap = this.sendPostMap( payPlatform.getQueryUrl(), packageJson( bodyMap ), null );
@@ -79,7 +80,7 @@ public class BoBiPayProcessor extends AbstractPay {
                 int status = Integer.parseInt( resultMap.getOrDefault( "status", -1 ).toString() );
                 if ( status == 1 ) {
                     BigDecimal amount = new BigDecimal( resultMap.getOrDefault( "money", 0 ).toString() );
-                    memberRechargeOnline.setRealMoney( amount.divide( BigDecimal.valueOf( 100 ), 0, RoundingMode.HALF_UP ) );
+                    memberRechargeOnline.setRealMoney( amount );
                     return true;
                 }
             }
@@ -88,7 +89,7 @@ public class BoBiPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
 
         String               merOrderNo           = requestMap.getOrDefault( "cp_order_id", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( merOrderNo );
@@ -116,7 +117,7 @@ public class BoBiPayProcessor extends AbstractPay {
         SortedMap<String, Object> treeMap = new TreeMap<>( requestMap );
 
         String sign   = ( String ) treeMap.remove( "sign" );
-        String data   = this.assemblyUrl( treeMap ) + "&pri_key=" + payPlatform.getSignMd5();
+        String data   = this.assemblyUrl( treeMap ) + "&pri_key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         String mySign = DigestUtils.md5Hex( data );
 
         log.info( payPlatform.getName() + "回调签名字符串:" + sign + "_" + mySign );

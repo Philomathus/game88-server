@@ -38,7 +38,7 @@
         <mysql-connector-j.version>8.4.0</mysql-connector-j.version>
         <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
         <pagehelper.starter.version>2.1.0</pagehelper.starter.version>
-        <mybatis-plus.version>3.5.6</mybatis-plus.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <dynamic.datasource.version>4.3.0</dynamic.datasource.version>
 
         <springdoc.version>2.5.0</springdoc.version>

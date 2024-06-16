@@ -56,8 +56,7 @@ public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
 
         log.warn( tempStr );
-        log.warn( JsonUtil.object2Json( bodyMap ) );
-        log.warn( "sign: {}", sign );
+        log.warn( payAgentPlatform.getName() + "下单请求参数 - {}", JsonUtil.object2Json( bodyMap ) );
 
         Map<String, Object> resultMap = this.sendPostMap( payAgentPlatform.getOrderUrl(), packageForm( bodyMap ), reqPayAgent );
         log.info( payAgentPlatform.getName()

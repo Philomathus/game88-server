@@ -54,11 +54,11 @@ public class PayAgentServiceImpl implements PayAgentService {
 
     @Override
     @Transactional( rollbackFor = Exception.class )
-    public void processOrderPay( MemberWithdrawDetail withdrawLog, PayAgentLog payAgentLog, String orderNo,
+    public void processOrderPay( MemberWithdrawDetail withdrawDetail, PayAgentLog payAgentLog, String orderNo,
                                  PayAgentChannel payAgentChannel, boolean isSuccess ) {
         LocalDateTime        now            = LocalDateTime.now();
         MemberWithdrawDetail newWithdrawLog = new MemberWithdrawDetail();
-        newWithdrawLog.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
+        newWithdrawLog.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
         newWithdrawLog.setStatus( isSuccess ? 6 : 5 );
         newWithdrawLog.setUpdateTime( now );
         newWithdrawLog.setRemark( "【" + payAgentChannel.getName() + "】代付" + ( isSuccess ? "成功" : "失败" ) );
@@ -70,9 +70,9 @@ public class PayAgentServiceImpl implements PayAgentService {
         newPayAgentLog.setCallbackStatus( isSuccess ? 1 : 2 );
         if ( payAgentLog == null ) {
             newPayAgentLog.setCreateTime( now );
-            newPayAgentLog.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
-            newPayAgentLog.setWithdrawMoney( withdrawLog.getWithdrawMoney() );
-            newPayAgentLog.setWithdrawId( withdrawLog.getWithdrawId() );
+            newPayAgentLog.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
+            newPayAgentLog.setWithdrawMoney( withdrawDetail.getWithdrawMoney() );
+            newPayAgentLog.setWithdrawId( withdrawDetail.getWithdrawId() );
             newPayAgentLog.setChannelId( payAgentChannel.getId() );
             newPayAgentLog.setChannelName( payAgentChannel.getName() );
             payAgentLogMapper.insert( newPayAgentLog );
@@ -119,16 +119,16 @@ public class PayAgentServiceImpl implements PayAgentService {
         if ( StringUtils.isBlank( reqPayAgent.getWithdrawOrderNo() ) || reqPayAgent.getPayAgentChannelId() == null ) {
             return RspBase.businessError( "订单号或代付通道ID不能为空" );
         }
-        MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( reqPayAgent.getWithdrawOrderNo() );
+        MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( reqPayAgent.getWithdrawOrderNo() );
 
         PayAgentChannel payAgentChannel = payAgentChannelMapper.selectById( reqPayAgent.getPayAgentChannelId() );
-        if ( withdrawLog == null || payAgentChannel == null ) {
+        if ( withdrawDetail == null || payAgentChannel == null ) {
             log.warn( "提现记录或代付通道未找到 - withdrawOrderNo:{};payAgentChannelId:{}", reqPayAgent.getWithdrawOrderNo(),
                     reqPayAgent.getPayAgentChannelId() );
             return RspBase.businessError( "提现记录或代付通道未找到" );
         }
-        if ( StringUtils.isNotBlank( withdrawLog.getOpName() ) && !userName.equals( withdrawLog.getOpName() ) ) {
-            return RspBase.businessError( "该订单只能由" + withdrawLog.getOpName() + "处理" );
+        if ( StringUtils.isNotBlank( withdrawDetail.getOpName() ) && !userName.equals( withdrawDetail.getOpName() ) ) {
+            return RspBase.businessError( "该订单只能由" + withdrawDetail.getOpName() + "处理" );
         }
         PayAgentPlatform payAgentPlatform = payAgentPlatformMapper.selectById( payAgentChannel.getPlatformId() );
         if ( payAgentPlatform == null ) {
@@ -140,41 +140,41 @@ public class PayAgentServiceImpl implements PayAgentService {
             return RspBase.businessError( "该订单已有代付记录" );
         }
 
-        if ( withdrawLog.getWithdrawMoney() == null || withdrawLog.getWithdrawMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
+        if ( withdrawDetail.getWithdrawMoney() == null || withdrawDetail.getWithdrawMoney().compareTo( BigDecimal.ZERO ) <= 0 ) {
             log.warn( "提现金额有误 - withdrawOrderNo:{};withdrawMoney:{}", reqPayAgent.getWithdrawOrderNo(),
-                    withdrawLog.getWithdrawMoney() );
+                    withdrawDetail.getWithdrawMoney() );
             return RspBase.businessError( "提现金额不得低于0元" );
         }
-        if ( withdrawLog.getStatus() != 1 ) {
+        if ( withdrawDetail.getStatus() != 1 ) {
             return RspBase.businessError( "审核流程非法" );
         }
 
         if ( payAgentPlatform.getCode().equals( ConstantsPayAgent.LIAN_FU_BAO )
-                && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitLianFuBao ) ) > 0 ) {
+                && withdrawDetail.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitLianFuBao ) ) > 0 ) {
             return RspBase.businessError( "此代付暂不支持" + payAgentLimitLianFuBao + "以上出款" );
         }
         if ( payAgentPlatform.getCode().equals( ConstantsPayAgent.MY_PAY )
-                && withdrawLog.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitMY ) ) > 0 ) {
+                && withdrawDetail.getWithdrawMoney().compareTo( new BigDecimal( payAgentLimitMY ) ) > 0 ) {
             return RspBase.businessError( "此代付暂不支持" + payAgentLimitMY + "以上出款" );
         }
 
         long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                .eq( "withdraw_order_no", withdrawDetail.getWithdrawOrderNo() )
                 .ne( "callback_status", 2 ) );
         if ( noFailCount > 0 ) {
             return RspBase.businessError( "此订单已被代付，请在三方后台跟踪订单状态" );
         }
         long platOrderCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                .eq( "withdraw_order_no", withdrawDetail.getWithdrawOrderNo() )
                 .eq( "channel_id", reqPayAgent.getPayAgentChannelId() ) );
         if ( platOrderCount > 0 ) {
             return RspBase.businessError( String.format( "此订单已被 %s 处理过，请更换代付商后重试", payAgentChannel.getName() ) );
         }
 
         reqPayAgent.setCurrentTime( LocalDateTime.now() );
-        SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawLog, reqPayAgent.getCurrentTime(), 4 );
+        SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawDetail, reqPayAgent.getCurrentTime(), 4 );
         BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
-        if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, reqPayAgent ) ) {
+        if ( basePayAgent.orderPay( withdrawDetail, payAgentChannel, payAgentPlatform, reqPayAgent ) ) {
             return RspBase.ok( "代付订单提交成功" );
         }
 
@@ -211,51 +211,51 @@ public class PayAgentServiceImpl implements PayAgentService {
             return RspBase.businessError( "代付平台未找到" );
         }
 
-        List<MemberWithdrawDetail> withdrawLogs = withdrawDetailMapper.selectBatchIds( reqPayAgent.getWithdrawOrderNos() );
-        if ( CollectionUtils.isEmpty( withdrawLogs ) ) {
+        List<MemberWithdrawDetail> withdrawDetails = withdrawDetailMapper.selectBatchIds( reqPayAgent.getWithdrawOrderNos() );
+        if ( CollectionUtils.isEmpty( withdrawDetails ) ) {
             return RspBase.businessError( "未匹配到可提现订单" );
         }
-        for ( MemberWithdrawDetail withdrawLog : withdrawLogs ) {
-            if ( userName.equals( withdrawLog.getOpName() ) ) {
-                return RspBase.businessError( String.format( "订单%s只能由%s处理", withdrawLog.getWithdrawOrderNo(),
-                        withdrawLog.getOpName() ) );
+        for ( MemberWithdrawDetail withdrawDetail : withdrawDetails ) {
+            if ( userName.equals( withdrawDetail.getOpName() ) ) {
+                return RspBase.businessError( String.format( "订单%s只能由%s处理", withdrawDetail.getWithdrawOrderNo(),
+                        withdrawDetail.getOpName() ) );
             }
         }
         BasePayAgent basePayAgent = payAgentProcessorFactoryUtil.createPayProcessor( payAgentPlatform.getCode() );
 
         Map<String, String> failReasonList  = new TreeMap<>();
         int                 sucessNum       = 0;
-        for ( MemberWithdrawDetail withdrawLog : withdrawLogs ) {
+        for ( MemberWithdrawDetail withdrawDetail : withdrawDetails ) {
             long noFailCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                    .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                    .eq( "withdraw_order_no", withdrawDetail.getWithdrawOrderNo() )
                     .ne( "callback_status", 2 ) );
             if ( noFailCount > 0 ) {
-                failReasonList.put( withdrawLog.getWithdrawOrderNo(), "此订单已被代付，请在三方后台跟踪订单状态" );
+                failReasonList.put( withdrawDetail.getWithdrawOrderNo(), "此订单已被代付，请在三方后台跟踪订单状态" );
                 continue;
             }
             long platOrderCount = payAgentLogMapper.selectCount( new QueryWrapper<PayAgentLog>()
-                    .eq( "withdraw_order_no", withdrawLog.getWithdrawOrderNo() )
+                    .eq( "withdraw_order_no", withdrawDetail.getWithdrawOrderNo() )
                     .eq( "channel_id", reqPayAgent.getPayAgentChannelId() ) );
             if ( platOrderCount > 0 ) {
-                failReasonList.put( withdrawLog.getWithdrawOrderNo(), String.format( "此订单已被 %s 处理过，请更换代付商后重试",
+                failReasonList.put( withdrawDetail.getWithdrawOrderNo(), String.format( "此订单已被 %s 处理过，请更换代付商后重试",
                         payAgentChannel.getName() ) );
                 continue;
             }
 
             ReqPayAgent newReqPayAgent = new ReqPayAgent();
             newReqPayAgent.setCurrentTime( LocalDateTime.now() );
-            newReqPayAgent.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
+            newReqPayAgent.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
             try {
-                SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawLog, newReqPayAgent.getCurrentTime(), 4 );
+                SpringUtils.getAopProxy( this ).processOrder( payAgentChannel, withdrawDetail, newReqPayAgent.getCurrentTime(), 4 );
 
-                if ( basePayAgent.orderPay( withdrawLog, payAgentChannel, payAgentPlatform, newReqPayAgent ) ) {
+                if ( basePayAgent.orderPay( withdrawDetail, payAgentChannel, payAgentPlatform, newReqPayAgent ) ) {
                     sucessNum++;
                 } else {
-                    failReasonList.put( withdrawLog.getWithdrawOrderNo(), newReqPayAgent.getFailReason() );
+                    failReasonList.put( withdrawDetail.getWithdrawOrderNo(), newReqPayAgent.getFailReason() );
                 }
             } catch ( Exception e ) {
-                log.error( "代付下单失败 - 订单号：{};失败原因：{}", withdrawLog.getWithdrawOrderNo(), e.getMessage(), e );
-                failReasonList.put( withdrawLog.getWithdrawOrderNo(), newReqPayAgent.getFailReason() );
+                log.error( "代付下单失败 - 订单号：{};失败原因：{}", withdrawDetail.getWithdrawOrderNo(), e.getMessage(), e );
+                failReasonList.put( withdrawDetail.getWithdrawOrderNo(), newReqPayAgent.getFailReason() );
             }
         }
         redisUtil.unLock( "payAgent" + userName );
@@ -266,14 +266,14 @@ public class PayAgentServiceImpl implements PayAgentService {
     @Transactional( rollbackFor = Exception.class )
     public void processOrder( PayAgentChannel payAgentChannel, MemberWithdrawDetail memberWithdrawLog, LocalDateTime now,
                               int status ) {
-        MemberWithdrawDetail withdrawLog = withdrawDetailMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
+        MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
         PayAgentLog          payAgentLog = payAgentLogMapper.selectById( memberWithdrawLog.getWithdrawOrderNo() );
-        if ( !( withdrawLog.getStatus() == 1 || withdrawLog.getStatus() == 4 ) ) {
+        if ( !( withdrawDetail.getStatus() == 1 || withdrawDetail.getStatus() == 4 ) ) {
             throw new BusinessException( "审核流程非法" );
         }
-        // 更改withdrawLog状态
+        // 更改withdrawDetail状态
         MemberWithdrawDetail newWithdrawLog = new MemberWithdrawDetail();
-        newWithdrawLog.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
+        newWithdrawLog.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
         newWithdrawLog.setStatus( status );
         newWithdrawLog.setUpdateTime( now );
         String remark = switch ( status ) {
@@ -303,9 +303,9 @@ public class PayAgentServiceImpl implements PayAgentService {
         }
         if ( payAgentLog == null ) {
             newPayAgentLog.setCreateTime( now );
-            newPayAgentLog.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
-            newPayAgentLog.setWithdrawMoney( withdrawLog.getWithdrawMoney() );
-            newPayAgentLog.setWithdrawId( withdrawLog.getWithdrawId() );
+            newPayAgentLog.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
+            newPayAgentLog.setWithdrawMoney( withdrawDetail.getWithdrawMoney() );
+            newPayAgentLog.setWithdrawId( withdrawDetail.getWithdrawId() );
             newPayAgentLog.setChannelId( payAgentChannel.getId() );
             newPayAgentLog.setChannelName( payAgentChannel.getName() );
             payAgentLogMapper.insert( newPayAgentLog );
@@ -317,17 +317,17 @@ public class PayAgentServiceImpl implements PayAgentService {
 
     @Override
     @Transactional( rollbackFor = Exception.class )
-    public void callBackOrder( MemberWithdrawDetail withdrawLog, String channelName ) {
-        // 更改withdrawLog状态
+    public void callBackOrder( MemberWithdrawDetail withdrawDetail, String channelName ) {
+        // 更改withdrawDetail状态
         MemberWithdrawDetail newWithdrawLog = new MemberWithdrawDetail();
-        newWithdrawLog.setWithdrawOrderNo( withdrawLog.getWithdrawOrderNo() );
+        newWithdrawLog.setWithdrawOrderNo( withdrawDetail.getWithdrawOrderNo() );
         newWithdrawLog.setStatus( 1 );
         newWithdrawLog.setUpdateTime( LocalDateTime.now() );
         newWithdrawLog.setRemark( String.format( "请求代付[%s]不成功", channelName ) );
         int updateW = withdrawDetailMapper.updateById( newWithdrawLog );
-        int deleteP = payAgentLogMapper.deleteById( withdrawLog.getWithdrawOrderNo() );
+        int deleteP = payAgentLogMapper.deleteById( withdrawDetail.getWithdrawOrderNo() );
         if ( updateW <= 0 && deleteP <= 0 ) {
-            log.error( "代付状态回退失败:{}", withdrawLog.getWithdrawOrderNo() );
+            log.error( "代付状态回退失败:{}", withdrawDetail.getWithdrawOrderNo() );
             throw new BusinessException( "代付状态回退失败" );
         }
     }

@@ -64,7 +64,7 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     }
 
     @NotNull
-    protected static HttpEntity<MultiValueMap<String, Object>> packageForm( Map<String, Object> params ) {
+    protected HttpEntity<MultiValueMap<String, Object>> packageForm( Map<String, Object> params ) {
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
         requestMap.setAll( params );
 
@@ -74,7 +74,7 @@ public abstract class AbstractPayAgent implements BasePayAgent {
     }
 
     @NotNull
-    protected static HttpEntity<Map<String, Object>> packageJson( Map<String, Object> params ) {
+    protected HttpEntity<Map<String, Object>> packageJson( Map<String, Object> params ) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         return new HttpEntity<>( params, httpHeaders );

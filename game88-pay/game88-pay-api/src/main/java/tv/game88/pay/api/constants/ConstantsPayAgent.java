@@ -1,13 +1,13 @@
 package tv.game88.pay.api.constants;
 
 public abstract class ConstantsPayAgent {
-    public static final String PROCESSOR = "PayAgentProcessor";
+    public static final String PROCESSOR = "AgentProcessor";
 
     public static final String LIAN_FU_BAO     = "lianFuBao";
     public static final String SHUN_WEI        = "shunWei";
     public static final String KUBI            = "kuBi";
     public static final String VIPPAY          = "vipPay";
-    public static final String CHONG_U         = "chongU";
+    public static final String CHONG_U_PAY     = "chongU";
     public static final String HY              = "hy";
     public static final String ZHAOH           = "zhaoh";
     public static final String TO_PAY          = "toPay";
@@ -26,4 +26,9 @@ public abstract class ConstantsPayAgent {
     public static final String QD_PAY          = "qdPay";
     public static final String TIANXIAHUI_PAY  = "tianXiaHuiPay";
     public static final String BO_BI_PAY       = "boBiPay";
+    public static final String SW_PAY          = "swPay";
+    public static final String AFGHAN_PAY      = "afghanPay";
+    public static final String JING_DONG_PAY   = "jingDongPay";
+    public static final String GOPAY           = "goPay";
+    public static final String OKPAY           = "okPay";
 }
