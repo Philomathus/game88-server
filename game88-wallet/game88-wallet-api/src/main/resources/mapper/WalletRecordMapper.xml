@@ -64,6 +64,9 @@
             <if test="orderNo != null and orderNo != ''">
                 AND order_no = #{orderNo}
             </if>
+            <if test="tradeType != null">
+                AND trade_type = #{tradeType}
+            </if>
             ORDER BY update_time DESC
         </where>
     </select>
