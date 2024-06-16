@@ -39,11 +39,11 @@ public enum EnumGameCategory {
     PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
     SHABA( ConstantsGame.SHABA, "沙巴体育" ),
 
-    T1( ConstantsGame.T1, "T1" ),
-    PP( ConstantsGame.PP, "pp" ),
-    CG( ConstantsGame.CG, "cg" ),
-    JILI( ConstantsGame.JILI, "jiLi" ),
-    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
+//    T1( ConstantsGame.T1, "T1" ),
+//    PP( ConstantsGame.PP, "pp" ),
+//    CG( ConstantsGame.CG, "cg" ),
+//    JILI( ConstantsGame.JILI, "jiLi" ),
+//    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
     ;
 
     private final String type;
