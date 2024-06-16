@@ -58,7 +58,7 @@ public class RecommendServiceImpl implements RecommendService {
         rspMyRecommend.setMemberCode( memberId );
         String val = valueList.get( 0 );
         if ( StringUtils.isNotBlank( val ) ) {
-            rspMyRecommend.setUrl( val.concat( "channelCode=" ).concat( memberId ) );
+            rspMyRecommend.setUrl( val.concat( "/?channelCode=" ).concat( memberId ) );
         }
         rspMyRecommend.setShareBackground( valueList.get( 1 ) );
         rspMyRecommend.setShareIcon( valueList.get( 2 ) );
