@@ -1038,6 +1038,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
                     .contains( "锁定" ) ? ":" + detail.getRemark() : "" ) );
         }
         }
+        if(detail.getOrderNo().startsWith( "CZU" ) && detail.getStatus() == 1){
+            detail.setColor( "#00AD27" );
+        }
     }
 }
 
