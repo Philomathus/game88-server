@@ -125,7 +125,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( !isAliPay ) {
                 return RspBase.ok("系统已审核认证,");
             } else {
-                return RspBase.ok( "新增支付方式成功" );
+                return RspBase.ok( "新增支付方式成功， 等待审核" );
             }
         }
 
