@@ -92,12 +92,19 @@
     </select>
 
     <select id="selectRspList" resultType="tv.game88.game.api.dto.RspGamePlatform">
-        select DISTINCT p.id, p.name, p.icon, p.card_icon
-        from game_platform p
-                 INNER JOIN game_info i on i.platform_id = p.id
-        where i.type_id = #{infoTypeId}
-          and i.effect = 1
-          and p.effect = 1
-        order by p.sort
+        SELECT DISTINCT a.id,
+                        a.name,
+                        a.icon,
+                        a.card_icon
+        FROM (SELECT p.id,
+                     p.NAME,
+                     p.icon,
+                     p.card_icon
+              FROM game_platform p
+                       INNER JOIN game_info i ON i.platform_id = p.id
+              WHERE i.type_id = #{infoTypeId}
+                AND i.effect = 1
+                AND p.effect = 1
+              ORDER BY p.sort) a
     </select>
 </mapper>
