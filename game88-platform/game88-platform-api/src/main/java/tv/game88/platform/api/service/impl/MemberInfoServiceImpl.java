@@ -477,7 +477,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.businessError( "请输入用户名" );
         }
         if ( mobileLogin.getUsername().length() < 6 || mobileLogin.getUsername().length() > 25 ) {
-            return RspBase.businessError( "用户名长度为8-25位" );
+            return RspBase.businessError( "用户名长度为6-25位" );
         }
         if ( StringUtils.isBlank( mobileLogin.getPasswd() ) ) {
             return RspBase.businessError( "请输入登陆密码" );
