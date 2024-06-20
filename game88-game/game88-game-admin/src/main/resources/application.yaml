@@ -105,7 +105,7 @@ token:
 
 management:
   server:
-    port: 8888
+    port: 8803
   endpoint:
     health:
       enabled: true

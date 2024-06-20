@@ -88,7 +88,7 @@ springdoc:
 
 management:
   server:
-    port: 8888
+    port: 8813
   endpoint:
     health:
       enabled: true
