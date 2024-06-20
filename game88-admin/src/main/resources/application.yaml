@@ -101,7 +101,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: *
+        include: "*"
   info:
     java:
       enabled: true
