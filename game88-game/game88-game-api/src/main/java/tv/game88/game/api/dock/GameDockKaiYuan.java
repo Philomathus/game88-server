@@ -288,9 +288,7 @@ public class GameDockKaiYuan extends AbstractGameDock {
 
             int code   = Integer.parseInt( d.getOrDefault( "code", "-1" ).toString() );
             int status = Integer.parseInt( d.getOrDefault( "status", "-1" ).toString() );
-            if ( status != 3 ) {
-                return code == 0 && status == 0;
-            }
+            return code == 0 && status == 0;
         }
         throw new RuntimeException( "查询结果为空,需要重试" );
     }
