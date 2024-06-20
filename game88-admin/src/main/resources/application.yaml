@@ -84,6 +84,8 @@ token:
   expireTime: 6
 
 management:
+  server:
+    port: 8888
   endpoint:
     health:
       enabled: true
@@ -95,13 +97,14 @@ management:
       cache:
         time-to-live: 10m
     configprops:
-      show-values: always
+      show-values: ALWAYS
     env:
-      show-values: always
+      show-values: ALWAYS
   endpoints:
     web:
       exposure:
         include: "*"
+    enabled-by-default: true
   info:
     java:
       enabled: true
