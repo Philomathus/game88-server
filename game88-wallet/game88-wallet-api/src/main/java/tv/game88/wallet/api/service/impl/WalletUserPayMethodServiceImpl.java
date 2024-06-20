@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
-import tv.game88.common.utils.ValidatorUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
@@ -22,7 +21,6 @@ import tv.game88.wallet.api.entity.WalletUser;
 import tv.game88.wallet.api.entity.WalletUserPayMethod;
 import tv.game88.wallet.api.mapper.WalletUserMapper;
 import tv.game88.wallet.api.mapper.WalletUserPayMethodMapper;
-import tv.game88.wallet.api.service.WalletTransactionService;
 import tv.game88.wallet.api.service.WalletUserPayMethodService;
 import tv.game88.wallet.api.type.WalletPayMethodEnum;
 
@@ -39,10 +37,6 @@ import java.util.*;
 public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMethodMapper, WalletUserPayMethod> implements WalletUserPayMethodService {
     @Resource
     private WalletUserMapper    walletUserMapper;
-//    @Resource
-//    private WalletTransactionMapper walletTransactionMapper;
-    @Resource
-    private WalletTransactionService walletTransactionService;
     @Resource
     private ConfigBankListCache configBankListCache;
     @Resource
@@ -80,9 +74,9 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
             if ( StringUtils.isBlank( reqPayMethod.getAccount() ) ) {
                 return RspBase.businessError( "请输入银行卡号" );
             }
-            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
-                return RspBase.businessError( "请输入正确的银行卡号" );
-            }
+//            if ( !ValidatorUtil.checkBankCard( reqPayMethod.getAccount() ) ) {
+//                return RspBase.businessError( "请输入正确的银行卡号" );
+//            }
             if ( StringUtils.isBlank( reqPayMethod.getRealName() ) ) {
                 return RspBase.businessError( "请输入微信实名姓名" );
             }
