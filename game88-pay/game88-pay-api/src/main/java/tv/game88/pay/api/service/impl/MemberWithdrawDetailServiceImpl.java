@@ -787,9 +787,9 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "提现密码错误，请联系客服!" );
         }
 //        comment for 8803
-//        if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
-//            return RspBase.businessError( "请绑定手机号后提现" );
-//        }
+        if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
+            return RspBase.businessError( "请绑定手机号后提现" );
+        }
         if ( memberInfo.getWithdrawalStatus() != null && memberInfo.getWithdrawalStatus() ) {
             return RspBase.businessError( "出款通道维护,请联系客服!" );
         }
