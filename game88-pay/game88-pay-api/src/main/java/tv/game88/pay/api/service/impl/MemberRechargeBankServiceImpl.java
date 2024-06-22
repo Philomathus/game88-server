@@ -3,6 +3,7 @@ package tv.game88.pay.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -15,6 +16,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.cache.ConfigEnvCacheUtil;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
+import tv.game88.core.config.entity.ConfigBankList;
+import tv.game88.core.config.mapper.ConfigBankListMapper;
 import tv.game88.core.member.dto.RspMemberCard;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
@@ -24,23 +27,19 @@ import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.mapper.MemberCardMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.quest.cache.ActivityCacheUtil;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
-import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.core.utils.TelegramBotMessage;
 import tv.game88.pay.api.dto.*;
-import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.entity.MemberRechargeBank;
 import tv.game88.pay.api.entity.PayRechargeBank;
 import tv.game88.pay.api.mapper.ActivityCashBackFirstRechargeMapper;
-import tv.game88.core.config.mapper.ConfigBankListMapper;
 import tv.game88.pay.api.mapper.MemberRechargeBankMapper;
 import tv.game88.pay.api.mapper.PayRechargeBankMapper;
 import tv.game88.pay.api.service.MemberRechargeBankService;
 import tv.game88.pay.api.service.MemberWithdrawDetailService;
 import tv.game88.pay.api.utils.BankAddressUtil;
-
-import jakarta.annotation.Resource;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -74,8 +73,6 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     private MemberQuestManager                  memberQuestManager;
     @Resource
     private ActivityCashBackFirstRechargeMapper cashBackFirstRechargeMapper;
-    @Resource
-    private ActivityQuestInfoMapper             questInfoMapper;
 
     @Resource
     private ConfigEnvCacheUtil configEnvCacheUtil;
@@ -83,6 +80,8 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
     private RedisUtils         redisUtils;
     @Resource
     private TelegramBotMessage telegramBotMessage;
+    @Resource
+    private ActivityCacheUtil  activityCacheUtil;
 
     @Override
     public List<RspPayRechargeBank> selectList( String memberId, Integer vip ) {
@@ -406,9 +405,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
         memberRecommendManager.recommendProcess( memberInfo, memberRechargeBank.getRechargeMoney() );
 
         //公司入款充值活动任务
-        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                .eq( "effect", 1 )
-                .eq( "game_type_id", -1 ) );
+        List<ActivityQuestInfo> listConfQuest = activityCacheUtil
+                .getQuestInfos()
+                .stream()
+                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() == -1 )
+                .toList();
+
         for ( ActivityQuestInfo confQuest : listConfQuest ) {
             memberQuestManager.memberQuestProcess( memberInfo.getId(), memberRechargeBank.getRechargeMoney(), confQuest );
         }

@@ -1,7 +1,7 @@
 package tv.game88.game.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -19,9 +19,9 @@ import tv.game88.core.member.entity.MemberBcode;
 import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.mapper.MemberBcodeMapper;
 import tv.game88.core.member.mapper.MemberInfoMapper;
+import tv.game88.core.quest.cache.ActivityCacheUtil;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
-import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.dto.RspGameInfo;
 import tv.game88.game.api.entity.GameDataRecord;
@@ -31,8 +31,6 @@ import tv.game88.game.api.mapper.GameDataRecordMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.MemberGameDataMapper;
 import tv.game88.game.api.service.GameDataService;
-
-import jakarta.annotation.Resource;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -52,8 +50,6 @@ public class GameDataServiceImpl implements GameDataService {
     @Resource
     private MemberInfoMapper        memberInfoMapper;
     @Resource
-    private ActivityQuestInfoMapper questInfoMapper;
-    @Resource
     private LotteryBetMapper        lotteryBetMapper;
     @Resource
     private GamePlatformMapper      gamePlatformMapper;
@@ -65,6 +61,8 @@ public class GameDataServiceImpl implements GameDataService {
     private ConfigVipCacheUtils     configVipCacheUtils;
     @Resource
     private SqlSessionTemplate      sqlSessionTemplate;
+    @Resource
+    private ActivityCacheUtil       activityCacheUtil;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
@@ -292,10 +290,11 @@ public class GameDataServiceImpl implements GameDataService {
 
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
-        List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                .eq( "effect", 1 )
-                .gt( "game_type_id", 0 ) );
-
+        List<ActivityQuestInfo> listConfQuest = activityCacheUtil
+                .getQuestInfos()
+                .stream()
+                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() == 0 )
+                .toList();
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {

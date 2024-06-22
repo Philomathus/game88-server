@@ -1,7 +1,7 @@
 package tv.game88.platform.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import tv.game88.platform.api.entity.ActivityType;
+import tv.game88.core.quest.entity.ActivityType;
 
 import java.util.List;
 

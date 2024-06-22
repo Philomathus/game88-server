@@ -2,8 +2,8 @@ package tv.game88.platform.api.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import tv.game88.platform.api.entity.ActivityType;
-import tv.game88.platform.api.mapper.ActivityTypeMapper;
+import tv.game88.core.quest.entity.ActivityType;
+import tv.game88.core.quest.mapper.ActivityTypeMapper;
 import tv.game88.platform.api.service.ActivityTypeService;
 
 import java.util.List;

@@ -1,7 +1,7 @@
-package tv.game88.platform.api.mapper;
+package tv.game88.core.quest.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tv.game88.platform.api.entity.ActivityQuestType;
+import tv.game88.core.quest.entity.ActivityQuestType;
 
 import java.util.List;
 

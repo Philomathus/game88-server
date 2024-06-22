@@ -1,18 +1,18 @@
-package tv.game88.platform.api.cache;
+package tv.game88.core.quest.cache;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import org.springframework.stereotype.Component;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.core.config.constants.Constants;
-import tv.game88.platform.api.entity.ActivityInfo;
+import tv.game88.core.quest.entity.ActivityInfo;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
-import tv.game88.platform.api.entity.ActivityQuestType;
-import tv.game88.platform.api.entity.ActivityType;
-import tv.game88.platform.api.mapper.ActivityInfoMapper;
+import tv.game88.core.quest.entity.ActivityQuestType;
+import tv.game88.core.quest.entity.ActivityType;
+import tv.game88.core.quest.mapper.ActivityInfoMapper;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
-import tv.game88.platform.api.mapper.ActivityQuestTypeMapper;
-import tv.game88.platform.api.mapper.ActivityTypeMapper;
+import tv.game88.core.quest.mapper.ActivityQuestTypeMapper;
+import tv.game88.core.quest.mapper.ActivityTypeMapper;
 
 import jakarta.annotation.Resource;
 

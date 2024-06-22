@@ -1,4 +1,4 @@
-package tv.game88.platform.api.entity;
+package tv.game88.core.quest.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
