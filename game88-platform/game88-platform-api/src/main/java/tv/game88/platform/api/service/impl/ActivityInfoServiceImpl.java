@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
-import tv.game88.platform.api.entity.ActivityInfo;
-import tv.game88.platform.api.mapper.ActivityInfoMapper;
+import tv.game88.core.quest.entity.ActivityInfo;
+import tv.game88.core.quest.mapper.ActivityInfoMapper;
 import tv.game88.platform.api.service.ActivityInfoService;
 
 import java.util.List;

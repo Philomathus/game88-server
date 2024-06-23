@@ -10,8 +10,8 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
-import tv.game88.platform.api.cache.ActivityCacheUtil;
-import tv.game88.platform.api.entity.ActivityInfo;
+import tv.game88.core.quest.cache.ActivityCacheUtil;
+import tv.game88.core.quest.entity.ActivityInfo;
 import tv.game88.platform.api.service.ActivityInfoService;
 
 import jakarta.annotation.Resource;

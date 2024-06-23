@@ -86,18 +86,31 @@ token:
   expireTime: 6
 
 management:
+  server:
+    port: 8801
   endpoint:
     health:
       enabled: true
-      show-details: WHEN_AUTHORIZED
+      show-details: ALWAYS
+      probes:
+        enabled: true
     info:
       enabled: true
       cache:
         time-to-live: 10m
+    configprops:
+      show-values: ALWAYS
+    env:
+      show-values: ALWAYS
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: "*"
+    enabled-by-default: true
   info:
     java:
+      enabled: true
+    env:
+      enabled: true
+    os:
       enabled: true

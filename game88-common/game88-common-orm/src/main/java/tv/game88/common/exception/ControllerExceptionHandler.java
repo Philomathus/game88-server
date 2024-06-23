@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tv.game88.common.utils.ServletUtil;
 import tv.game88.common.vo.RspBase;
 
@@ -49,6 +50,12 @@ public abstract class ControllerExceptionHandler {
             return RspBase.businessError( "你的用户所属角色没有操作权限" );
         } else if ( e instanceof AsyncRequestTimeoutException ) {
             throw e;
+        } else if ( e instanceof NoResourceFoundException ) {
+            HttpServletRequest request = ServletUtil.getHttpServletRequest();
+            log.warn( "资源不存在 - url:{}, IP:{}, msg:{}, dev:{}", request
+                    .getRequestURL()
+                    .toString(), ServletUtil.getIp( request ), e.getMessage(), request.getHeader( "dev" ) );
+            return RspBase.businessError( "资源不存在" );
         } else {
             HttpServletRequest request = ServletUtil.getHttpServletRequest();
             log.error( "异常请求url:{}, IP:{}, msg:{}, dev:{}", request

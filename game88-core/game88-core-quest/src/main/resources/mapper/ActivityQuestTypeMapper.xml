@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.platform.api.mapper.ActivityQuestTypeMapper">
-    <resultMap type="tv.game88.platform.api.entity.ActivityQuestType" id="ActivityQuestTypeResult">
+<mapper namespace="tv.game88.core.quest.mapper.ActivityQuestTypeMapper">
+    <resultMap type="tv.game88.core.quest.entity.ActivityQuestType" id="ActivityQuestTypeResult">
         <result property="id" column="id" />
         <result property="name" column="name" />
         <result property="sort" column="sort" />
@@ -20,7 +20,7 @@
         from activity_quest_type
     </sql>
 
-    <select id="selectActivityQuestTypeList" parameterType="tv.game88.platform.api.entity.ActivityQuestType"
+    <select id="selectActivityQuestTypeList" parameterType="tv.game88.core.quest.entity.ActivityQuestType"
             resultMap="ActivityQuestTypeResult">
         <include refid="selectActivityQuestTypeVo" />
         <where>
