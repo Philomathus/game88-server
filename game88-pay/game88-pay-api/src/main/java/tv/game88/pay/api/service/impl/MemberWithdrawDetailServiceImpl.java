@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +69,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
     private PayAgentProcessorFactoryUtil payAgentProcessorFactoryUtil;
     @Resource
     private PasswordEncoder              passwordEncoder;
+
+    @Value( "${spring.profiles.active}" )
+    private String profile;
+
 
     @Override
     public RspMemberWithdrawDetailInfo getRspWithdrawDetail( String memberId ) {
@@ -787,8 +792,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
             return RspBase.businessError( "提现密码错误，请联系客服!" );
         }
 //        comment for 8803
-        if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
-            return RspBase.businessError( "请绑定手机号后提现" );
+        if( profile.equals( "8803" )){
+            if ( StringUtils.isBlank( memberInfo.getPhone() ) ) {
+                return RspBase.businessError( "请绑定手机号后提现" );
+            }
         }
         if ( memberInfo.getWithdrawalStatus() != null && memberInfo.getWithdrawalStatus() ) {
             return RspBase.businessError( "出款通道维护,请联系客服!" );
