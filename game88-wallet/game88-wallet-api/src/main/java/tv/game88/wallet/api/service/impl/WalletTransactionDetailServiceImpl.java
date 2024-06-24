@@ -330,7 +330,8 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
             // 买家订单倒计时 20分钟 用于转账
             redisUtils.strSet( ConstantsWallet.SELLER_CONFIRM_TRANS_ORDER
-                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 20 ) );
+                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
+            //TODO: Change back 20 minutes after testing
 
             // 消息通知买家
             walletMessageService.saveWalletMessage( walletTransactionDetail, false );
@@ -443,7 +444,9 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
 
             // 卖家 订单倒计时 30分钟 用于确认是否收到转账
             redisUtils.strSet( ConstantsWallet.BUYER_CONFIRM_TRANSFER_ORDER
-                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofSeconds( 60 ) );
+//                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofSeconds( 1160 ) );
+                    + transDetailId, ConstantsWallet.REDIS_DEFAULT_VALUE, Duration.ofMinutes( 5 ) );
+            //TODO: return to 1160 seconds
             walletTransactionDetail = this.baseMapper.selectById( transDetailId );
 
             // 消息通知卖家
