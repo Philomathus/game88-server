@@ -75,6 +75,7 @@
         from member_card c
                  left join config_bank_list l on l.id = c.bank_id
         where member_id = #{memberId}
+        order by l.sort asc
     </select>
 
     <select id="selectRealNameByMemberIds" resultMap="MemberCardResult">
