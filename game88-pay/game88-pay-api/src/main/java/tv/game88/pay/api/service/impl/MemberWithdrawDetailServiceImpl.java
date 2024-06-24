@@ -1036,7 +1036,10 @@ public class MemberWithdrawDetailServiceImpl extends ServiceImpl<MemberWithdrawD
 
     private void setWithdrawColor( RspWithdrawRechargeDetail detail ) {
         switch ( detail.getStatus() ) {
-        case 0, 1, 4, 8 -> detail.setRemark( "提现中" );
+        case 0, 1, 4, 8 ->{
+            detail.setRemark( "提现中" );
+            detail.setColor( "#FFA500" );
+        }
         case 3, 6 -> detail.setRemark( "提现成功" );
         case 7 -> detail.setRemark( "提现成功，请联系客服" );
         case 2, 5 -> {
