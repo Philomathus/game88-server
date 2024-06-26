@@ -258,6 +258,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 return RspBase.businessError( "验证不通过" );
             }
         }
+
+        Boolean isNewMember = false;
+
         //设备号查询
         MemberInfo memberInfo = this.baseMapper.findMemberByDeviceId( mobileLogin.getDeviceId() );
         if ( memberInfo != null ) {
@@ -279,6 +282,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( oldm == null ) {
                 memberInfo = this.newMemberInfoReg( mobileLogin );
                 memberInfo.setRegisterType( 0 );
+                isNewMember = true;
             } else {
                 if ( oldm.getStatus() == 0 ) {
                     return RspBase.businessError( "您已被限制登录,请联系客服" );
@@ -303,6 +307,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( isNewMember );
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
     }
