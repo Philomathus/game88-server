@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tv.game88.platform.api.mapper.ActivityInfoMapper">
-    <resultMap type="tv.game88.platform.api.entity.ActivityInfo" id="ActivityInfoResult">
+<mapper namespace="tv.game88.core.quest.mapper.ActivityInfoMapper">
+    <resultMap type="tv.game88.core.quest.entity.ActivityInfo" id="ActivityInfoResult">
         <result property="id" column="id" />
         <result property="icon" column="icon" />
         <result property="title" column="title" />
@@ -34,7 +34,7 @@
         from activity_info
     </sql>
 
-    <select id="selectActivityInfoList" parameterType="tv.game88.platform.api.entity.ActivityInfo"
+    <select id="selectActivityInfoList" parameterType="tv.game88.core.quest.entity.ActivityInfo"
             resultMap="ActivityInfoResult">
         <include refid="selectActivityInfoVo" />
         <where>

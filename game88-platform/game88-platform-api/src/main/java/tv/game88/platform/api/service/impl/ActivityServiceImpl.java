@@ -17,14 +17,14 @@ import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.entity.MemberQuest;
 import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.core.quest.mapper.MemberQuestMapper;
-import tv.game88.platform.api.cache.ActivityCacheUtil;
+import tv.game88.core.quest.cache.ActivityCacheUtil;
 import tv.game88.platform.api.dto.RspActivityInfo;
 import tv.game88.platform.api.dto.RspActivityType;
 import tv.game88.platform.api.dto.RspQuestInfo;
 import tv.game88.platform.api.dto.RspQuestType;
-import tv.game88.platform.api.entity.ActivityInfo;
-import tv.game88.platform.api.entity.ActivityQuestType;
-import tv.game88.platform.api.entity.ActivityType;
+import tv.game88.core.quest.entity.ActivityInfo;
+import tv.game88.core.quest.entity.ActivityQuestType;
+import tv.game88.core.quest.entity.ActivityType;
 import tv.game88.platform.api.service.ActivityService;
 
 import jakarta.annotation.Resource;

@@ -26,9 +26,9 @@ import tv.game88.core.member.manager.MemberMoneyManager;
 import tv.game88.core.member.manager.MemberRecommendManager;
 import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.core.member.vo.PlatformUser;
+import tv.game88.core.quest.cache.ActivityCacheUtil;
 import tv.game88.core.quest.entity.ActivityQuestInfo;
 import tv.game88.core.quest.manager.MemberQuestManager;
-import tv.game88.core.quest.mapper.ActivityQuestInfoMapper;
 import tv.game88.pay.api.base.BasePay;
 import tv.game88.pay.api.base.PayProcessorFactoryUtil;
 import tv.game88.pay.api.cache.PayCacheUtil;
@@ -68,8 +68,6 @@ public class PayServiceImpl implements PayService {
     private MemberRecommendManager              memberRecommendManager;
     @Resource
     private MemberQuestManager                  memberQuestManager;
-    @Resource
-    private ActivityQuestInfoMapper             questInfoMapper;
 
     @Resource
     private PayProcessorFactoryUtil payProcessorFactoryUtil;
@@ -79,6 +77,8 @@ public class PayServiceImpl implements PayService {
     private ConfigEnvCacheUtil      configEnvCacheUtil;
     @Resource
     private PayCacheUtil            payCacheUtil;
+    @Resource
+    private ActivityCacheUtil       activityCacheUtil;
 
     @Value( "${spring.profiles.active}" )
     private String profile;
@@ -294,9 +294,11 @@ public class PayServiceImpl implements PayService {
 
         if ( Objects.equals( memberRechargeOnline.getPlatformId(), ConstantsPay.VIPPAY_PAY_PLATFORM_ID ) ) {
             //vipPay充值活动任务
-            List<ActivityQuestInfo> listConfQuest = questInfoMapper.selectList( new QueryWrapper<ActivityQuestInfo>()
-                    .eq( "effect", 1 )
-                    .eq( "game_type_id", -2 ) );
+            List<ActivityQuestInfo> listConfQuest = activityCacheUtil
+                    .getQuestInfos()
+                    .stream()
+                    .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() == -2 )
+                    .toList();
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 memberQuestManager.memberQuestProcess( memberInfo.getId(), payJourMoney, confQuest );
             }

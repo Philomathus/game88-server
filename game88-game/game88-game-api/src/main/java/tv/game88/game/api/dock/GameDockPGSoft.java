@@ -35,7 +35,7 @@ import java.util.*;
 @Repository( value = ConstantsGame.PG_SOFT + "GameProcessor" )
 @SuppressWarnings( "unchecked" )
 public class GameDockPGSoft extends AbstractGameDock {
-    private static final String CURRENCY = "RMB";
+    private static final String CURRENCY = "CNY";
 
     @Override
     public void getToken( ReqJoinGame reqJoinGame ) {
@@ -92,7 +92,7 @@ public class GameDockPGSoft extends AbstractGameDock {
         }
         extraMap.put( "oc", "0" );
         extraMap.put( "iwk", "1" );
-        extraMap.put( "l", "zh-CN" );
+        extraMap.put( "l", "zh" );
         params.put( "extra_args", URLEncoder.encode( assemblyUrl( extraMap ), StandardCharsets.UTF_8 ) );
         String body = assemblyUrl( params );
 
@@ -114,7 +114,7 @@ public class GameDockPGSoft extends AbstractGameDock {
             return text;
         } );
 
-        if ( StringUtils.isBlank( responseStr ) || !responseStr.contains( "CONNECTED SUCCESSFULLY" ) ) {
+        if ( StringUtils.isBlank( responseStr ) || !responseStr.startsWith( "<!doctype html>" ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
                     + "获取游戏链接失败 userId:{} - Response: {}", reqJoinGame.getGameMemberId(), responseStr );
             throw new BusinessException( "获取游戏链接失败" );

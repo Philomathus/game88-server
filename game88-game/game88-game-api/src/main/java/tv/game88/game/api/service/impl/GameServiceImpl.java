@@ -36,10 +36,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -204,7 +201,11 @@ public class GameServiceImpl implements GameService {
             // 获取游戏链接
             baseGameDock.getJoinGameUrl( reqJoinGame );
 
-            Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+            if ( gamePlatform.getGameCategory() == EnumGameCategory.PG_SOFT ) {
+                this.topUpGame( reqJoinGame, baseGameDock );// PG执行上分任务
+            } else {
+                Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+            }
 
             log.info( reqJoinGame.getGameCategory().getDes()
                     + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
