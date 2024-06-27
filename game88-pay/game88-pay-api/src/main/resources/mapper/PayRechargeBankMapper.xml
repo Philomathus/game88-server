@@ -47,7 +47,6 @@
                 and b.effect = #{effect}
             </if>
         </where>
-       order by b.sort asc
     </select>
 
     <select id="selectRspList" resultType="tv.game88.pay.api.dto.RspPayRechargeBank">
@@ -57,5 +56,6 @@
         where b.effect = 1
         and b.open_level_min <![CDATA[ <= ]]> #{vipLevel}
         and b.open_level_max <![CDATA[ >= ]]> #{vipLevel}
+        order by l.sort asc
     </select>
 </mapper>

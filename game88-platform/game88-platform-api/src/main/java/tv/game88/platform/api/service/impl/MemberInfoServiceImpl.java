@@ -184,6 +184,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         MemberInfo oldm       = null;
+        boolean isNewMember = false;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
@@ -229,11 +230,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( oldm != null ) {
             this.baseMapper.insert( memberInfo );
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
+            isNewMember = true;
         } else {
             this.baseMapper.updateById( update );
         }
 
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( isNewMember );
         BeanUtils.copyProperties( memberInfo, rspMember );
         setNextLevelIntegral( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
@@ -258,6 +261,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 return RspBase.businessError( "验证不通过" );
             }
         }
+
+        boolean isNewMember = false;
+
         //设备号查询
         MemberInfo memberInfo = this.baseMapper.findMemberByDeviceId( mobileLogin.getDeviceId() );
         if ( memberInfo != null ) {
@@ -279,6 +285,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             if ( oldm == null ) {
                 memberInfo = this.newMemberInfoReg( mobileLogin );
                 memberInfo.setRegisterType( 0 );
+                isNewMember = true;
             } else {
                 if ( oldm.getStatus() == 0 ) {
                     return RspBase.businessError( "您已被限制登录,请联系客服" );
@@ -303,6 +310,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( isNewMember );
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
     }
@@ -371,6 +379,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( rspBase != null ) {
             return rspBase;
         }
+        boolean isNewMember = false;
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         if ( memberInfo != null ) {
             return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
@@ -397,7 +406,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             memberInfo.setRegisterType( 1 );
 
             this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), memberInfo );
-
+             isNewMember = true;
             this.baseMapper.insert( memberInfo );
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
@@ -411,6 +420,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( isNewMember );
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "注册成功", rspMember );
     }
@@ -467,6 +477,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( true );
         BeanUtils.copyProperties( memberInfo, rspMember );
         return RspBase.ok( "注册成功", rspMember );
     }
@@ -492,6 +503,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "nick_name", mobileLogin.getUsername() ).one();
         MemberInfo oldm       = null;
+        boolean isNewMember = false;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
@@ -536,12 +548,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
         if ( oldm != null ) {
             this.baseMapper.insert( memberInfo );
+            isNewMember = true;
             this.baseMapper.deleteByHistoryKey( oldm.getId() );
         } else {
             this.baseMapper.updateById( update );
         }
 
         RspMember rspMember = new RspMember();
+        rspMember.setNewAccount( isNewMember );
         BeanUtils.copyProperties( memberInfo, rspMember );
         setNextLevelIntegral( memberInfo, rspMember );
         return RspBase.ok( "登录成功", rspMember );
