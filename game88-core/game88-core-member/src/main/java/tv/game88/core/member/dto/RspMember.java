@@ -45,6 +45,9 @@ public class RspMember {
     @JsonProperty( access = JsonProperty.Access.WRITE_ONLY )
     private String password;
 
+    @Schema( title = "是否是新会员" )
+    private boolean newAccount = false;
+
     public String getPhone() {
         if ( StringUtils.isNotBlank( phone ) ) {
             return phone.substring( 0, 3 ) + "****" + phone.substring( 7 );
