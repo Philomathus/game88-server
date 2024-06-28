@@ -182,9 +182,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
 
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
-        MemberInfo oldm       = null;
-        boolean isNewMember = false;
+        MemberInfo memberInfo  = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
+        MemberInfo oldm        = null;
+        boolean    isNewMember = false;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
@@ -379,8 +379,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         if ( rspBase != null ) {
             return rspBase;
         }
-        boolean isNewMember = false;
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
+        boolean    isNewMember = false;
+        MemberInfo memberInfo  = new QueryChainWrapper<>( this.baseMapper ).eq( "phone", mobileLogin.getMobile() ).one();
         if ( memberInfo != null ) {
             return RspBase.businessError( "您已注册过该手机号,请勿重复注册" );
         }
@@ -406,7 +406,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             memberInfo.setRegisterType( 1 );
 
             this.setMemberLoginParam( mobileLogin, dev, version, loginUrl, memberInfo.getLoginProvince(), memberInfo );
-             isNewMember = true;
+            isNewMember = true;
             this.baseMapper.insert( memberInfo );
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
@@ -501,9 +501,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             }
         }
 
-        MemberInfo memberInfo = new QueryChainWrapper<>( this.baseMapper ).eq( "nick_name", mobileLogin.getUsername() ).one();
-        MemberInfo oldm       = null;
-        boolean isNewMember = false;
+        MemberInfo memberInfo  = new QueryChainWrapper<>( this.baseMapper ).eq( "nick_name", mobileLogin.getUsername() ).one();
+        MemberInfo oldm        = null;
+        boolean    isNewMember = false;
         if ( memberInfo == null ) {
             //检查是不是归档会员回归
             oldm = this.baseMapper.findMemberHistoryByMobile( mobileLogin.getMobile() );
@@ -839,8 +839,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public boolean repairMemberBcode( String memberId ) {
-        return memberBcodeMapper.updateMemberBcodeStatus( memberId ) > 0 && memberBcodeMapper.repairMemberInfo( memberId ) > 0;
+    @Transactional( rollbackFor = Exception.class )
+    public void repairMemberBcode( String memberId ) {
+        memberBcodeMapper.updateMemberBcodeStatus( memberId );
+        memberBcodeMapper.repairMemberInfo( memberId );
     }
 
     @Override

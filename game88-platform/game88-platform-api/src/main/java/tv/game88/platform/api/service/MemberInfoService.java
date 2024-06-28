@@ -42,7 +42,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     BigDecimal getHistoryRecharge( String memberId );
 
-    boolean repairMemberBcode( String memberId );
+    void repairMemberBcode( String memberId );
 
     RspBase<?> unbindCard( MemberCard memberCard );
 

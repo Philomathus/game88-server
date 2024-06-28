@@ -301,7 +301,8 @@ public class MemberInfoController extends BaseController {
     @PostMapping( "/memberBcodeRepair/{memberId}" )
     public Object memberBcodeRepair( @PathVariable String memberId, Integer googleAuthCode ) throws Exception {
         SecurityUtils.verifyMFACode( googleAuthCode );
-        return toResult( memberInfoService.repairMemberBcode( memberId ) );
+        memberInfoService.repairMemberBcode( memberId );
+        return RspBase.ok();
     }
 
     @Log( title = "修改vip等级", businessType = BusinessType.UPDATE )
