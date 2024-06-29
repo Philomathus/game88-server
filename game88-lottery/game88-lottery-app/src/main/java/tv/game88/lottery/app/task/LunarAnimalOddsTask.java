@@ -99,6 +99,33 @@ public class LunarAnimalOddsTask {
             }
         }
 
+        String[] animals = LunarAnimalUtils.getLeftOverAnimals( todayAnimal );
+        for ( int i = 0; i < animals.length; i++ ) {
+            String animal = animals[ i ];
+            int[] codeIds = switch ( i ) {
+                case 0 -> new int[] { 1, 13, 25, 37, 49 };
+                case 1 -> new int[] { 2, 14, 26, 38 };
+                case 2 -> new int[] { 3, 15, 27, 39 };
+                case 3 -> new int[] { 4, 16, 28, 40 };
+                case 4 -> new int[] { 5, 17, 29, 41 };
+                case 5 -> new int[] { 6, 18, 30, 42 };
+                case 6 -> new int[] { 7, 19, 31, 43 };
+                case 7 -> new int[] { 8, 20, 32, 44 };
+                case 8 -> new int[] { 9, 21, 33, 45 };
+                case 9 -> new int[] { 10, 22, 34, 46 };
+                case 10 -> new int[] { 11, 23, 35, 47 };
+                case 11 -> new int[] { 12, 24, 36, 48 };
+                default -> throw new IllegalStateException( "Unexpected value: " + i );
+            };
+            StringBuilder codeJoin = new StringBuilder();
+            for ( int codeId : codeIds ) {
+                if ( !codeJoin.isEmpty() ) {
+                    codeJoin.append( "," );
+                }
+                codeJoin.append( "'" ).append( codeId >= 10 ? codeId : "0" + codeId ).append( "'" );
+            }
+            lotteryGameMapper.updateKillrateLiuheOne( codeJoin.toString(), animal );
+        }
         LotteryCacheUtils.me.clear();
     }
 }
