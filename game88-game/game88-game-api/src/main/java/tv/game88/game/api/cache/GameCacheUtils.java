@@ -33,6 +33,7 @@ public class GameCacheUtils {
     public static final String GAME_INFO_KEY                  = Constants.GAME_PREX + "info:";
     public static final String GAME_INFO_LIST_KEY             = Constants.GAME_PREX + "infoList:";
     public static final String GAME_INFO_LIST_ALL_KEY         = Constants.GAME_PREX + "infoListAll:";
+    public static final String GAME_INFO_LIST_HOT_KEY         = Constants.GAME_PREX + "infoListHot";
     public static final String GAME_INFO_S_KEY                = Constants.GAME_PREX + "infos:";
     public static final String GAME_WASH_CODE_CONFIG_LIST_KEY = Constants.GAME_PREX + "washCodeConfigList";
 
@@ -111,6 +112,18 @@ public class GameCacheUtils {
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
+    public List<RspGameInfo> getInfoHotList() {
+        if ( !redisUtils.exists( GAME_INFO_LIST_HOT_KEY ) ) {
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectHotRspList();
+            if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
+                redisUtils.strSet( GAME_INFO_LIST_HOT_KEY, JsonUtil.object2Json( rspGameInfoList ) );
+            }
+            return rspGameInfoList;
+        }
+        String s = redisUtils.strGet( GAME_INFO_LIST_HOT_KEY );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
+    }
+
     public List<RspGameInfo> getEffectInfoList( Long typeId ) {
         if ( !redisUtils.exists( GAME_INFO_LIST_KEY + typeId ) ) {
             List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( typeId );
@@ -132,11 +145,7 @@ public class GameCacheUtils {
     public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
         List<RspGameInfo> rspGameInfoList;
         if ( !redisUtils.exists( GAME_INFO_S_KEY + typeId ) ) {
-            if ( typeId == 1 ) {
-                rspGameInfoList = gameInfoMapper.selectRspListByRecommend();
-            } else {
-                rspGameInfoList = gameInfoMapper.selectRspList( typeId );
-            }
+            rspGameInfoList = gameInfoMapper.selectRspList( typeId );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
                 for ( RspGameInfo rspGameInfo : rspGameInfoList ) {
                     if ( rspGameInfo.getGameCategory() == EnumGameCategory.LOTTERY
@@ -164,12 +173,14 @@ public class GameCacheUtils {
         GameInfo gameInfo = getGameInfo( gameInfoId );
         if ( gameInfo != null ) {
             this.clear( GAME_INFO_KEY + gameInfoId );
+            this.clear( GAME_INFO_LIST_HOT_KEY );
         }
         List<RspGameType> effectTypeList = getEffectTypeList();
         for ( RspGameType rspGameType : effectTypeList ) {
             this.clear( GAME_INFO_LIST_KEY + rspGameType.getId() );
-            this.clear( GAME_INFO_LIST_ALL_KEY + rspGameType.getId() );
             this.clear( GAME_INFO_S_KEY + rspGameType.getId() );
+            this.clear( GAME_INFO_LIST_ALL_KEY + rspGameType.getId() );
+            getEffectInfoList( rspGameType.getId() );
         }
     }
 

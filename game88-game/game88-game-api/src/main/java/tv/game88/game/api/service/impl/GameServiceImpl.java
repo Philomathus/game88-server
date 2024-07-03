@@ -106,8 +106,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<RspGameInfo> getGameInfos( Long typeId, Long platformId ) {
-        if ( Objects.equals( platformId, -1L ) ) {
-            return gameInfoMapper.selectHotRspList( typeId );
+        if ( Objects.equals( platformId, 1L ) ) {
+            return gameCacheUtils.getInfoHotList();
         }
         return gameCacheUtils.getEffectInfoList( typeId, platformId );
     }
