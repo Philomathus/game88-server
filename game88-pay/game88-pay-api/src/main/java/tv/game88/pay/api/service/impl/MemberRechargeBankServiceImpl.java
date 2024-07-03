@@ -139,7 +139,7 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
                     rspPayRechargeBank.setBankIcon( domainValue + rspPayRechargeBank.getBankIcon() );
                 }
             }
-//            Collections.shuffle( configBankList );
+            Collections.shuffle( configBankList );
         }
         return configBankList;
     }
