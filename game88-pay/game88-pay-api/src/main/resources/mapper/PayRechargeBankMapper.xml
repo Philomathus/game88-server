@@ -56,6 +56,6 @@
         where b.effect = 1
         and b.open_level_min <![CDATA[ <= ]]> #{vipLevel}
         and b.open_level_max <![CDATA[ >= ]]> #{vipLevel}
-        order by l.sort desc
+        order by l.sort asc
     </select>
 </mapper>
