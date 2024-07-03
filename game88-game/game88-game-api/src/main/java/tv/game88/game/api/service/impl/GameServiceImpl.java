@@ -93,7 +93,7 @@ public class GameServiceImpl implements GameService {
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
-            Long typeId = gameTypeList.get( 0 ).getId();
+            Long typeId = gameTypeList.getFirst().getId();
             rspGameTypes.setRspGameInfos( hasNewVersion ? null : gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
@@ -106,9 +106,6 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<RspGameInfo> getGameInfos( Long typeId, Long platformId ) {
-        if ( Objects.equals( platformId, 1L ) ) {
-            return gameCacheUtils.getInfoHotList();
-        }
         return gameCacheUtils.getEffectInfoList( typeId, platformId );
     }
 

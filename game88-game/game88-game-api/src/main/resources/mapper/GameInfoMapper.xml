@@ -102,18 +102,21 @@
     <select id="selectHotRspList" resultType="tv.game88.game.api.dto.RspGameInfo">
         select p.game_category, p.maintain platform_maintain, a.*
         from (select i.id,
-                     i.name,
-                     i.icon,
-                     i.maintain,
-                     i.recommend,
-                     i.large_icon,
-                     i.kind_id,
-                     i.platform_id,
-                     i.sort
-              from game_info i
-              where i.effect = 1
-                and i.recommend = 1) a
-                 left join game_platform p on p.id = a.platform_id
+        i.name,
+        i.icon,
+        i.maintain,
+        i.recommend,
+        i.large_icon,
+        i.kind_id,
+        i.platform_id,
+        i.sort
+        from game_info i
+        where i.effect = 1
+        <if test="typeId != null">
+            and i.type_id = #{typeId}
+        </if>
+        and i.recommend = 1) a
+        left join game_platform p on p.id = a.platform_id
         where p.effect = 1
         order by a.sort asc
     </select>

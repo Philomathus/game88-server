@@ -27,7 +27,7 @@ public interface GameInfoMapper extends BaseMapper<GameInfo> {
 
     List<RspGameInfo> selectRspList( Long typeId );
 
-    List<RspGameInfo> selectHotRspList();
+    List<RspGameInfo> selectHotRspList( Long typeId );
 
     List<RspGameInfo> selectRspListByPlatform( @Param( "typeId" ) Long typeId, @Param( "platformId" ) Long platformId );
 }
