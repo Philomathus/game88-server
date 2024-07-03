@@ -21,6 +21,7 @@ import tv.game88.game.api.service.GamePlatformService;
 import tv.game88.core.game.type.EnumGameCategory;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -57,12 +58,15 @@ public class GamePlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:platform:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<RspGame>> listAll() {
-        List<RspGame> list = gamePlatformService.list( new QueryWrapper<GamePlatform>().select( "id", "name", "agent" ) ).stream()
-                                                .map( p -> {
-                                                    RspGame rspGame = new RspGame();
-                                                    BeanUtils.copyProperties( p, rspGame );
-                                                    return rspGame;
-                                                } ).collect( Collectors.toList() );
+        List<RspGame> list = gamePlatformService
+                .list( new QueryWrapper<GamePlatform>().select( "id", "name", "agent" ) )
+                .stream()
+                .map( p -> {
+                    RspGame rspGame = new RspGame();
+                    BeanUtils.copyProperties( p, rspGame );
+                    return rspGame;
+                } )
+                .collect( Collectors.toList() );
         return RspBase.ok( list );
     }
 
@@ -186,6 +190,7 @@ public class GamePlatformController extends BaseController {
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
             gameCacheUtils.clearByInfoId( null );
+            gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
         }
         return toResult( isSave );
     }
@@ -200,6 +205,7 @@ public class GamePlatformController extends BaseController {
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
             gameCacheUtils.clearByInfoId( null );
+            gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
         }
         return toResult( isSave );
     }
