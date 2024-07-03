@@ -293,7 +293,7 @@ public class GameDataServiceImpl implements GameDataService {
         List<ActivityQuestInfo> listConfQuest = activityCacheUtil
                 .getQuestInfos()
                 .stream()
-                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() == 0 )
+                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() > 0 )
                 .toList();
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
