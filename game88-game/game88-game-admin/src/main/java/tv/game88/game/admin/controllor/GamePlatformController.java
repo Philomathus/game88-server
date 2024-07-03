@@ -185,7 +185,7 @@ public class GamePlatformController extends BaseController {
         update.setEffect( effect );
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
+            gameCacheUtils.clearByInfoId( null );
         }
         return toResult( isSave );
     }
@@ -199,7 +199,7 @@ public class GamePlatformController extends BaseController {
         update.setMaintain( maintain );
         boolean isSave = gamePlatformService.updateById( update );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_PLATFORM_KEY + id );
+            gameCacheUtils.clearByInfoId( null );
         }
         return toResult( isSave );
     }

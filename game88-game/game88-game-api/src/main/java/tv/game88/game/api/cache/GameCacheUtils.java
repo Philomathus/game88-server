@@ -83,6 +83,9 @@ public class GameCacheUtils {
     }
 
     public GameInfo getGameInfo( Long infoId ) {
+        if ( infoId == null ) {
+            return null;
+        }
         if ( !redisUtils.exists( GAME_INFO_KEY + infoId ) ) {
             GameInfo gameInfo = new QueryChainWrapper<>( gameInfoMapper ).eq( "id", infoId ).one();
             if ( gameInfo != null ) {
