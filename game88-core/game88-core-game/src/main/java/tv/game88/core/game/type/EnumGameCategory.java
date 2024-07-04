@@ -6,7 +6,6 @@ import tv.game88.core.game.dto.RspGameCategory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public enum EnumGameCategory {
@@ -39,11 +38,11 @@ public enum EnumGameCategory {
     PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
     SHABA( ConstantsGame.SHABA, "沙巴体育" ),
 
-//    T1( ConstantsGame.T1, "T1" ),
-//    PP( ConstantsGame.PP, "pp" ),
-//    CG( ConstantsGame.CG, "cg" ),
-//    JILI( ConstantsGame.JILI, "jiLi" ),
-//    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
+    T1( ConstantsGame.T1, "T1" ),
+    PP( ConstantsGame.PP, "pp" ),
+    CG( ConstantsGame.CG, "cg" ),
+    JILI( ConstantsGame.JILI, "jiLi" ),
+    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
     ;
 
     private final String type;
@@ -55,12 +54,16 @@ public enum EnumGameCategory {
     }
 
     public static List<RspGameCategory> getGameCategorys() {
-        return Arrays.stream( EnumGameCategory.values() ).map( m -> {
-            RspGameCategory gameCategory = new RspGameCategory();
-            gameCategory.setName( m.name() );
-            gameCategory.setDes( m.getDes() );
-            return gameCategory;
-        } ).collect( Collectors.toList() );
+        return Arrays
+                .stream( EnumGameCategory.values() )
+                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, PG_NEW ).contains( m ) )
+                .map( m -> {
+                    RspGameCategory gameCategory = new RspGameCategory();
+                    gameCategory.setName( m.name() );
+                    gameCategory.setDes( m.getDes() );
+                    return gameCategory;
+                } )
+                .toList();
     }
 
     public static EnumGameCategory getGameCategoryByType( String type ) {
