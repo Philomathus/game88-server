@@ -32,7 +32,7 @@ public class GameDockMG extends AbstractGameDock {
             headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>( params, headers );
 
-            log.warn( reqJoinGame.getRecordUrl());
+            log.warn( reqJoinGame.getRecordUrl() );
             Map<String, Object> resultMap = restTemplate.postForObject( reqJoinGame.getRecordUrl(), httpEntity, Map.class );
             Object              obj       = resultMap.get( "access_token" );
             String              token     = obj == null ? null : obj.toString();
@@ -88,11 +88,12 @@ public class GameDockMG extends AbstractGameDock {
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
 
-        log.warn( url + " ::: "  + reqJoinGame.getToken());
+        log.warn( reqJoinGame.getGameCategory().getDes()
+                + "获取游戏链接 - URL:{}; BODY:{}; token:{}", url, JsonUtil.object2Json( params ), reqJoinGame.getToken() );
         ResponseEntity<Map> responseEntity = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
         Map                 result         = responseEntity.getBody();
         if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
-            reqJoinGame.setGameUrl( result.get( "gameURL" ).toString() );
+            reqJoinGame.setGameUrl( result.getOrDefault( "gameURL", "" ).toString() );
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
@@ -179,7 +180,7 @@ public class GameDockMG extends AbstractGameDock {
         headers.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
 
-        log.warn( url + " ::: "  + reqJoinGame.getToken());
+        log.warn( url + " ::: " + reqJoinGame.getToken() );
         ResponseEntity<Map> responseGameResult = restTemplate.exchange( url, HttpMethod.GET, requestEntity, Map.class );
         if ( responseGameResult.getStatusCode().is2xxSuccessful() ) {
             Map result    = responseGameResult.getBody();
