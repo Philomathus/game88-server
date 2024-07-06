@@ -56,7 +56,15 @@ public class GamePullDockT1 extends AbstractGamePull {
         params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
 
         String              url       = this.getURL( gamePlatform.getApiUrl(), "chain/query_game_history" );
-        Map<String, Object> resultMap = execute( url, HttpMethod.GET, params );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = execute( url, HttpMethod.GET, params );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            if ( e.getMessage().contains( "Invalid Auth Token" ) ) {
+                redisUtils.unlink( Constants.GAME_TOKEN_PREX + gamePlatform.getId() );
+            }
+        }
         if ( !CollectionUtils.isEmpty( resultMap ) && isSuccessCode( resultMap ) ) {
             Map<String, Object> detail = ( Map<String, Object> ) resultMap.getOrDefault( "detail", Collections.emptyMap() );
             // 状态正常,无论是否有数据,从结束时间开始查询
@@ -77,7 +85,7 @@ public class GamePullDockT1 extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "uniqueid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "period" ) ) );
-        String account  = String.valueOf( remoteGameDatum.get( "username" ) );
+        String account = String.valueOf( remoteGameDatum.get( "username" ) );
         String agent   = account.split( "_" )[ 0 ];
         gameDataRecord.setAccount( account );
         gameDataRecord.setAgent( agent );
@@ -108,17 +116,19 @@ public class GamePullDockT1 extends AbstractGamePull {
 
             log.warn( JsonUtil.object2Json( params ) );
 
-            final String              url       = this.getURL( gamePlatform.getApiUrl(), "generate_token" );
-            final Map<String, Object> resultMap = execute( url, HttpMethod.POST, params );
+            String              url       = this.getURL( gamePlatform.getApiUrl(), "generate_token" );
+            Map<String, Object> resultMap = execute( url, HttpMethod.POST, params );
 
             if ( !CollectionUtils.isEmpty( resultMap ) && isSuccessCode( resultMap ) ) {
                 Map<String, Object> data = ( Map<String, Object> ) resultMap.getOrDefault( "detail", Collections.emptyMap() );
                 if ( !data.isEmpty() ) {
-                    final String token = data.getOrDefault( "auth_token", "" ).toString();
+                    String token   = data.getOrDefault( "auth_token", "" ).toString();
+                    String timeout = data.getOrDefault( "timeout", "" ).toString();
                     if ( StringUtils.isBlank( token ) ) {
                         throw new BusinessException( "获取token失败" );
                     }
-                    redisUtils.strSet( Constants.GAME_TOKEN_PREX + gamePlatform.getId(), token, Duration.ofMinutes( 110 ) );
+                    redisUtils.strSet( Constants.GAME_TOKEN_PREX + gamePlatform.getId(), token, Duration.ofSeconds(
+                            Integer.parseInt( timeout ) - 600 ) );
                     return token;
                 }
             }
