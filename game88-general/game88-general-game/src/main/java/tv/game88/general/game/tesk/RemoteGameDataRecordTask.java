@@ -65,7 +65,7 @@ public class RemoteGameDataRecordTask {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
             scheduledExecutorService.schedule( () -> {
-                if ( redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 12000 ) ) {
+                if ( redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 300 ) ) {
                     String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
                     String versionValue = gamePlatform.getVersionValue();
                     if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
@@ -118,10 +118,13 @@ public class RemoteGameDataRecordTask {
                         }
                         // 如果补单程序
                         GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
-                        if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
-                                - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
-                            log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
-                            gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                        if ( gameRecordVersion != null ) {
+                            long version    = Long.parseLong( gameRecordVersion.getVersionValue() );
+                            long fixVersion = Long.parseLong( gamePlatform.getVersionValue() );
+                            if ( version > fixVersion && version - fixVersion <= 300000 ) {
+                                log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
+                                gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                            }
                         }
                     } catch ( Exception e ) {
                         log.error( e.getMessage(), e );
