@@ -3,6 +3,7 @@ package tv.game88.general.game.tesk;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -44,8 +45,14 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService      gameDataRecordService;
 
+    @Value( "${spring.profiles.active}" )
+    private String profile;
+
     @Scheduled( cron = "0 0 0,6,12,18 * * ?" ) // 每天0/6/12/18点执行一次
     public void fixRecordPPEveryDay() {
+        if ( !"99".equals( profile ) ) {
+            return;
+        }
         GameRecordFixVersion gameRecordFixVersion = new GameRecordFixVersion();
         gameRecordFixVersion.setPlatformId( 49L );
         gameRecordFixVersion.setVersionValue(
