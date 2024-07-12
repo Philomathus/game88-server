@@ -2,6 +2,7 @@ package tv.game88.common.utils;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -161,15 +162,7 @@ public class AESCoder {
         IvParameterSpec iv       = new IvParameterSpec( AESIV.getBytes() );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec, iv );
         byte[] encrypted = cipher.doFinal( content.getBytes( StandardCharsets.UTF_8 ) );
-        return bytesToHex( encrypted );
-    }
-
-    public static String bytesToHex( byte[] bytes ) {
-        StringBuilder buf = new StringBuilder( bytes.length * 2 );
-        for ( byte b : bytes ) { // 使用String的format方法进行转换
-            buf.append( String.format( "%02x", b & 0xff ) );
-        }
-        return buf.toString();
+        return Hex.encodeHexString( encrypted );
     }
 
     public static String decryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
