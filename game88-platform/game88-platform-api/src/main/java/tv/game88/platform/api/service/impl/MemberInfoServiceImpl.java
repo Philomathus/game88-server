@@ -58,7 +58,6 @@ import tv.game88.platform.api.service.MemberInfoService;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -650,13 +649,14 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );
             return;
         }
-        Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
+        String ip = mobileLogin.getIp();
+        Thread.ofVirtual().start( () -> {
             Map<String, Object> params = new HashMap<>();
             params.put( "channel_id", mobileLogin.getChannelCode() );
             params.put( "invitation_code", mobileLogin.getInviterCode() );
             params.put( "account", userId );
             params.put( "device_type", dev == 2 ? "android" : "ios" );
-            params.put( "ip", mobileLogin.getIp() );
+            params.put( "ip", ip );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType( MediaType.APPLICATION_JSON );
