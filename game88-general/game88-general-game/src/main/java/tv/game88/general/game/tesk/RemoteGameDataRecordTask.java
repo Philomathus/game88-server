@@ -3,13 +3,13 @@ package tv.game88.general.game.tesk;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.SpringUtils;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordFixVersion;
@@ -45,12 +45,9 @@ public class RemoteGameDataRecordTask {
     @Resource
     private GameDataRecordService      gameDataRecordService;
 
-    @Value( "${spring.profiles.active}" )
-    private String profile;
-
     @Scheduled( cron = "0 0 0,6,12,18 * * ?" ) // 每天0/6/12/18点执行一次
     public void fixRecordPPEveryDay() {
-        if ( !"99".equals( profile ) ) {
+        if ( !"99".equals( SpringUtils.getActiveProfile() ) ) {
             return;
         }
         GameRecordFixVersion gameRecordFixVersion = new GameRecordFixVersion();
