@@ -121,7 +121,7 @@ public class RemoteGameDataRecordTask {
                         if ( gameRecordVersion != null ) {
                             long version    = Long.parseLong( gameRecordVersion.getVersionValue() );
                             long fixVersion = Long.parseLong( gamePlatform.getVersionValue() );
-                            if ( version > fixVersion && version - fixVersion <= 300000 ) {
+                            if ( version - fixVersion <= 300000 ) {
                                 log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
                                 gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
                             }
