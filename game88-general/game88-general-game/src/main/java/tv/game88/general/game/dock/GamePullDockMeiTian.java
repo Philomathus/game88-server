@@ -1,7 +1,7 @@
 package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.util.encoders.Base64;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
@@ -28,7 +28,7 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         String rawDataStr = JsonUtil.object2Json( rawData );
 
         String url = gamePlatform.getApiUrl() + QUERY_RECORD_2 + "/" + gamePlatform.getAgent() + "/"
-                + Base64.encodeBase64String( rawDataStr.getBytes() );
+                + Base64.toBase64String( rawDataStr.getBytes() );
 
         Map<String, Object> resultMap = restTemplate.postForObject( url, null, Map.class );
 

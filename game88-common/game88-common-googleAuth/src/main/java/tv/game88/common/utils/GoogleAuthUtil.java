@@ -3,7 +3,6 @@ package tv.game88.common.utils;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 @Log4j2
 public class GoogleAuthUtil {
@@ -25,8 +25,7 @@ public class GoogleAuthUtil {
         SecureRandom random = new SecureRandom();
         byte[]       bytes  = new byte[ 20 ];
         random.nextBytes( bytes );
-        Base32 base32    = new Base32();
-        String secretKey = base32.encodeToString( bytes );
+        String secretKey = new Base32().encodeToString( bytes );
         return secretKey.toLowerCase();
     }
 
@@ -44,7 +43,8 @@ public class GoogleAuthUtil {
 
     public static String tranUrlToBase64String( String url ) {
         try {
-            URL               urlImg            = URI.create( url ).toURL();
+            URL               urlImg            = URI.create( url )
+                    .toURL();
             HttpURLConnection httpURLConnection = ( HttpURLConnection ) urlImg.openConnection();
             httpURLConnection.addRequestProperty( "User-Agent", "Mozilla / 4.76" );
             InputStream is = httpURLConnection.getInputStream();
@@ -56,8 +56,8 @@ public class GoogleAuthUtil {
                 byteArrayOutputStream.write( buffer, 0, rc );
             }
             buffer = byteArrayOutputStream.toByteArray();
-            Base64 base64 = new Base64();
-            return base64.encodeToString( buffer );
+            return Base64.getEncoder()
+                    .encodeToString( buffer );
         } catch ( IOException e ) {
             log.error( e.getMessage(), e );
         }

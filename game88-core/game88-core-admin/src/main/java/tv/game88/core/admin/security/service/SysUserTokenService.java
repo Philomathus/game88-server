@@ -53,11 +53,11 @@ public class SysUserTokenService {
 
     public static void main( String[] args ) throws Exception {
         //SecretKey secretKey = Keys.secretKeyFor( SignatureAlgorithm.HS512);
-        //System.out.println(Base64.encodeBase64String( secretKey.getEncoded() ));
+        //System.out.println(Base64.toBase64String( secretKey.getEncoded() ));
 
         //KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS512);
-        //System.out.println("公钥:" + Base64.encodeBase64String( keyPair.getPublic().getEncoded() ));
-        //System.out.println("私钥:" + Base64.encodeBase64String( keyPair.getPrivate().getEncoded() ));
+        //System.out.println("公钥:" + Base64.toBase64String( keyPair.getPublic().getEncoded() ));
+        //System.out.println("私钥:" + Base64.toBase64String( keyPair.getPrivate().getEncoded() ));
     }
 
     /**

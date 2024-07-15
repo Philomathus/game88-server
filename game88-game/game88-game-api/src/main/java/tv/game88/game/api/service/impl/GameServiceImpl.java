@@ -79,21 +79,25 @@ public class GameServiceImpl implements GameService {
     public RspGameTypes getGameTypes( String version ) {
         List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
         boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.13.0", version );
-        gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L ).contains( rspGameType.getId() ) : Arrays
-                .asList( 8L, 9L )
+        gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L )
+                .contains( rspGameType.getId() ) : Arrays.asList( 8L, 9L )
                 .contains( rspGameType.getId() ) );
         for ( RspGameType rspGameType : gameTypeList ) {
-            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
+            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon()
+                    .startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
             }
-            if ( StringUtils.isNotBlank( rspGameType.getName() ) && rspGameType.getName().contains( "-" ) ) {
-                rspGameType.setName( rspGameType.getName().replaceAll( "-", "" ) );
+            if ( StringUtils.isNotBlank( rspGameType.getName() ) && rspGameType.getName()
+                    .contains( "-" ) ) {
+                rspGameType.setName( rspGameType.getName()
+                        .replaceAll( "-", "" ) );
             }
         }
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
-            Long typeId = gameTypeList.getFirst().getId();
+            Long typeId = gameTypeList.getFirst()
+                    .getId();
             rspGameTypes.setRspGameInfos( hasNewVersion ? null : gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
@@ -121,7 +125,8 @@ public class GameServiceImpl implements GameService {
         if ( rspGameType_ == null ) {
             return RspBase.businessError( "未知的游戏分类" );
         }
-        if ( !Arrays.asList( 3, 4 ).contains( rspGameType_.getType() ) ) {
+        if ( !Arrays.asList( 3, 4 )
+                .contains( rspGameType_.getType() ) ) {
             return RspBase.businessError( "游戏显示类型错误" );
         }
 
@@ -137,11 +142,11 @@ public class GameServiceImpl implements GameService {
         rspGamePlatformList.addAll( gamePlatformMapper.selectRspList( infoTypeId ) );
         if ( !CollectionUtils.isEmpty( rspGamePlatformList ) ) {
             for ( RspGamePlatform rspGamePlatform : rspGamePlatformList ) {
-                if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon().startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon()
+                        .startsWith( "http" ) ) {
                     rspGamePlatform.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getIcon() );
                 }
-                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform
-                        .getCardIcon()
+                if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform.getCardIcon()
                         .startsWith( "http" ) ) {
                     rspGamePlatform.setCardIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getCardIcon() );
                 }
@@ -201,11 +206,12 @@ public class GameServiceImpl implements GameService {
             if ( gamePlatform.getGameCategory() == EnumGameCategory.PG_SOFT ) {
                 this.topUpGame( reqJoinGame, baseGameDock );// PG执行上分任务
             } else {
-                Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+                Thread.ofVirtual()
+                        .start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
             }
 
-            log.info( reqJoinGame.getGameCategory().getDes()
-                    + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
+            log.info( reqJoinGame.getGameCategory()
+                    .getDes() + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
 
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
@@ -218,7 +224,8 @@ public class GameServiceImpl implements GameService {
     public void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         // 设置为上分操作
         reqJoinGame.setMoneyType( 1 );
-        if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) > 0 ) {
+        if ( reqJoinGame.getTransferMoney()
+                .compareTo( BigDecimal.ZERO ) > 0 ) {
             // 扣除会员金额
             memberGameMoneyService.beginGameEnter( reqJoinGame );
             boolean success = false;
@@ -263,7 +270,8 @@ public class GameServiceImpl implements GameService {
     }
 
     private void processTopUpNotice( ReqJoinGame reqJoinGame ) {
-        String gameDes = reqJoinGame.getGameCategory().getDes();
+        String gameDes = reqJoinGame.getGameCategory()
+                .getDes();
         String msg = String.format( "There was an error transferring money for the member's game. Please attend to the "
                 + "member's money loss promptly! ::: gamePlatform: %s ; gameId: %s ; transferOrderId: %s ; "
                 + "memberId: %s ; money: %s ; IP: %s", gameDes, reqJoinGame.getGameInfoId(), reqJoinGame.getOrderId(),
@@ -333,7 +341,8 @@ public class GameServiceImpl implements GameService {
             }
             reqJoinGame.setTransferMoney( balance );
             // 异步下分
-            Thread.ofVirtual().start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
+            Thread.ofVirtual()
+                    .start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
@@ -344,9 +353,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<List<RspGameMoney>> getGameBalance( final String memberId ) {
-        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper )
-                .eq( "member_id", memberId )
-                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) )
+        Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper ).eq( "member_id", memberId )
+                .ge( "create_time", LocalDateTime.now()
+                        .minusMonths( 1 ) )
                 .select( "platform_id", "order_id" )
                 .list()
                 .stream()
@@ -389,13 +398,16 @@ public class GameServiceImpl implements GameService {
             } );
         }
         List<Future<RspGameMoney>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
-        List<RspGameMoney> resultList = futureList.stream().map( t -> {
-            try {
-                return t.get();
-            } catch ( InterruptedException | ExecutionException e ) {
-                throw new IllegalStateException( e );
-            }
-        } ).filter( Objects::nonNull ).collect( Collectors.toList() );
+        List<RspGameMoney> resultList = futureList.stream()
+                .map( t -> {
+                    try {
+                        return t.get();
+                    } catch ( InterruptedException | ExecutionException e ) {
+                        throw new IllegalStateException( e );
+                    }
+                } )
+                .filter( Objects::nonNull )
+                .collect( Collectors.toList() );
         return RspBase.ok( resultList );
     }
 
@@ -410,8 +422,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception {
-        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper )
-                .eq( "agent", agent )
+        GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper ).eq( "agent", agent )
                 .eq( "game_category", gameCategory )
                 .one();
         if ( gamePlatform == null ) {
@@ -436,8 +447,7 @@ public class GameServiceImpl implements GameService {
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
-        return ReqJoinGame
-                .builder()
+        return ReqJoinGame.builder()
                 .des( AESCoder.decrypt( gamePlatform.getDes() ) )
                 .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
                 .agent( gamePlatform.getAgent() )
@@ -461,17 +471,16 @@ public class GameServiceImpl implements GameService {
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) throws Exception {
         String orderId = switch ( gamePlatform.getGameCategory() ) {
             case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
-            case MEITIAN -> agent
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+            case MEITIAN -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
+                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
-            case HG -> AESCoder
-                    .decrypt( gamePlatform.getDes() )
+            case HG -> AESCoder.decrypt( gamePlatform.getDes() )
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
                     LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
-            default -> agent
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+            default -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
+                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );
         };
         if ( !redisUtils.strSetIfAbsent( Constants.CONFIG_PREX + "orderId:" + orderId, "", Duration.ofSeconds( 10 ) ) ) {
