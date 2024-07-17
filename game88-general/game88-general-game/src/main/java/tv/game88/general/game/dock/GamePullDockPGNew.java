@@ -22,13 +22,13 @@ import java.util.TreeMap;
 @Repository( value = ConstantsGame.PG_NEW + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockPGNew extends AbstractGamePull {
 
-    private static final BigDecimal RATE = new BigDecimal( 1000 );
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
         // 如果不是3分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 1 ) ) ) {
             return null;
         }
         final Map<String, Object> params = new TreeMap<>();
@@ -46,7 +46,7 @@ public class GamePullDockPGNew extends AbstractGamePull {
             if ( "200".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
                 List<Object> transactions = ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
                 if ( !CollectionUtils.isEmpty( transactions ) ) {
-                    Map<String, Object> last       = ( Map<String, Object> ) transactions.getLast();
+                    Map<String, Object> last = ( Map<String, Object> ) transactions.getLast();
                     // 状态正常,无论是否有数据,从结束时间开始查询
                     gamePlatform.setVersionValue( String.valueOf( last.get( "id" ) ) );
                 }
@@ -77,12 +77,21 @@ public class GamePullDockPGNew extends AbstractGamePull {
         if ( !account.contains( "_" ) ) {
             return null;
         }
-        String[] spl = account.split( "_" );
+        String[] spl   = account.split( "_" );
+        String   agent = spl[ 0 ];
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
+        gameDataRecord.setAccount( agent + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
+
+        BigDecimal RATE = BigDecimal.ONE;
+        if ( agent.startsWith( "99in" ) ) {
+            RATE = RATE_MAP.get( "INR" );
+        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
+            RATE = RATE_MAP.get( "IDR" );
+        }
+
         BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
         gameDataRecord.setCellScore( chip.toString() );
         gameDataRecord.setAllBet( chip.toString() );
@@ -95,7 +104,7 @@ public class GamePullDockPGNew extends AbstractGamePull {
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
-        gameDataRecord.setAgent( spl[ 0 ] );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

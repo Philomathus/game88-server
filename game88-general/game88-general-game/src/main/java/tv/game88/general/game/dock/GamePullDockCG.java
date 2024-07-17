@@ -30,7 +30,7 @@ import java.util.Map;
 @Repository( value = ConstantsGame.CG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockCG extends AbstractGamePull {
 
-    private static final BigDecimal RATE = new BigDecimal( 1000 );
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -41,11 +41,9 @@ public class GamePullDockCG extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        String startTime = LocalDateTimeUtils.RFC3339_FORMATTER.format( LocalDateTimeUtils
-                .convertToUTC7( start )
+        String startTime = LocalDateTimeUtils.RFC3339_FORMATTER.format( LocalDateTimeUtils.convertToUTC7( start )
                 .atZone( ZoneId.of( "UTC+7" ) ) );
-        String endTime = LocalDateTimeUtils.RFC3339_FORMATTER.format( LocalDateTimeUtils
-                .convertToUTC7( end )
+        String endTime = LocalDateTimeUtils.RFC3339_FORMATTER.format( LocalDateTimeUtils.convertToUTC7( end )
                 .atZone( ZoneId.of( "UTC+7" ) ) );
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -94,10 +92,16 @@ public class GamePullDockCG extends AbstractGamePull {
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         String startTime = remoteGameDatum.get( "LogTime" ).toString();
-        LocalDateTime startTimeLocal = LocalDateTimeUtils.parseLocalDateTime( startTime,
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME );
+        LocalDateTime startTimeLocal = LocalDateTimeUtils.parseLocalDateTime( startTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
+
+        BigDecimal RATE = BigDecimal.ONE;
+        if ( agent.startsWith( "99in" ) ) {
+            RATE = RATE_MAP.get( "INR" );
+        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
+            RATE = RATE_MAP.get( "IDR" );
+        }
 
         BigDecimal validBet = new BigDecimal( String.valueOf( remoteGameDatum.get( "ValidBet" ) ) ).multiply( RATE );
         gameDataRecord.setCellScore( validBet.toString() );
