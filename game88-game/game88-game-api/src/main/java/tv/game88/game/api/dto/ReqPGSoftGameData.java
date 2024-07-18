@@ -1,11 +1,10 @@
 package tv.game88.game.api.dto;
 
 import lombok.Data;
-
-import jakarta.validation.constraints.NotNull;
 import org.springframework.util.MultiValueMap;
 
-import java.util.StringJoiner;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Data
 public class ReqPGSoftGameData {
@@ -23,7 +22,10 @@ public class ReqPGSoftGameData {
         requestObject.setTraceId( params.getFirst( "trace_id" ) );
         requestObject.setOperatorToken( params.getFirst( "operator_token" ) );
         requestObject.setSecretKey( params.getFirst( "secret_key" ) );
-        requestObject.setOperatorPlayerSession( params.getFirst( "operator_player_session" ) );
+        String operator_player_session = params.getFirst( "operator_player_session" );
+        if ( operator_player_session != null ) {
+            requestObject.setOperatorPlayerSession( URLDecoder.decode( operator_player_session, StandardCharsets.UTF_8 ) );
+        }
         requestObject.setIp( params.getFirst( "ip" ) );
         requestObject.setCustomParameter( params.getFirst( "custom_parameter" ) );
         requestObject.setGameId( params.getFirst( "game_id" ) );
