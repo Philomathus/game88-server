@@ -27,9 +27,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Repository( value = ConstantsGame.PG_SOFT + "GameProcessor" )
@@ -80,7 +81,7 @@ public class GameDockPGSoft extends AbstractGameDock {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "client_ip", reqJoinGame.getIp() );
         params.add( "url_type", "game-entry" );
-        params.add( "path", URLEncoder.encode( "/" + reqJoinGame.getKindId() + "/index.html", StandardCharsets.UTF_8 ) );
+        params.add( "path", "/" + reqJoinGame.getKindId() + "/index.html" );
         params.add( "operator_token", reqJoinGame.getDes() );
         Map<String, String> extraMap = new HashMap<>();
         extraMap.put( "btt", "1" );
