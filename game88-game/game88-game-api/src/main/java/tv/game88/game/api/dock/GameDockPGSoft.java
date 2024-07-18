@@ -77,11 +77,11 @@ public class GameDockPGSoft extends AbstractGameDock {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "client_ip", reqJoinGame.getIp() );
-        params.put( "url_type", "game-entry" );
-        params.put( "path", URLEncoder.encode( "/" + reqJoinGame.getKindId() + "/index.html", StandardCharsets.UTF_8 ) );
-        params.put( "operator_token", reqJoinGame.getDes() );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "client_ip", reqJoinGame.getIp() );
+        params.add( "url_type", "game-entry" );
+        params.add( "path", URLEncoder.encode( "/" + reqJoinGame.getKindId() + "/index.html", StandardCharsets.UTF_8 ) );
+        params.add( "operator_token", reqJoinGame.getDes() );
         Map<String, String> extraMap = new HashMap<>();
         extraMap.put( "btt", "1" );
         String token = reqJoinGame.getGameMemberId() + "-" + System.currentTimeMillis() + "-" + CURRENCY;
@@ -93,16 +93,15 @@ public class GameDockPGSoft extends AbstractGameDock {
         extraMap.put( "oc", "0" );
         extraMap.put( "iwk", "1" );
         extraMap.put( "l", "zh" );
-        params.put( "extra_args", URLEncoder.encode( assemblyUrl( extraMap ), StandardCharsets.UTF_8 ) );
-        String body = assemblyUrl( params );
+        params.add( "extra_args", assemblyUrl( extraMap ) );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         httpHeaders.setCacheControl( "no-cache, no-store, must-revalidate" );
-        HttpEntity<String> requestEntity = new HttpEntity<>( body, httpHeaders );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
         String url = reqJoinGame.getApiUrl() + "/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=" + UUID.randomUUID();
-        log.warn( url + " ::: " + body );
+        log.warn( url + " ::: " + JsonUtil.object2Json( params ) );
 
         String responseStr = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
                 response -> {
