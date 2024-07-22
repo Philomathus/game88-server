@@ -78,10 +78,6 @@ spring:
           url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/88ky2?useUnicode=true&allowMultiQueries=true
           username: admin
           password: dRmBstReqberz!14Xm#
-        slave_8803:
-          url: jdbc:mysql://qp02-instance-1.c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/8803?useUnicode=true&allowMultiQueries=true
-          username: admin
-          password: dRmBstReqberz!14Xm#
         slave_77bl:
           url: jdbc:mysql://livedata.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/77bl_main?useUnicode=true&allowMultiQueries=true
           username: admin
@@ -111,7 +107,11 @@ spring:
           username: admin
           password: 3WMX&YMHXEthQ$ed
         slave_9907:
-          url: jdbc:mysql://r99-instance-1.ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9907?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://r99-2.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9907?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: admin
+          password: 3WMX&YMHXEthQ$ed
+        slave_9908:
+          url: jdbc:mysql://r99-2.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9908?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: 3WMX&YMHXEthQ$ed
   data:
