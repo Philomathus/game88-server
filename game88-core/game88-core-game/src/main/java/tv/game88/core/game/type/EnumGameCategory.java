@@ -54,16 +54,13 @@ public enum EnumGameCategory {
     }
 
     public static List<RspGameCategory> getGameCategorys() {
-        return Arrays
-                .stream( EnumGameCategory.values() )
-                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, PG_NEW ).contains( m ) )
+        return Arrays.stream( EnumGameCategory.values() ).filter( m -> !Arrays.asList( T1, PP, CG, JILI, PG_NEW ).contains( m ) )
                 .map( m -> {
                     RspGameCategory gameCategory = new RspGameCategory();
                     gameCategory.setName( m.name() );
                     gameCategory.setDes( m.getDes() );
                     return gameCategory;
-                } )
-                .toList();
+                } ).toList();
     }
 
     public static EnumGameCategory getGameCategoryByType( String type ) {
@@ -73,5 +70,14 @@ public enum EnumGameCategory {
             }
         }
         return null;
+    }
+
+    public static List<RspGameCategory> getGameCategoryAll() {
+        return Arrays.stream( EnumGameCategory.values() ).map( m -> {
+            RspGameCategory gameCategory = new RspGameCategory();
+            gameCategory.setName( m.name() );
+            gameCategory.setDes( m.getDes() );
+            return gameCategory;
+        } ).toList();
     }
 }
