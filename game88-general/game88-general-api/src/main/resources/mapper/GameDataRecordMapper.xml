@@ -63,13 +63,14 @@
     <insert id="insertByTableName">
         insert into ${tableName}
         (id, agent, game_agent, platform_id, game_id, game_round, account, kind_id,
-         table_id, chair_id, all_bet, cell_score, profit, revenue,  game_start_time, game_end_time, detail)
+         table_id, chair_id, all_bet, cell_score, profit, revenue, game_start_time,
+         game_end_time, detail, create_time)
         values (#{data.id}, #{data.agent}, #{data.gameAgent},
                 #{data.platformId}, #{data.gameId}, #{data.gameRound},
                 #{data.account}, #{data.kindId}, #{data.tableId},
                 #{data.chairId}, #{data.allBet}, #{data.cellScore},
                 #{data.profit}, #{data.revenue}, #{data.gameStartTime},
-                #{data.gameEndTime}, #{data.detail})
+                #{data.gameEndTime}, #{data.detail}, #{data.createTime})
     </insert>
 
     <select id="findCount" resultType="java.lang.Long">

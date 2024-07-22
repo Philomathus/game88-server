@@ -52,6 +52,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
             if ( mapper.findCount( gameDataRecord.getId(), TABLE_PREFIX + day ) > 0 ) {
                 continue;
             }
+            gameDataRecord.setCreateTime( LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() ) );
             mapper.insertByTableName( gameDataRecord, TABLE_PREFIX + day );
             num++;
             i++;

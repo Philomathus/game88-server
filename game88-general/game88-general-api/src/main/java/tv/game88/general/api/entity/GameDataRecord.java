@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -84,6 +85,8 @@ public class GameDataRecord {
      * 游戏结束时间
      */
     private String gameEndTime;
+
+    private LocalDateTime createTime;
 
     private String detail;
 
