@@ -47,12 +47,12 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         int                  i       = 0;
         int                  num     = 0;
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-            String day = LocalDateTimeUtils.format( LocalDateTimeUtils.parseLocalDateTime( gameDataRecord.getGameEndTime() ),
-                    LocalDateTimeUtils.YYYYMMDD_FORMATTER );
+            LocalDateTime now = LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() );
+            String day = LocalDateTimeUtils.format( now, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
             if ( mapper.findCount( gameDataRecord.getId(), TABLE_PREFIX + day ) > 0 ) {
                 continue;
             }
-            gameDataRecord.setCreateTime( LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() ) );
+            gameDataRecord.setCreateTime( now );
             mapper.insertByTableName( gameDataRecord, TABLE_PREFIX + day );
             num++;
             i++;
