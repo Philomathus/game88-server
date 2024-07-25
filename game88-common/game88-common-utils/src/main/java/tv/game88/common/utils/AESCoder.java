@@ -1,8 +1,8 @@
 package tv.game88.common.utils;
 
 import lombok.extern.log4j.Log4j2;
-import org.bouncycastle.util.encoders.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.util.encoders.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -10,7 +10,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -137,26 +136,20 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        String base64    = Base64.toBase64String( encrypted );// 此处使用BASE64做转码
-        return URLEncoder.encode( base64, StandardCharsets.UTF_8 );//URL加密
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString( encrypted );//URL加密
     }
 
     public static String encryptByKeyIvNoPadding( String data, String key, String iv ) throws Exception {
-        Cipher cipher          = Cipher.getInstance( "AES/CBC/NoPadding" );
-        int    blockSize       = cipher.getBlockSize();
-        byte[] dataBytes       = data.getBytes( StandardCharsets.UTF_8 );
-        int    plainTextLength = dataBytes.length;
-        if ( plainTextLength % blockSize != 0 ) {
-            plainTextLength = plainTextLength + ( blockSize - plainTextLength % blockSize );
-        }
-        byte[] plaintext = new byte[ plainTextLength ];
-        System.arraycopy( dataBytes, 0, plaintext, 0, dataBytes.length );
-        SecretKeySpec   keySpec = new SecretKeySpec( key.getBytes(), AES );
-        IvParameterSpec ivSpec  = new IvParameterSpec( iv.getBytes() );
+        Cipher          cipher          = Cipher.getInstance( "AES/CBC/NoPadding" );
+        SecretKeySpec   keySpec         = new SecretKeySpec( key.getBytes( StandardCharsets.UTF_8 ), AES );
+        IvParameterSpec ivSpec          = new IvParameterSpec( iv.getBytes( StandardCharsets.UTF_8 ) );
+        int             blockSize       = cipher.getBlockSize();
+        byte[]          dataBytes       = data.getBytes( StandardCharsets.UTF_8 );
+        int             paddedLength    = ( dataBytes.length + blockSize - 1 ) / blockSize * blockSize;
+        byte[]          paddedDataBytes = Arrays.copyOf( dataBytes, paddedLength );
         cipher.init( Cipher.ENCRYPT_MODE, keySpec, ivSpec );
-        byte[] encrypted = cipher.doFinal( plaintext );
-        return java.util.Base64.getUrlEncoder()
-                .encodeToString( encrypted );
+        byte[] encrypted = cipher.doFinal( paddedDataBytes );
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString( encrypted );
     }
 
     public static String encryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
@@ -173,22 +166,8 @@ public class AESCoder {
         SecretKeySpec   skeySpec = new SecretKeySpec( AESKey.getBytes( StandardCharsets.US_ASCII ), AES );
         IvParameterSpec iv       = new IvParameterSpec( AESIV.getBytes() );//使用CBC模式，需要一个向量iv，可增加加密算法的强度
         cipher.init( Cipher.DECRYPT_MODE, skeySpec, iv );
-        byte[] buffer    = toBytes( content );
-        byte[] encrypted = cipher.doFinal( buffer );
+        byte[] encrypted = cipher.doFinal( Hex.decodeHex( content ) );
         return new String( encrypted, StandardCharsets.UTF_8 );//此处使用BASE64做转码。
-    }
-
-    public static byte[] toBytes( String str ) {
-        if ( str == null || str.trim()
-                .isEmpty() ) {
-            return new byte[ 0 ];
-        }
-        byte[] bytes = new byte[ str.length() / 2 ];
-        for ( int i = 0; i < str.length() / 2; i++ ) {
-            String subStr = str.substring( i * 2, i * 2 + 2 );
-            bytes[ i ] = ( byte ) Integer.parseInt( subStr, 16 );
-        }
-        return bytes;
     }
 
     public static String encryptDES3( String str, String saltTxt ) throws Exception {
