@@ -14,21 +14,13 @@ import tv.game88.platform.api.service.MemberInfoHistoryService;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
 public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryMapper, MemberInfoHistory> implements MemberInfoHistoryService {
-
     @Resource
     private MemberCardMapper memberCardMapper;
-
-    @Resource
-    private ForkJoinPool forkJoinPool;
-
 
     @Override
     public List<MemberInfoHistory> memberInfoHistoryList( MemberInfoHistory memberInfoHistory ) {
@@ -80,7 +72,12 @@ public class MemberInfoHistoryServiceImpl extends ServiceImpl<MemberInfoHistoryM
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
-        List<Future<Map<String, Object>>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
+        List<Future<Map<String, Object>>> futureList = null;
+        try {
+            futureList = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
         Set<Map<String, Object>> resultSet = futureList.stream().map( t -> {
             try {
                 return t.get();

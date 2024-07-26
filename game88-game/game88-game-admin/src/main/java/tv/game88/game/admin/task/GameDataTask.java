@@ -8,6 +8,7 @@ import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.game.api.service.GameDataService;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -21,56 +22,54 @@ public class GameDataTask {
     @Resource
     private GameDataService gameDataService;
 
-    @Scheduled( cron = "0/30 * * * * ?")
-    public void runTask() {
-        if ( !redisUtils.lock( "GameDataTask", 29 ) ) {
+    @Scheduled( cron = "0/30 * * * * ?" )
+    public void runTask1() {
+        if ( !redisUtils.lock( "GameDataTaskRunTask1", 120 ) ) {
             return;
         }
-        LocalDateTime endDay  = LocalDateTime.now();
-        LocalDateTime starDay = endDay.minusMinutes( 3 );
-        String        begin   = LocalDateTimeUtils.format( starDay );
-        String        end     = LocalDateTimeUtils.format( endDay );
-        if ( LocalDateTimeUtils.isSameDay( starDay, endDay ) ) {
+        LocalDateTime now = LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() );
+        Thread.ofVirtual().start( () -> {
             try {
-                gameDataService.beatGameCodeAgent( begin, end, null, null );
+                LocalDateTime starDay = now.minusMinutes( 3 );
+                gameDataService.beatGameCodeAgent( starDay, now, null, null );
             } catch ( Exception e ) {
                 log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
             }
-            endDay  = LocalDateTime.now().minusMinutes( 5 );
-            starDay = endDay.minusMinutes( 3 );
-            begin   = LocalDateTimeUtils.format( starDay );
-            end     = LocalDateTimeUtils.format( endDay );
-
+        } );
+        Thread.ofVirtual().start( () -> {
             try {
-                gameDataService.beatGameCodeAgent( begin, end, null, null );
-            } catch ( Exception e ) {
-                log.error( "4游戏拉取注单异常{}", e.getMessage(), e );
-            }
-
-            endDay  = LocalDateTime.now().minusMinutes( 8 );
-            starDay = endDay.minusMinutes( 5 );
-            begin   = LocalDateTimeUtils.format( starDay );
-            end     = LocalDateTimeUtils.format( endDay );
-
-            try {
-                gameDataService.beatGameCodeAgent( begin, end, null, null );
-            } catch ( Exception e ) {
-                log.error( "5游戏拉取注单异常{}", e.getMessage(), e );
-            }
-        } else {
-            end = LocalDateTimeUtils.format( starDay.plusMinutes( 5 ).toLocalDate().atStartOfDay() );
-            try {
-                gameDataService.beatGameCodeAgent( begin, end, null, null );
+                LocalDateTime starDay = now.minusMinutes( 5 );
+                LocalDateTime endDay  = now.minusMinutes( 3 );
+                gameDataService.beatGameCodeAgent( starDay, endDay, null, null );
             } catch ( Exception e ) {
                 log.error( "2游戏拉取注单异常{}", e.getMessage(), e );
             }
-            begin = end;
-            end   = LocalDateTimeUtils.format( endDay );
+        } );
+        Thread.ofVirtual().start( () -> {
             try {
-                gameDataService.beatGameCodeAgent( begin, end, null, null );
+                LocalDateTime starDay = now.minusMinutes( 8 );
+                LocalDateTime endDay  = now.minusMinutes( 5 );
+                gameDataService.beatGameCodeAgent( starDay, endDay, null, null );
             } catch ( Exception e ) {
                 log.error( "3游戏拉取注单异常{}", e.getMessage(), e );
             }
+        } );
+    }
+
+    @Scheduled( cron = "0 * 0-23 * * ?" ) // 每小时拉一次
+    public void runTask2() {
+        if ( !redisUtils.lock( "GameDataTaskRunTask2", Duration.ofMinutes( 50 ) ) ) {
+            return;
         }
+        LocalDateTime now = LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() );
+        Thread.ofVirtual().start( () -> {
+            try {
+                LocalDateTime startTime = now.minusHours( 2 );
+                LocalDateTime endTime   = now.minusHours( 1 );
+                gameDataService.beatGameCodeAgent( startTime, endTime, null, null );
+            } catch ( Exception e ) {
+                log.error( "1游戏拉取注单异常{}", e.getMessage(), e );
+            }
+        } );
     }
 }

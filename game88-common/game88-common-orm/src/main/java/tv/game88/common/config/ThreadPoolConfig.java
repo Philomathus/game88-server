@@ -5,9 +5,6 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.support.TaskExecutorAdapter;
-import org.springframework.scheduling.concurrent.ForkJoinPoolFactoryBean;
 
 import java.util.concurrent.*;
 
@@ -21,9 +18,6 @@ import java.util.concurrent.*;
 public class ThreadPoolConfig {
     // 核心线程池大小
     private static final int corePoolSize = 20;
-
-    // 最大可创建的线程数
-    private static final int maxPoolSize = 50;
 
     /**
      * 打印线程异常信息
@@ -64,20 +58,6 @@ public class ThreadPoolConfig {
                 ThreadPoolConfig.printException( r, t );
             }
         };
-    }
-
-    @Bean
-    public ForkJoinPoolFactoryBean forkJoinPoolFactoryBean() {
-        final ForkJoinPoolFactoryBean poolFactory = new ForkJoinPoolFactoryBean();
-        poolFactory.setCommonPool( true );
-        poolFactory.setParallelism( maxPoolSize );
-        return poolFactory;
-    }
-
-    // JDK 21 将启用虚拟线程,可优化线程提供性能
-    @Bean
-    public AsyncTaskExecutor applicationTaskExecutor() {
-        return new TaskExecutorAdapter( Executors.newVirtualThreadPerTaskExecutor() );
     }
 
     @Bean

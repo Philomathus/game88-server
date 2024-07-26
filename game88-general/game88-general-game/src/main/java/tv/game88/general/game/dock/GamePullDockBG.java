@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Log4j2
@@ -40,7 +41,12 @@ public class GamePullDockBG extends AbstractGamePull {
         for ( String gameType : GAME_TYPE_LIST ) {
             forkJoinTasks.add( () -> queryList( gamePlatform, startTime, endTime, gameType ) );
         }
-        List<Future<List<Map<String, Object>>>> futures = forkJoinPool.invokeAll( forkJoinTasks );
+        List<Future<List<Map<String, Object>>>> futures = null;
+        try {
+            futures = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
         List<List<Map<String, Object>>> collect = futures.stream().map( t -> {
             try {
                 return t.get();

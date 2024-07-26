@@ -3,11 +3,12 @@ package tv.game88.game.api.service;
 import tv.game88.game.api.entity.MemberGameData;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 public interface GameDataService {
-    void beatGameCodeAgent( String start, String end, String account, Long id );
+    void beatGameCodeAgent( LocalDateTime start, LocalDateTime end, String account, Long id );
 
     void beatLotteryCode( String begin, String end );
 

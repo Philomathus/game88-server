@@ -72,32 +72,24 @@ public class GameServiceImpl implements GameService {
     @Value( "${gameOrderPrefix:0}" )
     private int    gameOrderPrefix;
 
-    @Resource
-    private ForkJoinPool forkJoinPool;
-
     @Override
     public RspGameTypes getGameTypes( String version ) {
         List<RspGameType> gameTypeList  = gameCacheUtils.getEffectTypeList();
         boolean           hasNewVersion = AppVersionUtils.hasNewVersion( "2.1.13.0", version );
         gameTypeList.removeIf( rspGameType -> hasNewVersion ? Arrays.asList( 2L, 4L )
-                .contains( rspGameType.getId() ) : Arrays.asList( 8L, 9L )
-                .contains( rspGameType.getId() ) );
+                .contains( rspGameType.getId() ) : Arrays.asList( 8L, 9L ).contains( rspGameType.getId() ) );
         for ( RspGameType rspGameType : gameTypeList ) {
-            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon()
-                    .startsWith( "http" ) ) {
+            if ( StringUtils.isNotBlank( rspGameType.getIcon() ) && !rspGameType.getIcon().startsWith( "http" ) ) {
                 rspGameType.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGameType.getIcon() );
             }
-            if ( StringUtils.isNotBlank( rspGameType.getName() ) && rspGameType.getName()
-                    .contains( "-" ) ) {
-                rspGameType.setName( rspGameType.getName()
-                        .replaceAll( "-", "" ) );
+            if ( StringUtils.isNotBlank( rspGameType.getName() ) && rspGameType.getName().contains( "-" ) ) {
+                rspGameType.setName( rspGameType.getName().replaceAll( "-", "" ) );
             }
         }
         RspGameTypes rspGameTypes = new RspGameTypes();
         rspGameTypes.setRspGameTypes( gameTypeList );
         if ( !CollectionUtils.isEmpty( gameTypeList ) ) {
-            Long typeId = gameTypeList.getFirst()
-                    .getId();
+            Long typeId = gameTypeList.getFirst().getId();
             rspGameTypes.setRspGameInfos( hasNewVersion ? null : gameCacheUtils.getEffectInfoList( typeId ) );
         }
         return rspGameTypes;
@@ -125,8 +117,7 @@ public class GameServiceImpl implements GameService {
         if ( rspGameType_ == null ) {
             return RspBase.businessError( "未知的游戏分类" );
         }
-        if ( !Arrays.asList( 3, 4 )
-                .contains( rspGameType_.getType() ) ) {
+        if ( !Arrays.asList( 3, 4 ).contains( rspGameType_.getType() ) ) {
             return RspBase.businessError( "游戏显示类型错误" );
         }
 
@@ -142,8 +133,7 @@ public class GameServiceImpl implements GameService {
         rspGamePlatformList.addAll( gamePlatformMapper.selectRspList( infoTypeId ) );
         if ( !CollectionUtils.isEmpty( rspGamePlatformList ) ) {
             for ( RspGamePlatform rspGamePlatform : rspGamePlatformList ) {
-                if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon()
-                        .startsWith( "http" ) ) {
+                if ( StringUtils.isNotBlank( rspGamePlatform.getIcon() ) && !rspGamePlatform.getIcon().startsWith( "http" ) ) {
                     rspGamePlatform.setIcon( ConfigDomainCacheUtil.me.getDomainOssValue() + rspGamePlatform.getIcon() );
                 }
                 if ( StringUtils.isNotBlank( rspGamePlatform.getCardIcon() ) && !rspGamePlatform.getCardIcon()
@@ -206,12 +196,11 @@ public class GameServiceImpl implements GameService {
             if ( gamePlatform.getGameCategory() == EnumGameCategory.PG_SOFT ) {
                 this.topUpGame( reqJoinGame, baseGameDock );// PG执行上分任务
             } else {
-                Thread.ofVirtual()
-                        .start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
+                Thread.ofVirtual().start( () -> this.topUpGame( reqJoinGame, baseGameDock ) );
             }
 
-            log.info( reqJoinGame.getGameCategory()
-                    .getDes() + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
+            log.info( reqJoinGame.getGameCategory().getDes()
+                    + "获取游戏链接成功:{}; userId:{}", reqJoinGame.getGameUrl(), reqJoinGame.getGameMemberId() );
 
             return RspBase.ok( "获取游戏链接成功", reqJoinGame.getGameUrl() );
         } catch ( Exception e ) {
@@ -224,8 +213,7 @@ public class GameServiceImpl implements GameService {
     public void topUpGame( ReqJoinGame reqJoinGame, BaseGameDock baseGameDock ) {
         // 设置为上分操作
         reqJoinGame.setMoneyType( 1 );
-        if ( reqJoinGame.getTransferMoney()
-                .compareTo( BigDecimal.ZERO ) > 0 ) {
+        if ( reqJoinGame.getTransferMoney().compareTo( BigDecimal.ZERO ) > 0 ) {
             // 扣除会员金额
             memberGameMoneyService.beginGameEnter( reqJoinGame );
             boolean success = false;
@@ -270,8 +258,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private void processTopUpNotice( ReqJoinGame reqJoinGame ) {
-        String gameDes = reqJoinGame.getGameCategory()
-                .getDes();
+        String gameDes = reqJoinGame.getGameCategory().getDes();
         String msg = String.format( "There was an error transferring money for the member's game. Please attend to the "
                 + "member's money loss promptly! ::: gamePlatform: %s ; gameId: %s ; transferOrderId: %s ; "
                 + "memberId: %s ; money: %s ; IP: %s", gameDes, reqJoinGame.getGameInfoId(), reqJoinGame.getOrderId(),
@@ -341,8 +328,7 @@ public class GameServiceImpl implements GameService {
             }
             reqJoinGame.setTransferMoney( balance );
             // 异步下分
-            Thread.ofVirtual()
-                    .start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
+            Thread.ofVirtual().start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
@@ -354,13 +340,8 @@ public class GameServiceImpl implements GameService {
     @Override
     public RspBase<List<RspGameMoney>> getGameBalance( final String memberId ) {
         Set<Long> platformIds = new QueryChainWrapper<>( memberGameMoneyMapper ).eq( "member_id", memberId )
-                .ge( "create_time", LocalDateTime.now()
-                        .minusMonths( 1 ) )
-                .select( "platform_id", "order_id" )
-                .list()
-                .stream()
-                .map( MemberGameMoney::getPlatformId )
-                .collect( Collectors.toSet() );
+                .ge( "create_time", LocalDateTime.now().minusMonths( 1 ) ).select( "platform_id", "order_id" ).list().stream()
+                .map( MemberGameMoney::getPlatformId ).collect( Collectors.toSet() );
         if ( CollectionUtils.isEmpty( platformIds ) ) {
             return RspBase.ok( new ArrayList<>() );
         }
@@ -397,17 +378,19 @@ public class GameServiceImpl implements GameService {
                 return rspGameMoney;
             } );
         }
-        List<Future<RspGameMoney>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
-        List<RspGameMoney> resultList = futureList.stream()
-                .map( t -> {
-                    try {
-                        return t.get();
-                    } catch ( InterruptedException | ExecutionException e ) {
-                        throw new IllegalStateException( e );
-                    }
-                } )
-                .filter( Objects::nonNull )
-                .collect( Collectors.toList() );
+        List<Future<RspGameMoney>> futureList = null;
+        try {
+            futureList = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
+        List<RspGameMoney> resultList = futureList.stream().map( t -> {
+            try {
+                return t.get();
+            } catch ( InterruptedException | ExecutionException e ) {
+                throw new IllegalStateException( e );
+            }
+        } ).filter( Objects::nonNull ).collect( Collectors.toList() );
         return RspBase.ok( resultList );
     }
 
@@ -423,8 +406,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public RspBase<String> getGameTokenByAgent( String agent, String gameCategory ) throws Exception {
         GamePlatform gamePlatform = new QueryChainWrapper<>( gamePlatformMapper ).eq( "agent", agent )
-                .eq( "game_category", gameCategory )
-                .one();
+                .eq( "game_category", gameCategory ).one();
         if ( gamePlatform == null ) {
             return RspBase.businessError( "游戏平台不存在" );
         }
@@ -447,25 +429,14 @@ public class GameServiceImpl implements GameService {
             case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
-        return ReqJoinGame.builder()
-                .des( AESCoder.decrypt( gamePlatform.getDes() ) )
-                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) )
-                .agent( gamePlatform.getAgent() )
-                .apiUrl( gamePlatform.getApiUrl() )
-                .recordUrl( gamePlatform.getRecordUrl() )
-                .linecode( gamePlatform.getLinecode() )
-                .kindId( gameInfo == null ? null : gameInfo.getKindId() )
-                .gameInfoId( gameInfo == null ? null : gameInfo.getId() )
-                .gameMemberId( gameMemberId )
-                .memberId( memberId )
-                .transferMoney( changeMoney )
-                .platformId( gamePlatform.getId() )
-                .platformName( gamePlatform.getName() )
-                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) )
-                .ip( ip )
-                .gameCategory( gamePlatform.getGameCategory() )
-                .dev( dev )
-                .build();
+        return ReqJoinGame.builder().des( AESCoder.decrypt( gamePlatform.getDes() ) )
+                .md5( AESCoder.decrypt( gamePlatform.getMd5() ) ).agent( gamePlatform.getAgent() )
+                .apiUrl( gamePlatform.getApiUrl() ).recordUrl( gamePlatform.getRecordUrl() )
+                .linecode( gamePlatform.getLinecode() ).kindId( gameInfo == null ? null : gameInfo.getKindId() )
+                .gameInfoId( gameInfo == null ? null : gameInfo.getId() ).gameMemberId( gameMemberId ).memberId( memberId )
+                .transferMoney( changeMoney ).platformId( gamePlatform.getId() ).platformName( gamePlatform.getName() )
+                .orderId( this.getGameOrderId( gameMemberId, gamePlatform.getAgent(), gamePlatform ) ).ip( ip )
+                .gameCategory( gamePlatform.getGameCategory() ).dev( dev ).build();
     }
 
     private String getGameOrderId( String gameMemberId, String agent, GamePlatform gamePlatform ) throws Exception {

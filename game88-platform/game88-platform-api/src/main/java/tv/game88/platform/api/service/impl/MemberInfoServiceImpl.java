@@ -84,8 +84,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     @Resource
     private SmsApi                smsApi;
     @Resource
-    private ForkJoinPool          forkJoinPool;
-    @Resource
     private MemberCardMapper      memberCardMapper;
     @Resource
     private MemberBcodeMapper     memberBcodeMapper;
@@ -913,7 +911,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
-        List<Future<Map<String, Object>>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
+        List<Future<Map<String, Object>>> futureList = null;
+        try {
+            futureList = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
         Set<Map<String, Object>> resultSet = futureList.stream().map( t -> {
             try {
                 return t.get();

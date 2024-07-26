@@ -24,15 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Pattern;
 
 @Log4j2
 public abstract class AbstractGamePull implements BaseGamePull {
     @Resource( name = "restUploadTemplate" )
     protected RestTemplate restTemplate;
-    @Resource
-    protected ForkJoinPool forkJoinPool;
 
     @Resource
     protected RedisUtils redisUtils;

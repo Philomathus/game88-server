@@ -25,9 +25,7 @@ public class beatTest {
     public void beatGameCodeAgent() {
         LocalDateTime endDay  = LocalDateTime.now();
         LocalDateTime starDay = endDay.minusHours( 4 );
-        String        begin   = LocalDateTimeUtils.format( starDay );
-        String        end     = LocalDateTimeUtils.format( endDay );
-        gameDataService.beatGameCodeAgent( begin, end, null, null );
+        gameDataService.beatGameCodeAgent( starDay, endDay, null, null );
     }
 
     @Test

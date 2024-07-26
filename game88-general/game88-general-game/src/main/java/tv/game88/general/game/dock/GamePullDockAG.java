@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -64,7 +65,12 @@ public class GamePullDockAG extends AbstractGamePull {
         // 获取视讯游戏订单数据
         forkJoinTasks.add( () -> this.queryList( gamePlatform, "getorders.xml", startMD, endMD ) );
 
-        List<Future<List<Object>>> futures = forkJoinPool.invokeAll( forkJoinTasks );
+        List<Future<List<Object>>> futures = null;
+        try {
+            futures = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
         List<List<Object>> collect = futures.stream().map( t -> {
             try {
                 return t.get();
@@ -112,7 +118,7 @@ public class GamePullDockAG extends AbstractGamePull {
                 + "5F14237EE2A67EF102203A4C97603BC5" ) );
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() + queryXml )
-                                                          .queryParams( requestMap ).build();
+                .queryParams( requestMap ).build();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );

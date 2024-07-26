@@ -6,10 +6,12 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.helper.RequestDataHelper;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
@@ -34,9 +36,11 @@ import tv.game88.game.api.service.GameDataService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @Service
@@ -64,29 +68,46 @@ public class GameDataServiceImpl implements GameDataService {
     @Resource
     private ActivityCacheUtil       activityCacheUtil;
 
-    @Value( "${spring.profiles.active}" )
-    private String profile;
-
-    private static final String TABLE_PREFIX = "game_data_record_";
-
     @Override
-    public void beatGameCodeAgent( String start, String end, String account, Long platformId ) {
+    public void beatGameCodeAgent( LocalDateTime start, LocalDateTime end, String account, Long platformId ) {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-
 
         Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms
                 .stream()
                 .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
 
-        String day = end.substring( 0, 10 ).replace( "-", "" );
-        List<GameDataRecord> gameDataRecords = gameDataRecordMapper.selectGameDataRecordAgentList(
-                TABLE_PREFIX + day, start, end, profile, account, platformId );
+        List<GameDataRecord> gameDataRecords;
+        String               startTime = LocalDateTimeUtils.format( start );
+        String               endTime   = LocalDateTimeUtils.format( end );
+        if ( LocalDateTimeUtils.isSameDay( start, end ) ) {
+            RequestDataHelper.setRequestData( Map.of( "time", start.toLocalDate() ) );
+            gameDataRecords = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start ).le( "create_time", end )
+                    .eq( "agent", SpringUtils.getActiveProfile() ).eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+        } else {
+            RequestDataHelper.setRequestData( Map.of( "time", start.toLocalDate() ) );
+            List<GameDataRecord> gameDataRecordList1 = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start )
+                    .le( "create_time", end ).eq( "agent", SpringUtils.getActiveProfile() )
+                    .eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+
+            RequestDataHelper.setRequestData( Map.of( "time", end.toLocalDate() ) );
+            List<GameDataRecord> gameDataRecordList2 = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start )
+                    .le( "create_time", end ).eq( "agent", SpringUtils.getActiveProfile() )
+                    .eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+
+            gameDataRecords = Stream.concat( gameDataRecordList1.stream(), gameDataRecordList2.stream() ).toList();
+        }
 
         if ( CollectionUtils.isEmpty( gameDataRecords ) ) {
-            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
+            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", startTime, endTime );
             return;
         }
-        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", gameDataRecords.size(), start, end );
+        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", gameDataRecords.size(), startTime, endTime );
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -129,11 +150,11 @@ public class GameDataServiceImpl implements GameDataService {
 
 
         }
-        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
+        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), startTime, endTime );
         insertBatch( session, mapper, willCodeList );
         this.doBeatCode( willCodeMap );
         this.deQuestCheck( willCodeList );
-        log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", gameDataRecords.size(), willCodeList.size(), start, end );
+        log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", gameDataRecords.size(), willCodeList.size(), startTime, endTime );
     }
 
     @Override
