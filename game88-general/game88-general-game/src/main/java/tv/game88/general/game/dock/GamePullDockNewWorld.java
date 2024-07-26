@@ -51,7 +51,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         String params = String.format( "s=%s&startTime=%s&endTime=%s", 6, startTime, endTime );
         String param  = null;
         try {
-            param = AESCoder.encryptByKey( params, gamePlatform.getDes() );
+            param = AESCoder.encryptByKeyUrl( params, gamePlatform.getDes() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -67,7 +67,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getRecordUrl() )
                 .queryParams( requestMap )
-                .build( true );
+                .build( false );
 
         // log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
