@@ -96,16 +96,9 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         String        endTime = remoteGameDatum.get( "betEndTime" ).toString();
         LocalDateTime end     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( end ) );
-
-        BigDecimal RATE = BigDecimal.ONE;
-        if ( agent.startsWith( "99in" ) ) {
-            RATE = RATE_MAP.get( "INR" );
-        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
-            RATE = RATE_MAP.get( "IDR" );
-        } else if ( agent.startsWith( "88" ) ) {
-            RATE = RATE_MAP.get( "CNY" );
-        }
-
+        String currency = remoteGameDatum.get( "currency" ).toString();
+        gameDataRecord.setCurrency( currency );
+        BigDecimal RATE      = RATE_MAP.get( currency );
         BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( RATE );
         gameDataRecord.setAllBet( betAmount.toString() );
         gameDataRecord.setCellScore( gameDataRecord.getAllBet() );
