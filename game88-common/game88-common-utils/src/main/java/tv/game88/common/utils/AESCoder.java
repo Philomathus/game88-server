@@ -118,7 +118,7 @@ public class AESCoder {
         SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
-        return Base64.toBase64String( encrypted );
+        return Hex.encodeHexString( encrypted );
     }
 
     public static String decryptByKey( String content, String key ) throws Exception {
