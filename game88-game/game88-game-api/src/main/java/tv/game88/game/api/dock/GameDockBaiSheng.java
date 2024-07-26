@@ -126,10 +126,11 @@ public class GameDockBaiSheng extends AbstractGameDock {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( reqJoinGame.getApiUrl() )
-                .queryParams( requestMap )
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
                 .build( true );
+
+        log.error( reqJoinGame.getGameCategory().getDes()
+                + "请求URL:{}; userId:{}", uriComponents.toUriString(), reqJoinGame.getGameMemberId() );
 
         return restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ), response -> {
             InputStream bodyStream = response.getBody();
@@ -150,6 +151,9 @@ public class GameDockBaiSheng extends AbstractGameDock {
         String params = String.format( "action=6&account=%s&money_type=RMB", reqJoinGame.getGameMemberId() );
 
         Map<String, Object> resultMap = execute( reqJoinGame, params );
+
+        log.info( reqJoinGame.getGameCategory().getDes()
+                + "查询余额:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
