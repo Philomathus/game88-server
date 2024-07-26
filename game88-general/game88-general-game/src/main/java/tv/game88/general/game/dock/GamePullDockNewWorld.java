@@ -67,7 +67,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         UriComponents uriComponents = UriComponentsBuilder
                 .fromUriString( gamePlatform.getRecordUrl() )
                 .queryParams( requestMap )
-                .build( false );
+                .build( true );
 
         // log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
