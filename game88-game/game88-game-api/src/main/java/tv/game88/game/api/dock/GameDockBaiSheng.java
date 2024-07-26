@@ -129,7 +129,7 @@ public class GameDockBaiSheng extends AbstractGameDock {
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( reqJoinGame.getApiUrl() ).queryParams( requestMap )
                 .build( true );
 
-        log.error( reqJoinGame.getGameCategory().getDes()
+        log.info( reqJoinGame.getGameCategory().getDes()
                 + "请求URL:{}; userId:{}", uriComponents.toUriString(), reqJoinGame.getGameMemberId() );
 
         return restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ), response -> {

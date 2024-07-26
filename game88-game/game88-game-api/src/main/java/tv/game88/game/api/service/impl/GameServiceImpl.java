@@ -505,7 +505,7 @@ public class GameServiceImpl implements GameService {
         Map<String, String> errorMap = new HashMap<>();
         if ( Objects.equals( AESCoder.decrypt( gamePlatform.getDes() ), reqPGSoftGameData.getOperatorToken() )
                 && Objects.equals( AESCoder.decrypt( gamePlatform.getMd5() ), reqPGSoftGameData.getSecretKey() ) ) {
-            String decrypt = AESCoder.decryptByKey( reqPGSoftGameData.getOperatorPlayerSession(), AESCoder.secretKey );
+            String decrypt = AESCoder.decryptByKeyHex( reqPGSoftGameData.getOperatorPlayerSession(), AESCoder.secretKey );
             if ( StringUtils.isNotBlank( decrypt ) ) {
                 String[] split        = decrypt.split( "-" );
                 String   gameMemberId = split[ 0 ];

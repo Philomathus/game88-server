@@ -121,6 +121,16 @@ public class AESCoder {
         return Base64.encodeBase64String( encrypted );// 此处使用BASE64做转码
     }
 
+    public static String decryptByKey( String content, String key ) throws Exception {
+        byte[]        encrypted1 = Base64.decodeBase64( content );
+        byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
+        SecretKeySpec skeySpec   = new SecretKeySpec( raw, AES );
+        Cipher        cipher     = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec );
+        byte[] original = cipher.doFinal( encrypted1 );
+        return new String( original, StandardCharsets.UTF_8 );
+    }
+
     public static String encryptByKeyHex( String value, String key ) throws Exception {
         Cipher        cipher   = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
         byte[]        raw      = key.getBytes( StandardCharsets.UTF_8 );
@@ -128,6 +138,15 @@ public class AESCoder {
         cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
         byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
         return Hex.encodeHexString( encrypted );
+    }
+
+    public static String decryptByKeyHex( String content, String key ) throws Exception {
+        byte[]        raw      = key.getBytes( StandardCharsets.UTF_8 );
+        SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
+        Cipher        cipher   = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec );
+        byte[] original = cipher.doFinal( Hex.decodeHex( content ) );
+        return new String( original, StandardCharsets.UTF_8 );
     }
 
     public static String encryptByKeyUrl( String value, String key ) throws Exception {
@@ -151,16 +170,6 @@ public class AESCoder {
         cipher.init( Cipher.ENCRYPT_MODE, keySpec, ivSpec );
         byte[] encrypted = cipher.doFinal( paddedDataBytes );
         return java.util.Base64.getUrlEncoder().encodeToString( encrypted );
-    }
-
-    public static String decryptByKey( String content, String key ) throws Exception {
-        byte[]        encrypted1 = Base64.decodeBase64( content );
-        byte[]        raw        = key.getBytes( StandardCharsets.UTF_8 );
-        SecretKeySpec skeySpec   = new SecretKeySpec( raw, AES );
-        Cipher        cipher     = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
-        cipher.init( Cipher.DECRYPT_MODE, skeySpec );
-        byte[] original = cipher.doFinal( encrypted1 );
-        return new String( original, StandardCharsets.UTF_8 );
     }
 
     public static String encryptByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
