@@ -57,7 +57,7 @@ public class GamePullDockPGSoft extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
-
+        log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             List<Object> dataList = ( List<Object> ) resultMap.getOrDefault( "data", Collections.EMPTY_LIST );
             if ( !CollectionUtils.isEmpty( dataList ) ) {
