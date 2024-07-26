@@ -9,6 +9,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.helper.RequestDataHelper;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.SpringUtils;
 import tv.game88.common.utils.StringUtils;
@@ -46,34 +47,33 @@ import java.util.stream.Stream;
 @Service
 public class GameDataServiceImpl implements GameDataService {
     @Resource
-    private MemberMoneyManager      memberMoneyManager;
+    private MemberMoneyManager   memberMoneyManager;
     @Resource
-    private MemberQuestManager      memberQuestManager;
+    private MemberQuestManager   memberQuestManager;
     @Resource
-    private MemberBcodeMapper       memberBcodeMapper;
+    private MemberBcodeMapper    memberBcodeMapper;
     @Resource
-    private MemberInfoMapper        memberInfoMapper;
+    private MemberInfoMapper     memberInfoMapper;
     @Resource
-    private LotteryBetMapper        lotteryBetMapper;
+    private LotteryBetMapper     lotteryBetMapper;
     @Resource
-    private GamePlatformMapper      gamePlatformMapper;
+    private GamePlatformMapper   gamePlatformMapper;
     @Resource
-    private GameDataRecordMapper    gameDataRecordMapper;
+    private GameDataRecordMapper gameDataRecordMapper;
     @Resource
-    private GameCacheUtils          gameCacheUtils;
+    private GameCacheUtils       gameCacheUtils;
     @Resource
-    private ConfigVipCacheUtils     configVipCacheUtils;
+    private ConfigVipCacheUtils  configVipCacheUtils;
     @Resource
-    private SqlSessionTemplate      sqlSessionTemplate;
+    private SqlSessionTemplate   sqlSessionTemplate;
     @Resource
-    private ActivityCacheUtil       activityCacheUtil;
+    private ActivityCacheUtil    activityCacheUtil;
 
     @Override
     public void beatGameCodeAgent( LocalDateTime start, LocalDateTime end, String account, Long platformId ) {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
-        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms
-                .stream()
+        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream()
                 .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
 
         List<GameDataRecord> gameDataRecords;
@@ -115,7 +115,10 @@ public class GameDataServiceImpl implements GameDataService {
         MemberGameDataMapper    mapper       = session.getMapper( MemberGameDataMapper.class );
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
             GamePlatform gamePlatform = gamePlatformIdMap.get( gameDataRecord.getPlatformId() );
-            String       memberId     = gameDataRecord.getAccount().toUpperCase().split( "_" )[ 1 ];
+            if ( gamePlatform == null ) {
+                log.warn( JsonUtil.object2Json( gameDataRecord ) );
+            }
+            String memberId = gameDataRecord.getAccount().toUpperCase().split( "_" )[ 1 ];
             if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), gameDataRecord.getId() ) > 0 ) {
                 continue;
             }
@@ -142,8 +145,7 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
 
-            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() )
-                    .multiply( gamePlatform.getRateBeat() )
+            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() ).multiply( gamePlatform.getRateBeat() )
                     .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
@@ -165,11 +167,8 @@ public class GameDataServiceImpl implements GameDataService {
         }
         log.warn( "彩票拉取注单数量" + list.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-        GamePlatform gamePlatform = gamePlatforms
-                .stream()
-                .filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
-                .findFirst()
-                .get();
+        GamePlatform gamePlatform = gamePlatforms.stream().filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
+                .findFirst().get();
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -298,12 +297,8 @@ public class GameDataServiceImpl implements GameDataService {
 
         }
 
-        List<ConfigVip> configVips = configVipCacheUtils
-                .getConfigVipMap()
-                .values()
-                .stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
-                .toList();
+        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         for ( String userId : willCodeMap.keySet() ) {
             memberMoneyManager.checkAndUpdateVip( userId, configVips );
         }
@@ -311,11 +306,8 @@ public class GameDataServiceImpl implements GameDataService {
 
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
-        List<ActivityQuestInfo> listConfQuest = activityCacheUtil
-                .getQuestInfos()
-                .stream()
-                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() > 0 )
-                .toList();
+        List<ActivityQuestInfo> listConfQuest = activityCacheUtil.getQuestInfos().stream()
+                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() > 0 ).toList();
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
@@ -332,8 +324,7 @@ public class GameDataServiceImpl implements GameDataService {
                         continue;
                     }
                     if ( Objects.equals( data.getPlatformId(), rspGameInfo.getPlatformId() ) && (
-                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo
-                                    .getKindId()
+                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId()
                                     .endsWith( "-" + data.getKindId() ) ) ) {
                         y = true;
                         break;
