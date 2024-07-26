@@ -121,6 +121,15 @@ public class AESCoder {
         return Base64.encodeBase64String( encrypted );// 此处使用BASE64做转码
     }
 
+    public static String encryptByKeyHex( String value, String key ) throws Exception {
+        Cipher        cipher   = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
+        byte[]        raw      = key.getBytes( StandardCharsets.UTF_8 );
+        SecretKeySpec skeySpec = new SecretKeySpec( raw, AES );
+        cipher.init( Cipher.ENCRYPT_MODE, skeySpec );
+        byte[] encrypted = cipher.doFinal( value.getBytes( StandardCharsets.UTF_8 ) );
+        return Hex.encodeHexString( encrypted );
+    }
+
     public static String encryptByKeyUrl( String value, String key ) throws Exception {
         Cipher        cipher   = Cipher.getInstance( "AES/ECB/PKCS5Padding" );
         byte[]        raw      = key.getBytes( StandardCharsets.UTF_8 );

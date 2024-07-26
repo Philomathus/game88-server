@@ -87,7 +87,7 @@ public class GameDockPGSoft extends AbstractGameDock {
         extraMap.put( "btt", "1" );
         String token = reqJoinGame.getGameMemberId() + "-" + System.currentTimeMillis() + "-" + CURRENCY;
         try {
-            extraMap.put( "ops", AESCoder.encryptByKey( token, AESCoder.secretKey ) );
+            extraMap.put( "ops", AESCoder.encryptByKeyHex( token, AESCoder.secretKey ) );
         } catch ( Exception e ) {
             throw new BusinessException( e.getMessage() );
         }
