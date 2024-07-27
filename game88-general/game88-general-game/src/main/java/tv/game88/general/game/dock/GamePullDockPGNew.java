@@ -12,7 +12,6 @@ import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +25,6 @@ public class GamePullDockPGNew extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
-        // 如果不是3分钟前的时间,跳过
-        if ( start.isAfter( LocalDateTime.now().minusMinutes( 1 ) ) ) {
-            return null;
-        }
         final Map<String, Object> params = new TreeMap<>();
         params.put( "traderId", gamePlatform.getAgent() );
         params.put( "transitionId", gamePlatform.getVersionValue() );

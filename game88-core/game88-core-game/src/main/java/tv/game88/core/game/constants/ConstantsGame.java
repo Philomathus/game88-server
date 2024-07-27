@@ -5,6 +5,7 @@ public class ConstantsGame {
 
     public static final String KAI_YUAN   = "kaiYuan";
     public static final String OG         = "og";
+    public static final String OG_NEW     = "ogNew";
     public static final String AG         = "ag";
     public static final String MG         = "mg";
     public static final String UPG        = "upg";
