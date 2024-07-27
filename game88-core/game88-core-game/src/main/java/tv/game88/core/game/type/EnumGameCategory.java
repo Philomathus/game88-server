@@ -13,6 +13,7 @@ public enum EnumGameCategory {
     LOTTERY( "lottery", "彩票游戏" ),
     KAIYUAN( ConstantsGame.KAI_YUAN, "开元棋牌" ),
     OG( ConstantsGame.OG, "OG电子" ),
+    OG_NEW( ConstantsGame.OG_NEW, "新OG电子" ),
     AG( ConstantsGame.AG, "AG电子" ),
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
