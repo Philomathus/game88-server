@@ -41,11 +41,12 @@ public class GamePullDockOGNew extends AbstractGamePull {
             return null;
         }
 
-        Map<Integer, Long> versionMap = JsonUtil.json2Map( gamePlatform.getVersionValue() );
+        Map<String, Long> versionMap = JsonUtil.json2Map( gamePlatform.getVersionValue() );
 
         List<Callable<Map<String, Object>>> forkJoinTasks = new ArrayList<>();
 
-        versionMap.forEach( ( key, value ) -> forkJoinTasks.add( () -> this.queryList( gamePlatform, key, value ) ) );
+        versionMap.forEach( ( key, value ) -> forkJoinTasks.add( () -> this.queryList( gamePlatform, Integer.parseInt( key ),
+                value ) ) );
 
         List<Future<Map<String, Object>>> futures = null;
         try {
@@ -66,7 +67,7 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
         for ( Map<String, Object> resultMap : collect ) {
             resultList.addAll( ( ArrayList ) resultMap.get( "records" ) );
-            versionMap.put( ( Integer ) resultMap.get( "gameTypeId" ), ( Long ) resultMap.get( "fetchId" ) );
+            versionMap.put( resultMap.get( "gameTypeId" ).toString(), ( Long ) resultMap.get( "fetchId" ) );
         }
 
         gamePlatform.setVersionValue( JsonUtil.object2Json( versionMap ) );
