@@ -27,8 +27,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Log4j2
 @Repository( value = ConstantsGame.OG_NEW + "GameProcessor" )
@@ -67,6 +69,8 @@ public class GameDockOGNew extends AbstractGameDock {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             String status = resultMap.getOrDefault( "rs_code", "" ).toString();
             if ( "S-100".equals( status ) || "S-121".equals( status ) ) {
+                log.info(
+                        reqJoinGame.getGameCategory().getDes() + " 创建玩家成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 redisUtils.sAdd( Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() );
                 return;
             }
@@ -88,8 +92,8 @@ public class GameDockOGNew extends AbstractGameDock {
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String sign = DigestUtils.md5Hex( sb.substring( sb.length() - 1 ) + reqJoinGame.getMd5() );
-        params.put( "signature", sign );
+        String sign = sb.substring( 0, sb.length() - 1 ) + reqJoinGame.getMd5();
+        params.put( "signature", DigestUtils.md5Hex( sign ) );
 
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.setAll( params );
@@ -125,19 +129,21 @@ public class GameDockOGNew extends AbstractGameDock {
         Map<String, String> params = new TreeMap<>();
         params.put( "player_id", reqJoinGame.getGameMemberId() );
         params.put( "transaction_id", reqJoinGame.getOrderId() );
-        params.put( "transfer_amount", reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString() );
+        params.put( "transfer_amount", reqJoinGame.getTransferMoney().stripTrailingZeros().toPlainString() );
         params.put( "timestamp", String.valueOf( System.currentTimeMillis() / 1000 ) );
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String sign = DigestUtils.md5Hex( sb.substring( sb.length() - 1 ) + reqJoinGame.getMd5() );
-        params.put( "signature", sign );
+        String sign = sb.substring( 0, sb.length() - 1 ) + reqJoinGame.getMd5();
+        params.put( "signature", DigestUtils.md5Hex( sign ) );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType( MediaType.APPLICATION_JSON );
         headers.set( "key", reqJoinGame.getDes() );
         headers.set( "operator-name", reqJoinGame.getAgent() );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( params, headers );
+
+        log.warn( JsonUtil.object2Json( requestEntity ) );
 
         Map<String, Object> resultMap = null;
         try {
@@ -169,13 +175,13 @@ public class GameDockOGNew extends AbstractGameDock {
         Map<String, String> params = new TreeMap<>();
         params.put( "player_id", reqJoinGame.getGameMemberId() );
         params.put( "transaction_id", reqJoinGame.getOrderId() );
-        params.put( "transfer_amount", reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString() );
+        params.put( "transfer_amount", reqJoinGame.getTransferMoney().stripTrailingZeros().toPlainString() );
         params.put( "timestamp", String.valueOf( System.currentTimeMillis() / 1000 ) );
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
-        String sign = DigestUtils.md5Hex( sb.substring( sb.length() - 1 ) + reqJoinGame.getMd5() );
-        params.put( "signature", sign );
+        String sign = sb.substring( 0, sb.length() - 1 ) + reqJoinGame.getMd5();
+        params.put( "signature", DigestUtils.md5Hex( sign ) );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType( MediaType.APPLICATION_JSON );
@@ -267,13 +273,17 @@ public class GameDockOGNew extends AbstractGameDock {
 
         log.info( reqJoinGame.getGameCategory().getDes()
                 + "查询转账:{}; userId:{}", JsonUtil.object2Json( resultMap ), reqJoinGame.getGameMemberId() );
-        if ( !CollectionUtils.isEmpty( resultMap ) && "S-100".equals( resultMap.getOrDefault( "rs_code", "" ).toString() ) ) {
-            List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records",
-                    new ArrayList<>() );
-            if ( !CollectionUtils.isEmpty( records ) && !CollectionUtils.isEmpty( records.getFirst() ) ) {
-                Map<String, Object> recordsFirst = records.getFirst();
-                return reqJoinGame.getOrderId().equals( recordsFirst.get( "transaction_id" ) ) && reqJoinGame.getGameMemberId()
-                        .equals( recordsFirst.get( "player_id" ) );
+        if ( !CollectionUtils.isEmpty( resultMap ) ) {
+            if ( "S-100".equals( resultMap.getOrDefault( "rs_code", "" ).toString() ) ) {
+                List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records",
+                        new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( records ) && !CollectionUtils.isEmpty( records.getFirst() ) ) {
+                    Map<String, Object> recordsFirst = records.getFirst();
+                    return reqJoinGame.getOrderId().equals( recordsFirst.get( "transaction_id" ) )
+                            && reqJoinGame.getGameMemberId().equals( recordsFirst.get( "player_id" ) );
+                }
+            } else {
+                return false;
             }
         }
         throw new RuntimeException( "查询结果为空,需要重试" );

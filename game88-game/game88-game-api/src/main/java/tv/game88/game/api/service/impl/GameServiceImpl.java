@@ -450,6 +450,9 @@ public class GameServiceImpl implements GameService {
                     .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
                     LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
+            case OG_NEW -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
+                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                    .concat( gameMemberId ).replaceAll( "_", "" ).toLowerCase();
             default -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
                             LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId );

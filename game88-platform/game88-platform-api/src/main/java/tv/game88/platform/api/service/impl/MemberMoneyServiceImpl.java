@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -79,13 +80,20 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
     @Override
     public RspBase<?> starSend( MemberMoney memberMoney, String adminName ) {
         String key = memberMoney.getMoneydes();
-        if ( !lockUnlock( key, true ) ) {
-            throw new BusinessException( "请勿重复提交" );
+        if ( !redisUtils.lock( LOCK_KEY, 200 ) ) {
+            throw new BusinessException( "三分钟后重试" );
         }
         List<MemberMoney> memberMoneyList = memberMoneyMapper.selectMemberMoneyList( new MemberMoney() );
 
         log.info( "STARSEND: List size - {}", memberMoneyList.size() );
         if ( !memberMoneyList.isEmpty() ) {
+            for ( MemberMoney money : memberMoneyList ) {
+                if ( !memberInfoMapper.exists( new QueryWrapper<MemberInfo>().eq( "id", money.getId() ) ) ) {
+                    redisUtils.unLock( LOCK_KEY );
+                    return RspBase.businessError( "会员id不存在:" + money.getId() );
+                }
+            }
+
             BigDecimal deliveryLimit = new BigDecimal( 10000 );
 
             memberMoneyList.forEach( memberData -> {
@@ -93,27 +101,27 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
                     throw new BusinessException( String.format( "会员%s派送金额超过一万, 派送金额:%s", memberData.getId(),
                             memberData.getMoney() ) );
                 }
-                MemberInfo memberInfo = getMemberInfo( memberData.getId(), key );
+                MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById( memberData.getId() );
                 log.info( "STARSEND: Processing memberMoney ID: {}, memberInfo nickName: {}", memberData.getId(),
                         memberInfo.getNickName() );
                 SpringUtils.getAopProxy( this ).processMoney( memberData, memberInfo, adminName, key );
             } );
         } else {
-            lockUnlock( key, false );
+            redisUtils.unLock( LOCK_KEY );
             throw new BusinessException( "请先上传有数据的excel" );
         }
         memberInfoMapper.clearMemberMoney();
-        lockUnlock( key, false );
         return RspBase.ok( "success" );
     }
 
     @Transactional( rollbackFor = Exception.class )
     public void processMoney( MemberMoney memberMoney, MemberInfo memberInfo, String adminName, String moneyDes ) {
-        String     startOfToday = LocalDateTimeUtils.format( LocalDateTimeUtils.getStartOfToday() );
-        String     today        = LocalDateTimeUtils.format( LocalDate.now() );
-        String     userId       = memberMoney.getId();
-        BigDecimal money        = memberMoney.getMoney();
-        String markOrder = "CJ" + today + memberMoney.getId() + "_" + money.setScale( 0, RoundingMode.HALF_UP ) + moneyDes;
+        String         startOfToday = LocalDateTimeUtils.format( LocalDateTimeUtils.getStartOfToday() );
+        String         today        = LocalDateTimeUtils.format( LocalDate.now() );
+        String         userId       = memberMoney.getId();
+        BigDecimal     money        = memberMoney.getMoney();
+        String         markOrder    =
+                "CJ" + today + memberMoney.getId() + "_" + money.setScale( 0, RoundingMode.HALF_UP ) + moneyDes;
         List<LogMoney> markList;
 
         if ( money.compareTo( BigDecimal.ZERO ) > 0 ) {
@@ -130,15 +138,6 @@ public class MemberMoneyServiceImpl extends ServiceImpl<MemberMoneyMapper, Membe
                             + "入款备注" + moneyDes );
         }
         memberMoneyManager.addMemberMoneyStarSend( memberMoney, memberInfo, markOrder, adminName, moneyDes );
-    }
-
-    private MemberInfo getMemberInfo( String id, String key ) {
-        MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById( id );
-        if ( memberInfo == null ) {
-            lockUnlock( key, false );
-            throw new BusinessException( "会员id不存在:" + id );
-        }
-        return memberInfo;
     }
 
     private boolean lockUnlock( String key, boolean lock ) {
