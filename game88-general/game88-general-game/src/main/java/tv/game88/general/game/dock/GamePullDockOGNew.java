@@ -87,15 +87,21 @@ public class GamePullDockOGNew extends AbstractGamePull {
         UriComponents uriComponents = UriComponentsBuilder.fromUriString(
                 gamePlatform.getApiUrl() + "/api/v2/platform/transaction/history" ).queryParams( requestMap ).build( true );
 
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
-                restTemplate.httpEntityCallback( requestEntity ), response -> {
-            InputStream bodyStream = response.getBody();
-            String      text;
-            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                text = IOUtils.toString( reader );
-            }
-            return JsonUtil.json2Map( text );
-        } );
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+                    restTemplate.httpEntityCallback( requestEntity ), response -> {
+                InputStream bodyStream = response.getBody();
+                String      text;
+                try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                    text = IOUtils.toString( reader );
+                }
+                return JsonUtil.json2Map( text );
+            } );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "S-100".equals( resultMap.getOrDefault( "rs_code", "" ).toString() ) ) {
                 List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records",
