@@ -41,7 +41,7 @@ public class GamePullDockOGNew extends AbstractGamePull {
             return null;
         }
 
-        Map<String, Long> versionMap = JsonUtil.json2Map( gamePlatform.getVersionValue() );
+        Map<String, Integer> versionMap = JsonUtil.json2Map( gamePlatform.getVersionValue() );
 
         List<Callable<Map<String, Object>>> forkJoinTasks = new ArrayList<>();
 
@@ -67,14 +67,14 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
         for ( Map<String, Object> resultMap : collect ) {
             resultList.addAll( ( ArrayList ) resultMap.get( "records" ) );
-            versionMap.put( resultMap.get( "gameTypeId" ).toString(), ( Long ) resultMap.get( "fetchId" ) );
+            versionMap.put( resultMap.get( "gameTypeId" ).toString(), Integer.parseInt( resultMap.get( "fetchId" ).toString() ) );
         }
 
         gamePlatform.setVersionValue( JsonUtil.object2Json( versionMap ) );
         return resultList;
     }
 
-    private Map<String, Object> queryList( GamePlatform gamePlatform, int gameTypeId, long fetchId ) {
+    private Map<String, Object> queryList( GamePlatform gamePlatform, int gameTypeId, int fetchId ) {
         MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
         requestMap.add( "fetch_id", String.valueOf( fetchId ) );
         requestMap.add( "game_type_id", String.valueOf( gameTypeId ) );
