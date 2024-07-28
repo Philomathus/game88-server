@@ -127,12 +127,12 @@ public class GamePullDockOGNew extends AbstractGamePull {
             return null;
         }
         String[]       splitParam     = playerId.split( "_" );
-        String         agent          = splitParam[ 1 ].toLowerCase();
+        String         agent          = splitParam[ 0 ].toLowerCase();
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "transaction_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
-        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
+        gameDataRecord.setAccount( agent + "_" + splitParam[ 1 ].toUpperCase() );
         gameDataRecord.setAgent( agent );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
