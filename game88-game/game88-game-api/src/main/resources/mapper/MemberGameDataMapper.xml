@@ -181,7 +181,7 @@
             and d.account = #{memberId}
         </if>
         <if test="req != null and req.gameCategory != null">
-            and d.platform_id = (select id from game_platform where game_category = #{req.gameCategory})
+            and d.platform_id in (select id from game_platform where game_category = #{req.gameCategory})
         </if>
         order by d.game_end_time desc
     </select>
