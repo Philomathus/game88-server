@@ -327,8 +327,7 @@ public class GameServiceImpl implements GameService {
                 return RspBase.ok( "游戏余额为0，无需下分" );
             }
             reqJoinGame.setTransferMoney( balance );
-            // 异步下分
-            Thread.ofVirtual().start( () -> this.cashOutGame( reqJoinGame, baseGameDock ) );
+            this.cashOutGame( reqJoinGame, baseGameDock );
             return RspBase.ok( "下分成功" );
         } catch ( Exception e ) {
             log.error( "人工下分失败,失败原因:" + e.getMessage(), e );
