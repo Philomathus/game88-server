@@ -88,7 +88,7 @@ public class GameDockOGNew extends AbstractGameDock {
         params.put( "lang", "zh" );
         params.put( "token", IdWorker.get32UUID() + reqJoinGame.getMemberId() );
         params.put( "game_id", reqJoinGame.getKindId() );
-        params.put( "betlimit", "317" );
+        params.put( "betlimit", "132" );
 
         StringBuilder sb = new StringBuilder();
         params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( v ).append( "&" ) );
