@@ -31,9 +31,9 @@ public class ConstantsGame {
     public static final String PG_SOFT    = "PGSoft";
     public static final String SHABA      = "shaBa";
 
-    public static final String T1     = "t1";
-    public static final String PP     = "pp";
-    public static final String CG     = "cg";
-    public static final String JILI   = "jiLi";
-    public static final String PG_NEW = "PGNew";
+    public static final String T1    = "t1";
+    public static final String PP    = "pp";
+    public static final String CG    = "cg";
+    public static final String JILI  = "jiLi";
+    public static final String LOCAL = "local";
 }

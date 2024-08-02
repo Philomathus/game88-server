@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Log4j2
-@Repository( value = ConstantsGame.PG_NEW + ConstantsGame.GAME_PULL_PROCESSOR )
-public class GamePullDockPGNew extends AbstractGamePull {
+@Repository( value = ConstantsGame.LOCAL + ConstantsGame.GAME_PULL_PROCESSOR )
+public class GamePullDockLocal extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE );
 
@@ -78,13 +78,8 @@ public class GamePullDockPGNew extends AbstractGamePull {
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( agent + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
-
-        BigDecimal RATE = BigDecimal.ONE;
-        if ( agent.startsWith( "99in" ) ) {
-            RATE = RATE_MAP.get( "INR" );
-        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
-            RATE = RATE_MAP.get( "IDR" );
-        }
+        String currency = String.valueOf( remoteGameDatum.get( "currency" ) );
+        BigDecimal RATE = RATE_MAP.get( currency );
 
         BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
         gameDataRecord.setCellScore( chip.toString() );
@@ -99,7 +94,8 @@ public class GamePullDockPGNew extends AbstractGamePull {
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setAgent( agent );
-        gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
+
+        gameDataRecord.setCurrency( currency );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

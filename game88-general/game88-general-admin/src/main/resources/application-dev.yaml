@@ -3,20 +3,20 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://8.210.10.193:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://43.199.95.227:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: root
           password: f:e=h>EVUH,!N7zS&J`9
         slave_1:
-          url: jdbc:mysql://8.210.10.193:3306/7700_main?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://43.199.95.227:3306/7700_main?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: root
           password: f:e=h>EVUH,!N7zS&J`9
         slave_2:
-          url: jdbc:mysql://8.210.10.193:3306/8800?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://43.199.95.227:3306/8800?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: root
           password: f:e=h>EVUH,!N7zS&J`9
   data:
     redis:
-      host: 8.210.10.193
+      host: 43.199.95.227
       port: 6379
       password: EvYsN39ViArDumx4pWyH
       database: 3
