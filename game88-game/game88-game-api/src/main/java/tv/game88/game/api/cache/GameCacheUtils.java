@@ -50,17 +50,12 @@ public class GameCacheUtils {
 
     public List<RspGameType> getEffectTypeList() {
         if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
-            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper )
-                    .eq( "effect", 1 )
-                    .orderByAsc( "sort" )
-                    .list()
-                    .stream()
-                    .map( gameType -> {
+            List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper ).eq( "effect", 1 ).orderByAsc( "sort" ).list()
+                    .stream().map( gameType -> {
                         RspGameType rspGameType = new RspGameType();
                         BeanUtils.copyProperties( gameType, rspGameType );
                         return rspGameType;
-                    } )
-                    .collect( Collectors.toList() );
+                    } ).collect( Collectors.toList() );
             if ( !CollectionUtils.isEmpty( gameTypes ) ) {
                 redisUtils.strSet( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
             }
@@ -115,21 +110,23 @@ public class GameCacheUtils {
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
-    public List<RspGameInfo> getInfoHotList() {
-        if ( !redisUtils.exists( GAME_INFO_LIST_HOT_KEY ) ) {
-            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectHotRspList( null );
+    public List<RspGameInfo> getInfoHotList( Long typeId ) {
+        String type = typeId == null ? "" : typeId.toString();
+        String key  = GAME_INFO_LIST_HOT_KEY + type;
+        if ( !redisUtils.exists( key ) ) {
+            List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectHotRspList( typeId );
             if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
-                redisUtils.strSet( GAME_INFO_LIST_HOT_KEY, JsonUtil.object2Json( rspGameInfoList ) );
+                redisUtils.strSet( key, JsonUtil.object2Json( rspGameInfoList ) );
             }
             return rspGameInfoList;
         }
-        String s = redisUtils.strGet( GAME_INFO_LIST_HOT_KEY );
+        String s = redisUtils.strGet( key );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId ) {
         if ( Objects.equals( typeId, 1L ) ) {
-            return getInfoHotList();
+            return getInfoHotList( null );
         }
         if ( !redisUtils.exists( GAME_INFO_LIST_KEY + typeId ) ) {
             List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspList( typeId );
@@ -150,6 +147,9 @@ public class GameCacheUtils {
 
     public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
         if ( Objects.equals( typeId, 9L ) ) {
+            if ( Objects.equals( platformId, -1L ) ) {
+                return this.getInfoHotList( typeId );
+            }
             if ( !redisUtils.exists( GAME_INFO_S_KEY + platformId ) ) {
                 List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspListByPlatform( platformId );
                 if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
