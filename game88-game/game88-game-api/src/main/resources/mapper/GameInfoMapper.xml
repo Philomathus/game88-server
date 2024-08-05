@@ -134,7 +134,6 @@
                      i.sort
               from game_info i
               where i.effect = 1
-                and i.type_id = #{typeId}
                 and i.platform_id = #{platformId}) a
                  left join game_platform p on p.id = a.platform_id
         where p.effect = 1
