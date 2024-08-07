@@ -50,7 +50,7 @@ public class AgentController extends BaseController {
     @GetMapping( "/export" )
     public void export( Agent Agent, HttpServletResponse response ) {
         List<Agent> list = agentService.selectAgentList( Agent );
-        ExportExcelUtil.exportExcel( list, "代理管理", "代理管理表", Agent.class, response );
+        ExportExcelUtil.exportBigExcel( list, "代理管理", "代理管理表", Agent.class, response );
     }
 
     /**

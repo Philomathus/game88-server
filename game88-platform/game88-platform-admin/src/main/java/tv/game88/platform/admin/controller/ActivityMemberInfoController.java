@@ -58,7 +58,7 @@ public class ActivityMemberInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( ActivityMemberInfo activityMemberInfo, HttpServletResponse response ) {
         List<ActivityMemberInfo> list = activityMemberInfoService.selectActivityMemberInfoList( activityMemberInfo );
-        ExportExcelUtil.exportExcel( list, "会员推广管理", "会员推广管理表", ActivityMemberInfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "会员推广管理", "会员推广管理表", ActivityMemberInfo.class, response );
     }
 
     /**

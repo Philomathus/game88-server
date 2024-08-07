@@ -44,6 +44,6 @@ public class SysLogininforController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysLogininfor logininfor, HttpServletResponse response ) {
         List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
-        ExportExcelUtil.exportExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
+        ExportExcelUtil.exportBigExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
     }
 }

@@ -51,7 +51,7 @@ public class ConfigRecommendController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigRecommend configRecommend, HttpServletResponse response ) {
         List<ConfigRecommend> list = configRecommendService.selectConfigRecommendList( configRecommend );
-        ExportExcelUtil.exportExcel( list, "推广设置", "推广设置表", ConfigRecommend.class, response );
+        ExportExcelUtil.exportBigExcel( list, "推广设置", "推广设置表", ConfigRecommend.class, response );
     }
 
     /**

@@ -49,7 +49,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysDictData dictData, HttpServletResponse response ) {
         List<SysDictData> list = dictDataService.selectDictDataList( dictData );
-        ExportExcelUtil.exportExcel( list, "字典数据", "字典数据表", SysDictData.class, response );
+        ExportExcelUtil.exportBigExcel( list, "字典数据", "字典数据表", SysDictData.class, response );
     }
 
     /**

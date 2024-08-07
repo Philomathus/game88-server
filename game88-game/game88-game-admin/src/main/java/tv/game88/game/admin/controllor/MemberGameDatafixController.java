@@ -72,7 +72,7 @@ public class MemberGameDatafixController extends BaseController {
     @GetMapping( "/export" )
     public void export( MemberGameDataFix memberGameDatafix, HttpServletResponse response ) {
         List<MemberGameDataFix> list = memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix );
-        ExportExcelUtil.exportExcel( list, "游戏注单修复", "游戏注单修复表", MemberGameDataFix.class, response );
+        ExportExcelUtil.exportBigExcel( list, "游戏注单修复", "游戏注单修复表", MemberGameDataFix.class, response );
     }
 
     /**

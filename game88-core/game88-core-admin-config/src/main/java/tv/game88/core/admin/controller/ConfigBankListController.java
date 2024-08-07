@@ -60,7 +60,7 @@ public class ConfigBankListController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigBankList configBankList, HttpServletResponse response ) {
         List<ConfigBankList> list = configBankListService.selectConfigBankListList( configBankList );
-        ExportExcelUtil.exportExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
+        ExportExcelUtil.exportBigExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
     }
 
     /**

@@ -70,7 +70,7 @@ public class PayAgentChannelController extends BaseController {
     @GetMapping( "/export" )
     public void export( PayAgentChannel payAgentChannel, HttpServletResponse response ) {
         List<PayAgentChannel> list = payAgentChannelService.selectPayAgentChannelList( payAgentChannel );
-        ExportExcelUtil.exportExcel( list, "代付通道", "代付通道表", PayAgentChannel.class, response );
+        ExportExcelUtil.exportBigExcel( list, "代付通道", "代付通道表", PayAgentChannel.class, response );
     }
 
     /**

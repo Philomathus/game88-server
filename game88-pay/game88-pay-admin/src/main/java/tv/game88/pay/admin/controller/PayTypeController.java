@@ -69,7 +69,7 @@ public class PayTypeController extends BaseController {
     @GetMapping( "/export" )
     public void export( PayType payType, HttpServletResponse response ) {
         List<PayType> list = payTypeService.selectPayTypeList( payType );
-        ExportExcelUtil.exportExcel( list, "支付类型", "支付类型表", PayType.class, response );
+        ExportExcelUtil.exportBigExcel( list, "支付类型", "支付类型表", PayType.class, response );
     }
 
     /**

@@ -36,7 +36,7 @@ public class MemberRechargeBankReportController extends BaseController {
     @GetMapping( "/export" )
     public void export( HttpServletResponse response, ReqMemberRechargeBank req ) {
         List<RspRechargeBankReport> list = memberRechargeBankService.selectReportList( req );
-        ExportExcelUtil.exportExcel( list, "公司入款", "公司入款表", RspRechargeBankReport.class, response );
+        ExportExcelUtil.exportBigExcel( list, "公司入款", "公司入款表", RspRechargeBankReport.class, response );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:lists')" )

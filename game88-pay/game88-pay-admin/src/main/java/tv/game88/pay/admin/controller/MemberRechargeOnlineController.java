@@ -51,7 +51,7 @@ public class MemberRechargeOnlineController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReqMemberRechargeOnline reqMemberRechargeOnline, HttpServletResponse response ) {
         List<MemberRechargeOnline> list = memberRechargeOnlineService.selectMemberRechargeOnlineList( reqMemberRechargeOnline );
-        ExportExcelUtil.exportExcel( list, "线上充值信息", "线上充值信息", MemberRechargeOnline.class, response );
+        ExportExcelUtil.exportBigExcel( list, "线上充值信息", "线上充值信息", MemberRechargeOnline.class, response );
     }
 
     /**
@@ -92,7 +92,7 @@ public class MemberRechargeOnlineController extends BaseController {
     @GetMapping( "/exportReport" )
     public void exportReport( ReqMemberRechargeOnline req, HttpServletResponse response ) {
         List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
-        ExportExcelUtil.exportExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
+        ExportExcelUtil.exportBigExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
     }
 
 

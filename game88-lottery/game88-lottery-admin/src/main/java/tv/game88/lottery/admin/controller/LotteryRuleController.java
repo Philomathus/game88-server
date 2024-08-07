@@ -48,7 +48,7 @@ public class LotteryRuleController extends BaseController {
 	@GetMapping( "/export" )
 	public void export(LotteryRule lotteryRule, HttpServletResponse response) {
 		List<LotteryRule>      list = lotteryRuleService.selectLotteryRuleList(lotteryRule);
-		ExportExcelUtil.exportExcel( list, "彩票规则说明", "彩票规则说明表", LotteryRule.class, response );
+		ExportExcelUtil.exportBigExcel( list, "彩票规则说明", "彩票规则说明表", LotteryRule.class, response );
 	}
 
 	/**

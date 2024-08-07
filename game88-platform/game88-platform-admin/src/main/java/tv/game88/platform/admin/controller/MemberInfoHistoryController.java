@@ -21,12 +21,13 @@ import tv.game88.platform.api.service.MemberInfoHistoryService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/member/memberInfoHistory")
+@RequestMapping( "/member/memberInfoHistory" )
 public class MemberInfoHistoryController extends BaseController {
 
     @Resource
@@ -40,7 +41,7 @@ public class MemberInfoHistoryController extends BaseController {
     public RspBase<List<MemberInfoHistory>> list( MemberInfoHistory memberInfoHistory ) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
-        List<MemberInfoHistory> list = memberInfoHistoryService.memberInfoHistoryList( memberInfoHistory);
+        List<MemberInfoHistory> list = memberInfoHistoryService.memberInfoHistoryList( memberInfoHistory );
         return getRspBasePage( list, pageDomain );
     }
 
@@ -61,11 +62,7 @@ public class MemberInfoHistoryController extends BaseController {
     @GetMapping( "/export" )
     public void export( MemberInfoHistory memberInfo, HttpServletResponse response ) {
         List<MemberInfoHistory> list = memberInfoHistoryService.memberInfoHistoryList( memberInfo );
-        if ( list.size() <= 200000L ) {
-            ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
-        } else {
-            throw new BusinessException( "导出条数超过20万条" );
-        }
+        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
     }
 
     /**
@@ -120,7 +117,6 @@ public class MemberInfoHistoryController extends BaseController {
     public Map listCount( MemberInfoHistory memberInfoHistory ) {
         return memberInfoHistoryService.listCount( memberInfoHistory );
     }
-
 
 
 }

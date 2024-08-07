@@ -74,7 +74,7 @@ public class SysUserController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysUser user, HttpServletResponse response ) {
         List<SysUser> list = userService.selectUserList( user );
-        ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", SysUser.class, response );
+        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", SysUser.class, response );
     }
 
     /**

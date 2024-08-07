@@ -50,7 +50,7 @@ public class CommissionRecordsController extends BaseController {
     @GetMapping( "/export" )
     public void export( LogCommission commissionRecords, HttpServletResponse response ) {
         List<LogCommission> list = commissionRecordsService.selectLogCommissionList( commissionRecords );
-        ExportExcelUtil.exportExcel( list, "佣金领取日志", "佣金领取日志表", LogCommission.class, response );
+        ExportExcelUtil.exportBigExcel( list, "佣金领取日志", "佣金领取日志表", LogCommission.class, response );
     }
 
 }

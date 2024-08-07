@@ -79,6 +79,6 @@ public class LogMoneyController extends BaseController {
     @GetMapping( "/export" )
     public void export( LogMoney logMoney, HttpServletResponse response ) {
         List<LogMoney> list = logMoneyService.selectLogMoneyList( logMoney );
-        ExportExcelUtil.exportExcel( list, "会员资金信息", "会员资金信息表", LogMoney.class, response );
+        ExportExcelUtil.exportBigExcel( list, "会员资金信息", "会员资金信息表", LogMoney.class, response );
     }
 }

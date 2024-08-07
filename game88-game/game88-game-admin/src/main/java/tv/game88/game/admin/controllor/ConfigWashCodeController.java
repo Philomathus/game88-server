@@ -97,6 +97,6 @@ public class ConfigWashCodeController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigWashCode configWashCode, HttpServletResponse response ) {
         List<ConfigWashCode> list = configWashCodeService.selectConfigWashCodeList( configWashCode );
-        ExportExcelUtil.exportExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
+        ExportExcelUtil.exportBigExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
     }
 }

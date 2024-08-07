@@ -45,7 +45,7 @@ public class SysDictTypeController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysDictType dictType, HttpServletResponse response ) {
         List<SysDictType> list = dictTypeService.selectDictTypeList( dictType );
-        ExportExcelUtil.exportExcel( list, "字典信息", "字典信息表", SysDictType.class, response );
+        ExportExcelUtil.exportBigExcel( list, "字典信息", "字典信息表", SysDictType.class, response );
     }
 
     /**

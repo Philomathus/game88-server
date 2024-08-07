@@ -53,7 +53,7 @@ public class MessageHomeNoticeController extends BaseController {
     @GetMapping( "/export" )
     public void export( MessageHomeNotice messageHomeNotice, HttpServletResponse response ) {
         List<MessageHomeNotice> list = messageHomeNoticeService.selectMessageHomeNoticeList( messageHomeNotice );
-        ExportExcelUtil.exportExcel( list, "首页公告", "首页公告表", MessageHomeNotice.class, response );
+        ExportExcelUtil.exportBigExcel( list, "首页公告", "首页公告表", MessageHomeNotice.class, response );
     }
 
     /**

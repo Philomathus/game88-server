@@ -57,7 +57,7 @@ public class MessageOnSiteController extends BaseController {
     @GetMapping( "/export" )
     public void export( MessageOnSite messageOnSite, HttpServletResponse response ) {
         List<MessageOnSite> list = messageOnSiteService.selectMessageOnSiteList( messageOnSite );
-        ExportExcelUtil.exportExcel( list, "站内信", "站内信表", MessageOnSite.class, response );
+        ExportExcelUtil.exportBigExcel( list, "站内信", "站内信表", MessageOnSite.class, response );
     }
 
     /**

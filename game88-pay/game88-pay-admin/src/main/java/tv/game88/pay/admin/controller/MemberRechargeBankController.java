@@ -17,6 +17,7 @@ import tv.game88.pay.api.service.MemberRechargeBankService;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 import java.util.Map;
 
@@ -60,9 +61,7 @@ public class MemberRechargeBankController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReqMemberRechargeBank req, HttpServletResponse response ) {
         List<MemberRechargeBank> list = memberRechargeBankService.selectMemberRechargeBankList( req );
-        if ( list.size() <= 200000 ) {
-            ExportExcelUtil.exportExcel( list, "公司入款", "公司入款信息表", MemberRechargeBank.class, response );
-        }
+        ExportExcelUtil.exportBigExcel( list, "公司入款", "公司入款信息表", MemberRechargeBank.class, response );
     }
 
     /**

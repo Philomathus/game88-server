@@ -72,7 +72,7 @@ public class WalletUserController extends BaseController {
     @GetMapping( "/export" )
     public void export( WalletUser walletUser, HttpServletResponse response ) {
         List<WalletUser> list = walletUserService.selectWalletUserList( walletUser );
-        ExportExcelUtil.exportExcel( list, "钱包用户", "钱包用户表", WalletUser.class, response );
+        ExportExcelUtil.exportBigExcel( list, "钱包用户", "钱包用户表", WalletUser.class, response );
     }
 
     /**

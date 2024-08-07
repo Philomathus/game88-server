@@ -51,7 +51,7 @@ public class ReportMoneyinfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) throws ParseException {
         List<ReportMoneyinfo> list = reportMoneyinfoService.exportMoneyinfoList( reportMoneyinfo );
-        ExportExcelUtil.exportExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
     }
 
 }

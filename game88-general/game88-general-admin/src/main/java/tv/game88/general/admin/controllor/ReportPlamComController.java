@@ -58,7 +58,7 @@ public class ReportPlamComController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {
         List<ReportPlamCom> list = reportPlamComService.exportPlamComList( reportPlamCom );
-        ExportExcelUtil.exportExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
+        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
     }
 
     /* 代理平台选择列表

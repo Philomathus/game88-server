@@ -72,11 +72,7 @@ public class MemberInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( MemberInfo memberInfo, HttpServletResponse response ) {
         List<MemberInfo> list = memberInfoService.selectMemberInfoList( memberInfo );
-        if ( list.size() <= 200000L ) {
-            ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
-        } else {
-            throw new BusinessException( "导出条数超过20万条" );
-        }
+        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
     }
 
     /**
@@ -156,8 +152,9 @@ public class MemberInfoController extends BaseController {
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
                 redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
-                String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
-                PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
+                        .toString();
+                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
                 platformUser.setStatus( status );
                 redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
@@ -398,15 +395,8 @@ public class MemberInfoController extends BaseController {
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId
-                        .append( "\"" )
-                        .append( cell1 )
-                        .append( "\"" )
-                        .append( "," )
-                        .append( cell2 )
-                        .append( "," )
-                        .append( cell3 )
-                        .append( "),(" );
+                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
+                        .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -481,15 +471,8 @@ public class MemberInfoController extends BaseController {
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId
-                        .append( "\"" )
-                        .append( cell1 )
-                        .append( "\"" )
-                        .append( "," )
-                        .append( cell2 )
-                        .append( "," )
-                        .append( cell3 )
-                        .append( "),(" );
+                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
+                        .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );

@@ -44,6 +44,6 @@ public class SysOperlogController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysOperLog operLog, HttpServletResponse response ) {
         List<SysOperLog> list = operLogService.selectOperLogList( operLog );
-        ExportExcelUtil.exportExcel( list, "操作日志", "操作日志表", SysOperLog.class, response );
+        ExportExcelUtil.exportBigExcel( list, "操作日志", "操作日志表", SysOperLog.class, response );
     }
 }

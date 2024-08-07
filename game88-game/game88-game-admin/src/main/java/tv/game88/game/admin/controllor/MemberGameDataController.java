@@ -66,7 +66,7 @@ public class MemberGameDataController extends BaseController {
     @GetMapping ( "/export" )
     public void export( ReqMemberGameData reqMemberGameData, HttpServletResponse response ) {
         List<MemberGameData> list = memberGameDataService.selectMemberGameDataList( reqMemberGameData );
-        ExportExcelUtil.exportExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
+        ExportExcelUtil.exportBigExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
     }
 
     @PreAuthorize ( "@ss.hasPermi('member:gameData:recordList')" )
