@@ -57,7 +57,7 @@ public class RemoteGameDataRecordTask {
         gameRecordFixVersionMapper.insert( gameRecordFixVersion );
     }
 
-    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    @Scheduled( cron = "0/5 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
