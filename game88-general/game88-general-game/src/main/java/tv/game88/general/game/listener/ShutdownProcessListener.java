@@ -28,6 +28,7 @@ public class ShutdownProcessListener implements ApplicationListener<ContextClose
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
             redisUtils.unLock( "remoteGameDataRecordFix:" + gamePlatform.getId() );
+            redisUtils.unLock( "remoteGameDataRecord:" + gamePlatform.getId() );
         }
         log.warn( "服务关闭或重启, 已注销所有锁Fix" );
     }

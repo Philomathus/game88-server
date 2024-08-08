@@ -78,16 +78,16 @@
     </select>
 
     <select id="selectGamePlatformAndVersionList" resultMap="GamePlatformResult">
-        select p.*, v.version_value
+        select p.*
         from game_record_version v
-                 LEFT JOIN game_platform p on v.platform_id = p.id
+                 INNER JOIN game_platform p on v.platform_id = p.id
         where p.effect = 1
     </select>
 
     <select id="selectGamePlatformAndVersionFixList" resultMap="GamePlatformResult">
-        select p.*, v.version_value
+        select p.*
         from game_record_fix_version v
-                 LEFT JOIN game_platform p on v.platform_id = p.id
+                 INNER JOIN game_platform p on v.platform_id = p.id
         where p.effect = 1
     </select>
 </mapper>
