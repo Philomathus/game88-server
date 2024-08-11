@@ -123,7 +123,7 @@ public class LoginController extends BaseController {
     @Operation( summary = "发送短信验证码" )
     @PostMapping( "/sendSmsVerifyCode" )
     @Anonymous
-    public RspBase<?> loginPasswd( @RequestBody Phone phone ) {
+    public RspBase<?> sendSmsVerifyCode( @RequestBody Phone phone ) {
         return memberInfoService.sendSmsVerifyCode( phone );
     }
 
