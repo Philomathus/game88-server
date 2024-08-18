@@ -1,5 +1,6 @@
 package tv.game88.game.api.cache;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Resource;
@@ -16,11 +17,13 @@ import tv.game88.game.api.dto.RspGameType;
 import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.entity.GameInfo;
 import tv.game88.game.api.entity.GamePlatform;
+import tv.game88.game.api.entity.GameType;
 import tv.game88.game.api.mapper.ConfigWashCodeMapper;
 import tv.game88.game.api.mapper.GameInfoMapper;
 import tv.game88.game.api.mapper.GamePlatformMapper;
 import tv.game88.game.api.mapper.GameTypeMapper;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,7 +31,8 @@ import java.util.stream.Collectors;
 @Component
 public class GameCacheUtils {
 
-    public static final String GAME_TYPE_KEY                  = Constants.GAME_PREX + "type:effect";
+    public static final String GAME_TYPE_EFFECT_KEY           = Constants.GAME_PREX + "typeEffect";
+    public static final String GAME_TYPE_KEY                  = Constants.GAME_PREX + "type:";
     public static final String GAME_PLATFORM_KEY              = Constants.GAME_PREX + "platform:";
     public static final String GAME_INFO_KEY                  = Constants.GAME_PREX + "info:";
     public static final String GAME_INFO_LIST_KEY             = Constants.GAME_PREX + "infoList:";
@@ -49,7 +53,7 @@ public class GameCacheUtils {
     private ConfigWashCodeMapper configWashCodeMapper;
 
     public List<RspGameType> getEffectTypeList() {
-        if ( !redisUtils.exists( GAME_TYPE_KEY ) ) {
+        if ( !redisUtils.exists( GAME_TYPE_EFFECT_KEY ) ) {
             List<RspGameType> gameTypes = new QueryChainWrapper<>( gameTypeMapper ).eq( "effect", 1 ).orderByAsc( "sort" ).list()
                     .stream().map( gameType -> {
                         RspGameType rspGameType = new RspGameType();
@@ -57,12 +61,29 @@ public class GameCacheUtils {
                         return rspGameType;
                     } ).collect( Collectors.toList() );
             if ( !CollectionUtils.isEmpty( gameTypes ) ) {
-                redisUtils.strSet( GAME_TYPE_KEY, JsonUtil.object2Json( gameTypes ) );
+                redisUtils.strSet( GAME_TYPE_EFFECT_KEY, JsonUtil.object2Json( gameTypes ) );
             }
             return gameTypes;
         }
-        String s = redisUtils.strGet( GAME_TYPE_KEY );
+        String s = redisUtils.strGet( GAME_TYPE_EFFECT_KEY );
         return StringUtils.isBlank( s ) ? null : JsonUtil.json2Array( s, new TypeReference<>() {} );
+    }
+
+    public RspGameType getTypeById( Long typeId ) {
+        String key = GAME_TYPE_KEY + typeId;
+        if ( !redisUtils.exists( key ) ) {
+            GameType gameType = new LambdaQueryChainWrapper<>( gameTypeMapper ).eq( GameType::getId, typeId ).one();
+            if ( gameType == null ) {
+                return null;
+            } else {
+                RspGameType rspGameType = new RspGameType();
+                BeanUtils.copyProperties( gameType, rspGameType );
+                redisUtils.strSet( key, JsonUtil.object2Json( rspGameType ) );
+                return rspGameType;
+            }
+        }
+        String s = redisUtils.strGet( key );
+        return StringUtils.isBlank( s ) ? null : JsonUtil.json2Object( s, new TypeReference<>() {} );
     }
 
     public GamePlatform getGamePlatform( Long platformId ) {
@@ -146,7 +167,8 @@ public class GameCacheUtils {
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
-        if ( Objects.equals( typeId, 9L ) ) {
+        RspGameType rspGameType = getTypeById( typeId );
+        if ( Arrays.asList( 3, 4 ).contains( rspGameType.getType() ) ) {
             if ( Objects.equals( platformId, -1L ) ) {
                 return this.getInfoHotList( typeId );
             }

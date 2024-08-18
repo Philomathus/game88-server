@@ -16,6 +16,7 @@ import tv.game88.game.api.entity.GameType;
 import tv.game88.game.api.service.GameTypeService;
 
 import jakarta.annotation.Resource;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,15 +52,12 @@ public class GameTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:type:list')" )
     @GetMapping( "/listAll" )
     public RspBase<List<RspGame>> listAll() {
-        List<RspGame> list = gameTypeService
-                .list( new QueryWrapper<GameType>().ne( "id", 1 ).select( "id", "name", "icon" ) )
-                .stream()
-                .map( p -> {
+        List<RspGame> list = gameTypeService.list( new QueryWrapper<GameType>().ne( "id", 1 ).select( "id", "name", "icon" ) )
+                .stream().map( p -> {
                     RspGame rspGame = new RspGame();
                     BeanUtils.copyProperties( p, rspGame );
                     return rspGame;
-                } )
-                .collect( Collectors.toList() );
+                } ).collect( Collectors.toList() );
         return RspBase.ok( list );
     }
 
@@ -93,7 +91,8 @@ public class GameTypeController extends BaseController {
         gameType.setEffect( null );
         boolean isSave = gameTypeService.updateById( gameType );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_EFFECT_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY + gameType.getId() );
         }
         return toResult( isSave );
     }
@@ -107,7 +106,10 @@ public class GameTypeController extends BaseController {
     public RspBase<?> remove( @PathVariable Long[] ids ) {
         boolean isSave = gameTypeService.removeByIds( Arrays.asList( ids ) );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_EFFECT_KEY );
+            for ( Long id : ids ) {
+                gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY + id );
+            }
         }
         return toResult( isSave );
     }
@@ -121,7 +123,8 @@ public class GameTypeController extends BaseController {
         update.setEffect( effect );
         boolean isSave = gameTypeService.updateById( update );
         if ( isSave ) {
-            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_EFFECT_KEY );
+            gameCacheUtils.clear( GameCacheUtils.GAME_TYPE_KEY + id );
         }
         return toResult( isSave );
     }
