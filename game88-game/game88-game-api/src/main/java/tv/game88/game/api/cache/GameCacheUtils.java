@@ -167,8 +167,7 @@ public class GameCacheUtils {
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
-        RspGameType rspGameType = getTypeById( typeId );
-        if ( Arrays.asList( 3, 4 ).contains( rspGameType.getType() ) ) {
+        if ( typeId > 0 && Arrays.asList( 3, 4 ).contains( getTypeById( typeId ).getType() ) ) {
             if ( Objects.equals( platformId, -1L ) ) {
                 return this.getInfoHotList( typeId );
             }
