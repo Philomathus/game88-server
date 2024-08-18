@@ -175,7 +175,7 @@ public class GameCacheUtils {
             if ( !redisUtils.exists( GAME_INFO_S_KEY + platformId ) ) {
                 List<RspGameInfo> rspGameInfoList = gameInfoMapper.selectRspListByPlatform( platformId );
                 if ( !CollectionUtils.isEmpty( rspGameInfoList ) ) {
-                    redisUtils.strSet( GAME_INFO_S_KEY + typeId, JsonUtil.object2Json( rspGameInfoList ) );
+                    redisUtils.strSet( GAME_INFO_S_KEY + platformId, JsonUtil.object2Json( rspGameInfoList ) );
                 }
                 return rspGameInfoList;
             }
