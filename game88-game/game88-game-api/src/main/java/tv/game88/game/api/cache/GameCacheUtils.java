@@ -70,6 +70,9 @@ public class GameCacheUtils {
     }
 
     public RspGameType getTypeById( Long typeId ) {
+        if ( typeId <= 0 ) {
+            return null;
+        }
         String key = GAME_TYPE_KEY + typeId;
         if ( !redisUtils.exists( key ) ) {
             GameType gameType = new LambdaQueryChainWrapper<>( gameTypeMapper ).eq( GameType::getId, typeId ).one();
@@ -167,7 +170,8 @@ public class GameCacheUtils {
     }
 
     public List<RspGameInfo> getEffectInfoList( Long typeId, Long platformId ) {
-        if ( typeId > 0 && Arrays.asList( 3, 4 ).contains( getTypeById( typeId ).getType() ) ) {
+        RspGameType rspGameType = getTypeById( typeId );
+        if ( rspGameType != null && Arrays.asList( 3, 4 ).contains( rspGameType.getType() ) ) {
             if ( Objects.equals( platformId, -1L ) ) {
                 return this.getInfoHotList( typeId );
             }
