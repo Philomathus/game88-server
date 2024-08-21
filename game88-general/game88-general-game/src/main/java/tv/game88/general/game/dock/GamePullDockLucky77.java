@@ -45,10 +45,9 @@ public class GamePullDockLucky77 extends AbstractGamePull {
                     gamePlatform.setVersionValue( String.valueOf( last.get( "id" ) ) );
                 }
                 return transactions;
-            } else {
-                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
+        log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
         return null;
     }
 
