@@ -44,6 +44,7 @@ public enum EnumGameCategory {
     CG( ConstantsGame.CG, "cg" ),
     JILI( ConstantsGame.JILI, "jiLi" ),
     LOCAL( ConstantsGame.LOCAL, "local" ),
+    LUCKY_77( ConstantsGame.LUCKY_77, "lucky77" ),
     ;
 
     private final String type;
@@ -55,8 +56,8 @@ public enum EnumGameCategory {
     }
 
     public static List<RspGameCategory> getGameCategorys() {
-        return Arrays.stream( EnumGameCategory.values() ).filter( m -> !Arrays.asList( T1, PP, CG, JILI, LOCAL ).contains( m ) )
-                .map( m -> {
+        return Arrays.stream( EnumGameCategory.values() )
+                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, LOCAL, LUCKY_77 ).contains( m ) ).map( m -> {
                     RspGameCategory gameCategory = new RspGameCategory();
                     gameCategory.setName( m.name() );
                     gameCategory.setDes( m.getDes() );
