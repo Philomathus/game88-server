@@ -117,7 +117,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             keys.addAll( Arrays.asList( "android_version", "android_force_update", "android_down_url", "android_update_text" ) );
         }
         keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id", "first_recharge_url" ,
-                "app_link","app_link_open_install") );
+                "app_link","app_link_tech_spark") );
         List<String> valueList = configEnvCacheUtil.getConf( keys );
         res.setCustomerUrl( valueList.get( 0 ) );
         res.setCustomerUrl2( valueList.get( 1 ) );
@@ -138,7 +138,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setProductId( valueList.get( 10 ) );
         res.setFirstRechargeUrl( valueList.get( 11 ) );
         res.setAppLink( valueList.get( 12 ) );
-        res.setAppLinkOpenInstall( valueList.get( 13 ) );
+        res.setAppLinkTechSpark( valueList.get( 13 ) );
         return res;
     }
 
