@@ -37,4 +37,8 @@ public class RspInit {
 
     @Schema( title = "appLink" )
     private String appLink;
+
+    @Schema( title = "appLinkOpenInstall" )
+    private String appLinkOpenInstall;
+
 }
