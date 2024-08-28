@@ -2,6 +2,7 @@ package tv.game88.general.game.dock;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -145,11 +146,20 @@ public class GamePullDockOGNew extends AbstractGamePull {
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winlose_amount" ) ) );
         LocalDateTime gameStartTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
                 remoteGameDatum.get( "debit_at" ) + "000" ) );
+        if ( gameStartTime == null ) {
+            log.error( JsonUtil.object2Json( remoteGameDatum ) );
+        }
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( gameStartTime ) );
-        LocalDateTime gameEndTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
-                remoteGameDatum.get( "credit_at" ) + "000" ) );
+        LocalDateTime gameEndTime;
+        if ( ObjectUtils.isEmpty( remoteGameDatum.get( "credit_at" ) ) ) {
+            gameEndTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
+                    remoteGameDatum.get( "rollback_at" ) + "000" ) );
+        } else {
+            gameEndTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
+                    remoteGameDatum.get( "credit_at" ) + "000" ) );
+        }
         if ( gameEndTime == null ) {
-            log.warn( JsonUtil.object2Json( object ) );
+            log.error( JsonUtil.object2Json( remoteGameDatum ) );
         }
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( gameEndTime ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
