@@ -104,6 +104,7 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "S-100".equals( resultMap.getOrDefault( "rs_code", "" ).toString() ) ) {
+                log.warn( JsonUtil.object2Json( resultMap ) );
                 List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records",
                         new ArrayList<>() );
                 int lastFetchId;
