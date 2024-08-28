@@ -104,7 +104,6 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "S-100".equals( resultMap.getOrDefault( "rs_code", "" ).toString() ) ) {
-                log.warn( JsonUtil.object2Json( resultMap ) );
                 List<Map<String, Object>> records = ( List<Map<String, Object>> ) resultMap.getOrDefault( "records",
                         new ArrayList<>() );
                 int lastFetchId;
@@ -126,7 +125,6 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
-        // log.warn( JsonUtil.object2Json( object ) );
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         String              playerId        = String.valueOf( remoteGameDatum.get( "player_id" ) );
         if ( !playerId.startsWith( "77" ) && !playerId.startsWith( "88" ) && !playerId.startsWith( "99" ) ) {
@@ -148,6 +146,9 @@ public class GamePullDockOGNew extends AbstractGamePull {
         LocalDateTime gameStartTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
                 remoteGameDatum.get( "debit_at" ) + "000" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( gameStartTime ) );
+        if ( !remoteGameDatum.containsKey( "credit_at" ) ) {
+            log.warn( JsonUtil.object2Json( object ) );
+        }
         LocalDateTime gameEndTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
                 remoteGameDatum.get( "credit_at" ) + "000" ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( gameEndTime ) );
