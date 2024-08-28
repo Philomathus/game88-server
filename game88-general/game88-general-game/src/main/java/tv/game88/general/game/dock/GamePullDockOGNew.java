@@ -125,7 +125,7 @@ public class GamePullDockOGNew extends AbstractGamePull {
 
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
-        log.warn( JsonUtil.object2Json( object ) );
+        // log.warn( JsonUtil.object2Json( object ) );
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         String              playerId        = String.valueOf( remoteGameDatum.get( "player_id" ) );
         if ( !playerId.startsWith( "77" ) && !playerId.startsWith( "88" ) && !playerId.startsWith( "99" ) ) {
