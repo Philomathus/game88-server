@@ -146,11 +146,11 @@ public class GamePullDockOGNew extends AbstractGamePull {
         LocalDateTime gameStartTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
                 remoteGameDatum.get( "debit_at" ) + "000" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( gameStartTime ) );
-        if ( !remoteGameDatum.containsKey( "credit_at" ) ) {
-            log.warn( JsonUtil.object2Json( object ) );
-        }
         LocalDateTime gameEndTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong(
                 remoteGameDatum.get( "credit_at" ) + "000" ) );
+        if ( gameEndTime == null ) {
+            log.warn( JsonUtil.object2Json( object ) );
+        }
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( gameEndTime ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
