@@ -69,6 +69,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
             mapper.insertBatchSomeColumn( gameDataList );
             session.commit();
         }
+        session.close();
         log.info( "{}数据开始存库,预存数据条数:{};实际存储数据条数:{}", name, gameDataRecords.size(), num );
     }
 
