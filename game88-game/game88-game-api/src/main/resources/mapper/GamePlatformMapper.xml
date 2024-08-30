@@ -105,6 +105,6 @@
               WHERE i.type_id = #{infoTypeId}
                 AND i.effect = 1
                 AND p.effect = 1
-              ORDER BY p.sort) a
+              ) a ORDER BY a.sort asc
     </select>
 </mapper>

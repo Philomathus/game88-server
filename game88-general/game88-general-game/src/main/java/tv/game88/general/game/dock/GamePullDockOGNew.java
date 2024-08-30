@@ -131,6 +131,9 @@ public class GamePullDockOGNew extends AbstractGamePull {
         if ( !playerId.startsWith( "77" ) && !playerId.startsWith( "88" ) && !playerId.startsWith( "99" ) ) {
             return null;
         }
+        if ( "rollback".equals( remoteGameDatum.get( "transaction_type" ) ) ) {
+            return null;
+        }
         String[]       splitParam     = playerId.split( "_" );
         String         agent          = splitParam[ 0 ].toLowerCase();
         GameDataRecord gameDataRecord = new GameDataRecord();
