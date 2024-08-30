@@ -8,6 +8,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import tv.game88.common.config.injector.EasySqlInjector;
 import tv.game88.common.helper.RequestDataHelper;
 import tv.game88.common.utils.LocalDateTimeUtils;
 
@@ -55,5 +56,10 @@ public class MybatisPlusConfig {
         interceptor.addInnerInterceptor( dynamicTableNameInnerInterceptor );
 
         return interceptor;
+    }
+
+    @Bean
+    public EasySqlInjector easySqlInjector() {
+        return new EasySqlInjector();
     }
 }

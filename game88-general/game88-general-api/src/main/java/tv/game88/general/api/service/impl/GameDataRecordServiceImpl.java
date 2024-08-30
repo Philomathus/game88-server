@@ -56,7 +56,7 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
             mapper.insertByTableName( gameDataRecord, TABLE_PREFIX + day );
             num++;
             i++;
-            if ( i > 100 ) {
+            if ( i > 500 ) {
                 session.commit();
                 i = 0;
             }
