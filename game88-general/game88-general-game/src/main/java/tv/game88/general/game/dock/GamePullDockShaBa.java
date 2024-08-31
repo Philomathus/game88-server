@@ -71,10 +71,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        if ( !remoteGameDatum.containsKey( "settlement_time" ) ) {
-            return null;
-        }
-        String ticket_status = String.valueOf( remoteGameDatum.get( "ticket_status" ) );
+        String              ticket_status   = String.valueOf( remoteGameDatum.get( "ticket_status" ) );
         if ( StringUtils.equals( "waiting", ticket_status ) || StringUtils.equals( "running", ticket_status ) ) {
             return null;
         }
@@ -107,13 +104,13 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
 
-        Object settlementTimeObj = remoteGameDatum.get( "settlement_time" );
-        if ( settlementTimeObj == null || settlementTimeObj.toString().equals( "null" ) ) {
+        String settlementTimeStr = String.valueOf( remoteGameDatum.getOrDefault( "settlement_time", remoteGameDatum.get(
+                "transaction_time" ) ) );
+        if ( settlementTimeStr == null || settlementTimeStr.equals( "null" ) ) {
             return null;
         } else {
-            LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( String
-                    .valueOf( settlementTimeObj )
-                    .substring( 0, 19 ), LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+            LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( settlementTimeStr.substring( 0, 19 ),
+                    LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
             gameDataRecord.setGameStartTime( gameDataRecord.getGameEndTime() );
         }
