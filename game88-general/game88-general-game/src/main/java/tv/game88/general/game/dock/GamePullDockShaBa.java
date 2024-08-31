@@ -104,15 +104,21 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
 
-        String settlementTimeStr = String.valueOf( remoteGameDatum.getOrDefault( "settlement_time", remoteGameDatum.get(
-                "transaction_time" ) ) );
-        if ( settlementTimeStr == null || settlementTimeStr.equals( "null" ) ) {
+
+        String transactionTimeStr = String.valueOf( remoteGameDatum.get( "transaction_time" ) );
+        String settlementTimeStr  = String.valueOf( remoteGameDatum.get( "settlement_time" ) );
+        if ( transactionTimeStr == null || transactionTimeStr.equals( "null" ) ) {
             return null;
+        }
+        LocalDateTime transactionTime = LocalDateTimeUtils.convertMeiDongToDefault( transactionTimeStr.substring( 0, 19 ),
+                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+        gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( transactionTime ) );
+        if ( settlementTimeStr == null || settlementTimeStr.equals( "null" ) ) {
+            gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         } else {
             LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( settlementTimeStr.substring( 0, 19 ),
                     LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
-            gameDataRecord.setGameStartTime( gameDataRecord.getGameEndTime() );
         }
         return gameDataRecord;
     }
