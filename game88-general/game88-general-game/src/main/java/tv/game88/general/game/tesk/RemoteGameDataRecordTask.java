@@ -10,6 +10,7 @@ import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
 import tv.game88.common.utils.SpringUtils;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordFixVersion;
@@ -126,10 +127,13 @@ public class RemoteGameDataRecordTask {
                         if ( gameRecordVersion != null ) {
                             long version    = Long.parseLong( gameRecordVersion.getVersionValue() );
                             long fixVersion = Long.parseLong( gamePlatform.getVersionValue() );
-                            if ( version - fixVersion <= 300000 ) {
+                            // @formatter:off
+                            if ( ( gamePlatform.getGameCategory() == EnumGameCategory.SHABA && version - fixVersion <= 100 ) || (
+                                    gamePlatform.getGameCategory() != EnumGameCategory.SHABA && version - fixVersion <= 300000 ) ) {
                                 log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
                                 gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
                             }
+                            // @formatter:on
                         }
                     } catch ( Exception e ) {
                         log.error( e.getMessage(), e );
