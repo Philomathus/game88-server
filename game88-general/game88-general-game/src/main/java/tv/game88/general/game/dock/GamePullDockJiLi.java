@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 @Repository( value = ConstantsGame.JILI + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockJiLi extends AbstractGamePull {
 
-    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE );
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "BRL"
+            , BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -101,12 +102,7 @@ public class GamePullDockJiLi extends AbstractGamePull {
                 LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
-        BigDecimal RATE = BigDecimal.ONE;
-        if ( agent.startsWith( "99in" ) ) {
-            RATE = RATE_MAP.get( "INR" );
-        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
-            RATE = RATE_MAP.get( "IDR" );
-        }
+        BigDecimal RATE = RATE_MAP.get( gamePlatform.getLinecode() );
 
         BigDecimal turnover = new BigDecimal( String.valueOf( remoteGameDatum.get( "Turnover" ) ) ).multiply( RATE );
         gameDataRecord.setCellScore( turnover.toString() );
@@ -133,8 +129,6 @@ public class GamePullDockJiLi extends AbstractGamePull {
     }
 
     private String getURL( final String apiURL, final String endpoint, final Map<String, Object> params ) {
-        final StringBuilder sb = new StringBuilder().append( apiURL ).append( endpoint ).append( "?" )
-                .append( keyValStringFormat( params ) );
-        return sb.toString();
+        return apiURL + endpoint + "?" + keyValStringFormat( params );
     }
 }

@@ -29,7 +29,7 @@ import java.util.*;
 public class GamePullDockPGSoft extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "CNY"
-            , BigDecimal.ONE );
+            , BigDecimal.ONE, "BRL", BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
