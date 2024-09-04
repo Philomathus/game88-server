@@ -172,9 +172,11 @@ public class GameDockPGSoft extends AbstractGameDock {
         params.add( "operator_token", reqJoinGame.getDes() );
         params.add( "secret_key", reqJoinGame.getMd5() );
         params.add( "player_name", reqJoinGame.getGameMemberId() );
-        params.add( "amount", reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString() );
+        String amount = reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString();
+        params.add( "amount", amount );
         params.add( "transfer_reference", reqJoinGame.getOrderId() );
         params.add( "currency", CURRENCY );
+        params.add( "real_transfer_amount", amount );
 
         Map<String, Object> resultMap = execute( url, params );
 
@@ -186,6 +188,10 @@ public class GameDockPGSoft extends AbstractGameDock {
             Map<String, Object> dataMap  = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
             Map<String, Object> errorMap = ( Map<String, Object> ) resultMap.getOrDefault( "error", Collections.emptyMap() );
             if ( dataMap != null && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" ).toString() ) ) {
+                if ( dataMap.containsKey( "real_transfer_amount" ) && reqJoinGame.getTransferMoney()
+                        .compareTo( new BigDecimal( dataMap.getOrDefault( "real_transfer_amount", "0" ).toString() ) ) != 0 ) {
+                    throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + action + "分金额不正确" );
+                }
                 return;
             }
             // 转账状态特殊处理
