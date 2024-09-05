@@ -127,16 +127,14 @@ public class GameDockPGSoft extends AbstractGameDock {
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v4/TransferIn", reqJoinGame.getApiUrl() );
-        transact( reqJoinGame, url, true );
+        transact( reqJoinGame, true );
     }
 
     @Override
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v4/TransferOut", reqJoinGame.getApiUrl() );
-        transact( reqJoinGame, url, false );
+        transact( reqJoinGame, false );
     }
 
     @Override
@@ -167,16 +165,19 @@ public class GameDockPGSoft extends AbstractGameDock {
         throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "上下分失败" );
     }
 
-    private void transact( ReqJoinGame reqJoinGame, String url, final boolean isDeposit ) {
+    private void transact( ReqJoinGame reqJoinGame, final boolean isDeposit ) {
+        String url = String.format( "%s/external/Cash/v4/%s", reqJoinGame.getApiUrl(), isDeposit ? "TransferIn" : "TransferOut" );
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "operator_token", reqJoinGame.getDes() );
         params.add( "secret_key", reqJoinGame.getMd5() );
         params.add( "player_name", reqJoinGame.getGameMemberId() );
-        String amount = reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString();
-        params.add( "amount", amount );
+        BigDecimal amount    = reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN );
+        String     amountStr = amount.stripTrailingZeros().toPlainString();
+        params.add( "amount", amountStr );
         params.add( "transfer_reference", reqJoinGame.getOrderId() );
         params.add( "currency", CURRENCY );
-        params.add( "real_transfer_amount", amount );
+        params.add( "real_transfer_amount", amountStr );
 
         Map<String, Object> resultMap = execute( url, params );
 
@@ -187,9 +188,10 @@ public class GameDockPGSoft extends AbstractGameDock {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> dataMap  = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
             Map<String, Object> errorMap = ( Map<String, Object> ) resultMap.getOrDefault( "error", Collections.emptyMap() );
-            if ( dataMap != null && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" ).toString() ) ) {
-                if ( dataMap.containsKey( "realTransferAmount" ) && reqJoinGame.getTransferMoney()
-                        .compareTo( new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() ) ) != 0 ) {
+            if ( !CollectionUtils.isEmpty( dataMap ) && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" )
+                    .toString() ) ) {
+                BigDecimal realTransferAmount = new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() );
+                if ( amount.compareTo( realTransferAmount ) != 0 ) {
                     throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + action + "分金额不正确" );
                 }
                 return;
