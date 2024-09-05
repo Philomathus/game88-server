@@ -188,8 +188,8 @@ public class GameDockPGSoft extends AbstractGameDock {
             Map<String, Object> dataMap  = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
             Map<String, Object> errorMap = ( Map<String, Object> ) resultMap.getOrDefault( "error", Collections.emptyMap() );
             if ( dataMap != null && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" ).toString() ) ) {
-                if ( dataMap.containsKey( "real_transfer_amount" ) && reqJoinGame.getTransferMoney()
-                        .compareTo( new BigDecimal( dataMap.getOrDefault( "real_transfer_amount", "0" ).toString() ) ) != 0 ) {
+                if ( dataMap.containsKey( "realTransferAmount" ) && reqJoinGame.getTransferMoney()
+                        .compareTo( new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() ) ) != 0 ) {
                     throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + action + "分金额不正确" );
                 }
                 return;
