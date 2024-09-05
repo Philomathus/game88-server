@@ -195,8 +195,10 @@ public class GameDockPGSoft extends AbstractGameDock {
                 return;
             }
             // 转账状态特殊处理
-            if ( errorMap != null ) {
-                this.sleep( 2 );
+            if ( !CollectionUtils.isEmpty( errorMap ) ) {
+                if ( "1315".equals( errorMap.getOrDefault( "code", "" ).toString() ) ) {
+                    throw new BusinessException( "会员正在游戏中,无法" + action + "分" );
+                }
                 throw new RuntimeException( errorMap.getOrDefault( "message", "" ).toString() );
             }
         }

@@ -95,7 +95,8 @@
         SELECT DISTINCT a.id,
                         a.name,
                         a.icon,
-                        a.card_icon
+                        a.card_icon,
+                        a.sort
         FROM (SELECT p.id,
                      p.NAME,
                      p.icon,
