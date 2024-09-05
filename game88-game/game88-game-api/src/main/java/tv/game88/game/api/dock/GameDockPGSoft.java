@@ -127,7 +127,7 @@ public class GameDockPGSoft extends AbstractGameDock {
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v3/TransferIn", reqJoinGame.getApiUrl() );
+        String url = String.format( "%s/external/Cash/v4/TransferIn", reqJoinGame.getApiUrl() );
         transact( reqJoinGame, url, true );
     }
 
@@ -135,7 +135,7 @@ public class GameDockPGSoft extends AbstractGameDock {
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v3/TransferOut", reqJoinGame.getApiUrl() );
+        String url = String.format( "%s/external/Cash/v4/TransferOut", reqJoinGame.getApiUrl() );
         transact( reqJoinGame, url, false );
     }
 
