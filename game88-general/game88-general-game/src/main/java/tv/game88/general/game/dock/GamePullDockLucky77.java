@@ -29,7 +29,7 @@ public class GamePullDockLucky77 extends AbstractGamePull {
         params.put( "traderId", gamePlatform.getAgent() );
         params.put( "transitionId", gamePlatform.getVersionValue() );
         params.put( "dateTime", System.currentTimeMillis() );
-        params.put( "size", 20000 );
+        params.put( "size", 50000 );
         params.put( "cert", getHash( params, gamePlatform.getMd5() ) );
 
         String url = String.format( "%s/trader/gameHistory/api/getTransactions", gamePlatform.getApiUrl() );
