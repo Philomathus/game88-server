@@ -49,24 +49,20 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
         List<GameDataRecord> gameDataList = new ArrayList<>();
 
         LocalDateTime now = LocalDateTimeUtils.convertToUTC8( LocalDateTime.now() );
-        String        day = LocalDateTimeUtils.format( now, LocalDateTimeUtils.YYYYMMDD_FORMATTER );
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
-            if ( mapper.findCount( gameDataRecord.getId(), TABLE_PREFIX + day ) > 0 ) {
-                continue;
-            }
             gameDataRecord.setCreateTime( now );
             gameDataList.add( gameDataRecord );
             num++;
             if ( gameDataList.size() >= 1000 ) {
                 RequestDataHelper.setRequestData( Map.of( "time", now.toLocalDate() ) );
-                mapper.insertBatchSomeColumn( gameDataList );
+                mapper.InsertIgnoreBatchAllColumn( gameDataList );
                 session.commit();
                 gameDataList.clear();
             }
         }
         if ( !gameDataList.isEmpty() ) {
             RequestDataHelper.setRequestData( Map.of( "time", now.toLocalDate() ) );
-            mapper.insertBatchSomeColumn( gameDataList );
+            mapper.InsertIgnoreBatchAllColumn( gameDataList );
             session.commit();
         }
         session.close();

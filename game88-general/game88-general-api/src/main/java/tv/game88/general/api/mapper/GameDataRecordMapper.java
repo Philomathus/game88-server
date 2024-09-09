@@ -22,4 +22,6 @@ public interface GameDataRecordMapper extends BaseMapper<GameDataRecord> {
     Long findCount( @Param( "id" ) String id, @Param( "tableName" ) String tableName );
 
     int insertBatchSomeColumn( List<GameDataRecord> gameDataList );
+
+    int InsertIgnoreBatchAllColumn( List<GameDataRecord> gameDataList );
 }
