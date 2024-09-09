@@ -55,14 +55,14 @@ public class GameDataRecordServiceImpl extends ServiceImpl<GameDataRecordMapper,
             num++;
             if ( gameDataList.size() >= 1000 ) {
                 RequestDataHelper.setRequestData( Map.of( "time", now.toLocalDate() ) );
-                mapper.InsertIgnoreBatchAllColumn( gameDataList );
+                mapper.insertIgnoreBatchAllColumn( gameDataList );
                 session.commit();
                 gameDataList.clear();
             }
         }
         if ( !gameDataList.isEmpty() ) {
             RequestDataHelper.setRequestData( Map.of( "time", now.toLocalDate() ) );
-            mapper.InsertIgnoreBatchAllColumn( gameDataList );
+            mapper.insertIgnoreBatchAllColumn( gameDataList );
             session.commit();
         }
         session.close();

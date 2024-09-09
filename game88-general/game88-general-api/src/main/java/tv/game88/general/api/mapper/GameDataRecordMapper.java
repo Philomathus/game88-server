@@ -23,5 +23,5 @@ public interface GameDataRecordMapper extends BaseMapper<GameDataRecord> {
 
     int insertBatchSomeColumn( List<GameDataRecord> gameDataList );
 
-    int InsertIgnoreBatchAllColumn( List<GameDataRecord> gameDataList );
+    int insertIgnoreBatchAllColumn( List<GameDataRecord> gameDataList );
 }
