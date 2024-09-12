@@ -444,7 +444,7 @@ public class GameServiceImpl implements GameService {
             case MEITIAN -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
                             LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
-            case HG -> AESCoder.decrypt( gamePlatform.getDes() )
+            case HG -> agent
                     .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),

@@ -53,6 +53,7 @@ public class GamePullDockHG extends AbstractGamePull {
 
         String param = null;
         try {
+            log.warn( "requestRemoteGameData params:{} md5:{}", JsonUtil.object2Json( params ), gamePlatform.getMd5());
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), gamePlatform.getMd5() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
