@@ -81,7 +81,7 @@ public class GamePullDockHG extends AbstractGamePull {
                 return ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
             }
         } else {
-            log.warn( JsonUtil.object2Json( resultMap ) );
+            log.warn( url + " ::: " + JsonUtil.object2Json( resultMap ) );
         }
         return null;
     }
