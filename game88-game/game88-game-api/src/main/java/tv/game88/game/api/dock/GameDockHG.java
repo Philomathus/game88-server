@@ -53,7 +53,7 @@ public class GameDockHG extends AbstractGameDock {
         params.put( "mode", MODE );
         String param = null;
         try {
-            log.warn( "createAccount params:{}", JsonUtil.object2Json( params ) );
+            log.warn( "createAccount params:{} md5:{}", JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), reqJoinGame.getMd5() );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
