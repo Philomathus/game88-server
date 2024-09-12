@@ -191,8 +191,7 @@ public class AESCoder {
     }
 
     public static String encryptDES3( String str, String saltTxt ) throws Exception {
-        byte[]    md5Key  = getMd5( saltTxt ); //16bytes
-        SecretKey key     = new SecretKeySpec( md5Key, "DESede" );
+        SecretKey key     = new SecretKeySpec( getMd5( saltTxt ), "DESede" );
         Cipher    ecipher = Cipher.getInstance( "DESede/ECB/PKCS5Padding" );
         ecipher.init( Cipher.ENCRYPT_MODE, key );
         byte[] data           = str.getBytes( StandardCharsets.UTF_8 );
