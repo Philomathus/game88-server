@@ -42,11 +42,11 @@ public class GameDockHG extends AbstractGameDock {
                 Constants.GAME_USERS_PREX + reqJoinGame.getPlatformId(), reqJoinGame.getGameMemberId() ) ) {
             return;
         }
-        String              url    = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String              url    = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "register" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "password", reqJoinGame.getGameMemberId() + "1234" );
         params.put( "ip", reqJoinGame.getIp() );
@@ -92,12 +92,12 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "login" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "password", reqJoinGame.getGameMemberId() + "1234" );
         params.put( "gameCode", reqJoinGame.getLinecode() );
@@ -139,12 +139,12 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "deposit" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
         params.put( "money", reqJoinGame.getTransferMoney().toString() );
@@ -189,12 +189,12 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "withdraw" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
         params.put( "money", reqJoinGame.getTransferMoney().toString() );
@@ -239,12 +239,12 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public BigDecimal queryBalance( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "balance" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "userName", reqJoinGame.getGameMemberId() );
         params.put( "mode", MODE );
         String param = null;
@@ -281,12 +281,12 @@ public class GameDockHG extends AbstractGameDock {
 
     @Override
     public boolean queryTransfer( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", reqJoinGame.getApiUrl(), reqJoinGame.getAgent() );
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put( "action", "check" );
-        params.put( "merchant", reqJoinGame.getDes() );
-        params.put( "agent", reqJoinGame.getAgent() );
+        params.put( "merchant", reqJoinGame.getAgent() );
+        params.put( "agent", reqJoinGame.getLinecode() );
         params.put( "type", reqJoinGame.getMoneyType() + "" );
         params.put( "transactionNo", reqJoinGame.getOrderId() );
         params.put( "mode", MODE );

@@ -43,8 +43,8 @@ public class GamePullDockHG extends AbstractGamePull {
 
         Map<String, Object> params = new HashMap<>();
         params.put( "action", "record" );
-        params.put( "merchant", gamePlatform.getDes() );
-        params.put( "agent", gamePlatform.getAgent() );
+        params.put( "merchant", gamePlatform.getAgent() );
+        params.put( "agent", gamePlatform.getLinecode() );
         params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "page", 1 );
@@ -62,7 +62,7 @@ public class GamePullDockHG extends AbstractGamePull {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getApiUrl(), gamePlatform.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getApiUrl(), gamePlatform.getAgent() );
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
