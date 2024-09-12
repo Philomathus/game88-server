@@ -41,14 +41,14 @@ public class GamePullDockHG extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        Map<String, Object> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put( "action", "record" );
         params.put( "merchant", gamePlatform.getAgent() );
         params.put( "agent", gamePlatform.getLinecode() );
         params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "page", 1 );
-        params.put( "pageSize", 1000 );
+        params.put( "page", "1" );
+        params.put( "pageSize", "1000" );
         params.put( "mode", MODE );
 
         String param = null;
