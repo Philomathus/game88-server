@@ -166,7 +166,7 @@ public class GameDockPGSoft extends AbstractGameDock {
     }
 
     private void transact( ReqJoinGame reqJoinGame, final boolean isDeposit ) {
-        String url = String.format( "%s/external/Cash/v4/%s", reqJoinGame.getApiUrl(), isDeposit ? "TransferIn" : "TransferOut" );
+        String url = String.format( "%s/external/Cash/v3/%s", reqJoinGame.getApiUrl(), isDeposit ? "TransferIn" : "TransferOut" );
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "operator_token", reqJoinGame.getDes() );
@@ -177,7 +177,7 @@ public class GameDockPGSoft extends AbstractGameDock {
         params.add( "amount", amountStr );
         params.add( "transfer_reference", reqJoinGame.getOrderId() );
         params.add( "currency", CURRENCY );
-        params.add( "real_transfer_amount", amountStr );
+        // params.add( "real_transfer_amount", amountStr );
 
         Map<String, Object> resultMap = execute( url, params );
 
@@ -190,10 +190,10 @@ public class GameDockPGSoft extends AbstractGameDock {
             Map<String, Object> errorMap = ( Map<String, Object> ) resultMap.getOrDefault( "error", Collections.emptyMap() );
             if ( !CollectionUtils.isEmpty( dataMap ) && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" )
                     .toString() ) ) {
-                BigDecimal realTransferAmount = new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() );
+                /*BigDecimal realTransferAmount = new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() );
                 if ( amount.compareTo( realTransferAmount ) != 0 ) {
                     throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + action + "分金额不正确" );
-                }
+                }*/
                 return;
             }
             // 转账状态特殊处理
