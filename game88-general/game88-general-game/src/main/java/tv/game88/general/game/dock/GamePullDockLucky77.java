@@ -25,6 +25,9 @@ public class GamePullDockLucky77 extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
+        if ( Long.parseLong( gamePlatform.getVersionValue() ) > 614796215L ) {
+            return null;
+        }
         final Map<String, Object> params = new TreeMap<>();
         params.put( "traderId", gamePlatform.getAgent() );
         params.put( "transitionId", gamePlatform.getVersionValue() );
@@ -78,8 +81,8 @@ public class GamePullDockLucky77 extends AbstractGamePull {
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setAccount( agent + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
-        String currency = String.valueOf( remoteGameDatum.get( "currency" ) );
-        BigDecimal RATE = RATE_MAP.get( currency );
+        String     currency = String.valueOf( remoteGameDatum.get( "currency" ) );
+        BigDecimal RATE     = RATE_MAP.get( currency );
 
         BigDecimal chip = new BigDecimal( remoteGameDatum.get( "chip" ).toString() ).multiply( RATE );
         gameDataRecord.setCellScore( chip.toString() );
