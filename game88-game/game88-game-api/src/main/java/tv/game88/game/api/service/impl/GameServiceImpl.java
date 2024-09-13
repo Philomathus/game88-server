@@ -425,7 +425,7 @@ public class GameServiceImpl implements GameService {
             case BBIN -> profile + "BBIN" + memberId;
             case GAMING_365 -> ( profile + "_" + memberId ).toLowerCase();
             case BOLE, JDB -> ( profile + memberId ).toLowerCase();
-            case HG -> AESCoder.decrypt( gamePlatform.getDes() ) + gamePlatform.getAgent() + "_" + profile + "_" + memberId;
+            case HG -> gamePlatform.getAgent() + gamePlatform.getLinecode() + "_" + profile + "_" + memberId;
             default -> profile + "_" + memberId;
         };
         return ReqJoinGame.builder().des( AESCoder.decrypt( gamePlatform.getDes() ) )
@@ -444,8 +444,8 @@ public class GameServiceImpl implements GameService {
             case MEITIAN -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
                             LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
-            case HG -> agent
-                    .concat( LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+            case HG -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
+                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
                     .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
                     LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
