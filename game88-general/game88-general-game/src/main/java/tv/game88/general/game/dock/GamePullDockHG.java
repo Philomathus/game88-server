@@ -78,10 +78,14 @@ public class GamePullDockHG extends AbstractGamePull {
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( result ) ) {
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
-                return ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
+                List<Object> bets = ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( bets ) ) {
+                    return bets;
+                }
             }
         }
-        log.warn( url + " ::: " + JsonUtil.object2Json( resultMap ) );
+        log.warn( gamePlatform.getName() + "-" + gamePlatform.getId() + " - URL:" + url + " - result: "
+                + JsonUtil.object2Json( resultMap ) );
         return null;
     }
 
