@@ -54,9 +54,6 @@ public class GamePullDockHG extends AbstractGamePull {
         String param = null;
         try {
             param = AESCoder.encryptDES3( JsonUtil.object2Json( params ), gamePlatform.getMd5() );
-
-            log.warn( "requestRemoteGameData params:{} md5:{} param:{}", JsonUtil.object2Json( params ), gamePlatform.getMd5(),
-                    param );
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
             throw new BusinessException( e.getMessage() );
@@ -83,9 +80,8 @@ public class GamePullDockHG extends AbstractGamePull {
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
                 return ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
             }
-        } else {
-            log.warn( url + " ::: " + JsonUtil.object2Json( resultMap ) );
         }
+        log.warn( url + " ::: " + JsonUtil.object2Json( resultMap ) );
         return null;
     }
 
