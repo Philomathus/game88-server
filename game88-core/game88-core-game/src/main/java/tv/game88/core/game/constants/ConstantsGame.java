@@ -35,6 +35,5 @@ public class ConstantsGame {
     public static final String PP       = "pp";
     public static final String CG       = "cg";
     public static final String JILI     = "jiLi";
-    public static final String LOCAL    = "local";
     public static final String LUCKY_77 = "lucky77";
 }
