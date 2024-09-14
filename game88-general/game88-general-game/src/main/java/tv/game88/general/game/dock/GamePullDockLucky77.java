@@ -25,9 +25,6 @@ public class GamePullDockLucky77 extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
-        if ( Long.parseLong( gamePlatform.getVersionValue() ) > 614796215L ) {
-            return null;
-        }
         final Map<String, Object> params = new TreeMap<>();
         params.put( "traderId", gamePlatform.getAgent() );
         params.put( "transitionId", gamePlatform.getVersionValue() );
