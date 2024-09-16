@@ -161,7 +161,7 @@
         <if test="channelName != null and channelName != ''">
             and t.channel_id in (SELECT id from pay_channel where name like concat(#{channelName}, '%'))
         </if>
-        GROUP BY t.channel_id, t.platform_id, c.name, t.rate, c.rate
+        GROUP BY t.channel_id, t.platform_id
     </select>
 
     <select id="reportListCount" resultType="java.util.Map">
