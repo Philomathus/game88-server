@@ -97,12 +97,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
     RspBase<?> queryPhones( ReqSmallFeatures req );
 
-    RspBase<?> commitMoney( ReqSmallFeatures req );
-
-    RspBase<?> insertPaiSong( String req );
-
-    RspBase<?> clear();
-
     void sendMsg( String msg, String memberId );
 
     RspBase<?> updateCodeTotalVipLevel( MemberInfo memberInfo );

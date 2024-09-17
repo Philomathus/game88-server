@@ -19,12 +19,13 @@ public interface MemberMoneyMapper extends BaseMapper<MemberMoney> {
      * 查询派送彩金暂存表列表
      *
      * @param memberMoney 派送彩金暂存表
+     *
      * @return 派送彩金暂存表集合
      */
     List<MemberMoney> selectMemberMoneyList( MemberMoney memberMoney );
 
     /**
-     *  行为类型统计 count money mapper
+     * 行为类型统计 count money mapper
      */
     BigDecimal countMoney();
 
@@ -32,4 +33,6 @@ public interface MemberMoneyMapper extends BaseMapper<MemberMoney> {
      * 查询派送彩金暂存表列表 remove all data mapper
      */
     Integer handleClean();
+
+    int insertBatch( List<MemberMoney> memberMoneyList );
 }

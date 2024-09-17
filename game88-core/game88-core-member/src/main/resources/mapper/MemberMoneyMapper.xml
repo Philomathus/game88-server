@@ -29,8 +29,15 @@
     </delete>
 
     <delete id="handleClean">
-       delete from member_money where 1=1
+        TRUNCATE TABLE member_money
     </delete>
+
+    <insert id="insertBatch">
+        insert into member_money (id, money, beat)
+        <foreach collection="list" item="item" open="values" separator=",">
+            (#{item.id}, #{item.money}, #{item.beat})
+        </foreach>
+    </insert>
 
     <select id="countMoney" resultType="java.math.BigDecimal">
         select sum(money) from member_money;

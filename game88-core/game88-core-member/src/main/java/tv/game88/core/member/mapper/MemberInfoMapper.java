@@ -124,10 +124,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
     List<ReqSmallFeatures> queryPhones(ReqSmallFeatures reqSmallFeatures);
 
-    Integer clear();
-
-    Integer insertPaiSong(@Param("userIds") String userIds);
-
     int updateCodeTotalVipLevel( MemberInfo memberInfo );
 
     BigDecimal sumRecharge( @Param( "memberId" ) String memberId, @Param( "days" ) int days );

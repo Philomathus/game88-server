@@ -1573,57 +1573,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    @Transactional( rollbackFor = Exception.class )
-    public RspBase<?> commitMoney( ReqSmallFeatures req ) {
-        if ( org.springframework.util.StringUtils.hasText( req.getMemberIds() ) ) {
-            String[] userIds = null;
-            if ( req.getMemberIds().contains( "\n" ) ) {
-                try {
-                    userIds = req.getMemberIds().split( "\n" );
-                    StringBuilder userId = new StringBuilder();
-                    for ( String id : userIds ) {
-                        userId
-                                .append( "\"" )
-                                .append( id )
-                                .append( "\"" )
-                                .append( "," )
-                                .append( req.getMoney() )
-                                .append( "," )
-                                .append( req.getMoney() )
-                                .append( "),(" );
-                    }
-                    userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
-                    req.setUserIds( userId.toString() );
-                } catch ( Exception e ) {
-                    return RspBase.businessError( "分割会员ID出错,请检查格式" );
-                }
-            } else {
-                req.setUserIds( "\"" + req.getMemberIds() + "\"" + "," + req.getMoney() + "," + req.getMoney() );
-            }
-            //清除表中数据
-            memberInfoMapper.clear();
-            memberInfoMapper.insertPaiSong( req.getUserIds() );
-            return RspBase.ok();
-        }
-        return RspBase.businessError( "请输入批量会员ID" );
-    }
-
-    @Override
-    public RspBase<?> insertPaiSong( String userIds ) {
-        if ( org.springframework.util.StringUtils.hasText( userIds ) ) {
-            memberInfoMapper.insertPaiSong( userIds );
-            return RspBase.ok();
-        }
-        return RspBase.businessError( "请输入批量会员ID" );
-    }
-
-    @Override
-    public RspBase<?> clear() {
-        memberInfoMapper.clear();
-        return RspBase.ok();
-    }
-
-    @Override
     public void sendMsg( String msg, String memberId ) {
         MemberInfo memberInfo = memberInfoMapper.selectMemberInfoById( memberId );
         String     phone      = memberInfo.getPhone();
