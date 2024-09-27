@@ -89,7 +89,7 @@ public class GameDockMG extends AbstractGameDock {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, headers );
 
         log.warn( reqJoinGame.getGameCategory().getDes()
-                + "获取游戏链接 - URL:{}; BODY:{}; token:{}", url, JsonUtil.object2Json( params ), reqJoinGame.getToken() );
+                + "获取游戏链接 - URL:{} - BODY:{}", url, JsonUtil.object2Json( params ) );
         ResponseEntity<Map> responseEntity = restTemplate.exchange( url, HttpMethod.POST, requestEntity, Map.class );
         Map                 result         = responseEntity.getBody();
         if ( responseEntity.getStatusCode().is2xxSuccessful() ) {

@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Log4j2
-@Repository( value = ConstantsGame.LUCKY_77 + ConstantsGame.GAME_PULL_PROCESSOR )
-public class GamePullDockLucky77 extends AbstractGamePull {
+@Repository( value = ConstantsGame.RR + ConstantsGame.GAME_PULL_PROCESSOR )
+public class GamePullDockRR extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", BigDecimal.ONE, "INR", BigDecimal.ONE );
 
