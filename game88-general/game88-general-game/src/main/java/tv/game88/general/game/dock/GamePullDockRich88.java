@@ -28,7 +28,7 @@ public class GamePullDockRich88 extends AbstractGamePull {
         if ( start.isAfter( LocalDateTime.now().minusMinutes( 3 ) ) ) {
             return null;
         }
-        LocalDateTime end = start.plusMinutes( 1 );
+        LocalDateTime end = start.plusHours( 1 );
 
         String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( start ) );
         String endTime   = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( end ) );
