@@ -40,8 +40,8 @@ spring:
           password: dRmBstReqberz!14Xm#
         slave_7709:
           url: jdbc:mysql://rdsdb-7709.c6uwqqgyc6gv.ap-northeast-1.rds.amazonaws.com:3306/7709_main?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
-          username: tv77admin
-          password: 5eypHP13jn2Nvaqgfsdjfsada
+          username: seldata
+          password: 5eypHP13jn2Nvaqgfd
         slave_7710:
           url: jdbc:mysql://moli-dandu.cluster-c2mgsz0wk6v3.ap-east-1.rds.amazonaws.com:3306/7710_main?useUnicode=true&allowMultiQueries=true
           username: admin
