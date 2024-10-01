@@ -99,11 +99,11 @@ spring:
           username: admin
           password: dRmBstReqberz!14Xm#
         slave_9901:
-          url: jdbc:mysql://r99-instance-1.ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9901?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://r99.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9901?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: 3WMX&YMHXEthQ$ed
         slave_9906:
-          url: jdbc:mysql://r99-instance-1.ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9906?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          url: jdbc:mysql://r99.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9906?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: 3WMX&YMHXEthQ$ed
         slave_9907:
