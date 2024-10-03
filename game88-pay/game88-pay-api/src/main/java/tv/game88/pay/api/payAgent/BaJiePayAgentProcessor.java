@@ -4,9 +4,11 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -38,11 +40,13 @@ public class BaJiePayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "channel", "1001" );
         bodyMap.put( "tradeid", memberWithdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "type", "cny" );
-        for ( RspConfigBankList rspConfigBank : configBankListCache.getEffectList() ) {
-            if ( Objects.equals( rspConfigBank.getId(), memberWithdrawDetail.getBankId() ) ) {
-                bodyMap.put( "bankname", rspConfigBank.getBankName() );
-            }
+        ConfigBankList configBank = configBankListCache.getConfigBank( memberWithdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( memberWithdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", memberWithdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + memberWithdrawDetail.getBankId() );
         }
+        bodyMap.put( "bankname", configBank.getBankName() );
         bodyMap.put( "accountname", memberWithdrawDetail.getBankUserName().trim() );
         bodyMap.put( "cardnumber", memberWithdrawDetail.getBankAccount().trim() );
         bodyMap.put( "subbranch", "123" );

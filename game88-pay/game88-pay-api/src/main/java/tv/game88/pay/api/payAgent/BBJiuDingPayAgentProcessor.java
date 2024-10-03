@@ -4,10 +4,12 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -35,12 +37,13 @@ public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
 
         bodyMap.put( "MerchantId", payAgentChannel.getMerId() );
         bodyMap.put( "Amount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
-        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
-        for ( RspConfigBankList rspConfigBank : effectList ) {
-            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
-                bodyMap.put( "BankCardBankName", rspConfigBank.getBankName() );
-            }
+        ConfigBankList configBank = configBankListCache.getConfigBank( withdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + withdrawDetail.getBankId() );
         }
+        bodyMap.put( "BankCardBankName", configBank.getBankName() );
         bodyMap.put( "BankCardNumber", withdrawDetail.getBankAccount() );
         bodyMap.put( "BankCardRealName", withdrawDetail.getBankUserName() );
         bodyMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );

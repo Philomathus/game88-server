@@ -11,10 +11,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.StringUtils;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -46,12 +48,13 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "action", "AgentPay" );
         bodyMap.put( "mer_no", payAgentChannel.getMerId() );
         Map<String, String>     cardInfoMap = new HashMap<>();
-        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
-        for ( RspConfigBankList rspConfigBank : effectList ) {
-            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
-                cardInfoMap.put( "bankName", rspConfigBank.getBankName() );
-            }
+        ConfigBankList configBank = configBankListCache.getConfigBank( withdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + withdrawDetail.getBankId() );
         }
+        cardInfoMap.put( "bankName", configBank.getBankName() );
         cardInfoMap.put( "cardNo", withdrawDetail.getBankAccount().trim() );
         cardInfoMap.put( "name", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "card_info", JsonUtil.object2Json( cardInfoMap ) );

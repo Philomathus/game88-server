@@ -9,8 +9,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -41,12 +43,13 @@ public class JqPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "merchId", payAgentChannel.getMerId() );
         bodyMap.put( "outTradeNo", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
-        List<RspConfigBankList> effectList = configBankListCache.getEffectList();
-        for ( RspConfigBankList rspConfigBank : effectList ) {
-            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
-                bodyMap.put( "accBankName", rspConfigBank.getBankName() );
-            }
+        ConfigBankList configBank = configBankListCache.getConfigBank( withdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + withdrawDetail.getBankId() );
         }
+        bodyMap.put( "accBankName", configBank.getBankName() );
         bodyMap.put( "accName", withdrawDetail.getBankUserName().trim() );
         bodyMap.put( "accNo", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );

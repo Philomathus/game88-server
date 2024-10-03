@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Component
 public class ConfigBankListCache {
     private static final String CONFIG_BANKLIST_CACHE = Constants.CONFIG_PREX + "bankList";
+    private static final String CONFIG_BANK_CACHE     = Constants.CONFIG_PREX + "bank";
 
     @Resource
     private ConfigBankListMapper configBankListMapper;
@@ -31,18 +32,18 @@ public class ConfigBankListCache {
     private RedisUtils redisUtils;
 
     @Resource
-    private Cache<String, List<RspConfigBankList>> cache;
+    private Cache<String, Object> cache;
 
-    public List<RspConfigBankList> getEffectList() {
-        List<RspConfigBankList> localCacheIfPresent = cache.getIfPresent( CONFIG_BANKLIST_CACHE );
+    public List<ConfigBankList> getEffectList() {
+        List<ConfigBankList> localCacheIfPresent = ( List<ConfigBankList> ) cache.getIfPresent( CONFIG_BANKLIST_CACHE );
         if ( CollectionUtils.isEmpty( localCacheIfPresent ) ) {
             exists();
-            List<RspConfigBankList> rspConfigBankLists = redisUtils
-                    .hGetAll( CONFIG_BANKLIST_CACHE )
+            List<ConfigBankList> rspConfigBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE )
                     .values()
                     .stream()
-                    .map( obj -> JsonUtil.json2Object( obj.toString(), RspConfigBankList.class ) )
-                    .sorted( Comparator.comparing( o -> o.getSort() ) )
+                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) )
+                    .filter( ConfigBankList::getEffect )
+                    .sorted( Comparator.comparing( o -> o.getSort() != null ? o.getSort() : 0 ) )
                     .collect( Collectors.toList() );
             cache.put( CONFIG_BANKLIST_CACHE, rspConfigBankLists );
             return rspConfigBankLists;
@@ -50,34 +51,30 @@ public class ConfigBankListCache {
         return localCacheIfPresent;
     }
 
-    public void exists() {
-        if ( !redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
-            List<ConfigBankList> bankListList = new QueryChainWrapper<>( configBankListMapper )
-                    .eq( "effect", 1 )
-                    .select( "id", "bank_name", "bank_icon", "sort" )
-                    .list();
-
-            Map<String, String> map = new HashMap<>();
-            for ( ConfigBankList configBankList : bankListList ) {
-                RspConfigBankList rspConfigBankList = new RspConfigBankList();
-                BeanUtils.copyProperties( configBankList, rspConfigBankList );
-                map.put( configBankList.getId().toString(), JsonUtil.object2Json( rspConfigBankList ) );
+    public ConfigBankList getConfigBank( Long id ) {
+        ConfigBankList localCacheIfPresent = ( ConfigBankList ) cache.getIfPresent( CONFIG_BANK_CACHE );
+        if ( localCacheIfPresent == null ) {
+            exists();
+            Object o = redisUtils.hGet( CONFIG_BANKLIST_CACHE, id.toString() );
+            if ( o != null ) {
+                ConfigBankList configBank = JsonUtil.json2Object( o.toString(), ConfigBankList.class );
+                cache.put( CONFIG_BANK_CACHE, configBank );
+                return configBank;
             }
+        }
+        return localCacheIfPresent;
+    }
 
-            redisUtils.hMSet( CONFIG_BANKLIST_CACHE, map );
+    private void exists() {
+        if ( !redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
+            List<ConfigBankList> bankListList = new QueryChainWrapper<>( configBankListMapper ).list();
+            redisUtils.hMSet( CONFIG_BANKLIST_CACHE, bankListList.stream()
+                    .collect( Collectors.toMap( a -> a.getId()
+                            .toString(), JsonUtil::object2Json ) ) );
         }
     }
 
-    public void setEffectConfigBank( ConfigBankList configBankList ) {
-        exists();
-        RspConfigBankList rspConfigBankList = new RspConfigBankList();
-        BeanUtils.copyProperties( configBankList, rspConfigBankList );
-        redisUtils.hSet( CONFIG_BANKLIST_CACHE, configBankList.getId().toString(), JsonUtil.object2Json( rspConfigBankList ) );
-    }
-
-    public void delEffectConfigBank( long id ) {
-        if ( redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
-            redisUtils.hRemove( CONFIG_BANKLIST_CACHE, String.valueOf( id ) );
-        }
+    public void clear() {
+        redisUtils.unlink( CONFIG_BANKLIST_CACHE );
     }
 }
