@@ -153,11 +153,10 @@ public class MemberInfoController extends BaseController {
         if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
-                redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
+                redisUtil.delete( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
-                String       platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" )
-                        .toString();
-                PlatformUser platformUser    = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
+                String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
+                PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
                 platformUser.setStatus( status );
                 redisUtil.hSet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr", JsonUtil.object2Json( platformUser ) );
             }
