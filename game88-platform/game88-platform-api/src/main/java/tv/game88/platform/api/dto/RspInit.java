@@ -41,4 +41,13 @@ public class RspInit {
     @Schema( title = "appLinkTechSpark" )
     private String appLinkTechSpark;
 
+    @Schema( title = "目标安装下载链接1" )
+    private String downloadLink1;
+
+    @Schema( title = "目标安装下载链接2" )
+    private String downloadLink2;
+
+    @Schema( title = "目标安装下载链接3" )
+    private String downloadLink3;
+
 }
