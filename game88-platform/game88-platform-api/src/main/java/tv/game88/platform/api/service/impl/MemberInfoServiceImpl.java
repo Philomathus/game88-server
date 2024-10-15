@@ -139,9 +139,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setFirstRechargeUrl( valueList.get( 11 ) );
         res.setAppLink( valueList.get( 12 ) );
         res.setAppLinkTechSpark( valueList.get( 13 ) );
-        res.setDownloadUrl1( "google.com" );
-        res.setDownloadUrl2( "google2.com" );
-        res.setDownloadUrl3( "google.test.com" );
+        res.setDownloadUrl1( "https://targetinstall-api.feiwin.dev" );
+        res.setDownloadUrl2( "https://targetinstall-api.feiwin.dev" );
+        res.setDownloadUrl3( "https://targetinstall-api.feiwin.dev" );
         return res;
     }
 
