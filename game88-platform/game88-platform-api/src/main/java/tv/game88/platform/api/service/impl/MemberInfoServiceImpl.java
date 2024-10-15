@@ -139,9 +139,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setFirstRechargeUrl( valueList.get( 11 ) );
         res.setAppLink( valueList.get( 12 ) );
         res.setAppLinkTechSpark( valueList.get( 13 ) );
-        res.setDownloadUrl1( valueList.get( 14 ) );
-        res.setDownloadUrl2( valueList.get( 15 ) );
-        res.setDownloadUrl3( valueList.get( 16 ) );
+        res.setDownloadUrl1( "google.com" );
+        res.setDownloadUrl2( "google2.com" );
+        res.setDownloadUrl3( "google.test.com" );
         return res;
     }
 
