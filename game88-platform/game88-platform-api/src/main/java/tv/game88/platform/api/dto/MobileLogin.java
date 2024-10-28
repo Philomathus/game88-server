@@ -1,5 +1,6 @@
 package tv.game88.platform.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,6 +22,7 @@ public class MobileLogin extends MobileBind {
     private String phoneModel;
 
     @Schema( title = "提交二次校验的验证数据，NECaptchaValidate值" )
+    @JsonInclude( JsonInclude.Include.NON_NULL )
     private String validate;
     @Schema( title = "反作弊结果查询token" )
     private String token;
