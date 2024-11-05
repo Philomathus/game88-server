@@ -40,7 +40,8 @@ public class ConfigBankListCache {
             List<ConfigBankList> configBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE ).values().stream()
                     .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) ).filter( Objects::nonNull )
                     .filter( config -> config.getEffect() != null && config.getEffect() )
-                    .sorted( Comparator.comparing( ConfigBankList::getSort, Comparator.nullsFirst( Long::compareTo ) ) ).toList();
+                    .sorted( Comparator.comparing( ConfigBankList::getSort, Comparator.nullsFirst( Long::compareTo ) ) )
+                    .collect( Collectors.toList() );
             cache.put( CONFIG_BANKLIST_CACHE, configBankLists );
             return configBankLists;
         }
