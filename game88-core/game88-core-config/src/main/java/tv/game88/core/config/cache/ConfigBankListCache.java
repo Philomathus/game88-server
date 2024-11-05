@@ -2,6 +2,7 @@ package tv.game88.core.config.cache;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.github.benmanes.caffeine.cache.Cache;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Component
 public class ConfigBankListCache {
     private static final String CONFIG_BANKLIST_CACHE = Constants.CONFIG_PREX + "bankList";
@@ -38,15 +40,13 @@ public class ConfigBankListCache {
         List<ConfigBankList> localCacheIfPresent = ( List<ConfigBankList> ) cache.getIfPresent( CONFIG_BANKLIST_CACHE );
         if ( CollectionUtils.isEmpty( localCacheIfPresent ) ) {
             exists();
-            List<ConfigBankList> rspConfigBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE )
-                    .values()
-                    .stream()
-                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) )
-                    .filter( ConfigBankList::getEffect )
-                    .sorted( Comparator.comparing( o -> o.getSort() != null ? o.getSort() : 0 ) )
-                    .collect( Collectors.toList() );
-            cache.put( CONFIG_BANKLIST_CACHE, rspConfigBankLists );
-            return rspConfigBankLists;
+            List<ConfigBankList> configBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE ).values().stream()
+                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) ).toList();
+            log.warn( configBankLists );
+            configBankLists = configBankLists.stream().filter( ConfigBankList::getEffect )
+                    .sorted( Comparator.comparing( o -> o.getSort() != null ? o.getSort() : 0 ) ).toList();
+            cache.put( CONFIG_BANKLIST_CACHE, configBankLists );
+            return configBankLists;
         }
         return localCacheIfPresent;
     }
@@ -69,8 +69,7 @@ public class ConfigBankListCache {
         if ( !redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
             List<ConfigBankList> bankListList = new QueryChainWrapper<>( configBankListMapper ).list();
             redisUtils.hMSet( CONFIG_BANKLIST_CACHE, bankListList.stream()
-                    .collect( Collectors.toMap( a -> a.getId()
-                            .toString(), JsonUtil::object2Json ) ) );
+                    .collect( Collectors.toMap( a -> a.getId().toString(), JsonUtil::object2Json ) ) );
         }
     }
 
