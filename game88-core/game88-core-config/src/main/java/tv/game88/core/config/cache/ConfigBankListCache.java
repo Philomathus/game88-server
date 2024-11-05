@@ -15,10 +15,7 @@ import tv.game88.core.config.mapper.ConfigBankListMapper;
 
 import jakarta.annotation.Resource;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -41,14 +38,17 @@ public class ConfigBankListCache {
         if ( CollectionUtils.isEmpty( localCacheIfPresent ) ) {
             exists();
             List<ConfigBankList> configBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE ).values().stream()
-                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) ).toList();
-            log.warn( configBankLists );
-            configBankLists = configBankLists.stream().filter( ConfigBankList::getEffect )
-                    .sorted( Comparator.comparing( o -> o.getSort() != null ? o.getSort() : 0 ) ).toList();
+                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) ).filter( Objects::nonNull )
+                    .filter( config -> config.getEffect() != null && config.getEffect() )
+                    .sorted( Comparator.comparing( ConfigBankList::getSort, Comparator.nullsFirst( Long::compareTo ) ) ).toList();
             cache.put( CONFIG_BANKLIST_CACHE, configBankLists );
             return configBankLists;
         }
         return localCacheIfPresent;
+    }
+
+    public static void main( String[] args ) {
+
     }
 
     public ConfigBankList getConfigBank( Long id ) {
