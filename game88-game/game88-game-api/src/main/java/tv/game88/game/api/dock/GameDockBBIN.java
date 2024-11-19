@@ -62,6 +62,7 @@ public class GameDockBBIN extends AbstractGameDock {
                 .fromUriString( reqJoinGame.getApiUrl() + "/CreateSession" )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
                     InputStream bodyStream = response.getBody();
@@ -120,7 +121,7 @@ public class GameDockBBIN extends AbstractGameDock {
                         "/GameUrlBy" + gameUrlId : "/LobbyUrl" ) )
                 .queryParams( requestMap )
                 .build( true );
-        log.warn( uriComponents.toUri().toString() );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
                     InputStream bodyStream = response.getBody();
@@ -167,6 +168,7 @@ public class GameDockBBIN extends AbstractGameDock {
                 .fromUriString( reqJoinGame.getApiUrl() + "/Transfer" )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
@@ -214,6 +216,7 @@ public class GameDockBBIN extends AbstractGameDock {
                 .fromUriString( reqJoinGame.getApiUrl() + "/Transfer" )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = null;
         try {
             resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
@@ -257,6 +260,7 @@ public class GameDockBBIN extends AbstractGameDock {
                 .fromUriString( reqJoinGame.getApiUrl() + "/CheckUsrBalance" )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
                     InputStream bodyStream = response.getBody();
@@ -294,6 +298,7 @@ public class GameDockBBIN extends AbstractGameDock {
                 .fromUriString( reqJoinGame.getApiUrl() + "/CheckTransfer" )
                 .queryParams( requestMap )
                 .build( true );
+        log.warn( uriComponents.toUriString() );
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
                     InputStream bodyStream = response.getBody();
