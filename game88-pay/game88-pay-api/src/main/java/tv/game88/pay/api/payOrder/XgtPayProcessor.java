@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.pay.api.base.AbstractPay;
 import tv.game88.pay.api.constants.ConstantsPay;
@@ -29,7 +30,7 @@ public class XgtPayProcessor extends AbstractPay {
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) {
+    public String orderPay( PayChannel payChannel, PayPlatform payPlatform, ReqPayRecharge reqPayRecharge ) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put( "merchantId", payPlatform.getMerId() );
         params.put( "orderId", reqPayRecharge.getOrderNo() );
@@ -37,7 +38,7 @@ public class XgtPayProcessor extends AbstractPay {
         params.put( "channelType", payChannel.getChannelCode() );
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
 
-        String sign = this.assemblyUrl( params ) + "&key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Order: {}", sign );
         params.put( "sign", DigestUtils.md5Hex( sign ) );
 
@@ -57,11 +58,11 @@ public class XgtPayProcessor extends AbstractPay {
     }
 
     @Override
-    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) {
+    public boolean queryPay( MemberRechargeOnline memberRechargeOnline, PayPlatform payPlatform, PayChannel payChannel ) throws Exception {
         Map<String, Object> bodyMap = new TreeMap<>();
         bodyMap.put( "merchantId", payPlatform.getMerId() );
         bodyMap.put( "orderId", memberRechargeOnline.getOrderNo() );
-        String sign = this.assemblyUrl( bodyMap ) + "&key=" + payPlatform.getSignMd5();
+        String sign = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Query: {}", sign );
         bodyMap.put( "sign", DigestUtils.md5Hex( sign ) );
 
@@ -78,7 +79,7 @@ public class XgtPayProcessor extends AbstractPay {
     }
 
     @Override
-    public String callbackPay( Map<String, Object> requestMap, String realIp ) {
+    public String callbackPay( Map<String, Object> requestMap, String realIp ) throws Exception {
         String               orderNo              = requestMap.getOrDefault( "orderId", "" ).toString();
         MemberRechargeOnline memberRechargeOnline = memberRechargeOnlineMapper.selectById( orderNo );
 
@@ -101,7 +102,7 @@ public class XgtPayProcessor extends AbstractPay {
 
         String                    sign    = ( String ) requestMap.remove( "sign" );
         SortedMap<String, Object> treeMap = new TreeMap<>( requestMap );
-        String                    tempStr = this.assemblyUrl( treeMap ) + "&key=" + payPlatform.getSignMd5();
+        String                    tempStr = this.assemblyUrl( treeMap ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
         log.warn( "Callback: {}", tempStr );
         String mySign = DigestUtils.md5Hex( tempStr );
 
