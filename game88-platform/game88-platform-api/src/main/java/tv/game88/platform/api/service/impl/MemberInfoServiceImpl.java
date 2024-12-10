@@ -649,7 +649,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     private void regChannelNotice( MobileLogin mobileLogin, Integer dev,String version, String userId ) {
 
-        if( AppVersionUtils.hasNewVersion("6.12.3.0", version ) ) {
+        if( AppVersionUtils.hasNewVersion("3.12.3.1", version ) ) {
             return;
         }
 
