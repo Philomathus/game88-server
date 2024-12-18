@@ -126,6 +126,18 @@ spring:
           url: jdbc:mysql://r9909.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9902?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
           username: admin
           password: 3W1MX&Y32M1HdXE12thQ$edd
+        slave_99s8:
+          url: jdbc:mysql://r9909.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/99s8?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: admin
+          password: 3W1MX&Y32M1HdXE12thQ$edd
+        slave_99d73:
+          url: jdbc:mysql://r9909.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/99d73?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: admin
+          password: 3W1MX&Y32M1HdXE12thQ$edd
+        slave_9983:
+          url: jdbc:mysql://r99-2.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com/9983?useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false
+          username: admin
+          password: 3W1MX&Y32M1HdXEthQ$edd
   data:
     redis:
       host: zongdaili.zczoyz.ng.0001.ape1.cache.amazonaws.com
