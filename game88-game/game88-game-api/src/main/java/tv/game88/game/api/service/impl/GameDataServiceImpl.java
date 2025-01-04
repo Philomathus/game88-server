@@ -331,6 +331,8 @@ public class GameDataServiceImpl implements GameDataService {
                     }
                 }
                 if ( y ) {
+                    log.info( "开始更新任务量 - 会员ID:{} - 活动:{}", data.getAccount(),
+                            confQuest.getTitle() + confQuest.getTarget() );
                     memberQuestManager.memberQuestProcess( data.getAccount(), add, confQuest );
                 }
             }
