@@ -33,9 +33,6 @@ public class MemberQuestManager {
             }
             newMemberQuest.setTaskMode( confQuest.getTaskMode() );
             memberQuestMapper.insert( newMemberQuest );
-
-            log.info( "开始更新任务量 - 会员ID:{} - 活动:{} - 活动量:{}", memberId,
-                    confQuest.getTitle() + confQuest.getTarget(), add );
         } else if ( memberQuest.getStatus() == 0 ) {
             MemberQuest update = new MemberQuest();
             update.setId( memberQuestId );
@@ -45,8 +42,6 @@ public class MemberQuestManager {
                 update.setStatus( 1 );
             }
             memberQuestMapper.updateById( update );
-            log.info( "开始更新任务量 - 会员ID:{} - 活动:{} - 活动量:{}", memberId,
-                    confQuest.getTitle() + confQuest.getTarget(), add );
         }
     }
 }
