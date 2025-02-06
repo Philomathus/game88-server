@@ -57,7 +57,7 @@ public class ConfigEnvironmentController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigEnvironment configEnvironment, HttpServletResponse response ) {
         List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentList( configEnvironment );
-        ExportExcelUtil.exportExcel( list, "环境参数配置", "环境参数配置表", ConfigEnvironment.class, response );
+        ExportExcelUtil.exportBigExcel( list, "环境参数配置", "环境参数配置表", ConfigEnvironment.class, response );
     }
 
     /**

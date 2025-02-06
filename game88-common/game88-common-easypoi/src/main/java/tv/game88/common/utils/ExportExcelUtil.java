@@ -4,51 +4,44 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import tv.game88.common.exception.ExcelException;
 import org.springframework.web.multipart.MultipartFile;
-
-import jakarta.servlet.http.HttpServletResponse;
+import tv.game88.common.exception.ExcelException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Log4j2
 public class ExportExcelUtil {
-    public static void exportExcel( List<?> list, String title, String sheetName, Class<?> pojoClass, boolean isCreateHeader,
-                                    HttpServletResponse response ) {
+    public static void exportBigExcel( List<?> list, String title, String sheetName, Class<?> pojoClass,
+                                       HttpServletResponse response ) {
         ExportParams exportParams = new ExportParams( title, sheetName );
-        exportParams.setCreateHeadRows( isCreateHeader );
-        defaultExport( list, pojoClass, response, exportParams );
-
+        exportParams.setMaxNum( 1000000 );
+        Workbook workbook = ExcelExportUtil.exportBigExcel( exportParams, pojoClass, ( queryParamsNum, num ) -> {
+            // 只导出一次，第二次返回null终止循环
+            if ( ( ( int ) queryParamsNum ) == num ) {
+                return null;
+            }
+            log.warn( "正在进行大数据量导出，条数: " + list.size() );
+            return Arrays.asList( list.toArray() );
+        }, 2 );
+        downLoadExcel( response, workbook, title );
     }
 
-    public static void exportExcel( List<?> list, String title, String sheetName, Class<?> pojoClass,
-                                    HttpServletResponse response ) {
-        defaultExport( list, pojoClass, response, new ExportParams( title, sheetName ) );
-    }
-
-    public static void exportExcel( List<Map<String, Object>> list, HttpServletResponse response ) {
-        defaultExport( list, response );
-    }
-
-    private static void defaultExport( List<?> list, Class<?> pojoClass, HttpServletResponse response,
-                                       ExportParams exportParams ) {
-        Workbook workbook = ExcelExportUtil.exportExcel( exportParams, pojoClass, list );
-        downLoadExcel( response, workbook );
-    }
-
-    private static void downLoadExcel( HttpServletResponse response, Workbook workbook ) {
+    private static void downLoadExcel( HttpServletResponse response, Workbook workbook, String filename ) {
         try {
             response.setCharacterEncoding( "UTF-8" );
-            response.setHeader( "content-Type", "application/vnd.ms-excel" );
-            response.setHeader( "Content-Disposition", "attachment;filename=data.xls" );
+            response.setHeader( "Content-Disposition", "attachment;filename=a.xls" );
+            response.setContentType( "application/vnd.ms-excel" );
+            response.setHeader( "filename", URLEncoder.encode( filename, StandardCharsets.UTF_8 ) + ".xls" );
             workbook.write( response.getOutputStream() );
         } catch ( IOException e ) {
             log.error( e.getMessage(), e );
@@ -60,11 +53,6 @@ public class ExportExcelUtil {
                 log.error( e.getMessage() );
             }
         }
-    }
-
-    private static void defaultExport( List<Map<String, Object>> list, HttpServletResponse response ) {
-        Workbook workbook = ExcelExportUtil.exportExcel( list, ExcelType.HSSF );
-        downLoadExcel( response, workbook );
     }
 
     public static <T> List<T> importExcel( String filePath, Integer titleRows, Integer headerRows, Class<T> pojoClass ) {

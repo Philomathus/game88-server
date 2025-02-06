@@ -61,7 +61,7 @@ public class MemberRechargeUsdtController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReqMemberRechargeUsdt req, HttpServletResponse response ) {
         List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( req );
-        ExportExcelUtil.exportExcel( list, "USDT充值信息", "USDT充值信息表", MemberRechargeUsdt.class, response );
+        ExportExcelUtil.exportBigExcel( list, "USDT充值信息", "USDT充值信息表", MemberRechargeUsdt.class, response );
     }
 
     /**

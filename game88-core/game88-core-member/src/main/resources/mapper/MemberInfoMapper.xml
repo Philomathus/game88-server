@@ -527,17 +527,6 @@
         where id = #{id}
     </select>
 
-    <delete id="clear">
-        delete
-        from member_money
-        where 1 = 1
-    </delete>
-
-    <insert id="insertPaiSong" parameterType="String">
-        insert into member_money(id, money, beat)
-        values (${userIds})
-    </insert>
-
     <update id="updatePhones" parameterType="tv.game88.core.member.dto.ReqSmallFeatures">
         update member_info
         set password = #{password}

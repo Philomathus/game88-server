@@ -49,7 +49,7 @@ public class ConfigVipController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigVip configVip, HttpServletResponse response ) {
         List<ConfigVip> list = configVipService.selectConfigVipList( configVip );
-        ExportExcelUtil.exportExcel( list, "会员VIP配置", "会员VIP配置表", ConfigVip.class, response );
+        ExportExcelUtil.exportBigExcel( list, "会员VIP配置", "会员VIP配置表", ConfigVip.class, response );
     }
 
     /**

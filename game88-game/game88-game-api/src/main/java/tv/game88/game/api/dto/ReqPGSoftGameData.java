@@ -1,11 +1,7 @@
 package tv.game88.game.api.dto;
 
 import lombok.Data;
-
-import jakarta.validation.constraints.NotNull;
 import org.springframework.util.MultiValueMap;
-
-import java.util.StringJoiner;
 
 @Data
 public class ReqPGSoftGameData {

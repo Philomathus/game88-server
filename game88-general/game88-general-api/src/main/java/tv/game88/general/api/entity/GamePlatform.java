@@ -83,8 +83,8 @@ public class GamePlatform {
     private LocalDateTime    updateTime;
 
     @TableField( exist = false )
-    private String versionValue;
-
+    private String  versionValue;
+    @TableField( exist = false )
     private boolean isFix = false;
 
     public String getDes() {

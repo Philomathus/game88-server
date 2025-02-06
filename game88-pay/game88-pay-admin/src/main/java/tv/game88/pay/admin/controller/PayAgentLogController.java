@@ -50,7 +50,7 @@ public class PayAgentLogController extends BaseController {
     @GetMapping( "/export" )
     public void export( PayAgentLog payAgentLog, HttpServletResponse response ) {
         List<PayAgentLog> list = payAgentLogService.selectPayAgentLogList( payAgentLog );
-        ExportExcelUtil.exportExcel( list, "代付下单日志", "代付下单日志信息表", PayAgentLog.class, response );
+        ExportExcelUtil.exportBigExcel( list, "代付下单日志", "代付下单日志信息表", PayAgentLog.class, response );
     }
 
     /**

@@ -77,7 +77,7 @@
             </if>
         </where>
         GROUP BY gameplame
-        <if test="!agentPlatform.startsWith('88')">
+        <if test="!agentPlatform.startsWith('88') and !agentPlatform.startsWith('99')">
             UNION all
             select '送礼金额' as liveprop,
             '0' as gamecell,

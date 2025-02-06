@@ -34,4 +34,20 @@ public class RspInit {
     private String productId;
     @Schema( title = "首存活动URL" )
     private String firstRechargeUrl;
+
+    @Schema( title = "appLink" )
+    private String appLink;
+
+    @Schema( title = "appLinkTechSpark" )
+    private String appLinkTechSpark;
+
+    @Schema( title = "目标安装下载链接1" )
+    private String downloadUrl1;
+
+    @Schema( title = "目标安装下载链接2" )
+    private String downloadUrl2;
+
+    @Schema( title = "目标安装下载链接3" )
+    private String downloadUrl3;
+
 }

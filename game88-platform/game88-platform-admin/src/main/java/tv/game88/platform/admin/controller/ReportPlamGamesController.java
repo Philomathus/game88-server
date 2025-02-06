@@ -70,7 +70,7 @@ public class ReportPlamGamesController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportPlamGames reportPlamGames, HttpServletResponse response ) {
         List<ReportPlamGames> list = reportPlamGamesService.exportPlamGamesList( reportPlamGames );
-        ExportExcelUtil.exportExcel( list, "游戏投注报表", "游戏投注报表", ReportPlamGames.class, response );
+        ExportExcelUtil.exportBigExcel( list, "游戏投注报表", "游戏投注报表", ReportPlamGames.class, response );
     }
 
     @PreAuthorize( "@ss.hasPermi('report:plam-games:list')" )

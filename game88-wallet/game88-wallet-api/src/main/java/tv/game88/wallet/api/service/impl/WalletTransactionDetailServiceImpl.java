@@ -17,6 +17,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.wallet.api.constants.ConstantsWallet;
 import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.*;
@@ -216,13 +217,13 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         rspBuyOrderDetail.setSellerId( walletTransactionDetail.getSellerId() );
         rspBuyOrderDetail.setTransStartTime( walletTransactionDetail.getBuyerConfirmBuyTime() );
 
-        List<RspConfigBankList> configBankList = configBankListCache.getEffectList();
+        List<ConfigBankList> configBankList = configBankListCache.getEffectList();
 
         RspPayMethod2 rspBuyerPayMethod = new RspPayMethod2();
         BeanUtils.copyProperties( bPayMethod, rspBuyerPayMethod );
         rspBuyOrderDetail.setBuyerPayMethod( rspBuyerPayMethod );
         rspBuyerPayMethod.setType( bPayMethod.getMethodType() );
-        for ( RspConfigBankList rspConfigBank : configBankList ) {
+        for ( ConfigBankList rspConfigBank : configBankList ) {
             if ( Objects.equals( bPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                 rspBuyerPayMethod.setBankName( rspConfigBank.getBankName() );
             }
@@ -232,7 +233,7 @@ public class WalletTransactionDetailServiceImpl extends ServiceImpl<WalletTransa
         BeanUtils.copyProperties( sPayMethod, rspSellerPayMethod );
         rspBuyOrderDetail.setSellerPayMethod( rspSellerPayMethod );
         rspSellerPayMethod.setType( sPayMethod.getMethodType() );
-        for ( RspConfigBankList rspConfigBank : configBankList ) {
+        for ( ConfigBankList rspConfigBank : configBankList ) {
             if ( Objects.equals( sPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                 rspSellerPayMethod.setBankName( rspConfigBank.getBankName() );
             }

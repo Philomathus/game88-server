@@ -64,8 +64,8 @@ public class RestTemplateConfig {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClient() );
-            requestFactory.setConnectionRequestTimeout( 15000 );
-            requestFactory.setConnectTimeout( 10000 );
+            requestFactory.setConnectionRequestTimeout( 6000 );
+            requestFactory.setConnectTimeout( 6000 );
             return requestFactory;
         } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
             throw new RuntimeException( e );
@@ -88,8 +88,8 @@ public class RestTemplateConfig {
         try {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient( getHttpClientNoRedirect() );
-            requestFactory.setConnectionRequestTimeout( 15000 );
-            requestFactory.setConnectTimeout( 10000 );
+            requestFactory.setConnectionRequestTimeout( 6000 );
+            requestFactory.setConnectTimeout( 6000 );
             return requestFactory;
         } catch ( NoSuchAlgorithmException | KeyStoreException | KeyManagementException e ) {
             throw new RuntimeException( e );

@@ -58,7 +58,6 @@ import tv.game88.platform.api.service.MemberInfoService;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -84,8 +83,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     private ConfigVipCacheUtils   configVipCacheUtils;
     @Resource
     private SmsApi                smsApi;
-    @Resource
-    private ForkJoinPool          forkJoinPool;
     @Resource
     private MemberCardMapper      memberCardMapper;
     @Resource
@@ -119,7 +116,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         } else {
             keys.addAll( Arrays.asList( "android_version", "android_force_update", "android_down_url", "android_update_text" ) );
         }
-        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id", "first_recharge_url" ) );
+        keys.addAll( Arrays.asList( "163action_captchaId", "163action_switch", "163action_Product_id", "first_recharge_url" ,
+                "app_link","app_link_tech_spark", "download_link1", "download_link2" , "download_link3") );
         List<String> valueList = configEnvCacheUtil.getConf( keys );
         res.setCustomerUrl( valueList.get( 0 ) );
         res.setCustomerUrl2( valueList.get( 1 ) );
@@ -139,6 +137,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setActionSwitch( valueList.get( 9 ) );
         res.setProductId( valueList.get( 10 ) );
         res.setFirstRechargeUrl( valueList.get( 11 ) );
+        res.setAppLink( valueList.get( 12 ) );
+        res.setAppLinkTechSpark( valueList.get( 13 ) );
+        res.setDownloadUrl1( valueList.get( 14 ) );
+        res.setDownloadUrl2( valueList.get( 15 ) );
+        res.setDownloadUrl3( valueList.get( 16 ));
         return res;
     }
 
@@ -306,7 +309,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 this.baseMapper.deleteByHistoryKey( oldm.getId() );
             } else {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             }
         }
         RspMember rspMember = new RspMember();
@@ -410,10 +413,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             this.baseMapper.insert( memberInfo );
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             } catch ( Exception e ) {
                 try {
-                    regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                    regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
                 } catch ( Exception p ) {
                     log.error( "反作弊注册成功，通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
                 }
@@ -468,10 +471,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         this.baseMapper.insert( memberInfo );
         try {
             //渠道邀请码注册通知(归档会员回归不通知)
-            regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+            regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
         } catch ( Exception e ) {
             try {
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             } catch ( Exception p ) {
                 log.error( "通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
             }
@@ -644,19 +647,25 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
 
-    private void regChannelNotice( MobileLogin mobileLogin, Integer dev, String userId ) {
+    private void regChannelNotice( MobileLogin mobileLogin, Integer dev,String version, String userId ) {
+
+        if( AppVersionUtils.hasNewVersion("3.12.3.1", version ) ) {
+            return;
+        }
+
         String noticeUrl = configEnvCacheUtil.getConf( "channel_reg_notice" );
         if ( StringUtils.isBlank( noticeUrl ) ) {
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );
             return;
         }
-        Executors.newVirtualThreadPerTaskExecutor().execute( () -> {
+        String ip = mobileLogin.getIp();
+        Thread.ofVirtual().start( () -> {
             Map<String, Object> params = new HashMap<>();
             params.put( "channel_id", mobileLogin.getChannelCode() );
             params.put( "invitation_code", mobileLogin.getInviterCode() );
             params.put( "account", userId );
             params.put( "device_type", dev == 2 ? "android" : "ios" );
-            params.put( "ip", mobileLogin.getIp() );
+            params.put( "ip", ip );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType( MediaType.APPLICATION_JSON );
@@ -913,7 +922,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         forkJoinTasks.add( () -> ImmutableMap.of( "totalAccount",
                 this.baseMapper.totalAccount( startTime, endTime, memberId ) ) );
 
-        List<Future<Map<String, Object>>> futureList = forkJoinPool.invokeAll( forkJoinTasks );
+        List<Future<Map<String, Object>>> futureList = null;
+        try {
+            futureList = Executors.newVirtualThreadPerTaskExecutor().invokeAll( forkJoinTasks );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( e );
+        }
         Set<Map<String, Object>> resultSet = futureList.stream().map( t -> {
             try {
                 return t.get();
@@ -1564,57 +1578,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             return RspBase.ok( phonesByIds );
         }
         return RspBase.businessError( "请输入批量会员ID" );
-    }
-
-    @Override
-    @Transactional( rollbackFor = Exception.class )
-    public RspBase<?> commitMoney( ReqSmallFeatures req ) {
-        if ( org.springframework.util.StringUtils.hasText( req.getMemberIds() ) ) {
-            String[] userIds = null;
-            if ( req.getMemberIds().contains( "\n" ) ) {
-                try {
-                    userIds = req.getMemberIds().split( "\n" );
-                    StringBuilder userId = new StringBuilder();
-                    for ( String id : userIds ) {
-                        userId
-                                .append( "\"" )
-                                .append( id )
-                                .append( "\"" )
-                                .append( "," )
-                                .append( req.getMoney() )
-                                .append( "," )
-                                .append( req.getMoney() )
-                                .append( "),(" );
-                    }
-                    userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
-                    req.setUserIds( userId.toString() );
-                } catch ( Exception e ) {
-                    return RspBase.businessError( "分割会员ID出错,请检查格式" );
-                }
-            } else {
-                req.setUserIds( "\"" + req.getMemberIds() + "\"" + "," + req.getMoney() + "," + req.getMoney() );
-            }
-            //清除表中数据
-            memberInfoMapper.clear();
-            memberInfoMapper.insertPaiSong( req.getUserIds() );
-            return RspBase.ok();
-        }
-        return RspBase.businessError( "请输入批量会员ID" );
-    }
-
-    @Override
-    public RspBase<?> insertPaiSong( String userIds ) {
-        if ( org.springframework.util.StringUtils.hasText( userIds ) ) {
-            memberInfoMapper.insertPaiSong( userIds );
-            return RspBase.ok();
-        }
-        return RspBase.businessError( "请输入批量会员ID" );
-    }
-
-    @Override
-    public RspBase<?> clear() {
-        memberInfoMapper.clear();
-        return RspBase.ok();
     }
 
     @Override

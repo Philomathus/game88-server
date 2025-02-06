@@ -57,7 +57,7 @@ public class ${ClassName}Controller extends BaseController {
 	@GetMapping( "/export" )
 	public void export(${ClassName} ${className}, HttpServletResponse response) {
 		List<${ClassName}>      list = ${className}Service.select${ClassName}List(${className});
-		ExportExcelUtil.exportExcel( list, "${functionName}", "${functionName}表", ${ClassName}.class, response );
+		ExportExcelUtil.exportBigExcel( list, "${functionName}", "${functionName}表", ${ClassName}.class, response );
 	}
 
 	/**

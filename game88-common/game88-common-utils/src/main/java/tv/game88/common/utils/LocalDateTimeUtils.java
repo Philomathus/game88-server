@@ -261,6 +261,12 @@ public class LocalDateTimeUtils {
         return converted.toLocalDateTime();
     }
 
+    public static LocalDateTime convertToUTC8( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+8" ) );
+        return converted.toLocalDateTime();
+    }
+
     /**
      * UTC+0时间转换成当地时区时间
      *

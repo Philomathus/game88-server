@@ -9,6 +9,8 @@ import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.RandomUtils;
 import tv.game88.common.utils.RedisUtils;
+import tv.game88.common.utils.SpringUtils;
+import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.api.entity.GameRecordFixVersion;
@@ -46,6 +48,9 @@ public class RemoteGameDataRecordTask {
 
     @Scheduled( cron = "0 0 0,6,12,18 * * ?" ) // 每天0/6/12/18点执行一次
     public void fixRecordPPEveryDay() {
+        if ( !"99".equals( SpringUtils.getActiveProfile() ) ) {
+            return;
+        }
         GameRecordFixVersion gameRecordFixVersion = new GameRecordFixVersion();
         gameRecordFixVersion.setPlatformId( 49L );
         gameRecordFixVersion.setVersionValue(
@@ -53,14 +58,18 @@ public class RemoteGameDataRecordTask {
         gameRecordFixVersionMapper.insert( gameRecordFixVersion );
     }
 
-    @Scheduled( cron = "0/15 * * * * ?" ) // 每15秒执行一次
+    @Scheduled( cron = "0/10 * * * * ?" ) // 每15秒执行一次
     public void remoteGameDataRecord() {
         List<GamePlatform> gamePlatformList = gamePlatformMapper.selectGamePlatformAndVersionList();
         for ( GamePlatform gamePlatform : gamePlatformList ) {
             scheduledExecutorService.schedule( () -> {
-                if ( redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 12000 ) ) {
-                    String name         = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
-                    String versionValue = gamePlatform.getVersionValue();
+                if ( redisUtils.lock( "remoteGameDataRecord:" + gamePlatform.getId(), 300 ) ) {
+
+                    String            name              = gamePlatform.getName() + "-" + gamePlatform.getId() + "注单拉取";
+                    GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
+                    String            versionValue      = gameRecordVersion.getVersionValue();
+                    gamePlatform.setVersionValue( versionValue );
+
                     if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
                         LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
                         log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
@@ -93,7 +102,11 @@ public class RemoteGameDataRecordTask {
                 if ( redisUtils.lock( "remoteGameDataRecordFix:" + gamePlatform.getId(), 12000 ) ) {
                     String name = gamePlatform.getName() + "-" + gamePlatform.getId() + "补单拉取";
                     gamePlatform.setFix( true );
-                    String versionValue = gamePlatform.getVersionValue();
+
+                    GameRecordFixVersion gameRecordFixVersion = gameRecordFixVersionMapper.selectById( gamePlatform.getId() );
+                    String               versionValue         = gameRecordFixVersion.getVersionValue();
+                    gamePlatform.setVersionValue( versionValue );
+
                     if ( StringUtils.isNumeric( versionValue ) && versionValue.length() == 13 ) {
                         LocalDateTime versionTime = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( versionValue ) );
                         log.info( "开始执行{}程序, 开始时间:{}", name, LocalDateTimeUtils.format( versionTime ) );
@@ -111,10 +124,16 @@ public class RemoteGameDataRecordTask {
                         }
                         // 如果补单程序
                         GameRecordVersion gameRecordVersion = gameRecordVersionMapper.selectById( gamePlatform.getId() );
-                        if ( gameRecordVersion != null && Long.parseLong( gameRecordVersion.getVersionValue() )
-                                - Long.parseLong( gamePlatform.getVersionValue() ) <= 300000 ) {
-                            log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
-                            gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                        if ( gameRecordVersion != null ) {
+                            long version    = Long.parseLong( gameRecordVersion.getVersionValue() );
+                            long fixVersion = Long.parseLong( gamePlatform.getVersionValue() );
+                            // @formatter:off
+                            if ( ( gamePlatform.getGameCategory() == EnumGameCategory.SHABA && version - fixVersion <= 100 ) || (
+                                    gamePlatform.getGameCategory() != EnumGameCategory.SHABA && version - fixVersion <= 300000 ) ) {
+                                log.warn( "{}, 补单结束 - 已执行到相近时间段:{}", name, versionValue );
+                                gameRecordFixVersionMapper.deleteById( gamePlatform.getId() );
+                            }
+                            // @formatter:on
                         }
                     } catch ( Exception e ) {
                         log.error( e.getMessage(), e );

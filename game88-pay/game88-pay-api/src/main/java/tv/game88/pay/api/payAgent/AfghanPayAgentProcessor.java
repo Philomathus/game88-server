@@ -4,9 +4,11 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -42,11 +44,13 @@ public class AfghanPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "currency", "cny" );
         bodyMap.put( "accountNo", withdrawDetail.getBankAccount().trim() );
         bodyMap.put( "accountName", withdrawDetail.getBankUserName().trim() );
-        for ( RspConfigBankList rspConfigBank : configBankListCache.getEffectList() ) {
-            if ( Objects.equals( rspConfigBank.getId(), withdrawDetail.getBankId() ) ) {
-                bodyMap.put( "bankName", rspConfigBank.getBankName() );
-            }
+        ConfigBankList configBank = configBankListCache.getConfigBank( withdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + withdrawDetail.getBankId() );
         }
+        bodyMap.put( "bankName", configBank.getBankName() );
         bodyMap.put( "clientIp", "127.0.0.1" );
         bodyMap.put( "transferDesc", "无" );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );

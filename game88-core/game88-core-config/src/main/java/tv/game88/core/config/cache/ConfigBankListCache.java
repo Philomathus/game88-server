@@ -2,6 +2,7 @@ package tv.game88.core.config.cache;
 
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.github.benmanes.caffeine.cache.Cache;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -14,15 +15,14 @@ import tv.game88.core.config.mapper.ConfigBankListMapper;
 
 import jakarta.annotation.Resource;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Component
 public class ConfigBankListCache {
     private static final String CONFIG_BANKLIST_CACHE = Constants.CONFIG_PREX + "bankList";
+    private static final String CONFIG_BANK_CACHE     = Constants.CONFIG_PREX + "bank";
 
     @Resource
     private ConfigBankListMapper configBankListMapper;
@@ -31,53 +31,50 @@ public class ConfigBankListCache {
     private RedisUtils redisUtils;
 
     @Resource
-    private Cache<String, List<RspConfigBankList>> cache;
+    private Cache<String, Object> cache;
 
-    public List<RspConfigBankList> getEffectList() {
-        List<RspConfigBankList> localCacheIfPresent = cache.getIfPresent( CONFIG_BANKLIST_CACHE );
+    public List<ConfigBankList> getEffectList() {
+        List<ConfigBankList> localCacheIfPresent = ( List<ConfigBankList> ) cache.getIfPresent( CONFIG_BANKLIST_CACHE );
         if ( CollectionUtils.isEmpty( localCacheIfPresent ) ) {
             exists();
-            List<RspConfigBankList> rspConfigBankLists = redisUtils
-                    .hGetAll( CONFIG_BANKLIST_CACHE )
-                    .values()
-                    .stream()
-                    .map( obj -> JsonUtil.json2Object( obj.toString(), RspConfigBankList.class ) )
-                    .sorted( Comparator.comparing( o -> o.getSort() ) )
+            List<ConfigBankList> configBankLists = redisUtils.hGetAll( CONFIG_BANKLIST_CACHE ).values().stream()
+                    .map( obj -> JsonUtil.json2Object( obj.toString(), ConfigBankList.class ) ).filter( Objects::nonNull )
+                    .filter( config -> config.getEffect() != null && config.getEffect() )
+                    .sorted( Comparator.comparing( ConfigBankList::getSort, Comparator.nullsFirst( Long::compareTo ) ) )
                     .collect( Collectors.toList() );
-            cache.put( CONFIG_BANKLIST_CACHE, rspConfigBankLists );
-            return rspConfigBankLists;
+            cache.put( CONFIG_BANKLIST_CACHE, configBankLists );
+            return configBankLists;
         }
         return localCacheIfPresent;
     }
 
-    public void exists() {
-        if ( !redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
-            List<ConfigBankList> bankListList = new QueryChainWrapper<>( configBankListMapper )
-                    .eq( "effect", 1 )
-                    .select( "id", "bank_name", "bank_icon", "sort" )
-                    .list();
+    public static void main( String[] args ) {
 
-            Map<String, String> map = new HashMap<>();
-            for ( ConfigBankList configBankList : bankListList ) {
-                RspConfigBankList rspConfigBankList = new RspConfigBankList();
-                BeanUtils.copyProperties( configBankList, rspConfigBankList );
-                map.put( configBankList.getId().toString(), JsonUtil.object2Json( rspConfigBankList ) );
+    }
+
+    public ConfigBankList getConfigBank( Long id ) {
+        ConfigBankList localCacheIfPresent = ( ConfigBankList ) cache.getIfPresent( CONFIG_BANK_CACHE );
+        if ( localCacheIfPresent == null ) {
+            exists();
+            Object o = redisUtils.hGet( CONFIG_BANKLIST_CACHE, id.toString() );
+            if ( o != null ) {
+                ConfigBankList configBank = JsonUtil.json2Object( o.toString(), ConfigBankList.class );
+                cache.put( CONFIG_BANK_CACHE, configBank );
+                return configBank;
             }
+        }
+        return localCacheIfPresent;
+    }
 
-            redisUtils.hMSet( CONFIG_BANKLIST_CACHE, map );
+    private void exists() {
+        if ( !redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
+            List<ConfigBankList> bankListList = new QueryChainWrapper<>( configBankListMapper ).list();
+            redisUtils.hMSet( CONFIG_BANKLIST_CACHE, bankListList.stream()
+                    .collect( Collectors.toMap( a -> a.getId().toString(), JsonUtil::object2Json ) ) );
         }
     }
 
-    public void setEffectConfigBank( ConfigBankList configBankList ) {
-        exists();
-        RspConfigBankList rspConfigBankList = new RspConfigBankList();
-        BeanUtils.copyProperties( configBankList, rspConfigBankList );
-        redisUtils.hSet( CONFIG_BANKLIST_CACHE, configBankList.getId().toString(), JsonUtil.object2Json( rspConfigBankList ) );
-    }
-
-    public void delEffectConfigBank( long id ) {
-        if ( redisUtils.exists( CONFIG_BANKLIST_CACHE ) ) {
-            redisUtils.hRemove( CONFIG_BANKLIST_CACHE, String.valueOf( id ) );
-        }
+    public void clear() {
+        redisUtils.unlink( CONFIG_BANKLIST_CACHE );
     }
 }

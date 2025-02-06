@@ -56,7 +56,7 @@ public class RechargeLogController extends BaseController {
     @GetMapping( "/export" )
     public void export( RechargeLog rechargeLog, HttpServletResponse response ) {
         List<RechargeLog> list = rechargeLogService.selectAllRechargeLog( rechargeLog );
-        ExportExcelUtil.exportExcel( list, "导出充值日志列表", "导出充值日志列表", RechargeLog.class, response );
+        ExportExcelUtil.exportBigExcel( list, "导出充值日志列表", "导出充值日志列表", RechargeLog.class, response );
     }
 
 

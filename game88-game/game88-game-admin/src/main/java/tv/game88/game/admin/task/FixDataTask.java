@@ -14,6 +14,7 @@ import tv.game88.game.api.service.GameDataService;
 import tv.game88.core.game.type.EnumGameCategory;
 
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,9 +41,7 @@ public class FixDataTask {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
         List<MemberGameDataFix> memberGameDataFixes = new QueryChainWrapper<>( memberGameDataFixMapper ).eq( "status", 0 )
-                                                                                                        .isNotNull(
-                                                                                                                "platform_id" )
-                                                                                                        .list();
+                .isNotNull( "platform_id" ).list();
         for ( MemberGameDataFix memberGameDataFix : memberGameDataFixes ) {
             for ( GamePlatform gamePlatform : gamePlatforms ) {
                 try {
@@ -53,8 +52,8 @@ public class FixDataTask {
                             gameDataService.beatLotteryCode( begin, end );
                         } else {
                             log.warn( "开始补单{}游戏", gamePlatform.getName() );
-                            gameDataService.beatGameCodeAgent( begin, end, memberGameDataFix.getMemberId(),
-                                    gamePlatform.getId() );
+                            gameDataService.beatGameCodeAgent( memberGameDataFix.getGameStartTime(),
+                                    memberGameDataFix.getGameEndTime(), memberGameDataFix.getMemberId(), gamePlatform.getId() );
                         }
                         MemberGameDataFix update = new MemberGameDataFix();
                         update.setId( memberGameDataFix.getId() );
@@ -70,15 +69,13 @@ public class FixDataTask {
     }
 
     @Scheduled( cron = "0 */10 * * * ?" )
-    public void scheduled() throws Exception {
+    public void scheduled() {
         try {
             log.warn( "开始补单游戏注单数据" );
             LocalDateTime endDay  = LocalDateTime.now().minusMinutes( 10 );
             LocalDateTime starDay = endDay.minusMinutes( 30 );
-            String        begin   = LocalDateTimeUtils.format( starDay );
-            String        end     = LocalDateTimeUtils.format( endDay );
 
-            gameDataService.beatGameCodeAgent( begin, end, null, null );
+            gameDataService.beatGameCodeAgent( starDay, endDay, null, null );
         } catch ( Exception e ) {
             log.error( "补单游戏注单数据失败,", e );
         }

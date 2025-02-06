@@ -6,10 +6,13 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.helper.RequestDataHelper;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.SpringUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.type.EnumGameCategory;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.core.lottery.mapper.LotteryBetMapper;
@@ -34,59 +37,77 @@ import tv.game88.game.api.service.GameDataService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @Service
 public class GameDataServiceImpl implements GameDataService {
     @Resource
-    private MemberMoneyManager      memberMoneyManager;
+    private MemberMoneyManager   memberMoneyManager;
     @Resource
-    private MemberQuestManager      memberQuestManager;
+    private MemberQuestManager   memberQuestManager;
     @Resource
-    private MemberBcodeMapper       memberBcodeMapper;
+    private MemberBcodeMapper    memberBcodeMapper;
     @Resource
-    private MemberInfoMapper        memberInfoMapper;
+    private MemberInfoMapper     memberInfoMapper;
     @Resource
-    private LotteryBetMapper        lotteryBetMapper;
+    private LotteryBetMapper     lotteryBetMapper;
     @Resource
-    private GamePlatformMapper      gamePlatformMapper;
+    private GamePlatformMapper   gamePlatformMapper;
     @Resource
-    private GameDataRecordMapper    gameDataRecordMapper;
+    private GameDataRecordMapper gameDataRecordMapper;
     @Resource
-    private GameCacheUtils          gameCacheUtils;
+    private GameCacheUtils       gameCacheUtils;
     @Resource
-    private ConfigVipCacheUtils     configVipCacheUtils;
+    private ConfigVipCacheUtils  configVipCacheUtils;
     @Resource
-    private SqlSessionTemplate      sqlSessionTemplate;
+    private SqlSessionTemplate   sqlSessionTemplate;
     @Resource
-    private ActivityCacheUtil       activityCacheUtil;
-
-    @Value( "${spring.profiles.active}" )
-    private String profile;
-
-    private static final String TABLE_PREFIX = "game_data_record_";
+    private ActivityCacheUtil    activityCacheUtil;
 
     @Override
-    public void beatGameCodeAgent( String start, String end, String account, Long platformId ) {
+    public void beatGameCodeAgent( LocalDateTime start, LocalDateTime end, String account, Long platformId ) {
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
 
-
-        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms
-                .stream()
+        Map<Long, GamePlatform> gamePlatformIdMap = gamePlatforms.stream()
                 .collect( Collectors.toMap( GamePlatform::getId, Function.identity() ) );
 
-        String day = end.substring( 0, 10 ).replace( "-", "" );
-        List<GameDataRecord> gameDataRecords = gameDataRecordMapper.selectGameDataRecordAgentList(
-                TABLE_PREFIX + day, start, end, profile, account, platformId );
+        List<GameDataRecord> gameDataRecords;
+        String               startTime = LocalDateTimeUtils.format( start );
+        String               endTime   = LocalDateTimeUtils.format( end );
+        if ( LocalDateTimeUtils.isSameDay( start, end ) ) {
+            RequestDataHelper.setRequestData( Map.of( "time", start.toLocalDate() ) );
+            gameDataRecords = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start ).le( "create_time", end )
+                    .eq( "agent", SpringUtils.getActiveProfile() ).eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+        } else {
+            RequestDataHelper.setRequestData( Map.of( "time", start.toLocalDate() ) );
+            List<GameDataRecord> gameDataRecordList1 = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start )
+                    .le( "create_time", end ).eq( "agent", SpringUtils.getActiveProfile() )
+                    .eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+
+            RequestDataHelper.setRequestData( Map.of( "time", end.toLocalDate() ) );
+            List<GameDataRecord> gameDataRecordList2 = new QueryChainWrapper<>( gameDataRecordMapper ).ge( "create_time", start )
+                    .le( "create_time", end ).eq( "agent", SpringUtils.getActiveProfile() )
+                    .eq( platformId != null, "platform_id", platformId )
+                    .eq( StringUtils.isNotBlank( account ), "account", account ).list();
+            RequestDataHelper.clear();
+
+            gameDataRecords = Stream.concat( gameDataRecordList1.stream(), gameDataRecordList2.stream() ).toList();
+        }
 
         if ( CollectionUtils.isEmpty( gameDataRecords ) ) {
-            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", start, end );
+            log.warn( "拉单条数为0, 开始时间:{} 结束时间:{}", startTime, endTime );
             return;
         }
-        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", gameDataRecords.size(), start, end );
+        log.info( "拉单条数:{}, 开始时间:{} 结束时间:{}", gameDataRecords.size(), startTime, endTime );
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -94,7 +115,10 @@ public class GameDataServiceImpl implements GameDataService {
         MemberGameDataMapper    mapper       = session.getMapper( MemberGameDataMapper.class );
         for ( GameDataRecord gameDataRecord : gameDataRecords ) {
             GamePlatform gamePlatform = gamePlatformIdMap.get( gameDataRecord.getPlatformId() );
-            String       memberId     = gameDataRecord.getAccount().toUpperCase().split( "_" )[ 1 ];
+            if ( gamePlatform == null ) {
+                log.warn( JsonUtil.object2Json( gameDataRecord ) );
+            }
+            String memberId = gameDataRecord.getAccount().toUpperCase().split( "_" )[ 1 ];
             if ( mapper.findExist( memberId.substring( memberId.length() - 1 ), gameDataRecord.getId() ) > 0 ) {
                 continue;
             }
@@ -121,19 +145,18 @@ public class GameDataServiceImpl implements GameDataService {
                 continue;
             }
 
-            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() )
-                    .multiply( gamePlatform.getRateBeat() )
+            BigDecimal beatAdd = new BigDecimal( gameDataRecord.getCellScore() ).multiply( gamePlatform.getRateBeat() )
                     .setScale( 4, RoundingMode.HALF_UP );
             willCodeMap.putIfAbsent( memberId, BigDecimal.ZERO );
             willCodeMap.put( memberId, willCodeMap.get( memberId ).add( beatAdd ) );
 
 
         }
-        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), start, end );
+        log.warn( "准备处理条数:{}, 开始时间:{} 结束时间:{}", willCodeList.size(), startTime, endTime );
         insertBatch( session, mapper, willCodeList );
         this.doBeatCode( willCodeMap );
         this.deQuestCheck( willCodeList );
-        log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", gameDataRecords.size(), willCodeList.size(), start, end );
+        log.info( "新拉单拉取条数：{},实际插入:{}, 开始时间:{}, 结束时间:{}", gameDataRecords.size(), willCodeList.size(), startTime, endTime );
     }
 
     @Override
@@ -144,11 +167,8 @@ public class GameDataServiceImpl implements GameDataService {
         }
         log.warn( "彩票拉取注单数量" + list.size() );
         List<GamePlatform> gamePlatforms = new QueryChainWrapper<>( gamePlatformMapper ).list();
-        GamePlatform gamePlatform = gamePlatforms
-                .stream()
-                .filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
-                .findFirst()
-                .get();
+        GamePlatform gamePlatform = gamePlatforms.stream().filter( p -> p.getGameCategory() == EnumGameCategory.LOTTERY )
+                .findFirst().get();
 
         Map<String, BigDecimal> willCodeMap  = new HashMap<>();
         List<MemberGameData>    willCodeList = new ArrayList<>();
@@ -277,12 +297,8 @@ public class GameDataServiceImpl implements GameDataService {
 
         }
 
-        List<ConfigVip> configVips = configVipCacheUtils
-                .getConfigVipMap()
-                .values()
-                .stream()
-                .sorted( Comparator.comparing( ConfigVip::getBcode ) )
-                .toList();
+        List<ConfigVip> configVips = configVipCacheUtils.getConfigVipMap().values().stream()
+                .sorted( Comparator.comparing( ConfigVip::getBcode ) ).toList();
         for ( String userId : willCodeMap.keySet() ) {
             memberMoneyManager.checkAndUpdateVip( userId, configVips );
         }
@@ -290,11 +306,8 @@ public class GameDataServiceImpl implements GameDataService {
 
     public void deQuestCheck( final List<MemberGameData> list ) {
         //查找全部任务
-        List<ActivityQuestInfo> listConfQuest = activityCacheUtil
-                .getQuestInfos()
-                .stream()
-                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() == 0 )
-                .toList();
+        List<ActivityQuestInfo> listConfQuest = activityCacheUtil.getQuestInfos().stream()
+                .filter( activityQuestInfo -> activityQuestInfo.getGameTypeId() > 0 ).toList();
         for ( MemberGameData data : list ) {
             // 过滤百家乐和局庄闲下注，不计入打码和任务
             if ( new BigDecimal( data.getProfit() ).compareTo( BigDecimal.ZERO ) == 0 && data.getKindId().equals( "2001" ) ) {
@@ -302,6 +315,9 @@ public class GameDataServiceImpl implements GameDataService {
             }
 
             BigDecimal add = new BigDecimal( data.getCellScore() );
+            if ( add.compareTo( BigDecimal.ZERO ) <= 0 ) {
+                continue;
+            }
             for ( ActivityQuestInfo confQuest : listConfQuest ) {
                 Long              gameTypeId     = confQuest.getGameTypeId();
                 List<RspGameInfo> effectInfoList = gameCacheUtils.getInfoAllList( gameTypeId );
@@ -311,8 +327,7 @@ public class GameDataServiceImpl implements GameDataService {
                         continue;
                     }
                     if ( Objects.equals( data.getPlatformId(), rspGameInfo.getPlatformId() ) && (
-                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo
-                                    .getKindId()
+                            data.getKindId().equals( rspGameInfo.getKindId() ) || rspGameInfo.getKindId()
                                     .endsWith( "-" + data.getKindId() ) ) ) {
                         y = true;
                         break;

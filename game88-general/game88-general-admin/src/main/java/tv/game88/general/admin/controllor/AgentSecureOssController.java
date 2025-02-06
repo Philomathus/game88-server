@@ -60,7 +60,7 @@ public class AgentSecureOssController extends BaseController {
     @GetMapping( "/export" )
     public void export( AgentSecureOss agentSecureOss, HttpServletResponse response ) {
         List<AgentSecureOss> list = agentSecureOssService.selectAgentSecureOssList( agentSecureOss );
-        ExportExcelUtil.exportExcel( list, "代理域名oss", "代理域名oss表", AgentSecureOss.class, response );
+        ExportExcelUtil.exportBigExcel( list, "代理域名oss", "代理域名oss表", AgentSecureOss.class, response );
     }
 
     /**

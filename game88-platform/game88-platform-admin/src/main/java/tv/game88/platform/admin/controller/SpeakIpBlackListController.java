@@ -48,7 +48,7 @@ public class SpeakIpBlackListController extends BaseController {
     @GetMapping("/export")
     public void export(SpeakIpBlackList speakIpBlackList, HttpServletResponse response) {
         List<SpeakIpBlackList> list = speakIpBlackListService.selectSpeakIpBlackListList(speakIpBlackList);
-        ExportExcelUtil.exportExcel(list, "禁言IP", "禁言IP表", SpeakIpBlackList.class, response);
+        ExportExcelUtil.exportBigExcel(list, "禁言IP", "禁言IP表", SpeakIpBlackList.class, response);
     }
 
     @PreAuthorize("@ss.hasPermi('admin:speakIpBlackList:query')")

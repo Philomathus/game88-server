@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:mysql://zongdai.cluster-ctsokuok0ohz.ap-southeast-3.rds.amazonaws.com:3306/general?serverTimezone=Asia/Shanghai&useSSL=false&autoReconnect=true&failOverReadOnly=false
+    username: admin
+    password: Y32M1$d1q23HdXEthQ
+  data:
+    redis:
+      host: 172.31.24.213
+      port: 6379
+      password: 123456

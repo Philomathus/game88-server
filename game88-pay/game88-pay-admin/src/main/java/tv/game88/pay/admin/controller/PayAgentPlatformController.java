@@ -65,7 +65,7 @@ public class PayAgentPlatformController extends BaseController {
     @GetMapping( "/export" )
     public void export( PayAgentPlatform payAgentPlatform, HttpServletResponse response ) {
         List<PayAgentPlatform> list = payAgentPlatformService.selectPayAgentPlatformList( payAgentPlatform );
-        ExportExcelUtil.exportExcel( list, "代付平台", "代付平台表", PayAgentPlatform.class, response );
+        ExportExcelUtil.exportBigExcel( list, "代付平台", "代付平台表", PayAgentPlatform.class, response );
     }
 
     /**

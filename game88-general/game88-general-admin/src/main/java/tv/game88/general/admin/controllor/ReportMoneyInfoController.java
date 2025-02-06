@@ -51,7 +51,7 @@ public class ReportMoneyInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) {
         List<ReportMoneyinfo> list = reportMoneyInfoService.exportMoneyinfoList( reportMoneyinfo );
-        ExportExcelUtil.exportExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
     }
 
 }

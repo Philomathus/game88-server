@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.wallet.api.constants.ReqConstant;
 import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
@@ -22,6 +24,7 @@ import tv.game88.wallet.api.type.WalletPayMethodEnum;
 import tv.game88.wallet.app.utils.MemberSecurityUtils;
 
 import jakarta.annotation.Resource;
+
 import java.util.List;
 import java.util.Map;
 
@@ -43,20 +46,24 @@ public class PayMethodController extends BaseController {
     @Operation( summary = "获取银行字典列表" )
     @PostMapping( "/api/getBankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
-        List<RspConfigBankList> effectList  = configBankListCache.getEffectList();
-        String                  domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
-        for ( RspConfigBankList bankList : effectList ) {
+        List<ConfigBankList> effectList  = configBankListCache.getEffectList();
+        String               domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+        for ( ConfigBankList bankList : effectList ) {
             if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
                 bankList.setBankIcon( domainValue + bankList.getBankIcon() );
             }
         }
-        return RspBase.ok( effectList );
+        return RspBase.ok( effectList.stream().map( configBankList -> {
+            RspConfigBankList rspConfigBankList = new RspConfigBankList();
+            BeanUtils.copyProperties( configBankList, rspConfigBankList );
+            return rspConfigBankList;
+        } ).toList() );
     }
 
     @Operation( summary = "是否有支付方式" )
     @PostMapping( "/api/hasPayMethod" )
     public RspBase<Boolean> hasPayMethod( @RequestBody ReqConstant.ReqHasPay type ) {
-        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId() , type.methodType());
+        return walletUserPayMethodService.hasPayMethod( MemberSecurityUtils.getUserId(), type.methodType() );
     }
 
     @Operation( summary = "绑定新支付方式" )
@@ -64,7 +71,6 @@ public class PayMethodController extends BaseController {
     public RspBase<?> bindNewPayMethod( @RequestBody @Validated ReqPayMethod reqPayMethod ) {
         return walletUserPayMethodService.bindNewPayMethod( MemberSecurityUtils.getUserId(), reqPayMethod );
     }
-
 
 
     @Operation( summary = "解绑支付方式" )

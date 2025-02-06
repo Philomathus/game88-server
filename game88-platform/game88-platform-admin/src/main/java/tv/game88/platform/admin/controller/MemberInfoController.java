@@ -1,15 +1,18 @@
 package tv.game88.platform.admin.controller;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tv.game88.common.base.BaseController;
-import tv.game88.common.exception.BusinessException;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.ExportExcelUtil;
@@ -24,17 +27,15 @@ import tv.game88.core.config.constants.Constants;
 import tv.game88.core.member.dto.ReqSmallFeatures;
 import tv.game88.core.member.entity.MemberCard;
 import tv.game88.core.member.entity.MemberInfo;
+import tv.game88.core.member.entity.MemberMoney;
+import tv.game88.core.member.mapper.MemberMoneyMapper;
 import tv.game88.core.member.vo.PlatformUser;
 import tv.game88.platform.api.dto.ReqAddScore;
 import tv.game88.platform.api.service.MemberInfoService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户信息Controller
@@ -47,6 +48,8 @@ import java.util.Map;
 public class MemberInfoController extends BaseController {
     @Resource
     private MemberInfoService memberInfoService;
+    @Resource
+    private MemberMoneyMapper memberMoneyMapper;
     @Resource
     private PasswordEncoder   passwordEncoder;
     @Resource
@@ -72,11 +75,7 @@ public class MemberInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( MemberInfo memberInfo, HttpServletResponse response ) {
         List<MemberInfo> list = memberInfoService.selectMemberInfoList( memberInfo );
-        if ( list.size() <= 200000L ) {
-            ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
-        } else {
-            throw new BusinessException( "导出条数超过20万条" );
-        }
+        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
     }
 
     /**
@@ -154,7 +153,7 @@ public class MemberInfoController extends BaseController {
         if ( b ) {
             String token = redisUtil.strGet( Constants.MEMBER_LOGIN_USER + memberId );
             if ( StringUtils.isNotBlank( token ) && status == 0 ) {
-                redisUtil.unlink( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId );
+                redisUtil.delete( Arrays.asList( Constants.MEMBER_LOGIN_TOKEN + token, Constants.MEMBER_LOGIN_USER + memberId ) );
             } else if ( StringUtils.isNotBlank( token ) && redisUtil.exists( Constants.MEMBER_LOGIN_TOKEN + token ) ) {
                 String platformUserStr = redisUtil.hGet( Constants.MEMBER_LOGIN_TOKEN + token, "platformUserStr" ).toString();
                 PlatformUser platformUser = JsonUtil.json2Object( platformUserStr, PlatformUser.class );
@@ -398,15 +397,8 @@ public class MemberInfoController extends BaseController {
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId
-                        .append( "\"" )
-                        .append( cell1 )
-                        .append( "\"" )
-                        .append( "," )
-                        .append( cell2 )
-                        .append( "," )
-                        .append( cell3 )
-                        .append( "),(" );
+                userId = userId.append( "\"" ).append( cell1 ).append( "\"" ).append( "," ).append( cell2 ).append( "," )
+                        .append( cell3 ).append( "),(" );
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
@@ -430,39 +422,25 @@ public class MemberInfoController extends BaseController {
         return RspBase.ok( memberInfoService.queryPhones( req ) );
     }
 
-    /**
-     * 批量会员ID派送彩金
-     */
-    @PostMapping( value = "/commitMoney" )
-    public Object commitMoney( @RequestBody ReqSmallFeatures req ) throws Exception {
-        SecurityUtils.verifyMFACode( req.getGoogleAuthCode() );
-        return RspBase.ok( memberInfoService.commitMoney( req ) );
-    }
-
     @RequestMapping( value = "/batchInsertShops", method = RequestMethod.POST )
     @Transactional( rollbackFor = Exception.class )
     public Object batchInsert( @RequestParam( "excelFile" ) MultipartFile excelFile ) throws Exception {
-        Workbook      workbook = null;
-        StringBuilder userId   = new StringBuilder();
-        try {
-            workbook = WorkbookFactory.create( excelFile.getInputStream() );
-            excelFile.getInputStream().close();
+        Set<String> memberSet    = new HashSet<>();
+        Set<String> duplicateSet = new HashSet<>();
+
+        List<MemberMoney> memberMoneyList = new ArrayList<>();
+        try ( InputStream inputStream = excelFile.getInputStream(); Workbook workbook = WorkbookFactory.create( inputStream ) ) {
             //工作表对象
             Sheet sheet = workbook.getSheetAt( 0 );
-            //总行数
-            int rowLength = sheet.getLastRowNum() + 1;
-            //工作表的列
-            Row row = sheet.getRow( 0 );
-            //总列数
+
             //得到指定的单元格
-            for ( int i = 0; i < rowLength; i++ ) {
-                Cell cell = row.getCell( i );
-                row = sheet.getRow( i );
+            for ( int i = 1; i < sheet.getLastRowNum() + 1; i++ ) {
+                Row    row   = sheet.getRow( i );
                 String cell1 = null;
                 String cell2 = null;
                 String cell3 = null;
                 for ( int j = 0; j < 3; j++ ) {
-                    cell = row.getCell( j );
+                    Cell cell = row.getCell( j );
                     if ( cell != null ) {
                         cell.setCellType( CellType.STRING );
                         String data = cell.getStringCellValue();
@@ -476,29 +454,34 @@ public class MemberInfoController extends BaseController {
                     }
                 }
                 if ( StringUtils.isBlank( cell1 ) || StringUtils.isBlank( cell2 ) ) {
-                    break;
+                    return RspBase.businessError( "第" + ( i + 1 ) + "行数据不完整" );
                 }
                 if ( StringUtils.isBlank( cell3 ) ) {
                     cell3 = "1";
                 }
-                userId = userId
-                        .append( "\"" )
-                        .append( cell1 )
-                        .append( "\"" )
-                        .append( "," )
-                        .append( cell2 )
-                        .append( "," )
-                        .append( cell3 )
-                        .append( "),(" );
+                if ( memberSet.contains( cell1 ) ) {
+                    duplicateSet.add( cell1 );
+                } else {
+                    memberSet.add( cell1 );
+                    MemberMoney memberMoney = new MemberMoney();
+                    memberMoney.setId( cell1 );
+                    memberMoney.setMoney( new BigDecimal( cell2 ) );
+                    memberMoney.setBeat( new BigDecimal( cell3 ) );
+                    memberMoneyList.add( memberMoney );
+                }
             }
         } catch ( Exception e ) {
             log.error( e.getMessage(), e );
         }
-        userId = new StringBuilder( userId.substring( 0, userId.length() - 3 ) );
-        String userIds = String.valueOf( userId );
+        if ( !CollectionUtils.isEmpty( duplicateSet ) ) {
+            return RspBase.businessError( "数据重复，请检查 - 重复ID: " + StringUtils.join( duplicateSet, "," ) );
+        }
+        if ( CollectionUtils.isEmpty( memberMoneyList ) ) {
+            return RspBase.businessError( "无数据,或者数据格式不正确" );
+        }
         //清除表中数据
-        memberInfoService.clear();
-        memberInfoService.insertPaiSong( userIds );
+        memberMoneyMapper.handleClean();
+        memberMoneyMapper.insertBatch( memberMoneyList );
         return RspBase.ok();
     }
 

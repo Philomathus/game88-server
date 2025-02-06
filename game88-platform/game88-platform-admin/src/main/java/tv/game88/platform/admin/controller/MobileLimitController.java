@@ -48,7 +48,7 @@ public class MobileLimitController extends BaseController {
     @GetMapping( "/export" )
     public void export( MobileLimit mobileLimit, HttpServletResponse response ) {
         List<MobileLimit> list = mobileLimitService.selectMobileLimitList( mobileLimit );
-        ExportExcelUtil.exportExcel( list, "限制手机号注册", "限制手机号注册表", MobileLimit.class, response );
+        ExportExcelUtil.exportBigExcel( list, "限制手机号注册", "限制手机号注册表", MobileLimit.class, response );
     }
 
     /**

@@ -146,7 +146,7 @@
         t.channel_id as channelId,
         SUM(t.money) AS money,
         SUM(t.real_money) AS realMoney,
-        t.update_time as updateTime
+        max(t.update_time) as updateTime
         FROM member_recharge_online t
         LEFT JOIN pay_channel c ON t.channel_id = c.id
         LEFT JOIN pay_platform p ON t.platform_id = p.id

@@ -44,7 +44,7 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
             throw new BusinessException( "此代付无法支持的银行类型：" + withdrawDetail.getBankId() );
         } else {
             bodyMap.put( "bankNumber", bankCodeType.name() );
-            bodyMap.put( "bankName", bankCodeType.name() );
+            bodyMap.put( "bankName", bankCodeType.getName() );
         }
         bodyMap.put( "mchId", payAgentChannel.getMerId() );
         bodyMap.put( "mchOrderNo", withdrawDetail.getWithdrawOrderNo() );

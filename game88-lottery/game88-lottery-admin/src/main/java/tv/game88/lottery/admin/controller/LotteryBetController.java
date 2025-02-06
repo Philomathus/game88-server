@@ -50,7 +50,7 @@ public class LotteryBetController extends BaseController {
     @GetMapping( "/export" )
     public void export( LotteryBet lotteryBet, HttpServletResponse response ) {
         List<LotteryBet> list = lotteryBetService.selectLotteryBetList( lotteryBet );
-        ExportExcelUtil.exportExcel( list, "彩票会员下注详情", "彩票会员下注详情表", LotteryBet.class, response );
+        ExportExcelUtil.exportBigExcel( list, "彩票会员下注详情", "彩票会员下注详情表", LotteryBet.class, response );
     }
 
     /**

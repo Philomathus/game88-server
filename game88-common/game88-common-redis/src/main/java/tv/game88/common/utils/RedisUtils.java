@@ -1943,7 +1943,11 @@ public class RedisUtils {
     // ---------------------- Redis 分布式锁 ---------------------
 
     public Boolean lock( String key, int timeOutSec ) {
-        return strSetIfAbsent( "lock:".concat( key ), key, Duration.ofSeconds( timeOutSec ) );
+        return lock( key, Duration.ofSeconds( timeOutSec ) );
+    }
+
+    public Boolean lock( String key, Duration duration ) {
+        return strSetIfAbsent( "lock:".concat( key ), key, duration );
     }
 
     public Boolean unLock( String key ) {

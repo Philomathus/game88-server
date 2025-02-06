@@ -2,7 +2,6 @@ package tv.game88.game.api.dock;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -43,7 +42,7 @@ public class GameDockBG extends AbstractGameDock {
         String method     = "open.user.create";
         String id         = IdWorker.get32UUID();
         String sn         = reqJoinGame.getAgent();
-        String secretCode = Base64.encodeBase64String( DigestUtils.sha1( reqJoinGame.getDes() ) );
+        String secretCode = Base64.getEncoder().encodeToString( DigestUtils.sha1( reqJoinGame.getDes() ) );
 
         Map<String, Object> params = new HashMap<>();
         params.put( "random", id );
@@ -145,7 +144,7 @@ public class GameDockBG extends AbstractGameDock {
         String     sn         = reqJoinGame.getAgent();
         BigDecimal amount     = reqJoinGame.getTransferMoney();
         String     loginId    = reqJoinGame.getGameMemberId();
-        String     secretCode = Base64.encodeBase64String( DigestUtils.sha1( reqJoinGame.getDes() ) );
+        String     secretCode = Base64.getEncoder().encodeToString( DigestUtils.sha1( reqJoinGame.getDes() ) );
 
         Map<String, Object> params = new HashMap<>();
         params.put( "random", id );
@@ -188,7 +187,7 @@ public class GameDockBG extends AbstractGameDock {
         String     sn         = reqJoinGame.getAgent();
         BigDecimal amount     = reqJoinGame.getTransferMoney().negate();
         String     loginId    = reqJoinGame.getGameMemberId();
-        String     secretCode = Base64.encodeBase64String( DigestUtils.sha1( reqJoinGame.getDes() ) );
+        String     secretCode = Base64.getEncoder().encodeToString( DigestUtils.sha1( reqJoinGame.getDes() ) );
 
         Map<String, Object> params = new HashMap<>();
         params.put( "random", id );
@@ -230,7 +229,7 @@ public class GameDockBG extends AbstractGameDock {
         String id         = IdWorker.get32UUID();
         String sn         = reqJoinGame.getAgent();
         String loginId    = reqJoinGame.getGameMemberId();
-        String secretCode = Base64.encodeBase64String( DigestUtils.sha1( reqJoinGame.getDes() ) );
+        String secretCode = Base64.getEncoder().encodeToString( DigestUtils.sha1( reqJoinGame.getDes() ) );
 
         Map<String, Object> params = new HashMap<>();
         params.put( "random", id );

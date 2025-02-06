@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
         <relativePath />
     </parent>
 
@@ -47,7 +47,7 @@
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-io.version>2.16.1</commons-io.version>
         <commons-compress.version>1.26.2</commons-compress.version>
-        <commons-codec.version>1.17.0</commons-codec.version>
+        <commons-codec.version>1.17.1</commons-codec.version>
         <opencsv.version>5.9</opencsv.version>
         <httpclient5.version>5.3.1</httpclient5.version>
         <easypoi.version>4.4.0</easypoi.version>

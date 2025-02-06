@@ -95,16 +95,18 @@
         SELECT DISTINCT a.id,
                         a.name,
                         a.icon,
-                        a.card_icon
+                        a.card_icon,
+                        a.sort
         FROM (SELECT p.id,
                      p.NAME,
                      p.icon,
-                     p.card_icon
+                     p.card_icon,
+                     p.sort
               FROM game_platform p
                        INNER JOIN game_info i ON i.platform_id = p.id
               WHERE i.type_id = #{infoTypeId}
                 AND i.effect = 1
                 AND p.effect = 1
-              ORDER BY p.sort) a
+              ) a ORDER BY a.sort asc
     </select>
 </mapper>

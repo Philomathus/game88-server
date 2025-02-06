@@ -16,6 +16,7 @@ import tv.game88.platform.api.service.MemberMoneyService;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -27,8 +28,8 @@ import java.util.List;
  * @date 2022-10-23
  */
 @RestController
-@RequestMapping("/member/money")
-public class MemberMoneyController extends BaseController{
+@RequestMapping( "/member/money" )
+public class MemberMoneyController extends BaseController {
 
     @Resource
     private MemberMoneyService memberMoneyService;
@@ -37,21 +38,21 @@ public class MemberMoneyController extends BaseController{
      * 查询派送彩金暂存表列表 list all data
      */
     @PreAuthorize( "@ss.hasPermi('member:money:list')" )
-    @GetMapping("/list")
-    public RspBase<List<MemberMoney>> list(MemberMoney memberMoney){
+    @GetMapping( "/list" )
+    public RspBase<List<MemberMoney>> list( MemberMoney memberMoney ) {
         PageDomain pages = TableSupport.buildPageRequest();
         startPage( pages );
-        List<MemberMoney> memberMoneyList = memberMoneyService.selectAllMemberMoneyList(memberMoney);
-        return getRspBasePage(memberMoneyList,pages );
+        List<MemberMoney> memberMoneyList = memberMoneyService.selectAllMemberMoneyList( memberMoney );
+        return getRspBasePage( memberMoneyList, pages );
     }
 
     /**
      * 通过id查询获取 query data according to id
      */
     @PreAuthorize( "@ss.hasPermi('member:money:query')" )
-    @GetMapping("/{memberId}")
-    public RspBase<MemberMoney> getById( @PathVariable String memberId ){
-        return RspBase.ok(memberMoneyService.getById(memberId));
+    @GetMapping( "/{memberId}" )
+    public RspBase<MemberMoney> getById( @PathVariable String memberId ) {
+        return RspBase.ok( memberMoneyService.getById( memberId ) );
     }
 
     /**
@@ -59,9 +60,9 @@ public class MemberMoneyController extends BaseController{
      */
     @PreAuthorize( "@ss.hasPermi('member:money:remove')" )
     @Log( title = "派送彩金暂存表", businessType = BusinessType.DELETE )
-    @DeleteMapping("/{ids}")
-    public RspBase<?> remove(@PathVariable String[] ids){
-        return RspBase.ok(memberMoneyService.removeByIds( Arrays.asList( ids ) ));
+    @DeleteMapping( "/{ids}" )
+    public RspBase<?> remove( @PathVariable String[] ids ) {
+        return RspBase.ok( memberMoneyService.removeByIds( Arrays.asList( ids ) ) );
     }
 
     /**
@@ -72,11 +73,7 @@ public class MemberMoneyController extends BaseController{
     @GetMapping( "/export" )
     public void export( MemberMoney memberMoney, HttpServletResponse response ) {
         List<MemberMoney> list = memberMoneyService.selectAllMemberMoneyList( memberMoney );
-        if ( list.size() <= 200000L ) {
-            ExportExcelUtil.exportExcel( list, "用户信息", "用户信息表", MemberMoney.class, response );
-        } else {
-            throw new BusinessException( "导出条数超过20万条" );
-        }
+        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberMoney.class, response );
     }
 
     /**
@@ -87,7 +84,7 @@ public class MemberMoneyController extends BaseController{
     @PutMapping
     public RspBase<?> edit( @RequestBody MemberMoney memberMoney ) throws Exception {
         SecurityUtils.verifyMFACode( memberMoney.getGoogleAuthCode() );
-        return RspBase.ok(memberMoneyService.updateById(memberMoney));
+        return RspBase.ok( memberMoneyService.updateById( memberMoney ) );
     }
 
     /**
@@ -96,16 +93,16 @@ public class MemberMoneyController extends BaseController{
     @Log( title = "新增派送彩金", businessType = BusinessType.INSERT )
     @PostMapping
     @PreAuthorize( "@ss.hasPermi('member:money:add')" )
-    public RspBase<?> add(@RequestBody MemberMoney memberMoney) throws Exception {
-        SecurityUtils.verifyMFACode( memberMoney.getGoogleAuthCode());
-        return RspBase.ok(memberMoneyService.save( memberMoney ));
+    public RspBase<?> add( @RequestBody MemberMoney memberMoney ) throws Exception {
+        SecurityUtils.verifyMFACode( memberMoney.getGoogleAuthCode() );
+        return RspBase.ok( memberMoneyService.save( memberMoney ) );
     }
 
     /**
-      * 行为类型统计 count money
+     * 行为类型统计 count money
      */
-    @GetMapping("/count")
-    public BigDecimal countMoney(){
+    @GetMapping( "/count" )
+    public BigDecimal countMoney() {
         return memberMoneyService.countMoney();
     }
 
@@ -113,17 +110,17 @@ public class MemberMoneyController extends BaseController{
      * 查询派送彩金暂存表列表
      */
     @PreAuthorize( "@ss.hasPermi(' member:money:remove')" )
-    @GetMapping("/handleClean")
+    @GetMapping( "/handleClean" )
     @Log( title = "派送彩金暂存表", businessType = BusinessType.DELETE )
-    public RspBase<?> handleCleanData(){
-        return RspBase.ok(memberMoneyService.handleClean());
+    public RspBase<?> handleCleanData() {
+        return RspBase.ok( memberMoneyService.handleClean() );
     }
 
     @PreAuthorize( "@ss.hasPermi('member:money:edit')" )
     @Log( title = "开始派送彩金", businessType = BusinessType.INSERT )
-    @PostMapping("/starSend")
+    @PostMapping( "/starSend" )
     public RspBase<?> starSend( @RequestBody MemberMoney memberMoney ) throws Exception {
         SecurityUtils.verifyMFACode( memberMoney.getGoogleAuthCode() );
-        return memberMoneyService.starSend(memberMoney, SecurityUtils.getUsername());
+        return memberMoneyService.starSend( memberMoney, SecurityUtils.getUsername() );
     }
 }

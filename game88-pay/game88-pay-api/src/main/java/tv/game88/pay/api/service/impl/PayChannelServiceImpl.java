@@ -67,8 +67,8 @@ public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChan
             return RspBase.businessError( "通道费率或快捷金额不得为空,请补全" );
         }
         if ( payChannel.getRate().compareTo( new BigDecimal( "0.4" ) ) > 0
-                || payChannel.getRate().compareTo( new BigDecimal( "0.01" ) ) < 0 ) {
-            return RspBase.businessError( "通道费率不得大于0.4或小于0.01" );
+                || payChannel.getRate().compareTo( new BigDecimal( "0.001" ) ) < 0 ) {
+            return RspBase.businessError( "通道费率不得大于0.4或小于0.001" );
         }
         if ( !StringUtils.isNotBlank( payChannel.getDiscountBill() ) || payChannel.getDiscountBill() == null ) {
             payChannel.setDiscountBill( "0" );

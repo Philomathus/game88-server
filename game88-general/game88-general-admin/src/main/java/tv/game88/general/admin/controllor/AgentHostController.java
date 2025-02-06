@@ -52,7 +52,7 @@ public class AgentHostController extends BaseController {
     @GetMapping( "/export" )
     public void export( AgentHost agentHost, HttpServletResponse response ) {
         List<AgentHost> list = agentHostService.selectAgentHostList( agentHost );
-        ExportExcelUtil.exportExcel( list, "主播域名管理", "主播域名管理表", AgentHost.class, response );
+        ExportExcelUtil.exportBigExcel( list, "主播域名管理", "主播域名管理表", AgentHost.class, response );
     }
 
     /**

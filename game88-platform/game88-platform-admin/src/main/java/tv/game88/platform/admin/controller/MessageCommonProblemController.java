@@ -53,7 +53,7 @@ public class MessageCommonProblemController extends BaseController {
     @GetMapping( "/export" )
     public void export( MessageCommonProblem messageCommonProblem, HttpServletResponse response ) {
         List<MessageCommonProblem> list = messageCommonProblemService.selectMessageCommonProblemList( messageCommonProblem );
-        ExportExcelUtil.exportExcel( list, "常用问题", "常用问题表", MessageCommonProblem.class, response );
+        ExportExcelUtil.exportBigExcel( list, "常用问题", "常用问题表", MessageCommonProblem.class, response );
     }
 
     /**

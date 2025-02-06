@@ -6,7 +6,6 @@ import tv.game88.core.game.dto.RspGameCategory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public enum EnumGameCategory {
@@ -14,6 +13,7 @@ public enum EnumGameCategory {
     LOTTERY( "lottery", "彩票游戏" ),
     KAIYUAN( ConstantsGame.KAI_YUAN, "开元棋牌" ),
     OG( ConstantsGame.OG, "OG电子" ),
+    OG_NEW( ConstantsGame.OG_NEW, "新OG电子" ),
     AG( ConstantsGame.AG, "AG电子" ),
     MG( ConstantsGame.MG, "MG电子" ),
     UPG( ConstantsGame.UPG, "UPG电子" ),
@@ -39,11 +39,11 @@ public enum EnumGameCategory {
     PG_SOFT( ConstantsGame.PG_SOFT, "PG电子" ),
     SHABA( ConstantsGame.SHABA, "沙巴体育" ),
 
-//    T1( ConstantsGame.T1, "T1" ),
-//    PP( ConstantsGame.PP, "pp" ),
-//    CG( ConstantsGame.CG, "cg" ),
-//    JILI( ConstantsGame.JILI, "jiLi" ),
-//    PG_NEW( ConstantsGame.PG_NEW, "PGNew" ),
+    T1( ConstantsGame.T1, "T1" ),
+    PP( ConstantsGame.PP, "pp" ),
+    CG( ConstantsGame.CG, "cg" ),
+    JILI( ConstantsGame.JILI, "jiLi" ),
+    RR( ConstantsGame.RR, "rr" ),
     ;
 
     private final String type;
@@ -55,12 +55,13 @@ public enum EnumGameCategory {
     }
 
     public static List<RspGameCategory> getGameCategorys() {
-        return Arrays.stream( EnumGameCategory.values() ).map( m -> {
-            RspGameCategory gameCategory = new RspGameCategory();
-            gameCategory.setName( m.name() );
-            gameCategory.setDes( m.getDes() );
-            return gameCategory;
-        } ).collect( Collectors.toList() );
+        return Arrays.stream( EnumGameCategory.values() )
+                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, RR ).contains( m ) ).map( m -> {
+                    RspGameCategory gameCategory = new RspGameCategory();
+                    gameCategory.setName( m.name() );
+                    gameCategory.setDes( m.getDes() );
+                    return gameCategory;
+                } ).toList();
     }
 
     public static EnumGameCategory getGameCategoryByType( String type ) {
@@ -70,5 +71,14 @@ public enum EnumGameCategory {
             }
         }
         return null;
+    }
+
+    public static List<RspGameCategory> getGameCategoryAll() {
+        return Arrays.stream( EnumGameCategory.values() ).map( m -> {
+            RspGameCategory gameCategory = new RspGameCategory();
+            gameCategory.setName( m.name() );
+            gameCategory.setDes( m.getDes() );
+            return gameCategory;
+        } ).toList();
     }
 }

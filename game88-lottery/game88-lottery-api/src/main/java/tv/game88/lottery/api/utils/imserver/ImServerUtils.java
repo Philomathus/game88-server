@@ -1,19 +1,18 @@
 package tv.game88.lottery.api.utils.imserver;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.vo.RspBase;
 
-import jakarta.annotation.Resource;
 import java.util.Map;
 
 @Log4j2
@@ -35,14 +34,15 @@ public class ImServerUtils {
      *
      * @param ext 消息map
      */
-    @Async
     public void sendOnlineGroupMessage( Map<String, Object> ext ) {
         ext.put( "groupId", profile );
         ext.put( "uuid", IdWorker.get32UUID() );
-        RspBase<?> rspBase = this.sendGroupMessage( profile, ext, 3 );
-        if ( rspBase != null && rspBase.getCode() == 200 ) {
-            // log.info( "新IM - 在线群组im消息发送成功" );
-        }
+        Thread.ofVirtual().start( () -> {
+            RspBase<?> rspBase = this.sendGroupMessage( profile, ext, 3 );
+            if ( rspBase != null && rspBase.getCode() == 200 ) {
+                // log.info( "新IM - 在线群组im消息发送成功" );
+            }
+        } );
     }
 
     /**
@@ -51,16 +51,17 @@ public class ImServerUtils {
      * @param roomId 主播ID
      * @param ext    消息map
      */
-    @Async
     public void sendGroupMessage( String roomId, Map<String, Object> ext ) {
         String groupId = profile + "@" + roomId.replaceAll( "#", "" ).replaceAll( "@", "" );
         // 设置群组ID
         ext.put( "groupId", groupId );
         ext.put( "uuid", IdWorker.get32UUID() );
-        RspBase<?> rspBase = this.sendGroupMessage( groupId, ext, 3 );
-        if ( rspBase != null && rspBase.getCode() == 200 ) {
-            log.info( "新IM - 群组{}im消息发送成功", groupId );
-        }
+        Thread.ofVirtual().start( () -> {
+            RspBase<?> rspBase = this.sendGroupMessage( groupId, ext, 3 );
+            if ( rspBase != null && rspBase.getCode() == 200 ) {
+                log.info( "新IM - 群组{}im消息发送成功", groupId );
+            }
+        } );
     }
 
     private RspBase<?> sendGroupMessage( String groupId, Map<String, Object> messageMap, int retryNum ) {
@@ -83,7 +84,7 @@ public class ImServerUtils {
             log.error( e.getMessage(), e );
         }
         try {
-            Thread.sleep( 999L );
+            Thread.sleep( 1000 );
         } catch ( InterruptedException ex ) {
             log.error( ex.getMessage(), ex );
         }

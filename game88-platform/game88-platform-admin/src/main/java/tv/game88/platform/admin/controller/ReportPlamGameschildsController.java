@@ -66,6 +66,6 @@ public class ReportPlamGameschildsController extends BaseController {
                         .gameprofit(child.getGameprofit().toString())
                         .agentchild(child.getAgentchild()).build()
         ).collect( Collectors.toList());
-        ExportExcelUtil.exportExcel(voList, "综合数据报表", "综合数据报表", ReportPlamGamesChildVo.class, response);
+        ExportExcelUtil.exportBigExcel(voList, "综合数据报表", "综合数据报表", ReportPlamGamesChildVo.class, response);
     }
 }

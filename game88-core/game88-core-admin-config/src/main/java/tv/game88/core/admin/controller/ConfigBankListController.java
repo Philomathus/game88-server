@@ -60,7 +60,7 @@ public class ConfigBankListController extends BaseController {
     @GetMapping( "/export" )
     public void export( ConfigBankList configBankList, HttpServletResponse response ) {
         List<ConfigBankList> list = configBankListService.selectConfigBankListList( configBankList );
-        ExportExcelUtil.exportExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
+        ExportExcelUtil.exportBigExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
     }
 
     /**
@@ -84,11 +84,7 @@ public class ConfigBankListController extends BaseController {
         update.setEffect( effect );
         boolean success = configBankListService.updateById( update );
         if ( success ) {
-            if ( effect ) {
-                configBankListCache.setEffectConfigBank( configBankListService.getById( id ) );
-            } else {
-                configBankListCache.delEffectConfigBank( id );
-            }
+            configBankListCache.clear();
         }
         return RspBase.ok( success );
     }
@@ -113,7 +109,7 @@ public class ConfigBankListController extends BaseController {
     public RspBase<?> edit( @RequestBody ConfigBankList configBankList ) {
         boolean data = configBankListService.updateById( configBankList );
         if ( data ) {
-            configBankListCache.setEffectConfigBank( configBankListService.getById( configBankList.getId() ) );
+            configBankListCache.clear();
         }
         return RspBase.ok( data );
     }
@@ -127,9 +123,7 @@ public class ConfigBankListController extends BaseController {
     public RspBase<?> remove( @PathVariable Long[] ids ) {
         boolean data = configBankListService.removeByIds( Arrays.asList( ids ) );
         if ( data ) {
-            for ( Long id : ids ) {
-                configBankListCache.delEffectConfigBank( id );
-            }
+            configBankListCache.clear();
         }
         return RspBase.ok( data );
     }

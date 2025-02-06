@@ -53,7 +53,7 @@ public class ActivityInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( ActivityInfo activityInfo, HttpServletResponse response ) {
         List<ActivityInfo> list = activityInfoService.selectActivityInfoList( activityInfo );
-        ExportExcelUtil.exportExcel( list, "活动信息", "活动信息表", ActivityInfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "活动信息", "活动信息表", ActivityInfo.class, response );
     }
 
     /**

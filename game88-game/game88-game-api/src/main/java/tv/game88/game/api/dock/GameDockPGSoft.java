@@ -27,9 +27,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Repository( value = ConstantsGame.PG_SOFT + "GameProcessor" )
@@ -77,32 +78,31 @@ public class GameDockPGSoft extends AbstractGameDock {
 
     @Override
     public void getJoinGameUrl( ReqJoinGame reqJoinGame ) {
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put( "client_ip", reqJoinGame.getIp() );
-        params.put( "url_type", "game-entry" );
-        params.put( "path", URLEncoder.encode( "/" + reqJoinGame.getKindId() + "/index.html", StandardCharsets.UTF_8 ) );
-        params.put( "operator_token", reqJoinGame.getDes() );
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add( "client_ip", reqJoinGame.getIp() );
+        params.add( "url_type", "game-entry" );
+        params.add( "path", "/" + reqJoinGame.getKindId() + "/index.html" );
+        params.add( "operator_token", reqJoinGame.getDes() );
         Map<String, String> extraMap = new HashMap<>();
         extraMap.put( "btt", "1" );
         String token = reqJoinGame.getGameMemberId() + "-" + System.currentTimeMillis() + "-" + CURRENCY;
         try {
-            extraMap.put( "ops", AESCoder.encryptByKey( token, AESCoder.secretKey ) );
+            extraMap.put( "ops", AESCoder.encryptByKeyHex( token, AESCoder.secretKey ) );
         } catch ( Exception e ) {
             throw new BusinessException( e.getMessage() );
         }
         extraMap.put( "oc", "0" );
         extraMap.put( "iwk", "1" );
         extraMap.put( "l", "zh" );
-        params.put( "extra_args", URLEncoder.encode( assemblyUrl( extraMap ), StandardCharsets.UTF_8 ) );
-        String body = assemblyUrl( params );
+        params.add( "extra_args", assemblyUrl( extraMap ) );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         httpHeaders.setCacheControl( "no-cache, no-store, must-revalidate" );
-        HttpEntity<String> requestEntity = new HttpEntity<>( body, httpHeaders );
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
 
         String url = reqJoinGame.getApiUrl() + "/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=" + UUID.randomUUID();
-        log.warn( url + " ::: " + body );
+        log.warn( url + " ::: " + JsonUtil.object2Json( params ) );
 
         String responseStr = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( requestEntity ),
                 response -> {
@@ -127,16 +127,14 @@ public class GameDockPGSoft extends AbstractGameDock {
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void transferMoney( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v3/TransferIn", reqJoinGame.getApiUrl() );
-        transact( reqJoinGame, url, true );
+        transact( reqJoinGame, true );
     }
 
     @Override
     @Retryable( retryFor = Exception.class, noRetryFor = GameTransferException.class, backoff = @Backoff( delay = 1000 ),
             maxAttempts = 5 )
     public void withdrawal( ReqJoinGame reqJoinGame ) {
-        String url = String.format( "%s/external/Cash/v3/TransferOut", reqJoinGame.getApiUrl() );
-        transact( reqJoinGame, url, false );
+        transact( reqJoinGame, false );
     }
 
     @Override
@@ -167,14 +165,19 @@ public class GameDockPGSoft extends AbstractGameDock {
         throw new BusinessException( reqJoinGame.getGameCategory().getDes() + "上下分失败" );
     }
 
-    private void transact( ReqJoinGame reqJoinGame, String url, final boolean isDeposit ) {
+    private void transact( ReqJoinGame reqJoinGame, final boolean isDeposit ) {
+        String url = String.format( "%s/external/Cash/v4/%s", reqJoinGame.getApiUrl(), isDeposit ? "TransferIn" : "TransferOut" );
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "operator_token", reqJoinGame.getDes() );
         params.add( "secret_key", reqJoinGame.getMd5() );
         params.add( "player_name", reqJoinGame.getGameMemberId() );
-        params.add( "amount", reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN ).toString() );
+        BigDecimal amount    = reqJoinGame.getTransferMoney().setScale( 2, RoundingMode.DOWN );
+        String     amountStr = amount.stripTrailingZeros().toPlainString();
+        params.add( "amount", amountStr );
         params.add( "transfer_reference", reqJoinGame.getOrderId() );
         params.add( "currency", CURRENCY );
+        params.add( "real_transfer_amount", amountStr );
 
         Map<String, Object> resultMap = execute( url, params );
 
@@ -185,12 +188,19 @@ public class GameDockPGSoft extends AbstractGameDock {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> dataMap  = ( Map<String, Object> ) resultMap.getOrDefault( "data", Collections.emptyMap() );
             Map<String, Object> errorMap = ( Map<String, Object> ) resultMap.getOrDefault( "error", Collections.emptyMap() );
-            if ( dataMap != null && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" ).toString() ) ) {
+            if ( !CollectionUtils.isEmpty( dataMap ) && StringUtils.isNotBlank( dataMap.getOrDefault( "transactionId", "" )
+                    .toString() ) ) {
+                BigDecimal realTransferAmount = new BigDecimal( dataMap.getOrDefault( "realTransferAmount", "0" ).toString() );
+                if ( amount.compareTo( realTransferAmount ) != 0 ) {
+                    throw new RuntimeException( reqJoinGame.getGameCategory().getDes() + action + "分金额不正确" );
+                }
                 return;
             }
             // 转账状态特殊处理
-            if ( errorMap != null ) {
-                this.sleep( 2 );
+            if ( !CollectionUtils.isEmpty( errorMap ) ) {
+                if ( "1315".equals( errorMap.getOrDefault( "code", "" ).toString() ) ) {
+                    throw new BusinessException( "会员正在游戏中,无法" + action + "分" );
+                }
                 throw new RuntimeException( errorMap.getOrDefault( "message", "" ).toString() );
             }
         }

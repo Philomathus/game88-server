@@ -17,6 +17,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.GenerateOrderCacheUtils;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.wallet.api.dto.*;
 import tv.game88.wallet.api.entity.WalletTransaction;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -195,7 +196,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .split( "," );
         List<WalletUserPayMethod> userPayMethods = walletUserPayMethodMapper.selectBatchIds( Arrays.asList( payMethodIds ) );
 
-        List<RspConfigBankList> configBankList = configBankListCache.getEffectList();
+        List<ConfigBankList> configBankList = configBankListCache.getEffectList();
 
         Map<String, RspPayMethod2> rspPayMethodMap = new HashMap<>();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
@@ -206,7 +207,7 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                     .getMethodType()
                     .name(), rspPayMethod );
 
-            for ( RspConfigBankList rspConfigBank : configBankList ) {
+            for ( ConfigBankList rspConfigBank : configBankList ) {
                 if ( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ) {
                     rspPayMethod.setBankName( rspConfigBank.getBankName() );
                 }
@@ -342,12 +343,12 @@ public class WalletTransactionServiceImpl extends ServiceImpl<WalletTransactionM
                 .orderByDesc( "create_time" ) );
 
         Map<String, List<RspPayMethod2>> rspPayMethodMap = new HashMap<>();
-        List<RspConfigBankList>    configBankList  = configBankListCache.getEffectList();
+        List<ConfigBankList>    configBankList  = configBankListCache.getEffectList();
         for ( WalletUserPayMethod userPayMethod : userPayMethods ) {
             RspPayMethod2 rspPayMethod = new RspPayMethod2();
             BeanUtils.copyProperties( userPayMethod, rspPayMethod );
             rspPayMethod.setType( userPayMethod.getMethodType() );
-             for ( RspConfigBankList rspConfigBank : configBankList ) {
+             for ( ConfigBankList rspConfigBank : configBankList ) {
                  if( Objects.equals( userPayMethod.getBankId(), rspConfigBank.getId() ) ){
                      rspPayMethod.setBankName( rspConfigBank.getBankName() );
                  }

@@ -51,7 +51,7 @@ public class AgentHostClientController extends BaseController {
     @GetMapping( "/export" )
     public void export( AgentHostClient agentHostClient, HttpServletResponse response ) {
         List<AgentHostClient> list = agentHostClientService.selectAgentHostClientList( agentHostClient );
-        ExportExcelUtil.exportExcel( list, "主播版本号", "主播版本号表", AgentHostClient.class, response );
+        ExportExcelUtil.exportBigExcel( list, "主播版本号", "主播版本号表", AgentHostClient.class, response );
     }
 
     /**

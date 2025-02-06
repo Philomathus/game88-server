@@ -28,8 +28,8 @@ import java.util.*;
 @Repository( value = ConstantsGame.PG_SOFT + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockPGSoft extends AbstractGamePull {
 
-    private static final BigDecimal IDR_RATE = new BigDecimal( 1000 );
-    private static final BigDecimal CNY_RATE = BigDecimal.ONE;
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "CNY"
+            , BigDecimal.ONE, "BRL", BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -57,7 +57,7 @@ public class GamePullDockPGSoft extends AbstractGamePull {
             }
             return JsonUtil.json2Map( text );
         } );
-
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             List<Object> dataList = ( List<Object> ) resultMap.getOrDefault( "data", Collections.EMPTY_LIST );
             if ( !CollectionUtils.isEmpty( dataList ) ) {
@@ -96,13 +96,13 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         String        endTime = remoteGameDatum.get( "betEndTime" ).toString();
         LocalDateTime end     = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( endTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( end ) );
-
-        BigDecimal exchangeRate = account.startsWith( "99" ) ? IDR_RATE : CNY_RATE;
-
-        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( exchangeRate );
+        String currency = remoteGameDatum.get( "currency" ).toString();
+        gameDataRecord.setCurrency( currency );
+        BigDecimal RATE      = RATE_MAP.get( currency );
+        BigDecimal betAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betAmount" ) ) ).multiply( RATE );
         gameDataRecord.setAllBet( betAmount.toString() );
         gameDataRecord.setCellScore( gameDataRecord.getAllBet() );
-        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ).multiply( exchangeRate );
+        BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winAmount" ) ) ).multiply( RATE );
         gameDataRecord.setProfit( payoffAmount.subtract( betAmount ).toString() );
         return gameDataRecord;
     }

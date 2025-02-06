@@ -21,6 +21,7 @@ import tv.game88.pay.api.service.MemberWithdrawDetailService;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 
 /**
@@ -79,7 +80,7 @@ public class MemberWithdrawDetailController extends BaseController {
      */
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:query')" )
     @GetMapping( value = "/reportList" )
-    public RspBase<List<RspWithdrawReport>> withdrawReportList( ) {
+    public RspBase<List<RspWithdrawReport>> withdrawReportList() {
         return RspBase.ok( memberWithdrawDetailService.withdrawReportList() );
     }
 
@@ -100,9 +101,7 @@ public class MemberWithdrawDetailController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReqMemberWithdrawDetail reqMemberWithdrawDetail, HttpServletResponse response ) {
         List<MemberWithdrawDetail> list = memberWithdrawDetailService.selectMemberWithdrawDetailList( reqMemberWithdrawDetail );
-        if ( list.size() <= 200000 ) {
-            ExportExcelUtil.exportExcel( list, "会员提现", "会员提现信息表", MemberWithdrawDetail.class, response );
-        }
+        ExportExcelUtil.exportBigExcel( list, "会员提现", "会员提现信息表", MemberWithdrawDetail.class, response );
     }
 
     /**
@@ -113,7 +112,7 @@ public class MemberWithdrawDetailController extends BaseController {
     @PostMapping( "/exportShunWei" )
     public void exportShunWei( @RequestBody ReqMemberWithdrawDetail req, HttpServletResponse response ) {
         List<RspMemberWithdrawDetailShunWei> list = memberWithdrawDetailService.selectMemberWithdrawDetailShunWeiList( req );
-        ExportExcelUtil.exportExcel( list, null, "顺为格式会员提现表", RspMemberWithdrawDetailShunWei.class, response );
+        ExportExcelUtil.exportBigExcel( list, null, "顺为格式会员提现表", RspMemberWithdrawDetailShunWei.class, response );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:refused')" )

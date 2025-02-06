@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +36,7 @@ public abstract class ControllerExceptionHandler {
     @ExceptionHandler( Throwable.class )
     @ResponseBody
     @ResponseStatus( HttpStatus.OK )
-    public RspBase<?> resolveException( Exception e ) throws Exception {
+    public RspBase<Void> resolveException( Exception e ) throws Exception {
         if ( e instanceof SessionExpireException || e instanceof NotLoginException ) {
             return RspBase.sessionError( e.getMessage() );
         } else if ( e instanceof NumberFormatException ) {
@@ -52,14 +53,12 @@ public abstract class ControllerExceptionHandler {
             throw e;
         } else if ( e instanceof NoResourceFoundException ) {
             HttpServletRequest request = ServletUtil.getHttpServletRequest();
-            log.warn( "资源不存在 - url:{}, IP:{}, msg:{}, dev:{}", request
-                    .getRequestURL()
+            log.warn( "资源不存在 - url:{}, IP:{}, msg:{}, dev:{}", request.getRequestURL()
                     .toString(), ServletUtil.getIp( request ), e.getMessage(), request.getHeader( "dev" ) );
             return RspBase.businessError( "资源不存在" );
         } else {
             HttpServletRequest request = ServletUtil.getHttpServletRequest();
-            log.error( "异常请求url:{}, IP:{}, msg:{}, dev:{}", request
-                    .getRequestURL()
+            log.error( "异常请求url:{}, IP:{}, msg:{}, dev:{}", request.getRequestURL()
                     .toString(), ServletUtil.getIp( request ), e.getMessage(), request.getHeader( "dev" ), e );
             return RspBase.businessError( "系统错误,请联系值班技术" );
         }
@@ -68,13 +67,25 @@ public abstract class ControllerExceptionHandler {
     @ResponseStatus( HttpStatus.BAD_REQUEST )
     @ResponseBody
     @ExceptionHandler( MethodArgumentNotValidException.class )
-    public RspBase<?> methodArgumentNotValidException( MethodArgumentNotValidException ex ) {
+    public RspBase<Void> methodArgumentNotValidException( MethodArgumentNotValidException ex ) {
         BindingResult    result      = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        RspBase<?>       error       = new RspBase<>( HttpStatus.BAD_REQUEST.value(), "数据验证错误:" );
+        RspBase<Void>    error       = new RspBase<>( HttpStatus.BAD_REQUEST.value(), "数据验证错误:" );
         for ( FieldError fieldError : fieldErrors ) {
             error.setMsg( error.getMsg().concat( fieldError.getField() + ":" + fieldError.getDefaultMessage() + ";" ) );
         }
         return error;
+    }
+
+    /**
+     * 请求方式不支持
+     */
+    @ExceptionHandler( HttpRequestMethodNotSupportedException.class )
+    public RspBase<Void> handleHttpRequestMethodNotSupported( HttpRequestMethodNotSupportedException e,
+                                                              HttpServletRequest request ) {
+        String requestURI = request.getRequestURI();
+        log.warn( "请求地址'{}',不支持'{}'请求, IP:{}, dev:{}", requestURI, e.getMethod(), ServletUtil.getIp( request ),
+                request.getHeader( "dev" ) );
+        return RspBase.businessError( "请求方式不支持" );
     }
 }

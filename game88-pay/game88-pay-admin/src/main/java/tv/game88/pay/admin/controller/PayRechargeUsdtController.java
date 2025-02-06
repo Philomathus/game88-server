@@ -50,7 +50,7 @@ public class PayRechargeUsdtController extends BaseController {
     @GetMapping( "/export" )
     public void export( PayRechargeUsdt payRechargeUsdt, HttpServletResponse response ) {
         List<PayRechargeUsdt> list = payRechargeUsdtService.selectPayRechargeUsdtList( payRechargeUsdt );
-        ExportExcelUtil.exportExcel( list, "USDT渠道", "USDT渠道表", PayRechargeUsdt.class, response );
+        ExportExcelUtil.exportBigExcel( list, "USDT渠道", "USDT渠道表", PayRechargeUsdt.class, response );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:query')" )

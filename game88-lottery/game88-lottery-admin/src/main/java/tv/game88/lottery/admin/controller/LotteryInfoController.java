@@ -58,7 +58,7 @@ public class LotteryInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( LotteryInfo lotteryInfo, HttpServletResponse response ) {
         List<LotteryInfo> list = lotteryInfoService.selectLotteryInfoList( lotteryInfo );
-        ExportExcelUtil.exportExcel( list, "彩票信息", "彩票信息表", LotteryInfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "彩票信息", "彩票信息表", LotteryInfo.class, response );
     }
 
     /**

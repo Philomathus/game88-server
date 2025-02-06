@@ -53,7 +53,7 @@ public class GamePlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:platform:list')" )
     @GetMapping( "/gameCategoryAll" )
     public RspBase<List<RspGameCategory>> gameCategoryAll() {
-        return RspBase.ok( EnumGameCategory.getGameCategorys() );
+        return RspBase.ok( EnumGameCategory.getGameCategoryAll() );
     }
 
     /**

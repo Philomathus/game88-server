@@ -57,7 +57,7 @@ public class MemberBcodeController extends BaseController {
     @GetMapping( "/export" )
     public void export( MemberBcode memberBcode, HttpServletResponse response ) {
         List<MemberBcode> list = memberBcodeService.selectMemberBcodeList( memberBcode );
-        ExportExcelUtil.exportExcel( list, "会员打码数据", "会员打码数据表", MemberBcode.class, response );
+        ExportExcelUtil.exportBigExcel( list, "会员打码数据", "会员打码数据表", MemberBcode.class, response );
     }
 
     /**

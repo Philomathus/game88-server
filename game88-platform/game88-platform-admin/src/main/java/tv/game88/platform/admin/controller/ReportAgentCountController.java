@@ -110,7 +110,7 @@ public class ReportAgentCountController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportAgentcount reportAgentcount, HttpServletResponse response ) throws ParseException {
         List<ReportAgentcount> list = reportAgentcountService.exportAgentcountList( reportAgentcount );
-        ExportExcelUtil.exportExcel( list, "推广统计报表", "推广统计报表", ReportAgentcount.class, response );
+        ExportExcelUtil.exportBigExcel( list, "推广统计报表", "推广统计报表", ReportAgentcount.class, response );
     }
 
     @PreAuthorize( "@ss.hasPermi('report:agentCount:generateData')" )

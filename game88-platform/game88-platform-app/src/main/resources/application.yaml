@@ -1,10 +1,10 @@
 server:
-  undertow:
+  tomcat:
+    max-connections: 80000
+    accept-count: 100
     threads:
-      io: 32
-      worker: 256
-    buffer-size: 1024
-    direct-buffers: true
+      max: 800
+      min-spare: 80
   shutdown: graceful
   port: 18811
   max-http-request-header-size: 64KB
@@ -75,7 +75,7 @@ pagehelper:
 # token配置
 token:
   # 令牌有效期（默认1天）
-  expireTime: 6
+  expireTime: 30
 
 im:
   tokenUrl: http://47.243.143.163:43000/token/auth

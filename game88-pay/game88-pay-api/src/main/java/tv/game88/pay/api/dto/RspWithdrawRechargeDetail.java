@@ -29,7 +29,7 @@ public class RspWithdrawRechargeDetail {
     private String bankAddress;
 
     public String getBankAccount() {
-        if ( StringUtils.isNotBlank( bankAccount ) ) {
+        if ( StringUtils.isNotBlank( bankAccount ) && bankAccount.length() > 4 ) {
             return "******" + bankAccount.substring( bankAccount.length() - 4 );
         }
         return "";

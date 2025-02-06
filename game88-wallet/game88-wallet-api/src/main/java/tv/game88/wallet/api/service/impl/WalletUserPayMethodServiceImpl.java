@@ -15,6 +15,7 @@ import tv.game88.common.vo.RspBase;
 import tv.game88.core.config.cache.ConfigBankListCache;
 import tv.game88.core.config.cache.ConfigDomainCacheUtil;
 import tv.game88.core.config.dto.RspConfigBankList;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.wallet.api.dto.ReqPayMethod;
 import tv.game88.wallet.api.dto.RspPayMethod;
 import tv.game88.wallet.api.entity.WalletUser;
@@ -152,8 +153,8 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
 
         Map<String, List<RspPayMethod>> resultMap = new LinkedHashMap<>();
         if ( !CollectionUtils.isEmpty( walletUserPayMethods ) ) {
-            List<RspConfigBankList> effectList     = configBankListCache.getEffectList();
-            String                  domainOssValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+            List<ConfigBankList> effectList     = configBankListCache.getEffectList();
+            String               domainOssValue = ConfigDomainCacheUtil.me.getDomainOssValue();
             for ( WalletPayMethodEnum payMethodEnum : WalletPayMethodEnum.values() ) {
                 resultMap.put( payMethodEnum.name(), new ArrayList<>() );
                 for ( WalletUserPayMethod userPayMethod : walletUserPayMethods ) {
@@ -170,7 +171,7 @@ public class WalletUserPayMethodServiceImpl extends ServiceImpl<WalletUserPayMet
                         } else {
                             rspPayMethod.setPayPicAddr( userPayMethod.getPayPicAddr() );
                         }
-                        for ( RspConfigBankList rspConfigBank : effectList ) {
+                        for ( ConfigBankList rspConfigBank : effectList ) {
                             if ( Objects.equals( rspConfigBank.getId(), userPayMethod.getBankId() ) ) {
                                 rspPayMethod.setBankName( rspConfigBank.getBankName() );
                                 if ( StringUtils.isNotBlank( rspConfigBank.getBankIcon() ) && !rspConfigBank

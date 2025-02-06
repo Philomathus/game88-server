@@ -74,6 +74,6 @@ public class ReportIncomeDayController extends BaseController {
     @GetMapping( "/export" )
     public void export( ReportIncomeDay reportIncomeDay, HttpServletResponse response ) {
         List<ReportIncomeDay> list = reportIncomeDayService.selectReportIncomeDayList( reportIncomeDay );
-        ExportExcelUtil.exportExcel( list, "平台充值报表", "平台充值报表", ReportIncomeDay.class, response );
+        ExportExcelUtil.exportBigExcel( list, "平台充值报表", "平台充值报表", ReportIncomeDay.class, response );
     }
 }

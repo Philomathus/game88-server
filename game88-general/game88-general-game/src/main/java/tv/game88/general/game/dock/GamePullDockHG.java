@@ -41,14 +41,14 @@ public class GamePullDockHG extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        Map<String, Object> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put( "action", "record" );
-        params.put( "merchant", gamePlatform.getDes() );
-        params.put( "agent", gamePlatform.getAgent() );
+        params.put( "merchant", gamePlatform.getAgent() );
+        params.put( "agent", gamePlatform.getLinecode() );
         params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "page", 1 );
-        params.put( "pageSize", 1000 );
+        params.put( "page", "1" );
+        params.put( "pageSize", "1000" );
         params.put( "mode", MODE );
 
         String param = null;
@@ -62,7 +62,7 @@ public class GamePullDockHG extends AbstractGamePull {
         httpHeaders.setContentType( MediaType.APPLICATION_JSON );
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>( Map.of( "params", param ), httpHeaders );
 
-        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getApiUrl(), gamePlatform.getDes() );
+        String url = String.format( "%s/api/game/%s/handle", gamePlatform.getApiUrl(), gamePlatform.getAgent() );
 
         Map<String, Object> resultMap = restTemplate.execute( url, HttpMethod.PUT,
                 restTemplate.httpEntityCallback( requestEntity ), response -> {
@@ -78,11 +78,14 @@ public class GamePullDockHG extends AbstractGamePull {
             Map<String, Object> result = ( Map<String, Object> ) resultMap.getOrDefault( "result", new HashMap<>() );
             if ( !CollectionUtils.isEmpty( result ) ) {
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
-                return ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
+                List<Object> bets = ( List<Object> ) result.getOrDefault( "bets", new ArrayList<>() );
+                if ( !CollectionUtils.isEmpty( bets ) ) {
+                    return bets;
+                }
             }
-        } else {
-            log.warn( JsonUtil.object2Json( resultMap ) );
         }
+        log.warn( gamePlatform.getName() + "-" + gamePlatform.getId() + " - URL:" + url + " - result: "
+                + JsonUtil.object2Json( resultMap ) );
         return null;
     }
 

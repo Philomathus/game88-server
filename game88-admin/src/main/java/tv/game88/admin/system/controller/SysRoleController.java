@@ -45,7 +45,7 @@ public class SysRoleController extends BaseController {
     @GetMapping( "/export" )
     public void export( SysRole role, HttpServletResponse response ) {
         List<SysRole> list = roleService.selectRoleList( role );
-        ExportExcelUtil.exportExcel( list, "角色信息", "角色信息表", SysRole.class, response );
+        ExportExcelUtil.exportBigExcel( list, "角色信息", "角色信息表", SysRole.class, response );
     }
 
     /**

@@ -51,7 +51,7 @@ public class ActivityQuestInfoController extends BaseController {
     @GetMapping( "/export" )
     public void export( ActivityQuestInfo activityQuestInfo, HttpServletResponse response ) {
         List<ActivityQuestInfo> list = activityQuestInfoService.selectActivityQuestInfoList( activityQuestInfo );
-        ExportExcelUtil.exportExcel( list, "任务信息", "任务信息表", ActivityQuestInfo.class, response );
+        ExportExcelUtil.exportBigExcel( list, "任务信息", "任务信息表", ActivityQuestInfo.class, response );
     }
 
     /**

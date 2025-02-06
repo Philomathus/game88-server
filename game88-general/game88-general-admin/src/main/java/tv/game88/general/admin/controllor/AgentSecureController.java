@@ -52,7 +52,7 @@ public class AgentSecureController extends BaseController {
     @GetMapping( "/export" )
     public void export( AgentSecure agentSecure, HttpServletResponse response ) {
         List<AgentSecure> list = agentSecureService.selectAgentSecureList( agentSecure );
-        ExportExcelUtil.exportExcel( list, "域名加密管理", "域名加密管理表", AgentSecure.class, response );
+        ExportExcelUtil.exportBigExcel( list, "域名加密管理", "域名加密管理表", AgentSecure.class, response );
     }
 
     /**

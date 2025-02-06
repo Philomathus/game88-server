@@ -2,7 +2,6 @@ package tv.game88.pay.api.payOrder;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -63,7 +62,7 @@ public class QiangWeiPayProcessor extends AbstractPay {
                     reqPayRecharge.setUrlType( 1 );
                 }
                 String paySrc = dataMap.getOrDefault( "pay_src", "" ).toString();
-                return new String( Base64.decodeBase64( paySrc ), StandardCharsets.UTF_8 );
+                return new String( Base64.getDecoder().decode( paySrc ), StandardCharsets.UTF_8 );
             } else {
                 reqPayRecharge.setFailReason( resultMap.getOrDefault( "info", "" ).toString() );
             }

@@ -31,7 +31,19 @@
                     <groupId>com.aliyun</groupId>
                     <artifactId>aliyun-java-sdk-sts</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.json</groupId>
+                    <artifactId>json</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
         </dependency>
         <dependency>
             <groupId>tv.game88.core</groupId>
