@@ -39,12 +39,9 @@ public class MemberGameDataController extends BaseController {
     @PreAuthorize ( "@ss.hasPermi('member:gameData:list')" )
     @GetMapping ( "/list" )
     public RspBase<List<MemberGameData>> list( ReqMemberGameData reqMemberGameData ) {
-        long       a1         = System.currentTimeMillis();
         PageDomain pageDomain = TableSupport.buildPageRequest();
         startPage( pageDomain );
         List<MemberGameData> list = memberGameDataService.selectMemberGameDataList( reqMemberGameData );
-        long                 a2   = System.currentTimeMillis();
-        log.warn( "111:" + ( a2 - a1 ) );
         return getRspBasePage( list, pageDomain );
     }
 

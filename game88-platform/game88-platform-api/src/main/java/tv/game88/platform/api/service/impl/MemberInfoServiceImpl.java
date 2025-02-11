@@ -139,9 +139,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         res.setFirstRechargeUrl( valueList.get( 11 ) );
         res.setAppLink( valueList.get( 12 ) );
         res.setAppLinkTechSpark( valueList.get( 13 ) );
-        res.setDownloadUrl1( "https://targetinstall-api.feiwin.dev" );
-        res.setDownloadUrl2( "https://targetinstall-api.feiwin.dev" );
-        res.setDownloadUrl3( "https://targetinstall-api.feiwin.dev" );
+        res.setDownloadUrl1( valueList.get( 14 ) );
+        res.setDownloadUrl2( valueList.get( 15 ) );
+        res.setDownloadUrl3( valueList.get( 16 ));
         return res;
     }
 
@@ -309,7 +309,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 this.baseMapper.deleteByHistoryKey( oldm.getId() );
             } else {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             }
         }
         RspMember rspMember = new RspMember();
@@ -413,10 +413,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             this.baseMapper.insert( memberInfo );
             try {
                 //渠道邀请码注册通知(归档会员回归不通知)
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             } catch ( Exception e ) {
                 try {
-                    regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                    regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
                 } catch ( Exception p ) {
                     log.error( "反作弊注册成功，通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
                 }
@@ -471,10 +471,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         this.baseMapper.insert( memberInfo );
         try {
             //渠道邀请码注册通知(归档会员回归不通知)
-            regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+            regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
         } catch ( Exception e ) {
             try {
-                regChannelNotice( mobileLogin, dev, memberInfo.getId() );
+                regChannelNotice( mobileLogin, dev,version, memberInfo.getId() );
             } catch ( Exception p ) {
                 log.error( "通知推广渠道失败 account:{},errMsg:{}", memberInfo.getId(), p.getMessage() );
             }
@@ -647,7 +647,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
 
-    private void regChannelNotice( MobileLogin mobileLogin, Integer dev, String userId ) {
+    private void regChannelNotice( MobileLogin mobileLogin, Integer dev,String version, String userId ) {
+
+        if( AppVersionUtils.hasNewVersion("3.12.3.1", version ) ) {
+            return;
+        }
+
         String noticeUrl = configEnvCacheUtil.getConf( "channel_reg_notice" );
         if ( StringUtils.isBlank( noticeUrl ) ) {
             log.error( "平台无法找到环境变量channel_reg_notice,userId:{}", userId );

@@ -29,18 +29,23 @@ public class ConfigBankListController extends BaseController {
     @Operation( summary = "获取银行字典列表" )
     @PostMapping( "/bankList" )
     public RspBase<List<RspConfigBankList>> bankList() {
-        List<ConfigBankList> effectList = configBankListCache.getEffectList();
-        effectList.removeIf( r -> Arrays.asList( "GOPAY", "OKPAY", "VIPPAY" ).contains( r.getBankName().toUpperCase() ) );
-        String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
-        for ( ConfigBankList bankList : effectList ) {
-            if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
-                bankList.setBankIcon( domainValue + bankList.getBankIcon() );
+        try {
+            List<ConfigBankList> effectList = configBankListCache.getEffectList();
+            effectList.removeIf( r -> Arrays.asList( "GOPAY", "OKPAY", "VIPPAY" ).contains( r.getBankName().toUpperCase() ) );
+            String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
+            for ( ConfigBankList bankList : effectList ) {
+                if ( StringUtils.isNotBlank( bankList.getBankIcon() ) && !bankList.getBankIcon().startsWith( "http" ) ) {
+                    bankList.setBankIcon( domainValue + bankList.getBankIcon() );
+                }
             }
+            return RspBase.ok( effectList.stream().map( configBankList -> {
+                RspConfigBankList rspConfigBankList = new RspConfigBankList();
+                BeanUtils.copyProperties( configBankList, rspConfigBankList );
+                return rspConfigBankList;
+            } ).toList() );
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+            throw e;
         }
-        return RspBase.ok( effectList.stream().map( configBankList -> {
-            RspConfigBankList rspConfigBankList = new RspConfigBankList();
-            BeanUtils.copyProperties( configBankList, rspConfigBankList );
-            return rspConfigBankList;
-        } ).toList() );
     }
 }
