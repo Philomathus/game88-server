@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.security.annotation.Anonymous;
+import tv.game88.common.vo.RspBase;
 import tv.game88.common.vo.RspEntity;
+import tv.game88.platform.api.constant.RecordConstants;
 import tv.game88.platform.api.dto.ReqReportMemberStatistics;
 import tv.game88.platform.api.service.ReportMemberStatisticsService;
 
@@ -58,5 +60,10 @@ public class ReportMemberDataStatisticsController extends BaseController {
     @PostMapping( "/gift" )
     public RspEntity<BigDecimal> getTotalGift( @RequestBody ReqReportMemberStatistics req ) {
         return RspEntity.ok( BigDecimal.ZERO );
+    }
+
+    @PostMapping( "/getMemberStats" )
+    public RspBase<RecordConstants.RspMemberStats> getMemberStats( @RequestBody ReqReportMemberStatistics req ) {
+        return RspBase.ok( reportMemberStatisticsService.getMemberStats( req ) );
     }
 }
