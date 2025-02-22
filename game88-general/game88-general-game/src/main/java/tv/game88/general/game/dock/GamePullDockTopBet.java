@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Log4j2
-@Repository( value = ConstantsGame.PP + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.TOP_BET + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockTopBet extends AbstractGamePull {
 
     @Override

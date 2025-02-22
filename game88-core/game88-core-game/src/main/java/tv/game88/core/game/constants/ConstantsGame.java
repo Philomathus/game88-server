@@ -37,4 +37,5 @@ public class ConstantsGame {
     public static final String JILI    = "jiLi";
     public static final String RR      = "rr";
     public static final String TOP_BET = "topBet";
+    public static final String EVO     = "evo";
 }

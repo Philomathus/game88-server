@@ -31,6 +31,8 @@ public class LocalDateTimeUtils {
 
     public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssXXX" );
 
+    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XFORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssX" );
+
     public static final DateTimeFormatter RFC3339_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
@@ -255,6 +257,11 @@ public class LocalDateTimeUtils {
         ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
         ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
         return converted.toLocalDateTime();
+    }
+
+    public static ZonedDateTime convertToUTC0Zoned( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        return  zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
     }
 
     public static LocalDateTime convertToUTC7( LocalDateTime localDateTime ) {
