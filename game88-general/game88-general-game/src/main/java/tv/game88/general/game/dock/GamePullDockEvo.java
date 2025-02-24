@@ -56,10 +56,14 @@ public class GamePullDockEvo extends AbstractGamePull {
                 JsonUtil.object2Json( resultMap ) );*/
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( "1".equals( resultMap.getOrDefault( "status", "-1" ).toString() ) ) {
-                if ( end.isAfter( LocalDateTime.now() ) ) {
+                LocalDateTime now        = LocalDateTime.now();
+                LocalDateTime cutoffTime = now.minusMinutes( 3 );
+                if ( end.isBefore( cutoffTime ) || end.isEqual( cutoffTime ) ) {
+                    // end在3分钟前，保留原始end
                     gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
                 } else {
-                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( start.plusMinutes( 1 ) ) ) );
+                    // end仍在最近3分钟范围内，使用cutoffTime
+                    gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( now.minusMinutes( 2 ) ) ) );
                 }
                 Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
                 return ( List<Object> ) dataMap.getOrDefault( "bets", new ArrayList<>() );
