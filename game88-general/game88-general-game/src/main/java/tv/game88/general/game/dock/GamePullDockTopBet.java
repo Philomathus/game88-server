@@ -77,7 +77,7 @@ public class GamePullDockTopBet extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         // 9901_M22611
         String account = String.valueOf( remoteGameDatum.get( "user_name" ) );
-        if ( !account.startsWith( "99" ) && !account.contains( "m" ) ) {
+        if ( !( account.startsWith( "99" ) && account.contains( "m" ) ) ) {
             return null;
         }
         GameDataRecord gameDataRecord = new GameDataRecord();
