@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class GamePullDockJiLi extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "BRL"
-            , BigDecimal.ONE );
+            , BigDecimal.ONE, "BDT", BigDecimal.ONE, "PKR", BigDecimal.ONE );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
