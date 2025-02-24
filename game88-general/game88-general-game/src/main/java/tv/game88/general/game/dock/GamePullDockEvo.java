@@ -35,9 +35,9 @@ public class GamePullDockEvo extends AbstractGamePull {
         LocalDateTime end = start.plusHours( 2 );
 
         Map<String, Object> params = new HashMap<>();
-        params.put( "starttime", LocalDateTimeUtils.convertToUTC0Zoned( start )
+        params.put( "start_date", LocalDateTimeUtils.convertToUTC0Zoned( start )
                 .format( LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XFORMATTER ) );
-        params.put( "endtime", LocalDateTimeUtils.convertToUTC0Zoned( end )
+        params.put( "end_date", LocalDateTimeUtils.convertToUTC0Zoned( end )
                 .format( LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XFORMATTER ) );
         params.put( "txn_type", 1 );
         params.put( "date_filter_type", 2 );
