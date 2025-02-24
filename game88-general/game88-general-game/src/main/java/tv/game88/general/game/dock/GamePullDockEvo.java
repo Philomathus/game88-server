@@ -64,7 +64,7 @@ public class GamePullDockEvo extends AbstractGamePull {
                 Map<String, Object> dataMap = ( Map<String, Object> ) resultMap.getOrDefault( "data", new HashMap<>() );
                 return ( List<Object> ) dataMap.getOrDefault( "bets", new ArrayList<>() );
             } else {
-                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( url + " ::: " + JsonUtil.object2Json( requestEntity ) + " ::: " + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;

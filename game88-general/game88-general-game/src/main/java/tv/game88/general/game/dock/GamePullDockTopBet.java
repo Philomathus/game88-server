@@ -75,15 +75,18 @@ public class GamePullDockTopBet extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        GameDataRecord      gameDataRecord  = new GameDataRecord();
+        // 9901_M22611
+        String account = String.valueOf( remoteGameDatum.get( "user_name" ) );
+        if ( !account.startsWith( "99" ) && !account.contains( "m" ) ) {
+            return null;
+        }
+        GameDataRecord gameDataRecord = new GameDataRecord();
+        String         agent          = account.split( "_" )[ 0 ];
+        gameDataRecord.setAccount( account );
+        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "index" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "game_record" ) ) );
-        // 9901_M22611
-        String account = String.valueOf( remoteGameDatum.get( "user_name" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "app_id" ) ) );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
 
