@@ -58,7 +58,7 @@ public class GamePullDockTopBet extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        log.warn( JsonUtil.object2Json( resultMap ) );
+        // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) && "0".equals( resultMap.getOrDefault( "code", "-1" ).toString() ) ) {
             List<Object> dataList = ( List<Object> ) resultMap.getOrDefault( "list", Collections.EMPTY_LIST );
             if ( !CollectionUtils.isEmpty( dataList ) ) {
