@@ -35,4 +35,5 @@ public abstract class ConstantsPayAgent {
     public static final String A1_PAY          = "a1Pay";
     public static final String WAN_GUO_PAY     = "wanGuoPay";
     public static final String SANJIN2_PAY     = "sanJin2Pay";
+    public static final String NO_COIN_PAY     = "noCoinPay";
 }
