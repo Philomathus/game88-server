@@ -77,8 +77,7 @@ public class GamePullDockEvo extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        String              type            = String.valueOf( remoteGameDatum.get( "type" ) );
-        if ( !"completed".equals( type ) ) {
+        if ( !"completed".equals( String.valueOf( remoteGameDatum.get( "type" ) ) ) ) {
             return null;
         }
         GameDataRecord gameDataRecord = new GameDataRecord();
@@ -90,7 +89,7 @@ public class GamePullDockEvo extends AbstractGamePull {
         String memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
         gameDataRecord.setAccount( memberId );
         gameDataRecord.setAgent( agent );
-        gameDataRecord.setKindId( remoteGameDatum.get( "prd_id" ) + "-" + remoteGameDatum.get( "game_id" ) );
+        gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "table_id" ) ) );
         String bet = String.valueOf( remoteGameDatum.get( "stake" ) );
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
