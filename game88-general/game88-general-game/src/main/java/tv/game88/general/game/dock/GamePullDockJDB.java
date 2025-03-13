@@ -89,34 +89,9 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setGameId( historyId );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
-        String agent    = null;
-        String memberId = null;
-        if ( account.startsWith( "88" ) || account.startsWith( "99" ) ) {
-            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
-                Matcher matcher = GET_NUMBER.matcher( account );
-                if ( matcher.find() ) {
-                    String memberAccount = matcher.group();
-                    agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                    memberId = agent + "_" + memberAccount;
-                }
-            } else {
-                agent    = account.substring( 0, account.lastIndexOf( "m" ) );
-                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
-            }
-        } else if ( account.startsWith( "77" ) ) {
-            Matcher matcher = GET_NUMBER.matcher( account );
-            if ( matcher.find() ) {
-                String memberAccount = matcher.group();
-                agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                memberId = agent + "_" + memberAccount;
-            }
-        }
-        if ( agent == null ) {
-            return null;
-        }
-        gameDataRecord.setAccount( memberId );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( remoteGameDatum.get( "gType" ) + "-" + remoteGameDatum.get( "mtype" ) );
         String bet = new BigDecimal( String.valueOf( remoteGameDatum.get( "bet" ) ) ).negate().toString();
         gameDataRecord.setCellScore( bet );

@@ -56,12 +56,9 @@ public class GamePullDockWali extends AbstractGamePull {
         }
 
         UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl( gamePlatform.getApiUrl() ).path( "/getRecordV2" )
-                                                          .queryParam( "a", gamePlatform.getLinecode() )
-                                                          .queryParam( "t", unixTimeSeconds )
-                                                          .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
-                                                          .queryParam( "k", DigestUtils.md5Hex(
-                                                                  params + unixTimeSeconds + gamePlatform.getMd5() ) )
-                                                          .build( true );
+                .queryParam( "a", gamePlatform.getLinecode() ).queryParam( "t", unixTimeSeconds )
+                .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
+                .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + gamePlatform.getMd5() ) ).build( true );
 
         log.warn( uriComponents.toUriString() );
 
@@ -103,9 +100,9 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "recordId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "uid" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "uid" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "validBet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet" ) ) );
@@ -114,7 +111,6 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "gameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "recordTime" ) ) );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setDetail( String.valueOf( remoteGameDatum.get( "detailUrl" ) ) );

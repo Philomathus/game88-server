@@ -78,10 +78,9 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         // gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "playerId" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         String     betAmount     = String.valueOf( remoteGameDatum.get( "betAmount" ) );
         BigDecimal betAmountDeci = new BigDecimal( betAmount.equals( "0" ) ? "0" : betAmount );
@@ -89,10 +88,8 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         String payoutAmount = String.valueOf( remoteGameDatum.get( "payoutAmount" ) );
-        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount )
-                .subtract( betAmountDeci )
-                .setScale( 2, RoundingMode.HALF_UP )
-                .toString();
+        String profit = new BigDecimal( payoutAmount.equals( "0" ) ? "0" : payoutAmount ).subtract( betAmountDeci )
+                .setScale( 2, RoundingMode.HALF_UP ).toString();
         gameDataRecord.setProfit( profit );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,

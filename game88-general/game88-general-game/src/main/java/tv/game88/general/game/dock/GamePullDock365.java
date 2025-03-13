@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.GAMING_365 + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.GAMING_365 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDock365 extends AbstractGamePull {
 
     @Override
@@ -77,10 +77,9 @@ public class GamePullDock365 extends AbstractGamePull {
 
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "txId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        String[] accounts = String.valueOf( remoteGameDatum.get( "userId" ) ).toUpperCase().split( "_" );
-        String   agent    = accounts[ 0 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "userId" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameNumber" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );

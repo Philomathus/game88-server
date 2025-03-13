@@ -64,9 +64,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( gamePlatform.getRecordUrl() )
-                .queryParams( requestMap )
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap )
                 .build( true );
 
         // log.warn( uriComponents.toUriString() );
@@ -121,16 +119,9 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String   accounts   = String.valueOf( remoteGameDatum.get( "PlayerAccount" ) );
-        String[] splitParam = accounts.split( "_" );
-        if ( !gamePlatform.getAgent().equals( splitParam[ 0 ] ) ) {
-            return null;
-        }
-        String agent = splitParam[ 1 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
-        gameDataRecord.setAgent( agent );
-        gameDataRecord.setAccount( StringUtils.substringAfter( accounts, "_" ) );
-        gameDataRecord.setAgent( splitParam[ 1 ] );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "PlayerAccount" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameArrNo" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effScore" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "allScore" ) ) );

@@ -127,21 +127,16 @@ public class GamePullDockOGNew extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-        String              playerId        = String.valueOf( remoteGameDatum.get( "player_id" ) );
-        if ( !playerId.startsWith( "77" ) && !playerId.startsWith( "88" ) && !playerId.startsWith( "99" ) ) {
-            return null;
-        }
         if ( "rollback".equals( remoteGameDatum.get( "transaction_type" ) ) ) {
             return null;
         }
-        String[]       splitParam     = playerId.split( "_" );
-        String         agent          = splitParam[ 0 ].toLowerCase();
         GameDataRecord gameDataRecord = new GameDataRecord();
+        String[]       accounts       = assemblyAccount( String.valueOf( remoteGameDatum.get( "player_id" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "transaction_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
-        gameDataRecord.setAccount( agent + "_" + splitParam[ 1 ].toUpperCase() );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effective_amount" ) ) );

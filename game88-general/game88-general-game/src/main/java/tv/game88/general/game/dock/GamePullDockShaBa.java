@@ -80,10 +80,9 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "trans_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "trans_id" ) ) );
-        String userID = String.valueOf( remoteGameDatum.get( "vendor_member_id" ) ).toLowerCase();
-        String agent  = userID.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( userID );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "vendor_member_id" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         Object sportType = remoteGameDatum.get( "sport_type" );
         if ( sportType == null ) {
             List<Map<String, Object>> ParlayDatas = ( List<Map<String, Object>> ) remoteGameDatum.get( "ParlayData" );

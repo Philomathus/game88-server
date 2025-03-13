@@ -77,26 +77,20 @@ public class GamePullDockTopBet extends AbstractGamePull {
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         // 9901_M22611
-        String account = String.valueOf( remoteGameDatum.get( "user_name" ) ).toLowerCase();
-        if ( !( account.startsWith( "99" ) && account.contains( "m" ) ) ) {
-            return null;
-        }
         GameDataRecord gameDataRecord = new GameDataRecord();
-        String         agent          = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "index" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "game_record" ) ) );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "user_name" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "app_id" ) ) );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
-
         String bet = String.valueOf( remoteGameDatum.get( "total_pay" ) );
         gameDataRecord.setCellScore( bet );
         gameDataRecord.setAllBet( bet );
         BigDecimal win = new BigDecimal( String.valueOf( remoteGameDatum.get( "profit" ) ) );
         gameDataRecord.setProfit( win.subtract( new BigDecimal( bet ) ).stripTrailingZeros().toPlainString() );
-
         LocalDateTime startDate = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( remoteGameDatum.get( "start_time" ) ),
                 LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_SSS_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startDate ) );

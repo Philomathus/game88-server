@@ -1,5 +1,6 @@
 package tv.game88.general.game.base;
 
+import com.google.common.collect.HashBiMap;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpEntity;
@@ -20,21 +21,77 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Log4j2
 public abstract class AbstractGamePull implements BaseGamePull {
     @Resource( name = "restUploadTemplate" )
     protected RestTemplate restTemplate;
-
     @Resource
-    protected RedisUtils redisUtils;
+    protected RedisUtils   redisUtils;
 
     protected static final Pattern GET_NUMBER = Pattern.compile( "\\d+$" );
+
+    protected static final HashBiMap<String, String> profileBiMap = HashBiMap.create();
+
+    static {
+        profileBiMap.put( "dev", "0AA" );
+        profileBiMap.put( "9900", "1AA" );
+        profileBiMap.put( "99115", "1PK" );
+        profileBiMap.put( "99116", "1BD" );
+    }
+
+    public static void main( String[] args ) {
+        System.out.println( Arrays.toString( assemblyAccount( "7710_1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "88ky_1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "88ky_M1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "88kym1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "9901m1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "9901_m1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "99k3_m1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "m1aa1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "m1pk1234" ) ) );
+        System.out.println( Arrays.toString( assemblyAccount( "m1bd1234" ) ) );
+    }
+
+    protected static String[] assemblyAccount( String account ) {
+        account = account.toLowerCase();
+        if ( account.startsWith( "77" ) ) {
+            Matcher matcher = GET_NUMBER.matcher( account );
+            if ( matcher.find() ) {
+                String memberNum = matcher.group();
+                String agent     = account.substring( 0, account.lastIndexOf( memberNum ) - 1 ).toLowerCase();
+                String memberId  = agent + "_" + memberNum;
+                return new String[] { agent, memberId };
+            }
+        } else if ( account.startsWith( "88" ) || account.startsWith( "99" ) ) {
+            if ( account.contains( "_" ) ) {
+                String[] split = account.split( "_" );
+                return new String[] { split[ 0 ], split[ 0 ] + "_" + split[ 1 ].toUpperCase() };
+            } else {
+                if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
+                    String memberId = account.replaceFirst( "88ky", "" );
+                    return new String[] { "88ky", "88ky_" + memberId };
+                } else {
+                    String agent    = account.substring( 0, account.lastIndexOf( "m" ) );
+                    String memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
+                    return new String[] { agent, memberId };
+                }
+            }
+        } else {
+            account = account.toUpperCase();
+            Matcher matcher = GET_NUMBER.matcher( account );
+            if ( matcher.find() ) {
+                String memberNum  = matcher.group();
+                String agentValue = account.substring( 1, account.lastIndexOf( memberNum ) );
+                String agent      = profileBiMap.inverse().get( agentValue );
+                return new String[] { agent, agent + "_" + "M" + agentValue + memberNum };
+            }
+        }
+        return new String[ 2 ];
+    }
 
     protected String createRecordId( GamePlatform info, String tarId ) {
         return String.valueOf( info.getId() ).concat( "-" ).concat( tarId );

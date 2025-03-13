@@ -84,11 +84,9 @@ public class GamePullDockEvo extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "txn_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
-        String account  = String.valueOf( remoteGameDatum.get( "username" ) ).toLowerCase();
-        String agent    = account.substring( 0, account.lastIndexOf( "m" ) );
-        String memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
-        gameDataRecord.setAccount( memberId );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "username" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "table_id" ) ) );
         String bet = String.valueOf( remoteGameDatum.get( "stake" ) );
         gameDataRecord.setCellScore( bet );

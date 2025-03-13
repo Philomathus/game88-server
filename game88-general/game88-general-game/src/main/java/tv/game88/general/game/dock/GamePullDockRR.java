@@ -66,17 +66,12 @@ public class GamePullDockRR extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
-        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
-        if ( !account.contains( "_" ) ) {
-            return null;
-        }
-        String[] spl   = account.split( "_" );
-        String   agent = spl[ 0 ];
-
+        String   logId    = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "user_id" ) ) );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        gameDataRecord.setAccount( agent + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         String     currency = String.valueOf( remoteGameDatum.get( "currency" ) );
         BigDecimal RATE     = RATE_MAP.get( currency );
@@ -93,8 +88,6 @@ public class GamePullDockRR extends AbstractGamePull {
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
                 LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
-        gameDataRecord.setAgent( agent );
-
         gameDataRecord.setCurrency( currency );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
