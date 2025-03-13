@@ -23,7 +23,7 @@ import java.math.RoundingMode;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.NO_COIN_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.NO_COIN_PAY + "AgentProcessor" )
 @Log4j2
 public class NoCoinPayAgentProcessor extends AbstractPayAgent {
 
