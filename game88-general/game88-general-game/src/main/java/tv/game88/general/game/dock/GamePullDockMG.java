@@ -79,6 +79,10 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         // gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "betUID" ) ) );
         String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
         gameDataRecord.setAgent( accounts[ 0 ] );
         gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );

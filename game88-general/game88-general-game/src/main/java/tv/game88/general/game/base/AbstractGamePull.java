@@ -90,7 +90,7 @@ public abstract class AbstractGamePull implements BaseGamePull {
                 return new String[] { agent, agent + "_" + "M" + agentValue + memberNum };
             }
         }
-        return new String[ 2 ];
+        return null;
     }
 
     protected String createRecordId( GamePlatform info, String tarId ) {

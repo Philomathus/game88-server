@@ -90,6 +90,10 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
         gameDataRecord.setAgent( accounts[ 0 ] );
         gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( remoteGameDatum.get( "gType" ) + "-" + remoteGameDatum.get( "mtype" ) );

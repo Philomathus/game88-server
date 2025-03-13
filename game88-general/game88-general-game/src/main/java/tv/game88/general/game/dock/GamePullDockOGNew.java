@@ -132,6 +132,10 @@ public class GamePullDockOGNew extends AbstractGamePull {
         }
         GameDataRecord gameDataRecord = new GameDataRecord();
         String[]       accounts       = assemblyAccount( String.valueOf( remoteGameDatum.get( "player_id" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
         gameDataRecord.setAgent( accounts[ 0 ] );
         gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "transaction_id" ) ) );

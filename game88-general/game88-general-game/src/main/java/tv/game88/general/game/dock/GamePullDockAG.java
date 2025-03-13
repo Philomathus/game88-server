@@ -166,6 +166,10 @@ public class GamePullDockAG extends AbstractGamePull {
         }
 
         String[] accounts = assemblyAccount( account );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( element ) );
+            return null;
+        }
         gameDataRecord.setAgent( accounts[ 0 ] );
         gameDataRecord.setAccount( accounts[ 1 ] );
 
