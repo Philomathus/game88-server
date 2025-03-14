@@ -71,8 +71,8 @@ public class GamePullDockJDB extends AbstractGamePull {
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
                 return ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
             } else {
-                log.error( "{} - url:{} - request:{} - result:{}", gamePlatform.getName(), url,
-                        JsonUtil.object2Json( requestMap ), JsonUtil.object2Json( resultMap ) );
+                log.error( "{} - url:{} - request:{} - param:{} - result:{}", gamePlatform.getName(), url,
+                        JsonUtil.object2Json( requestMap ), json, JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
