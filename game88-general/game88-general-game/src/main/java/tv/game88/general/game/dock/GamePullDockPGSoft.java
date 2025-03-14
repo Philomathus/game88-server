@@ -43,8 +43,6 @@ public class GamePullDockPGSoft extends AbstractGamePull {
 
         String url = gamePlatform.getApiUrl() + "/external-datagrabber/Bet/v4/GetHistory?trace_id=" + UUID.randomUUID();
 
-        log.warn( url + " ::: " + JsonUtil.object2Json( params ) );
-
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( params, httpHeaders );
@@ -67,7 +65,8 @@ public class GamePullDockPGSoft extends AbstractGamePull {
                 return dataList;
             }
             if ( resultMap.get( "error" ) != null ) {
-                log.warn( JsonUtil.object2Json( resultMap ) );
+                log.error( "{} - url:{} - request:{} - result:{}", gamePlatform.getName(), url, JsonUtil.object2Json( params ),
+                        JsonUtil.object2Json( resultMap ) );
             } else {
                 gamePlatform.setVersionValue( String.valueOf( Long.parseLong( gamePlatform.getVersionValue() ) + 60000 ) );
             }
