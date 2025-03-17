@@ -95,6 +95,7 @@ public class YiAnPayAgentProcessor extends AbstractPayAgent {
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
         requestMap.values().removeIf( value -> value == null || StringUtils.isBlank( value.toString() ) );
+        requestMap.remove( "NO_SIGN_FailReason" );
 
         SortedMap<String, Object> dataMap = new TreeMap<>( requestMap );
         String                    tempStr = assemblyUrl( dataMap ) + signMd5;

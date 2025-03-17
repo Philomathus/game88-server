@@ -2,6 +2,7 @@ package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
@@ -90,6 +91,9 @@ public class BBJiuDingPayAgentProcessor extends AbstractPayAgent {
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
+
+        requestMap.values().removeIf( value -> value == null || StringUtils.isBlank( value.toString() ) );
+        requestMap.remove( "NO_SIGN_FailReason" );
 
         SortedMap<String, Object> dataMap = new TreeMap<>( requestMap );
         String                    tempStr = assemblyUrl( dataMap ) + signMd5;
