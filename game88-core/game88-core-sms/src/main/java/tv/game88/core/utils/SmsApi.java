@@ -45,6 +45,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +100,12 @@ public class SmsApi {
             case 2 -> this.sendSmsBaidu( configSms, phone, code );
             case 3 -> this.sendSmsHuawei( configSms, phone, code );
             case 4 -> this.sendSmsYunJi( configSms, phone, code );
+            case 5 -> this.sendSmsCxlink(configSms , phone , code );
             default -> throw new BusinessException( "not found provider" );
         };
     }
+
+
 
     private String sendSmsYunJi( ConfigSms configSms, String phone, String code ) {
         Map<String, Object> body = new HashMap<>();
@@ -139,6 +143,37 @@ public class SmsApi {
         }
         log.warn( "云极短信发送失败:{}", JsonUtil.object2Json( resultMap ) );
         throw new BusinessException( "短信发送失败,请联系客服" );
+    }
+
+    private String sendSmsCxlink(ConfigSms configSms, String phone, String code) {
+        Map<String, Object> body = new HashMap<>();
+        body.put( "accessKey", configSms.getAppKey() );
+        body.put( "accessSecret", configSms.getAppAccess() );
+        body.put( "signCode", configSms.getSignature() );
+        body.put( "templateCode", configSms.getTemplate() );
+        body.put( "msgType", 1 );
+        body.put( "mobile", phone );
+        body.put( "params", Collections.singletonList( code ) );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_JSON );
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>( body, httpHeaders );
+
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = restTemplate.postForObject( configSms.getEndpoint() , httpEntity, Map.class );
+            if ( !CollectionUtils.isEmpty( resultMap ) ) {
+                String rspCode = resultMap.getOrDefault( "code", "0" ).toString();
+                if ( "200".equals( rspCode ) ) {
+                    return code;
+                }
+            }
+        } catch ( Exception e ) {
+            log.error( e.getMessage(), e );
+        }
+        log.warn( "Cxlink短信发送失败:{}", JsonUtil.object2Json( resultMap ) );
+
+        return null;
     }
 
     private String sendSmsHuawei( ConfigSms configSms, String phone, String code ) {
