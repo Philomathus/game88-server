@@ -46,6 +46,7 @@ public enum EnumGameCategory {
     RR( ConstantsGame.RR, "rr" ),
     TOP_BET( ConstantsGame.TOP_BET, "topBet" ),
     EVO( ConstantsGame.EVO, "evo" ),
+    V8( ConstantsGame.V8, "v8" ),
     ;
 
     private final String type;
@@ -58,7 +59,7 @@ public enum EnumGameCategory {
 
     public static List<RspGameCategory> getGameCategorys() {
         return Arrays.stream( EnumGameCategory.values() )
-                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, RR, TOP_BET, EVO ).contains( m ) ).map( m -> {
+                .filter( m -> !Arrays.asList( T1, PP, CG, JILI, RR, TOP_BET, EVO, V8 ).contains( m ) ).map( m -> {
                     RspGameCategory gameCategory = new RspGameCategory();
                     gameCategory.setName( m.name() );
                     gameCategory.setDes( m.getDes() );

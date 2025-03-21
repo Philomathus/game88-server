@@ -1,5 +1,6 @@
 package tv.game88.general.game.dock;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,9 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.SHABA + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockShaBa extends AbstractGamePull {
+    private static final Map<Integer, BigDecimal> RATE = ImmutableMap.of( 51, BigDecimal.valueOf( 1000 ), 20, BigDecimal.ONE,
+            13, BigDecimal.ONE );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -97,16 +102,27 @@ public class GamePullDockShaBa extends AbstractGamePull {
         } else {
             gameDataRecord.setKindId( String.valueOf( sportType ) );
         }
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "stake" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "stake" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) );
+
+        int currencyType = ( int ) remoteGameDatum.get( "currency" );
+        gameDataRecord.setCurrency( switch ( currencyType ) {
+            case 51 -> "VND";
+            case 13 -> "CNY";
+            default -> "";
+        } );
+
+        BigDecimal rate     = RATE.get( currencyType );
+        BigDecimal stake    = new BigDecimal( String.valueOf( remoteGameDatum.get( "stake" ) ) ).multiply( rate );
+        String     stakeStr = stake.stripTrailingZeros().toPlainString();
+        gameDataRecord.setCellScore( stakeStr );
+        gameDataRecord.setAllBet( stakeStr );
+        BigDecimal winLostAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) ).multiply( rate );
+        gameDataRecord.setProfit( winLostAmount.stripTrailingZeros().toPlainString() );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.getOrDefault( "match_id",
                 remoteGameDatum.get( "league_id" ) ) ) );
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.getOrDefault( "away_id", remoteGameDatum.get( "team_id" ) ) ) );
 
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
-
 
         String transactionTimeStr = String.valueOf( remoteGameDatum.get( "transaction_time" ) );
         String settlementTimeStr  = String.valueOf( remoteGameDatum.get( "settlement_time" ) );
