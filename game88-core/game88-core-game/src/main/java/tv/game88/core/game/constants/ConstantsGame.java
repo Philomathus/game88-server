@@ -31,12 +31,14 @@ public class ConstantsGame {
     public static final String PG_SOFT    = "PGSoft";
     public static final String SHABA      = "shaBa";
 
-    public static final String T1      = "t1";
-    public static final String PP      = "pp";
-    public static final String CG      = "cg";
-    public static final String JILI    = "jiLi";
-    public static final String RR      = "rr";
-    public static final String TOP_BET = "topBet";
-    public static final String EVO     = "evo";
-    public static final String V8      = "v8";
+    public static final String T1       = "t1";
+    public static final String PP       = "pp";
+    public static final String CG       = "cg";
+    public static final String JILI     = "jiLi";
+    public static final String RR       = "rr";
+    public static final String TOP_BET  = "topBet";
+    public static final String EVO      = "evo";
+    public static final String V8       = "v8";
+    public static final String TOP_PLAY = "topPlay";
+    public static final String WS168    = "ws168";
 }
