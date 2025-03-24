@@ -73,4 +73,5 @@ public abstract class ConstantsPay {
     public static final String OKPAY          = "okPay";
     public static final String XGT_PAY        = "xgtPay";
     public static final String NO_COIN_PAY    = "noCoinPay";
+    public static final String ALI_PAY        = "aliPay";
 }

@@ -3,6 +3,7 @@ package tv.game88.common.utils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -248,5 +249,23 @@ public class AESCoder {
                 16 * 8, Arrays.copyOfRange( combined, 0, 12 ) ) );
         byte[] original = cipher.doFinal( Arrays.copyOfRange( combined, 12, combined.length ) );
         return new String( original, StandardCharsets.UTF_8 );
+    }
+
+    public static String encryptBase64ByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.decodeBase64( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.decodeBase64( AESIV ) );
+        cipher.init( Cipher.ENCRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( content.getBytes( StandardCharsets.UTF_8 ) );
+        return Base64.encodeBase64String( encrypted );
+    }
+
+    public static String decryptBase64ByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.decodeBase64( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.decodeBase64( AESIV ) );
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( Base64.decodeBase64( content ) );
+        return new String( encrypted, StandardCharsets.UTF_8 );
     }
 }
