@@ -111,6 +111,7 @@ public class GameDockMeiTian extends AbstractGameDock {
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             if ( StringUtils.equals( "1", resultMap.get( "resultCode" ) ) && resultMap.containsKey( "url" ) ) {
                 reqJoinGame.setGameUrl( resultMap.get( "url" ) );
+                log.warn( reqJoinGame.getGameUrl() );
             }
         }
         if ( StringUtils.isBlank( reqJoinGame.getGameUrl() ) ) {

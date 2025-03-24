@@ -77,7 +77,7 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
                 log.info( payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
-                reqPayAgent.setFailReason( resultMap.getOrDefault( "errDes", "" ).toString() );
+                reqPayAgent.setFailReason( resultMap.getOrDefault( "errDes", resultMap.get( "retMsg" ) ).toString() );
                 payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             }
         }
