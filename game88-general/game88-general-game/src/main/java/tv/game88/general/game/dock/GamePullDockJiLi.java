@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class GamePullDockJiLi extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "BRL"
-            , BigDecimal.ONE, "BDT", BigDecimal.ONE, "PKR", BigDecimal.ONE );
+            , BigDecimal.ONE, "BDT", BigDecimal.ONE, "PKR", BigDecimal.ONE, "VND", new BigDecimal( 1000 ) );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -108,10 +108,6 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
         BigDecimal RATE = RATE_MAP.get( gamePlatform.getLinecode() );
-
-        if ( "VND".equals( gamePlatform.getLinecode() ) ) {
-            log.warn( JsonUtil.object2Json( remoteGameDatum ) );
-        }
 
         BigDecimal turnover = new BigDecimal( String.valueOf( remoteGameDatum.get( "Turnover" ) ) ).multiply( RATE );
         gameDataRecord.setCellScore( turnover.toString() );
