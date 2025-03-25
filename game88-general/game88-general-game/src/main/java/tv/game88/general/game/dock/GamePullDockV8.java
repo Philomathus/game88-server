@@ -63,12 +63,10 @@ public class GamePullDockV8 extends AbstractGamePull {
         requestMap.set( "param", param );
         requestMap.set( "key", key );
 
-        log.warn( JsonUtil.object2Json( requestMap ) );
-
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap )
                 .build( true );
 
-        log.warn( uriComponents.toUriString() );
+        // log.warn( uriComponents.toUriString() );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
@@ -80,7 +78,7 @@ public class GamePullDockV8 extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        // log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
+        log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d    = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             String              code = d.getOrDefault( "code", "-1" ).toString();
