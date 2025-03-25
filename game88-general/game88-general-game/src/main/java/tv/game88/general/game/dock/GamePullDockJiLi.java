@@ -1,5 +1,6 @@
 package tv.game88.general.game.dock;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -107,6 +108,10 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
         BigDecimal RATE = RATE_MAP.get( gamePlatform.getLinecode() );
+
+        if ( "VND".equals( gamePlatform.getLinecode() ) ) {
+            log.warn( JsonUtil.object2Json( remoteGameDatum ) );
+        }
 
         BigDecimal turnover = new BigDecimal( String.valueOf( remoteGameDatum.get( "Turnover" ) ) ).multiply( RATE );
         gameDataRecord.setCellScore( turnover.toString() );
