@@ -121,13 +121,20 @@ public class GamePullDockV8 extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameID" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "Accounts" ) ) );
+        String accounts = String.valueOf( remoteGameDatum.get( "Accounts" ) );
+        int    index    = accounts.indexOf( '_' );
+        String agent    = accounts.substring( 0, index );
+        String account  = accounts.substring( index + 1 );
+        if ( !gamePlatform.getAgent().equals( agent ) ) {
+            return null;
+        }
+        String[] members = assemblyAccount( account );
         if ( StringUtils.isEmpty( accounts ) ) {
             log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        gameDataRecord.setAgent( accounts[ 0 ] );
-        gameDataRecord.setAccount( accounts[ 1 ] );
+        gameDataRecord.setAgent( members[ 0 ] );
+        gameDataRecord.setAccount( members[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "CellScore" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );
