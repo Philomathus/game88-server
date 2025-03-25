@@ -67,7 +67,8 @@ public class GamePullDockShaBa extends AbstractGamePull {
 
                 return resultList;
             } else {
-                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( gamePlatform.getName() + ":::" + JsonUtil.object2Json( httpEntity ) + ":::"
+                        + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
