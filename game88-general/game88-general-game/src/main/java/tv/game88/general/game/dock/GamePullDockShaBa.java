@@ -33,7 +33,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add( "vendor_id", gamePlatform.getAgent() );
+        map.add( "vendor_id", StringUtils.isBlank( gamePlatform.getMd5() ) ? gamePlatform.getAgent() : gamePlatform.getMd5() );
         map.add( "version_key", gamePlatform.getVersionValue() );
 
         HttpHeaders httpHeaders = new HttpHeaders();
