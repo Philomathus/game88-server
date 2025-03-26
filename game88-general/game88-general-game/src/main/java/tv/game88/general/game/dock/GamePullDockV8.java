@@ -24,6 +24,7 @@ import tv.game88.general.game.base.AbstractGamePull;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.V8 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockV8 extends AbstractGamePull {
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "VNDK", new BigDecimal( 1000 ) );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
@@ -135,16 +138,22 @@ public class GamePullDockV8 extends AbstractGamePull {
         }
         gameDataRecord.setAgent( members[ 0 ] );
         gameDataRecord.setAccount( members[ 1 ] );
+        String     currency = String.valueOf( remoteGameDatum.get( "Currency" ) );
+        BigDecimal rate     = RATE_MAP.get( currency );
+        gameDataRecord.setCurrency( currency );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "CellScore" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "Profit" ) ) );
-        gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "Revenue" ) ) );
+        gameDataRecord.setAllBet( new BigDecimal( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ).multiply( rate )
+                .stripTrailingZeros().toPlainString() );
+        gameDataRecord.setCellScore( new BigDecimal( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ).multiply( rate )
+                .stripTrailingZeros().toPlainString() );
+        gameDataRecord.setProfit( new BigDecimal( String.valueOf( remoteGameDatum.get( "Profit" ) ) ).multiply( rate )
+                .stripTrailingZeros().toPlainString() );
+        gameDataRecord.setRevenue( new BigDecimal( String.valueOf( remoteGameDatum.get( "Revenue" ) ) ).multiply( rate )
+                .stripTrailingZeros().toPlainString() );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.get( "ChairID" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "GameEndTime" ) ) );
-        gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "Currency" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;
