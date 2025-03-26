@@ -34,6 +34,11 @@ public class GamePullDockPGSoft extends AbstractGamePull {
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
+        // 如果不是3分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 4 ) ) ) {
+            return null;
+        }
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "operator_token", gamePlatform.getDes() );
         params.add( "secret_key", gamePlatform.getMd5() );
