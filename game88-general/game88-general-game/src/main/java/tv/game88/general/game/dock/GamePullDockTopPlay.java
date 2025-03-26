@@ -65,7 +65,7 @@ public class GamePullDockTopPlay extends AbstractGamePull {
         httpHeaders.set( "Authorization", gamePlatform.getMd5() );
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>( httpHeaders );
 
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getApiUrl() + "/api/betlog" )
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() + "/api/betlog" )
                 .queryParams( requestMap ).build();
 
         String uriString = uriComponents.toUriString();
