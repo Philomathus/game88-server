@@ -27,8 +27,10 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.SHABA + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockShaBa extends AbstractGamePull {
-    private static final Map<Integer, BigDecimal> RATE = ImmutableMap.of( 51, BigDecimal.valueOf( 1000 ), 20, BigDecimal.ONE,
-            13, BigDecimal.ONE );
+    // 20 是测试货币
+    private static final Map<Integer, BigDecimal> RATE          = ImmutableMap.of( 51, BigDecimal.valueOf( 1000 ), 20,
+            BigDecimal.ONE, 13, BigDecimal.ONE );
+    private static final Map<Integer, String>     CURRENCY_TYPE = ImmutableMap.of( 51, "VND", 20, "UUS", 13, "CNY" );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -67,8 +69,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
 
                 return resultList;
             } else {
-                log.error( url + ":::" + JsonUtil.object2Json( httpEntity ) + ":::"
-                        + JsonUtil.object2Json( resultMap ) );
+                log.error( url + ":::" + JsonUtil.object2Json( httpEntity ) + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
@@ -105,11 +106,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
         }
 
         int currencyType = ( int ) remoteGameDatum.get( "currency" );
-        gameDataRecord.setCurrency( switch ( currencyType ) {
-            case 51 -> "VND";
-            case 13 -> "CNY";
-            default -> "UUS";
-        } );
+        gameDataRecord.setCurrency( CURRENCY_TYPE.get( currencyType ) );
 
         BigDecimal rate     = RATE.get( currencyType );
         BigDecimal stake    = new BigDecimal( String.valueOf( remoteGameDatum.get( "stake" ) ) ).multiply( rate );
