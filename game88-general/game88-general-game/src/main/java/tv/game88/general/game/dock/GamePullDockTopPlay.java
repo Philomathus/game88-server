@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 @Repository( value = ConstantsGame.TOP_PLAY + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockTopPlay extends AbstractGamePull {
 
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "KVND", new BigDecimal( 1000 ) );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
 
@@ -117,12 +119,16 @@ public class GamePullDockTopPlay extends AbstractGamePull {
         gameDataRecord.setAgent( accounts[ 0 ] );
         gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
-        BigDecimal betvalid = new BigDecimal( String.valueOf( remoteGameDatum.get( "betvalid" ) ) );
-        gameDataRecord.setCellScore( betvalid.toString() );
-        BigDecimal betamount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betamount" ) ) );
-        gameDataRecord.setAllBet( betamount.toString() );
-        BigDecimal betresult = new BigDecimal( String.valueOf( remoteGameDatum.get( "betresult" ) ) );
-        gameDataRecord.setProfit( betresult.subtract( betvalid ).toString() );
+
+        String     currency = gamePlatform.getAgent().split( "-" )[ 1 ];
+        BigDecimal rate     = RATE_MAP.get( currency );
+
+        BigDecimal betvalid = new BigDecimal( String.valueOf( remoteGameDatum.get( "betvalid" ) ) ).multiply( rate );
+        gameDataRecord.setCellScore( betvalid.stripTrailingZeros().toPlainString() );
+        BigDecimal betamount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betamount" ) ) ).multiply( rate );
+        gameDataRecord.setAllBet( betamount.stripTrailingZeros().toPlainString() );
+        BigDecimal betresult = new BigDecimal( String.valueOf( remoteGameDatum.get( "betresult" ) ) ).multiply( rate );
+        gameDataRecord.setProfit( betresult.subtract( betvalid ).stripTrailingZeros().toPlainString() );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "bettime" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( gameStartTime ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "payout_time" ) );
