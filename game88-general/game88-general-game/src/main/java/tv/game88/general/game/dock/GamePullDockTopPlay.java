@@ -103,6 +103,8 @@ public class GamePullDockTopPlay extends AbstractGamePull {
             return null;
         }
 
+        log.warn( JsonUtil.object2Json( remoteGameDatum ) );
+
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "rowid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );

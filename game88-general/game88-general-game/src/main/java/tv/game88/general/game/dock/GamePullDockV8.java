@@ -81,7 +81,7 @@ public class GamePullDockV8 extends AbstractGamePull {
             return JsonUtil.json2Map( text );
         } );
 
-        log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
+        // log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
             Map<String, Object> d    = ( Map<String, Object> ) resultMap.getOrDefault( "d", new HashMap<>() );
             String              code = d.getOrDefault( "code", "-1" ).toString();
