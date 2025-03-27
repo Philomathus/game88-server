@@ -108,7 +108,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setCurrency( switch ( currencyType ) {
             case 51 -> "VND";
             case 13 -> "CNY";
-            default -> "";
+            default -> "UUS";
         } );
 
         BigDecimal rate     = RATE.get( currencyType );
