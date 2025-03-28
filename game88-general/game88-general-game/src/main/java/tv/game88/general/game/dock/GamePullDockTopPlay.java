@@ -135,6 +135,7 @@ public class GamePullDockTopPlay extends AbstractGamePull {
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( gameEndTime ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
+        gameDataRecord.setCurrency( currency );
         return gameDataRecord;
     }
 }
