@@ -41,19 +41,8 @@ public abstract class AbstractGamePull implements BaseGamePull {
         profileBiMap.put( "9900", "1AA" );
         profileBiMap.put( "99115", "1PK" );
         profileBiMap.put( "99116", "1BD" );
-    }
-
-    public static void main( String[] args ) {
-        System.out.println( Arrays.toString( assemblyAccount( "7710_1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "88ky_1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "88ky_M1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "88kym1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "9901m1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "9901_m1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "99k3_m1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "m1aa1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "m1pk1234" ) ) );
-        System.out.println( Arrays.toString( assemblyAccount( "m1bd1234" ) ) );
+        profileBiMap.put( "99126", "1IN" );
+        profileBiMap.put( "99136", "1VI" );
     }
 
     protected static String[] assemblyAccount( String account ) {
