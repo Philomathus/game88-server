@@ -35,7 +35,6 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.V8 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockV8 extends AbstractGamePull {
-    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "VNDK", new BigDecimal( 1000 ) );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -138,18 +137,16 @@ public class GamePullDockV8 extends AbstractGamePull {
         }
         gameDataRecord.setAgent( members[ 0 ] );
         gameDataRecord.setAccount( members[ 1 ] );
-        String     currency = String.valueOf( remoteGameDatum.get( "Currency" ) );
-        BigDecimal rate     = RATE_MAP.get( currency );
-        gameDataRecord.setCurrency( currency );
+        gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "Currency" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
-        gameDataRecord.setAllBet( new BigDecimal( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ).multiply( rate )
-                .stripTrailingZeros().toPlainString() );
-        gameDataRecord.setCellScore( new BigDecimal( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ).multiply( rate )
-                .stripTrailingZeros().toPlainString() );
-        gameDataRecord.setProfit( new BigDecimal( String.valueOf( remoteGameDatum.get( "Profit" ) ) ).multiply( rate )
-                .stripTrailingZeros().toPlainString() );
-        gameDataRecord.setRevenue( new BigDecimal( String.valueOf( remoteGameDatum.get( "Revenue" ) ) ).multiply( rate )
-                .stripTrailingZeros().toPlainString() );
+        gameDataRecord.setAllBet( new BigDecimal( String.valueOf( remoteGameDatum.get( "AllBet" ) ) ).stripTrailingZeros()
+                .toPlainString() );
+        gameDataRecord.setCellScore( new BigDecimal( String.valueOf( remoteGameDatum.get( "CellScore" ) ) ).stripTrailingZeros()
+                .toPlainString() );
+        gameDataRecord.setProfit( new BigDecimal( String.valueOf( remoteGameDatum.get( "Profit" ) ) ).stripTrailingZeros()
+                .toPlainString() );
+        gameDataRecord.setRevenue( new BigDecimal( String.valueOf( remoteGameDatum.get( "Revenue" ) ) ).stripTrailingZeros()
+                .toPlainString() );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "TableID" ) ) );
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.get( "ChairID" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "GameStartTime" ) ) );
