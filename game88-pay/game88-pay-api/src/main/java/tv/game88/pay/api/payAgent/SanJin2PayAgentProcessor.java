@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.SANJIN2_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.SANJIN2_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class SanJin2PayAgentProcessor extends AbstractPayAgent {
     @Override
