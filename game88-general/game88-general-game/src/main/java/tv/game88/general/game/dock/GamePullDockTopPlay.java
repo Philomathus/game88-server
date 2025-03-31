@@ -128,7 +128,7 @@ public class GamePullDockTopPlay extends AbstractGamePull {
         BigDecimal betamount = new BigDecimal( String.valueOf( remoteGameDatum.get( "betamount" ) ) ).multiply( rate );
         gameDataRecord.setAllBet( betamount.stripTrailingZeros().toPlainString() );
         BigDecimal betresult = new BigDecimal( String.valueOf( remoteGameDatum.get( "betresult" ) ) ).multiply( rate );
-        gameDataRecord.setProfit( betresult.subtract( betvalid ).stripTrailingZeros().toPlainString() );
+        gameDataRecord.setProfit( betresult.stripTrailingZeros().toPlainString() );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "bettime" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertMeiDongToDefault( gameStartTime ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "payout_time" ) );
