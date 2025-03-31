@@ -42,13 +42,13 @@ public enum EnumGameCategory {
     T1( ConstantsGame.T1, "T1" ),
     PP( ConstantsGame.PP, "pp" ),
     CG( ConstantsGame.CG, "cg" ),
-    JILI( ConstantsGame.JILI, "jiLi" ),
-    RR( ConstantsGame.RR, "rr" ),
+    JILI( ConstantsGame.JILI, "JiLi" ),
+    RR( ConstantsGame.RR, "RR" ),
     TOP_BET( ConstantsGame.TOP_BET, "TopBet" ),
     EVO( ConstantsGame.EVO, "evo" ),
     V8( ConstantsGame.V8, "v8" ),
     TOP_PLAY( ConstantsGame.TOP_PLAY, "TopPlay" ),
-    WS168( ConstantsGame.WS168, "ws168" ),
+    WS168( ConstantsGame.WS168, "Ws168" ),
     ;
 
     private final String type;
