@@ -77,7 +77,7 @@ public class GongYingPayAgentProcessor extends AbstractPayAgent {
     public String callbackPay( PayAgentPlatform payAgentPlatform, Map<String, Object> requestMap, String realIp ) throws Exception {
         requestMap.remove( "success_time" );
         String rspSign         = requestMap.remove( "sign" ).toString();
-        String refCode         = requestMap.getOrDefault( "code", "" ).toString();
+        String refCode         = requestMap.getOrDefault( "refCode", "" ).toString();
         String withdrawOrderId = requestMap.getOrDefault( "out_trade_no", "" ).toString();
 
         MemberWithdrawDetail withdrawDetail = withdrawDetailMapper.selectById( withdrawOrderId );
