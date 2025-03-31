@@ -40,9 +40,9 @@ public class GamePullDockWs168 extends AbstractGamePull {
         }
         LocalDateTime end = start.plusMinutes( 1 );
 
-        String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( start ),
+        String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0Zoned( start ),
                 LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
-        String endTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0( end ),
+        String endTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0Zoned( end ),
                 LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
 
         Map<String, Object> requestMap = new HashMap<>();
