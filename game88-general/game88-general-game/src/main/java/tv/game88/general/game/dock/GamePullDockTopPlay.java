@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Repository( value = ConstantsGame.TOP_PLAY + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockTopPlay extends AbstractGamePull {
 
-    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "KVND", BigDecimal.ONE );
+    private static final Map<String, BigDecimal> RATE_MAP = Map.of( "KVND", new BigDecimal( 1000 ) );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
