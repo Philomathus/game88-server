@@ -46,6 +46,7 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
             bodyMap.put( "bankNumber", bankCodeType.name() );
             bodyMap.put( "bankName", bankCodeType.getName() );
         }
+        bodyMap.put( "passageId", AESCoder.decrypt( payAgentChannel.getHeaderValue() ) );
         bodyMap.put( "mchId", payAgentChannel.getMerId() );
         bodyMap.put( "mchOrderNo", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "amount", withdrawDetail
@@ -55,8 +56,6 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
                 .intValue() );
         bodyMap.put( "accountName", withdrawDetail.getBankUserName() );
         bodyMap.put( "accountNo", withdrawDetail.getBankAccount().trim() );
-        bodyMap.put( "province", "1" );
-        bodyMap.put( "city", "1" );
         bodyMap.put( "remark", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
