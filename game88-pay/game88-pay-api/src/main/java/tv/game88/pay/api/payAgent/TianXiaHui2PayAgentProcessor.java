@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.TIANXIAHUI_PAY + ConstantsPayAgent.PROCESSOR )
+@Repository( value = ConstantsPayAgent.TIANXIAHUI2_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
-public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
+public class TianXiaHui2PayAgentProcessor extends AbstractPayAgent {
     @Override
     public String getName() {
-        return "天下汇代付";
+        return "天下汇2代付";
     }
 
     @Override
