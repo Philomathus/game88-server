@@ -100,13 +100,9 @@ public class GamePullDockTopPlay extends AbstractGamePull {
     @Override
     public GameDataRecord handleResult( Object object, GamePlatform gamePlatform ) {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
-
         if ( "0".equals( remoteGameDatum.getOrDefault( "status", "0" ).toString() ) ) {
             return null;
         }
-
-        log.warn( JsonUtil.object2Json( remoteGameDatum ) );
-
         GameDataRecord gameDataRecord = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "rowid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
