@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 @Log4j2
 @Repository( value = ConstantsGame.JDB + ConstantsGame.GAME_PULL_PROCESSOR )
@@ -42,9 +41,9 @@ public class GamePullDockJDB extends AbstractGamePull {
         params.put( "ts", System.currentTimeMillis() );
         params.put( "parent", gamePlatform.getAgent() );
         params.put( "starttime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ),
-                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+                LocalDateTimeUtils.ENGTIME_00_FORMATTER ) );
         params.put( "endtime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ),
-                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+                LocalDateTimeUtils.ENGTIME_00_FORMATTER ) );
 
         String json         = JsonUtil.object2Json( params );
         String encodedParam = null;
@@ -104,11 +103,11 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "total" ) ) );
         String startTime = remoteGameDatum.get( "gameDate" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
-                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+                LocalDateTimeUtils.ENGTIME_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String endTime = remoteGameDatum.get( "lastModifyTime" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
-                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+                LocalDateTimeUtils.ENGTIME_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

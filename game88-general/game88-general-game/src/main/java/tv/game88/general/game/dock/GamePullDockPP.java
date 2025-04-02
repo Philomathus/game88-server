@@ -99,10 +99,10 @@ public class GamePullDockPP extends AbstractGamePull {
         //gameDataRecord.setChairId( String.valueOf( remoteGameDatum.get( "bank" ) ) );
 
         LocalDateTime startDate = LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "startDate" ) )
-                , LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                , LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startDate ) );
         LocalDateTime endDate = LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "endDate" ) ),
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endDate ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

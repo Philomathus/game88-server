@@ -41,9 +41,9 @@ public class GamePullDockWs168 extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0Zoned( start ),
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
         String endTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC0Zoned( end ),
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put( "time_type", "settled_at" );
@@ -100,10 +100,10 @@ public class GamePullDockWs168 extends AbstractGamePull {
         }
         GameDataRecord gameDataRecord = new GameDataRecord();
         LocalDateTime betTime = LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "bet_at" ) ),
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.ISO8601_SP_FORMATTER );
         LocalDateTime settledTime =
                 LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "settled_at" ) ),
-                        LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                        LocalDateTimeUtils.ISO8601_SP_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( betTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settledTime ) );
 

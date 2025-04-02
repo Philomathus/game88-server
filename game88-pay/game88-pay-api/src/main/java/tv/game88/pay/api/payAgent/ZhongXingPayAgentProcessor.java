@@ -13,7 +13,6 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -57,7 +56,7 @@ public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
         String sign    = DigestUtils.md5Hex( tempStr ).toLowerCase();
 
         bodyMap.put( "Sign", sign );
-        bodyMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        bodyMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         log.warn( tempStr );
         log.warn( JsonUtil.object2Json( bodyMap ) );

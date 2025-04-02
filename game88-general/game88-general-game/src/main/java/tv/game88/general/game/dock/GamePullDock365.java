@@ -69,9 +69,9 @@ public class GamePullDock365 extends AbstractGamePull {
         String betTransTimeStr = String.valueOf( remoteGameDatum.get( "betTransTime" ) );
 
         LocalDateTime payTransTime = LocalDateTimeUtils.parseLocalDateTime( payTransTimeStr,
-                LocalDateTimeUtils.MMDDYYYYHHMMSSSSS_FORMATTER );
+                LocalDateTimeUtils.USATIME_FORMATTER );
         LocalDateTime betTransTime = LocalDateTimeUtils.parseLocalDateTime( betTransTimeStr,
-                LocalDateTimeUtils.MMDDYYYYHHMMSSSSS_FORMATTER );
+                LocalDateTimeUtils.USATIME_FORMATTER );
 
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( betTransTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( payTransTime ) );

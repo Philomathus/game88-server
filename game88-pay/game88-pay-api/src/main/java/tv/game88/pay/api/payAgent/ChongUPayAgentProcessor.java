@@ -13,7 +13,6 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -50,7 +49,7 @@ public class ChongUPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "NotifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         bodyMap.put( "Timestamp", LocalDateTimeUtils.format( reqPayAgent.getCurrentTime(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         bodyMap.put( "WithdrawTypeId", 0 );
 
         String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
@@ -133,7 +132,7 @@ public class ChongUPayAgentProcessor extends AbstractPayAgent {
                                  PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "MerchantId", payAgentPlatform.getId() );
-        dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         dataMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );

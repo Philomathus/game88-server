@@ -46,8 +46,8 @@ public class GamePullDockHG extends AbstractGamePull {
         params.put( "action", "record" );
         params.put( "merchant", gamePlatform.getAgent() );
         params.put( "agent", gamePlatform.getLinecode() );
-        params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
+        params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "page", "1" );
         params.put( "pageSize", "1000" );
         params.put( "mode", MODE );

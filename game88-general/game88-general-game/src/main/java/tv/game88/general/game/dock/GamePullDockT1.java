@@ -50,8 +50,8 @@ public class GamePullDockT1 extends AbstractGamePull {
         Map<String, String> params = new TreeMap<>();
         params.put( "auth_token", getToken( gamePlatform ) );
         params.put( "merchant_code", gamePlatform.getAgent() );
-        params.put( "from", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "to", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "from", LocalDateTimeUtils.format( start, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
+        params.put( "to", LocalDateTimeUtils.format( end, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "time_type", "2" );
         params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
 

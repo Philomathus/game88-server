@@ -97,10 +97,10 @@ public class GamePullDockMG extends AbstractGamePull {
         gameDataRecord.setProfit( profit );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "gameStartTimeUTC" ) ).substring( 0, 19 );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "gameEndTimeUTC" ) ).substring( 0, 19 );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

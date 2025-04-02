@@ -82,10 +82,10 @@ public class GamePullDockRich88 extends AbstractGamePull {
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "round_start_at" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "round_end_at" ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

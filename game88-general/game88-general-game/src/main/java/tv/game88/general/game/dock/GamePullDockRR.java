@@ -90,9 +90,9 @@ public class GamePullDockRR extends AbstractGamePull {
         String createTime = remoteGameDatum.get( "create_time" ).toString();
         String payoffTime = remoteGameDatum.get( "payoff_time" ).toString();
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( createTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         gameDataRecord.setCurrency( currency );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

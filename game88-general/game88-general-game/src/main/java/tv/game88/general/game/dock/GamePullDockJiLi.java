@@ -1,6 +1,5 @@
 package tv.game88.general.game.dock;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -45,9 +44,9 @@ public class GamePullDockJiLi extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
         String endTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
 
         final Map<String, Object> params = new LinkedHashMap<>();
         params.put( "StartTime", startTime );
@@ -100,11 +99,11 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         String startTime = remoteGameDatum.get( "WagersTime" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String endTime = remoteGameDatum.get( "SettlementTime" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
         BigDecimal RATE = RATE_MAP.get( gamePlatform.getLinecode() );

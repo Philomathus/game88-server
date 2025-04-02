@@ -39,8 +39,8 @@ public class GamePullDockWali extends AbstractGamePull {
         }
         LocalDateTime until = from.plusMinutes( 1 );
 
-        String startTime = LocalDateTimeUtils.format( from, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
-        String endTime   = LocalDateTimeUtils.format( until, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
+        String startTime = LocalDateTimeUtils.format( from, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
+        String endTime   = LocalDateTimeUtils.format( until, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
 
         Map<String, String> paramMap = new LinkedHashMap<>();
         paramMap.put( "from", startTime );

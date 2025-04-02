@@ -20,7 +20,6 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -61,7 +60,7 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "pay_amt", withdrawDetail.getWithdrawMoney().setScale( 2, RoundingMode.HALF_UP ) );
         bodyMap.put( "notify_url", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         bodyMap.put( "mer_order", withdrawDetail.getWithdrawOrderNo() );
-        String ts = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
+        String ts = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 
@@ -173,7 +172,7 @@ public class SanJinPayAgentProcessor extends AbstractPayAgent {
         paramsMap.put( "order_no", withdrawDetail.getWithdrawOrderNo() );
         paramsMap.put( "mer_no", payAgentChannel.getMerId() );
 
-        String ts = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
+        String ts = LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 

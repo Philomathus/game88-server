@@ -45,7 +45,7 @@ public class JiuXinPayProcessor extends AbstractPay {
         params.put( "notifyUrl", configEnvCacheUtil.getConf( "payCallbackUrl" ) + payPlatform.getCode() );
         params.put( "subject", "subject" );
         params.put( "body", "body" );
-        params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "version", "1.0" );
 
         String tempStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );
@@ -74,7 +74,7 @@ public class JiuXinPayProcessor extends AbstractPay {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put( "mchId", payPlatform.getMerId() );
         params.put( "mchOrderNo", memberRechargeOnline.getOrderNo() );
-        params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "version", "1.0" );
 
         String signStr = this.assemblyUrl( params ) + "&key=" + AESCoder.decrypt( payPlatform.getSignMd5() );

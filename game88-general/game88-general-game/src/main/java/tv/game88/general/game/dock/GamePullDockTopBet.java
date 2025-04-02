@@ -96,10 +96,10 @@ public class GamePullDockTopBet extends AbstractGamePull {
         BigDecimal win = new BigDecimal( String.valueOf( remoteGameDatum.get( "profit" ) ) );
         gameDataRecord.setProfit( win.subtract( new BigDecimal( bet ) ).stripTrailingZeros().toPlainString() );
         LocalDateTime startDate = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( remoteGameDatum.get( "start_time" ) ),
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_SSS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startDate ) );
         LocalDateTime endDate = LocalDateTimeUtils.parseLocalDateTime( String.valueOf( remoteGameDatum.get( "end_time" ) ),
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_SSS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endDate ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

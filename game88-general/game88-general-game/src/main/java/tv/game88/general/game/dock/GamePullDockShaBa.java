@@ -128,13 +128,13 @@ public class GamePullDockShaBa extends AbstractGamePull {
             return null;
         }
         LocalDateTime transactionTime = LocalDateTimeUtils.convertMeiDongToDefault( transactionTimeStr.substring( 0, 19 ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( transactionTime ) );
         if ( settlementTimeStr == null || settlementTimeStr.equals( "null" ) ) {
             gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         } else {
             LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( settlementTimeStr.substring( 0, 19 ),
-                    LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                    LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
         }
         return gameDataRecord;

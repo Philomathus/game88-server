@@ -37,9 +37,9 @@ public class GamePullDockEvo extends AbstractGamePull {
 
         Map<String, Object> params = new HashMap<>();
         params.put( "start_date", LocalDateTimeUtils.convertToUTC0Zoned( start )
-                .format( LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XFORMATTER ) );
+                .format( LocalDateTimeUtils.ISO8601_SP_NOM_FORMATTER ) );
         params.put( "end_date", LocalDateTimeUtils.convertToUTC0Zoned( end )
-                .format( LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XFORMATTER ) );
+                .format( LocalDateTimeUtils.ISO8601_SP_NOM_FORMATTER ) );
         params.put( "txn_type", 1 );
         params.put( "date_filter_type", 2 );
 
@@ -101,11 +101,11 @@ public class GamePullDockEvo extends AbstractGamePull {
                 .toPlainString() );
         String startTime = remoteGameDatum.get( "created_at" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC0ToDefault( startTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String endTime = remoteGameDatum.get( "settled_at" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC0ToDefault( endTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
