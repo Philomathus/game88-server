@@ -61,7 +61,7 @@ public class GamePullDockWs168 extends AbstractGamePull {
 
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.execute( url, HttpMethod.POST, restTemplate.httpEntityCallback( httpEntity ), response -> {
+            resultMap = restTemplate.execute( url, HttpMethod.GET, restTemplate.httpEntityCallback( httpEntity ), response -> {
                 InputStream bodyStream = response.getBody();
                 String      text;
                 try ( Reader reader = new InputStreamReader( bodyStream ) ) {
