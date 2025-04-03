@@ -23,7 +23,10 @@
                create_by,
                create_time,
                update_by,
-               update_time
+               update_time,
+               download_link1,
+               download_link12,
+               download_link3
         from agent_host_client
     </sql>
 
