@@ -39,7 +39,7 @@
 
 
     <select id="findLatestHostClient" resultType="tv.game88.general.api.dto.RspHostClient">
-        select version, version_name, latest_fore, url, update_text
+        select version, version_name, latest_fore, url, update_text, download_url1,download_url2, download_url3
         from agent_host_client
         where dev = #{dev}
         ORDER BY version desc

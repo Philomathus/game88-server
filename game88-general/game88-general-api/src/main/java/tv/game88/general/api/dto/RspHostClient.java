@@ -15,4 +15,12 @@ public class RspHostClient {
     private String  updateText;
     @Schema( title = "1=强更0=不强更" )
     private Integer latestFore = 0;
+
+    @Schema( title = "target install download link 1" )
+    private String downloadLink1;
+    @Schema( title = "target install download link 2" )
+    private String downloadLink2;
+    @Schema( title = "target install download link 3" )
+    private String downloadLink3;
+
 }
