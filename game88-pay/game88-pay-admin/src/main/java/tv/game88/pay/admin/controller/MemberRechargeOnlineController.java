@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -49,9 +48,10 @@ public class MemberRechargeOnlineController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:export')" )
     @Log( title = "memberRechargeOnline", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReqMemberRechargeOnline reqMemberRechargeOnline, HttpServletResponse response ) {
+    public RspBase<List<MemberRechargeOnline>> export(ReqMemberRechargeOnline reqMemberRechargeOnline, HttpServletResponse response ) {
         List<MemberRechargeOnline> list = memberRechargeOnlineService.selectMemberRechargeOnlineList( reqMemberRechargeOnline );
-        ExportExcelUtil.exportBigExcel( list, "线上充值信息", "线上充值信息", MemberRechargeOnline.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "线上充值信息", "线上充值信息", MemberRechargeOnline.class, response );
+        return RspBase.ok( list );
     }
 
     /**
@@ -90,9 +90,10 @@ public class MemberRechargeOnlineController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:export')" )
     @Log( title = "线上充值信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/exportReport" )
-    public void exportReport( ReqMemberRechargeOnline req, HttpServletResponse response ) {
+    public RspBase<List<RspRechargeOnline>> exportReport(ReqMemberRechargeOnline req, HttpServletResponse response ) {
         List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
-        ExportExcelUtil.exportBigExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
+        return RspBase.ok( list );
     }
 
 

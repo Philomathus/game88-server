@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.entity.SysRole;
@@ -59,9 +58,10 @@ public class MemberRechargeUsdtController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:export')" )
     @Log( title = "USDT充值信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReqMemberRechargeUsdt req, HttpServletResponse response ) {
+    public RspBase<List<MemberRechargeUsdt>> export(ReqMemberRechargeUsdt req, HttpServletResponse response ) {
         List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( req );
-        ExportExcelUtil.exportBigExcel( list, "USDT充值信息", "USDT充值信息表", MemberRechargeUsdt.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "USDT充值信息", "USDT充值信息表", MemberRechargeUsdt.class, response );
+        return RspBase.ok( list );
     }
 
     /**

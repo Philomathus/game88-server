@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -48,9 +47,10 @@ public class PayRechargeUsdtController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:export')" )
     @Log( title = "导出USDT渠道列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( PayRechargeUsdt payRechargeUsdt, HttpServletResponse response ) {
+    public RspBase<List<PayRechargeUsdt>> export(PayRechargeUsdt payRechargeUsdt, HttpServletResponse response ) {
         List<PayRechargeUsdt> list = payRechargeUsdtService.selectPayRechargeUsdtList( payRechargeUsdt );
-        ExportExcelUtil.exportBigExcel( list, "USDT渠道", "USDT渠道表", PayRechargeUsdt.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "USDT渠道", "USDT渠道表", PayRechargeUsdt.class, response );
+        return RspBase.ok( list );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:query')" )
