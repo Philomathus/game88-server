@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -46,9 +45,10 @@ public class LotteryRuleController extends BaseController {
 	@PreAuthorize( "@ss.hasPermi('lottery:rule:export')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.EXPORT )
 	@GetMapping( "/export" )
-	public void export(LotteryRule lotteryRule, HttpServletResponse response) {
+	public RspBase<List<LotteryRule>> export(LotteryRule lotteryRule, HttpServletResponse response) {
 		List<LotteryRule>      list = lotteryRuleService.selectLotteryRuleList(lotteryRule);
-		ExportExcelUtil.exportBigExcel( list, "彩票规则说明", "彩票规则说明表", LotteryRule.class, response );
+//		ExportExcelUtil.exportBigExcel( list, "彩票规则说明", "彩票规则说明表", LotteryRule.class, response );
+		return RspBase.ok( list );
 	}
 
 	/**
