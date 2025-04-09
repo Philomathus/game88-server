@@ -20,6 +20,7 @@ import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.http.HttpEntity;
@@ -28,6 +29,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
@@ -45,10 +48,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @Component
@@ -100,11 +100,12 @@ public class SmsApi {
             case 2 -> this.sendSmsBaidu( configSms, phone, code );
             case 3 -> this.sendSmsHuawei( configSms, phone, code );
             case 4 -> this.sendSmsYunJi( configSms, phone, code );
-            case 5 -> this.sendSmsCxlink(configSms , phone , code );
+            case 5 -> this.sendSmsCxlink( configSms, phone, code );
+            case 6 -> this.sendSmsBao( configSms, phone, code );
+            case 7 -> this.sendSms163( configSms, phone, code );
             default -> throw new BusinessException( "not found provider" );
         };
     }
-
 
 
     private String sendSmsYunJi( ConfigSms configSms, String phone, String code ) {
@@ -145,7 +146,7 @@ public class SmsApi {
         throw new BusinessException( "短信发送失败,请联系客服" );
     }
 
-    private String sendSmsCxlink(ConfigSms configSms, String phone, String code) {
+    private String sendSmsCxlink( ConfigSms configSms, String phone, String code ) {
         Map<String, Object> body = new HashMap<>();
         body.put( "accessKey", configSms.getAppKey() );
         body.put( "accessSecret", configSms.getAppAccess() );
@@ -161,7 +162,7 @@ public class SmsApi {
 
         Map<String, Object> resultMap = null;
         try {
-            resultMap = restTemplate.postForObject( configSms.getEndpoint() , httpEntity, Map.class );
+            resultMap = restTemplate.postForObject( configSms.getEndpoint(), httpEntity, Map.class );
             if ( !CollectionUtils.isEmpty( resultMap ) ) {
                 String rspCode = resultMap.getOrDefault( "code", "0" ).toString();
                 if ( "200".equals( rspCode ) ) {
@@ -188,10 +189,7 @@ public class SmsApi {
         params.put( "signature", configSms.getName() );
 
         StringBuilder sb = new StringBuilder();
-        params.forEach( ( k, v ) -> sb
-                .append( k )
-                .append( "=" )
-                .append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) )
+        params.forEach( ( k, v ) -> sb.append( k ).append( "=" ).append( URLEncoder.encode( v, StandardCharsets.UTF_8 ) )
                 .append( "&" ) );
         String body = sb.substring( 0, sb.length() - 1 );
 
@@ -226,7 +224,6 @@ public class SmsApi {
 
     /**
      * 构造X-WSSE参数值 Construct X-WSSE parameter value
-     *
      */
     private static String buildWsseHeader( String appKey, String appSecret ) {
         try {
@@ -365,6 +362,69 @@ public class SmsApi {
         } catch ( BusinessException e ) {
             throw new BusinessException( e.getMessage() );
         }
+    }
+
+    private String sendSmsBao( ConfigSms serverSms, String phone , String code ) {
+
+        try {
+            String template = serverSms.getTemplate().replace( "{code}", code );
+            String httpArg = "u=" + serverSms.getAppKey() + "&" +
+                    "p=" + serverSms.getAppAccess() + "&" +
+                    "m=" + phone + "&" +
+                    "c=" + template;
+
+            String httpUrl = serverSms.getEndpoint() + "?" + httpArg;
+
+            ResponseEntity<Object> responseEntity = restTemplate.getForEntity(
+                    httpUrl, Object.class );
+            Object returnCode = responseEntity.getBody();
+            log.warn( returnCode );
+            if ( ! Objects.isNull( returnCode ) && org.apache.commons.lang3.StringUtils.isNotBlank( returnCode.toString() ) && "0".equals( returnCode.toString() ) ) {
+                log.info( "send code success {} " ,  code  );
+                return template;
+            }
+        } catch (Exception e) {
+            log.error( e.getMessage() );
+        }
+        throw new BusinessException( "短信发送失败,请联系客服" );
+    }
+
+    private String sendSms163( ConfigSms serverSms, String phone , String code ) {
+        Map<String, Object> params = new HashMap<>();
+        params.put( "mobile", phone );
+        params.put( "templateid", Integer.parseInt( serverSms.getTemplate() ) );
+        params.put( "authCode", code );
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        requestMap.setAll( params );
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
+        httpHeaders.add( "AppKey", serverSms.getAppKey() );
+        String nonce = IdWorker.get32UUID();
+        httpHeaders.add( "Nonce", nonce );
+        String curTime = String.valueOf( System.currentTimeMillis() / 1000 );
+        httpHeaders.add( "CurTime", curTime );
+        httpHeaders.add( "CheckSum", DigestUtils.sha1Hex( serverSms.getAppAccess() + nonce + curTime ) );
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>( requestMap, httpHeaders );
+
+        try {
+            ResponseEntity<Map> responseEntity = restTemplate.postForEntity( serverSms.getEndpoint(), httpEntity, Map.class );
+            Map<String, Object> entityBody = responseEntity.getBody();
+            if ( responseEntity.getStatusCode().is2xxSuccessful() ) {
+                if ( !CollectionUtils.isEmpty( entityBody ) ) {
+                    String rspCode = entityBody.getOrDefault( "code", "" ).toString();
+                    if ( "200".equals( rspCode ) ) {
+                        return code;
+                    }
+                }
+            }
+            log.error( JsonUtil.object2Json( entityBody ) );
+        } catch ( Exception e ) {
+            log.error( "短信发送失败" + e.getMessage(), e );
+
+        }
+        throw new BusinessException( "短信发送失败,请联系客服" );
     }
 
     //记录短信登录异常日志

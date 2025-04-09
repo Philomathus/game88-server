@@ -75,7 +75,7 @@ pagehelper:
 # token配置
 token:
   # 令牌有效期（默认1天）
-  expireTime: 30
+  expireTime: 180
 
 im:
   tokenUrl: http://47.243.143.163:43000/token/auth

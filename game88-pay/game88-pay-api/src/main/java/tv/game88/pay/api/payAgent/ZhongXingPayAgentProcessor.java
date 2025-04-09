@@ -2,6 +2,7 @@ package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
@@ -12,7 +13,6 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -56,7 +56,7 @@ public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
         String sign    = DigestUtils.md5Hex( tempStr ).toLowerCase();
 
         bodyMap.put( "Sign", sign );
-        bodyMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        bodyMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         log.warn( tempStr );
         log.warn( JsonUtil.object2Json( bodyMap ) );
@@ -89,6 +89,9 @@ public class ZhongXingPayAgentProcessor extends AbstractPayAgent {
 
         PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( order_num );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
+
+        requestMap.values().removeIf( value -> value == null || StringUtils.isBlank( value.toString() ) );
+        requestMap.remove( "NO_SIGN_FailReason" );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
 

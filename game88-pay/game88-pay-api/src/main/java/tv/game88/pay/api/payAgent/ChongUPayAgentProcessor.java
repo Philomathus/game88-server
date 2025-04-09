@@ -2,6 +2,7 @@ package tv.game88.pay.api.payAgent;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.exception.BusinessException;
@@ -12,7 +13,6 @@ import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
-import tv.game88.core.config.dto.RspConfigBankList;
 import tv.game88.pay.api.entity.MemberWithdrawDetail;
 import tv.game88.pay.api.entity.PayAgentChannel;
 import tv.game88.pay.api.entity.PayAgentLog;
@@ -49,7 +49,7 @@ public class ChongUPayAgentProcessor extends AbstractPayAgent {
         bodyMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
         bodyMap.put( "NotifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
         bodyMap.put( "Timestamp", LocalDateTimeUtils.format( reqPayAgent.getCurrentTime(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         bodyMap.put( "WithdrawTypeId", 0 );
 
         String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
@@ -90,6 +90,9 @@ public class ChongUPayAgentProcessor extends AbstractPayAgent {
         PayAgentLog     payAgentLog     = payAgentLogMapper.selectById( withdrawOrderId );
         PayAgentChannel payAgentChannel = payCacheUtil.getPayAgentChannel( payAgentLog.getChannelId() );
 
+        requestMap.values().removeIf( value -> value == null || StringUtils.isBlank( value.toString() ) );
+        requestMap.remove( "NO_SIGN_FailReason" );
+
         SortedMap<String, Object> bodyMap = new TreeMap<>( requestMap );
 
         String signStr = this.assemblyUrl( bodyMap ) + AESCoder.decrypt( payAgentChannel.getSignMd5() );
@@ -129,7 +132,7 @@ public class ChongUPayAgentProcessor extends AbstractPayAgent {
                                  PayAgentPlatform payAgentPlatform ) throws Exception {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "MerchantId", payAgentPlatform.getId() );
-        dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        dataMap.put( "Timestamp", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         dataMap.put( "MerchantUniqueOrderId", withdrawDetail.getWithdrawOrderNo() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );

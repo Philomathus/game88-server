@@ -13,6 +13,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -96,12 +97,13 @@ public class GamePullDockXingYun extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "recordid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "recordid" ) ) );
-
-        String   userName      = String.valueOf( remoteGameDatum.get( "username" ) );
-        String[] userNameSplit = userName.split( "_" );
-        String   agent         = userNameSplit[ userNameSplit.length - 2 ];
-        String   account       = agent + "_" + userNameSplit[ userNameSplit.length - 1 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "username" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameid" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effectivebet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "totalbet" ) ) );
@@ -110,7 +112,6 @@ public class GamePullDockXingYun extends AbstractGamePull {
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "tableno" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "starttime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "endtime" ) ) );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setDetail( String.valueOf( remoteGameDatum.get( "showpage" ) ) );

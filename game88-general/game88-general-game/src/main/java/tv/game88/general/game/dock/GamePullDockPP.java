@@ -10,6 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
@@ -77,10 +78,13 @@ public class GamePullDockPP extends AbstractGamePull {
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         // 9901_M22611
-        String account = String.valueOf( remoteGameDatum.get( "extPlayerID" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "extPlayerID" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameID" ) ) );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
 
@@ -95,10 +99,10 @@ public class GamePullDockPP extends AbstractGamePull {
         //gameDataRecord.setChairId( String.valueOf( remoteGameDatum.get( "bank" ) ) );
 
         LocalDateTime startDate = LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "startDate" ) )
-                , LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                , LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startDate ) );
         LocalDateTime endDate = LocalDateTimeUtils.convertUTC0ToDefault( String.valueOf( remoteGameDatum.get( "endDate" ) ),
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endDate ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

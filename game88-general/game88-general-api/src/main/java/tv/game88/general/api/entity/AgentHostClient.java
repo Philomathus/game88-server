@@ -3,6 +3,7 @@ package tv.game88.general.api.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -55,5 +56,14 @@ public class AgentHostClient {
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss" )
     private LocalDateTime updateTime;
+
+    @Schema( title = "target install download link 1" )
+    private String downloadLink1;
+
+    @Schema( title = "target install download link 2" )
+    private String downloadLink2;
+
+    @Schema( title = "target install download link 3" )
+    private String downloadLink3;
 
 }

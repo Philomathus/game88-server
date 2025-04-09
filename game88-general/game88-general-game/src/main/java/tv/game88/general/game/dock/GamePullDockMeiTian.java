@@ -57,17 +57,13 @@ public class GamePullDockMeiTian extends AbstractGamePull {
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "period" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "playerName" ) ).toUpperCase();
-        if ( account.contains( "DEMO" ) ) {
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerName" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        if ( account.contains( "WWUFA3TEST" ) ) {
-            return null;
-        }
-        String[] split = account.split( "_" );
-        String   agent = split[ 0 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + split[ 1 ] );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "betAmount" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "commissionable" ) ) );

@@ -128,7 +128,7 @@ public class WanGuoPayAgentProcessor extends AbstractPayAgent {
         params.put( "merchantId", payAgentChannel.getMerId() );
         params.put( "version", "1.0.0" );
         params.put( "merchantOrderNo", withdrawDetail.getWithdrawOrderNo() );
-        params.put( "submitTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "submitTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         String tempStr = this.assemblyUrl( params );
         String sign    = RSACoder.signSha1Rsa( tempStr, AESCoder.decrypt( payAgentChannel.getSignPrivateKey() ) );

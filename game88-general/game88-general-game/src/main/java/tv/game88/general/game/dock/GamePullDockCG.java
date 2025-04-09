@@ -12,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -84,10 +85,13 @@ public class GamePullDockCG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "SerialNumber" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "ThirdPartyAccount" ) ).toUpperCase();
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "ThirdPartyAccount" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameType" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
@@ -97,9 +101,7 @@ public class GamePullDockCG extends AbstractGamePull {
         gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
 
         BigDecimal RATE = BigDecimal.ONE;
-        if ( agent.startsWith( "99in" ) ) {
-            RATE = RATE_MAP.get( "INR" );
-        } else if ( agent.startsWith( "99id" ) || agent.startsWith( "99" ) ) {
+        if ( accounts[ 0 ].startsWith( "99" ) ) {
             RATE = RATE_MAP.get( "IDR" );
         }
 

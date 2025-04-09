@@ -442,18 +442,18 @@ public class GameServiceImpl implements GameService {
         String orderId = switch ( gamePlatform.getGameCategory() ) {
             case AG, BBIN, BG, XINGYUN, JDB, FG, RICH88 -> this.getGameAtomicId( gamePlatform.getId() );
             case MEITIAN -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
-                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                            LocalDateTimeUtils.LOCALTIME_SP_FORMATTER ) )
                     .concat( gameMemberId.replaceAll( "_", "" ) );
             case HG -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
-                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                            LocalDateTimeUtils.LOCALTIME_SP_FORMATTER ) )
                     .concat( RandomStringUtils.randomAlphabetic( 5 ) );
             case WALI -> String.join( "_", agent, LocalDateTimeUtils.format( LocalDateTime.now(),
-                    LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ), gameMemberId );
+                    LocalDateTimeUtils.LOCALTIME_SP_FORMATTER ), gameMemberId );
             case OG_NEW -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
-                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                            LocalDateTimeUtils.LOCALTIME_SP_FORMATTER ) )
                     .concat( gameMemberId ).replaceAll( "_", "" ).toLowerCase();
             default -> agent.concat( LocalDateTimeUtils.format( LocalDateTime.now(),
-                            LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER ) )
+                            LocalDateTimeUtils.LOCALTIME_SP_FORMATTER ) )
                     .concat( gameMemberId );
         };
         if ( !redisUtils.strSetIfAbsent( Constants.CONFIG_PREX + "orderId:" + orderId, "", Duration.ofSeconds( 10 ) ) ) {

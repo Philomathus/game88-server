@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 @Log4j2
 @Repository( value = ConstantsGame.JDB + ConstantsGame.GAME_PULL_PROCESSOR )
@@ -42,9 +41,9 @@ public class GamePullDockJDB extends AbstractGamePull {
         params.put( "ts", System.currentTimeMillis() );
         params.put( "parent", gamePlatform.getAgent() );
         params.put( "starttime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ),
-                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+                LocalDateTimeUtils.ENGTIME_00_FORMATTER ) );
         params.put( "endtime", LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ),
-                LocalDateTimeUtils.DDMMYYYYHHMM00_FORMATTER ) );
+                LocalDateTimeUtils.ENGTIME_00_FORMATTER ) );
 
         String json         = JsonUtil.object2Json( params );
         String encodedParam = null;
@@ -71,7 +70,8 @@ public class GamePullDockJDB extends AbstractGamePull {
                 gamePlatform.setVersionValue( String.valueOf( LocalDateTimeUtils.localDateToTimestamp( end ) ) );
                 return ( List<Object> ) resultMap.getOrDefault( "data", new ArrayList<>() );
             } else {
-                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( "{} - url:{} - request:{} - param:{} - result:{}", gamePlatform.getName(), url,
+                        JsonUtil.object2Json( requestMap ), json, JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
@@ -89,34 +89,13 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setGameId( historyId );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account  = String.valueOf( remoteGameDatum.get( "playerId" ) ).toLowerCase();
-        String agent    = null;
-        String memberId = null;
-        if ( account.startsWith( "88" ) || account.startsWith( "99" ) ) {
-            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
-                Matcher matcher = GET_NUMBER.matcher( account );
-                if ( matcher.find() ) {
-                    String memberAccount = matcher.group();
-                    agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                    memberId = agent + "_" + memberAccount;
-                }
-            } else {
-                agent    = account.substring( 0, account.lastIndexOf( "m" ) );
-                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
-            }
-        } else if ( account.startsWith( "77" ) ) {
-            Matcher matcher = GET_NUMBER.matcher( account );
-            if ( matcher.find() ) {
-                String memberAccount = matcher.group();
-                agent    = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                memberId = agent + "_" + memberAccount;
-            }
-        }
-        if ( agent == null ) {
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerId" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        gameDataRecord.setAccount( memberId );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( remoteGameDatum.get( "gType" ) + "-" + remoteGameDatum.get( "mtype" ) );
         String bet = new BigDecimal( String.valueOf( remoteGameDatum.get( "bet" ) ) ).negate().toString();
         gameDataRecord.setCellScore( bet );
@@ -124,11 +103,11 @@ public class GamePullDockJDB extends AbstractGamePull {
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "total" ) ) );
         String startTime = remoteGameDatum.get( "gameDate" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
-                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+                LocalDateTimeUtils.ENGTIME_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String endTime = remoteGameDatum.get( "lastModifyTime" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
-                LocalDateTimeUtils.DDMMYYYYHHMMSS_FORMATTER );
+                LocalDateTimeUtils.ENGTIME_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

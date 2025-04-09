@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -74,34 +75,13 @@ public class GamePullDockBoLe extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "sn" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account  = String.valueOf( remoteGameDatum.get( "player_account" ) ).toLowerCase();
-        String agent    = null;
-        String memberId = null;
-        if ( account.startsWith( "88" ) ) {
-            if ( account.startsWith( "88ky" ) && !account.contains( "m" ) ) {
-                Matcher matcher = GET_NUMBER.matcher( account );
-                if ( matcher.find() ) {
-                    String memberAccount = matcher.group();
-                    agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                    memberId = agent + "_" + memberAccount;
-                }
-            } else {
-                agent = account.substring( 0, account.lastIndexOf( "m" ) );
-                memberId = agent + "_" + account.substring( account.lastIndexOf( "m" ) ).toUpperCase();
-            }
-        } else if ( account.startsWith( "77" ) ) {
-            Matcher matcher = GET_NUMBER.matcher( account );
-            if ( matcher.find() ) {
-                String memberAccount = matcher.group();
-                agent = account.substring( 0, account.lastIndexOf( memberAccount ) ).toLowerCase();
-                memberId = agent + "_" + memberAccount;
-            }
-        }
-        if ( agent == null || memberId == null ) {
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "player_account" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        gameDataRecord.setAccount( memberId );
-        gameDataRecord.setAgent( agent );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "bet_num_valid" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet_num" ) ) );

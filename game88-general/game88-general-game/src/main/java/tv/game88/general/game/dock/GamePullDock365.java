@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.GAMING_365 + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.GAMING_365 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDock365 extends AbstractGamePull {
 
     @Override
@@ -68,19 +69,22 @@ public class GamePullDock365 extends AbstractGamePull {
         String betTransTimeStr = String.valueOf( remoteGameDatum.get( "betTransTime" ) );
 
         LocalDateTime payTransTime = LocalDateTimeUtils.parseLocalDateTime( payTransTimeStr,
-                LocalDateTimeUtils.MMDDYYYYHHMMSSSSS_FORMATTER );
+                LocalDateTimeUtils.USATIME_FORMATTER );
         LocalDateTime betTransTime = LocalDateTimeUtils.parseLocalDateTime( betTransTimeStr,
-                LocalDateTimeUtils.MMDDYYYYHHMMSSSSS_FORMATTER );
+                LocalDateTimeUtils.USATIME_FORMATTER );
 
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( betTransTime ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( payTransTime ) );
 
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "txId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        String[] accounts = String.valueOf( remoteGameDatum.get( "userId" ) ).toUpperCase().split( "_" );
-        String   agent    = accounts[ 0 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "userId" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameNumber" ) ) );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );

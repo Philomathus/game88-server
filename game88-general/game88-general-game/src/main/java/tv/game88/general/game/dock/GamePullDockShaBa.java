@@ -1,7 +1,7 @@
 package tv.game88.general.game.dock;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,11 +11,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
 import tv.game88.general.game.base.AbstractGamePull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +27,15 @@ import java.util.Map;
 @Log4j2
 @Repository( value = ConstantsGame.SHABA + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockShaBa extends AbstractGamePull {
+    // 20 是测试货币
+    private static final Map<Integer, BigDecimal> RATE          = ImmutableMap.of( 51, BigDecimal.valueOf( 1000 ), 20,
+            BigDecimal.ONE, 13, BigDecimal.ONE );
+    private static final Map<Integer, String>     CURRENCY_TYPE = ImmutableMap.of( 51, "VND", 20, "UUS", 13, "CNY" );
+
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add( "vendor_id", gamePlatform.getAgent() );
+        map.add( "vendor_id", StringUtils.isBlank( gamePlatform.getMd5() ) ? gamePlatform.getAgent() : gamePlatform.getMd5() );
         map.add( "version_key", gamePlatform.getVersionValue() );
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -62,7 +69,7 @@ public class GamePullDockShaBa extends AbstractGamePull {
 
                 return resultList;
             } else {
-                log.error( url + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( url + ":::" + JsonUtil.object2Json( httpEntity ) + ":::" + JsonUtil.object2Json( resultMap ) );
             }
         }
         return null;
@@ -80,10 +87,13 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "trans_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "trans_id" ) ) );
-        String userID = String.valueOf( remoteGameDatum.get( "vendor_member_id" ) ).toLowerCase();
-        String agent  = userID.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( userID );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "vendor_member_id" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         Object sportType = remoteGameDatum.get( "sport_type" );
         if ( sportType == null ) {
             List<Map<String, Object>> ParlayDatas = ( List<Map<String, Object>> ) remoteGameDatum.get( "ParlayData" );
@@ -94,9 +104,17 @@ public class GamePullDockShaBa extends AbstractGamePull {
         } else {
             gameDataRecord.setKindId( String.valueOf( sportType ) );
         }
-        gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "stake" ) ) );
-        gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "stake" ) ) );
-        gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) );
+
+        int currencyType = ( int ) remoteGameDatum.get( "currency" );
+        gameDataRecord.setCurrency( CURRENCY_TYPE.get( currencyType ) );
+
+        BigDecimal rate     = RATE.get( currencyType );
+        BigDecimal stake    = new BigDecimal( String.valueOf( remoteGameDatum.get( "stake" ) ) ).multiply( rate );
+        String     stakeStr = stake.stripTrailingZeros().toPlainString();
+        gameDataRecord.setCellScore( stakeStr );
+        gameDataRecord.setAllBet( stakeStr );
+        BigDecimal winLostAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "winlost_amount" ) ) ).multiply( rate );
+        gameDataRecord.setProfit( winLostAmount.stripTrailingZeros().toPlainString() );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.getOrDefault( "match_id",
                 remoteGameDatum.get( "league_id" ) ) ) );
         gameDataRecord.setChairId( String.valueOf( remoteGameDatum.getOrDefault( "away_id", remoteGameDatum.get( "team_id" ) ) ) );
@@ -104,20 +122,19 @@ public class GamePullDockShaBa extends AbstractGamePull {
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
 
-
         String transactionTimeStr = String.valueOf( remoteGameDatum.get( "transaction_time" ) );
         String settlementTimeStr  = String.valueOf( remoteGameDatum.get( "settlement_time" ) );
         if ( transactionTimeStr == null || transactionTimeStr.equals( "null" ) ) {
             return null;
         }
         LocalDateTime transactionTime = LocalDateTimeUtils.convertMeiDongToDefault( transactionTimeStr.substring( 0, 19 ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( transactionTime ) );
         if ( settlementTimeStr == null || settlementTimeStr.equals( "null" ) ) {
             gameDataRecord.setGameEndTime( gameDataRecord.getGameStartTime() );
         } else {
             LocalDateTime settlementTime = LocalDateTimeUtils.convertMeiDongToDefault( settlementTimeStr.substring( 0, 19 ),
-                    LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                    LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
             gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( settlementTime ) );
         }
         return gameDataRecord;

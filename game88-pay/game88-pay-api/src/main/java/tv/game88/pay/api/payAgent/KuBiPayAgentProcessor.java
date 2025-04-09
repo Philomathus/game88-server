@@ -57,7 +57,7 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "city", "深圳市" );
         dataMap.put( "openBank", "南油支行" );
         dataMap.put( "clientTime", LocalDateTimeUtils.format( reqPayAgent.getCurrentTime(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         dataMap.put( "schTime", "" );
         dataMap.put( "rmk", "" );
         dataMap.put( "tel", "" );
@@ -183,7 +183,7 @@ public class KuBiPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "mchId", payAgentChannel.getMerId() );
         dataMap.put( "mchOrderId", withdrawDetail.getWithdrawOrderNo() );
         dataMap.put( "clientTime", LocalDateTimeUtils.format( LocalDateTime.now(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String tempStr = this.assemblyUrl( dataMap ) + "&key=" + signMd5;

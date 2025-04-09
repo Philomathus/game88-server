@@ -12,6 +12,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -45,8 +46,8 @@ public class GamePullDockHG extends AbstractGamePull {
         params.put( "action", "record" );
         params.put( "merchant", gamePlatform.getAgent() );
         params.put( "agent", gamePlatform.getLinecode() );
-        params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "startDate", LocalDateTimeUtils.format( start, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
+        params.put( "endDate", LocalDateTimeUtils.format( end, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "page", "1" );
         params.put( "pageSize", "1000" );
         params.put( "mode", MODE );
@@ -96,11 +97,13 @@ public class GamePullDockHG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameNumber" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameNumber" ) ) );
-        String   userName      = String.valueOf( remoteGameDatum.get( "userName" ) );
-        String[] userNameSplit = userName.split( "_" );
-        String   agent         = userNameSplit[ userNameSplit.length - 2 ];
-        String   account       = agent + "_" + userNameSplit[ userNameSplit.length - 1 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "userName" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "goldEffective" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "goldBet" ) ) );
@@ -113,7 +116,6 @@ public class GamePullDockHG extends AbstractGamePull {
         long   gameEndTime = Long.parseLong( String.valueOf( remoteGameDatum.get( "gameEndTime" ) ) );
         String endTime     = LocalDateTimeUtils.format( LocalDateTimeUtils.getDateTimeFromTimestamp( gameEndTime ) );
         gameDataRecord.setGameEndTime( endTime );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.SANJIN2_PAY + ConstantsPayAgent.PROCESSOR )
+@Repository( value = ConstantsPayAgent.QB_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
-public class SanJin2PayAgentProcessor extends AbstractPayAgent {
+public class QbPayAgentProcessor extends AbstractPayAgent {
     @Override
     public String getName() {
-        return "三斤代付";
+        return "钱宝代付";
     }
 
     @Override

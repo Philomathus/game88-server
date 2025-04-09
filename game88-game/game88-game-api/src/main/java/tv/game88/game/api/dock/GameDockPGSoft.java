@@ -114,7 +114,7 @@ public class GameDockPGSoft extends AbstractGameDock {
             return text;
         } );
 
-        if ( StringUtils.isBlank( responseStr ) || !responseStr.startsWith( "<!doctype html>" ) ) {
+        if ( StringUtils.isBlank( responseStr ) ) {
             log.error( reqJoinGame.getGameCategory().getDes()
                     + "获取游戏链接失败 userId:{} - Response: {}", reqJoinGame.getGameMemberId(), responseStr );
             throw new BusinessException( "获取游戏链接失败" );

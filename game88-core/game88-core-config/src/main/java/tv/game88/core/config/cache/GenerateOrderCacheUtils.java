@@ -34,7 +34,7 @@ public class GenerateOrderCacheUtils {
      * @param randomDigits 随机a-z,A-Z的字符串,长度为randomDigits
      */
     public String getOrderId( String prefix, int randomDigits ) {
-        String orderNo = prefix + LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSSSSS_FORMATTER )
+        String orderNo = prefix + LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_FORMATTER )
                 + RandomStringUtils.randomAlphabetic( randomDigits );
         if ( !redisUtil.strSetIfAbsent( CONFIG_ORDER_ID + orderNo, "", Duration.ofSeconds( 10 ) ) ) {
             return getOrderId( prefix, randomDigits );

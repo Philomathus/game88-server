@@ -14,6 +14,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.dto.RspZdList;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -31,7 +32,7 @@ import java.util.Map;
 
 
 @Log4j2
-@Repository ( value = ConstantsGame.KAI_YUAN + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.KAI_YUAN + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockKaiYuan extends AbstractGamePull {
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -64,22 +65,20 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
 
         log.warn( JsonUtil.object2Json( requestMap ) );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( gamePlatform.getRecordUrl() )
-                .queryParams( requestMap )
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap )
                 .build( true );
 
         log.warn( uriComponents.toUriString() );
 
-        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET, restTemplate.httpEntityCallback( null ),
-                response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+        Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
+                restTemplate.httpEntityCallback( null ), response -> {
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
         // log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
@@ -108,7 +107,8 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
                     return resultList;
                 }
             } else {
-                log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::" + JsonUtil.object2Json( resultMap ) );
+                log.error( gamePlatform.getName() + ":::" + uriComponents.toUriString() + ":::"
+                        + JsonUtil.object2Json( resultMap ) );
             }
         } else {
             log.warn( gamePlatform.getName() + "::" + uriComponents.toUriString() + "::" + JsonUtil.object2Json( resultMap ) );
@@ -123,14 +123,20 @@ public class GamePullDockKaiYuan extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "GameID" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String   accounts   = String.valueOf( remoteGameDatum.get( "Accounts" ) );
-        String[] splitParam = accounts.split( "_" );
-        if ( !gamePlatform.getAgent().equals( splitParam[ 0 ] ) ) {
+        String accounts = String.valueOf( remoteGameDatum.get( "Accounts" ) );
+        int    index    = accounts.indexOf( '_' );
+        String agent    = accounts.substring( 0, index );
+        String account  = accounts.substring( index + 1 );
+        if ( !gamePlatform.getAgent().equals( agent ) ) {
             return null;
         }
-        String agent = splitParam[ 1 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
-        gameDataRecord.setAgent( agent );
+        String[] members = assemblyAccount( account );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( members[ 0 ] );
+        gameDataRecord.setAccount( members[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "KindID" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "CellScore" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );

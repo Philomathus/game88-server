@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -20,7 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BG + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.BG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBG extends AbstractGamePull {
     // 443 棋牌 105 捕鱼 411 西游捕鱼 484 大仙捕鱼
     private static final String[] GAME_TYPE_LIST = { "443" };
@@ -116,10 +117,13 @@ public class GamePullDockBG extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "issueId" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "loginId" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "loginId" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "validAmount" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "betAmount" ) ) );

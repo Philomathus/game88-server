@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Log4j2
-@Repository ( value = ConstantsGame.RICH88 + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.RICH88 + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockRich88 extends AbstractGamePull {
 
     @Override
@@ -67,9 +68,13 @@ public class GamePullDockRich88 extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "record_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "account" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "account" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "bet_valid" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet" ) ) );
@@ -77,11 +82,10 @@ public class GamePullDockRich88 extends AbstractGamePull {
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         String gameStartTime = String.valueOf( remoteGameDatum.get( "round_start_at" ) );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameStartTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER ) ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "round_end_at" ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC0ToDefault( gameEndTime,
-                LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER ) ) );
-        gameDataRecord.setAgent( agent );
+                LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

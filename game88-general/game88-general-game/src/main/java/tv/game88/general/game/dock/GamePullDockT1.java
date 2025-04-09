@@ -50,8 +50,8 @@ public class GamePullDockT1 extends AbstractGamePull {
         Map<String, String> params = new TreeMap<>();
         params.put( "auth_token", getToken( gamePlatform ) );
         params.put( "merchant_code", gamePlatform.getAgent() );
-        params.put( "from", LocalDateTimeUtils.format( start, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
-        params.put( "to", LocalDateTimeUtils.format( end, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        params.put( "from", LocalDateTimeUtils.format( start, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
+        params.put( "to", LocalDateTimeUtils.format( end, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         params.put( "time_type", "2" );
         params.put( "sign", generateSecureKey( params, gamePlatform.getDes() ) );
 
@@ -85,10 +85,13 @@ public class GamePullDockT1 extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "uniqueid" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "period" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "username" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "username" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_code" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
