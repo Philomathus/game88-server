@@ -8,6 +8,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -79,15 +80,19 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameOrder" ) ) );
-        String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String   account = String.valueOf( remoteGameDatum.get( "thirdUid" ) ).toLowerCase();
-        String[] spl     = account.split( "_" );
+        String   logId    = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "thirdUid" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
 
         String createTime = remoteGameDatum.get( "createTimeDate" ).toString();
 
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "roundId" ) ) );
-        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "nid" ) ) );
         gameDataRecord.setCellScore( fenToYuan( String.valueOf( remoteGameDatum.get( "validBet" ) ) ) );
         gameDataRecord.setAllBet( fenToYuan( String.valueOf( remoteGameDatum.get( "input" ) ) ) );
@@ -95,7 +100,6 @@ public class GamePullDockMeiBo extends AbstractGamePull {
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "sceneId" ) ) );
         gameDataRecord.setGameStartTime( createTime );
         gameDataRecord.setGameEndTime( createTime );
-        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

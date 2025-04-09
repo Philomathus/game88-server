@@ -15,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -143,8 +144,14 @@ public class GamePullDockBBIN extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "WagersID" ) ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
         String   logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String   account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" ).toLowerCase();
-        String[] spl     = account.split( "_" );
+        String   account = String.valueOf( remoteGameDatum.get( "UserName" ) ).replace( "bbin", "_" );
+        String[] accounts = assemblyAccount( account );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
 
         String endString;
         if ( remoteGameDatum.containsKey( "ModifiedDate" ) ) {
@@ -161,14 +168,12 @@ public class GamePullDockBBIN extends AbstractGamePull {
         }
 
         gameDataRecord.setId( logId );
-        gameDataRecord.setAccount( spl[ 0 ] + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameType" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "Commissionable" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "BetAmount" ) ) );
         gameDataRecord.setProfit( String.valueOf( remoteGameDatum.get( "Payoff" ) ) );
         gameDataRecord.setTableId( String.valueOf( remoteGameDatum.get( "GameCode" ) ) );
 
-        gameDataRecord.setAgent( spl[ 0 ] );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setGameStartTime( endString );

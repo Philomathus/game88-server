@@ -26,6 +26,9 @@ public class Constants {
 
     public static final int BACCARAT_BEGIN_BET_TIME = 10;
 
+    public static final String MEMBER_REPORT_STATS = "member:report:stats:";
+
+
     /**
      * 登录会员 redis token key
      */

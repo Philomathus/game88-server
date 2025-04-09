@@ -190,6 +190,12 @@ public class MemberRechargeBankServiceImpl extends ServiceImpl<MemberRechargeBan
             memberCardList.removeIf( rspMemberCard -> "BOBIPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
                     || "BOBIPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
         }
+        if ( configEnvCacheUtil.getConfBool( "is_display_alipay" ) ) {
+            rspWithdrawBank.getSpecialBankInfoMap().put( "ALIPAY", configBankListMapper.findBankIdByNameOrCode( "ALIPAY" ) );
+        } else {
+            memberCardList.removeIf( rspMemberCard -> "ALIPAY".equalsIgnoreCase( rspMemberCard.getBankCode() )
+                    || "ALIPAY".equalsIgnoreCase( rspMemberCard.getBankName() ) );
+        }
         String domainValue = ConfigDomainCacheUtil.me.getDomainOssValue();
         for ( RspMemberCard memberCard : memberCardList ) {
             if ( StringUtils.isNotBlank( memberCard.getBankIcon() ) && !memberCard.getBankIcon().startsWith( "http" ) ) {

@@ -13,6 +13,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -38,8 +39,8 @@ public class GamePullDockWali extends AbstractGamePull {
         }
         LocalDateTime until = from.plusMinutes( 1 );
 
-        String startTime = LocalDateTimeUtils.format( from, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
-        String endTime   = LocalDateTimeUtils.format( until, LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER );
+        String startTime = LocalDateTimeUtils.format( from, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
+        String endTime   = LocalDateTimeUtils.format( until, LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER );
 
         Map<String, String> paramMap = new LinkedHashMap<>();
         paramMap.put( "from", startTime );
@@ -56,12 +57,9 @@ public class GamePullDockWali extends AbstractGamePull {
         }
 
         UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl( gamePlatform.getApiUrl() ).path( "/getRecordV2" )
-                                                          .queryParam( "a", gamePlatform.getLinecode() )
-                                                          .queryParam( "t", unixTimeSeconds )
-                                                          .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
-                                                          .queryParam( "k", DigestUtils.md5Hex(
-                                                                  params + unixTimeSeconds + gamePlatform.getMd5() ) )
-                                                          .build( true );
+                .queryParam( "a", gamePlatform.getLinecode() ).queryParam( "t", unixTimeSeconds )
+                .queryParam( "p", UriUtils.encode( params, StandardCharsets.UTF_8 ) )
+                .queryParam( "k", DigestUtils.md5Hex( params + unixTimeSeconds + gamePlatform.getMd5() ) ).build( true );
 
         log.warn( uriComponents.toUriString() );
 
@@ -103,9 +101,13 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "recordId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "uid" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "uid" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "validBet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "bet" ) ) );
@@ -114,7 +116,6 @@ public class GamePullDockWali extends AbstractGamePull {
         gameDataRecord.setRevenue( String.valueOf( remoteGameDatum.get( "tax" ) ) );
         gameDataRecord.setGameStartTime( String.valueOf( remoteGameDatum.get( "gameStartTime" ) ) );
         gameDataRecord.setGameEndTime( String.valueOf( remoteGameDatum.get( "recordTime" ) ) );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         gameDataRecord.setDetail( String.valueOf( remoteGameDatum.get( "detailUrl" ) ) );

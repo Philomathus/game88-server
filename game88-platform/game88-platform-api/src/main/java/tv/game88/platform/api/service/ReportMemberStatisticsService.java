@@ -1,5 +1,6 @@
 package tv.game88.platform.api.service;
 
+import tv.game88.platform.api.constant.RecordConstants;
 import tv.game88.platform.api.dto.ReqReportMemberStatistics;
 
 import java.math.BigDecimal;
@@ -17,4 +18,6 @@ public interface ReportMemberStatisticsService {
     Long getDailyRechargeCount( ReqReportMemberStatistics req );
 
     Long getDailyFirstRechargeCount( ReqReportMemberStatistics req );
+
+    RecordConstants.RspMemberStats getMemberStats( ReqReportMemberStatistics req );
 }

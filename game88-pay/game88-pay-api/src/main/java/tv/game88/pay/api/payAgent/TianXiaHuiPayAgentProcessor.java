@@ -48,17 +48,12 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
         }
         bodyMap.put( "mchId", payAgentChannel.getMerId() );
         bodyMap.put( "mchOrderNo", withdrawDetail.getWithdrawOrderNo() );
-        bodyMap.put( "amount", withdrawDetail
-                .getWithdrawMoney()
-                .multiply( BigDecimal.valueOf( 100 ) )
-                .setScale( 0, RoundingMode.HALF_UP )
-                .intValue() );
+        bodyMap.put( "amount", withdrawDetail.getWithdrawMoney().multiply( BigDecimal.valueOf( 100 ) )
+                .setScale( 0, RoundingMode.HALF_UP ).intValue() );
         bodyMap.put( "accountName", withdrawDetail.getBankUserName() );
         bodyMap.put( "accountNo", withdrawDetail.getBankAccount().trim() );
-        bodyMap.put( "province", "1" );
-        bodyMap.put( "city", "1" );
         bodyMap.put( "remark", withdrawDetail.getWithdrawOrderNo() );
-        bodyMap.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        bodyMap.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         bodyMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
 
         String tempStr = this.assemblyUrl( bodyMap ) + "&key=" + AESCoder.decrypt( payAgentChannel.getSignMd5() );
@@ -77,7 +72,7 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
                 log.info( payAgentPlatform.getName() + "代付订单提交成功 - result:{}", JsonUtil.object2Json( resultMap ) );
                 return true;
             } else {
-                reqPayAgent.setFailReason( resultMap.getOrDefault( "errDes", "" ).toString() );
+                reqPayAgent.setFailReason( resultMap.getOrDefault( "errDes", resultMap.get( "retMsg" ) ).toString() );
                 payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
             }
         }
@@ -138,7 +133,7 @@ public class TianXiaHuiPayAgentProcessor extends AbstractPayAgent {
         Map<String, Object> dataMap = new TreeMap<>();
         dataMap.put( "mchId", payAgentChannel.getMerId() );
         dataMap.put( "mchOrderNo", withdrawDetail.getWithdrawOrderNo() );
-        dataMap.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+        dataMap.put( "reqTime", LocalDateTimeUtils.format( LocalDateTime.now(), LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );
         String tempStr = this.assemblyUrl( dataMap ) + "&key=" + signMd5;

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -66,17 +67,16 @@ public class GamePullDockRR extends AbstractGamePull {
         Map<String, Object> remoteGameDatum = ( Map<String, Object> ) object;
         GameDataRecord      gameDataRecord  = new GameDataRecord();
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "id" ) ) );
-        String logId   = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "user_id" ) ).toLowerCase();
-        if ( !account.contains( "_" ) ) {
+        String   logId    = this.createRecordId( gamePlatform, gameDataRecord.getGameId() );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "user_id" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        String[] spl   = account.split( "_" );
-        String   agent = spl[ 0 ];
-
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setId( logId );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        gameDataRecord.setAccount( agent + "_" + spl[ 1 ].toUpperCase() );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         String     currency = String.valueOf( remoteGameDatum.get( "currency" ) );
         BigDecimal RATE     = RATE_MAP.get( currency );
@@ -90,11 +90,9 @@ public class GamePullDockRR extends AbstractGamePull {
         String createTime = remoteGameDatum.get( "create_time" ).toString();
         String payoffTime = remoteGameDatum.get( "payoff_time" ).toString();
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( createTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( LocalDateTimeUtils.convertUTC7ToDefault( payoffTime,
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER ) ) );
-        gameDataRecord.setAgent( agent );
-
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER ) ) );
         gameDataRecord.setCurrency( currency );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );

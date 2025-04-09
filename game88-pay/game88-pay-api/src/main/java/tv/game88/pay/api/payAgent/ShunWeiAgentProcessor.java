@@ -229,7 +229,7 @@ public class ShunWeiAgentProcessor extends AbstractPayAgent {
                                                      String realIp ) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put( "dateTime", LocalDateTimeUtils.format( LocalDateTime.now(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
         resultMap.put( "sign", "" );
         resultMap.put( "code", "99" );
         if ( this.checkWhiteIp( payAgentPlatform.getWhiteIp(), realIp ) ) {

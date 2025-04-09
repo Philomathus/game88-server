@@ -127,7 +127,7 @@ public class HengShengPayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "version", "1.0.0" );
         dataMap.put( "merchantOrderNo", withdrawDetail.getWithdrawOrderNo() );
         dataMap.put( "submitTime", LocalDateTimeUtils.format( LocalDateTime.now(),
-                LocalDateTimeUtils.YYYYMMDDHHMMSS_FORMATTER ) );
+                LocalDateTimeUtils.LOCALTIME_SP_NOM_FORMATTER ) );
 
         String tempStr = this.assemblyUrl( dataMap );
         dataMap.put( "sign", RSACoder.signSha1Rsa( tempStr, AESCoder.decrypt( payAgentChannel.getSignPrivateKey() ) ) );

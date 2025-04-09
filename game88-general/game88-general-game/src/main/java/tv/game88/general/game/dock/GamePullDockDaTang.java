@@ -12,6 +12,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -57,7 +58,7 @@ public class GamePullDockDaTang extends AbstractGamePull {
         requestMap.set( "key", key );
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() + "/GetRecordHandle" )
-                                                          .queryParams( requestMap ).build( true );
+                .queryParams( requestMap ).build( true );
         String uriString = uriComponents.toUriString();
 
         Map<String, Object> resultMap = this.sendGetMap( uriString );
@@ -82,9 +83,13 @@ public class GamePullDockDaTang extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "ObjectID" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( String.valueOf( remoteGameDatum.get( "GameInfoID" ) ) );
-        String account = String.valueOf( remoteGameDatum.get( "Account" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameID" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "ValidBet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "AllBet" ) ) );
@@ -96,7 +101,6 @@ public class GamePullDockDaTang extends AbstractGamePull {
         gameDataRecord.setGameStartTime( gameStartTime.substring( 0, gameStartTime.length() - 4 ) );
         String gameEndTime = String.valueOf( remoteGameDatum.get( "GameEndTime" ) );
         gameDataRecord.setGameEndTime( gameEndTime.substring( 0, gameEndTime.length() - 4 ) );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         return gameDataRecord;

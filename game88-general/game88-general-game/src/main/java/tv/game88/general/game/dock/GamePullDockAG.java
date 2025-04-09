@@ -165,8 +165,13 @@ public class GamePullDockAG extends AbstractGamePull {
             account = element.getAttribute( "playName" );
         }
 
-        String[] accounts = account.toUpperCase().split( "_" );
-        String   agent    = accounts[ 0 ].toLowerCase();
+        String[] accounts = assemblyAccount( account );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( element ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
 
         String billno = element.getAttribute( "billno" );
         if ( StringUtils.isBlank( billno ) ) {
@@ -179,7 +184,6 @@ public class GamePullDockAG extends AbstractGamePull {
         }
         gameDataRecord.setGameRound( gameCode );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
-        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
 
         String gametype = element.getAttribute( "gametype" );
         if ( StringUtils.isBlank( gametype ) ) {
@@ -236,7 +240,6 @@ public class GamePullDockAG extends AbstractGamePull {
             reckontime = LocalDateTimeUtils.format( LocalDateTime.now() );
         }
         gameDataRecord.setGameEndTime( reckontime );
-        gameDataRecord.setAgent( agent );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
 

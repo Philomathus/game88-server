@@ -249,4 +249,22 @@ public class AESCoder {
         byte[] original = cipher.doFinal( Arrays.copyOfRange( combined, 12, combined.length ) );
         return new String( original, StandardCharsets.UTF_8 );
     }
+
+    public static String encryptBase64ByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.decodeBase64( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.decodeBase64( AESIV ) );
+        cipher.init( Cipher.ENCRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( content.getBytes( StandardCharsets.UTF_8 ) );
+        return Base64.encodeBase64String( encrypted );
+    }
+
+    public static String decryptBase64ByKeyIv( String content, String AESKey, String AESIV ) throws Exception {
+        Cipher          cipher   = Cipher.getInstance( "AES/CBC/PKCS5Padding" );
+        SecretKeySpec   skeySpec = new SecretKeySpec( Base64.decodeBase64( AESKey ), AES );
+        IvParameterSpec iv       = new IvParameterSpec( Base64.decodeBase64( AESIV ) );
+        cipher.init( Cipher.DECRYPT_MODE, skeySpec, iv );
+        byte[] encrypted = cipher.doFinal( Base64.decodeBase64( content ) );
+        return new String( encrypted, StandardCharsets.UTF_8 );
+    }
 }

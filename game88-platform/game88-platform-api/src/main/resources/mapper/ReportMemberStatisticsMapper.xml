@@ -124,4 +124,55 @@
                 and update_time >= STR_TO_DATE(CONCAT(#{req.inclusive_date}, ' 00:00:00'), '%Y-%m-%d %H:%i:%s')
                 and update_time &lt;= STR_TO_DATE(CONCAT(#{req.inclusive_date}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')) a
     </select>
+
+
+    <select id="getDailyWithdrawCount" resultType="java.lang.Long">
+        select ifnull(sum(withdraw_money),0) total_withdraw from member_withdraw_detail
+        <where>
+            `status` in (3, 6)
+            <if test="req.inclusive_date != null">
+                and update_time >= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 00:00:00'),'%Y-%m-%d %H:%i:%s')
+                and update_time &lt;= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 23:59:59'),'%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="req.channelCode != null">
+                and withdraw_id in (select id from member_info where inviter_code = #{req.channelCode})
+            </if>
+        </where>
+    </select>
+
+    <select id="getRechargeStats" resultType="tv.game88.platform.api.dto.RechargeStatsDto">
+        SELECT ifnull(count( distinct a.member_id), 0) dailyRechargeCount,
+        ifnull(sum( distinct a.money), 0) totalRecharge
+        FROM (
+        SELECT p.member_id member_id, p.money
+        FROM member_recharge_online p
+        WHERE p.status = 1
+        <if test="req.inclusive_date != null">
+            and p.update_time >= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 00:00:00'),'%Y-%m-%d %H:%i:%s')
+            and p.update_time &lt;= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 23:59:59'),'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        UNION ALL
+
+        SELECT m.member_id member_id, m.recharge_money money
+        FROM member_recharge_bank m
+        WHERE m.status = 3
+        <if test="req.inclusive_date != null">
+            and m.update_time >= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 00:00:00'),'%Y-%m-%d %H:%i:%s')
+            and m.update_time &lt;= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 23:59:59'),'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        UNION ALL
+
+        SELECT u.member_id member_id, u.recharge_money money
+        FROM member_recharge_usdt u
+        WHERE u.status = 3
+        <if test="req.inclusive_date != null">
+            and u.update_time >= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 00:00:00'),'%Y-%m-%d %H:%i:%s')
+            and u.update_time &lt;= STR_TO_DATE(CONCAT(#{req.inclusive_date},' 23:59:59'),'%Y-%m-%d %H:%i:%s')
+        </if>
+        ) as a
+        inner join member_info as mi on mi.id = a.member_id
+        where mi.inviter_code = #{req.channelCode}
+    </select>
 </mapper>

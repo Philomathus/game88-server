@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 public class GamePullDockJiLi extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "BRL"
-            , BigDecimal.ONE );
+            , BigDecimal.ONE, "BDT", BigDecimal.ONE, "PKR", BigDecimal.ONE, "VND", new BigDecimal( 1000 ) );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
@@ -43,9 +44,9 @@ public class GamePullDockJiLi extends AbstractGamePull {
         LocalDateTime end = start.plusMinutes( 1 );
 
         String startTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( start ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
         String endTime = LocalDateTimeUtils.format( LocalDateTimeUtils.convertToUTC_4( end ),
-                LocalDateTimeUtils.YYYY_MM_DDTHH_MM_SS_FORMATTER );
+                LocalDateTimeUtils.RFC3339_NOMZ_FORMATTER );
 
         final Map<String, Object> params = new LinkedHashMap<>();
         params.put( "StartTime", startTime );
@@ -86,20 +87,23 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "WagersId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "Account" ) ).toUpperCase();
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "Account" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameId" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );
         gameDataRecord.setPlatformId( gamePlatform.getId() );
         String startTime = remoteGameDatum.get( "WagersTime" ).toString();
         LocalDateTime startTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( startTime,
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
         gameDataRecord.setGameStartTime( LocalDateTimeUtils.format( startTimeLocal ) );
         String endTime = remoteGameDatum.get( "SettlementTime" ).toString();
         LocalDateTime endTimeLocal = LocalDateTimeUtils.convertUTC_4ToDefault( endTime,
-                LocalDateTimeUtils.YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER );
+                LocalDateTimeUtils.RFC3339_NOM_FORMATTER );
         gameDataRecord.setGameEndTime( LocalDateTimeUtils.format( endTimeLocal ) );
 
         BigDecimal RATE = RATE_MAP.get( gamePlatform.getLinecode() );

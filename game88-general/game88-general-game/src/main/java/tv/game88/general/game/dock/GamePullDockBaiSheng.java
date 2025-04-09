@@ -14,6 +14,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-@Repository ( value = ConstantsGame.BAISHENG + ConstantsGame.GAME_PULL_PROCESSOR )
+@Repository( value = ConstantsGame.BAISHENG + ConstantsGame.GAME_PULL_PROCESSOR )
 public class GamePullDockBaiSheng extends AbstractGamePull {
 
     @Override
@@ -63,17 +64,18 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         requestMap.set( "timestamp", time );
         requestMap.set( "key", DigestUtils.md5Hex( gamePlatform.getAgent() + time + gamePlatform.getMd5() ) );
 
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap ).build( true );
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap )
+                .build( true );
 
         Map<String, Object> resultMap = restTemplate.execute( uriComponents.toUri(), HttpMethod.GET,
                 restTemplate.httpEntityCallback( null ), response -> {
-                    InputStream bodyStream = response.getBody();
-                    String      text;
-                    try ( Reader reader = new InputStreamReader( bodyStream ) ) {
-                        text = IOUtils.toString( reader );
-                    }
-                    return JsonUtil.json2Map( text );
-                } );
+            InputStream bodyStream = response.getBody();
+            String      text;
+            try ( Reader reader = new InputStreamReader( bodyStream ) ) {
+                text = IOUtils.toString( reader );
+            }
+            return JsonUtil.json2Map( text );
+        } );
 
         // log.warn( JsonUtil.object2Json( resultMap ) );
         if ( !CollectionUtils.isEmpty( resultMap ) ) {
@@ -98,10 +100,13 @@ public class GamePullDockBaiSheng extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "round_id" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String[] accounts = String.valueOf( remoteGameDatum.get( "user_id" ) ).toUpperCase().split( "_" );
-        String   agent    = accounts[ 0 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + accounts[ 1 ] );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "user_id" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "game_id" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "avail_bet" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "all_bet" ) ) );

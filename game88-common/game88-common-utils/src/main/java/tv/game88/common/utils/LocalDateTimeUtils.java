@@ -10,30 +10,35 @@ public class LocalDateTimeUtils {
 
     public static final DateTimeFormatter YYYYMMDD_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMdd" );
 
-    public static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
-    public static final DateTimeFormatter YYYY_MM_DDTHH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss" );
-
-    public static final DateTimeFormatter YYYY_MM_DDTHH_MM_SS_SSS_FORMATTER = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm" + ":ss.SSS" );
-
-
-    public static final DateTimeFormatter YYYYMMDDHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
-
-    public static final DateTimeFormatter YYYYMMDDHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
-
-    public static final DateTimeFormatter DDMMYYYYHHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
-    public static final DateTimeFormatter DDMMYYYYHHMM00_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:00" );
-
-    public static final DateTimeFormatter MMDDYYYYHHMMSSSSS_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
-
-    public static final DateTimeFormatter YYYY_MM_DD_T_HH_MM_SSS_XXXFORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH"
-            + ":mm:ssXXX" );
-
-    public static final DateTimeFormatter RFC3339_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" );
+    public static final DateTimeFormatter HHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "HHmmss" );
 
     public static final DateTimeFormatter HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern( "HH:mm:ss" );
 
-    public static final DateTimeFormatter HHMMSS_FORMATTER = DateTimeFormatter.ofPattern( "HHmmss" );
+    public static final DateTimeFormatter LOCALTIME_NOM_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
+
+    public static final DateTimeFormatter LOCALTIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss.SSS" );
+
+    public static final DateTimeFormatter LOCALTIME_SP_NOM_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmss" );
+
+    public static final DateTimeFormatter LOCALTIME_SP_FORMATTER = DateTimeFormatter.ofPattern( "yyyyMMddHHmmssSSS" );
+
+    public static final DateTimeFormatter ENGTIME_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:ss" );
+
+    public static final DateTimeFormatter ENGTIME_00_FORMATTER = DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm:00" );
+
+    public static final DateTimeFormatter USATIME_FORMATTER = DateTimeFormatter.ofPattern( "MM/dd/yyyy HH:mm:ss.SSS" );
+
+    public static final DateTimeFormatter RFC3339_NOMZ_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss" );
+
+    public static final DateTimeFormatter RFC3339_NOZ_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSS" );
+
+    public static final DateTimeFormatter RFC3339_NOM_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssXXX" );
+
+    public static final DateTimeFormatter ISO8601_SP_NOM_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ssX" );
+
+    public static final DateTimeFormatter RFC3339_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" );
+
+    public static final DateTimeFormatter ISO8601_SP_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd'T'HH:mm:ss.SSSX" );
 
     /**
      * 格式化LocalDate
@@ -62,13 +67,17 @@ public class LocalDateTimeUtils {
         return time.format( formatter );
     }
 
+    public static String format( ZonedDateTime time, DateTimeFormatter formatter ) {
+        return time.format( formatter );
+    }
+
     /**
      * 默认格式化LocalDateTime
      *
      * @param time
      */
     public static String format( LocalDateTime time ) {
-        return time.format( LocalDateTimeUtils.YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        return time.format( LocalDateTimeUtils.LOCALTIME_NOM_FORMATTER );
     }
 
     /**
@@ -104,7 +113,7 @@ public class LocalDateTimeUtils {
      * @param dateStr
      */
     public static LocalDateTime parseLocalDateTime( String dateStr ) {
-        return LocalDateTime.parse( dateStr, YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        return LocalDateTime.parse( dateStr, LOCALTIME_NOM_FORMATTER );
     }
 
     /**
@@ -229,7 +238,7 @@ public class LocalDateTimeUtils {
      * @return LocalDateTime
      */
     public static LocalDateTime convertMeiDongToDefault( String time ) {
-        LocalDateTime localDateTime = LocalDateTime.parse( time, YYYY_MM_DD_HH_MM_SS_FORMATTER );
+        LocalDateTime localDateTime = LocalDateTime.parse( time, LOCALTIME_NOM_FORMATTER );
         ZonedDateTime zonedTime     = localDateTime.atZone( ZoneId.of( "America/Caracas" ) );
         ZonedDateTime converted     = zonedTime.withZoneSameInstant( ZoneId.systemDefault() );
         return converted.toLocalDateTime();
@@ -253,6 +262,11 @@ public class LocalDateTimeUtils {
         ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
         ZonedDateTime converted = zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
         return converted.toLocalDateTime();
+    }
+
+    public static ZonedDateTime convertToUTC0Zoned( LocalDateTime localDateTime ) {
+        ZonedDateTime zonedTime = localDateTime.atZone( ZoneId.systemDefault() );
+        return zonedTime.withZoneSameInstant( ZoneId.of( "UTC+0" ) );
     }
 
     public static LocalDateTime convertToUTC7( LocalDateTime localDateTime ) {

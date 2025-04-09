@@ -4,8 +4,10 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
+import tv.game88.core.config.entity.ConfigBankList;
 import tv.game88.pay.api.base.AbstractPayAgent;
 import tv.game88.pay.api.constants.ConstantsPayAgent;
 import tv.game88.pay.api.dto.ReqPayAgent;
@@ -18,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Repository( value = ConstantsPayAgent.SANJIN2_PAY + "PayAgentProcessor" )
+@Repository( value = ConstantsPayAgent.SANJIN2_PAY + ConstantsPayAgent.PROCESSOR )
 @Log4j2
 public class SanJin2PayAgentProcessor extends AbstractPayAgent {
     @Override
@@ -36,7 +38,13 @@ public class SanJin2PayAgentProcessor extends AbstractPayAgent {
         dataMap.put( "cardNumber", withdrawDetail.getBankAccount().trim() );
         dataMap.put( "payType", AESCoder.decrypt( payAgentChannel.getHeaderValue() ) );
         dataMap.put( "account", withdrawDetail.getBankUserName() );
-        dataMap.put( "bankName", withdrawDetail.getBankUserName() );
+        ConfigBankList configBank = configBankListCache.getConfigBank( withdrawDetail.getBankId() );
+        if ( configBank == null ) {
+            payAgentService.callBackOrder( withdrawDetail, payAgentChannel.getName() );
+            log.warn( "未知银行类型 - 银行类型:{}", withdrawDetail.getBankId() );
+            throw new BusinessException( "未知银行类型：" + withdrawDetail.getBankId() );
+        }
+        dataMap.put( "bankName", configBank.getBankName() );
         dataMap.put( "notifyUrl", configEnvCacheUtil.getConf( "payAgentNotifyUrl" ) + payAgentPlatform.getCode() );
 
         String signMd5 = AESCoder.decrypt( payAgentChannel.getSignMd5() );

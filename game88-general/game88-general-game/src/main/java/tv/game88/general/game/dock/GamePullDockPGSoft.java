@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.entity.GameDataRecord;
 import tv.game88.general.api.entity.GamePlatform;
@@ -29,10 +30,15 @@ import java.util.*;
 public class GamePullDockPGSoft extends AbstractGamePull {
 
     private static final Map<String, BigDecimal> RATE_MAP = Map.of( "IDR", new BigDecimal( 1000 ), "INR", BigDecimal.ONE, "CNY"
-            , BigDecimal.ONE, "BRL", BigDecimal.ONE );
+            , BigDecimal.ONE, "BRL", BigDecimal.ONE, "VND", new BigDecimal( 1000 ) );
 
     @Override
     public List<Object> requestRemoteGameData( GamePlatform gamePlatform ) {
+        LocalDateTime start = LocalDateTimeUtils.getDateTimeFromTimestamp( Long.parseLong( gamePlatform.getVersionValue() ) );
+        // 如果不是3分钟前的时间,跳过
+        if ( start.isAfter( LocalDateTime.now().minusMinutes( 4 ) ) ) {
+            return null;
+        }
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add( "operator_token", gamePlatform.getDes() );
         params.add( "secret_key", gamePlatform.getMd5() );
@@ -41,8 +47,6 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         params.add( "row_version", gamePlatform.getVersionValue() );
 
         String url = gamePlatform.getApiUrl() + "/external-datagrabber/Bet/v4/GetHistory?trace_id=" + UUID.randomUUID();
-
-        log.warn( url + " ::: " + JsonUtil.object2Json( params ) );
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType( MediaType.APPLICATION_FORM_URLENCODED );
@@ -66,7 +70,8 @@ public class GamePullDockPGSoft extends AbstractGamePull {
                 return dataList;
             }
             if ( resultMap.get( "error" ) != null ) {
-                log.warn( JsonUtil.object2Json( resultMap ) );
+                log.error( "{} - url:{} - request:{} - result:{}", gamePlatform.getName(), url, JsonUtil.object2Json( params ),
+                        JsonUtil.object2Json( resultMap ) );
             } else {
                 gamePlatform.setVersionValue( String.valueOf( Long.parseLong( gamePlatform.getVersionValue() ) + 60000 ) );
             }
@@ -81,10 +86,13 @@ public class GamePullDockPGSoft extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "betId" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String account = String.valueOf( remoteGameDatum.get( "playerName" ) );
-        String agent   = account.split( "_" )[ 0 ];
-        gameDataRecord.setAccount( account );
-        gameDataRecord.setAgent( agent );
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "playerName" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
+            return null;
+        }
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "gameId" ) ) );
         gameDataRecord.setCurrency( String.valueOf( remoteGameDatum.get( "currency" ) ) );
         gameDataRecord.setGameAgent( gamePlatform.getAgent() );

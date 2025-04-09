@@ -3,7 +3,6 @@ package tv.game88.general.game.dock;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +14,7 @@ import tv.game88.common.exception.BusinessException;
 import tv.game88.common.utils.AESCoder;
 import tv.game88.common.utils.JsonUtil;
 import tv.game88.common.utils.LocalDateTimeUtils;
+import tv.game88.common.utils.StringUtils;
 import tv.game88.core.game.constants.ConstantsGame;
 import tv.game88.general.api.dto.RspZdXsjList;
 import tv.game88.general.api.entity.GameDataRecord;
@@ -64,9 +64,7 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         requestMap.set( "paramerter", param );
         requestMap.set( "key", key );
 
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString( gamePlatform.getRecordUrl() )
-                .queryParams( requestMap )
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString( gamePlatform.getRecordUrl() ).queryParams( requestMap )
                 .build( true );
 
         // log.warn( uriComponents.toUriString() );
@@ -121,16 +119,13 @@ public class GamePullDockNewWorld extends AbstractGamePull {
         gameDataRecord.setGameId( String.valueOf( remoteGameDatum.get( "gameCode" ) ) );
         gameDataRecord.setId( this.createRecordId( gamePlatform, gameDataRecord.getGameId() ) );
         gameDataRecord.setGameRound( gameDataRecord.getGameId() );
-        String   accounts   = String.valueOf( remoteGameDatum.get( "PlayerAccount" ) );
-        String[] splitParam = accounts.split( "_" );
-        if ( !gamePlatform.getAgent().equals( splitParam[ 0 ] ) ) {
+        String[] accounts = assemblyAccount( String.valueOf( remoteGameDatum.get( "PlayerAccount" ) ) );
+        if ( StringUtils.isEmpty( accounts ) ) {
+            log.error( "accounts is empty - data:{}", JsonUtil.object2Json( remoteGameDatum ) );
             return null;
         }
-        String agent = splitParam[ 1 ].toLowerCase();
-        gameDataRecord.setAccount( agent + "_" + splitParam[ 2 ].toUpperCase() );
-        gameDataRecord.setAgent( agent );
-        gameDataRecord.setAccount( StringUtils.substringAfter( accounts, "_" ) );
-        gameDataRecord.setAgent( splitParam[ 1 ] );
+        gameDataRecord.setAgent( accounts[ 0 ] );
+        gameDataRecord.setAccount( accounts[ 1 ] );
         gameDataRecord.setKindId( String.valueOf( remoteGameDatum.get( "GameArrNo" ) ) );
         gameDataRecord.setCellScore( String.valueOf( remoteGameDatum.get( "effScore" ) ) );
         gameDataRecord.setAllBet( String.valueOf( remoteGameDatum.get( "allScore" ) ) );
