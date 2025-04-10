@@ -49,9 +49,10 @@ public class ConfigRecommendController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:recommend:export')" )
     @Log( title = "推广设置", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ConfigRecommend configRecommend, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ConfigRecommend configRecommend, HttpServletResponse response ) {
         List<ConfigRecommend> list = configRecommendService.selectConfigRecommendList( configRecommend );
-        ExportExcelUtil.exportBigExcel( list, "推广设置", "推广设置表", ConfigRecommend.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "推广设置", "推广设置表", ConfigRecommend.class, response );
+        return RspBase.ok( list );
     }
 
     /**

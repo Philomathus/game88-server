@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -58,9 +57,10 @@ public class ConfigBankListController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:export')" )
     @Log( title = "银行字典列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ConfigBankList configBankList, HttpServletResponse response ) {
+    public RspBase<List<ConfigBankList>> export(ConfigBankList configBankList, HttpServletResponse response ) {
         List<ConfigBankList> list = configBankListService.selectConfigBankListList( configBankList );
-        ExportExcelUtil.exportBigExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
+        return RspBase.ok( list );
     }
 
     /**

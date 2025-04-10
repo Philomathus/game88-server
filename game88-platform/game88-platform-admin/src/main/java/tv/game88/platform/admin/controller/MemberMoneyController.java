@@ -71,9 +71,10 @@ public class MemberMoneyController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:money:export')" )
     @Log( title = "导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( MemberMoney memberMoney, HttpServletResponse response ) {
+    public RspBase<List<?>> export( MemberMoney memberMoney, HttpServletResponse response ) {
         List<MemberMoney> list = memberMoneyService.selectAllMemberMoneyList( memberMoney );
-        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberMoney.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberMoney.class, response );
+        return RspBase.ok( list );
     }
 
     /**

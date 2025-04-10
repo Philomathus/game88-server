@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.utils.ExportExcelUtil;
+import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.platform.api.entity.ReportPlamCom;
@@ -45,8 +46,9 @@ public class ReportPlamComController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('report:plam-com:export')" )
     @Log( title = "综合数据", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {
+    public RspBase<List<?>> export(ReportPlamCom reportPlamCom, HttpServletResponse response ) {
         List<ReportPlamCom> list = reportPlamComService.exportPlamComList( reportPlamCom );
-        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
+        return RspBase.ok(list);
     }
 }

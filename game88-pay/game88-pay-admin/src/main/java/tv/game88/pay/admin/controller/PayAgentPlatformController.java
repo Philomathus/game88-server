@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -63,9 +62,10 @@ public class PayAgentPlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payAgentPlatform:export')" )
     @Log( title = "代付平台", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( PayAgentPlatform payAgentPlatform, HttpServletResponse response ) {
+    public RspBase<List<PayAgentPlatform>> export(PayAgentPlatform payAgentPlatform, HttpServletResponse response ) {
         List<PayAgentPlatform> list = payAgentPlatformService.selectPayAgentPlatformList( payAgentPlatform );
-        ExportExcelUtil.exportBigExcel( list, "代付平台", "代付平台表", PayAgentPlatform.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "代付平台", "代付平台表", PayAgentPlatform.class, response );
+        return RspBase.ok( list );
     }
 
     /**

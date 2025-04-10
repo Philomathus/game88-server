@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.entity.SysRole;
@@ -99,9 +98,10 @@ public class MemberWithdrawDetailController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:export')" )
     @Log( title = "会员提现信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReqMemberWithdrawDetail reqMemberWithdrawDetail, HttpServletResponse response ) {
+    public RspBase<List<MemberWithdrawDetail>> export(ReqMemberWithdrawDetail reqMemberWithdrawDetail, HttpServletResponse response ) {
         List<MemberWithdrawDetail> list = memberWithdrawDetailService.selectMemberWithdrawDetailList( reqMemberWithdrawDetail );
-        ExportExcelUtil.exportBigExcel( list, "会员提现", "会员提现信息表", MemberWithdrawDetail.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "会员提现", "会员提现信息表", MemberWithdrawDetail.class, response );
+        return RspBase.ok( list );
     }
 
     /**
@@ -110,9 +110,10 @@ public class MemberWithdrawDetailController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:export')" )
     @Log( title = "顺为代付格式会员提现信息", businessType = BusinessType.EXPORT )
     @PostMapping( "/exportShunWei" )
-    public void exportShunWei( @RequestBody ReqMemberWithdrawDetail req, HttpServletResponse response ) {
+    public RspBase<List<RspMemberWithdrawDetailShunWei>> exportShunWei(@RequestBody ReqMemberWithdrawDetail req, HttpServletResponse response ) {
         List<RspMemberWithdrawDetailShunWei> list = memberWithdrawDetailService.selectMemberWithdrawDetailShunWeiList( req );
-        ExportExcelUtil.exportBigExcel( list, null, "顺为格式会员提现表", RspMemberWithdrawDetailShunWei.class, response );
+//        ExportExcelUtil.exportBigExcel( list, null, "顺为格式会员提现表", RspMemberWithdrawDetailShunWei.class, response );
+        return RspBase.ok( list );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:refused')" )

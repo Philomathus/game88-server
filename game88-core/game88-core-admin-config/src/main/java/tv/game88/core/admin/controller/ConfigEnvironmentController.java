@@ -55,9 +55,10 @@ public class ConfigEnvironmentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:env:export')" )
     @Log( title = "导出环境参数配置列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ConfigEnvironment configEnvironment, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ConfigEnvironment configEnvironment, HttpServletResponse response ) {
         List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentList( configEnvironment );
-        ExportExcelUtil.exportBigExcel( list, "环境参数配置", "环境参数配置表", ConfigEnvironment.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "环境参数配置", "环境参数配置表", ConfigEnvironment.class, response );
+        return RspBase.ok(list);
     }
 
     /**

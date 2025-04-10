@@ -6,7 +6,6 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -68,9 +67,10 @@ public class PayAgentChannelController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:agentChannel:export')" )
     @Log( title = "代付通道", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( PayAgentChannel payAgentChannel, HttpServletResponse response ) {
+    public RspBase<List<PayAgentChannel>> export(PayAgentChannel payAgentChannel, HttpServletResponse response ) {
         List<PayAgentChannel> list = payAgentChannelService.selectPayAgentChannelList( payAgentChannel );
-        ExportExcelUtil.exportBigExcel( list, "代付通道", "代付通道表", PayAgentChannel.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "代付通道", "代付通道表", PayAgentChannel.class, response );
+        return RspBase.ok( list );
     }
 
     /**

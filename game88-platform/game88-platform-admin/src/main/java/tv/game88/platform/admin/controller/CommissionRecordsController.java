@@ -48,9 +48,10 @@ public class CommissionRecordsController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:commissionRecords:export')" )
     @Log( title = "佣金领取日志", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( LogCommission commissionRecords, HttpServletResponse response ) {
+    public RspBase<List<?>> export( LogCommission commissionRecords, HttpServletResponse response ) {
         List<LogCommission> list = commissionRecordsService.selectLogCommissionList( commissionRecords );
-        ExportExcelUtil.exportBigExcel( list, "佣金领取日志", "佣金领取日志表", LogCommission.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "佣金领取日志", "佣金领取日志表", LogCommission.class, response );
+        return RspBase.ok(list);
     }
 
 }

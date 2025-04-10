@@ -8,7 +8,6 @@ import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
 import tv.game88.common.utils.AESCoder;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -66,9 +65,10 @@ public class PayPlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payPlatform:export')" )
     @Log( title = "支付平台", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( PayPlatform payPlatform, HttpServletResponse response ) {
+    public RspBase<List<PayPlatform>> export(PayPlatform payPlatform, HttpServletResponse response ) {
         List<PayPlatform> list = payPlatformService.selectPayPlatformList( payPlatform );
-        ExportExcelUtil.exportBigExcel( list, "支付平台", "支付平台表", PayPlatform.class, response );
+//        ExportExcelUtil.exportBigExcel( list, "支付平台", "支付平台表", PayPlatform.class, response );
+        return RspBase.ok( list );
     }
 
     /**
