@@ -47,9 +47,9 @@ public class SysDictDataController extends BaseController {
     @Log( title = "字典数据", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('system:dict:export')" )
     @GetMapping( "/export" )
-    public void export( SysDictData dictData, HttpServletResponse response ) {
-        List<SysDictData> list = dictDataService.selectDictDataList( dictData );
-        ExportExcelUtil.exportBigExcel( list, "字典数据", "字典数据表", SysDictData.class, response );
+    public RspBase<List<SysDictData>> export( SysDictData dictData, HttpServletResponse response ) {
+        return RspBase.ok(  dictDataService.selectDictDataList( dictData ) );
+//        ExportExcelUtil.exportBigExcel( list, "字典数据", "字典数据表", SysDictData.class, response );
     }
 
     /**

@@ -70,9 +70,9 @@ public class MemberGameDatafixController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:memberGameDatafix:export')" )
     @Log( title = "游戏注单修复", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( MemberGameDataFix memberGameDatafix, HttpServletResponse response ) {
-        List<MemberGameDataFix> list = memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix );
-        ExportExcelUtil.exportBigExcel( list, "游戏注单修复", "游戏注单修复表", MemberGameDataFix.class, response );
+    public RspBase<List<MemberGameDataFix>> export( MemberGameDataFix memberGameDatafix, HttpServletResponse response ) {
+        return RspBase.ok(  memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix ) );
+//        ExportExcelUtil.exportBigExcel( list, "游戏注单修复", "游戏注单修复表", MemberGameDataFix.class, response );
     }
 
     /**

@@ -48,9 +48,9 @@ public class AgentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agent:export')" )
     @Log( title = "代理管理", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( Agent Agent, HttpServletResponse response ) {
-        List<Agent> list = agentService.selectAgentList( Agent );
-        ExportExcelUtil.exportBigExcel( list, "代理管理", "代理管理表", Agent.class, response );
+    public RspBase<List<Agent>> export( Agent Agent, HttpServletResponse response ) {
+        return RspBase.ok(  agentService.selectAgentList( Agent ) );
+//        ExportExcelUtil.exportBigExcel( list, "代理管理", "代理管理表", Agent.class, response );
     }
 
     /**

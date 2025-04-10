@@ -61,9 +61,9 @@ public class MemberGameDataController extends BaseController {
     @PreAuthorize ( "@ss.hasPermi('member:gameData:export')" )
     @Log ( title = "会员注单数据", businessType = BusinessType.EXPORT )
     @GetMapping ( "/export" )
-    public void export( ReqMemberGameData reqMemberGameData, HttpServletResponse response ) {
-        List<MemberGameData> list = memberGameDataService.selectMemberGameDataList( reqMemberGameData );
-        ExportExcelUtil.exportBigExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
+    public RspBase<List<MemberGameData>> export( ReqMemberGameData reqMemberGameData, HttpServletResponse response ) {
+        return RspBase.ok(  memberGameDataService.selectMemberGameDataList( reqMemberGameData ) );
+//        ExportExcelUtil.exportBigExcel( list, "会员注单数据", "会员注单数据表", MemberGameData.class, response );
     }
 
     @PreAuthorize ( "@ss.hasPermi('member:gameData:recordList')" )

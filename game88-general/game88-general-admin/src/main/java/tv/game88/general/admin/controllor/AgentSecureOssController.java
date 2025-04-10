@@ -58,9 +58,9 @@ public class AgentSecureOssController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('agent:secureOss:export')" )
     @Log( title = "代理域名oss", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( AgentSecureOss agentSecureOss, HttpServletResponse response ) {
-        List<AgentSecureOss> list = agentSecureOssService.selectAgentSecureOssList( agentSecureOss );
-        ExportExcelUtil.exportBigExcel( list, "代理域名oss", "代理域名oss表", AgentSecureOss.class, response );
+    public RspBase<List<AgentSecureOss>> export( AgentSecureOss agentSecureOss, HttpServletResponse response ) {
+        return RspBase.ok(  agentSecureOssService.selectAgentSecureOssList( agentSecureOss ) );
+//        ExportExcelUtil.exportBigExcel( list, "代理域名oss", "代理域名oss表", AgentSecureOss.class, response );
     }
 
     /**

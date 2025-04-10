@@ -49,9 +49,9 @@ public class AgentHostClientController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agentHostClient:export')" )
     @Log( title = "主播版本号", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( AgentHostClient agentHostClient, HttpServletResponse response ) {
-        List<AgentHostClient> list = agentHostClientService.selectAgentHostClientList( agentHostClient );
-        ExportExcelUtil.exportBigExcel( list, "主播版本号", "主播版本号表", AgentHostClient.class, response );
+    public RspBase<List<AgentHostClient>>  export( AgentHostClient agentHostClient, HttpServletResponse response ) {
+        return RspBase.ok(  agentHostClientService.selectAgentHostClientList( agentHostClient ) );
+//        ExportExcelUtil.exportBigExcel( list, "主播版本号", "主播版本号表", AgentHostClient.class, response );
     }
 
     /**

@@ -95,8 +95,8 @@ public class ConfigWashCodeController extends BaseController {
     @Log( title = "洗码配置", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('game:configWashCode:export')" )
     @GetMapping( "/export" )
-    public void export( ConfigWashCode configWashCode, HttpServletResponse response ) {
-        List<ConfigWashCode> list = configWashCodeService.selectConfigWashCodeList( configWashCode );
-        ExportExcelUtil.exportBigExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
+    public RspBase<List<ConfigWashCode>> export( ConfigWashCode configWashCode, HttpServletResponse response ) {
+        return RspBase.ok(  configWashCodeService.selectConfigWashCodeList( configWashCode ) );
+//        ExportExcelUtil.exportBigExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
     }
 }

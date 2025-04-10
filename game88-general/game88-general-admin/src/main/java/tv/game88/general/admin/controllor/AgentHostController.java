@@ -50,9 +50,9 @@ public class AgentHostController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('agent:agentHost:export')" )
     @Log( title = "主播域名管理", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( AgentHost agentHost, HttpServletResponse response ) {
-        List<AgentHost> list = agentHostService.selectAgentHostList( agentHost );
-        ExportExcelUtil.exportBigExcel( list, "主播域名管理", "主播域名管理表", AgentHost.class, response );
+    public RspBase<List<AgentHost>> export( AgentHost agentHost, HttpServletResponse response ) {
+        return RspBase.ok( agentHostService.selectAgentHostList( agentHost ) );
+//        ExportExcelUtil.exportBigExcel( list, "主播域名管理", "主播域名管理表", AgentHost.class, response );
     }
 
     /**

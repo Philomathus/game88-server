@@ -48,9 +48,9 @@ public class LotteryBetController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('lottery:bet:export')" )
     @Log( title = "彩票会员下注详情", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( LotteryBet lotteryBet, HttpServletResponse response ) {
-        List<LotteryBet> list = lotteryBetService.selectLotteryBetList( lotteryBet );
-        ExportExcelUtil.exportBigExcel( list, "彩票会员下注详情", "彩票会员下注详情表", LotteryBet.class, response );
+    public RspBase<List<LotteryBet>> export( LotteryBet lotteryBet, HttpServletResponse response ) {
+        return RspBase.ok(  lotteryBetService.selectLotteryBetList( lotteryBet ) );
+//        ExportExcelUtil.exportBigExcel( list, "彩票会员下注详情", "彩票会员下注详情表", LotteryBet.class, response );
     }
 
     /**

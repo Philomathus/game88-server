@@ -50,9 +50,9 @@ public class AgentSecureController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('agent:agentSecure:export')" )
     @Log( title = "域名加密管理", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( AgentSecure agentSecure, HttpServletResponse response ) {
-        List<AgentSecure> list = agentSecureService.selectAgentSecureList( agentSecure );
-        ExportExcelUtil.exportBigExcel( list, "域名加密管理", "域名加密管理表", AgentSecure.class, response );
+    public RspBase<List<AgentSecure>> export( AgentSecure agentSecure, HttpServletResponse response ) {
+        return RspBase.ok(  agentSecureService.selectAgentSecureList( agentSecure ) );
+//        ExportExcelUtil.exportBigExcel( list, "域名加密管理", "域名加密管理表", AgentSecure.class, response );
     }
 
     /**

@@ -56,9 +56,9 @@ public class ReportPlamComController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:report-plam-com:export')" )
     @Log( title = "综合数据报会每天进行前一天数据的生成，如果需要查当天的数据则需手动调用prorep_plamcom报存储过程，传入当天时间", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {
-        List<ReportPlamCom> list = reportPlamComService.exportPlamComList( reportPlamCom );
-        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
+    public RspBase<List<ReportPlamCom>> export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {
+        return RspBase.ok(  reportPlamComService.exportPlamComList( reportPlamCom ) );
+//        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
     }
 
     /* 代理平台选择列表

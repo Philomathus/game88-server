@@ -42,8 +42,8 @@ public class SysLogininforController extends BaseController {
     @Log( title = "登录日志", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('monitor:logininfor:export')" )
     @GetMapping( "/export" )
-    public void export( SysLogininfor logininfor, HttpServletResponse response ) {
-        List<SysLogininfor> list = logininforService.selectLogininforList( logininfor );
-        ExportExcelUtil.exportBigExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
+    public RspBase<List<SysLogininfor>> export( SysLogininfor logininfor, HttpServletResponse response ) {
+        return RspBase.ok(  logininforService.selectLogininforList( logininfor ) );
+//        ExportExcelUtil.exportBigExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
     }
 }

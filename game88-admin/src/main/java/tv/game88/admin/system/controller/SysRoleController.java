@@ -43,9 +43,9 @@ public class SysRoleController extends BaseController {
     @Log( title = "角色管理", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('system:role:export')" )
     @GetMapping( "/export" )
-    public void export( SysRole role, HttpServletResponse response ) {
-        List<SysRole> list = roleService.selectRoleList( role );
-        ExportExcelUtil.exportBigExcel( list, "角色信息", "角色信息表", SysRole.class, response );
+    public RspBase<List<SysRole>> export( SysRole role, HttpServletResponse response ) {
+        return RspBase.ok(  roleService.selectRoleList( role ) );
+//        ExportExcelUtil.exportBigExcel( list, "角色信息", "角色信息表", SysRole.class, response );
     }
 
     /**

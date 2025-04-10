@@ -42,8 +42,8 @@ public class SysOperlogController extends BaseController {
     @Log( title = "操作日志", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('monitor:operlog:export')" )
     @GetMapping( "/export" )
-    public void export( SysOperLog operLog, HttpServletResponse response ) {
-        List<SysOperLog> list = operLogService.selectOperLogList( operLog );
-        ExportExcelUtil.exportBigExcel( list, "操作日志", "操作日志表", SysOperLog.class, response );
+    public RspBase<List<SysOperLog>> export( SysOperLog operLog, HttpServletResponse response ) {
+        return RspBase.ok(  operLogService.selectOperLogList( operLog ) ) ;
+//        ExportExcelUtil.exportBigExcel( list, "操作日志", "操作日志表", SysOperLog.class, response );
     }
 }
