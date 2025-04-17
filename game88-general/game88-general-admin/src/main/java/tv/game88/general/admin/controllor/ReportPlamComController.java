@@ -1,5 +1,6 @@
 package tv.game88.general.admin.controllor;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -17,15 +17,13 @@ import tv.game88.general.api.entity.ReportPlamCom;
 import tv.game88.general.api.service.AgentService;
 import tv.game88.general.api.service.IReportPlamComService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
  * 综合数据报会每天进行前一天数据的生成，如果需要查当天的数据则需手动调用prorep_plamcom报存储过程，传入当天时间Controller
  *
  * @author 77tv
- * @date 2021-01-25
+ * {@code @date} 2021-01-25
  */
 @RestController
 @RequestMapping( "/admin/report-plam-com" )
@@ -56,9 +54,8 @@ public class ReportPlamComController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:report-plam-com:export')" )
     @Log( title = "综合数据报会每天进行前一天数据的生成，如果需要查当天的数据则需手动调用prorep_plamcom报存储过程，传入当天时间", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<ReportPlamCom>> export( ReportPlamCom reportPlamCom, HttpServletResponse response ) {
+    public RspBase<List<ReportPlamCom>> export( ReportPlamCom reportPlamCom ) {
         return RspBase.ok(  reportPlamComService.exportPlamComList( reportPlamCom ) );
-//        ExportExcelUtil.exportBigExcel( list, "综合数据报表", "综合数据报表", ReportPlamCom.class, response );
     }
 
     /* 代理平台选择列表

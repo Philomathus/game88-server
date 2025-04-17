@@ -1,11 +1,11 @@
 package tv.game88.game.admin.controllor;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
@@ -15,8 +15,6 @@ import tv.game88.core.member.mapper.MemberInfoMapper;
 import tv.game88.game.api.entity.MemberGameDataFix;
 import tv.game88.game.api.service.MemberGameDataFixService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import java.util.List;
  * 游戏补单Controller
  *
  * @author 77tv
- * @date 2021-01-29
+ * {@code @date} 2021-01-29
  */
 @RestController
 @RequestMapping( "/game/memberGameDatafix" )
@@ -70,9 +68,8 @@ public class MemberGameDatafixController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('game:memberGameDatafix:export')" )
     @Log( title = "游戏注单修复", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<MemberGameDataFix>> export( MemberGameDataFix memberGameDatafix, HttpServletResponse response ) {
+    public RspBase<List<MemberGameDataFix>> export( MemberGameDataFix memberGameDatafix ) {
         return RspBase.ok(  memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix ) );
-//        ExportExcelUtil.exportBigExcel( list, "游戏注单修复", "游戏注单修复表", MemberGameDataFix.class, response );
     }
 
     /**

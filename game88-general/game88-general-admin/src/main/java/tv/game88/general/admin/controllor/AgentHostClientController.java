@@ -1,11 +1,11 @@
 package tv.game88.general.admin.controllor;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -13,8 +13,6 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.general.api.entity.AgentHostClient;
 import tv.game88.general.api.service.AgentHostClientService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.List;
  * 主播版本号Controller
  *
  * @author 77tv
- * @date 2021-03-18
+ * {@code @date} 2021-03-18
  */
 @RestController
 @RequestMapping( "/admin/agentHostClient" )
@@ -49,9 +47,8 @@ public class AgentHostClientController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agentHostClient:export')" )
     @Log( title = "主播版本号", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<AgentHostClient>>  export( AgentHostClient agentHostClient, HttpServletResponse response ) {
+    public RspBase<List<AgentHostClient>>  export( AgentHostClient agentHostClient ) {
         return RspBase.ok(  agentHostClientService.selectAgentHostClientList( agentHostClient ) );
-//        ExportExcelUtil.exportBigExcel( list, "主播版本号", "主播版本号表", AgentHostClient.class, response );
     }
 
     /**

@@ -1,11 +1,11 @@
 package tv.game88.game.admin.controllor;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -13,8 +13,6 @@ import tv.game88.game.api.cache.GameCacheUtils;
 import tv.game88.game.api.entity.ConfigWashCode;
 import tv.game88.game.api.service.ConfigWashCodeService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
@@ -95,8 +93,7 @@ public class ConfigWashCodeController extends BaseController {
     @Log( title = "洗码配置", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('game:configWashCode:export')" )
     @GetMapping( "/export" )
-    public RspBase<List<ConfigWashCode>> export( ConfigWashCode configWashCode, HttpServletResponse response ) {
+    public RspBase<List<ConfigWashCode>> export( ConfigWashCode configWashCode ) {
         return RspBase.ok(  configWashCodeService.selectConfigWashCodeList( configWashCode ) );
-//        ExportExcelUtil.exportBigExcel( list, "洗码配置信息", "洗码配置信息表", ConfigWashCode.class, response );
     }
 }

@@ -1,5 +1,6 @@
 package tv.game88.admin.system.controller;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -8,16 +9,12 @@ import tv.game88.admin.system.service.ISysDictTypeService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.utils.StringUtils;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.entity.SysDictData;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.admin.utils.SecurityUtils;
-
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +44,8 @@ public class SysDictDataController extends BaseController {
     @Log( title = "字典数据", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('system:dict:export')" )
     @GetMapping( "/export" )
-    public RspBase<List<SysDictData>> export( SysDictData dictData, HttpServletResponse response ) {
+    public RspBase<List<SysDictData>> export( SysDictData dictData ) {
         return RspBase.ok(  dictDataService.selectDictDataList( dictData ) );
-//        ExportExcelUtil.exportBigExcel( list, "字典数据", "字典数据表", SysDictData.class, response );
     }
 
     /**

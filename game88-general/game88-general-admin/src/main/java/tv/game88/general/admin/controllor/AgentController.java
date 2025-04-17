@@ -1,11 +1,11 @@
 package tv.game88.general.admin.controllor;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
@@ -13,8 +13,6 @@ import tv.game88.core.admin.utils.SecurityUtils;
 import tv.game88.general.api.entity.Agent;
 import tv.game88.general.api.service.AgentService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +20,7 @@ import java.util.List;
  * 代理管理Controller
  *
  * @author 77tv
- * @date 2021-04-16
+ * {@code @date} 2021-04-16
  */
 @RestController
 @RequestMapping( "/admin/agent" )
@@ -48,9 +46,8 @@ public class AgentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:agent:export')" )
     @Log( title = "代理管理", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<Agent>> export( Agent Agent, HttpServletResponse response ) {
+    public RspBase<List<Agent>> export( Agent Agent ) {
         return RspBase.ok(  agentService.selectAgentList( Agent ) );
-//        ExportExcelUtil.exportBigExcel( list, "代理管理", "代理管理表", Agent.class, response );
     }
 
     /**

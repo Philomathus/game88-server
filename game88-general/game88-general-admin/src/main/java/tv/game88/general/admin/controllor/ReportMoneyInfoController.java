@@ -1,20 +1,18 @@
 package tv.game88.general.admin.controllor;
 
+import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.general.api.entity.ReportMoneyinfo;
 import tv.game88.general.api.service.IReportMoneyinfoService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.List;
 
@@ -22,7 +20,7 @@ import java.util.List;
  * 平台资金报，记录平台每日收入及支出总额，预估当前会员的积分余额Controller
  *
  * @author MengJun
- * @date 2023-07-01
+ * {@code @date} 2023-07-01
  */
 @RestController
 @RequestMapping( "/admin/report/moneyInfo" )
@@ -49,9 +47,8 @@ public class ReportMoneyInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:report-moneyInfo:export')" )
     @Log( title = "平台资金报表导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ReportMoneyinfo reportMoneyinfo ) {
         List<ReportMoneyinfo> list = reportMoneyInfoService.exportMoneyinfoList( reportMoneyinfo );
-//        ExportExcelUtil.exportBigExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
         return RspBase.ok( list );
     }
 

@@ -1,21 +1,18 @@
 package tv.game88.admin.system.controller;
 
-import tv.game88.common.page.PageDomain;
-import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
-import tv.game88.common.vo.RspBase;
-import tv.game88.core.admin.annotation.Log;
-import tv.game88.core.admin.entity.SysLogininfor;
-import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.admin.system.service.ISysLogininforService;
-import tv.game88.common.base.BaseController;
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
+import tv.game88.admin.system.service.ISysLogininforService;
+import tv.game88.common.base.BaseController;
+import tv.game88.common.page.PageDomain;
+import tv.game88.common.page.TableSupport;
+import tv.game88.common.vo.RspBase;
+import tv.game88.core.admin.annotation.Log;
+import tv.game88.core.admin.entity.SysLogininfor;
+import tv.game88.core.admin.enums.BusinessType;
 
 import java.util.List;
 
@@ -42,8 +39,7 @@ public class SysLogininforController extends BaseController {
     @Log( title = "登录日志", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('monitor:logininfor:export')" )
     @GetMapping( "/export" )
-    public RspBase<List<SysLogininfor>> export( SysLogininfor logininfor, HttpServletResponse response ) {
+    public RspBase<List<SysLogininfor>> export( SysLogininfor logininfor ) {
         return RspBase.ok(  logininforService.selectLogininforList( logininfor ) );
-//        ExportExcelUtil.exportBigExcel( list, "登录日志", "登录日志表", SysLogininfor.class, response );
     }
 }

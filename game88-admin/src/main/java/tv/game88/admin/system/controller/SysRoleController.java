@@ -1,22 +1,19 @@
 package tv.game88.admin.system.controller;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import tv.game88.admin.system.service.ISysRoleService;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.constant.UserConstants;
 import tv.game88.core.admin.entity.SysRole;
 import tv.game88.core.admin.enums.BusinessType;
-import tv.game88.admin.system.service.ISysRoleService;
 import tv.game88.core.admin.utils.SecurityUtils;
-
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -43,9 +40,8 @@ public class SysRoleController extends BaseController {
     @Log( title = "角色管理", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('system:role:export')" )
     @GetMapping( "/export" )
-    public RspBase<List<SysRole>> export( SysRole role, HttpServletResponse response ) {
+    public RspBase<List<SysRole>> export( SysRole role ) {
         return RspBase.ok(  roleService.selectRoleList( role ) );
-//        ExportExcelUtil.exportBigExcel( list, "角色信息", "角色信息表", SysRole.class, response );
     }
 
     /**

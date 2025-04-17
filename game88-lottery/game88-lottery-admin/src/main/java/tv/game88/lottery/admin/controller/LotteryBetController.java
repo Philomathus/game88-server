@@ -1,5 +1,6 @@
 package tv.game88.lottery.admin.controller;
 
+import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,15 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import tv.game88.common.base.BaseController;
 import tv.game88.common.page.PageDomain;
 import tv.game88.common.page.TableSupport;
-import tv.game88.common.utils.ExportExcelUtil;
 import tv.game88.common.vo.RspBase;
 import tv.game88.core.admin.annotation.Log;
 import tv.game88.core.admin.enums.BusinessType;
 import tv.game88.core.lottery.entity.LotteryBet;
 import tv.game88.lottery.api.service.LotteryBetService;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -48,9 +46,8 @@ public class LotteryBetController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('lottery:bet:export')" )
     @Log( title = "彩票会员下注详情", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<LotteryBet>> export( LotteryBet lotteryBet, HttpServletResponse response ) {
+    public RspBase<List<LotteryBet>> export( LotteryBet lotteryBet ) {
         return RspBase.ok(  lotteryBetService.selectLotteryBetList( lotteryBet ) );
-//        ExportExcelUtil.exportBigExcel( list, "彩票会员下注详情", "彩票会员下注详情表", LotteryBet.class, response );
     }
 
     /**
