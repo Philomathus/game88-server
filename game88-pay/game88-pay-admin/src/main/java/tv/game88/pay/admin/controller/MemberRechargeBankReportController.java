@@ -35,7 +35,6 @@ public class MemberRechargeBankReportController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<RspRechargeBankReport>> export(HttpServletResponse response, ReqMemberRechargeBank req ) {
         List<RspRechargeBankReport> list = memberRechargeBankService.selectReportList( req );
-//        ExportExcelUtil.exportBigExcel( list, "公司入款", "公司入款表", RspRechargeBankReport.class, response );
         return RspBase.ok( list );
     }
 

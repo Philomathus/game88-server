@@ -59,7 +59,6 @@ public class ConfigBankListController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<ConfigBankList>> export(ConfigBankList configBankList, HttpServletResponse response ) {
         List<ConfigBankList> list = configBankListService.selectConfigBankListList( configBankList );
-//        ExportExcelUtil.exportBigExcel( list, "银行字典列表", "银行字典列表", ConfigBankList.class, response );
         return RspBase.ok( list );
     }
 

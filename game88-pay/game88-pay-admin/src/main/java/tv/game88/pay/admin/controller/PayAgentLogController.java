@@ -49,7 +49,6 @@ public class PayAgentLogController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<PayAgentLog>> export(PayAgentLog payAgentLog, HttpServletResponse response ) {
         List<PayAgentLog> list = payAgentLogService.selectPayAgentLogList( payAgentLog );
-//        ExportExcelUtil.exportBigExcel( list, "代付下单日志", "代付下单日志信息表", PayAgentLog.class, response );
         return RspBase.ok( list );
     }
 

@@ -57,7 +57,6 @@ public class LotteryInfoController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<LotteryInfo>> export(LotteryInfo lotteryInfo, HttpServletResponse response ) {
         List<LotteryInfo> list = lotteryInfoService.selectLotteryInfoList( lotteryInfo );
-//        ExportExcelUtil.exportBigExcel( list, "彩票信息", "彩票信息表", LotteryInfo.class, response );
         return RspBase.ok( list );
     }
 

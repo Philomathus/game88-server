@@ -68,7 +68,6 @@ public class PayTypeController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<PayType>> export(PayType payType, HttpServletResponse response ) {
         List<PayType> list = payTypeService.selectPayTypeList( payType );
-//        ExportExcelUtil.exportBigExcel( list, "支付类型", "支付类型表", PayType.class, response );
         return RspBase.ok( list );
     }
 

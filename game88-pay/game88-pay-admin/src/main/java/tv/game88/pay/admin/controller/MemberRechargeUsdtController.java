@@ -60,7 +60,6 @@ public class MemberRechargeUsdtController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<MemberRechargeUsdt>> export(ReqMemberRechargeUsdt req, HttpServletResponse response ) {
         List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( req );
-//        ExportExcelUtil.exportBigExcel( list, "USDT充值信息", "USDT充值信息表", MemberRechargeUsdt.class, response );
         return RspBase.ok( list );
     }
 

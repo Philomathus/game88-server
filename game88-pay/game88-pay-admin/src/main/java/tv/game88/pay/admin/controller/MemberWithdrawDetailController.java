@@ -100,7 +100,6 @@ public class MemberWithdrawDetailController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<MemberWithdrawDetail>> export(ReqMemberWithdrawDetail reqMemberWithdrawDetail, HttpServletResponse response ) {
         List<MemberWithdrawDetail> list = memberWithdrawDetailService.selectMemberWithdrawDetailList( reqMemberWithdrawDetail );
-//        ExportExcelUtil.exportBigExcel( list, "会员提现", "会员提现信息表", MemberWithdrawDetail.class, response );
         return RspBase.ok( list );
     }
 
@@ -112,7 +111,6 @@ public class MemberWithdrawDetailController extends BaseController {
     @PostMapping( "/exportShunWei" )
     public RspBase<List<RspMemberWithdrawDetailShunWei>> exportShunWei(@RequestBody ReqMemberWithdrawDetail req, HttpServletResponse response ) {
         List<RspMemberWithdrawDetailShunWei> list = memberWithdrawDetailService.selectMemberWithdrawDetailShunWeiList( req );
-//        ExportExcelUtil.exportBigExcel( list, null, "顺为格式会员提现表", RspMemberWithdrawDetailShunWei.class, response );
         return RspBase.ok( list );
     }
 

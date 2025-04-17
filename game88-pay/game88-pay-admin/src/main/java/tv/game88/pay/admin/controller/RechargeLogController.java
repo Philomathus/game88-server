@@ -55,7 +55,6 @@ public class RechargeLogController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<RechargeLog>> export(RechargeLog rechargeLog, HttpServletResponse response ) {
         List<RechargeLog> list = rechargeLogService.selectAllRechargeLog( rechargeLog );
-//        ExportExcelUtil.exportBigExcel( list, "导出充值日志列表", "导出充值日志列表", RechargeLog.class, response );
         return RspBase.ok( list );
     }
 

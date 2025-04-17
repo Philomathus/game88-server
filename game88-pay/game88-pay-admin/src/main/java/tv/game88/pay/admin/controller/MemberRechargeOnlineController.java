@@ -50,7 +50,6 @@ public class MemberRechargeOnlineController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<MemberRechargeOnline>> export(ReqMemberRechargeOnline reqMemberRechargeOnline, HttpServletResponse response ) {
         List<MemberRechargeOnline> list = memberRechargeOnlineService.selectMemberRechargeOnlineList( reqMemberRechargeOnline );
-//        ExportExcelUtil.exportBigExcel( list, "线上充值信息", "线上充值信息", MemberRechargeOnline.class, response );
         return RspBase.ok( list );
     }
 
@@ -92,7 +91,6 @@ public class MemberRechargeOnlineController extends BaseController {
     @GetMapping( "/exportReport" )
     public RspBase<List<RspRechargeOnline>> exportReport(ReqMemberRechargeOnline req, HttpServletResponse response ) {
         List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
-//        ExportExcelUtil.exportBigExcel( list, "线上充值报表", "线上充值报表", RspRechargeOnline.class, response );
         return RspBase.ok( list );
     }
 

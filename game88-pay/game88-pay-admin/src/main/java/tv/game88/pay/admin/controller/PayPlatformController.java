@@ -67,7 +67,6 @@ public class PayPlatformController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<PayPlatform>> export(PayPlatform payPlatform, HttpServletResponse response ) {
         List<PayPlatform> list = payPlatformService.selectPayPlatformList( payPlatform );
-//        ExportExcelUtil.exportBigExcel( list, "支付平台", "支付平台表", PayPlatform.class, response );
         return RspBase.ok( list );
     }
 

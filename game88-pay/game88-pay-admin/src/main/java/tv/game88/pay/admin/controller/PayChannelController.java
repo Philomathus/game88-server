@@ -61,7 +61,6 @@ public class PayChannelController extends BaseController {
     @GetMapping( "/export" )
     public RspBase<List<PayChannel>> export(PayChannel payChannel, HttpServletResponse response ) {
         List<PayChannel> list = payChannelService.selectPayChannelList( payChannel );
-//        ExportExcelUtil.exportBigExcel( list, "支付通道", "支付通道表", PayChannel.class, response );
         return RspBase.ok( list );
     }
 
