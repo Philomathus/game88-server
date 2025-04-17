@@ -56,9 +56,8 @@ public class ActivityMemberInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('activity:memberInfo:export')" )
     @Log( title = "会员推广管理", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ActivityMemberInfo activityMemberInfo, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ActivityMemberInfo activityMemberInfo ) {
         List<ActivityMemberInfo> list = activityMemberInfoService.selectActivityMemberInfoList( activityMemberInfo );
-//        ExportExcelUtil.exportBigExcel( list, "会员推广管理", "会员推广管理表", ActivityMemberInfo.class, response );
         return RspBase.ok( list );
     }
 

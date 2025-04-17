@@ -47,9 +47,8 @@ public class ConfigVipController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:vip:export')" )
     @Log( title = "会员VIP配置", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ConfigVip configVip, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ConfigVip configVip ) {
         List<ConfigVip> list = configVipService.selectConfigVipList( configVip );
-//        ExportExcelUtil.exportBigExcel( list, "会员VIP配置", "会员VIP配置表", ConfigVip.class, response );
         return RspBase.ok( list );
     }
 

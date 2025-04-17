@@ -108,9 +108,8 @@ public class ReportAgentCountController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('report:agentCount:export')" )
     @Log( title = "推广统计报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ReportAgentcount reportAgentcount, HttpServletResponse response ) throws ParseException {
+    public RspBase<List<?>> export( ReportAgentcount reportAgentcount ) throws ParseException {
         List<ReportAgentcount> list = reportAgentcountService.exportAgentcountList( reportAgentcount );
-//        ExportExcelUtil.exportBigExcel( list, "推广统计报表", "推广统计报表", ReportAgentcount.class, response );
         return RspBase.ok(list);
     }
 

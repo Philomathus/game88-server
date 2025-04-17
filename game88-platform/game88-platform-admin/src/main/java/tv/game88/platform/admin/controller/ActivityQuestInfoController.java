@@ -49,9 +49,8 @@ public class ActivityQuestInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('activity:activityQuestInfo:export')" )
     @Log( title = "任务信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ActivityQuestInfo activityQuestInfo, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ActivityQuestInfo activityQuestInfo ) {
         List<ActivityQuestInfo> list = activityQuestInfoService.selectActivityQuestInfoList( activityQuestInfo );
-//        ExportExcelUtil.exportBigExcel( list, "任务信息", "任务信息表", ActivityQuestInfo.class, response );
         return RspBase.ok(list);
     }
 

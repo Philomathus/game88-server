@@ -51,9 +51,8 @@ public class MessageCommonProblemController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('message:commonProblem:export')" )
     @Log( title = "常用问题", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( MessageCommonProblem messageCommonProblem, HttpServletResponse response ) {
+    public RspBase<List<?>> export( MessageCommonProblem messageCommonProblem ) {
         List<MessageCommonProblem> list = messageCommonProblemService.selectMessageCommonProblemList( messageCommonProblem );
-//        ExportExcelUtil.exportBigExcel( list, "常用问题", "常用问题表", MessageCommonProblem.class, response );
         return RspBase.ok(list);
     }
 

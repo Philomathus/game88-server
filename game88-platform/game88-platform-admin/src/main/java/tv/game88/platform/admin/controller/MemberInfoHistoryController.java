@@ -60,9 +60,8 @@ public class MemberInfoHistoryController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('member:infoHistory:export')" )
     @Log( title = "导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export(MemberInfoHistory memberInfo, HttpServletResponse response ) {
+    public RspBase<List<?>> export(MemberInfoHistory memberInfo) {
         List<MemberInfoHistory> list = memberInfoHistoryService.memberInfoHistoryList( memberInfo );
-//        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", MemberInfo.class, response );
         return RspBase.ok(list);
     }
 

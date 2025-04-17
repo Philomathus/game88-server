@@ -60,9 +60,8 @@ public class ActivityTypeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('activity:activityType:export')" )
     @Log( title = "活动类型", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ActivityType activityType, HttpServletResponse response ) {
+    public RspBase<List<?>> export( ActivityType activityType ) {
         List<ActivityType> list = activityTypeService.selectActivityTypeList( activityType );
-//        ExportExcelUtil.exportBigExcel( list, "活动类型", "活动类型表", ActivityType.class, response );
         return RspBase.ok( list );
     }
 

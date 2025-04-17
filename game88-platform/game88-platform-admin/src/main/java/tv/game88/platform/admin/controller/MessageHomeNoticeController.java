@@ -51,9 +51,8 @@ public class MessageHomeNoticeController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('message:homeNotice:export')" )
     @Log( title = "首页公告", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( MessageHomeNotice messageHomeNotice, HttpServletResponse response ) {
+    public RspBase<List<?>> export( MessageHomeNotice messageHomeNotice ) {
         List<MessageHomeNotice> list = messageHomeNoticeService.selectMessageHomeNoticeList( messageHomeNotice );
-//        ExportExcelUtil.exportBigExcel( list, "首页公告", "首页公告表", MessageHomeNotice.class, response );
         return RspBase.ok(list);
     }
 

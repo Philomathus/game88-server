@@ -49,9 +49,8 @@ public class ReportMoneyinfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('report:moneyinfo:export')" )
     @Log( title = "平台资金报表导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ReportMoneyinfo reportMoneyinfo, HttpServletResponse response ) throws ParseException {
+    public RspBase<List<?>> export( ReportMoneyinfo reportMoneyinfo ) throws ParseException {
         List<ReportMoneyinfo> list = reportMoneyinfoService.exportMoneyinfoList( reportMoneyinfo );
-//        ExportExcelUtil.exportBigExcel( list, "平台资金报表", "平台资金报表", ReportMoneyinfo.class, response );
         return RspBase.ok( list );
     }
 

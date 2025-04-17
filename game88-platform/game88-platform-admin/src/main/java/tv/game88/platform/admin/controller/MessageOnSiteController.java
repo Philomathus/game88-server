@@ -55,9 +55,8 @@ public class MessageOnSiteController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('message:onSite:export')" )
     @Log( title = "站内信", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( MessageOnSite messageOnSite, HttpServletResponse response ) {
+    public RspBase<List<?>> export( MessageOnSite messageOnSite ) {
         List<MessageOnSite> list = messageOnSiteService.selectMessageOnSiteList( messageOnSite );
-//        ExportExcelUtil.exportBigExcel( list, "站内信", "站内信表", MessageOnSite.class, response );
         return RspBase.ok(list);
     }
 
