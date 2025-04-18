@@ -47,9 +47,8 @@ public class PayRechargeUsdtController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:export')" )
     @Log( title = "导出USDT渠道列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<PayRechargeUsdt>> export(PayRechargeUsdt payRechargeUsdt, HttpServletResponse response ) {
-        List<PayRechargeUsdt> list = payRechargeUsdtService.selectPayRechargeUsdtList( payRechargeUsdt );
-        return RspBase.ok( list );
+    public RspBase<List<PayRechargeUsdt>> export( PayRechargeUsdt payRechargeUsdt ) {
+        return RspBase.ok( payRechargeUsdtService.selectPayRechargeUsdtList( payRechargeUsdt ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:rechargeUsdt:query')" )

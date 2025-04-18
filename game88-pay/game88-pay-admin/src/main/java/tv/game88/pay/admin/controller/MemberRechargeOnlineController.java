@@ -48,9 +48,8 @@ public class MemberRechargeOnlineController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:export')" )
     @Log( title = "memberRechargeOnline", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<MemberRechargeOnline>> export(ReqMemberRechargeOnline reqMemberRechargeOnline, HttpServletResponse response ) {
-        List<MemberRechargeOnline> list = memberRechargeOnlineService.selectMemberRechargeOnlineList( reqMemberRechargeOnline );
-        return RspBase.ok( list );
+    public RspBase<List<MemberRechargeOnline>> export( ReqMemberRechargeOnline reqMemberRechargeOnline ) {
+        return RspBase.ok( memberRechargeOnlineService.selectMemberRechargeOnlineList( reqMemberRechargeOnline ) );
     }
 
     /**
@@ -89,9 +88,8 @@ public class MemberRechargeOnlineController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeOnline:export')" )
     @Log( title = "线上充值信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/exportReport" )
-    public RspBase<List<RspRechargeOnline>> exportReport(ReqMemberRechargeOnline req, HttpServletResponse response ) {
-        List<RspRechargeOnline> list = memberRechargeOnlineService.selectRspReportList( req );
-        return RspBase.ok( list );
+    public RspBase<List<RspRechargeOnline>> exportReport( ReqMemberRechargeOnline req ) {
+        return RspBase.ok( memberRechargeOnlineService.selectRspReportList( req ) );
     }
 
 

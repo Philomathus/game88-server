@@ -47,9 +47,8 @@ public class PayAgentLogController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payAgentLog:export')" )
     @Log( title = "代付下单日志", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<PayAgentLog>> export(PayAgentLog payAgentLog, HttpServletResponse response ) {
-        List<PayAgentLog> list = payAgentLogService.selectPayAgentLogList( payAgentLog );
-        return RspBase.ok( list );
+    public RspBase<List<PayAgentLog>> export(PayAgentLog payAgentLog ) {
+        return RspBase.ok( payAgentLogService.selectPayAgentLogList( payAgentLog ) );
     }
 
     /**

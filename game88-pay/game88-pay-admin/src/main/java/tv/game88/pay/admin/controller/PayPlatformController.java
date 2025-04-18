@@ -65,9 +65,8 @@ public class PayPlatformController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payPlatform:export')" )
     @Log( title = "支付平台", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<PayPlatform>> export(PayPlatform payPlatform, HttpServletResponse response ) {
-        List<PayPlatform> list = payPlatformService.selectPayPlatformList( payPlatform );
-        return RspBase.ok( list );
+    public RspBase<List<PayPlatform>> export( PayPlatform payPlatform ) {
+        return RspBase.ok( payPlatformService.selectPayPlatformList( payPlatform ) );
     }
 
     /**

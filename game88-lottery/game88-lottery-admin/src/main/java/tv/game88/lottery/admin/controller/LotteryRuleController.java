@@ -45,9 +45,8 @@ public class LotteryRuleController extends BaseController {
 	@PreAuthorize( "@ss.hasPermi('lottery:rule:export')" )
 	@Log( title = "彩票规则说明", businessType = BusinessType.EXPORT )
 	@GetMapping( "/export" )
-	public RspBase<List<LotteryRule>> export(LotteryRule lotteryRule, HttpServletResponse response) {
-		List<LotteryRule>      list = lotteryRuleService.selectLotteryRuleList(lotteryRule);
-		return RspBase.ok( list );
+	public RspBase<List<LotteryRule>> export( LotteryRule lotteryRule ) {
+		return RspBase.ok( lotteryRuleService.selectLotteryRuleList(lotteryRule) );
 	}
 
 	/**

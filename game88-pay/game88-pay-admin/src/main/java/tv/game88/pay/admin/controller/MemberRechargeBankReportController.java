@@ -33,9 +33,8 @@ public class MemberRechargeBankReportController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:export')" )
     @Log( title = "公司入款报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<RspRechargeBankReport>> export(HttpServletResponse response, ReqMemberRechargeBank req ) {
-        List<RspRechargeBankReport> list = memberRechargeBankService.selectReportList( req );
-        return RspBase.ok( list );
+    public RspBase<List<RspRechargeBankReport>> export( ReqMemberRechargeBank req ) {
+        return RspBase.ok( memberRechargeBankService.selectReportList( req ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeBankReport:lists')" )

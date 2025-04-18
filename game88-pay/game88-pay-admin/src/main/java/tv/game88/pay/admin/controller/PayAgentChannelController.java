@@ -67,9 +67,8 @@ public class PayAgentChannelController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:agentChannel:export')" )
     @Log( title = "代付通道", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<PayAgentChannel>> export(PayAgentChannel payAgentChannel, HttpServletResponse response ) {
-        List<PayAgentChannel> list = payAgentChannelService.selectPayAgentChannelList( payAgentChannel );
-        return RspBase.ok( list );
+    public RspBase<List<PayAgentChannel>> export( PayAgentChannel payAgentChannel ) {
+        return RspBase.ok( payAgentChannelService.selectPayAgentChannelList( payAgentChannel ) );
     }
 
     /**

@@ -98,9 +98,8 @@ public class MemberWithdrawDetailController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:export')" )
     @Log( title = "会员提现信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<MemberWithdrawDetail>> export(ReqMemberWithdrawDetail reqMemberWithdrawDetail, HttpServletResponse response ) {
-        List<MemberWithdrawDetail> list = memberWithdrawDetailService.selectMemberWithdrawDetailList( reqMemberWithdrawDetail );
-        return RspBase.ok( list );
+    public RspBase<List<MemberWithdrawDetail>> export( ReqMemberWithdrawDetail reqMemberWithdrawDetail ) {
+        return RspBase.ok( memberWithdrawDetailService.selectMemberWithdrawDetailList( reqMemberWithdrawDetail ) );
     }
 
     /**
@@ -109,9 +108,8 @@ public class MemberWithdrawDetailController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:export')" )
     @Log( title = "顺为代付格式会员提现信息", businessType = BusinessType.EXPORT )
     @PostMapping( "/exportShunWei" )
-    public RspBase<List<RspMemberWithdrawDetailShunWei>> exportShunWei(@RequestBody ReqMemberWithdrawDetail req, HttpServletResponse response ) {
-        List<RspMemberWithdrawDetailShunWei> list = memberWithdrawDetailService.selectMemberWithdrawDetailShunWeiList( req );
-        return RspBase.ok( list );
+    public RspBase<List<RspMemberWithdrawDetailShunWei>> exportShunWei(@RequestBody ReqMemberWithdrawDetail req ) {
+        return RspBase.ok( memberWithdrawDetailService.selectMemberWithdrawDetailShunWeiList( req ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('pay:memberWithdrawDetail:refused')" )

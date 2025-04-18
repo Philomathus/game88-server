@@ -55,9 +55,8 @@ public class LotteryInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('lottery:info:export')" )
     @Log( title = "彩票信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<LotteryInfo>> export(LotteryInfo lotteryInfo, HttpServletResponse response ) {
-        List<LotteryInfo> list = lotteryInfoService.selectLotteryInfoList( lotteryInfo );
-        return RspBase.ok( list );
+    public RspBase<List<LotteryInfo>> export( LotteryInfo lotteryInfo ) {
+        return RspBase.ok( lotteryInfoService.selectLotteryInfoList( lotteryInfo ) );
     }
 
     /**

@@ -58,9 +58,8 @@ public class MemberRechargeUsdtController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:memberRechargeUsdt:export')" )
     @Log( title = "USDT充值信息", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<MemberRechargeUsdt>> export(ReqMemberRechargeUsdt req, HttpServletResponse response ) {
-        List<MemberRechargeUsdt> list = memberRechargeUsdtService.selectMemberRechargeUsdtList( req );
-        return RspBase.ok( list );
+    public RspBase<List<MemberRechargeUsdt>> export(ReqMemberRechargeUsdt req ) {
+        return RspBase.ok( memberRechargeUsdtService.selectMemberRechargeUsdtList( req ) );
     }
 
     /**

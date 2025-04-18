@@ -53,9 +53,8 @@ public class PayRechargeBankController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:payRechargeBank:export')" )
     @Log( title = "公司入款银行导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<PayRechargeBank>> export(PayRechargeBank payRechargeBank, HttpServletResponse response ) {
-        List<PayRechargeBank> list = payRechargeBankService.selectPayRechargeBankList( payRechargeBank );
-        return RspBase.ok( list );
+    public RspBase<List<PayRechargeBank>> export( PayRechargeBank payRechargeBank ) {
+        return RspBase.ok( payRechargeBankService.selectPayRechargeBankList( payRechargeBank ) );
     }
 
     /**

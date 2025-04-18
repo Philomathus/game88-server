@@ -53,9 +53,8 @@ public class RechargeLogController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:rechargeLog:export')" )
     @Log( title = "充值日志列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<RechargeLog>> export(RechargeLog rechargeLog, HttpServletResponse response ) {
-        List<RechargeLog> list = rechargeLogService.selectAllRechargeLog( rechargeLog );
-        return RspBase.ok( list );
+    public RspBase<List<RechargeLog>> export(RechargeLog rechargeLog ) {
+        return RspBase.ok( rechargeLogService.selectAllRechargeLog( rechargeLog ) );
     }
 
 

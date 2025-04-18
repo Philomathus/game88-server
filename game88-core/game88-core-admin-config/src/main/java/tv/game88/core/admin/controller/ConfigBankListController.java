@@ -57,9 +57,8 @@ public class ConfigBankListController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('pay:configBankList:export')" )
     @Log( title = "银行字典列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<ConfigBankList>> export(ConfigBankList configBankList, HttpServletResponse response ) {
-        List<ConfigBankList> list = configBankListService.selectConfigBankListList( configBankList );
-        return RspBase.ok( list );
+    public RspBase<List<ConfigBankList>> export( ConfigBankList configBankList ) {
+        return RspBase.ok( configBankListService.selectConfigBankListList( configBankList ) );
     }
 
     /**
