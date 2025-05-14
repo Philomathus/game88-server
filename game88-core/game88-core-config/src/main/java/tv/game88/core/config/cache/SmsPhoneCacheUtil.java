@@ -40,10 +40,11 @@ public class SmsPhoneCacheUtil {
         if ( phone != null && phone.startsWith( "0" ) ) {
             phone = phone.replaceFirst( "0", "" );
         }
-        redisUtil.strSet( SMS_PHONE + phone, code, Duration.ofMinutes( 10 ) );
-        redisUtil.strSet( SMS_PHONE_INDEX + phone, index, Duration.ofMinutes( 10 ) );
+        Duration timeout = Duration.ofMinutes( 30 );
+        redisUtil.strSet( SMS_PHONE + phone, code, timeout );
+        redisUtil.strSet( SMS_PHONE_INDEX + phone, index, timeout );
         redisUtil.strSet( SMS_PHONE_EXPIRE + phone, index, Duration.ofMinutes( 1 ) );
-        redisUtil.strSet( SMS_PHONE_NUMBER + phone, "0", Duration.ofMinutes( 10 ) );
+        redisUtil.strSet( SMS_PHONE_NUMBER + phone, "0", timeout );
     }
 
     public String getSmsPhoneExpire( String phone ) {

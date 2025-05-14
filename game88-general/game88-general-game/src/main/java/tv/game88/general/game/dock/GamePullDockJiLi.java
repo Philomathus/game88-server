@@ -114,6 +114,7 @@ public class GamePullDockJiLi extends AbstractGamePull {
         gameDataRecord.setAllBet( betAmount.toString() );
         BigDecimal payoffAmount = new BigDecimal( String.valueOf( remoteGameDatum.get( "PayoffAmount" ) ) ).multiply( RATE );
         gameDataRecord.setProfit( payoffAmount.subtract( betAmount ).toString() );
+        gameDataRecord.setCurrency( gamePlatform.getLinecode() );
         return gameDataRecord;
     }
 
