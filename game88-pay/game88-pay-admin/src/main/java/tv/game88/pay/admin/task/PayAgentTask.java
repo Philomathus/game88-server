@@ -16,7 +16,7 @@ public class PayAgentTask {
     @Resource
     private PayAgentService payAgentService;
 
-    @Scheduled( cron = "0 * * * * ?" ) // 每分钟执行一次
+    // @Scheduled( cron = "0 * * * * ?" ) // 每分钟执行一次
     public void confirmPayAgentOrder() {
         try {
             if ( redisUtil.lock( "confirmPayAgentOrder", 30 ) ) {

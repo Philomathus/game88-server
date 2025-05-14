@@ -58,12 +58,12 @@ public class AgentHostClient {
     private LocalDateTime updateTime;
 
     @Schema( title = "target install download link 1" )
-    private String downloadLink1;
+    private String downloadUrl1;
 
     @Schema( title = "target install download link 2" )
-    private String downloadLink2;
+    private String downloadUrl2;
 
     @Schema( title = "target install download link 3" )
-    private String downloadLink3;
+    private String downloadUrl3;
 
 }

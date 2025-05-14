@@ -11,7 +11,9 @@
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
-        <result property="updateTime" column="update_time" />
+        <result property="downloadUrl1" column="download_url1" />
+        <result property="downloadUrl2" column="download_url2" />
+        <result property="downloadUrl3" column="download_url3" />
     </resultMap>
 
     <sql id="selectAgentHostClientVo">
@@ -24,9 +26,9 @@
                create_time,
                update_by,
                update_time,
-               download_link1,
-               download_link12,
-               download_link3
+               download_url1,
+               download_url2,
+               download_url3
         from agent_host_client
     </sql>
 

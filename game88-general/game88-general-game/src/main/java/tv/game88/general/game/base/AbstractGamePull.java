@@ -43,6 +43,7 @@ public abstract class AbstractGamePull implements BaseGamePull {
         profileBiMap.put( "99116", "1BD" );
         profileBiMap.put( "99126", "1IN" );
         profileBiMap.put( "99136", "1VI" );
+        profileBiMap.put( "99700", "1BR" );
     }
 
     protected static String[] assemblyAccount( String account ) {
