@@ -72,9 +72,8 @@ public class SysUserController extends BaseController {
     @Log( title = "用户管理", businessType = BusinessType.EXPORT )
     @PreAuthorize( "@ss.hasPermi('system:user:export')" )
     @GetMapping( "/export" )
-    public void export( SysUser user, HttpServletResponse response ) {
-        List<SysUser> list = userService.selectUserList( user );
-        ExportExcelUtil.exportBigExcel( list, "用户信息", "用户信息表", SysUser.class, response );
+    public RspBase<List<SysUser>> export( SysUser user ) {
+        return RspBase.ok(userService.selectUserList( user ));
     }
 
     /**

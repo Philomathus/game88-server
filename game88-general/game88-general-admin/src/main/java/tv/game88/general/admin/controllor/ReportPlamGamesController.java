@@ -61,9 +61,8 @@ public class ReportPlamGamesController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:reportPlamGames:export')" )
     @Log( title = "游戏投注报表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public void export( ReportPlamGames reportPlamGames, HttpServletResponse response ) {
-        List<ReportPlamGames> list = reportPlamGamesService.exportPlamGamesList( reportPlamGames );
-        ExportExcelUtil.exportBigExcel( list, "游戏投注报表", "游戏投注报表", ReportPlamGames.class, response );
+    public RspBase<List<ReportPlamGames>> export( ReportPlamGames reportPlamGames ) {
+        return RspBase.ok( reportPlamGamesService.exportPlamGamesList( reportPlamGames ) );
     }
 
     @PreAuthorize( "@ss.hasPermi('admin:report-plam-games:list')" )

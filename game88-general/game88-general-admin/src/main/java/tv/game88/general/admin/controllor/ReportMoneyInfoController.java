@@ -47,9 +47,8 @@ public class ReportMoneyInfoController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('admin:report-moneyInfo:export')" )
     @Log( title = "平台资金报表导出", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ReportMoneyinfo reportMoneyinfo ) {
-        List<ReportMoneyinfo> list = reportMoneyInfoService.exportMoneyinfoList( reportMoneyinfo );
-        return RspBase.ok( list );
+    public RspBase<List<ReportMoneyinfo>> export( ReportMoneyinfo reportMoneyinfo ) {
+        return RspBase.ok( reportMoneyInfoService.exportMoneyinfoList( reportMoneyinfo ) );
     }
 
 }

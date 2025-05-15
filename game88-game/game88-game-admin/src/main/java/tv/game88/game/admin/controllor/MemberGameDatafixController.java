@@ -69,7 +69,7 @@ public class MemberGameDatafixController extends BaseController {
     @Log( title = "游戏注单修复", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
     public RspBase<List<MemberGameDataFix>> export( MemberGameDataFix memberGameDatafix ) {
-        return RspBase.ok(  memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix ) );
+        return RspBase.ok( memberGameDataFixService.selectMemberGameDataFixList( memberGameDatafix ) );
     }
 
     /**

@@ -55,9 +55,8 @@ public class ConfigEnvironmentController extends BaseController {
     @PreAuthorize( "@ss.hasPermi('config:env:export')" )
     @Log( title = "导出环境参数配置列表", businessType = BusinessType.EXPORT )
     @GetMapping( "/export" )
-    public RspBase<List<?>> export( ConfigEnvironment configEnvironment ) {
-        List<ConfigEnvironment> list = configEnvironmentService.selectConfigEnvironmentList( configEnvironment );
-        return RspBase.ok(list);
+    public RspBase<List<ConfigEnvironment>> export( ConfigEnvironment configEnvironment ) {
+        return RspBase.ok(configEnvironmentService.selectConfigEnvironmentList( configEnvironment ));
     }
 
     /**
